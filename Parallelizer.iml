@@ -7,7 +7,7 @@
         <attribute name="URI" value="$TEAMCITYSOURCES$" />
       </containerElement>
     </containerInfo>
-    <setting name="jarUrl" value="file:$TEAMCITYSOURCES$/$MODULE_DIR$/Parallelizer.jar" />
+    <setting name="jarUrl" value="file:$TEAMCITYSOURCES$/$MODULE_DIR$/GParallelizer.jar" />
     <setting name="buildJar" value="true" />
     <setting name="mainClass" value="" />
   </component>
