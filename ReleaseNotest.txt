@@ -1,0 +1,5 @@
+GParallelizer
+
+0.1
+Initial release of the core functionality for both Parallelizer, which uses JSR-166y Parallel Arrays,
+and Asynchronizer, which uses Java's executor services.
