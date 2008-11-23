@@ -162,4 +162,40 @@ public class Parallelizer {
         }
         return result
     }
+
+    /**
+     * Enhanced the Object's meta-class with the <i>withParallelizer</i> and <i>withExistingParallelizer</i> methods,
+     * which call apropriate static methods on the <I>Parallelizer</i> class. So the DSL can be then wrapped like this:
+     * <pre>
+     * Parallelizer.initializeDSL()
+     * ...
+     * withParallelizer {
+     *     assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
+     *     assert [1, 2, 3, 4, 5].allAsync {it > 0}
+     *     assert [1, 2, 3, 4, 5].findAsync{Number number -> number > 2} in [3, 4, 5]
+     *     ...
+     * }
+     * </pre>
+     */
+    public static void initializeDSL () {
+        Object.metaClass {
+            withParallelizer = {Closure cl ->
+                Parallelizer.withParallelizer cl
+            }
+
+            withParallelizer = {int numberOfThreads, Closure cl ->
+                Parallelizer.withParallelizer numberOfThreads, cl
+            }
+
+            withParallelizer = {int numberOfThreads, UncaughtExceptionHandler handler, Closure cl ->
+                Parallelizer.withParallelizer numberOfThreads, handler, cl
+            }
+
+            withExistingParallelizer = {ForkJoinPool pool, Closure cl ->
+                Parallelizer.withExistingParallelizer pool, cl
+            }
+        }
+    }
+
+    //todo allow for destroying the DSL
 }
