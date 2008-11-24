@@ -30,7 +30,7 @@ class Asynchronizer {
     }
 
     private static createPool() {
-        return createPool(Runtime.getRuntime().availableProcessors())
+        return createPool(Runtime.getRuntime().availableProcessors() + 1)
     }
 
     private static createPool(int poolSize) {
@@ -46,7 +46,7 @@ class Asynchronizer {
     private static ThreadFactory createDefaultThreadFactory() {
         return {Runnable runnable ->
             final Thread thread = new Thread(runnable)
-            thread.daemon = true
+            thread.daemon = false
             return thread
         } as ThreadFactory
     }
