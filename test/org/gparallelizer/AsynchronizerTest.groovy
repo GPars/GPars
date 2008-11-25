@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * @author Vaclav Pech
@@ -81,6 +82,21 @@ public class AsynchronizerTest extends GroovyTestCase {
             assert [1, 2, 3, 4, 5].anyAsync{Number number -> number > 0}
             assert [1, 2, 3, 4, 5].anyAsync{Number number -> number > 2}
             assert ![1, 2, 3, 4, 5].anyAsync{Number number -> number > 6}
+        }
+    }
+
+    public void testAsyncTask() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            final AtomicBoolean flag = new AtomicBoolean(false)
+            final CountDownLatch latch = new CountDownLatch(1)
+
+            service.submit({
+                flag.set(true)
+                latch.countDown()
+            } as Runnable)
+
+            latch.await()
+            assert flag.get()
         }
     }
 }

@@ -2,7 +2,8 @@ GParallelizer
 
 0.3
 Set default pool size to Ncpu + 1, where Ncpu is the number of CPU in the system.
-Made pool threads non-daemon.
+Made pool threads to be non-daemon.
+Updated documentation.
 
 0.2
 Enabled calling withParallelizer() and withAsynchronizer() methods on any object.
