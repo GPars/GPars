@@ -1,5 +1,12 @@
 GParallelizer
 
+0.3
+Set default pool size to Ncpu + 1, where Ncpu is the number of CPU in the system.
+Made pool threads non-daemon.
+
+0.2
+Enabled calling withParallelizer() and withAsynchronizer() methods on any object.
+
 0.1
 Initial release of the core functionality for both Parallelizer, which uses JSR-166y Parallel Arrays,
 and Asynchronizer, which uses Java's executor services.
