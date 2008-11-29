@@ -256,11 +256,11 @@
   <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file:$TEAMCITYSOURCES$/$PROJECT_DIR$/Parallelizer.iml" filepath="$PROJECT_DIR$/Parallelizer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Parallelizer.iml" filepath="$PROJECT_DIR$/Parallelizer.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
-    <output url="file:$TEAMCITYSOURCES$/$PROJECT_DIR$/out" />
+    <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="RmicSettings">
     <option name="IS_EANABLED" value="false" />
@@ -296,8 +296,5 @@
     <mapping directory="" vcs="svn" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
-  <UsedPathMacros>
-    <macro name="TEAMCITYSOURCES" />
-  </UsedPathMacros>
 </project>
 
