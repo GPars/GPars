@@ -100,6 +100,9 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     //todo exception handler doesn't seem to be accepted by the pool
+    //todo try setting exception handlers on the thread level in both Parallelizer and Asynchronizer
+    //todo consider queue and pool options
+    //todo consider rejection policy
     public void testExceptionHandler() {
         final AtomicInteger exceptionCount = new AtomicInteger(0)
         def handler = {Thread t, Throwable e ->
