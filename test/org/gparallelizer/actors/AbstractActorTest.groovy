@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentSkipListSet
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-
 public class AbstractActorTest extends GroovyTestCase {
 
     public void testActorState() {

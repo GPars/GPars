@@ -9,10 +9,9 @@ import java.util.concurrent.TimeUnit
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-
 public class SynchronousActorTest extends GroovyTestCase {
     public void testDefaultMessaging() {
-        SynchronizedtTestActor actor=new SynchronizedtTestActor()
+        SynchronoustTestActor actor=new SynchronoustTestActor()
         actor.start()
         actor.send "Message"
         actor.latch.await(30, TimeUnit.SECONDS)
@@ -20,7 +19,7 @@ public class SynchronousActorTest extends GroovyTestCase {
     }
 }
 
-class SynchronizedtTestActor extends SynchronousActor {
+class SynchronoustTestActor extends SynchronousActor {
     final AtomicBoolean flag = new AtomicBoolean(false)
     final CountDownLatch latch = new CountDownLatch(1)
 

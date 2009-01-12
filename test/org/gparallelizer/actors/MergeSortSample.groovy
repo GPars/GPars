@@ -1,0 +1,66 @@
+import org.gparallelizer.actors.Actors
+
+/**
+ *
+ * @author Vaclav Pech
+ * Date: Jan 7, 2009
+ */
+def split(List<Integer> list) {
+    int listSize = list.size()
+    int middleIndex = listSize / 2
+    def list1 = list[0..<middleIndex]
+    def list2 = list[middleIndex..listSize - 1]
+    return [list1, list2]
+}
+
+List<Integer> merge(List<Integer> a, List<Integer> b) {
+    int i = 0, j = 0
+    final int newSize = a.size() + b.size()
+    List<Integer> result = new ArrayList<Integer>(newSize)
+
+    while ((i < a.size()) && (j < b.size())) {
+        if (a[i] <= b[j]) result << a[i++]
+        else result << b[j++]
+    }
+
+    if (i < a.size()) result.addAll(a[i..-1])
+    else result.addAll(b[j..-1])
+    return result
+}
+
+Closure createMessageHandler(def parentActor) {
+    return {
+        receive {List<Integer> message ->
+            assert message != null
+            switch (message.size()) {
+                case 0..1:
+                    parentActor.send(message)
+                    break
+                case 2:
+                    if (message[0] <= message[1]) parentActor.send(message)
+                    else parentActor.send(message[-1..0])
+                    break
+                default:
+                    def splitList = split(message)
+
+                    def child1 = Actors.oneShotActor(createMessageHandler(delegate))
+                    def child2 = Actors.oneShotActor(createMessageHandler(delegate))
+                    child1.start().send(splitList[0])
+                    child2.start().send(splitList[1])
+
+                    parentActor.send merge(receive(), receive())
+            }
+        }
+    }
+
+}
+
+def resultActor = Actors.oneShotActor {
+    println "Sorted array:\t${receive()}"
+}.start()
+
+def sorter = Actors.oneShotActor(createMessageHandler(resultActor))
+sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3])
+
+//resultActor.join(30000)
+

@@ -6,11 +6,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Jan 9, 2009
  */
-
 public class ActorsTest extends GroovyTestCase {
     public void testDefaultActor() {
         final AtomicInteger counter = new AtomicInteger(0)
@@ -41,6 +40,23 @@ public class ActorsTest extends GroovyTestCase {
             latch.countDown()
         }
 
+        actor.start()
+
+        latch.await(30, TimeUnit.SECONDS)
+        assert flag.get()
+    }
+
+    public void testDefaultOneShotActorWithException() {
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final Actor actor = Actors.defaultOneShotActor {
+            throw new RuntimeException('test')
+        }
+        actor.metaClass.afterStop = {
+            flag.set(true)
+            latch.countDown()
+        }
         actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
@@ -82,6 +98,24 @@ public class ActorsTest extends GroovyTestCase {
         assert flag.get()
     }
 
+    public void testSynchronousOneShotActorWithException() {
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final Actor actor = Actors.synchronousOneShotActor {
+            if (true) throw new RuntimeException('test')
+        }
+        actor.metaClass.afterStop = {
+            flag.set(true)
+            latch.countDown()
+        }
+        actor.start()
+
+        latch.await(30, TimeUnit.SECONDS)
+        assert flag.get()
+    }
+
+
     public void testBoundedActor() {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
@@ -111,6 +145,23 @@ public class ActorsTest extends GroovyTestCase {
             latch.countDown()
         }
 
+        actor.start()
+
+        latch.await(30, TimeUnit.SECONDS)
+        assert flag.get()
+    }
+
+    public void testBoundedOneShotActorWithException() {
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final Actor actor = Actors.boundedOneShotActor {
+            if (true) throw new RuntimeException('test')
+        }
+        actor.metaClass.afterStop = {
+            flag.set(true)
+            latch.countDown()
+        }
         actor.start()
 
         latch.await(30, TimeUnit.SECONDS)

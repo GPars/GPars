@@ -1,12 +1,9 @@
-package org.gparallelizer.actors;
+package org.gparallelizer.actors
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
-import java.util.logging.Logger
-import java.util.logging.Level
-import java.util.concurrent.Semaphore
 import org.gparallelizer.actors.util.EnhancedSemaphore;
 
 /**
@@ -32,29 +29,23 @@ abstract public class AbstractActor implements Actor {
     /**
      * The actors background thread.
      */
-    protected Thread actorThread;
+    protected volatile Thread actorThread;
 
     //todo should be private but currently it wouldn't be visible inside closures
     /**
      * Flag indicating Actor's liveness status.
      */
-    protected AtomicBoolean started=new AtomicBoolean(false);
-
-    //todo consider using commons logging
-    /**
-     * Logger to use.
-     */
-    Logger log=Logger.getLogger(this.class.name)
+    protected final AtomicBoolean started = new AtomicBoolean(false);
 
     //todo should be private but currently it wouldn't be visible inside closures
-    protected EnhancedSemaphore startupLock=new EnhancedSemaphore(1);
+    protected final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
 
     //todo add generics
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
     public AbstractActor(final BlockingQueue messageQueue) {
-        if (messageQueue==null) throw new IllegalArgumentException("Actor message queue must not be null.")
+        if (messageQueue == null) throw new IllegalArgumentException("Actor message queue must not be null.")
         this.messageQueue = messageQueue;
     }
 
@@ -62,29 +53,37 @@ abstract public class AbstractActor implements Actor {
      * Starts the Actor. No messages can be send or received before an Actor is started.
      */
     public final Actor start() {
+        //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
+        def localStarted = started
         startupLock.withSemaphore {
-            if (started.getAndSet(true)) throw new IllegalStateException("Actor already started")
+            if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
         }
-        actorThread=Thread.start(createThreadName()) {
+        actorThread = Thread.start(createThreadName()) {
             try {
-                log.log(Level.FINE, "Started an actor thread ${actorThread.name}.")
                 if (delegate.respondsTo('afterStart')) delegate.afterStart()
-                while(!actorThread.interrupted()) {
+                while (!Thread.currentThread().interrupted()) {
                     try {
                         act();
                     } catch (InterruptedException e) {
-                        actorThread.interrupt()
-                        log.log(Level.FINE, "An actor thread ${actorThread.name} has been interrupted.")
+                        if (delegate.respondsTo('onInterrupt')) delegate.onInterrupt(e)
+                        Thread.currentThread().interrupt()
                     } catch (Throwable e) {
-                        log.log(Level.SEVERE, "An exception occured in an actor thread ${actorThread.name}: ", e)
+                        reportError(delegate, e)
                     }
                 }
+            } catch (Throwable e) {
+                e.printStackTrace(System.err) //invoked when the onException handler threw an exception
             } finally {
-                if (delegate.respondsTo('beforeStop')) delegate.beforeStop()
-                log.log(Level.FINE, "Stopping an actor thread ${actorThread.name}.")
-                startupLock.withSemaphore {
-                    started.set(false)
-                    if (this.respondsTo('afterStop')) this.afterStop(sweepQueue())
+                try {
+                    if (delegate.respondsTo('beforeStop')) delegate.beforeStop()
+                    startupLock.withSemaphore {
+                        started.set(false)
+                        if (this.respondsTo('afterStop')) this.afterStop(sweepQueue())
+                    }
+                } catch (Throwable e) {
+                    try {
+                        reportError(delegate, e)
+                    } catch (Throwable ex) {ex.printStackTrace(System.err)} //invoked when the onException handler threw an exception
                 }
             }
         }
@@ -175,17 +174,34 @@ abstract public class AbstractActor implements Actor {
         throw new UnsupportedOperationException("The act() method must be overriden")
     }
 
+    /**
+     * Joins the actor's thread
+     * @param milis Timeout in miliseconds
+     */
+    void join(long milis) {
+        actorThread?.join(milis)
+    }
+
+    //todo should be private, but mixins need higher visibility
+    protected def reportError(def delegate, Throwable e) {
+        if (delegate.respondsTo('onException')) delegate.onException(e)
+        else {
+            System.err.println("An exception occured in the Actor thread ${Thread.currentThread().name}")
+            e.printStackTrace(System.err)
+        }
+    }
+
     //todo should be private, but mixins need higher visibility
     /**
      * Clears the message queue returning all the messages it held.
      * @return The messages stored in the queue
      */
     protected List sweepQueue() {
-        def messages=[]
-        Object message=messageQueue.poll()
-        while (message!=null) {
+        def messages = []
+        Object message = messageQueue.poll()
+        while (message != null) {
             messages << message
-            message=messageQueue.poll()
+            message = messageQueue.poll()
         }
         return messages
     }
@@ -210,7 +226,7 @@ abstract public class AbstractActor implements Actor {
     /**
      * Unique counter for Actors' threads
      */
-    private static final AtomicLong threadCount=new AtomicLong(0)
+    private static final AtomicLong threadCount = new AtomicLong(0)
 
 
 }
