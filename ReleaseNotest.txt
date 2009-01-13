@@ -1,5 +1,8 @@
 GParallelizer
 
+0.4
+Actors added
+
 0.3
 Set default pool size to Ncpu + 1, where Ncpu is the number of CPU in the system.
 Made pool threads to be non-daemon.
