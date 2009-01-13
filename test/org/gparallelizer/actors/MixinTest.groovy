@@ -13,14 +13,14 @@ public class MixinTest extends GroovyTestCase {
     public void testMixin1() {
     }
 
-    public void _testMixin() {
+    public void testMixin() {
         volatile def result=null
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Company.metaClass {
-            mixin DefaultActor
-
-//            def act = {->
+//        Company.metaClass {
+//            mixin DefaultActor
+//
+//            act = {->
 //                println 'AAAAAAAAAAAAAAAAAAaa'
 //                receive {
 //                    println 'BBBBBBBBBBBBBBBBBBBBBBBBBBB'
@@ -28,15 +28,19 @@ public class MixinTest extends GroovyTestCase {
 //                    latch.countDown()
 //                }
 //            }
-        }
+//        }
 
         final Company company = new Company(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
-        company.metaClass.act = {->
-            println 'AAAAAAAAAAAAAAAAAAaa'
-            (mixinOwner as Actor).receive {
-                println 'BBBBBBBBBBBBBBBBBBBBBBBBBBB'
-                result = it
-                latch.countDown()
+        company.metaClass {
+            mixin DefaultActor
+
+            act = {->
+                println 'AAAAAAAAAAAAAAAAAAaa'
+                receive {
+                    println 'BBBBBBBBBBBBBBBBBBBBBBBBBBB'
+                    result = it
+                    latch.countDown()
+                }
             }
         }
 
@@ -44,6 +48,8 @@ public class MixinTest extends GroovyTestCase {
         company.start()
         company.send("Message")
         latch.await(30, TimeUnit.SECONDS)
+        company.stop()
+        
         assertEquals('Message', result)
     }
 }
