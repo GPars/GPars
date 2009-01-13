@@ -56,8 +56,9 @@ class Processor extends DefaultActor {
                 case 2:parent.send([list[0] + list[1]])
                     break
                 default:
-                //todo use multiple return values once possible
-                    def splitList = split(list)
+                    def splitList1
+                    def splitList2
+                    (splitList1, splitList2) = split(list)
                     def sum=0
                     Actor replyActor
                     replyActor=Actors.actor {
@@ -71,8 +72,8 @@ class Processor extends DefaultActor {
                         stop()
                     }
                     replyActor.start()
-                    new Processor(replyActor).start().send(splitList[0])
-                    new Processor(replyActor).start().send(splitList[1])
+                    new Processor(replyActor).start().send(splitList1)
+                    new Processor(replyActor).start().send(splitList2)
             }
         }
     }
