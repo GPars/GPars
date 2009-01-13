@@ -13,6 +13,7 @@ public class MixinTest extends GroovyTestCase {
     public void testMixin1() {
     }
 
+    //todo enable mixins
     public void _testMixin() {
         volatile def result=null
         final CountDownLatch latch = new CountDownLatch(1)
@@ -44,7 +45,6 @@ public class MixinTest extends GroovyTestCase {
             }
         }
 
-        //todo enable mixins
         company.start()
         company.send("Message")
         latch.await(30, TimeUnit.SECONDS)

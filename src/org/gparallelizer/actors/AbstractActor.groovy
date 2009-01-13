@@ -183,7 +183,7 @@ abstract public class AbstractActor implements Actor {
     }
 
     //todo should be private, but mixins need higher visibility
-    protected def reportError(def delegate, Throwable e) {
+    protected void reportError(def delegate, Throwable e) {
         if (delegate.respondsTo('onException')) delegate.onException(e)
         else {
             System.err.println("An exception occured in the Actor thread ${Thread.currentThread().name}")
@@ -206,20 +206,18 @@ abstract public class AbstractActor implements Actor {
         return messages
     }
 
-    //todo should be private, but mixins need higher visibility
     /**
      * Checks, whether the Actor is active.
      * @throws IllegalStateException If the Actor is not active.
      */
-    void checkState() {
+    private void checkState() {
         if (!started.get()) throw new IllegalStateException("The actor hasn't been started.");
     }
 
-    //todo should be private, but mixins need higher visibility
     /**
      * Created a JVM-unique name for Actors' threads.
      */
-    final String createThreadName() {
+    private final String createThreadName() {
         "Actor Thread ${threadCount.incrementAndGet()}"
     }
 
