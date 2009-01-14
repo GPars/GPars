@@ -12,10 +12,14 @@ import java.util.concurrent.ExecutorService
  * Date: Jan 9, 2009
  */
 public class AsynchronousEnhancerTest extends GroovyTestCase {
-    public void testEnhancement1() {
 
+    protected void tearDown() {
+        super.tearDown();
+        AsynchronousEnhancer.unenhanceClass(String)
     }
-    public void _testEnhancement() {
+
+
+    public void testEnhancement() {
         AsynchronousEnhancer.enhanceClass(String)
 
         final AtomicReference result = new AtomicReference()
@@ -29,16 +33,24 @@ public class AsynchronousEnhancerTest extends GroovyTestCase {
         latch.await(30, TimeUnit.SECONDS)
         assertEquals 'TEST', result.get()
 
+        shouldFail (MissingMethodException) {
+            'test'.nonExistantMethod()
+        }
+
+        shouldFail (MissingMethodException) {
+            'test'.nonExistantMethod {}
+        }
+
         AsynchronousEnhancer.unenhanceClass(String)
 
         shouldFail(MissingMethodException) {
-            'tests'.toUpperCase() {
+            'anotherTest'.toUpperCase() {
                 println(it)
             }
         }
     }
 
-    public void _testPoolEnhancement() {
+    public void testPoolEnhancement() {
         Asynchronizer.withAsynchronizer {ExecutorService pool ->
             AsynchronousEnhancer.enhanceClass(String, pool)
 
@@ -53,23 +65,31 @@ public class AsynchronousEnhancerTest extends GroovyTestCase {
             latch.await(30, TimeUnit.SECONDS)
             assertEquals 'TEST', result.get()
 
+            shouldFail (MissingMethodException) {
+                'test'.nonExistantMethod()
+            }
+
+            shouldFail (MissingMethodException) {
+                'test'.nonExistantMethod {}
+            }
+
             AsynchronousEnhancer.unenhanceClass(String)
 
             shouldFail(MissingMethodException) {
-                'tests'.toUpperCase() {
+                'anotherTest'.toUpperCase() {
                     println(it)
                 }
             }
         }
     }
 
-    public void _testPropertEnhancement() {
+    public void testPropertyEnhancement() {
         AsynchronousEnhancer.enhanceClass(String)
 
         final AtomicReference result = new AtomicReference()
         final CountDownLatch latch = new CountDownLatch(1)
 
-        "test".bytes {
+        "test".getBytes {
             result.set(it)
             latch.countDown()
         }
@@ -79,23 +99,31 @@ public class AsynchronousEnhancerTest extends GroovyTestCase {
 
         assertEquals 4, 'test'.size()
 
+        shouldFail (MissingPropertyException) {
+            'test'.nonExistantProperty
+        }
+
+        shouldFail (MissingMethodException) {
+            'test'.nonExistantProperty {}
+        }
+
         AsynchronousEnhancer.unenhanceClass(String)
 
         shouldFail(MissingMethodException) {
-            'tests'.bytes(1, 2) {
+            'anotherTest'.bytes(1, 2) {
                 println(it)
             }
         }
     }
 
-    public void _testPropertyPoolEnhancement() {
+    public void testPropertyPoolEnhancement() {
         Asynchronizer.withAsynchronizer {ExecutorService pool ->
             AsynchronousEnhancer.enhanceClass(String, pool)
 
             final AtomicReference result = new AtomicReference()
             final CountDownLatch latch = new CountDownLatch(1)
 
-            "test".bytes {
+            "test".getBytes {
                 result.set(it)
                 latch.countDown()
             }
@@ -105,10 +133,67 @@ public class AsynchronousEnhancerTest extends GroovyTestCase {
 
             assertEquals 4, 'test'.size()
 
+            shouldFail (MissingPropertyException) {
+                'test'.nonExistantProperty
+            }
+
+            shouldFail (MissingMethodException) {
+                'test'.nonExistantProperty {}
+            }
+
             AsynchronousEnhancer.unenhanceClass(String)
 
             shouldFail(MissingMethodException) {
-                'tests'.bytes(1, 2) {
+                'anotherTest'.bytes(1, 2) {
+                    println(it)
+                }
+            }
+        }
+    }
+
+    public void testUnenhancement() {
+        AsynchronousEnhancer.enhanceClass(String)
+
+        final AtomicReference result = new AtomicReference()
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        "test".toUpperCase() { }
+
+        AsynchronousEnhancer.unenhanceClass(String)
+
+        "test".toUpperCase() {
+            result.set(it)
+            latch.countDown()
+        }
+
+        latch.await(30, TimeUnit.SECONDS)
+        assertEquals 'TEST', result.get()
+
+        shouldFail(MissingMethodException) {
+            'anotherTest'.toUpperCase() {
+                println(it)
+            }
+        }
+    }
+
+    public void testPoolUnenhancement() {
+        Asynchronizer.withAsynchronizer {ExecutorService pool ->
+            AsynchronousEnhancer.enhanceClass(String, pool)
+
+            final AtomicReference result = new AtomicReference()
+            final CountDownLatch latch = new CountDownLatch(1)
+
+            "test".toUpperCase() { }
+
+            AsynchronousEnhancer.unenhanceClass(String)
+
+            "test".toUpperCase() {
+                result.set(it)
+                latch.countDown()
+            }
+
+            shouldFail(MissingMethodException) {
+                'anotherTest'.toUpperCase() {
                     println(it)
                 }
             }

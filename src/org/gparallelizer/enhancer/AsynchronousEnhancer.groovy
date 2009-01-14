@@ -1,7 +1,9 @@
 package org.gparallelizer.enhancer
 
-import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
+import org.gparallelizer.enhancer.AbstractEnhancer
+import org.gparallelizer.enhancer.PoolEnhancer
+import org.gparallelizer.enhancer.ThreadEnhancer
 
 /**
  * Experimental state
@@ -19,61 +21,67 @@ public class AsynchronousEnhancer {
         new PoolEnhancer(pool).enhanceClass(clazz)
     }
 
+    public static void enhanceInstance(Object instance) {
+        new ThreadEnhancer().enhanceInstance(instance)
+    }
+
+    public static void enhanceInstance(Object instance, ExecutorService pool) {
+        new PoolEnhancer(pool).enhanceInstance(instance)
+    }
+
     //todo write doc
     //todo revisit
     public static void unenhanceClass(Class clazz) {
-        final def originalInvokeMethod = clazz.metaClass.originalInvokeMethod
-        if (originalInvokeMethod) {
-            clazz.metaClass.invokeMethod = {String methodName, Object[] args ->
-                originalInvokeMethod.invokeMethod(methodName, args)
-            }
-            clazz.metaClass.originalInvokeMethod = null
+//        final def originalMethodMissing = clazz.metaClass.originalMethodMissing
+//        if (originalMethodMissing) {
+//            clazz.metaClass.methodMissing = originalMethodMissing
+//            clazz.metaClass.originalMethodMissing = null
+//        }
+        clazz.metaClass.methodMissing = {String methodName, args ->
+            throw new MissingMethodException(methodName, delegate.class, args)
         }
     }
 }
 
-//todo enhance property retrieval - test
+//todo enable chaining and unenhancing
 abstract private class AbstractEnhancer {
-    public final void enhanceClass(Class clazz) {
-        def originalInvokeMethod = clazz.metaClass.invokeMethod
-        clazz.metaClass.originalInvokeMethod = originalInvokeMethod
-
-        clazz.metaClass.invokeMethod = {String methodName, Object[] args ->
-            def metaMethod = String.metaClass.getMetaMethod(methodName, args)
-            if ((!metaMethod) && (args.size() > 0) && (args[-1] instanceof Closure)) {
-                def originalArgs = args.size() > 1 ? args[0..-2] : []
-                final def method = delegate.class.metaClass.getMetaMethod(methodName, * originalArgs)
-                if (method) {
-                    schedule {
-                        def result
-                        try {
-                            result = delegate."$methodName"(* originalArgs)
-                        } catch (Exception e) {
-                            result = e
-                        }
-                        args[-1].call(result)
-                    }
-                    return
-                } else {
-                    if ((args.size() == 1) && (args[0] instanceof Closure)) {
-                        final def property = delegate.class.metaClass.getMetaProperty(methodName)
-                        if (property) {
-                            schedule {
-                                def result
-                                try {
-                                    result = delegate."$methodName"
-                                } catch (Exception e) {
-                                    result = e
-                                }
-                                args[0].call(result)
+    private Closure handler = {String methodName, args ->
+            if ((args.size() > 0) && (args[-1] instanceof Closure)) {
+                final def originalArgs = (args.size() > 1) ? args[0..<-1] : []
+                if (delegate.metaClass.respondsTo(delegate, methodName, * originalArgs)) {
+                    delegate.metaClass."$methodName" = {Object[] varArgs ->
+                        final def originalVarArgs = (varArgs.size() > 1) ? varArgs[0..<-1] : []
+                        schedule {
+                            def result
+                            try {
+                                result = delegate."$methodName"(* originalVarArgs)
+                            } catch (Throwable e) {
+                                result = e
                             }
-                            return
+                            varArgs[-1].call(result)
                         }
                     }
+                    delegate."$methodName"(args)
+                    return
                 }
             }
-            originalInvokeMethod.invokeMethod(methodName, args)
+//            if (clazz.metaClass.originalMethodMissing) ((ExpandoMetaProperty)clazz.metaClass.originalMethodMissing).getProperty().call(methodName, args)
+//            else
+                throw new MissingMethodException(methodName, delegate.class, args)
         }
+
+    public final void enhanceClass(Class clazz) {
+
+//        clazz.metaClass.originalMethodMissing = clazz.metaClass.methodMissing
+
+        clazz.metaClass.methodMissing = handler
+    }
+
+    public final void enhanceInstance(Object instance) {
+
+//        clazz.metaClass.originalMethodMissing = clazz.metaClass.methodMissing
+
+        instance.metaClass.methodMissing = handler
     }
 
     abstract protected void schedule(Closure task)
