@@ -10,15 +10,24 @@ import java.util.concurrent.TimeUnit
  */
 public class MixinTest extends GroovyTestCase {
 
-    public void testMixin1() {
-    }
-
-    //todo enable mixins
-    public void _testMixin() {
+    //todo document this option
+    public void testMixin() {
         volatile def result=null
         final CountDownLatch latch = new CountDownLatch(1)
 
-//        Company.metaClass {
+        Company.metaClass {
+            mixin DefaultActor
+
+            act = {->
+                receive {
+                    result = it
+                    latch.countDown()
+                }
+            }
+        }
+
+        final Company company = new Company(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
+//        company.metaClass {
 //            mixin DefaultActor
 //
 //            act = {->
@@ -30,20 +39,6 @@ public class MixinTest extends GroovyTestCase {
 //                }
 //            }
 //        }
-
-        final Company company = new Company(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
-        company.metaClass {
-            mixin DefaultActor
-
-            act = {->
-                println 'AAAAAAAAAAAAAAAAAAaa'
-                receive {
-                    println 'BBBBBBBBBBBBBBBBBBBBBBBBBBB'
-                    result = it
-                    latch.countDown()
-                }
-            }
-        }
 
         company.start()
         company.send("Message")
@@ -57,5 +52,4 @@ public class MixinTest extends GroovyTestCase {
 class Company {
     String name
     List<String> employees
-
 }

@@ -55,7 +55,10 @@ abstract public class AbstractActor implements Actor {
     public final Actor start() {
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
         def localStarted = started
-        startupLock.withSemaphore {
+        //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
+        def localStartupLock = startupLock
+        
+        localStartupLock.withSemaphore {
             if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
         }
         actorThread = Thread.start(createThreadName()) {
@@ -76,8 +79,8 @@ abstract public class AbstractActor implements Actor {
             } finally {
                 try {
                     if (delegate.respondsTo('beforeStop')) delegate.beforeStop()
-                    startupLock.withSemaphore {
-                        started.set(false)
+                    localStartupLock.withSemaphore {
+                        localStarted.set(false)
                         if (this.respondsTo('afterStop')) this.afterStop(sweepQueue())
                     }
                 } catch (Throwable e) {
@@ -106,16 +109,18 @@ abstract public class AbstractActor implements Actor {
         return started.get()
     }
 
+    //todo should be protected, but mixins need higher visibility
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @return The message retrieved from the queue.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive() throws InterruptedException {
+    public final Object receive() throws InterruptedException {
         checkState();
         return messageQueue.take();
     }
 
+    //todo should be protected, but mixins need higher visibility
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @param how long to wait before giving up, in units of unit
@@ -123,7 +128,7 @@ abstract public class AbstractActor implements Actor {
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
+    public final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
         checkState();
         return messageQueue.poll(timeout, timeUnit);
     }
@@ -206,18 +211,20 @@ abstract public class AbstractActor implements Actor {
         return messages
     }
 
+    //todo should be private, but mixins need higher visibility
     /**
      * Checks, whether the Actor is active.
      * @throws IllegalStateException If the Actor is not active.
      */
-    private void checkState() {
+    protected void checkState() {
         if (!started.get()) throw new IllegalStateException("The actor hasn't been started.");
     }
 
+    //todo should be private, but mixins need higher visibility
     /**
      * Created a JVM-unique name for Actors' threads.
      */
-    private final String createThreadName() {
+    protected final String createThreadName() {
         "Actor Thread ${threadCount.incrementAndGet()}"
     }
 
