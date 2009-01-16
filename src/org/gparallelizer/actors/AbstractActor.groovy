@@ -4,7 +4,9 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
-import org.gparallelizer.actors.util.EnhancedSemaphore;
+import org.gparallelizer.actors.util.EnhancedSemaphore
+import org.codehaus.groovy.runtime.TimeCategory
+import groovy.time.Duration;
 
 /**
  * Default Actor implementation designed to be extended with actual message queue and the act() method.
@@ -15,11 +17,18 @@ import org.gparallelizer.actors.util.EnhancedSemaphore;
  * After it stops the afterStop(List unprocessedMessages) is called, if exists,
  * with all the unprocessed messages from the queue as a parameter.
  * The Actor can be restarted be calling start() again.
+ * Each Actor can define lifecycle observing methods, which will be called by the Actor's background thread whenever a certain lifecycle event occurs.
+ * <ul>
+ * <li>afterStart() - called immediatelly after the Actor's background thread has been started, before the act() method is called the first time.</li>
+ * <li>beforeStop() - called right before the actor stops.</li>
+ * <li>afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the messages from the queue.</li>
+ * <li>onInterrupt(InterruptedException? e) - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.</li>
+ * <li>onException(Throwable e) - called when an exception occurs in the actor's thread. Throwing an exception from this method will stop the actor.</li>
+ * </ul>
  *
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-
 abstract public class AbstractActor implements Actor {
     /**
      * Queue for the messages
@@ -57,7 +66,7 @@ abstract public class AbstractActor implements Actor {
         def localStarted = started
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
         def localStartupLock = startupLock
-        
+
         localStartupLock.withSemaphore {
             if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
         }
@@ -66,7 +75,9 @@ abstract public class AbstractActor implements Actor {
                 if (delegate.respondsTo('afterStart')) delegate.afterStart()
                 while (!Thread.currentThread().interrupted()) {
                     try {
-                        act();
+                        use(TimeCategory) {
+                            act();
+                        }
                     } catch (InterruptedException e) {
                         if (delegate.respondsTo('onInterrupt')) delegate.onInterrupt(e)
                         Thread.currentThread().interrupt()
@@ -123,14 +134,24 @@ abstract public class AbstractActor implements Actor {
     //todo should be protected, but mixins need higher visibility
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     * @param how long to wait before giving up, in units of unit
-     * @unit a TimeUnit determining how to interpret the timeout parameter
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     public final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
         checkState();
         return messageQueue.poll(timeout, timeUnit);
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * @param duration how long to wait before giving up, in units of unit
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final Object receive(Duration duration) throws InterruptedException {
+        return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -147,13 +168,25 @@ abstract public class AbstractActor implements Actor {
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * The message retrieved from the queue is passed into the handler as the only parameter.
      * A null value is passed into the handler, if the timeout expires
-     * @param how long to wait before giving up, in units of unit
-     * @unit a TimeUnit determining how to interpret the timeout parameter
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
      * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
         handler.call(receive(timeout, timeUnit))
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * The message retrieved from the queue is passed into the handler as the only parameter.
+     * A null value is passed into the handler, if the timeout expires
+     * @param duration how long to wait before giving up, in units of unit
+     * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final void receive(Duration duration, Closure handler) throws InterruptedException {
+        handler.call(receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS))
     }
 
     /**

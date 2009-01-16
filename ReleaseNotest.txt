@@ -1,5 +1,9 @@
 GParallelizer
 
+0.5
+Mixin support
+The act() method wrapped with TimeCategory to allow for time DSL in receive() calls
+
 0.4
 Actors added
 

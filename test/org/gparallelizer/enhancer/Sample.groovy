@@ -1,4 +1,5 @@
 import org.gparallelizer.enhancer.AsynchronousEnhancer
+import org.gparallelizer.actors.Actors
 
 //AsynchronousEnhancer.enhanceClass URL
 //
@@ -17,9 +18,19 @@ import org.gparallelizer.enhancer.AsynchronousEnhancer
 //}
 
 //todo report
-class MyURL {
 
-}
+class MyClass {}
+// returns null
+println MyClass.metaClass.getMetaMethod("methodMissing", [String, Object] as Object[])
+
+MyClass.metaClass.methodMissing = {String name, args -> println "$name called"}
+
+// returns a not-null meta-method instance
+println MyClass.metaClass.getMetaMethod("methodMissing", [String, Object] as Object[])
+
+
+
+class MyURL {}
 
 MyURL.metaClass.methodMissing = {String methodName, args ->
     if (methodName=='retrieve1') return "Result 1"
@@ -28,9 +39,16 @@ MyURL.metaClass.methodMissing = {String methodName, args ->
 
 println new MyURL().retrieve1()
 
+def original1 = MyURL.metaClass.getMetaMethod("methodMissing", [String, Object] as Object[])
+println original1
+
+
+println MyURL.metaClass.getMetaMethods()
+def original = MyURL.metaClass.getMetaMethod("methodMissing", [Object, Object] as Object[])
+println 'AAAAAAAAAAAAAAAAAAAAa ' + original
 MyURL.metaClass.methodMissing = {String methodName, args ->
     if (methodName=='retrieve2') return "Result 2"
-    else throw new MissingMethodException(methodName, delegate.class, args)
+    else original.invoke(delegate, methodName, args)
 }
 
 println new MyURL().retrieve2()

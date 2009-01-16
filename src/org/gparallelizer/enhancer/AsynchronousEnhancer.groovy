@@ -30,7 +30,6 @@ public class AsynchronousEnhancer {
     }
 
     //todo write doc
-    //todo revisit
     public static void unenhanceClass(Class clazz) {
 //        final def originalMethodMissing = clazz.metaClass.originalMethodMissing
 //        if (originalMethodMissing) {
@@ -43,6 +42,8 @@ public class AsynchronousEnhancer {
     }
 }
 
+//todo test various scenarios of enhancing and unenhancing classes and instances
+//todo block enhancement
 //todo enable chaining and unenhancing
 abstract private class AbstractEnhancer {
     private Closure handler = {String methodName, args ->
