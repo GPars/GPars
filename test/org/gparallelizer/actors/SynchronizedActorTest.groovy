@@ -33,6 +33,6 @@ class SynchronoustTestActor extends SynchronousActor {
     }
 
     public String getThreadName() {
-        return actorThread.name
+        return getActorThread().name
     }
 }

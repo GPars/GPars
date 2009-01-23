@@ -1,9 +1,9 @@
 package org.gparallelizer.actors
 
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicBoolean
+import org.gparallelizer.actors.BoundedActor
 
 /**
  *
@@ -39,6 +39,6 @@ class BoundedtTestActor extends BoundedActor {
     }
 
     public String getThreadName() {
-        return actorThread.name
+        return getActorThread().name
     }
 }

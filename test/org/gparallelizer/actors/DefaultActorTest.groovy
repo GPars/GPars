@@ -41,6 +41,6 @@ class DefaultTestActor extends DefaultActor {
     }
 
     public String getThreadName() {
-        return actorThread.name
+        return getActorThread().name
     }
 }

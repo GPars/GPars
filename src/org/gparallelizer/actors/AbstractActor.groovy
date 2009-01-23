@@ -40,14 +40,12 @@ abstract public class AbstractActor implements Actor {
      */
     protected volatile Thread actorThread;
 
-    //todo should be private but currently it wouldn't be visible inside closures
     /**
      * Flag indicating Actor's liveness status.
      */
-    protected final AtomicBoolean started = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
-    //todo should be private but currently it wouldn't be visible inside closures
-    protected final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
+    private final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
 
     //todo add generics
     /**
@@ -120,18 +118,16 @@ abstract public class AbstractActor implements Actor {
         return started.get()
     }
 
-    //todo should be protected, but mixins need higher visibility
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @return The message retrieved from the queue.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    public final Object receive() throws InterruptedException {
+    protected final Object receive() throws InterruptedException {
         checkState();
         return messageQueue.take();
     }
 
-    //todo should be protected, but mixins need higher visibility
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @param timeout how long to wait before giving up, in units of unit
@@ -139,7 +135,7 @@ abstract public class AbstractActor implements Actor {
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    public final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
+    protected final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
         checkState();
         return messageQueue.poll(timeout, timeUnit);
     }
@@ -213,14 +209,19 @@ abstract public class AbstractActor implements Actor {
     }
 
     /**
+     * Returns the actor's thread
+     */
+    protected Thread getActorThread() { actorThread }
+
+    /**
      * Joins the actor's thread
      * @param milis Timeout in miliseconds
      */
-    void join(long milis) {
+    public void join(long milis) {
         actorThread?.join(milis)
     }
 
-    //todo should be private, but mixins need higher visibility
+    //todo should be private, but closures demand higher visibility
     protected void reportError(def delegate, Throwable e) {
         if (delegate.respondsTo('onException')) delegate.onException(e)
         else {
@@ -229,7 +230,7 @@ abstract public class AbstractActor implements Actor {
         }
     }
 
-    //todo should be private, but mixins need higher visibility
+    //todo should be private, but closures demand higher visibility
     /**
      * Clears the message queue returning all the messages it held.
      * @return The messages stored in the queue
@@ -244,20 +245,18 @@ abstract public class AbstractActor implements Actor {
         return messages
     }
 
-    //todo should be private, but mixins need higher visibility
     /**
      * Checks, whether the Actor is active.
      * @throws IllegalStateException If the Actor is not active.
      */
-    protected void checkState() {
+    private void checkState() {
         if (!started.get()) throw new IllegalStateException("The actor hasn't been started.");
     }
 
-    //todo should be private, but mixins need higher visibility
     /**
      * Created a JVM-unique name for Actors' threads.
      */
-    protected final String createThreadName() {
+    private final String createThreadName() {
         "Actor Thread ${threadCount.incrementAndGet()}"
     }
 
