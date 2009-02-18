@@ -3,7 +3,7 @@ package org.gparallelizer.actors.util
 import java.util.concurrent.Semaphore
 
 /**
- * Extends Sepahore with a handy withSemaphore(Closure) method to safely acquire and release the Semaphore
+ * Extends Semaphore with a handy withSemaphore(Closure) method to safely acquire and release the Semaphore
  * for the passed-in closure.
  * Use:
  * def extendedSemaphore = new ExtendedSemaphore()
@@ -14,7 +14,6 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Jan 8, 2009
  */
-
 public class EnhancedSemaphore extends Semaphore {
 
     /**
@@ -28,7 +27,7 @@ public class EnhancedSemaphore extends Semaphore {
     /**
      * Performs the passed-in closure with the Semaphore acquired and releases the Semaphore automatically
      * after the closure finishes.
-     * @param cl The closure the perform with the Semaphore acquired
+     * @param cl The closure to perform with the Semaphore acquired
      */
     public void withSemaphore(Closure cl) {
         acquire()
