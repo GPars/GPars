@@ -1,7 +1,9 @@
 package org.gparallelizer.actors;
 
 /**
- * Actors are active objects, which have their own thread processing repeatedly messages submitted to the object.
+ * Actors are active objects, which either have their own thread processing repeatedly messages submitted to them
+ * or they borrow a thread from a thread pool. Actors implementing the ThreadedActor interface have their own thread,
+ * whereas actors implementing PooledActor interface delegate processing to threads from a thread pool.
  * The Actor interface provides means to send messages to the object, start and stop the background thread as well as
  * check its status.
  *

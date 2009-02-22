@@ -29,7 +29,7 @@ import groovy.time.Duration;
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-abstract public class AbstractActor implements Actor {
+abstract public class AbstractActor implements ThreadedActor {
     /**
      * Queue for the messages
      */
@@ -114,7 +114,7 @@ abstract public class AbstractActor implements Actor {
     /**
      * Checks the current status of the Actor.
      */
-    public boolean isActive() {
+    public final boolean isActive() {
         return started.get()
     }
 
@@ -211,18 +211,18 @@ abstract public class AbstractActor implements Actor {
     /**
      * Returns the actor's thread
      */
-    protected Thread getActorThread() { actorThread }
+    protected final Thread getActorThread() { actorThread }
 
     /**
      * Joins the actor's thread
      * @param milis Timeout in miliseconds
      */
-    public void join(long milis) {
+    public final void join(long milis) {
         actorThread?.join(milis)
     }
 
     //todo should be private, but closures demand higher visibility
-    protected void reportError(def delegate, Throwable e) {
+    void reportError(def delegate, Throwable e) {
         if (delegate.respondsTo('onException')) delegate.onException(e)
         else {
             System.err.println("An exception occured in the Actor thread ${Thread.currentThread().name}")
@@ -235,7 +235,7 @@ abstract public class AbstractActor implements Actor {
      * Clears the message queue returning all the messages it held.
      * @return The messages stored in the queue
      */
-    protected List sweepQueue() {
+    final List sweepQueue() {
         def messages = []
         Object message = messageQueue.poll()
         while (message != null) {
