@@ -120,8 +120,6 @@ public class LifecycleTest extends GroovyTestCase {
         afterStopBarrier.await()
         assertEquals 1, counter.intValue()
         assertFalse actor.isActive()
-        Thread.sleep 500
-        assertEquals 1, counter.intValue()
     }
 
     public void testStopWithoutMessageSent() {

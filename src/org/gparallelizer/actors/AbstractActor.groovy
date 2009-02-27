@@ -103,7 +103,7 @@ abstract public class AbstractActor implements ThreadedActor {
     }
 
     /**
-     * Stops an Actor. The background thread will be stopped, unprocessed messages will be lost.
+     * Stops the Actor. The background thread will be stopped, unprocessed messages will be lost.
      * Has no effect if the Actor is not started.
      */
     public final Actor stop() {

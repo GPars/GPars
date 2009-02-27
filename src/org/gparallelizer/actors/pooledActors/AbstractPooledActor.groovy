@@ -51,14 +51,14 @@ abstract public class AbstractPooledActor implements PooledActor {
     private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>(null)
 
     /**
-     * Timer holding timeouts for react methods
-     */
-    private Timer timer = new Timer()
-
-    /**
      * Internal lock to synchronize access of external threads calling send() or stop() with the current active action
      */
     private final Object lock = new Object()
+
+    /**
+     * Timer holding timeouts for react methods
+     */
+    private static Timer timer = new Timer()
 
     /**
      * Maps each thread to the actor it currently processes.
@@ -77,18 +77,19 @@ abstract public class AbstractPooledActor implements PooledActor {
         return this
     }
 
-    final void indicateStop() {
-        stopFlag.set(true)
+    final boolean indicateStop() {
+        return stopFlag.getAndSet(true)
     }
 
     /**
-     * Stops an Actor. The background thread will be stopped, unprocessed messages will be lost.
+     * Stops the Actor. The background thread will be stopped, unprocessed messages will be lost.
      * Has no effect if the Actor is not started.
      */
     public final Actor stop() {
         synchronized (lock) {
-            indicateStop()
-            (codeReference.getAndSet(null)) ? actorAction(this) { throw TERMINATE } : currentAction.get()?.cancel()
+            if (!indicateStop()) {
+                (codeReference.getAndSet(null)) ? actorAction(this) { throw TERMINATE } : currentAction.get()?.cancel()
+            }
         }
         return this
     }
@@ -116,7 +117,7 @@ abstract public class AbstractPooledActor implements PooledActor {
 
         Closure reactCode = {ActorMessage message ->
             if (message.payLoad == TIMEOUT) throw TIMEOUT
-            
+
             this.metaClass {
                 reply = {
                     final PooledActor sender = message.sender
@@ -147,7 +148,7 @@ abstract public class AbstractPooledActor implements PooledActor {
             } else {
                 codeReference.set(reactCode)
                 if (timeout > 0) {
-                    timerTask.set ([run:{ this.send(TIMEOUT) }] as TimerTask)
+                    timerTask.set([run: { this.send(TIMEOUT) }] as TimerTask)
                     timer.schedule(timerTask.get(), timeout)
                 }
             }
@@ -219,8 +220,10 @@ abstract public class AbstractPooledActor implements PooledActor {
         return messages
     }
 
+    //todo refactor
     //todo try standard thread pool
     //todo document
+    //todo Thread-bound actors keep running
 
     //todo retry after timeout or exception
     //todo support mixins

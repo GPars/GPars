@@ -30,10 +30,12 @@ final class ActorAction extends AsyncAction {
     protected void compute() {
         try {
             try {
+                this.actor.currentAction.set this
+
                 actionThread = Thread.currentThread()
                 registerCurrentActorWithThread()
 
-                if (isCancelled()) throw TERMINATE
+                if (isCancelled() || !actor.isActive()) throw TERMINATE
                 use(TimeCategory) { code.call() }
             } finally { actionThread = null }
 
@@ -98,8 +100,6 @@ final class ActorAction extends AsyncAction {
     }
 
     static void actorAction(AbstractPooledActor actor, Closure code) {
-        final ActorAction action = new ActorAction(actor, code)
-        actor.currentAction.set action
-        PooledActors.pool.execute action
+        PooledActors.pool.execute new ActorAction(actor, code)
     }
 }

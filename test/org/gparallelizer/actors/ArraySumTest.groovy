@@ -76,6 +76,7 @@ class Processor extends DefaultActor {
                     new Processor(replyActor).start().send(splitList2)
             }
         }
+        stop()
     }
 
     private split(List<Integer> list) {
