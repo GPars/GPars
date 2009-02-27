@@ -9,11 +9,10 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Feb 17, 2009
  */
-
 public class LoopTest extends GroovyTestCase {
 
     protected void setUp() {

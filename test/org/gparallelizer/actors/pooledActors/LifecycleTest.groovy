@@ -10,11 +10,10 @@ import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Feb 19, 2009
  */
-
 public class LifecycleTest extends GroovyTestCase {
 
     protected void setUp() {

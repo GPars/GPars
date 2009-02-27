@@ -6,10 +6,11 @@ import org.gparallelizer.actors.pooledActors.ActorContinuationException
 import org.gparallelizer.actors.pooledActors.ActorTerminationException
 import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE
+import org.codehaus.groovy.runtime.TimeCategory
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Feb 7, 2009
  */
 final class ActorAction extends AsyncAction {
@@ -30,20 +31,32 @@ final class ActorAction extends AsyncAction {
         try {
             try {
                 actionThread = Thread.currentThread()
+                registerCurrentActorWithThread()
+
                 if (isCancelled()) throw TERMINATE
-                code.call()
+                use(TimeCategory) { code.call() }
             } finally { actionThread = null }
 
             handleTermination()
 
         } catch (ActorContinuationException continuation) {
         } catch (ActorTerminationException termination) { handleTermination()
+        } catch (ActorTimeoutException timeout) { handleTimeout()
         } catch (InterruptedException e) { handleInterrupt(e)
         } catch (Exception e) { handleException(e)
         } finally {
             clearInterruptionFlag()
+            deregisterCurrentActorWithThread()
             actor.currentAction.compareAndSet this, null
         }
+    }
+
+    private def registerCurrentActorWithThread() {
+        AbstractPooledActor.currentActor.set(this.actor)
+    }
+
+    private def deregisterCurrentActorWithThread() {
+        AbstractPooledActor.currentActor.set(null)
     }
 
     final void cancel() {
@@ -53,6 +66,11 @@ final class ActorAction extends AsyncAction {
 
     private boolean clearInterruptionFlag() {
         return Thread.currentThread().interrupted()
+    }
+
+    private def handleTimeout() {
+        if (actor.respondsTo('onTimeout')) actor.onTimeout()
+        handleTermination()
     }
 
     private def handleTermination() {

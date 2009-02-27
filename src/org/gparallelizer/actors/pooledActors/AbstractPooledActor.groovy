@@ -1,5 +1,6 @@
 package org.gparallelizer.actors.pooledActors
 
+import groovy.time.Duration
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -8,12 +9,11 @@ import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.ActorAction
 import org.gparallelizer.actors.pooledActors.PooledActor
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
-import static org.gparallelizer.actors.pooledActors.ActorException.CONTINUE
-import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE
+import static org.gparallelizer.actors.pooledActors.ActorException.*
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Feb 7, 2009
  */
 abstract public class AbstractPooledActor implements PooledActor {
@@ -45,10 +45,27 @@ abstract public class AbstractPooledActor implements PooledActor {
     final AtomicReference<ActorAction> currentAction = new AtomicReference<ActorAction>(null)
 
     /**
+     * The current timeout task, which will send a TIMEOUT message to the actor if not cancelled by someone
+     * calling the send() method within the timeout specified for the currently blocked react() method.
+     */
+    private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>(null)
+
+    /**
+     * Timer holding timeouts for react methods
+     */
+    private Timer timer = new Timer()
+
+    /**
      * Internal lock to synchronize access of external threads calling send() or stop() with the current active action
      */
     private final Object lock = new Object()
 
+    //todo document
+    static ThreadLocal<PooledActor> currentActor = new ThreadLocal<PooledActor>()
+
+    /**
+     * Starts the Actor. No messages can be send or received before an Actor is started.
+     */
     public final AbstractPooledActor start() {
         actorAction(this) {
             if (delegate.respondsTo('afterStart')) delegate.afterStart()
@@ -61,10 +78,14 @@ abstract public class AbstractPooledActor implements PooledActor {
         stopFlag.set(true)
     }
 
+    /**
+     * Stops an Actor. The background thread will be stopped, unprocessed messages will be lost.
+     * Has no effect if the Actor is not started.
+     */
     public final Actor stop() {
         synchronized (lock) {
             indicateStop()
-            (codeReference.getAndSet(null)) ? actorAction(this) { throw TERMINATE } :  currentAction.get()?.cancel()
+            (codeReference.getAndSet(null)) ? actorAction(this) { throw TERMINATE } : currentAction.get()?.cancel()
         }
         return this
     }
@@ -80,10 +101,30 @@ abstract public class AbstractPooledActor implements PooledActor {
         throw new UnsupportedOperationException("The act() method must be overriden")
     }
 
-    protected final void react(final Closure code) {
+    protected final void react(final Duration duration, final Closure code) {
+        react(duration.toMilliseconds(), code)
+    }
 
-        Closure reactCode = {message ->
-            code.call(message)
+    protected final void react(final Closure code) {
+        react(0, code)
+    }
+
+    protected final void react(final long timeout, final Closure code) {
+
+        Closure reactCode = {ActorMessage message ->
+            if (message.payLoad == TIMEOUT) throw TIMEOUT
+            
+            this.metaClass.reply = {
+                final PooledActor sender = message.sender
+                if (sender) {
+                    sender.send it
+                } else {
+                    throw new IllegalArgumentException("Cannot send a message ${it} to a null recipient.")
+                }
+            }
+
+            code.call(message.payLoad)
+
             this.repeatLoop()
         }
 
@@ -96,22 +137,37 @@ abstract public class AbstractPooledActor implements PooledActor {
                 actorAction(this) { reactCode.call(currentMessage) }
             } else {
                 codeReference.set(reactCode)
+                if (timeout > 0) {
+                    timerTask.set ([run:{ this.send(TIMEOUT) }] as TimerTask)
+                    timer.schedule(timerTask.get(), timeout)
+                }
             }
         }
         throw CONTINUE
     }
 
+    /**
+     * Adds a message to the Actor's queue. Can only be called on a started Actor.
+     */
     public final Actor send(Object message) {
         synchronized (lock) {
             checkState()
+            cancelCurrentTimeoutTimer(message)
+
+            def actorMessage = new ActorMessage(message, currentActor.get())
+
             final Closure currentReference = codeReference.getAndSet(null)
             if (currentReference) {
-                actorAction(this) { currentReference.call(message) }
+                actorAction(this) { currentReference.call(actorMessage) }
             } else {
-                messageQueue.put(message)
+                messageQueue.put(actorMessage)
             }
         }
         return this
+    }
+
+    private def cancelCurrentTimeoutTimer(message) {
+        if (message != TIMEOUT) timerTask.get()?.cancel()
     }
 
     /**
@@ -154,21 +210,14 @@ abstract public class AbstractPooledActor implements PooledActor {
         return messages
     }
 
-    /**
-     * Joins the actor's thread
-     * @param milis Timeout in miliseconds
-     */
-    void join(long milis) {
-        //todo implement or refactor away from the PooledActor interface
-        throw new UnsupportedOperationException("Pooled actors don't support join")
-    }
-
-    //todo timeout support
     //todo try standard thread pool
-    //todo reorganize packages
     //todo document
 
-    //todo replyTo support
+    //todo retry after timeout or exception
+    //todo support mixins
+    //todo read system properties to configure pool
+    //todo implement reply for thread-bound actors and between the two actor categories
+    //todo replyIfExists support
     //todo handle nested loops
     //todo make codeReference non-atomic
 }

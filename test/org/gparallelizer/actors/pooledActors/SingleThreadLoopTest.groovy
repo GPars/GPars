@@ -1,12 +1,12 @@
 package org.gparallelizer.actors.pooledActors
-/**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Feb 18, 2009
- */
 
 import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
 
+/**
+ *
+ * @author Vaclav Pech
+ * Date: Feb 18, 2009
+ */
 public class SingleThreadLoopTest extends LoopTest {
 
     protected void setUp() {

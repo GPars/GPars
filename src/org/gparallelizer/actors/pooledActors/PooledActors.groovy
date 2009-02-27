@@ -1,14 +1,14 @@
 package org.gparallelizer.actors.pooledActors
 
 /**
- * Provides handy helper methods to create various types of pooled actors and customize their behavior..
+ * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
  *
  * @author Vaclav Pech
  * Date: Feb 18, 2009
  */
 public class PooledActors {
 
-    private static final Pool instance = new Pool()
+    private static final Pool instance = new FJBasedPool()
 
     public static Pool getPool() {instance}
 

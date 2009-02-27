@@ -8,4 +8,11 @@ package org.gparallelizer.actors
  * @author Vaclav Pech
  * Date: Feb 20, 2009
  */
-public interface ThreadedActor extends Actor {}
+public interface ThreadedActor extends Actor {
+
+    /**
+     * Joins the actor's thread
+     * @param milis Timeout in miliseconds
+     */
+    void join(long milis);
+}

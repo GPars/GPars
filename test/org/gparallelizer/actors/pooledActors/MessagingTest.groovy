@@ -7,11 +7,10 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Feb 20, 2009
  */
-
 public class MessagingTest extends GroovyTestCase {
     protected void setUp() {
         super.setUp();

@@ -1,27 +1,27 @@
 package org.gparallelizer.actors.pooledActors
 
-import jsr166y.forkjoin.ForkJoinPool
 import java.util.concurrent.TimeUnit
-import jsr166y.forkjoin.ForkJoinTask
+import jsr166y.forkjoin.ForkJoinPool
+import org.gparallelizer.actors.pooledActors.Pool
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Feb 7, 2009
  */
-public final class Pool {
+public final class FJBasedPool implements Pool {
 
     private final ForkJoinPool pool;
 
-    def Pool() {
+    def FJBasedPool() {
         this(Runtime.getRuntime().availableProcessors() + 1)
     }
 
-    def Pool(final int poolSize) {
+    def FJBasedPool(final int poolSize) {
         createPool(poolSize)
     }
 
-    private final ForkJoinPool createPool(final int poolSize) {
+    private ForkJoinPool createPool(final int poolSize) {
         pool = new ForkJoinPool(poolSize);
 
         //todo parametrize
@@ -36,11 +36,11 @@ public final class Pool {
         pool.awaitTermination(1, TimeUnit.MINUTES)
     }
 
-    public final <T> void execute(ForkJoinTask<T> task) {
+    public final void execute(Object task) {
         pool.execute task
     }
 
-    public final initialize(int size) {
+    public final void initialize(int size) {
         pool.poolSize = size
     }
 }
