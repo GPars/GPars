@@ -60,7 +60,10 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     private final Object lock = new Object()
 
-    //todo document
+    /**
+     * Maps each thread to the actor it currently processes.
+     * Used in the send() method to remember the sender of each message for potential replies
+     */
     static ThreadLocal<PooledActor> currentActor = new ThreadLocal<PooledActor>()
 
     /**
@@ -114,12 +117,18 @@ abstract public class AbstractPooledActor implements PooledActor {
         Closure reactCode = {ActorMessage message ->
             if (message.payLoad == TIMEOUT) throw TIMEOUT
             
-            this.metaClass.reply = {
-                final PooledActor sender = message.sender
-                if (sender) {
-                    sender.send it
-                } else {
-                    throw new IllegalArgumentException("Cannot send a message ${it} to a null recipient.")
+            this.metaClass {
+                reply = {
+                    final PooledActor sender = message.sender
+                    if (sender) {
+                        sender.send it
+                    } else {
+                        throw new IllegalArgumentException("Cannot send a message ${it} to a null recipient.")
+                    }
+                }
+
+                replyIfExists = {
+                    message.sender?.send it
                 }
             }
 
@@ -217,7 +226,6 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo support mixins
     //todo read system properties to configure pool
     //todo implement reply for thread-bound actors and between the two actor categories
-    //todo replyIfExists support
     //todo handle nested loops
     //todo make codeReference non-atomic
 }

@@ -2,6 +2,7 @@ package org.gparallelizer.actors.pooledActors
 
 import java.util.concurrent.CyclicBarrier
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  *
@@ -9,6 +10,11 @@ import static org.gparallelizer.actors.pooledActors.PooledActors.*
  * Date: Feb 27, 2009
  */
 public class ReplyTest extends GroovyTestCase {
+
+    protected void setUp() {
+        super.setUp();
+        PooledActors.pool.initialize(5)
+    }
 
     public void testMultipleClients() {
         final CyclicBarrier barrier = new CyclicBarrier(3)
@@ -132,4 +138,75 @@ public class ReplyTest extends GroovyTestCase {
         assertEquals 4, replies2.size()
         assert replies2.containsAll([21, 59, 31, 39])
     }
+
+    public void testReplyWithoutSender() {
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final AbstractPooledActor actor = actor {
+            react {
+                reply it
+            }
+        }
+
+        actor.metaClass {
+            onException = {
+                flag.set(true)
+                barrier.await()
+            }
+        }
+
+        actor.start()
+
+        actor.send 'messsage'
+        barrier.await()
+
+        assert flag.get()
+    }
+
+    public void testReplyIfExists() {
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final AbstractPooledActor receiver = actor {
+            react {
+                replyIfExists it
+            }
+        }
+
+        receiver.start()
+
+        actor {
+            receiver.send 'messsage'
+            react {
+                flag.set(true)
+                barrier.await()
+            }
+        }.start()
+
+        barrier.await()
+
+        assert flag.get()
+    }
+
+    public void testReplyIfExistsWithoutSender() {
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final AbstractPooledActor actor = actor {
+            react {
+                replyIfExists it
+                flag.set(true)
+                barrier.await()
+            }
+        }
+
+        actor.start()
+
+        actor.send 'messsage'
+        barrier.await()
+
+        assert flag.get()
+    }
+
 }

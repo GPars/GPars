@@ -49,6 +49,7 @@ public class LoopTest extends GroovyTestCase {
         actor.stop()
     }
 
+    //todo fix
     public void testLoopStop() {
         final def barrier = new CyclicBarrier(2)
         final def afterStopBarrier = new CyclicBarrier(2)
