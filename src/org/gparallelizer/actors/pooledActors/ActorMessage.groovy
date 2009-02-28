@@ -1,4 +1,6 @@
-package org.gparallelizer.actors.pooledActors;
+package org.gparallelizer.actors.pooledActors
+
+import org.gparallelizer.actors.Actor;
 
 /**
  *
@@ -7,9 +9,9 @@ package org.gparallelizer.actors.pooledActors;
  */
 final class ActorMessage {
     final Object payLoad
-    final PooledActor sender
+    final Actor sender
 
-    public ActorMessage(final Object payLoad, final PooledActor sender) {
+    public ActorMessage(final Object payLoad, final Actor sender) {
         this.payLoad = payLoad;
         this.sender = sender;
     }

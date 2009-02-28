@@ -117,24 +117,8 @@ abstract public class AbstractPooledActor implements PooledActor {
 
         Closure reactCode = {ActorMessage message ->
             if (message.payLoad == TIMEOUT) throw TIMEOUT
-
-            this.metaClass {
-                reply = {
-                    final PooledActor sender = message.sender
-                    if (sender) {
-                        sender.send it
-                    } else {
-                        throw new IllegalArgumentException("Cannot send a message ${it} to a null recipient.")
-                    }
-                }
-
-                replyIfExists = {
-                    message.sender?.send it
-                }
-            }
-
+            enhanceWithReplyMethods(this, message.sender)
             code.call(message.payLoad)
-
             this.repeatLoop()
         }
 
@@ -176,36 +160,6 @@ abstract public class AbstractPooledActor implements PooledActor {
         return this
     }
 
-    private def cancelCurrentTimeoutTimer(message) {
-        if (message != TIMEOUT) timerTask.get()?.cancel()
-    }
-
-    /**
-     * Checks, whether the Actor is active.
-     * @throws IllegalStateException If the Actor is not active.
-     */
-    private void checkState() {
-        if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
-    }
-
-    protected final void repeatLoop() {
-        final Closure code = loopCode.get()
-        if (!code) return;
-        doCall(code)
-    }
-
-    protected final void loop(final Closure code) {
-        assert loopCode.get() == null, "The loop method must be only called once"
-        loopCode.set(code)
-        doCall(code)
-    }
-
-    private def doCall(Closure code) {
-        if (stopFlag.get()) throw TERMINATE
-        actorAction(this, code)
-        throw CONTINUE
-    }
-
     /**
      * Clears the message queue returning all the messages it held.
      * @return The messages stored in the queue
@@ -218,6 +172,58 @@ abstract public class AbstractPooledActor implements PooledActor {
             message = messageQueue.poll()
         }
         return messages
+    }
+
+    protected final void loop(final Closure code) {
+        assert loopCode.get() == null, "The loop method must be only called once"
+        loopCode.set(code)
+        doLoopCall(code)
+    }
+
+    private void repeatLoop() {
+        final Closure code = loopCode.get()
+        if (!code) return;
+        doLoopCall(code)
+    }
+
+    private def doLoopCall(Closure code) {
+        if (stopFlag.get()) throw TERMINATE
+        actorAction(this, code)
+        throw CONTINUE
+    }
+
+    private def cancelCurrentTimeoutTimer(message) {
+        if (message != TIMEOUT) timerTask.get()?.cancel()
+    }
+
+    /**
+     * Checks, whether the Actor is active.
+     * @throws IllegalStateException If the Actor is not active.
+     */
+    private void checkState() {
+        if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
+    }
+
+    /**
+     * Adds reply() and replyIfExists() methods to the currentActor.
+     * These methods will call send() on the target actor (the sender of the original message)
+     * @param currentActor The actor to enhance
+     * @param sender The actor that we need to be able to respond to
+     */
+    private static void enhanceWithReplyMethods(PooledActor currentActor, Actor sender) {
+        currentActor.metaClass {
+            reply = {
+                if (sender) {
+                    sender.send it
+                } else {
+                    throw new IllegalArgumentException("Cannot send a message ${it} to a null recipient.")
+                }
+            }
+
+            replyIfExists = {
+                sender?.send it
+            }
+        }
     }
 
     //todo refactor
