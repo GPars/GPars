@@ -18,7 +18,7 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  * The work performed by a PooledActor is divided into chunks, which are sequentially submitted as independent tasks
  * to the thread pool for processing.
  * Whenever a PooledActor looks for a new message through the react() method, the actor gets detached
- * from the thread, making the thread available for other actors. Thanks to the ability to dynamically attach and dettach
+ * from the thread, making the thread available for other actors. Thanks to the ability to dynamically attach and detach
  * threads to actors, PooledActors can scale far beyond the limits of the underlying platform on number of cuncurrently
  * available threads.
  * The loop() method allows repeatedly invoke a closure and yet perform each of the iterations in different thread
