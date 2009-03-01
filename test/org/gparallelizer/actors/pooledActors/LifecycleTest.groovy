@@ -274,4 +274,50 @@ public class LifecycleTest extends GroovyTestCase {
         assertNotNull messagesReference.get()
         assertEquals 2, messagesReference.get().size()
     }
+
+    public void testRestart() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicInteger counter = new AtomicInteger(0)
+
+        final AbstractPooledActor actor = actor {
+            barrier.await()
+            counter.incrementAndGet()
+            barrier.await()
+        }.start()
+
+        barrier.await()
+        assert actor.isActive()
+        barrier.await()
+        assertEquals 1, counter.intValue()
+        Thread.sleep 500
+        assertFalse actor.isActive()
+
+        actor.start()
+
+        barrier.await()
+        assert actor.isActive()
+        barrier.await()
+        assertEquals 2, counter.intValue()
+        Thread.sleep 500
+        assertFalse actor.isActive()
+    }
+
+    public void testDoubleStart() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicInteger counter = new AtomicInteger(0)
+
+        final AbstractPooledActor actor = actor {
+            barrier.await()
+        }.start()
+
+        shouldFail(IllegalStateException) {
+            actor.start()
+        }
+
+        assert actor.isActive()
+        barrier.await()
+        Thread.sleep 500
+        assertFalse actor.isActive()
+    }
+
 }
