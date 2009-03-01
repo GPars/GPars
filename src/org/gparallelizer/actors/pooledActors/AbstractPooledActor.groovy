@@ -40,7 +40,7 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     /**
      * The current active action (continuation) associated with the actor. An action must not use Actor's state
-     * after it shedules a new action, only throw CONTINUE.
+     * after it schedules a new action, only throw CONTINUE.
      */
     final AtomicReference<ActorAction> currentAction = new AtomicReference<ActorAction>(null)
 
@@ -220,8 +220,6 @@ abstract public class AbstractPooledActor implements PooledActor {
         }
     }
 
-    //todo refactor
-    //todo try standard thread pool
     //todo document
     //todo Thread-bound actors keep running
 

@@ -17,7 +17,7 @@ public class LoopTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        getPool().initialize(10)
+        getPool().resize(10)
     }
 
     public void testLoop() {
@@ -80,6 +80,7 @@ public class LoopTest extends GroovyTestCase {
 
     public void testSubsequentLoopStop() {
         final def barrier = new CyclicBarrier(2)
+        final def afterBarrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
         AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
@@ -97,7 +98,7 @@ public class LoopTest extends GroovyTestCase {
         actor.metaClass {
             afterStop = {List messages ->
                 messagesReference.set(messages)
-                barrier.await()
+                afterBarrier.await()
             }
             onInterrupt = {}
         }
@@ -108,7 +109,7 @@ public class LoopTest extends GroovyTestCase {
         barrier.await()
         actor.stop()
 
-        Thread.sleep 1000
+        afterBarrier.await()
         assertEquals 1, counter.intValue()
         assertEquals 1, messagesReference.get().size()
     }

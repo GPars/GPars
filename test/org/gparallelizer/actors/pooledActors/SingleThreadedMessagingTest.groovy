@@ -11,6 +11,6 @@ public class SingleThreadedMessagingTest extends MessagingTest {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.pool.initialize(1)
+        PooledActors.pool.resize(1)
     }
 }

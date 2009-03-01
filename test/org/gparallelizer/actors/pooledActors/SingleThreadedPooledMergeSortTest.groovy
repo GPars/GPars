@@ -11,6 +11,6 @@ public class SingleThreadedPooledMergeSortTest extends PooledMergeSortTest {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.pool.initialize(1)
+        PooledActors.pool.resize(1)
     }
 }

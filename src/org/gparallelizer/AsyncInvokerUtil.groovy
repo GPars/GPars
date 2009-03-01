@@ -18,7 +18,7 @@ import java.lang.Thread.UncaughtExceptionHandler
  */
 public class AsyncInvokerUtil {
     /**
-     * Shedules the supplied closure for processing in the underlying thread pool.
+     * schedules the supplied closure for processing in the underlying thread pool.
      */
     private static Future callAsync(Closure task) {
         final ExecutorService pool = Asynchronizer.retrieveCurrentPool()

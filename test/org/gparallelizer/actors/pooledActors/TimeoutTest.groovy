@@ -14,7 +14,7 @@ public class TimeoutTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.pool.initialize(5)
+        PooledActors.pool.resize(5)
     }
 
     public void testTimeout() {

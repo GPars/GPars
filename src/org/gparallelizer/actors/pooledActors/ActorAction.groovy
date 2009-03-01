@@ -1,12 +1,8 @@
 package org.gparallelizer.actors.pooledActors
 
-import jsr166y.forkjoin.AsyncAction
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.ActorContinuationException
-import org.gparallelizer.actors.pooledActors.ActorTerminationException
-import org.gparallelizer.actors.pooledActors.PooledActors
-import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE
 import org.codehaus.groovy.runtime.TimeCategory
+import org.gparallelizer.actors.pooledActors.*
+import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE
 
 /**
  * ActorAction represents a chunk of work to perform on behalf of a PooledActor.
@@ -14,7 +10,7 @@ import org.codehaus.groovy.runtime.TimeCategory
  * @author Vaclav Pech
  * Date: Feb 7, 2009
  */
-final class ActorAction extends AsyncAction {
+final class ActorAction implements Runnable {
 
     /**
      * The code to invoke as part of this ActorAction
@@ -41,6 +37,8 @@ final class ActorAction extends AsyncAction {
      * Used in the send() method to remember the sender of each message for potential replies
      */
     static ThreadLocal<PooledActor> currentActorPerThread = new ThreadLocal<PooledActor>()
+
+    volatile boolean cancelled = false
 
     /**
      * Creates a new ActorAction asociated with a PooledActor, which will eventually perform the specified code.
@@ -70,7 +68,7 @@ final class ActorAction extends AsyncAction {
                 actionThread = Thread.currentThread()
                 registerCurrentActorWithThread()
 
-                if (isCancelled() || !actor.isActive()) throw TERMINATE
+                if (cancelled || !actor.isActive()) throw TERMINATE
                 use(TimeCategory) { code.call() }
             } finally {
                 synchronized (actionThreadCancellationLock) {
@@ -108,7 +106,7 @@ final class ActorAction extends AsyncAction {
      */
     final void cancel() {
         synchronized(actionThreadCancellationLock) {
-            super.cancel()
+            cancelled = true
             this.actionThread?.interrupt()
         }
     }
@@ -147,9 +145,13 @@ final class ActorAction extends AsyncAction {
     }
 
     /**
-     * Creates a new ActorAction and shedules it for processing.
+     * Creates a new ActorAction and schedules it for processing.
      */
     static void actorAction(AbstractPooledActor actor, Closure code) {
         PooledActors.pool.execute new ActorAction(actor, code)
+    }
+
+    public void run() {
+        compute()
     }
 }

@@ -11,6 +11,6 @@ public class SingleThreadLoopTest extends LoopTest {
 
     protected void setUp() {
         super.setUp();
-        getPool().initialize(1)
+        getPool().resize(1)
     }
 }

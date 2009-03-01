@@ -14,7 +14,7 @@ import static org.gparallelizer.actors.pooledActors.PooledActors.*
 public class MessagingTest extends GroovyTestCase {
     protected void setUp() {
         super.setUp();
-        PooledActors.pool.initialize(10)
+        PooledActors.pool.resize(10)
     }
 
     public void testReact() {
