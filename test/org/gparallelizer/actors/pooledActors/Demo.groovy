@@ -36,3 +36,24 @@ actor {
         println "Result: $it"
     }
 }.start()
+
+getPool().resize 2
+
+def actors = []
+def messages = []
+1.upto(1000) {count ->
+    actors << actor {
+        loop {
+            react {message ->
+                messages << "Message received: $count:$message"
+            }
+        }
+
+    }.start()
+}
+
+Thread.sleep(10000)
+actors.each {it.send 'a'}
+Thread.sleep(10000)
+
+println messages

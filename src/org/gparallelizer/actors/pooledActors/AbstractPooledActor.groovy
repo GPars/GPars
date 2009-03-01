@@ -13,7 +13,7 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
- * which reacts asynchronously to messages sent to it from outside through its send() method.
+ * which reacts asynchronously to messages sent to it from outside through the send() method.
  * Each PooledActor has its own message queue and a thread pool shared with other PooledActors.
  * The work performed by a PooledActor is divided into chunks, which are sequentially submitted as independent tasks
  * to the thread pool for processing.
@@ -306,13 +306,8 @@ abstract public class AbstractPooledActor implements PooledActor {
         }
     }
 
-    //todo document
-    //todo Thread-bound actors keep running
-
     //todo retry after timeout or exception
     //todo support mixins
-    //todo read system properties to configure pool
     //todo implement reply for thread-bound actors and between the two actor categories
     //todo handle nested loops
-    //todo make codeReference non-atomic
 }
