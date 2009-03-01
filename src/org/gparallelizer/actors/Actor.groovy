@@ -18,7 +18,7 @@ public interface Actor {
     Actor start();
 
     /**
-     * Stops the Actor. The background thread will be stopped, unprocessed messages will be lost.
+     * Stops the Actor. Unprocessed messages will be passed to the afterStop method, if exists.
      * Has no effect if the Actor is not started.
      */
     Actor stop();

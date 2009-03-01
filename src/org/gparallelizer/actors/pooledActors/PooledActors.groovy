@@ -3,6 +3,18 @@ package org.gparallelizer.actors.pooledActors
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
  * Use static import to be able to call PooledActors methods without the need to prepend them with the PooledActors identifier.
+ * <pre>
+ * import static org.gparallelizer.actors.pooledActors.PooledActors.*
+ *
+ * def actor = actor {
+ *     react {message ->
+ *         println message
+ *     }
+ *     //this line will never be reached
+ * }.start()
+ *
+ * actor.send 'Hi!'
+ * </pre>
  *
  * @author Vaclav Pech
  * Date: Feb 18, 2009

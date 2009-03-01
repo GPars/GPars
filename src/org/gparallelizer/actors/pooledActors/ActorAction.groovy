@@ -5,7 +5,14 @@ import org.gparallelizer.actors.pooledActors.*
 import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE
 
 /**
- * ActorAction represents a chunk of work to perform on behalf of a PooledActor.
+ * ActorAction represents a chunk of work to perform on behalf of an associated PooledActor.
+ * A PooledActor has at most one active ActorAction associated with it at any given time, which represents the currently
+ * processed chunk of actor's work.
+ * ActorActions need to be scheduled for processing on a thread pool (ExecutorService), which is best achieved
+ * through the actorAction() method. ActorAction may create and schedule a new ActorAction to continue processing
+ * on the actor's behalf (hence the term "continuations"). After a new ActorAction has been scheduled, the original
+ * ActorAction must avoid touching the actor's state to avoid race conditions with te new ActorAction and should terminate
+ * quickly.
  *
  * @author Vaclav Pech
  * Date: Feb 7, 2009
@@ -38,6 +45,9 @@ final class ActorAction implements Runnable {
      */
     static ThreadLocal<PooledActor> currentActorPerThread = new ThreadLocal<PooledActor>()
 
+    /**
+     * Indicates whether the cancel() method has been called
+     */
     volatile boolean cancelled = false
 
     /**
@@ -151,6 +161,9 @@ final class ActorAction implements Runnable {
         PooledActors.pool.execute new ActorAction(actor, code)
     }
 
+    /**
+     * Performs the ActorAction
+     */
     public void run() {
         compute()
     }
