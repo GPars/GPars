@@ -69,7 +69,7 @@ class Processor extends DefaultActor {
                             }
                         }
                         parent.send([sum])
-                        stop()
+                        replyActor.stop()
                     }
                     replyActor.start()
                     new Processor(replyActor).start().send(splitList1)

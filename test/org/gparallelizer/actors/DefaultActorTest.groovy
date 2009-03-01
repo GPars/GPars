@@ -23,6 +23,7 @@ public class DefaultActorTest extends GroovyTestCase {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
         assert actor.threadName.startsWith("Actor Thread ")
+        actor.stop()
     }
 }
 
