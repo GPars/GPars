@@ -40,7 +40,7 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     /**
      * The current active action (continuation) associated with the actor. An action must not use Actor's state
-     * after it spounds a new action, only throw CONTINUE.
+     * after it shedules a new action, only throw CONTINUE.
      */
     final AtomicReference<ActorAction> currentAction = new AtomicReference<ActorAction>(null)
 
@@ -59,12 +59,6 @@ abstract public class AbstractPooledActor implements PooledActor {
      * Timer holding timeouts for react methods
      */
     private static Timer timer = new Timer()
-
-    /**
-     * Maps each thread to the actor it currently processes.
-     * Used in the send() method to remember the sender of each message for potential replies
-     */
-    static ThreadLocal<PooledActor> currentActor = new ThreadLocal<PooledActor>()
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
@@ -117,7 +111,7 @@ abstract public class AbstractPooledActor implements PooledActor {
 
         Closure reactCode = {ActorMessage message ->
             if (message.payLoad == TIMEOUT) throw TIMEOUT
-            enhanceWithReplyMethods(this, message.sender)
+            AbstractPooledActor.enhanceWithReplyMethods(this, message.sender)
             code.call(message.payLoad)
             this.repeatLoop()
         }
@@ -148,7 +142,7 @@ abstract public class AbstractPooledActor implements PooledActor {
             checkState()
             cancelCurrentTimeoutTimer(message)
 
-            def actorMessage = new ActorMessage(message, currentActor.get())
+            def actorMessage = new ActorMessage(message, ActorAction.currentActorPerThread.get())
 
             final Closure currentReference = codeReference.getAndSet(null)
             if (currentReference) {
@@ -180,7 +174,7 @@ abstract public class AbstractPooledActor implements PooledActor {
         doLoopCall(code)
     }
 
-    private void repeatLoop() {
+    protected void repeatLoop() {
         final Closure code = loopCode.get()
         if (!code) return;
         doLoopCall(code)
