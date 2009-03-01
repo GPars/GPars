@@ -107,8 +107,8 @@ final class ActorAction extends AsyncAction {
      * Attempts to cancel the action and interrupt the thread processing it.
      */
     final void cancel() {
-        super.cancel()
         synchronized(actionThreadCancellationLock) {
+            super.cancel()
             this.actionThread?.interrupt()
         }
     }
