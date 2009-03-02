@@ -7,7 +7,7 @@
         <attribute name="URI" value="/" />
       </containerElement>
     </containerInfo>
-    <setting name="jarUrl" value="file://$MODULE_DIR$/GParallelizer-0.5.jar" />
+    <setting name="jarUrl" value="file://$MODULE_DIR$/GParallelizer-0.6.jar" />
     <setting name="buildJar" value="true" />
     <setting name="mainClass" value="" />
   </component>

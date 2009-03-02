@@ -21,8 +21,8 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  * from the thread, making the thread available for other actors. Thanks to the ability to dynamically attach and detach
  * threads to actors, PooledActors can scale far beyond the limits of the underlying platform on number of cuncurrently
  * available threads.
- * The loop() method allows repeatedly invoke a closure and yet perform each of the iterations in different thread
- * from the thread pool.
+ * The loop() method allows repeatedly invoke a closure and yet perform each of the iterations sequentially
+ * in different thread from the thread pool.
  * To suport continuations correctly the react() and loop() methods never return.
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
@@ -39,7 +39,7 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  *
  * actor.send 'Hi!'
  * </pre>
- * This requires the code to be structured accordingly:
+ * This requires the code to be structured accordingly.
  *
  * <pre>
  * def adder = actor {
@@ -55,6 +55,21 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  *     //this line will never be reached
  * }.start()
  * </pre>
+ * The closures passed to the react() method can call reply() or replyIfExists(), which will send a message back to
+ * the originator of the currently processed message. The replyIfExists() method unlike the reply() method will not fail
+ * if the original message wasn't sent by an actor nor if the original sender actor is no longer running.
+ * The react() method accepts timout specified using the TimeCategory DSL.
+ * <pre>
+ * react(10.MINUTES) {
+ *     println 'Received message: ' + it
+ * }
+ * </pre>
+ * If not message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
+ * and the actor terminates.
+ * Each PooledActor has at any point in time at most one active instance of ActorAction associated, which abstracts
+ * the current chunk of actor's work to perform. Once a thread is assigned to the ActorAction, it moves the actor forward
+ * till loop() or react() is called. These methods schedule another ActorAction for processing and throw dedicated exception
+ * to terminate the current ActorAction. 
  *
  * @author Vaclav Pech
  * Date: Feb 7, 2009
@@ -94,14 +109,14 @@ abstract public class AbstractPooledActor implements PooledActor {
     private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>(null)
 
     /**
-     * Internal lock to synchronize access of external threads calling send() or stop() with the current active action
+     * Internal lock to synchronize access of external threads calling send() or stop() with the current active actor action
      */
     private final Object lock = new Object()
 
     /**
      * Timer holding timeouts for react methods
      */
-    private static Timer timer = new Timer()
+    private static final Timer timer = new Timer(true)
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
@@ -120,6 +135,7 @@ abstract public class AbstractPooledActor implements PooledActor {
      * @return The previous value of the stopFlag
      */
     final boolean indicateStop() {
+        cancelCurrentTimeoutTimer('')
         return stopFlag.getAndSet(true)
     }
 
@@ -147,7 +163,7 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     /**
      * This method represents the body of the actor. It is called upon actor's start and can exit either normally
-     * through return or due to actor being stopped through the stop() method.
+     * by return or due to actor being stopped through the stop() method, which cancels the current actor action.
      * Provides an extension point for subclasses to provide their custom Actor's message handling code.
      * The default implementation throws UnsupportedOperationException.
      */
@@ -213,7 +229,7 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
-     * If there's no ActorAction scheduled for the actor a new one is created and scheduled.
+     * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
      */
     public final Actor send(Object message) {
         synchronized (lock) {
@@ -247,7 +263,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     }
 
     /**
-     * Ensures that the suplied cosure will be invoked repeatedly in a loop.
+     * Ensures that the suplied closure will be invoked repeatedly in a loop.
      * The method never returns, but instead frees the processing thread back to the thread pool.
      * @param code The closure to invoke repeatedly
      */
@@ -301,7 +317,9 @@ abstract public class AbstractPooledActor implements PooledActor {
             }
 
             replyIfExists = {
-                sender?.send it
+                try {
+                    sender?.send it
+                } catch (IllegalStateException ignore) { }
             }
         }
     }

@@ -6,6 +6,8 @@ package org.gparallelizer.actors.pooledActors
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
  *
+ * getPool().resize 1
+ *
  * def actor = actor {
  *     react {message ->
  *         println message

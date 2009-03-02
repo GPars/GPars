@@ -1,5 +1,8 @@
 GParallelizer
 
+0.6
+Event-driven (pooled) actors
+
 0.5
 Mixin support
 The act() method wrapped with TimeCategory to allow for time DSL in receive() calls

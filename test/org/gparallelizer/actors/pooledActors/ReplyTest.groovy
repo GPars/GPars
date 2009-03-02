@@ -3,6 +3,7 @@ package org.gparallelizer.actors.pooledActors
 import java.util.concurrent.CyclicBarrier
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.CountDownLatch
 
 /**
  *
@@ -209,4 +210,37 @@ public class ReplyTest extends GroovyTestCase {
         assert flag.get()
     }
 
+    public void testReplyIfExistsWithStoppedSender() {
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final AbstractPooledActor replier = actor {
+            react {
+                latch.await()
+                replyIfExists it
+                flag.set(true)
+                barrier.await()
+            }
+        }
+
+        replier.start()
+
+        final AbstractPooledActor sender = actor {
+            replier.send 'messsage'
+        }
+
+        sender.metaClass {
+            afterStop = {
+                latch.countDown()
+            }
+        }
+
+        sender.start()
+
+        latch.await()
+        barrier.await()
+
+        assert flag.get()
+    }
 }
