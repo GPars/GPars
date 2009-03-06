@@ -328,4 +328,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo support mixins
     //todo implement reply for thread-bound actors and between the two actor categories
     //todo handle nested loops
+    //todo consider other types of queues
+    //todo add operators
+    //todo add synchronous calls
 }
