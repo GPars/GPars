@@ -199,6 +199,17 @@ abstract public class AbstractActor implements ThreadedActor {
         return this
     }
 
+  /**
+   * Adds the message to the Actor's message queue.
+   * The method will wait for space to become available in the queue, if it is full.
+   * It can only be called on a started Actor.
+   * @return The same Actor instance
+   * @throws InterruptedException If the thread is interrupted during the wait.
+   */
+    public final Actor leftShift(Object message) throws InterruptedException {
+        send message
+    }
+  
     /**
      * This method is called periodically from the Actor's thread until the Actor is stopped
      * with a call to the stop() method or the background thread is interrupted.

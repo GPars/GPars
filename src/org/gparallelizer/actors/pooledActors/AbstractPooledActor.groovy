@@ -249,6 +249,14 @@ abstract public class AbstractPooledActor implements PooledActor {
     }
 
     /**
+     * Adds a message to the Actor's queue. Can only be called on a started Actor.
+     * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
+     */
+    public final Actor leftShift(Object message) {
+        send message
+    }
+
+    /**
      * Clears the message queue returning all the messages it held.
      * @return The messages stored in the queue
      */

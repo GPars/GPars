@@ -193,4 +193,7 @@ class Asynchronizer {
     }
 
     //todo allow for destroying the DSL
+
+  //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
+  //todo switch package to groovyx.concurrent
 }

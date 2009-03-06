@@ -32,4 +32,10 @@ public interface Actor {
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      */
     Actor send(Object message) throws InterruptedException;
+
+    /**
+     * Adds a message to the Actor's queue. Can only be called on a started Actor.
+     * Identical to the send() method.
+     */
+    Actor leftShift(Object message) throws InterruptedException;
 }

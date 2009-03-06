@@ -53,7 +53,7 @@ def messages = []
 }
 
 Thread.sleep(10000)
-actors.each {it.send 'a'}
+actors.each {it << 'a'}
 Thread.sleep(10000)
 
 println messages
