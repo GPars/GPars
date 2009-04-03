@@ -7,7 +7,7 @@
         <attribute name="URI" value="/" />
       </containerElement>
     </containerInfo>
-    <setting name="jarUrl" value="file://$MODULE_DIR$/GParallelizer-0.6.jar" />
+    <setting name="jarUrl" value="file://$MODULE_DIR$/GParallelizer-0.6.1.jar" />
     <setting name="buildJar" value="true" />
     <setting name="mainClass" value="" />
   </component>
@@ -19,8 +19,12 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/assembly" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/groovy" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
     </content>
     <orderEntry type="library" name="groovy-1.6.0" level="application" />
     <orderEntry type="inheritedJdk" />
@@ -37,7 +41,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jsr166y.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jsr166y-070108.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

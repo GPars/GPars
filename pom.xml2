@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>gparallelizer</artifactId>
+    <groupId>org.codehaus.groovy</groupId>
+    <version>0.5.0</version>
+    <name>Groovy concurrency and actor library</name>
+    <url>http://groovy.codehaus.org/modules/http-builder/</url>
+    <inceptionYear>2008</inceptionYear>
+
+    <description>
+    </description>
+
+    <properties>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.coconut.forkjoin</groupId>
+            <artifactId>jsr166y</artifactId>
+            <version>070108</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>[1.6,)</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <configuration>
+                        <debug>false</debug>
+                        <verbose>true</verbose>
+                        <stacktrace>true</stacktrace>
+                        <defaultScriptExtension>.groovy</defaultScriptExtension>
+                    </configuration>
+                <executions>
+                    <execution>
+                        <id>build</id>
+                        <goals>
+                            <goal>generateStubs</goal>
+                            <goal>compile</goal>
+                            <goal>generateTestStubs</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <configuration>
+                    <check>
+                        <haltOnFailure>false</haltOnFailure>
+                        <lineRate>60</lineRate>
+                        <packageLineRate>60</packageLineRate>
+                        <totalLineRate>60</totalLineRate>
+                        <branchRate>50</branchRate>
+                        <packageBranchRate>50</packageBranchRate>
+                        <totalBranchRate>50</totalBranchRate>
+                    </check>
+                </configuration>
+                <executions>
+                    <!--<execution>
+                             <id>test</id>
+                             <phase>test</phase>
+                             <goals>
+                                 <goal>cobertura</goal>
+                             </goals>
+                         </execution>
+                         -->
+                    <execution>
+                        <id>defaults</id>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/all.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <preparationGoals>clean verify</preparationGoals>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <linksource>true</linksource>
+                    <links>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+                        <link>http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166ydocs/</link>
+                        <link>http://groovy.codehaus.org/api/</link>
+                    </links>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <configuration>
+                    <linkJavadoc>true</linkJavadoc>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-changes-plugin</artifactId>
+                <configuration>
+                    <component>13625</component>
+                    <statusIds>5,6</statusIds>
+                    <columnNames>Key,Summary,Status,Resolution,Fix Version</columnNames>
+                    <sortColumnNames>Fix Version DESC,Priority DESC,Created DESC</sortColumnNames>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>jira-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <scm>
+        <!--
+          <developerConnection>scm:https://svn.codehaus.org/gmod/httpbuilder/</developerConnection>
+          <connection>scm:http://svn.codehaus.org/gmod/httpbuilder/</connection>
+          <tag>trunk</tag>
+          <url>http://fisheye.codehaus.org/browse/gmod/httpbuilder/</url>
+          -->
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>Groovy-Contrib</id>
+            <name>Codehaus Groovy Repo</name>
+            <url>dav:https://dav.codehaus.org/repository/groovy</url>
+        </repository>
+        <snapshotRepository>
+            <id>Groovy-Contrib</id>
+            <name>Codehaus Groovy Snapshots Repo</name>
+            <url>dav:https://dav.codehaus.org/snapshots.repository/groovy</url>
+        </snapshotRepository>
+        <site>
+            <id>Groovy-Contrib</id>
+            <name>Codehaus Groovy WebDAV</name>
+            <url>dav:https://dav.codehaus.org/groovy/modules/http-builder</url>
+        </site>
+    </distributionManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>Groovy-User</name>
+            <post>user@groovy.codehaus.org</post>
+            <subscribe>http://xircles.codehaus.org/manage_email/user@groovy.codehaus.org</subscribe>
+            <archive>http://www.nabble.com/groovy---user-f11867.html</archive>
+        </mailingList>
+    </mailingLists>
+
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://jira.codehaus.org/browse/GMOD</url>
+        <!--<url>http://jira.codehaus.org/browse/GMOD/component/13625</url>
+      -->
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+          <!--<developer>-->
+              <!--<name>Vaclav Pech</name>-->
+              <!--<id></id>-->
+              <!--<email>gparallelizer@gmail.com</email>-->
+              <!--<timezone>+1</timezone>-->
+              <!--<roles>-->
+                  <!--<role>Developer</role>-->
+              <!--</roles>-->
+          <!--</developer>-->
+    </developers>
+
+</project>
