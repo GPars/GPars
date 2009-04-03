@@ -10,6 +10,7 @@ import org.gparallelizer.actors.pooledActors.ActorAction
 import org.gparallelizer.actors.pooledActors.PooledActor
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
+import org.gparallelizer.actors.ActorMessage
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -352,7 +353,9 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo consider flow control to throttle message production
 
     //Backlog
+    //todo put into maven repo
     //todo add transitive mvn dependencies
+    //todo support gradle
     //todo retry after timeout or exception
     //todo support mixins
     //todo handle nested loops

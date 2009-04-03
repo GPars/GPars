@@ -1,4 +1,4 @@
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.samples
 
 import org.gparallelizer.actors.pooledActors.PooledActors
 

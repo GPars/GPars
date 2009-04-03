@@ -1,9 +1,10 @@
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors
 
 import org.gparallelizer.actors.Actor;
 
 /**
  * An internal representation of received messages holding both the original message plus the sender actor reference.
+ * This class is not intented to be use directly by users.
  *
  * @author Vaclav Pech
  * Date: Feb 27, 2009

@@ -1,4 +1,4 @@
-import org.gparallelizer.actors.pooledActors.PooledActors
+import static org.gparallelizer.actors.pooledActors.PooledActors.*
 
 enum Move { ROCK, PAPER, SCISSORS }
 
@@ -23,7 +23,7 @@ final def player2 = actor {
   }
 }.start()
 
-def coordinator = PooledActors.actor {
+def coordinator = actor {
   loop {
     react {
       player1.send("play")
@@ -58,8 +58,7 @@ def toString(player, move) {
 }
 
 def firstWins(Move m1, Move m2) {
-  return
-    (m1 == ROCK && m2 == SCISSORS) ||
+  return (m1 == ROCK && m2 == SCISSORS) ||
     (m1 == PAPER && m2 == ROCK) ||
     (m1 == SCISSORS && m2 == PAPER)
 }
