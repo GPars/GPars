@@ -46,6 +46,35 @@ public class MessagingTest extends GroovyTestCase {
         assertEquals 3, counter.intValue()
     }
 
+    public void testLeftShift() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicInteger counter = new AtomicInteger(0)
+
+        final AbstractPooledActor actor = actor {
+            counter.incrementAndGet()
+            barrier.await()
+            react {
+                counter.incrementAndGet()
+                barrier.await()
+                react {
+                    counter.incrementAndGet()
+                    barrier.await()
+                }
+            }
+        }.start()
+
+        barrier.await()
+        assertEquals 1, counter.intValue()
+
+        actor << 'message'
+        barrier.await()
+        assertEquals 2, counter.intValue()
+
+        actor << 'message'
+        barrier.await()
+        assertEquals 3, counter.intValue()
+    }
+
     public void testReactWithBufferedMessages() {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
