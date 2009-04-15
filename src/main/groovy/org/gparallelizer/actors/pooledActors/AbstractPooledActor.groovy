@@ -347,12 +347,14 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo implement reply for thread-bound actors and between the two actor categories
     //todo multiple messages in receive() and react()
     //todo consider mutable state inside Actors or messages - JVM memory model might require explicit synchronization
+
+    //Backlog
     //todo maven
     //todo thread-bound actors could use threads from a pool or share a thread factory
     //todo introduce actor groups - actors sharing a thread pool
     //todo consider flow control to throttle message production
-
-    //Backlog
+    //todo resize the pool if all threads are busy or blocked
+    //todo implement remote actors
     //todo put into maven repo
     //todo add transitive mvn dependencies
     //todo support gradle
@@ -364,6 +366,10 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo add synchronous calls plus an operator
     //todo add sendLater(Duration) and sendAfterDone(Future)
     //todo consider pass by copy (clone, serialization) for mutable messages, reject mutable messages otherwise
+
+    //To consider
+    //todo unify and publish spawn operation and mail boxes
+    //todo associate a mail box with each thread, not only with actors
 
     /*
 import scala.actors.Actor._
