@@ -11,6 +11,8 @@ import org.gparallelizer.actors.pooledActors.PooledActor
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
 import org.gparallelizer.actors.ActorMessage
+import org.gparallelizer.actors.ReplyRegistry
+import org.gparallelizer.actors.ReplyEnhancer
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -205,7 +207,7 @@ abstract public class AbstractPooledActor implements PooledActor {
 
         Closure reactCode = {ActorMessage message ->
             if (message.payLoad == TIMEOUT) throw TIMEOUT
-            AbstractPooledActor.enhanceWithReplyMethods(this, message)
+            ReplyEnhancer.enhanceWithReplyMethods(this, message)
             code.call(message.payLoad)
             this.repeatLoop()
         }
@@ -237,7 +239,7 @@ abstract public class AbstractPooledActor implements PooledActor {
             checkState()
             cancelCurrentTimeoutTimer(message)
 
-            def actorMessage = new ActorMessage(message, ActorAction.currentActorPerThread.get())
+            def actorMessage = ActorMessage.build(message)
 
             final Closure currentReference = codeReference.getAndSet(null)
             if (currentReference) {
@@ -305,38 +307,6 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     private void checkState() {
         if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
-    }
-
-    /**
-     * Adds reply() and replyIfExists() methods to the currentActor and the message.
-     * These methods will call send() on the target actor (the sender of the original message)
-     * @param currentActor The actor to enhance
-     * @param message The instance of ActorMessage wrapping the sender actor, who we need to be able to respond to,
-     * plus the original message
-     */
-    private static void enhanceWithReplyMethods(final PooledActor actor, final ActorMessage message) {
-        final Actor sender = message.sender
-        enhanceObject(actor, sender)
-        enhanceObject(message.payLoad, sender)
-    }
-
-    /**
-     * Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
-     */
-    private static def enhanceObject(def replier, Actor sender) {
-        replier.metaClass.reply = {msg ->
-            if (sender) {
-                sender.send msg
-            } else {
-                throw new IllegalArgumentException("Cannot send a message ${it} to a null recipient.")
-            }
-        }
-
-        replier.metaClass.replyIfExists = {msg ->
-            try {
-                sender?.send msg
-            } catch (IllegalStateException ignore) { }
-        }
     }
 
     //Document before next release

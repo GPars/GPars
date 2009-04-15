@@ -18,9 +18,18 @@ final class ActorMessage {
      * @param payLoad The original message
      * @param sender The sending actor, null, if the message was not sent by an actor
      */
-    public ActorMessage(final Object payLoad, final Actor sender) {
+    private ActorMessage(final Object payLoad, final Actor sender) {
         this.payLoad = payLoad;
         this.sender = sender;
+    }
+
+    /**
+     * Factory method to create instances of ActorMessage with given payload.
+     * The sender of the ActorMessage is retrieved from the ReplyRegistry.
+     * * @param payLoad The original message
+     */
+    public static ActorMessage build(final Object payLoad) {
+        new ActorMessage(payLoad, ReplyRegistry.threadBoundActor())
     }
 
     public String toString() { "Message from $sender: $payLoad" }

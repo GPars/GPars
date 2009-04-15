@@ -18,6 +18,6 @@ public class BoundedActor extends AbstractActor {
     }
 
     BoundedActor(int capacity) {
-        super(new ArrayBlockingQueue(capacity, false));
+        super(new ArrayBlockingQueue<ActorMessage>(capacity, false));
     }
 }

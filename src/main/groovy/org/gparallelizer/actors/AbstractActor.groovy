@@ -33,7 +33,7 @@ abstract public class AbstractActor implements ThreadedActor {
     /**
      * Queue for the messages
      */
-    private final BlockingQueue messageQueue;
+    private final BlockingQueue<ActorMessage> messageQueue;
 
     /**
      * The actors background thread.
@@ -51,7 +51,7 @@ abstract public class AbstractActor implements ThreadedActor {
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
-    public AbstractActor(final BlockingQueue messageQueue) {
+    public AbstractActor(final BlockingQueue<ActorMessage> messageQueue) {
         if (messageQueue == null) throw new IllegalArgumentException("Actor message queue must not be null.")
         this.messageQueue = messageQueue;
     }
@@ -70,6 +70,7 @@ abstract public class AbstractActor implements ThreadedActor {
         }
         actorThread = Thread.start(createThreadName()) {
             try {
+                ReplyRegistry.registerCurrentActorWithThread this
                 if (delegate.respondsTo('afterStart')) delegate.afterStart()
                 while (!Thread.currentThread().interrupted()) {
                     try {
@@ -97,6 +98,7 @@ abstract public class AbstractActor implements ThreadedActor {
                         reportError(delegate, e)
                     } catch (Throwable ex) {ex.printStackTrace(System.err)} //invoked when the onException handler threw an exception
                 }
+                ReplyRegistry.deregisterCurrentActorWithThread()
             }
         }
         return this
@@ -126,7 +128,10 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     protected final Object receive() throws InterruptedException {
         checkState();
-        return messageQueue.take();
+        ActorMessage message = messageQueue.take()
+        if (!message) return null
+        ReplyEnhancer.enhanceWithReplyMethods(this, message)
+        return message.payLoad;
     }
 
     /**
@@ -138,7 +143,10 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     protected final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
         checkState();
-        return messageQueue.poll(timeout, timeUnit);
+        ActorMessage message = messageQueue.poll(timeout, timeUnit)
+        if (!message) return null
+        ReplyEnhancer.enhanceWithReplyMethods(this, message)
+        return message.payLoad;
     }
 
     /**
@@ -194,8 +202,8 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait.
      */
     public final Actor send(Object message) throws InterruptedException {
-        checkState();
-        messageQueue.put(message);
+        checkState()
+        messageQueue.put(ActorMessage.build(message))
         return this
     }
 

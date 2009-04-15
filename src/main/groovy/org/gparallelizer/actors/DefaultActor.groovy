@@ -10,6 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class DefaultActor extends AbstractActor {
     DefaultActor() {
-        super(new LinkedBlockingQueue());
+        super(new LinkedBlockingQueue<ActorMessage>());
     }
 }

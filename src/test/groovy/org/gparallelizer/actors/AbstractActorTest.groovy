@@ -172,7 +172,7 @@ class AfterStopTestActor extends DefaultActor {
 
     public void afterStop(List undeliveredMessages) {
         afterStopFlag.set(true)
-        this.undeliveredMessages.set(undeliveredMessages)
+        this.undeliveredMessages.set(undeliveredMessages*.payLoad)
         stopLatch.countDown()
     }
 }

@@ -3,6 +3,7 @@ package org.gparallelizer.actors.pooledActors
 import org.codehaus.groovy.runtime.TimeCategory
 import org.gparallelizer.actors.pooledActors.*
 import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE
+import org.gparallelizer.actors.ReplyRegistry
 
 /**
  * ActorAction represents a chunk of work to perform on behalf of an associated PooledActor in one go.
@@ -76,7 +77,7 @@ final class ActorAction implements Runnable {
                 this.actor.currentAction.set this
 
                 actionThread = Thread.currentThread()
-                registerCurrentActorWithThread()
+                ReplyRegistry.registerCurrentActorWithThread(this.actor)
 
                 if (cancelled || !actor.isActive()) throw TERMINATE
                 use(TimeCategory) { code.call() }
@@ -98,17 +99,9 @@ final class ActorAction implements Runnable {
             handleException(e)
         } finally {
             clearInterruptionFlag()
-            deregisterCurrentActorWithThread()
+            ReplyRegistry.deregisterCurrentActorWithThread()
             actor.currentAction.compareAndSet this, null
         }
-    }
-
-    private def registerCurrentActorWithThread() {
-        currentActorPerThread.set(this.actor)
-    }
-
-    private def deregisterCurrentActorWithThread() {
-        currentActorPerThread.set(null)
     }
 
     /**

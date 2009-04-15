@@ -13,6 +13,6 @@ import java.util.concurrent.SynchronousQueue;
 
 public class SynchronousActor extends AbstractActor {
     SynchronousActor() {
-        super(new SynchronousQueue(false));
+        super(new SynchronousQueue<ActorMessage>(false));
     }
 }
