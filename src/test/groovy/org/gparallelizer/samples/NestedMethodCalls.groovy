@@ -1,8 +1,8 @@
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.Actor
-import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.CountDownLatch
+import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import static org.gparallelizer.actors.pooledActors.PooledActors.actor
+import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
 
 class MyActor extends AbstractPooledActor {
 
