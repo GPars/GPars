@@ -41,12 +41,6 @@ final class ActorAction implements Runnable {
     private final Object actionThreadCancellationLock = new Object()
 
     /**
-     * Maps each thread to the actor it currently processes.
-     * Used in the send() method to remember the sender of each message for potential replies
-     */
-    static ThreadLocal<PooledActor> currentActorPerThread = new ThreadLocal<PooledActor>()
-
-    /**
      * Indicates whether the cancel() method has been called
      */
     volatile boolean cancelled = false

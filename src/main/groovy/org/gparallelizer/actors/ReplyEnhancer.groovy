@@ -1,13 +1,12 @@
 package org.gparallelizer.actors;
 
 /**
+ * Enables actors and messages to send replies.
  *
  * @author Vaclav Pech
  * Date: Apr 15, 2009
  */
-public class ReplyEnhancer {
-
-    //todo comment
+public abstract class ReplyEnhancer {
 
     /**
      * Adds reply() and replyIfExists() methods to the currentActor and the message.

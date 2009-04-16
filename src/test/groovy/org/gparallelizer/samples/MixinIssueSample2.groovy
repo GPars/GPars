@@ -4,16 +4,25 @@
  * Date: Jan 13, 2009
  */
 class SampleA {
-    public void foo() {
+    private void foo() {
         println 'Original foo ' + receive('')
     }
 
+    private String bar() {
+        "Bar"
+    }
+
     protected Object receive() {
-        return "Message"
+        return "Message " + bar()
     }
 
     protected Object receive(Object param) {
         receive() + param
+    }
+
+    public void perform() {
+        foo()
+        foo()
     }
 }
 
@@ -28,8 +37,8 @@ SampleB.metaClass {
 }
 
 final SampleA a = new SampleA()
-a.foo()
+a.perform()
 
 final SampleB b = new SampleB()
-b.foo()
+b.perform()
 

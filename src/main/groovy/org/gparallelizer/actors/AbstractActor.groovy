@@ -265,11 +265,12 @@ abstract public class AbstractActor implements ThreadedActor {
         return messages
     }
 
+    //todo should be private, but mixins would not work properly
     /**
      * Checks, whether the Actor is active.
      * @throws IllegalStateException If the Actor is not active.
      */
-    private void checkState() {
+    void checkState() {
         if (!started.get()) throw new IllegalStateException("The actor hasn't been started.");
     }
 

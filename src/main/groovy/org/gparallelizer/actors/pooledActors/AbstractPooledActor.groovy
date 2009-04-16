@@ -310,14 +310,16 @@ abstract public class AbstractPooledActor implements PooledActor {
     }
 
     //Document before next release
-    //todo add reply() and replyIfExists() to messages - document
     //todo document send operator
-
-    //Planned for the next release
+    //todo add reply() and replyIfExists() to messages - document
     //todo implement reply for thread-bound actors and between the two actor categories
-    //todo multiple messages in receive() and react()
+    
+    //Planned for the next release
     //todo consider mutable state inside Actors or messages - JVM memory model might require explicit synchronization
-
+    //todo handle nested loops - document using methods for nested loops, including breaking nested loops
+    //todo describe tips and tricks to call methods from act() - method, dynamically added closure, closure with delegate set
+    //todo multiple messages in receive() and react()
+    
     //Backlog
     //todo maven
     //todo thread-bound actors could use threads from a pool or share a thread factory
@@ -328,9 +330,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo put into maven repo
     //todo add transitive mvn dependencies
     //todo support gradle
-    //todo retry after timeout or exception
     //todo support mixins
-    //todo handle nested loops
     //todo consider other types of queues
     //todo use ForkJoin
     //todo add synchronous calls plus an operator
@@ -338,6 +338,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo consider pass by copy (clone, serialization) for mutable messages, reject mutable messages otherwise
 
     //To consider
+    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo unify and publish spawn operation and mail boxes
     //todo associate a mail box with each thread, not only with actors
 
