@@ -7,6 +7,8 @@ import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
 
 public class SharedMemoryTest extends GroovyTestCase {
 
+    private static final long MAX_COUNTER = 1000
+
     public void testSharedAccess() {
         long counter = 0
 
@@ -25,7 +27,7 @@ public class SharedMemoryTest extends GroovyTestCase {
 
         Actor actor2 = actor {
             loop {
-                if (counter < 10000) actor1.send counter.longValue() * 2
+                if (counter < MAX_COUNTER) actor1.send counter.longValue() * 2
                 else {
                     actor1.stop()
                     stop()
@@ -40,7 +42,7 @@ public class SharedMemoryTest extends GroovyTestCase {
 
 
         latch.await()
-        assertEquals 10000, counter
+        assertEquals MAX_COUNTER, counter
         getPool().shutdown()
     }
 }

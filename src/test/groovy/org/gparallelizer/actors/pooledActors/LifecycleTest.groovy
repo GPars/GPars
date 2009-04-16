@@ -8,6 +8,7 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.CountDownLatch
 
 /**
  *
@@ -96,7 +97,7 @@ public class LifecycleTest extends GroovyTestCase {
 
     public void testReentrantStop() {
         final def barrier = new CyclicBarrier(2)
-        final def afterStopBarrier = new CyclicBarrier(2)
+        final def latch = new CountDownLatch(1)
         final AtomicInteger counter = new AtomicInteger(0)
 
         final AbstractPooledActor actor = actor {
@@ -108,7 +109,7 @@ public class LifecycleTest extends GroovyTestCase {
         actor.metaClass {
             afterStop = {List messages ->
                 counter.incrementAndGet()
-                afterStopBarrier.await()
+                latch.countDown()
             }
             onInterrupt = {}
         }
@@ -117,13 +118,14 @@ public class LifecycleTest extends GroovyTestCase {
         actor.stop()
         actor.stop()
         actor.stop()
-        afterStopBarrier.await()
+        latch.await()
         assertEquals 1, counter.intValue()
         assertFalse actor.isActive()
     }
 
     public void testStopWithoutMessageSent() {
         final def barrier = new CyclicBarrier(2)
+        final def latch = new CountDownLatch(1)
         final AtomicInteger counter = new AtomicInteger(0)
         AtomicReference messagesReference = new AtomicReference(null)
 
@@ -139,7 +141,7 @@ public class LifecycleTest extends GroovyTestCase {
         actor.metaClass {
             afterStop = {List messages ->
                 messagesReference.set(messages)
-                barrier.await()
+                latch.countDown()
             }
         }
 
@@ -150,7 +152,7 @@ public class LifecycleTest extends GroovyTestCase {
 
         actor.stop()
 
-        barrier.await(30, TimeUnit.SECONDS)
+        latch.await(30, TimeUnit.SECONDS)
         assertFalse actor.isActive()
         assertEquals 1, counter.intValue()
         assertNotNull messagesReference.get()
@@ -158,6 +160,7 @@ public class LifecycleTest extends GroovyTestCase {
 
     public void testStopWithInterruption() {
         final def barrier = new CyclicBarrier(2)
+        final def latch = new CountDownLatch(1)
         final AtomicInteger counter = new AtomicInteger(0)
         AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
@@ -172,7 +175,7 @@ public class LifecycleTest extends GroovyTestCase {
         actor.metaClass {
             afterStop = {List messages ->
                 messagesReference.set(messages)
-                barrier.await()
+                latch.countDown()
             }
             onInterrupt = {}            
         }
@@ -185,7 +188,7 @@ public class LifecycleTest extends GroovyTestCase {
         Thread.sleep 500
         actor.stop()
 
-        barrier.await(30, TimeUnit.SECONDS)
+        latch.await(30, TimeUnit.SECONDS)
         assertEquals 0, counter.intValue()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
