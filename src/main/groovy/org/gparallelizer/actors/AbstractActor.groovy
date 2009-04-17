@@ -300,10 +300,11 @@ abstract public class AbstractActor implements ThreadedActor {
         if (!started.get()) throw new IllegalStateException("The actor hasn't been started.");
     }
 
+    //todo should be private but closures demand higher visibility
     /**
      * Created a JVM-unique name for Actors' threads.
      */
-    private final String createThreadName() {
+    final String createThreadName() {
         "Actor Thread ${threadCount.incrementAndGet()}"
     }
 

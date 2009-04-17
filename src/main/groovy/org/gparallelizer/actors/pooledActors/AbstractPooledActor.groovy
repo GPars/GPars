@@ -313,12 +313,11 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo document send operator
     //todo add reply() and replyIfExists() to messages
     //todo implement reply for thread-bound actors and between the two actor categories
-    //todo handle nested loops - document using methods for nested loops, including breaking nested loops
-    //todo describe tips and tricks to call methods from act() - method, dynamically added closure, closure with delegate set
 
     //Planned for the next release
     //todo multiple messages in receive() and react()
     //todo remove the DSL replaceable with static import
+    //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
 
     //Backlog
     //todo maven
