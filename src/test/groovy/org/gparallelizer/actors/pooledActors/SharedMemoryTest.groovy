@@ -38,7 +38,8 @@ public class SharedMemoryTest extends GroovyTestCase {
                     counter += 1
                 }
             }
-        }.start()
+        }
+        actor2.start()
 
 
         latch.await()
