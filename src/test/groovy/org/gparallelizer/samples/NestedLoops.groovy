@@ -7,13 +7,16 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 class MyLoopActor extends AbstractPooledActor {
 
     protected void act() {
-        outerLoop()
+        loop {
+            outerLoop()
+        }
     }
 
     private void outerLoop() {
         react {a ->
             println 'Outer: ' + a
-            innerLoop()
+            if (a!=0) innerLoop()
+            else println 'Done'
         }
     }
 
@@ -46,7 +49,14 @@ actor.send 3
 actor.send 3
 actor.send 3
 actor.send 3
+actor.send 0
+actor.send 0
+
+
 
 Thread.sleep 5000
+actor.send 4
+Thread.sleep 5000
+
 getPool().shutdown()
 
