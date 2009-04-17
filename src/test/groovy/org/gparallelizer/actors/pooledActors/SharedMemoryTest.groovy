@@ -43,6 +43,5 @@ public class SharedMemoryTest extends GroovyTestCase {
 
         latch.await()
         assertEquals MAX_COUNTER, counter
-        getPool().shutdown()
     }
 }
