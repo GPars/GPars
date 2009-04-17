@@ -160,40 +160,4 @@ class Asynchronizer {
         }
         return result
     }
-
-    /**
-     * Enhanced the Object's meta-class with the <i>withAsynchronizer</i> and <i>withExistingAsynchronizer</i> methods,
-     * which call apropriate static methods on the <I>Asynchronizer</i> class. So the DSL can be then wrapped like this:
-     * <pre>
-     * Asynchronizer.initializeDSL()
-     * ...
-     * withAsynchronizer {*     assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-     *     assert [1, 2, 3, 4, 5].allAsync {it > 0}*     assert [1, 2, 3, 4, 5].findAsync{Number number -> number > 2} in [3, 4, 5]
-     *     ...
-     *}* </pre>
-     */
-    public static void initializeDSL () {
-        Object.metaClass {
-            withAsynchronizer = {Closure cl ->
-                Asynchronizer.withAsynchronizer cl
-            }
-
-            withAsynchronizer = {int numberOfThreads, Closure cl ->
-                Asynchronizer.withAsynchronizer numberOfThreads, cl
-            }
-
-            withAsynchronizer = {int numberOfThreads, ThreadFactory threadFactory, Closure cl ->
-                Asynchronizer.withAsynchronizer numberOfThreads, threadFactory, cl
-            }
-
-            withExistingAsynchronizer = {ExecutorService pool, Closure cl ->
-                Asynchronizer.withExistingAsynchronizer pool, cl
-            }
-        }
-    }
-
-    //todo allow for destroying the DSL
-
-  //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
-  //todo switch package to groovyx.concurrent
 }

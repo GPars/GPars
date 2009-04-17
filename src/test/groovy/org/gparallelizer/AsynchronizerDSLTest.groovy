@@ -2,14 +2,14 @@ package org.gparallelizer
 
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import static org.gparallelizer.Asynchronizer.*
 
 /**
  * @author Vaclav Pech
  * Date: Nov 23, 2008
  */
-public class AsynchronizerDSLInitializationTest extends GroovyTestCase {
+public class AsynchronizerDSLTest extends GroovyTestCase {
     public void testDSLInitialization() {
-        Asynchronizer.initializeDSL()
         withAsynchronizer {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
             assert [1, 2, 3, 4, 5].allAsync {it > 0}

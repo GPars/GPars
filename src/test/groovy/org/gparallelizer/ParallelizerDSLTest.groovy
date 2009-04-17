@@ -2,14 +2,14 @@ package org.gparallelizer
 
 import java.lang.Thread.UncaughtExceptionHandler
 import jsr166y.forkjoin.ForkJoinPool
+import static org.gparallelizer.Parallelizer.*
 
 /**
  * @author Vaclav Pech
  * Date: Nov 23, 2008
  */
-public class ParallelizerDSLInitializationTest extends GroovyTestCase {
+public class ParallelizerDSLTest extends GroovyTestCase {
     public void testDSLInitialization() {
-        Parallelizer.initializeDSL()
         withParallelizer {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
             assert [1, 2, 3, 4, 5].allAsync {it > 0}
