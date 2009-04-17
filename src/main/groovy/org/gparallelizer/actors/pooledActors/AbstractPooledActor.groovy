@@ -319,6 +319,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     
     //Planned for the next release
     //todo multiple messages in receive() and react()
+    //todo remove the DSL replaceable with static import
     
     //Backlog
     //todo maven
