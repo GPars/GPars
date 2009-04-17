@@ -1,5 +1,13 @@
 GParallelizer
 
+0.7
+Reply methods for thread-bound actors
+Reply methods available on received messages
+Ability to send replies between thread-bound and event-driven actors in both directions
+Documented structuring actors code and implementing event-driven loops
+Overloaded the << operator to perform send
+Handling multiple messages in single receive/react
+
 0.6
 Event-driven (pooled) actors
 
