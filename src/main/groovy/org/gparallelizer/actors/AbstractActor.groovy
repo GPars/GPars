@@ -33,7 +33,8 @@ abstract public class AbstractActor implements ThreadedActor {
     /**
      * Queue for the messages
      */
-    private final BlockingQueue<ActorMessage> messageQueue;
+    final BlockingQueue<ActorMessage> messageQueue;
+    //todo should be private but the closure in doReceive() method would not see it
 
     /**
      * The actors background thread.
@@ -121,17 +122,25 @@ abstract public class AbstractActor implements ThreadedActor {
         return started.get()
     }
 
+    //todo should be private but mixins woudn't work
+    /**
+     * Does the actual message receive using the supplied closure and wraps it with all necessary ceremony
+     */
+    final Object doReceive(Closure code) throws InterruptedException {
+        checkState();
+        ActorMessage message = code()
+        if (!message) return null
+        ReplyEnhancer.enhanceWithReplyMethods(this, message)
+        return message.payLoad;
+    }
+
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @return The message retrieved from the queue.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receive() throws InterruptedException {
-        checkState();
-        ActorMessage message = messageQueue.take()
-        if (!message) return null
-        ReplyEnhancer.enhanceWithReplyMethods(this, message)
-        return message.payLoad;
+        doReceive {messageQueue.take()}
     }
 
     /**
@@ -142,11 +151,7 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
-        checkState();
-        ActorMessage message = messageQueue.poll(timeout, timeUnit)
-        if (!message) return null
-        ReplyEnhancer.enhanceWithReplyMethods(this, message)
-        return message.payLoad;
+        doReceive {messageQueue.poll(timeout, timeUnit)}
     }
 
     /**
@@ -166,7 +171,13 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(Closure handler) throws InterruptedException {
-        handler.call(receive())
+        int maxNumberOfParameters = handler.getMaximumNumberOfParameters()
+        if (maxNumberOfParameters == 0) {
+            receive()
+            handler.call()
+        } else {
+            handler.call(*(1..maxNumberOfParameters).collect { receive() })
+        }
     }
 
     /**
@@ -179,7 +190,22 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
-        handler.call(receive(timeout, timeUnit))
+        int maxNumberOfParameters = handler.getMaximumNumberOfParameters()
+        if (maxNumberOfParameters == 0) {
+            receive(timeout, timeUnit)
+            handler.call()
+        } else {
+            long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis()
+            boolean nullAppeared = false  //Ignore further potential messages once a null is retrieved (due to a timeout)
+            handler.call(*(1..maxNumberOfParameters).collect {
+                if (nullAppeared) return null
+                else {
+                    Object message = receive(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS)
+                    nullAppeared = (message == null)
+                    return message
+                }
+            })
+        }
     }
 
     /**
@@ -207,17 +233,17 @@ abstract public class AbstractActor implements ThreadedActor {
         return this
     }
 
-  /**
-   * Adds the message to the Actor's message queue.
-   * The method will wait for space to become available in the queue, if it is full.
-   * It can only be called on a started Actor.
-   * @return The same Actor instance
-   * @throws InterruptedException If the thread is interrupted during the wait.
-   */
+    /**
+     * Adds the message to the Actor's message queue.
+     * The method will wait for space to become available in the queue, if it is full.
+     * It can only be called on a started Actor.
+     * @return The same Actor instance
+     * @throws InterruptedException If the thread is interrupted during the wait.
+     */
     public final Actor leftShift(Object message) throws InterruptedException {
         send message
     }
-  
+
     /**
      * This method is called periodically from the Actor's thread until the Actor is stopped
      * with a call to the stop() method or the background thread is interrupted.

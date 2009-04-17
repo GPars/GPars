@@ -311,18 +311,18 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     //Document before next release
     //todo document send operator
-    //todo add reply() and replyIfExists() to messages - document
+    //todo add reply() and replyIfExists() to messages
     //todo implement reply for thread-bound actors and between the two actor categories
     //todo handle nested loops - document using methods for nested loops, including breaking nested loops
     //todo describe tips and tricks to call methods from act() - method, dynamically added closure, closure with delegate set
-    //todo combine loop() with nested method calls
-    
+
     //Planned for the next release
     //todo multiple messages in receive() and react()
     //todo remove the DSL replaceable with static import
-    
+
     //Backlog
     //todo maven
+    //todo try fixes for the MixinTest
     //todo thread-bound actors could use threads from a pool or share a thread factory
     //todo introduce actor groups - actors sharing a thread pool
     //todo consider flow control to throttle message production

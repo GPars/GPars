@@ -10,14 +10,14 @@ class MyActor extends AbstractPooledActor {
         handleA()
     }
 
-    void handleA() {
+    private void handleA() {
         react {a ->
             replyIfExists "Done"
             handleB(a)
         }
     }
 
-    void handleB(int a) {
+    private void handleB(int a) {
         react {b ->
             println a + b
             LifeCycleHelper.latch.countDown()

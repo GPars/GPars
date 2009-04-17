@@ -5,12 +5,16 @@
  */
 class A {
 
-    def final foo() {
-        bar()
+    int counter = 0
+
+    protected def final foo() {
+        bar {
+            counter
+        }
     }
 
-    private final String bar() {
-        return "Bar"
+    private final String bar(Closure code) {
+        return "Bar " + code()
     }
 }
 
