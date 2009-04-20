@@ -48,7 +48,6 @@ abstract public class AbstractActor implements ThreadedActor {
 
     private final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
 
-    //todo add generics
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
@@ -240,9 +239,7 @@ abstract public class AbstractActor implements ThreadedActor {
      * @return The same Actor instance
      * @throws InterruptedException If the thread is interrupted during the wait.
      */
-    public final Actor leftShift(Object message) throws InterruptedException {
-        send message
-    }
+    public final Actor leftShift(Object message) throws InterruptedException { send message }
 
     /**
      * This method is called periodically from the Actor's thread until the Actor is stopped

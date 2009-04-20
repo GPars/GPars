@@ -316,21 +316,20 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     //Planned for the next release
     //todo multiple messages in receive() and react()
-    //todo remove the DSL replaceable with static import
     //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
 
     //Backlog
     //todo maven
-    //todo try fixes for the MixinTest
+    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
+    //todo try the fixes for the MixinTest
     //todo thread-bound actors could use threads from a pool or share a thread factory
     //todo introduce actor groups - actors sharing a thread pool
     //todo consider flow control to throttle message production
     //todo resize the pool if all threads are busy or blocked
-    //todo implement remote actors
     //todo put into maven repo
     //todo add transitive mvn dependencies
     //todo support gradle
-    //todo support mixins
+    //todo support mixins for event-driven actors
     //todo consider other types of queues
     //todo use ForkJoin
     //todo add synchronous calls plus an operator
@@ -338,9 +337,10 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo consider pass by copy (clone, serialization) for mutable messages, reject mutable messages otherwise
 
     //To consider
-    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo unify and publish spawn operation and mail boxes
     //todo associate a mail box with each thread, not only with actors
+    //todo add generics to actors
+    //todo implement remote actors
 
     /*
 import scala.actors.Actor._

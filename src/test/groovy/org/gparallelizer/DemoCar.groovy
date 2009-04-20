@@ -1,10 +1,3 @@
-/**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Mar 13, 2009
- * Time: 11:10:12 PM
- * To change this template use File | Settings | File Templates.
- */
 def car = "Patriot"
 
 def manufacturer = match(car) {

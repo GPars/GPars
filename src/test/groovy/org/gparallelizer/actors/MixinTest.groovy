@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 public class MixinTest extends GroovyTestCase {
 
-    //todo enable
     public void testClassMixin() {
         volatile def result=null
         final CountDownLatch latch = new CountDownLatch(1)
@@ -45,7 +44,6 @@ public class MixinTest extends GroovyTestCase {
         assert stopFlag.get()
     }
 
-    //todo enable
     public void testInstanceMixin() {
         volatile def result=null
         final CountDownLatch latch = new CountDownLatch(1)
