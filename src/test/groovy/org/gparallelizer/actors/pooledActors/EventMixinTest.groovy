@@ -9,7 +9,10 @@ import java.util.concurrent.TimeUnit
  * @author Vaclav Pech
  * Date: Feb 27, 2009
  */
-public abstract class EventMixinTest extends GroovyTestCase {
+public class EventMixinTest extends GroovyTestCase {
+
+    public void testSomething() {}
+    
     public void _testClassMixin() {
         volatile def result=null
         final CountDownLatch latch = new CountDownLatch(1)

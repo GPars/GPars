@@ -11,7 +11,7 @@ import org.gparallelizer.actors.BoundedActor
  * Date: Jan 7, 2009
  */
 
-public class BoundedActorTest {
+public class BoundedActorTest extends GroovyTestCase{
     public void testDefaultMessaging() {
         BoundedtTestActor actor=new BoundedtTestActor(2)
         actor.start()
