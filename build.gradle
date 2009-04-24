@@ -1,0 +1,18 @@
+usePlugin('groovy')
+srcRootName = 'src'
+srcDirNames = []
+groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
+groovyTestSrcDirNames = ['test/groovy', 'test/java']
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
+
+dependencies {
+    addMavenRepo()
+    groovy "org.codehaus.groovy:groovy-all:1.6.1"
+    compile "org.coconut.forkjoin:jsr166y:070108"
+    testCompile "junit:junit:4.5"
+}
+
+archive_jar {
+    version = '0.6.2'
+}
