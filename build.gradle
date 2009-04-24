@@ -1,4 +1,4 @@
-usePlugin('groovy')
+usePlugin 'groovy'
 srcRootName = 'src'
 srcDirNames = []
 groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
