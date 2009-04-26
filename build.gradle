@@ -1,6 +1,5 @@
 archivesBaseName = 'GParallelizer'
 
-
 usePlugin 'groovy'
 srcRootName = 'src'
 srcDirNames = []
@@ -17,6 +16,5 @@ dependencies {
 }
 
 archive_jar {
-//    baseName = 'GParallelizer'
     version = '0.6.3'
 }
