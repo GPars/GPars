@@ -205,6 +205,11 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     protected final void react(final long timeout, final Closure code) {
 
+//        int maxNumberOfParameters = code.getMaximumNumberOfParameters()
+        //todo handle timeout
+        //todo handle maxNunmberOfParameters == 0 correctly
+
+//        Closure reactCode = {List<ActorMessage> message ->
         Closure reactCode = {ActorMessage message ->
             if (message.payLoad == TIMEOUT) throw TIMEOUT
             ReplyEnhancer.enhanceWithReplyMethods(this, message)
@@ -319,6 +324,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
 
     //Backlog
+    //todo use AST transformation to turn actors methods into async processing
     //todo maven
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest
