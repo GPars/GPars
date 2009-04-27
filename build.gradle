@@ -7,6 +7,11 @@ groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembl
 groovyTestSrcDirNames = ['test/groovy', 'test/java']
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
+buildTime = new Date()
+type = 'jar'
+group = 'org.gparallelizer'
+def currentVersion = '0.6.4'
+
 
 dependencies {
     addMavenRepo()
@@ -16,5 +21,33 @@ dependencies {
 }
 
 archive_jar {
-    version = '0.6.3'
+    version = currentVersion
 }
+
+explodedDistDir = new File(distsDir, 'exploded')
+explodedDistDocsDir = new File(explodedDistDir, 'docs')
+explodedDistJavadocsDir = new File(explodedDistDocsDir, 'javadoc')
+explodedDistGroovydocsDir = new File(explodedDistDocsDir, 'groovydoc')
+
+groovydoc {
+    //todo set title
+    //todo check validity in IDEs
+//    title = "GParallelizer API $currentVersion"
+    destinationDir = explodedDistGroovydocsDir
+}
+
+javadoc {
+    title = "GParallelizer API $currentVersion"
+    destinationDir = explodedDistJavadocsDir
+    include 'org/gparallelizer/**'
+}
+
+createTask('zipdoc', dependsOn:'groovydoc') {
+    ant.zip(baseDir: explodedDistGroovydocsDir, destFile:"$distsDir/GParallelizer-$currentVersion-doc.zip")
+}
+
+createTask('release', dependsOn:['archive_jar', 'zipdoc']) {
+    ant.zip(baseDir: explodedDistDocsDir, destFile:"$distsDir/GParallelizer-$currentVersion-doc.zip")
+
+}
+
