@@ -325,16 +325,14 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo document send operator
     //todo add reply() and replyIfExists() to messages
     //todo implement reply for thread-bound actors and between the two actor categories
+    //todo use Gradle
 
     //Planned for the next release
     //todo multiple messages in receive() and react()
-    //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
-    //todo use Gradle
-    //todo add actor meta class
 
     //Backlog
+    //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
     //todo use AST transformation to turn actors methods into async processing
-    //todo maven
     //todo implement in Java
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest
@@ -342,17 +340,17 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo introduce actor groups - actors sharing a thread pool
     //todo consider flow control to throttle message production
     //todo resize the pool if all threads are busy or blocked
+    //todo maven
     //todo put into maven repo
     //todo add transitive mvn dependencies
-    //todo support gradle
     //todo support mixins for event-driven actors
     //todo consider other types of queues
     //todo use ForkJoin
     //todo add synchronous calls plus an operator
-    //todo add sendLater(Duration) and sendAfterDone(Future)
-    //todo consider pass by copy (clone, serialization) for mutable messages, reject mutable messages otherwise
 
     //To consider
+    //todo add sendLater(Duration) and sendAfterDone(Future)
+    //todo consider pass by copy (clone, serialization) for mutable messages, reject mutable messages otherwise
     //todo unify and publish spawn operation and mail boxes
     //todo associate a mail box with each thread, not only with actors
     //todo add generics to actors
