@@ -121,6 +121,13 @@ abstract public class AbstractActor implements ThreadedActor {
         return started.get()
     }
 
+    /**
+     * Checks whether the current thread is the actor's current thread.
+     */
+    public final boolean isActorThread() {
+        return Thread.currentThread() == actorThread
+    }
+
     //todo should be private but mixins woudn't work
     /**
      * Does the actual message receive using the supplied closure and wraps it with all necessary ceremony

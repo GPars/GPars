@@ -165,6 +165,13 @@ abstract public class AbstractPooledActor implements PooledActor {
     }
 
     /**
+     * Checks whether the current thread is the actor's current thread.
+     */
+    public final boolean isActorThread() {
+        return Thread.currentThread() == currentAction.get()?.actionThread
+    }
+
+    /**
      * This method represents the body of the actor. It is called upon actor's start and can exit either normally
      * by return or due to actor being stopped through the stop() method, which cancels the current actor action.
      * Provides an extension point for subclasses to provide their custom Actor's message handling code.
@@ -322,10 +329,13 @@ abstract public class AbstractPooledActor implements PooledActor {
     //Planned for the next release
     //todo multiple messages in receive() and react()
     //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
+    //todo use Gradle
+    //todo add actor meta class
 
     //Backlog
     //todo use AST transformation to turn actors methods into async processing
     //todo maven
+    //todo implement in Java
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest
     //todo thread-bound actors could use threads from a pool or share a thread factory

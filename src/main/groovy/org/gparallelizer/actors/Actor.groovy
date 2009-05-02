@@ -29,6 +29,11 @@ public interface Actor {
     boolean isActive();
 
     /**
+     * Checks whether the current thread is the actor's current thread.
+     */
+    boolean isActorThread();
+
+    /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      */
     Actor send(Object message) throws InterruptedException;
