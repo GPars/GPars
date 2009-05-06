@@ -1,7 +1,7 @@
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
+import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 class MyLoopActor extends AbstractPooledActor {
@@ -58,5 +58,5 @@ Thread.sleep 5000
 actor.send 4
 Thread.sleep 5000
 
-getPool().shutdown()
+retrieveDefaultPool().shutdown()
 

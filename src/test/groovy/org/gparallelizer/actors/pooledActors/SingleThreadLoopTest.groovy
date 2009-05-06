@@ -1,6 +1,6 @@
 package org.gparallelizer.actors.pooledActors
 
-import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
+import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 
 /**
  *
@@ -11,6 +11,6 @@ public class SingleThreadLoopTest extends LoopTest {
 
     protected void setUp() {
         super.setUp();
-        getPool().resize(1)
+        retrieveDefaultPool().resize(1)
     }
 }

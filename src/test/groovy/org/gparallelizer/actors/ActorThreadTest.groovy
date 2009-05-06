@@ -11,7 +11,7 @@ public class ActorThreadTest extends GroovyTestCase {
         final Actor actor
         actor = Actors.oneShotActor {
             receive()
-            flag1=actor.isActorThread()
+            flag1=isActorThread()
             latch.countDown()
 
         }.start()

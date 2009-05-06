@@ -11,9 +11,9 @@ public class PooledActorThreadTest extends GroovyTestCase {
 
         final Actor actor
         actor = PooledActors.actor {
-            flag1=actor.isActorThread()
+            flag1=isActorThread()
             react {
-                flag2=actor.isActorThread()
+                flag2=isActorThread()
                 latch.countDown()
             }
 

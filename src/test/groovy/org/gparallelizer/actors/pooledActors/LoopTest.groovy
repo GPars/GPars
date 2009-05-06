@@ -4,7 +4,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
+import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import java.util.concurrent.atomic.AtomicReference
 
@@ -17,7 +17,7 @@ public class LoopTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        getPool().resize(10)
+        retrieveDefaultPool().resize(10)
     }
 
     public void testLoop() {

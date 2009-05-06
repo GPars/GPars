@@ -142,10 +142,10 @@ final class ActorAction implements Runnable {
     }
 
     /**
-     * Creates a new ActorAction and schedules it for processing.
+     * Creates a new ActorAction and schedules it for processing in the thread pool belonging to the actor's group.
      */
     static void actorAction(AbstractPooledActor actor, Closure code) {
-        PooledActors.pool.execute new ActorAction(actor, code)
+        actor.actorGroup.threadPool.execute new ActorAction(actor, code)
     }
 
     /**

@@ -1,7 +1,7 @@
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
+import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,4 +44,4 @@ console.metaClass {
 
 latch.await()
 println 'Shutdown'
-getPool().shutdown()
+retrieveDefaultPool().shutdown()

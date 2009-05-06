@@ -30,43 +30,32 @@ import org.gparallelizer.actors.ReplyEnhancer
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
  *
- * def actor = actor {
- *     loop {
- *         react {message ->
+ * def actor = actor {*     loop {*         react {message ->
  *             println message
- *         }
- *         //this line will never be reached
- *     }
- *     //this line will never be reached
- * }.start()
+ *}*         //this line will never be reached
+ *}*     //this line will never be reached
+ *}.start()
  *
  * actor.send 'Hi!'
  * </pre>
  * This requires the code to be structured accordingly.
  *
  * <pre>
- * def adder = actor {
- *     loop {
- *         react {a ->
+ * def adder = actor {*     loop {*         react {a ->
  *             react {b ->
  *                 println a+b
  *                 replyIfExists a+b  //sends reply, if b was sent by a PooledActor
- *             }
- *         }
- *         //this line will never be reached
- *     }
- *     //this line will never be reached
- * }.start()
+ *}*}*         //this line will never be reached
+ *}*     //this line will never be reached
+ *}.start()
  * </pre>
  * The closures passed to the react() method can call reply() or replyIfExists(), which will send a message back to
  * the originator of the currently processed message. The replyIfExists() method unlike the reply() method will not fail
  * if the original message wasn't sent by an actor nor if the original sender actor is no longer running.
  * The react() method accepts timout specified using the TimeCategory DSL.
  * <pre>
- * react(10.MINUTES) {
- *     println 'Received message: ' + it
- * }
- * </pre>
+ * react(10.MINUTES) {*     println 'Received message: ' + it
+ *}* </pre>
  * If not message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
  * and the actor terminates.
  * Each PooledActor has at any point in time at most one active instance of ActorAction associated, which abstracts
@@ -122,9 +111,30 @@ abstract public class AbstractPooledActor implements PooledActor {
     private static final Timer timer = new Timer(true)
 
     /**
+     * The actor group to which the actor belongs
+     */
+    volatile PooledActorGroup actorGroup = PooledActors.defaultPooledActorGroup
+
+    /**
+     * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
+     */
+    private volatile boolean groupMembershipChangeable = true
+
+    /**
+     * Sets the actor's group.
+     * It can only be invoked before the actor is started.
+     */
+    public final void setActorGroup(PooledActorGroup group) {
+        if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
+        if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
+        actorGroup = group
+    }
+
+    /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
      */
     public final AbstractPooledActor start() {
+        groupMembershipChangeable = false
         if (!stopFlag.getAndSet(false)) throw new IllegalStateException("Actor has alredy been started.")
         actorAction(this) {
             if (delegate.respondsTo('afterStart')) delegate.afterStart()
@@ -329,6 +339,8 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     //Planned for the next release
     //todo multiple messages in receive() and react()
+    //todo thread-bound actors could use threads from a pool or share a thread factory
+    //todo introduce actor groups - actors sharing a thread pool
 
     //Backlog
     //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
@@ -336,8 +348,6 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo implement in Java
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest
-    //todo thread-bound actors could use threads from a pool or share a thread factory
-    //todo introduce actor groups - actors sharing a thread pool
     //todo consider flow control to throttle message production
     //todo resize the pool if all threads are busy or blocked
     //todo maven

@@ -1,7 +1,7 @@
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
+import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 
 Actor actor = actor {
     outerLoop()
@@ -44,5 +44,5 @@ actor.send 3
 actor.send 3
 
 Thread.sleep 5000
-getPool().shutdown()
+retrieveDefaultPool().shutdown()
 

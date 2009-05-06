@@ -2,7 +2,7 @@ import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.getPool
+import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 
 class MyActor extends AbstractPooledActor {
 
@@ -72,7 +72,7 @@ testActor(actor3)
 
 
 LifeCycleHelper.latch.await()
-getPool().shutdown()
+retrieveDefaultPool().shutdown()
 
 
 class LifeCycleHelper {

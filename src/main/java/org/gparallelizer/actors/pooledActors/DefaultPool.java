@@ -16,31 +16,35 @@ public final class DefaultPool implements Pool {
 
     /**
      * Creates the pool with default number of threads.
+     * @param daemon Sets the daemon flag of threads in the pool.
      */
-    public DefaultPool() {
-        this(retrieveDefaultPoolSize());
+    public DefaultPool(final boolean daemon) {
+        this(daemon, DefaultPool.retrieveDefaultPoolSize());
     }
 
     /**
      * Creates the pool with specified number of threads.
+     * @param daemon Sets the daemon flag of threads in the pool.
      * @param poolSize The required size of the pool
      */
-    public DefaultPool(final int poolSize) {
+    public DefaultPool(final boolean daemon, final int poolSize) {
         if (poolSize<0) throw new IllegalStateException("Pool size must be a non-negative number.");
-        createPool(poolSize);
+        createPool(daemon, poolSize);
     }
 
     /**
      * Creates a fixed-thread pool of given size. Each thread will have the uncaught exception handler set
      * to print the unhandled exception to standard error output.
-     * @param poolSize The required pool size
-     * @return The created thread pool
+     * @param daemon Sets the daemon flag of threads in the pool.
+     * @param poolSize The required pool size  @return The created thread pool
+     * @return The newly created thread pool
      */
-    private ExecutorService createPool(final int poolSize) {
+    private ExecutorService createPool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
         pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
             public Thread newThread(final Runnable r) {
                 final Thread thread = new Thread(r);
+                thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                     public void uncaughtException(final Thread t, final Throwable e) {
                         System.err.println("Uncaught exception occured in actor pool " + t.getName());
@@ -66,7 +70,7 @@ public final class DefaultPool implements Pool {
      * Sets the pool size to the default
      */
     public void resetDefaultSize() {
-        resize(retrieveDefaultPoolSize());
+        resize(DefaultPool.retrieveDefaultPoolSize());
     }
 
     /**

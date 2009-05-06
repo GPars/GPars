@@ -37,7 +37,7 @@ actor {
     }
 }.start()
 
-getPool().resize 2
+retrieveDefaultPool().resize 2
 
 def actors = []
 def messages = []

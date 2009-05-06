@@ -6,7 +6,7 @@ package org.gparallelizer.actors.pooledActors
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
  *
- * getPool().resize 1
+ * retrieveDefaultPool().resize 1
  *
  * def actor = actor {
  *     react {message ->
@@ -18,30 +18,33 @@ package org.gparallelizer.actors.pooledActors
  * actor.send 'Hi!'
  * </pre>
  *
+ * All actors created through the PooledActors class will belong to the same default actor group and run
+ * on daemon threads.
+ * The PooledActorGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
+ * threads are to be used.
  * @author Vaclav Pech
  * Date: Feb 18, 2009
  */
-public class PooledActors {
+public abstract class PooledActors {
 
     /**
-     * Stored the actors' thread pool
+     * The default actor group to share by all actors created through the PooledActors class.
      */
-    private static final Pool instance = new DefaultPool()
+    final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(true)
 
     /**
-     * Returns the actors' thread pool
-     * @return The thread pool shared by actors
+     * Returns the default actors' group thread pool
+     * @return The thread pool shared by actors in the default actor group
      */
-    public static Pool getPool() {instance}
+    public static Pool retrieveDefaultPool() {defaultPooledActorGroup.threadPool}
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
+     * The created actor will be part of the default actor group.
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the AbstractPooledActor class
      */
     public static AbstractPooledActor actor(Closure handler) {
-        final AbstractPooledActor actor = [act: handler] as AbstractPooledActor
-        handler.delegate = actor
-        return actor
+        return defaultPooledActorGroup.actor(handler)
     }
 }

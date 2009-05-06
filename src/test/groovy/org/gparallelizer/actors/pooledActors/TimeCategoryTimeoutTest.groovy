@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger
 public class TimeCategoryTimeoutTest extends GroovyTestCase {
     protected void setUp() {
         super.setUp();
-        PooledActors.pool.resize(5)
+        PooledActors.retrieveDefaultPool().resize(5)
     }
 
     public void testTimeout() {
