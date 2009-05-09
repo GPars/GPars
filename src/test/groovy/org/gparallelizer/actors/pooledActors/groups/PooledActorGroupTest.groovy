@@ -127,11 +127,11 @@ public class PooledActorGroupTest extends GroovyTestCase {
 
         assert daemonGroup1.threadPool != daemonGroup2.threadPool
         assert daemonGroup1.threadPool != nonDaemonGroup1.threadPool
-        assert daemonGroup1.threadPool != defaultGroup
+        assert daemonGroup1.threadPool != defaultGroup.threadPool
 
         assert nonDaemonGroup1.threadPool != daemonGroup2.threadPool
         assert nonDaemonGroup1.threadPool != nonDaemonGroup2.threadPool
-        assert nonDaemonGroup1.threadPool != defaultGroup
+        assert nonDaemonGroup1.threadPool != defaultGroup.threadPool
     }
 }
 
