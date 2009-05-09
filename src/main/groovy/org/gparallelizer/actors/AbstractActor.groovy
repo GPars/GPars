@@ -49,6 +49,16 @@ abstract public class AbstractActor implements ThreadedActor {
     private final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
 
     /**
+     * The actor group to which the actor belongs
+     */
+    volatile ActorGroup actorGroup = Actors.defaultActorGroup
+
+    /**
+     * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
+     */
+    private volatile boolean groupMembershipChangeable = true
+
+    /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
     public AbstractActor(final BlockingQueue<ActorMessage> messageQueue) {
@@ -57,9 +67,20 @@ abstract public class AbstractActor implements ThreadedActor {
     }
 
     /**
+     * Sets the actor's group.
+     * It can only be invoked before the actor is started.
+     */
+    public final void setActorGroup(ActorGroup group) {
+        if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
+        if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
+        actorGroup = group
+    }
+
+    /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
      */
     public final Actor start() {
+        groupMembershipChangeable = false
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
         def localStarted = started
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
@@ -68,7 +89,8 @@ abstract public class AbstractActor implements ThreadedActor {
         localStartupLock.withSemaphore {
             if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
         }
-        actorThread = Thread.start(createThreadName()) {
+
+        actorThread = actorGroup.threadFactory.newThread({
             try {
                 ReplyRegistry.registerCurrentActorWithThread this
                 if (delegate.respondsTo('afterStart')) delegate.afterStart()
@@ -100,7 +122,9 @@ abstract public class AbstractActor implements ThreadedActor {
                 }
                 ReplyRegistry.deregisterCurrentActorWithThread()
             }
-        }
+        } as Runnable)
+        actorThread.name = createThreadName()
+        actorThread.start()
         return this
     }
 
@@ -182,7 +206,7 @@ abstract public class AbstractActor implements ThreadedActor {
             receive()
             handler.call()
         } else {
-            handler.call(*(1..maxNumberOfParameters).collect { receive() })
+            handler.call(* (1..maxNumberOfParameters).collect { receive() })
         }
     }
 
@@ -203,7 +227,7 @@ abstract public class AbstractActor implements ThreadedActor {
         } else {
             long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis()
             boolean nullAppeared = false  //Ignore further potential messages once a null is retrieved (due to a timeout)
-            handler.call(*(1..maxNumberOfParameters).collect {
+            handler.call(* (1..maxNumberOfParameters).collect {
                 if (nullAppeared) return null
                 else {
                     Object message = receive(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS)

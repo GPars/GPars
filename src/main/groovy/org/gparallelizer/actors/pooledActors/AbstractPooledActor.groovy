@@ -336,15 +336,15 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo add reply() and replyIfExists() to messages
     //todo implement reply for thread-bound actors and between the two actor categories
     //todo use Gradle
+    //todo introduce actor groups - actors sharing a thread pool
 
     //Planned for the next release
     //todo multiple messages in receive() and react()
     //todo thread-bound actors could use threads from a pool or share a thread factory
-    //todo introduce actor groups - actors sharing a thread pool
 
     //Backlog
-    //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
     //todo use AST transformation to turn actors methods into async processing
+    //todo consider asynchronous metaclass
     //todo implement in Java
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest
@@ -359,6 +359,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo add synchronous calls plus an operator
 
     //To consider
+    //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
     //todo add sendLater(Duration) and sendAfterDone(Future)
     //todo consider pass by copy (clone, serialization) for mutable messages, reject mutable messages otherwise
     //todo unify and publish spawn operation and mail boxes

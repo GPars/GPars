@@ -1,7 +1,7 @@
 package org.gparallelizer.actors.pooledActors
 
 /**
- * Provides logical grouping for actors. Each group has an underlying thread pool, which will perform actions
+ * Provides logical grouping for pooled actors. Each group has an underlying thread pool, which will perform actions
  * on behalf of the actors belonging to the group. Actors created through the PooledActorGroup.actor() method
  * will automatically belong to the group through which they were created.
  * <pre>
@@ -13,7 +13,6 @@ package org.gparallelizer.actors.pooledActors
  *     react {message ->
  *         println message
  *     }
- *     //this line will never be reached
  * }.start()
  *
  * actor.send 'Hi!'
@@ -21,8 +20,8 @@ package org.gparallelizer.actors.pooledActors
  * group.threadPool.shutdown()
  * </pre>
  *
- * Otherwise the PooledActor.actorGroup property, which defaults to the PooledActors.defaultPooledActorGroup,
- * can be set before the actor is started.
+ * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.actorGroup property,
+ * which defaults to the PooledActors.defaultPooledActorGroup, can be set before the actor is started.
  *
  * <pre>
  * def group = new PooledActorGroup(false)
@@ -36,7 +35,7 @@ package org.gparallelizer.actors.pooledActors
  * </pre>
  *
  * @author Vaclav Pech
- * Time: 1:47:53 PM
+ * Date: May 4, 2009
  */
 public class PooledActorGroup {
 

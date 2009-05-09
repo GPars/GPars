@@ -30,7 +30,7 @@ public abstract class PooledActors {
     /**
      * The default actor group to share by all actors created through the PooledActors class.
      */
-    final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(true)
+    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(true)
 
     /**
      * Returns the default actors' group thread pool
