@@ -22,6 +22,22 @@ public abstract class ReplyEnhancer {
     }
 
     /**
+     * Adds reply() and replyIfExists() methods to the currentActor and all the messages. Replies invoked on the actor
+     * will be sent to the sender of the last message in the supplied list of messages.
+     * These methods will call send() on the target actor (the sender of the original message)
+     * @param actor The actor to enhance
+     * @param message The instance of ActorMessage wrapping the sender actor, who we need to be able to respond to,
+     * plus the original message
+     */
+    public static void enhanceWithReplyMethods(final Actor actor, final List<ActorMessage> messages) {
+        messages.each {ActorMessage message ->
+            final Actor sender = message.sender
+            enhanceObject(message.payLoad, sender)
+        }
+        enhanceObject(actor, messages[-1].sender)
+    }
+
+    /**
      * Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
      */
     private static def enhanceObject(def replier, Actor sender) {

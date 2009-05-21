@@ -79,6 +79,11 @@ abstract public class AbstractPooledActor implements PooledActor {
     private final AtomicReference<Closure> codeReference = new AtomicReference<Closure>(null)
 
     /**
+     * Buffer to hold messages required by the scheduled next continuation. Null when no continuation scheduled.
+     */
+    private final MessageHolder bufferedMessages = null
+
+    /**
      * Indicates whether the actor should terminate
      */
     private final AtomicBoolean stopFlag = new AtomicBoolean(true)
@@ -222,15 +227,17 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     protected final void react(final long timeout, final Closure code) {
 
-//        int maxNumberOfParameters = code.getMaximumNumberOfParameters()
-        //todo handle timeout
+        int maxNumberOfParameters = code.maximumNumberOfParameters
+        //todo handle timeout - test
         //todo handle maxNunmberOfParameters == 0 correctly
+        //todo check reply on all messages and the actor - test
+        //todo test and document that reply on the actor goes to the last message
 
-//        Closure reactCode = {List<ActorMessage> message ->
-        Closure reactCode = {ActorMessage message ->
-            if (message.payLoad == TIMEOUT) throw TIMEOUT
-            ReplyEnhancer.enhanceWithReplyMethods(this, message)
-            code.call(message.payLoad)
+        Closure reactCode = {List<ActorMessage> messages ->
+//        Closure reactCode = {ActorMessage message ->
+            if (messages.any {ActorMessage actorMessage -> actorMessage.payLoad == TIMEOUT}) throw TIMEOUT
+            ReplyEnhancer.enhanceWithReplyMethods(this, messages)
+            code.call(*(messages*.payLoad))
             this.repeatLoop()
         }
 
@@ -238,9 +245,16 @@ abstract public class AbstractPooledActor implements PooledActor {
             if (stopFlag.get()) throw TERMINATE
             assert (codeReference.get() == null), "Cannot have more react called at the same time."
 
-            final Object currentMessage = messageQueue.poll()
-            if (currentMessage) {
-                actorAction(this) { reactCode.call(currentMessage) }
+            bufferedMessages = new MessageHolder(Math.max(maxNumberOfParameters, 1))
+
+            ActorMessage currentMessage
+            while((!bufferedMessages.ready) && (currentMessage = (ActorMessage)messageQueue.poll())) {
+                bufferedMessages.addMessage(currentMessage)
+            }
+            if (bufferedMessages.ready) {
+                final List<ActorMessage> messages = bufferedMessages.messages
+                actorAction(this) { reactCode.call(messages) }
+                bufferedMessages = null
             } else {
                 codeReference.set(reactCode)
                 if (timeout > 0) {
@@ -265,7 +279,13 @@ abstract public class AbstractPooledActor implements PooledActor {
 
             final Closure currentReference = codeReference.getAndSet(null)
             if (currentReference) {
-                actorAction(this) { currentReference.call(actorMessage) }
+                assert bufferedMessages && !bufferedMessages.isReady()
+                bufferedMessages.addMessage actorMessage
+                if (bufferedMessages.ready) {
+                    final List<ActorMessage> messages = bufferedMessages.messages
+                    actorAction(this) { currentReference.call(messages) }
+                    bufferedMessages = null
+                }
             } else {
                 messageQueue.put(actorMessage)
             }
