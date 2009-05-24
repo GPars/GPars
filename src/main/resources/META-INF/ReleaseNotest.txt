@@ -7,6 +7,8 @@ Ability to send replies between thread-bound and event-driven actors in both dir
 Documented structuring actors code and implementing event-driven loops
 Overloaded the << operator to perform send
 Handling multiple messages in single receive/react
+Actor groups, multiple independent configurable thread pools
+Gradle build script 
 
 0.6
 Event-driven (pooled) actors

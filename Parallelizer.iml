@@ -4,7 +4,6 @@
     <containerInfo>
       <containerElement type="module" name="Parallelizer">
         <attribute name="method" value="1" />
-        <attribute name="URI" value="/" />
       </containerElement>
     </containerInfo>
     <setting name="jarUrl" value="file://$MODULE_DIR$/GParallelizer-0.6.1.jar" />
@@ -31,7 +30,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="groovy-1.6.2" level="application" />
+    <orderEntry type="library" name="gant-1.6.1" level="application" />
+    <orderEntry type="library" name="groovy-1.6.3" level="application" />
     <orderEntry type="library" name="groovy-1.6.1" level="application" />
     <orderEntry type="module-library">
       <library>

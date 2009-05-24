@@ -46,6 +46,26 @@ public class MessageHolderTest extends GroovyTestCase {
         assert holder.timeout
     }
 
+    public void testZeroHolder() {
+        final MessageHolder holder = new MessageHolder(0)
+        assertFalse holder.ready
+        assertFalse holder.timeout
+
+        holder.addMessage createMessage('Message 1')
+        assert holder.ready
+        assertFalse holder.timeout
+    }
+
+    public void testZeroHolderTimeout() {
+        final MessageHolder holder = new MessageHolder(0)
+        assertFalse holder.ready
+        assertFalse holder.timeout
+
+        holder.addMessage createMessage(ActorException.TIMEOUT)
+        assert holder.ready
+        assert holder.timeout
+    }
+
     private final ActorMessage createMessage(Object payLoad) {
         new ActorMessage(payLoad, null)
     }

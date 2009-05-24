@@ -24,6 +24,10 @@ archive_jar {
     version = currentVersion
 }
 
+//jar(type:Jar) {
+//
+//}
+
 explodedDistDir = new File(distsDir as File, 'exploded')
 explodedDistDocsDir = new File(explodedDistDir, 'docs')
 explodedDistJavadocsDir = new File(explodedDistDocsDir, 'javadoc')

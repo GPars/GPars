@@ -156,12 +156,9 @@ abstract public class AbstractActor implements ThreadedActor {
     /**
      * Does the actual message receive using the supplied closure and wraps it with all necessary ceremony
      */
-    final Object doReceive(Closure code) throws InterruptedException {
+    final ActorMessage doReceive(Closure code) throws InterruptedException {
         checkState();
-        ActorMessage message = code()
-        if (!message) return null
-        ReplyEnhancer.enhanceWithReplyMethods(this, message)
-        return message.payLoad;
+        return code()
     }
 
     /**
@@ -170,7 +167,9 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receive() throws InterruptedException {
-        doReceive {messageQueue.take()}
+        Object message = doReceive {messageQueue.take()}
+        ReplyEnhancer.enhanceWithReplyMethods(this, message)
+        return message?.payLoad
     }
 
     /**
@@ -181,7 +180,9 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
-        doReceive {messageQueue.poll(timeout, timeUnit)}
+        Object message = doReceive {messageQueue.poll(timeout, timeUnit)}
+        ReplyEnhancer.enhanceWithReplyMethods(this, message)
+        return message?.payLoad
     }
 
     /**
@@ -201,12 +202,17 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(Closure handler) throws InterruptedException {
-        int maxNumberOfParameters = handler.getMaximumNumberOfParameters()
+        int maxNumberOfParameters = handler.maximumNumberOfParameters
         if (maxNumberOfParameters == 0) {
-            receive()
+            ActorMessage message = doReceive {messageQueue.take()}
+            ReplyEnhancer.enhanceWithReplyMethods(this, message)
             handler.call()
         } else {
-            handler.call(* (1..maxNumberOfParameters).collect { receive() })
+            final List<ActorMessage> messages = (1..maxNumberOfParameters).collect {
+                doReceive {messageQueue.take()}
+            }
+            ReplyEnhancer.enhanceWithReplyMethods(this, messages)
+            handler.call(* messages*.payLoad)
         }
     }
 
@@ -220,21 +226,27 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
-        int maxNumberOfParameters = handler.getMaximumNumberOfParameters()
+        int maxNumberOfParameters = handler.maximumNumberOfParameters
         if (maxNumberOfParameters == 0) {
-            receive(timeout, timeUnit)
+            ActorMessage message = doReceive {messageQueue.poll(timeout, timeUnit)}
+            ReplyEnhancer.enhanceWithReplyMethods(this, message)
             handler.call()
         } else {
             long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis()
             boolean nullAppeared = false  //Ignore further potential messages once a null is retrieved (due to a timeout)
-            handler.call(* (1..maxNumberOfParameters).collect {
+
+            final List<ActorMessage> messages = (1..maxNumberOfParameters).collect {
                 if (nullAppeared) return null
                 else {
-                    Object message = receive(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS)
+                    ActorMessage message = doReceive {
+                        messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS)
+                    }
                     nullAppeared = (message == null)
                     return message
                 }
-            })
+            }
+            ReplyEnhancer.enhanceWithReplyMethods(this, messages)
+            handler.call(* messages*.payLoad)
         }
     }
 

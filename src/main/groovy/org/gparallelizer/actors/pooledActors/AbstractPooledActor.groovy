@@ -229,12 +229,10 @@ abstract public class AbstractPooledActor implements PooledActor {
 
         int maxNumberOfParameters = code.maximumNumberOfParameters
         //todo handle timeout - test
-        //todo handle maxNunmberOfParameters == 0 correctly
         //todo check reply on all messages and the actor - test
         //todo test and document that reply on the actor goes to the last message
 
         Closure reactCode = {List<ActorMessage> messages ->
-//        Closure reactCode = {ActorMessage message ->
             if (messages.any {ActorMessage actorMessage -> actorMessage.payLoad == TIMEOUT}) throw TIMEOUT
             ReplyEnhancer.enhanceWithReplyMethods(this, messages)
             code.call(*(messages*.payLoad))
@@ -245,7 +243,7 @@ abstract public class AbstractPooledActor implements PooledActor {
             if (stopFlag.get()) throw TERMINATE
             assert (codeReference.get() == null), "Cannot have more react called at the same time."
 
-            bufferedMessages = new MessageHolder(Math.max(maxNumberOfParameters, 1))
+            bufferedMessages = new MessageHolder(maxNumberOfParameters)
 
             ActorMessage currentMessage
             while((!bufferedMessages.ready) && (currentMessage = (ActorMessage)messageQueue.poll())) {
@@ -277,13 +275,14 @@ abstract public class AbstractPooledActor implements PooledActor {
 
             def actorMessage = ActorMessage.build(message)
 
-            final Closure currentReference = codeReference.getAndSet(null)
+            final Closure currentReference = codeReference.get()
             if (currentReference) {
                 assert bufferedMessages && !bufferedMessages.isReady()
                 bufferedMessages.addMessage actorMessage
                 if (bufferedMessages.ready) {
                     final List<ActorMessage> messages = bufferedMessages.messages
                     actorAction(this) { currentReference.call(messages) }
+                    codeReference.set(null)
                     bufferedMessages = null
                 }
             } else {
@@ -359,12 +358,15 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo introduce actor groups - actors sharing a thread pool
 
     //Planned for the next release
+    //todo reconsider reply() and replyIfExists()
     //todo multiple messages in receive() and react()
+    //todo system properties for the default pool size
     //todo thread-bound actors could use threads from a pool or share a thread factory
 
     //Backlog
     //todo use AST transformation to turn actors methods into async processing
     //todo consider asynchronous metaclass
+    //todo create a performance benchmark
     //todo implement in Java
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest

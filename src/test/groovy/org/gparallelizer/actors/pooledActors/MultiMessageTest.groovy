@@ -1,4 +1,4 @@
-package org.gparallelizer.actors
+package org.gparallelizer.actors.pooledActors
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -10,8 +10,8 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.oneShotActor {
-            receive {a, b, c ->
+        def actor = PooledActors.actor {
+            react {a, b, c ->
                 result = a + b + c
                 latch.countDown()
             }
@@ -29,8 +29,8 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.oneShotActor {
-            receive {->
+        def actor = PooledActors.actor {
+            react {->
                 result = 1
                 latch.countDown()
             }
@@ -46,8 +46,8 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.oneShotActor {
-            receive {
+        def actor = PooledActors.actor {
+            react {
                 result = 1
                 latch.countDown()
             }
@@ -63,8 +63,8 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.oneShotActor {
-            receive {a, b, c ->
+        def actor = PooledActors.actor {
+            react {a, b, c ->
                 result = a[2] + b + c
                 latch.countDown()
             }
@@ -82,18 +82,20 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
+        final PooledActorGroup group = new PooledActorGroup(true)
+        group.threadPool.resize 5
 
-        def actor = Actors.oneShotActor {
-            receive {a, b, c ->
+        def actor = group.actor {
+            react {a, b, c ->
                 a.reply(a + 1)
                 b.reply(b + 1)
                 c.reply(c + 1)
             }
         }.start()
 
-        createReplyActor actor, 10, barrier, latch, result
-        createReplyActor actor, 100, barrier, latch, result
-        createReplyActor actor, 1000, barrier, latch, result
+        createReplyActor group, actor, 10, barrier, latch, result
+        createReplyActor group, actor, 100, barrier, latch, result
+        createReplyActor group, actor, 1000, barrier, latch, result
 
         latch.await(30, TimeUnit.SECONDS)
 
@@ -104,30 +106,33 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
+        final PooledActorGroup group = new PooledActorGroup(true)
+        group.threadPool.resize 5
 
-        def actor = Actors.oneShotActor {
-            receive {a, b, c ->
+        def actor = group.actor {
+            react {a, b, c ->
                 reply(20)
             }
         }.start()
 
-        createReplyActor actor, 10, barrier, latch, result
-        createReplyActor actor, 100, barrier, latch, result
-        createReplyActor actor, 1000, barrier, latch, result
+        createReplyActor group, actor, 10, barrier, latch, result
+        createReplyActor group, actor, 100, barrier, latch, result
+        createReplyActor group, actor, 1000, barrier, latch, result
 
         latch.await(30, TimeUnit.SECONDS)
 
         assertEquals 60, result.get()
     }
 
-    Actor createReplyActor(Actor actor, int num, CyclicBarrier barrier, CountDownLatch latch, AtomicInteger result) {
-        Actors.oneShotActor {
+    PooledActor createReplyActor(PooledActorGroup group, PooledActor actor, int num,
+                                 CyclicBarrier barrier, CountDownLatch latch, AtomicInteger result) {
+        group.actor {
             barrier.await()
             actor.send(num)
-            receive {
+            react {
                 result.addAndGet(it)
                 latch.countDown()
             }
         }.start()
-    }    
+    }
 }
