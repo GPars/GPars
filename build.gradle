@@ -8,10 +8,10 @@ manifest.mainAttributes(
     'Implementation-Version': version
 )
 
-//srcRootName = 'src'
-//srcDirNames = []
-//groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
-//groovyTestSrcDirNames = ['test/groovy', 'test/java']
+srcRootName = 'src'
+srcDirNames = []
+groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
+groovyTestSrcDirNames = ['test/groovy', 'test/java']
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
 buildTime = new Date()
