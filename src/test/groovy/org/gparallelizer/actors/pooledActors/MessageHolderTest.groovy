@@ -66,6 +66,23 @@ public class MessageHolderTest extends GroovyTestCase {
         assert holder.timeout
     }
 
+    public void testMessageDump() {
+        final MessageHolder holder = new MessageHolder(3)
+        assertEquals([null, null, null], holder.dumpMessages())
+
+        final ActorMessage msg1 = createMessage('Message 1')
+        holder.addMessage(msg1)
+        assertEquals([msg1, null, null], holder.dumpMessages())
+
+        final ActorMessage msg2 = createMessage('Message 2')
+        holder.addMessage(msg2)
+        assertEquals([msg1, msg2, null], holder.dumpMessages())
+
+        final ActorMessage msg3 = createMessage('Message 3')
+        holder.addMessage(msg3)
+        assertEquals([msg1, msg2, msg3], holder.dumpMessages())
+    }
+
     private final ActorMessage createMessage(Object payLoad) {
         new ActorMessage(payLoad, null)
     }

@@ -58,6 +58,15 @@ public class PooledActorGroup {
     }
 
     /**
+     * Creates a group of actors. The actors will share a common thread pool.
+     * @param daemon Sets the daemon flag of threads in the group's thread pool.
+     * @param poolSize The initial size of the underlying thread pool
+     */
+    def PooledActorGroup(final boolean daemon, final int poolSize) {
+        threadPool = new DefaultPool(daemon, poolSize)
+    }
+
+    /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
      * The created actor will belong to the pooled actor group.
      * @param handler The body of the newly created actor's act method.

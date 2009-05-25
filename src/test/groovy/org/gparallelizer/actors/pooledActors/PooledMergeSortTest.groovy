@@ -59,11 +59,8 @@ public class PooledMergeSortTest extends GroovyTestCase {
                         child1.start().send(splitList[0])
                         child2.start().send(splitList[1])
 
-                        react {message1 ->
-                            react {message2 ->
+                        react {message1, message2 ->
                                 parentActor.send merge(message1, message2)
-                            }
-
                         }
                 }
             }

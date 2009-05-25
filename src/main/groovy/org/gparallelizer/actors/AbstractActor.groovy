@@ -211,7 +211,7 @@ abstract public class AbstractActor implements ThreadedActor {
             final List<ActorMessage> messages = (1..maxNumberOfParameters).collect {
                 doReceive {messageQueue.take()}
             }
-            ReplyEnhancer.enhanceWithReplyMethods(this, messages)
+            ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
             handler.call(* messages*.payLoad)
         }
     }
@@ -245,7 +245,7 @@ abstract public class AbstractActor implements ThreadedActor {
                     return message
                 }
             }
-            ReplyEnhancer.enhanceWithReplyMethods(this, messages)
+            ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
             handler.call(* messages*.payLoad)
         }
     }
@@ -259,7 +259,7 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(Duration duration, Closure handler) throws InterruptedException {
-        handler.call(receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS))
+        receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler)
     }
 
     /**

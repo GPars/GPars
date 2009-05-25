@@ -13,6 +13,7 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
 import org.gparallelizer.actors.ActorMessage
 import org.gparallelizer.actors.ReplyRegistry
 import org.gparallelizer.actors.ReplyEnhancer
+import java.util.concurrent.TimeUnit
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -81,7 +82,13 @@ abstract public class AbstractPooledActor implements PooledActor {
     /**
      * Buffer to hold messages required by the scheduled next continuation. Null when no continuation scheduled.
      */
-    private final MessageHolder bufferedMessages = null
+    private MessageHolder bufferedMessages = null
+
+    //todo should be private, but wouldn't work
+    /**
+     * A copy of buffer in case of timeout.
+     */
+    volatile List savedBufferedMessages = null
 
     /**
      * Indicates whether the actor should terminate
@@ -215,7 +222,19 @@ abstract public class AbstractPooledActor implements PooledActor {
      * the closure to send a reply back to the actor, which sent the original message.
      */
     protected final void react(final Closure code) {
-        react(0, code)
+        react(-1, code)
+    }
+
+    /**
+     * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
+     * The method never returns, but instead frees the processing thread back to the thread pool.
+     * @param timeout Time in miliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
+     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
+     * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
+     * the closure to send a reply back to the actor, which sent the original message.
+     */
+    protected final void react(final long timeout, TimeUnit timeUnit, final Closure code) {
+        react(timeUnit.toMillis(timeout), code)
     }
 
     /**
@@ -227,15 +246,17 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     protected final void react(final long timeout, final Closure code) {
 
-        int maxNumberOfParameters = code.maximumNumberOfParameters
-        //todo handle timeout - test
-        //todo check reply on all messages and the actor - test
-        //todo test and document that reply on the actor goes to the last message
+        final int maxNumberOfParameters = code.maximumNumberOfParameters
 
         Closure reactCode = {List<ActorMessage> messages ->
-            if (messages.any {ActorMessage actorMessage -> actorMessage.payLoad == TIMEOUT}) throw TIMEOUT
-            ReplyEnhancer.enhanceWithReplyMethods(this, messages)
-            code.call(*(messages*.payLoad))
+
+            if (messages.any {ActorMessage actorMessage -> actorMessage.payLoad == TIMEOUT}) {
+                savedBufferedMessages = messages.findAll{it!=null && it?.payLoad!=TIMEOUT}*.payLoad
+                throw TIMEOUT
+            }
+
+            ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
+            maxNumberOfParameters>0 ? code.call(*(messages*.payLoad)) : code.call()
             this.repeatLoop()
         }
 
@@ -255,7 +276,7 @@ abstract public class AbstractPooledActor implements PooledActor {
                 bufferedMessages = null
             } else {
                 codeReference.set(reactCode)
-                if (timeout > 0) {
+                if (timeout >= 0) {
                     timerTask.set([run: { this.send(TIMEOUT) }] as TimerTask)
                     timer.schedule(timerTask.get(), timeout)
                 }
@@ -304,6 +325,7 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     final List sweepQueue() {
         def messages = []
+        if (savedBufferedMessages) messages.addAll savedBufferedMessages
         Object message = messageQueue.poll()
         while (message != null) {
             messages << message
@@ -356,14 +378,12 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo implement reply for thread-bound actors and between the two actor categories
     //todo use Gradle
     //todo introduce actor groups - actors sharing a thread pool
+    //todo system properties for the default pool size - -Dgparallelizer.poolsize=10
 
     //Planned for the next release
-    //todo reconsider reply() and replyIfExists()
-    //todo multiple messages in receive() and react()
-    //todo system properties for the default pool size
-    //todo thread-bound actors could use threads from a pool or share a thread factory
 
     //Backlog
+    //todo cannot send maps and messages - no metaclass
     //todo use AST transformation to turn actors methods into async processing
     //todo consider asynchronous metaclass
     //todo create a performance benchmark
@@ -381,6 +401,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo add synchronous calls plus an operator
 
     //To consider
+    //todo thread-bound actors could use threads from a pool or share a thread factory
     //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
     //todo add sendLater(Duration) and sendAfterDone(Future)
     //todo consider pass by copy (clone, serialization) for mutable messages, reject mutable messages otherwise

@@ -22,7 +22,6 @@ public abstract class ReplyEnhancer {
         if (message) enhanceObject(message.payLoad, [sender])
     }
 
-    //todo javadoc
     /**
      * Adds reply() and replyIfExists() methods to the currentActor and all the messages.
      * These methods will call send() on the target actor (the sender of the original message).
@@ -31,7 +30,7 @@ public abstract class ReplyEnhancer {
      * @param message The instance of ActorMessage wrapping the sender actor, who we need to be able to respond to,
      * plus the original message
      */
-    public static void enhanceWithReplyMethods(final Actor actor, final List<ActorMessage> messages) {
+    public static void enhanceWithReplyMethodsToMessages(final Actor actor, final List<ActorMessage> messages) {
         assert actor!=null
         messages.each { if(it) enhanceObject(it.payLoad, [it?.sender]) }
         enhanceObject(actor, messages*.sender)
@@ -41,7 +40,8 @@ public abstract class ReplyEnhancer {
      * Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
      */
     private static def enhanceObject(final def replier, final List<Actor> senders) {
-        replier.metaClass.reply = {msg ->
+        //todo getMetaClass() is required, since maps don't handle metaClass property access correctly
+        replier.getMetaClass().reply = {msg ->
             if (!senders.isEmpty()) {
                 for(sender in senders) {
                     if (sender) sender.send msg
@@ -52,7 +52,7 @@ public abstract class ReplyEnhancer {
             }
         }
 
-        replier.metaClass.replyIfExists = {msg ->
+        replier.getMetaClass().replyIfExists = {msg ->
             try {
                 for(sender in senders) sender?.send msg
             } catch (IllegalStateException ignore) { }

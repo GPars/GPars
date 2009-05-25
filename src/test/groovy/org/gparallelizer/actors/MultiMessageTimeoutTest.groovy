@@ -117,6 +117,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
 
         def actor = Actors.oneShotActor {
             receive(10, TimeUnit.SECONDS) {->
+                result = 1
                 latch.countDown()
             }
         }.start()
@@ -124,7 +125,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 2
 
         latch.await(30, TimeUnit.SECONDS)
-        assertEquals 0, result
+        assertEquals 1, result
     }
 
     public void testNoMessageReceiveZeroTimeout() {
@@ -135,6 +136,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         def actor = Actors.oneShotActor {
             barrier.await()
             receive(0, TimeUnit.SECONDS) {->
+                result = 1
                 latch.countDown()
             }
         }.start()
@@ -143,7 +145,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         barrier.await()
 
         latch.await(30, TimeUnit.SECONDS)
-        assertEquals 0, result
+        assertEquals 1, result
     }
 
     public void testNoMessageReceivePassedZeroTimeout() {
@@ -152,13 +154,14 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
 
         def actor = Actors.oneShotActor {
             receive(0, TimeUnit.SECONDS) {->
+                result = 1
                 latch.countDown()
             }
         }.start()
 
 
         latch.await(30, TimeUnit.SECONDS)
-        assertEquals 0, result
+        assertEquals 1, result
     }
 
     public void testDefaultMessageReceive() {
@@ -167,6 +170,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
 
         def actor = Actors.oneShotActor {
             receive(10, TimeUnit.SECONDS) {
+                result = 1
                 latch.countDown()
             }
         }.start()
@@ -174,7 +178,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 2
 
         latch.await(30, TimeUnit.SECONDS)
-        assertEquals 0, result
+        assertEquals 1, result
     }
 
     public void testArrayReceive() {
