@@ -251,7 +251,7 @@ abstract public class AbstractPooledActor implements PooledActor {
         Closure reactCode = {List<ActorMessage> messages ->
 
             if (messages.any {ActorMessage actorMessage -> actorMessage.payLoad == TIMEOUT}) {
-                savedBufferedMessages = messages.findAll{it!=null && it?.payLoad!=TIMEOUT}*.payLoad
+                savedBufferedMessages = messages.findAll{it!=null && it.payLoad!=TIMEOUT}*.payLoad
                 throw TIMEOUT
             }
 
@@ -373,14 +373,9 @@ abstract public class AbstractPooledActor implements PooledActor {
     }
 
     //Document before next release
-    //todo document send operator
-    //todo add reply() and replyIfExists() to messages
-    //todo implement reply for thread-bound actors and between the two actor categories
-    //todo use Gradle
-    //todo introduce actor groups - actors sharing a thread pool
-    //todo system properties for the default pool size - -Dgparallelizer.poolsize=10
 
     //Planned for the next release
+    //todo use Gradle
 
     //Backlog
     //todo cannot send maps and messages - no metaclass
