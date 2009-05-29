@@ -4,7 +4,7 @@
     <defaultAnt bundledAnt="true" />
   </component>
   <component name="BuildJarProjectSettings">
-    <option name="BUILD_JARS_ON_MAKE" value="true" />
+    <option name="BUILD_JARS_ON_MAKE" value="false" />
   </component>
   <component name="CodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS">
