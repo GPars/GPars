@@ -376,12 +376,15 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     //Planned for the next release
     //todo use Gradle
-
-    //Backlog
-    //todo cannot send maps and messages - no metaclass
+    //todo cannot send maps as messages - no metaclass
+    //todo create a performance benchmark
     //todo use AST transformation to turn actors methods into async processing
     //todo consider asynchronous metaclass
-    //todo create a performance benchmark
+    //todo dataflow concurrency
+
+    //Backlog
+    //todo use ForkJoin
+    //todo add synchronous calls plus an operator
     //todo implement in Java
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest
@@ -391,11 +394,10 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo put into maven repo
     //todo add transitive mvn dependencies
     //todo support mixins for event-driven actors
-    //todo consider other types of queues
-    //todo use ForkJoin
-    //todo add synchronous calls plus an operator
 
     //To consider
+    //todo consider other types of queues
+    //todo actor groups could manage actors and give public access to them
     //todo thread-bound actors could use threads from a pool or share a thread factory
     //todo shorten method names withAsynchronizer and withParallelizer doAsync, doParallel
     //todo add sendLater(Duration) and sendAfterDone(Future)
