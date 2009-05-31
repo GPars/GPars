@@ -376,11 +376,10 @@ abstract public class AbstractPooledActor implements PooledActor {
 
     //Planned for the next release
     //todo use Gradle
-    //todo cannot send maps as messages - no metaclass
-    //todo create a performance benchmark
-    //todo use AST transformation to turn actors methods into async processing
     //todo consider asynchronous metaclass
     //todo dataflow concurrency
+    //todo create a performance benchmark
+    //todo use AST transformation to turn actors methods into async processing
 
     //Backlog
     //todo use ForkJoin
