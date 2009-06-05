@@ -375,6 +375,8 @@ abstract public class AbstractPooledActor implements PooledActor {
     //Document before next release
 
     //Planned for the next release
+    //todo separate code sample download
+    //todo seperate javadoc download
     //todo use Gradle
     //todo consider asynchronous metaclass
     //todo dataflow concurrency
@@ -382,6 +384,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo use AST transformation to turn actors methods into async processing
 
     //Backlog
+    //todo switch each to for loops where helping performance
     //todo use ForkJoin
     //todo add synchronous calls plus an operator
     //todo implement in Java
@@ -395,6 +398,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo support mixins for event-driven actors
 
     //To consider
+    //todo test on Google App Engine
     //todo consider other types of queues
     //todo actor groups could manage actors and give public access to them
     //todo thread-bound actors could use threads from a pool or share a thread factory
