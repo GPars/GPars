@@ -28,8 +28,8 @@ final class ActorMessage {
      * The sender of the ActorMessage is retrieved from the ReplyRegistry.
      * * @param payLoad The original message
      */
-    public static ActorMessage build(final Object payLoad) {
-        new ActorMessage(payLoad, ReplyRegistry.threadBoundActor())
+    public static ActorMessage build(final Object payLoad, final boolean enhanceForReplies) {
+        new ActorMessage(payLoad, enhanceForReplies ? ReplyRegistry.threadBoundActor() : null)
     }
 
     public String toString() { "Message from $sender: $payLoad" }

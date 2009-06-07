@@ -6,7 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import org.gparallelizer.actors.util.EnhancedSemaphore
 import org.codehaus.groovy.runtime.TimeCategory
-import groovy.time.Duration;
+import groovy.time.Duration
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Default Actor implementation designed to be extended with actual message queue and the act() method.
@@ -270,9 +271,47 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait.
      */
     public final Actor send(Object message) throws InterruptedException {
+        return doSend(message, true)
+    }
+
+    /**
+     * Adds the message to the Actor's message queue.
+     * The method will wait for space to become available in the queue, if it is full.
+     * It can only be called on a started Actor.
+     * Sending messages through the signal() method is faster than using send(), but recipients won't be able
+     * to send replies to messages sent through signal().
+     * @return The same Actor instance
+     * @throws InterruptedException If the thread is interrupted during the wait.
+     */
+    public final Actor signal(Object message) throws InterruptedException {
+        //todo test and document
+        return doSend(message, false)
+    }
+
+    //todo should be private but woudn't be visible
+    final Actor doSend(Object message, boolean enhanceForReplies) throws InterruptedException {
         checkState()
-        messageQueue.put(ActorMessage.build(message))
+        messageQueue.put(ActorMessage.build(message, enhanceForReplies))
         return this
+    }
+
+    //todo test
+    //todo document
+    public sendAndWait(Object message) {
+        volatile Object result = null
+        //todo use Phaser instead once available to keep the thread running
+        final def latch = new CountDownLatch(1)
+
+        actorGroup.oneShotActor {
+            this << message
+            receive {
+                result = it
+                latch.countDown()
+            }
+        }.start()
+
+        latch.await()
+        return result
     }
 
     /**

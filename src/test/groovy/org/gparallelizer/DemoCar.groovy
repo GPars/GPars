@@ -1,3 +1,5 @@
+package org.gparallelizer
+
 def car = "Patriot"
 
 def manufacturer = match(car) {

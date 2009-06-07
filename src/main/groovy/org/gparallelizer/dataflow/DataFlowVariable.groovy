@@ -80,6 +80,8 @@ private class In<T> extends DataFlowActor {
 
     public void onException(Exception exception) {
         //todo handle correctly
+        //todo document threads being actors
+        //todo test thread lifecycle methods
         println 'Exception occured '
         exception.printStackTrace()
     }
@@ -141,20 +143,3 @@ private class Out<T> extends DataFlowActor {
 //    }
 //}
 
-
-//todo use in PooledActor
-//private sendAndWait(PooledActor actor, def message) {
-//    volatile T result = null
-//    final def latch = new CountDownLatch(1)
-//
-//    PooledActors.actor {
-//        actor << message
-//        react {
-//            result = it
-//            latch.countDown()
-//        }
-//    }.start()
-//
-//    latch.await()
-//    return result
-//}

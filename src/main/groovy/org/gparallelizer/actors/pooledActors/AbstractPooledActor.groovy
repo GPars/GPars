@@ -14,6 +14,7 @@ import org.gparallelizer.actors.ActorMessage
 import org.gparallelizer.actors.ReplyRegistry
 import org.gparallelizer.actors.ReplyEnhancer
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.CountDownLatch
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -251,12 +252,12 @@ abstract public class AbstractPooledActor implements PooledActor {
         Closure reactCode = {List<ActorMessage> messages ->
 
             if (messages.any {ActorMessage actorMessage -> actorMessage.payLoad == TIMEOUT}) {
-                savedBufferedMessages = messages.findAll{it!=null && it.payLoad!=TIMEOUT}*.payLoad
+                savedBufferedMessages = messages.findAll {it != null && it.payLoad != TIMEOUT}*.payLoad
                 throw TIMEOUT
             }
 
             ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
-            maxNumberOfParameters>0 ? code.call(*(messages*.payLoad)) : code.call()
+            maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
             this.repeatLoop()
         }
 
@@ -267,7 +268,7 @@ abstract public class AbstractPooledActor implements PooledActor {
             bufferedMessages = new MessageHolder(maxNumberOfParameters)
 
             ActorMessage currentMessage
-            while((!bufferedMessages.ready) && (currentMessage = (ActorMessage)messageQueue.poll())) {
+            while ((!bufferedMessages.ready) && (currentMessage = (ActorMessage) messageQueue.poll())) {
                 bufferedMessages.addMessage(currentMessage)
             }
             if (bufferedMessages.ready) {
@@ -290,11 +291,27 @@ abstract public class AbstractPooledActor implements PooledActor {
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
      */
     public final Actor send(Object message) {
+        return doSend(message, true)
+    }
+
+    /**
+     * Adds a message to the Actor's queue. Can only be called on a started Actor.
+     * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
+     * Sending messages through the signal() method is faster than using send(), but recipients won't be able
+     * to send replies to messages sent through signal().
+     */
+    public final Actor signal(Object message) {
+        //todo test and document
+        return doSend(message, false)
+    }
+
+    //todo should be private but woudn't be visible
+    final Actor doSend(Object message, boolean enhanceForReplies) {
         synchronized (lock) {
             checkState()
             cancelCurrentTimeoutTimer(message)
 
-            def actorMessage = ActorMessage.build(message)
+            def actorMessage = ActorMessage.build(message, enhanceForReplies)
 
             final Closure currentReference = codeReference.get()
             if (currentReference) {
@@ -311,6 +328,25 @@ abstract public class AbstractPooledActor implements PooledActor {
             }
         }
         return this
+    }
+
+    //todo test
+    //todo document
+    public sendAndWait(Object message) {
+        volatile Object result = null
+        //todo use Phaser instead once available to keep the thread running
+        final def latch = new CountDownLatch(1)
+
+        actorGroup.actor {
+            this << message
+            react {
+                result = it
+                latch.countDown()
+            }
+        }.start()
+
+        latch.await()
+        return result
     }
 
     /**
