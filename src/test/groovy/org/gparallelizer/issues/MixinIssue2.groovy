@@ -1,8 +1,5 @@
-/**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Jan 13, 2009
- */
+package org.gparallelizer.issues
+
 class SampleA {
     private void foo() {
         println 'Original foo ' + receive('')

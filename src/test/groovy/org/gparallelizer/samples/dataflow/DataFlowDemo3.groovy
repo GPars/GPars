@@ -1,11 +1,12 @@
-import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.*
+package org.gparallelizer.samples.dataflow
+
+import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowStream
-import org.gparallelizer.actors.pooledActors.PooledActors
+import static org.gparallelizer.dataflow.DataFlow.thread
 
 //Example 3
 
-PooledActors.defaultPooledActorGroup.threadPool.resize 4
+DataFlowActor.DATA_FLOW_GROUP.threadPool.resize 4
 
 void ints(int n, int max, DataFlowStream<Integer> stream) {
     if (n != max) {

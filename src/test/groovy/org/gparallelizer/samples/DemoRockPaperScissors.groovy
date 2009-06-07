@@ -3,6 +3,11 @@ package org.gparallelizer.samples
 import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
+/**
+ * A popular gae implemented with actors.
+ * Notice the use of a PooledActorGroup to hold the actors participating in the game.
+ */
+
 enum Move {
     ROCK, PAPER, SCISSORS
 }

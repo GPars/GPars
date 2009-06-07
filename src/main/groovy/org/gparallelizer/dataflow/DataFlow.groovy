@@ -1,4 +1,8 @@
 package org.gparallelizer.dataflow
+
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.pooledActors.PooledActor
+
 /**
  * Created by IntelliJ IDEA.
  * User: vaclav
@@ -8,8 +12,9 @@ package org.gparallelizer.dataflow
  */
 
 public class DataFlow {
-    public static IsolatedEventBasedThread thread(final Closure code) {
-        new IsolatedEventBasedThread(body: code).start()
+
+    public static PooledActor thread(final Closure code) {
+        new SingleRunThread(body: code).start()
     }
 
     //todo reconsider need for it

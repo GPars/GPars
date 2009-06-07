@@ -1,10 +1,12 @@
-import org.gparallelizer.actors.pooledActors.PooledActors
+package org.gparallelizer.samples.dataflow
+
+import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
 
 //Example 5
 
-PooledActors.defaultPooledActorGroup.threadPool.resize 4
+DataFlowActor.DATA_FLOW_GROUP.threadPool.resize 4
 
 DataFlowVariable<Integer> x = new DataFlowVariable<Integer>()
 DataFlowVariable<Integer> y = new DataFlowVariable<Integer>()

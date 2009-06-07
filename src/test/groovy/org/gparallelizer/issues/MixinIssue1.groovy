@@ -1,8 +1,5 @@
-/**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Jan 7, 2009
- */
+package org.gparallelizer.issues
+
 class A {
 
     int counter = 0

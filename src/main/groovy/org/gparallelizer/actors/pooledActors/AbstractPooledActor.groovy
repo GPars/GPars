@@ -375,6 +375,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //Document before next release
 
     //Planned for the next release
+    //todo abandoned actor group - what happens to the pool
     //todo separate code sample download
     //todo seperate javadoc download
     //todo use Gradle
@@ -384,6 +385,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo use AST transformation to turn actors methods into async processing
 
     //Backlog
+    //todo add a signal() method to send a (singleton) message, which you never expect replies to
     //todo switch each to for loops where helping performance
     //todo use ForkJoin
     //todo add synchronous calls plus an operator

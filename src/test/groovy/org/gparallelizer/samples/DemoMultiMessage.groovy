@@ -1,10 +1,22 @@
+package org.gparallelizer.samples
+
 import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.DefaultActor
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
-final AbstractPooledActor actor = PooledActors.actor {
+/**
+ * Demonstrates the ability to receive multiple messages and selectively reply to some of them.
+ * Notice the ability to sent HashMaps as well as instances of the Offer class as messages.
+ * A custom pooled actor group is used to group the actors with a single thread pool.
+ * @author Vaclav Pech
+ */
+
+final PooledActorGroup group = new PooledActorGroup(true, 1)
+
+final AbstractPooledActor actor = group.actor {
     react {offerA, offerB, offerC ->
         reply 'Received your kind offer. Now processing it and comparing with others.'  //sent to all senders
         def winnerOffer = [offerA, offerB, offerC].min {it.price}
@@ -13,7 +25,7 @@ final AbstractPooledActor actor = PooledActors.actor {
 }
 actor.start()
 
-PooledActors.actor {
+group.actor {
     actor << new Offer(price : 10)
     loop {
         react {
@@ -22,7 +34,7 @@ PooledActors.actor {
     }
 }.start()
 
-PooledActors.actor {
+group.actor {
     actor << [price:20]
     loop {
         react {
@@ -31,7 +43,7 @@ PooledActors.actor {
     }
 }.start()
 
-PooledActors.actor {
+group.actor {
     actor << new Offer(price : 5)
     loop {
         react {
@@ -40,7 +52,7 @@ PooledActors.actor {
     }
 }.start()
 
-Thread.sleep 1000
+System.in.read()
 
 class Offer {
     int price

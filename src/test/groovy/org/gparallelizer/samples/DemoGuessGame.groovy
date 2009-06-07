@@ -1,11 +1,18 @@
+package org.gparallelizer.samples
+
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
+/**
+ * A guess game. A player actor guesses a number and the master replies with either'too large', 'too small' or 'guessed'.
+ * The player continues guessing until he guesses the correct number.
+ * @author Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàlisi, MAiA Facultat de Matemàtiques, Universitat de Barcelona
+ */
 class GameMaster extends AbstractPooledActor {
        int secretNum
 
        void afterStart()
        {
-               secretNum = new Random().nextInt(10)
+               secretNum = new Random().nextInt(20)
        }
 
        void act()
@@ -21,6 +28,7 @@ class GameMaster extends AbstractPooledActor {
                                {
                                        reply 'you win'
                                        stop()
+                                   System.exit 0 
                                }
                        }
                }
@@ -36,7 +44,7 @@ class Player extends AbstractPooledActor {
        {
                loop
                {
-                       myNum = new Random().nextInt(10)
+                       myNum = new Random().nextInt(20)
 
                        server << myNum
 
@@ -55,3 +63,4 @@ class Player extends AbstractPooledActor {
 def master = new GameMaster().start()
 new Player( name: 'Player', server: master ).start()
 
+System.in.read()

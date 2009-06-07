@@ -1,8 +1,5 @@
-/**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Jan 8, 2009
- */
+package org.gparallelizer.issues
+
 class Parent {
     private String myPrivateProperty="secret"
 

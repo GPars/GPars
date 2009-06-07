@@ -1,7 +1,9 @@
+package org.gparallelizer.samples
+
 import org.gparallelizer.actors.Actors
 
 /**
- *
+ * Performs merge sort using pooled actors.
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */

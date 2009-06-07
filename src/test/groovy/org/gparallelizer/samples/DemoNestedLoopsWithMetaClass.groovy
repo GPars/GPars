@@ -1,35 +1,35 @@
+package org.gparallelizer.samples
+
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
-class MyLoopActor extends AbstractPooledActor {
+/**
+ * Demonstrates a way to do continuation-style loops with PooledActors.
+ * @author Vaclav Pech
+ */
 
-    protected void act() {
-        loop {
-            outerLoop()
-        }
-    }
+Actor actor = actor {
+    outerLoop()
+}
 
-    private void outerLoop() {
+actor.metaClass {
+    outerLoop = {->
         react {a ->
             println 'Outer: ' + a
-            if (a!=0) innerLoop()
-            else println 'Done'
+            innerLoop()
         }
     }
 
-    private void innerLoop() {
+    innerLoop = {->
         react {b ->
             println 'Inner ' + b
-            if (b == 0) outerLoop()
+            if (b==0) outerLoop()
             else innerLoop()
         }
     }
 }
-
-MyLoopActor actor = new MyLoopActor()
 
 actor.start()
 
@@ -49,14 +49,7 @@ actor.send 3
 actor.send 3
 actor.send 3
 actor.send 3
-actor.send 0
-actor.send 0
-
-
 
 Thread.sleep 5000
-actor.send 4
-Thread.sleep 5000
-
 retrieveDefaultPool().shutdown()
 

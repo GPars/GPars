@@ -3,9 +3,10 @@ package org.gparallelizer.dataflow
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.PooledActor
-import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.dataflow.DataFlowActor
+import org.gparallelizer.dataflow.SetMessage
+import static org.gparallelizer.dataflow.DataFlowMessage.EXIT
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,137 +19,142 @@ import org.gparallelizer.actors.pooledActors.PooledActors
 public class DataFlowVariable<T> {
 
     final AtomicReference<T> value = new AtomicReference<T>()
-    final ConcurrentLinkedQueue<PooledActor> blockedReaders = new ConcurrentLinkedQueue<PooledActor>()
-
-    private PooledActor inActor = new In(variable : this).start()  //todo escaping reference here
+    private PooledActor inActor = new In<T>(value : value).start()
     
-    //todo a group
-
     public T bitwiseNegate() {
-        final def ref = value.get()
-        if (ref!=null) return ref
+        final def currentValue = value.get()
+        if (currentValue!=null) return currentValue
         else {
-            //todo eliminate the need for Out
-            final def outActor = new Out(variable : this).start()
-            blockedReaders.offer(outActor)
-            return sendAndWait(outActor, new Get())
+            final def outActor = new Out<T>(inActor : inActor).start()
+            return outActor.retrieveResult()
         }
     }
 
-    private sendAndWait(PooledActor actor, def message) {
-        volatile T result = null
-        final def latch = new CountDownLatch(1)
+    public void leftShift(Object value) { inActor << new SetMessage(value) }
 
-        PooledActors.actor {
-            actor << message
-            react {
-                result = it
-                latch.countDown()
-            }
-        }.start()
+    public void leftShift(DataFlowVariable ref) { inActor << new SetMessage(~ref) }
 
-        //todo blocking here, expand the pool or use Phaser in F/J
-        latch.await()
-        return result
-    }
-
-    public void leftShift(Object value) {
-        inActor << new Set(value:value)
-    }
-
-    public void leftShift(DataFlowVariable ref) {
-        inActor << new Set(value:~ref)
-    }
-
-    public void shutdown() {
-        inActor.stop()
-    }
+    public void shutdown() { inActor << EXIT }
 }
 
-private class DataFlowMessage{}
+//todo ensure correct generics
+//todo add types to messages where possible
 
-private class Set<T> extends DataFlowMessage {
-    T value
-}
+private class In<T> extends DataFlowActor {
 
-private class Get extends DataFlowMessage {}
+    AtomicReference<T> value
 
-private class In extends AbstractPooledActor {
+    final ConcurrentLinkedQueue blockedReaders = new ConcurrentLinkedQueue()
 
-    DataFlowVariable variable
-
-    void act() {
-        loop {
-            react {
-                switch (it) {
-                    case Set:
-                        if (variable.value.compareAndSet(null, it.value)) {
-                            for(reader in variable.blockedReaders) {
-                                reader << new Set(value : it.value)
-                            }
-                            variable.blockedReaders.clear()
-                        } else {
-                            throw new IllegalStateException("Attempt to change data flow variable (from [${variable.value.get()}] to [${it.value}])")
-                        }
-                        break
-                    default:throw new IllegalStateException("Cannot handle a message: $it")
-                }
-            }
-        }
-    }
-}
-
-private class Out extends AbstractPooledActor {
-
-    DataFlowVariable variable
-    private Object storedMessage
-
-    //todo ensure correct generics
-    //todo add types to messages where possible
     void act() {
         loop {
             react {
                 switch (it) {
                     case Get:
-                        final def ref = variable.value.get()
-                        if (ref != null) {
-                            it.reply(ref)
+                        if (value.get() == null) {
+                            blockedReaders.add(it)
                         } else {
-                            storedMessage = it
+                            it.reply new SetMessage<T>(value.get())
                         }
                         break
-                    case Set:
-                        if (storedMessage != null) storedMessage.reply(it.value)
+                    case SetMessage:
+                        if (value.compareAndSet(null, it.value)) {
+                            for(reader in blockedReaders) {
+                                reader.reply new SetMessage<T>(it.value)
+                            }
+                            blockedReaders.clear()
+                        } else {
+                            throw new IllegalStateException("Attempt to change data flow variable (from [${value.get()}] to [${it.value}])")
+                        }
+                        break
+                    case EXIT:
+                        for(reader in blockedReaders) { reader.reply EXIT }
+                        blockedReaders.clear()
+                        stop()
                         break
                     default:throw new IllegalStateException("Cannot handle a message: $it")
                 }
             }
         }
     }
-}
 
-private class IsolatedEventBasedThread extends AbstractPooledActor {
-
-    Closure body
-
-    void act() {
-        //todo consider adding a loop
-        body.delegate = this
-        body()
+    public void onException(Exception exception) {
+        //todo handle correctly
+        println 'Exception occured '
+        exception.printStackTrace()
     }
 }
 
-private class ReactiveEventBasedThread extends AbstractPooledActor {
+private class Out<T> extends DataFlowActor {
 
-    Closure body
+    PooledActor inActor
 
-    //todo reconsider the loop
+    private volatile T result = null
+    private final def latch = new CountDownLatch(1)
+
     void act() {
-        body.delegate = this
+        inActor << new Get<T>()
         loop {
             react {
-                it.reply body(it)
+                switch (it) {
+                    case SetMessage:
+                        result = it.value
+                        latch.countDown()
+                        stop()
+                        break
+                    case EXIT:
+                        stop()
+                        break
+                    default:throw new IllegalStateException("Cannot handle a message: $it")
+                }
             }
         }
     }
+
+    public void onException(Exception exception) {
+        //todo handle correctly
+        println 'Exception occured ' + this
+        exception.printStackTrace()
+    }
+
+    //todo blocking here, expand the pool or use Phaser in F/J
+    T retrieveResult() {
+        latch.await()
+        return result
+    }
 }
+
+
+//private class ReactiveEventBasedThread extends DataFlowActor {
+//
+//    Closure body
+//
+//    //todo reconsider the loop
+//    //todo reconsider the method
+//    void act() {
+//        body.delegate = this
+//        loop {
+//            react {
+//                it.reply body(it)
+//            }
+//        }
+//    }
+//}
+
+
+//todo use in PooledActor
+//private sendAndWait(PooledActor actor, def message) {
+//    volatile T result = null
+//    final def latch = new CountDownLatch(1)
+//
+//    PooledActors.actor {
+//        actor << message
+//        react {
+//            result = it
+//            latch.countDown()
+//        }
+//    }.start()
+//
+//    latch.await()
+//    return result
+//}

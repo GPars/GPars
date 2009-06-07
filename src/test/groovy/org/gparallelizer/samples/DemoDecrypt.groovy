@@ -1,12 +1,15 @@
+package org.gparallelizer.samples
+
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Mar 2, 2009
+ * A demo showing two cooperating actors. The decryptor decrypts received messages and replies them back.
+ * The console actor sends a message to decrypt, prints out the reply and termitanes both actors.
+ * The main thread waits on a latch to prevent premature exit, since both actors use the default pooled actor group,
+ * which uses a daemon thread pool.
+ * @author Vaclav Pech
  */
 final CountDownLatch latch = new CountDownLatch(2)
 
@@ -43,5 +46,3 @@ console.metaClass {
 }
 
 latch.await()
-println 'Shutdown'
-retrieveDefaultPool().shutdown()

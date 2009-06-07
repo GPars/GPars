@@ -1,8 +1,15 @@
+package org.gparallelizer.samples
+
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
+
+/**
+ * Demonstrates various ways to structure pooled actor's code with its continuation-style message handling.
+ * @author Vaclav Pech
+ */
 
 class MyActor extends AbstractPooledActor {
 
