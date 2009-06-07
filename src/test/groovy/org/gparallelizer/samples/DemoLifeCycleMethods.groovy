@@ -4,8 +4,7 @@ import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.DefaultActor
 
 /**
- * Three actors are created, two of them in a newly created actor group, one in the fefault actor group using
- * the factory method of the Actors class.
+ * Two actors are created to show possible ways to handle all lifecycle events of thread-bound actors.
  * @author Vaclav Pech
  */
 
