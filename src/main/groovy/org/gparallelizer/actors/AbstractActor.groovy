@@ -47,6 +47,10 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
+    //todo Is it required?
+    /**
+     * PRevents race condition on the started flag
+     */
     private final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
 
     /**
@@ -209,8 +213,9 @@ abstract public class AbstractActor implements ThreadedActor {
             ReplyEnhancer.enhanceWithReplyMethods(this, message)
             handler.call()
         } else {
-            final List<ActorMessage> messages = (1..maxNumberOfParameters).collect {
-                doReceive {messageQueue.take()}
+            final List<ActorMessage> messages = []
+            for(i in 1..maxNumberOfParameters){
+                messages << doReceive {messageQueue.take()}
             }
             ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
             handler.call(* messages*.payLoad)
@@ -236,14 +241,15 @@ abstract public class AbstractActor implements ThreadedActor {
             long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis()
             boolean nullAppeared = false  //Ignore further potential messages once a null is retrieved (due to a timeout)
 
-            final List<ActorMessage> messages = (1..maxNumberOfParameters).collect {
-                if (nullAppeared) return null
+            final List<ActorMessage> messages = []
+            for(i in 1..maxNumberOfParameters) {
+                if (nullAppeared) messages << null
                 else {
                     ActorMessage message = doReceive {
                         messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS)
                     }
                     nullAppeared = (message == null)
-                    return message
+                    messages << message
                 }
             }
             ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)

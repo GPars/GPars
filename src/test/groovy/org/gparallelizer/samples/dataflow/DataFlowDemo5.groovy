@@ -6,7 +6,7 @@ import static org.gparallelizer.dataflow.DataFlow.thread
 
 //Example 5
 
-DataFlowActor.DATA_FLOW_GROUP.threadPool.resize 4
+DataFlowActor.DATA_FLOW_GROUP.resize 4
 
 DataFlowVariable<Integer> x = new DataFlowVariable<Integer>()
 DataFlowVariable<Integer> y = new DataFlowVariable<Integer>()

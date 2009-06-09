@@ -1,6 +1,4 @@
-package org.gparallelizer.actors
-
-import org.gparallelizer.actors.Actor;
+package org.gparallelizer.actors;
 
 /**
  * An internal representation of received messages holding both the original message plus the sender actor reference.
@@ -9,9 +7,10 @@ import org.gparallelizer.actors.Actor;
  * @author Vaclav Pech
  * Date: Feb 27, 2009
  */
-final class ActorMessage {
-    final Object payLoad
-    final Actor sender
+@SuppressWarnings({"MethodReturnOfConcreteClass"})
+public final class ActorMessage {
+    final private Object payLoad;
+    final private Actor sender;
 
     /**
      * Creates a new instance
@@ -23,14 +22,26 @@ final class ActorMessage {
         this.sender = sender;
     }
 
+    public Object getPayLoad() {
+        return payLoad;
+    }
+
+    public Actor getSender() {
+        return sender;
+    }
+
     /**
      * Factory method to create instances of ActorMessage with given payload.
      * The sender of the ActorMessage is retrieved from the ReplyRegistry.
-     * * @param payLoad The original message
+     * @param payLoad The original message
+     * @param enhanceForReplies Flag indicating whether to enable replies for the message being sent
+     * @return The newly created message
      */
     public static ActorMessage build(final Object payLoad, final boolean enhanceForReplies) {
-        new ActorMessage(payLoad, enhanceForReplies ? ReplyRegistry.threadBoundActor() : null)
+        return new ActorMessage(payLoad, enhanceForReplies ? ReplyRegistry.threadBoundActor() : null);
     }
 
-    public String toString() { "Message from $sender: $payLoad" }
+    @Override public String toString() {
+        return "Message from $sender: $payLoad";
+    }
 }

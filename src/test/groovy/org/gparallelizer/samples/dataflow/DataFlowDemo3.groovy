@@ -6,7 +6,7 @@ import static org.gparallelizer.dataflow.DataFlow.thread
 
 //Example 3
 
-DataFlowActor.DATA_FLOW_GROUP.threadPool.resize 4
+DataFlowActor.DATA_FLOW_GROUP.resize 4
 
 void ints(int n, int max, DataFlowStream<Integer> stream) {
     if (n != max) {

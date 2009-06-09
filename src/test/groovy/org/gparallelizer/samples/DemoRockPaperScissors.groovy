@@ -70,4 +70,4 @@ group.with {
 }
 
 System.in.read()
-group.threadPool.shutdown()
+group.shutdown()

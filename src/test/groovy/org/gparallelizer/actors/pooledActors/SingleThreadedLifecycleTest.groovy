@@ -11,6 +11,6 @@ public class SingleThreadedLifecycleTest extends LifecycleTest {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.retrieveDefaultPool().resize(1)
+        PooledActors.defaultPooledActorGroup.resize(1)
     }
 }

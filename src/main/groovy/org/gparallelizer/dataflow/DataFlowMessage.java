@@ -1,12 +1,15 @@
 package org.gparallelizer.dataflow;
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ * The parent message for messages used internally to implement Dataflow Concurrency.
+ *
+ * @author Vaclav Pech
  * Date: Jun 5, 2009
- * Time: 1:59:38 PM
- * To change this template use File | Settings | File Templates.
  */
 class DataFlowMessage {
+
+    /**
+     * The message to send to dataflow actors to terminate them.
+     */
     static final DataFlowMessage EXIT = new DataFlowMessage();
 }

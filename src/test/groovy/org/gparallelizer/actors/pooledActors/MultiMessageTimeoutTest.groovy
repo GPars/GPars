@@ -169,12 +169,13 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 2
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.metaClass.onTimeout = { flag = true }
         actor.metaClass.afterStop = {messages ->
             latch.countDown()
         }
+        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assert flag

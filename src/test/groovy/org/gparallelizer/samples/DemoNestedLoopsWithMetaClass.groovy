@@ -3,7 +3,6 @@ package org.gparallelizer.samples
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 
 /**
  * Demonstrates a way to do continuation-style loops with PooledActors.
@@ -51,5 +50,5 @@ actor.send 3
 actor.send 3
 
 Thread.sleep 5000
-retrieveDefaultPool().shutdown()
+PooledActors.defaultPooledActorGroup.shutdown()
 

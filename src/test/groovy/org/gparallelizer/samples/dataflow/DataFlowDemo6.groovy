@@ -6,7 +6,7 @@ import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.dataflow.DataFlowActor
 
-DataFlowActor.DATA_FLOW_GROUP.threadPool.resize 10
+DataFlowActor.DATA_FLOW_GROUP.resize 10
 
 def dzone = new DataFlowVariable()
 def jroller = new DataFlowVariable()

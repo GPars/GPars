@@ -3,7 +3,6 @@ package org.gparallelizer.actors.pooledActors
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import static org.gparallelizer.actors.pooledActors.PooledActors.retrieveDefaultPool
 
 public class SharedMemoryTest extends GroovyTestCase {
 
@@ -12,7 +11,7 @@ public class SharedMemoryTest extends GroovyTestCase {
     public void testSharedAccess() {
         long counter = 0
 
-        retrieveDefaultPool().resize 2
+        PooledActors.defaultPooledActorGroup.resize 2
         def latch = new CountDownLatch(1)
 
         Actor actor1 = actor {

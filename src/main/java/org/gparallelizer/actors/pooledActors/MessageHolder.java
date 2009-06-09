@@ -58,7 +58,7 @@ public final class MessageHolder {
         if (isReady()) throw new IllegalStateException("The MessageHolder cannot accept new messages when ready");
         messages[currentSize] = message;
         currentSize++;
-        if (message.getPayLoad().equals(ActorException.TIMEOUT)) timeout = true;
+        if (ActorException.TIMEOUT.equals(message.getPayLoad())) timeout = true;
     }
 
     /**

@@ -5,7 +5,7 @@ import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
 
-DataFlowActor.DATA_FLOW_GROUP.threadPool.resize 10
+DataFlowActor.DATA_FLOW_GROUP.resize 10
 
 def buffer = new DataFlowStream()
 

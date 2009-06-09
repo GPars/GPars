@@ -30,11 +30,11 @@ actor1.metaClass {
     }
 
     onInterrupt = {InterruptedException e ->
-        println "actor2 has been interrupted"
+        println "actor1 has been interrupted"
     }
 
     onTimeout = {->
-        println "actor2 has timed out"
+        println "actor1 has timed out"
     }
 
     onException = {Exception e ->

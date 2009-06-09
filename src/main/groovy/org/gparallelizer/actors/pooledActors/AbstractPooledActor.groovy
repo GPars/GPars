@@ -2,19 +2,19 @@ package org.gparallelizer.actors.pooledActors
 
 import groovy.time.Duration
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.ActorAction
-import org.gparallelizer.actors.pooledActors.PooledActor
+import org.gparallelizer.actors.ActorMessage
+import org.gparallelizer.actors.ReplyEnhancer
+import org.gparallelizer.actors.pooledActors.*
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
-import org.gparallelizer.actors.ActorMessage
-import org.gparallelizer.actors.ReplyRegistry
 import org.gparallelizer.actors.ReplyEnhancer
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.CountDownLatch
+
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -251,8 +251,8 @@ abstract public class AbstractPooledActor implements PooledActor {
 
         Closure reactCode = {List<ActorMessage> messages ->
 
-            if (messages.any {ActorMessage actorMessage -> actorMessage.payLoad == TIMEOUT}) {
-                savedBufferedMessages = messages.findAll {it != null && it.payLoad != TIMEOUT}*.payLoad
+            if (messages.any {ActorMessage actorMessage -> (TIMEOUT == actorMessage.payLoad)}) {
+                savedBufferedMessages = messages.findAll {it != null && TIMEOUT != it.payLoad}*.payLoad
                 throw TIMEOUT
             }
 
@@ -291,7 +291,27 @@ abstract public class AbstractPooledActor implements PooledActor {
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
      */
     public final Actor send(Object message) {
-        return doSend(message, true)
+        synchronized (lock) {
+            if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
+            cancelCurrentTimeoutTimer(message)
+
+            def actorMessage = ActorMessage.build(message, true)
+
+            final Closure currentReference = codeReference.get()
+            if (currentReference) {
+                assert bufferedMessages && !bufferedMessages.isReady()
+                bufferedMessages.addMessage actorMessage
+                if (bufferedMessages.ready) {
+                    final List<ActorMessage> messages = bufferedMessages.messages
+                    actorAction(this) { currentReference.call(messages) }
+                    codeReference.set(null)
+                    bufferedMessages = null
+                }
+            } else {
+                messageQueue.put(actorMessage)
+            }
+        }
+        return this
     }
 
     /**
@@ -308,7 +328,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo should be private but woudn't be visible
     final Actor doSend(Object message, boolean enhanceForReplies) {
         synchronized (lock) {
-            checkState()
+            if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
             cancelCurrentTimeoutTimer(message)
 
             def actorMessage = ActorMessage.build(message, enhanceForReplies)
@@ -397,34 +417,38 @@ abstract public class AbstractPooledActor implements PooledActor {
     }
 
     private def cancelCurrentTimeoutTimer(message) {
-        if (message != TIMEOUT) timerTask.get()?.cancel()
-    }
-
-    /**
-     * Checks, whether the Actor is active.
-     * @throws IllegalStateException If the Actor is not active.
-     */
-    private void checkState() {
-        if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
+        if (TIMEOUT != message) timerTask.get()?.cancel()
     }
 
     //Document before next release
+    //todo use @Delegate from group to pool
+    //todo try @Immutable messages
 
     //Planned for the next release
     //todo abandoned actor group - what happens to the pool
-    //todo separate code sample download
-    //todo seperate javadoc download
-    //todo use Gradle
-    //todo consider asynchronous metaclass
-    //todo dataflow concurrency
-    //todo create a performance benchmark
-    //todo use AST transformation to turn actors methods into async processing
 
-    //Backlog
+    //todo add exit()
+
+    //todo create a performance benchmarks
     //todo add a signal() method to send a (singleton) message, which you never expect replies to
+    //todo add slowReply() + test replies to replies
+    //todo ActorAction into Java    
     //todo switch each to for loops where helping performance
     //todo use ForkJoin
+
+    //todo use Gradle
+    //todo automate code sample download
+    //todo automate javadoc download
+
     //todo add synchronous calls plus an operator
+    
+    //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
+
+    //todo move Java sources and tests to the java folder
+    
+    //Backlog
+    //todo consider asynchronous metaclass
+    //todo use AST transformation to turn actors methods into async processing
     //todo implement in Java
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo try the fixes for the MixinTest

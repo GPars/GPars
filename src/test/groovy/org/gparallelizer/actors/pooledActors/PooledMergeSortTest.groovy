@@ -13,7 +13,7 @@ public class PooledMergeSortTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.retrieveDefaultPool().resize(10)
+        PooledActors.defaultPooledActorGroup.resize(10)
     }
 
     protected def split(List<Integer> list) {
@@ -69,7 +69,7 @@ public class PooledMergeSortTest extends GroovyTestCase {
     }
 
     public void testDefaultMergeSortWithOneThreadPool() {
-        PooledActors.retrieveDefaultPool().resize(1)
+        PooledActors.defaultPooledActorGroup.resize(1)
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -88,7 +88,7 @@ public class PooledMergeSortTest extends GroovyTestCase {
     }
 
     public void testDefaultMergeSort() {
-        PooledActors.retrieveDefaultPool().resize(10)
+        PooledActors.defaultPooledActorGroup.resize(10)
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 

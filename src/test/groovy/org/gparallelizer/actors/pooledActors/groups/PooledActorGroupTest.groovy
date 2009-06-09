@@ -55,8 +55,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
         latch2.await()
         assertFalse daemon
 
-        daemonGroup.threadPool.shutdown()
-        nonDaemonGroup.threadPool.shutdown()
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
     }
 
     public void testGroupsWithActorInheritance() {
@@ -88,8 +88,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
         assertEquals nonDaemonGroup, actor2.actorGroup
         latch2.await()
         assertFalse daemon
-        daemonGroup.threadPool.shutdown()
-        nonDaemonGroup.threadPool.shutdown()
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
     }
 
     public void testValidGroupReset() {
@@ -101,8 +101,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
         actor.actorGroup = nonDaemonGroup
         assertEquals nonDaemonGroup, actor.actorGroup
 
-        daemonGroup.threadPool.shutdown()
-        nonDaemonGroup.threadPool.shutdown()
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
     }
 
     public void testInvalidGroupReset() {
@@ -114,8 +114,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
         shouldFail {
             actor.actorGroup = nonDaemonGroup
         }
-        daemonGroup.threadPool.shutdown()
-        nonDaemonGroup.threadPool.shutdown()
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
     }
 
     public void testDifferentPools() {

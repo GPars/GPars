@@ -6,7 +6,7 @@ package org.gparallelizer.actors.pooledActors
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
  *
- * retrieveDefaultPool().resize 1
+ * PooledActors.defaultPooledActorGroup.resize 1
  *
  * def actor = actor {
  *     react {message ->
@@ -31,12 +31,6 @@ public abstract class PooledActors {
      * The default actor group to share by all actors created through the PooledActors class.
      */
     public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(true)
-
-    /**
-     * Returns the default actors' group thread pool
-     * @return The thread pool shared by actors in the default actor group
-     */
-    public static Pool retrieveDefaultPool() {defaultPooledActorGroup.threadPool}
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.

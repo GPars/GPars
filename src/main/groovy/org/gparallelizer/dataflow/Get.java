@@ -1,10 +1,10 @@
 package org.gparallelizer.dataflow;
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Jun 6, 2009
- * Time: 10:22:18 AM
- * To change this template use File | Settings | File Templates.
+ * A message representing a request for value of a DataFlowVariable, once available. The value should be replied back
+ * as an instance of the Set message class.
+ *
+ * @author Vaclav Pech
+ * Date: Jun 5, 2009
  */
-public class Get<T> extends DataFlowMessage { }
+final class Get<T> extends DataFlowMessage { }

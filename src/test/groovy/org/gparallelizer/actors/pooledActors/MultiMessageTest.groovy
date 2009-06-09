@@ -83,7 +83,7 @@ public class MultiMessageTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
         final PooledActorGroup group = new PooledActorGroup(true)
-        group.threadPool.resize 5
+        group.resize 5
 
         def actor = group.actor {
             react {a, b, c ->
@@ -107,7 +107,7 @@ public class MultiMessageTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
         final PooledActorGroup group = new PooledActorGroup(true)
-        group.threadPool.resize 5
+        group.resize 5
 
         def actor = group.actor {
             react {a, b, c ->

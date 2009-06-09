@@ -19,7 +19,7 @@ public class LifecycleTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.retrieveDefaultPool().resize(5)
+        PooledActors.defaultPooledActorGroup.resize(5)
     }
 
     public void testDefaultStop() {

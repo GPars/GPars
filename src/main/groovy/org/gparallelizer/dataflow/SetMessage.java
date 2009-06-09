@@ -1,11 +1,10 @@
 package org.gparallelizer.dataflow;
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ * A message representing a value to set on the DataFlowVariable.
+ *
+ * @author Vaclav Pech
  * Date: Jun 5, 2009
- * Time: 2:04:42 PM
- * To change this template use File | Settings | File Templates.
  */
 final class SetMessage<T> extends DataFlowMessage {
     private final T value;

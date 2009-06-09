@@ -1,18 +1,19 @@
 package org.gparallelizer.dataflow
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.actors.pooledActors.PooledActor
+import org.gparallelizer.dataflow.SingleRunThread
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ * Conains factory methods to create Dataflow Concurrency threads.
+ *
+ * @author Vaclav Pech
  * Date: Jun 4, 2009
- * Time: 1:21:43 PM
- * To change this template use File | Settings | File Templates.
  */
+public abstract class DataFlow {
 
-public class DataFlow {
-
+    /**
+     * Creates a new instance of SingleRunThread to run the supplied code.
+     */
     public static PooledActor thread(final Closure code) {
         new SingleRunThread(body: code).start()
     }
