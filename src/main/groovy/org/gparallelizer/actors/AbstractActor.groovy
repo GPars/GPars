@@ -64,6 +64,18 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     private volatile boolean groupMembershipChangeable = true
 
+
+    //todo should be private ut wouldm't work
+    /**
+     * A list of senders for the currently procesed messages
+     */
+    List senders = []
+
+    /**
+     * Indicates whether the actor should enhance messages to enable sending replies to their senders
+     */
+    private boolean sendRepliesFlag = true
+
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
@@ -80,6 +92,18 @@ abstract public class AbstractActor implements ThreadedActor {
         if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
         if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
         actorGroup = group
+    }
+
+    /**
+     * Only supposed to be caled from the actor thread
+     */
+    final void enableSendingReplies() {
+        sendRepliesFlag=true
+    }
+
+    final void disableSendingReplies() {
+        sendRepliesFlag=false
+        senders.clear()
     }
 
     /**
@@ -115,6 +139,7 @@ abstract public class AbstractActor implements ThreadedActor {
             } catch (Throwable e) {
                 e.printStackTrace(System.err) //invoked when the onException handler threw an exception
             } finally {
+                senders.clear()
                 try {
                     if (delegate.respondsTo('beforeStop')) delegate.beforeStop()
                     localStartupLock.withSemaphore {
@@ -167,6 +192,25 @@ abstract public class AbstractActor implements ThreadedActor {
         return code()
     }
 
+    //todo should be private, but woudn't be work
+    /**
+     * Adds reply() and replyIfExists() methods to the currentActor and the message.
+     * These methods will call send() on the target actor (the sender of the original message).
+     * The reply()/replyIfExists() methods invoked on the actor will be sent to all currently processed messages,
+     * reply()/replyIfExists() invoked on a message will send a reply to the sender of that particular message only.
+     * @param message The instance of ActorMessage wrapping the sender actor, who we need to be able to respond to,
+     * plus the original message
+     */
+    final void enhanceReplies(List<ActorMessage> messages) {
+        senders.clear()
+        if (sendRepliesFlag) {
+            for (message in messages) {
+                senders << message?.sender
+            }
+            ReplyEnhancer.enhanceWithReplyMethodsToMessages(messages)
+        }
+    }
+
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @return The message retrieved from the queue.
@@ -174,7 +218,7 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     protected final Object receive() throws InterruptedException {
         Object message = doReceive {messageQueue.take()}
-        ReplyEnhancer.enhanceWithReplyMethods(this, message)
+        enhanceReplies([message])
         return message?.payLoad
     }
 
@@ -187,7 +231,7 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     protected final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
         Object message = doReceive {messageQueue.poll(timeout, timeUnit)}
-        ReplyEnhancer.enhanceWithReplyMethods(this, message)
+        enhanceReplies([message])
         return message?.payLoad
     }
 
@@ -211,15 +255,25 @@ abstract public class AbstractActor implements ThreadedActor {
         int maxNumberOfParameters = handler.maximumNumberOfParameters
         if (maxNumberOfParameters == 0) {
             ActorMessage message = doReceive {messageQueue.take()}
-            ReplyEnhancer.enhanceWithReplyMethods(this, message)
-            handler.call()
+            try {
+                enhanceReplies([message])
+                handler.call()
+            } finally {
+                senders.clear()
+            }
+
         } else {
             final List<ActorMessage> messages = []
-            for(i in 1..maxNumberOfParameters){
+            for (i in 1..maxNumberOfParameters) {
                 messages << doReceive {messageQueue.take()}
             }
-            ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
-            handler.call(* messages*.payLoad)
+            try {
+                enhanceReplies(messages)
+                handler.call(* messages*.payLoad)
+            } finally {
+                senders.clear()
+            }
+
         }
     }
 
@@ -236,14 +290,19 @@ abstract public class AbstractActor implements ThreadedActor {
         int maxNumberOfParameters = handler.maximumNumberOfParameters
         if (maxNumberOfParameters == 0) {
             ActorMessage message = doReceive {messageQueue.poll(timeout, timeUnit)}
-            ReplyEnhancer.enhanceWithReplyMethods(this, message)
-            handler.call()
+            try {
+                enhanceReplies([message])
+                handler.call()
+            } finally {
+                senders.clear()
+            }
+
         } else {
             long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis()
             boolean nullAppeared = false  //Ignore further potential messages once a null is retrieved (due to a timeout)
 
             final List<ActorMessage> messages = []
-            for(i in 1..maxNumberOfParameters) {
+            for (i in 1..maxNumberOfParameters) {
                 if (nullAppeared) messages << null
                 else {
                     ActorMessage message = doReceive {
@@ -253,8 +312,12 @@ abstract public class AbstractActor implements ThreadedActor {
                     messages << message
                 }
             }
-            ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
-            handler.call(* messages*.payLoad)
+            try {
+                enhanceReplies(messages)
+                handler.call(* messages*.payLoad)
+            } finally {
+                senders.clear()
+            }
         }
     }
 
@@ -270,6 +333,25 @@ abstract public class AbstractActor implements ThreadedActor {
         receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler)
     }
 
+    protected final void reply(Object message) {
+        assert senders != null
+        if (!senders.isEmpty()) {
+            for (sender in senders) {
+                if (sender != null) sender.send message
+                else throw new IllegalArgumentException("Cannot send a reply message ${msg} to a null recipient.")
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot send replies. The list of recipients is empty.")
+        }
+    }
+
+    protected final void replyIfExists(Object message) {
+        assert senders != null
+        try {
+            for (sender in senders) sender?.send message
+        } catch (IllegalStateException ignore) { }
+    }
+
     /**
      * Adds the message to the Actor's message queue.
      * The method will wait for space to become available in the queue, if it is full.
@@ -278,26 +360,8 @@ abstract public class AbstractActor implements ThreadedActor {
      * @throws InterruptedException If the thread is interrupted during the wait.
      */
     public final Actor send(Object message) throws InterruptedException {
-        return doSend(message, true)
-    }
-
-    /**
-     * Adds the message to the Actor's message queue.
-     * The method will wait for space to become available in the queue, if it is full.
-     * It can only be called on a started Actor.
-     * Sending messages through the fastSend()() method is about 6% faster than using send(), but recipients won't be able
-     * to send replies to messages sent through fastSend().
-     * @return The same Actor instance
-     * @throws InterruptedException If the thread is interrupted during the wait.
-     */
-    public final Actor fastSend(Object message) throws InterruptedException {
-        return doSend(message, false)
-    }
-
-    //todo should be private but woudn't be visible
-    final Actor doSend(Object message, boolean enhanceForReplies) throws InterruptedException {
         checkState()
-        messageQueue.put(ActorMessage.build(message, enhanceForReplies))
+        messageQueue.put(ActorMessage.build(message))
         return this
     }
 
@@ -316,7 +380,7 @@ abstract public class AbstractActor implements ThreadedActor {
         Actor representative
 
         message.getMetaClass().onDeliveryError = {
-            representative.fastSend new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
+            representative << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
         }
 
         representative = actorGroup.oneShotActor {

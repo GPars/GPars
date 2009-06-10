@@ -69,7 +69,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assertEquals 11, stream.length()
 
         thread << 'Proceed'
-        assertEquals 11, stream.length()
+        assertEquals 11, stream.length()  //todo sometimes fails
         (0..10).each {
             assertEquals it, ~stream
         }

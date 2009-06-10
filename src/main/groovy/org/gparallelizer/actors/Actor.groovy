@@ -39,12 +39,6 @@ public interface Actor {
     Actor send(Object message) throws InterruptedException;
 
     /**
-     * Adds a message to the Actor's queue. Can only be called on a started Actor.
-     * Doesn't allow replies to be sent back, which makes fastSend() about 6% faster than send().
-     */
-    Actor fastSend(Object message) throws InterruptedException;
-
-    /**
      * Sends a message and waits for a reply.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
      * @return The message that came in reply to the original send.

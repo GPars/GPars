@@ -92,6 +92,17 @@ abstract public class AbstractPooledActor implements PooledActor {
     volatile List savedBufferedMessages = null
 
     /**
+     * A list of senders for the currently procesed messages
+     */
+    List senders = []
+
+    //todo should be private, nut wouldn't work
+    /**
+     * Indicates whether the actor should enhance messages to enable sending replies to their senders
+     */
+    boolean sendRepliesFlag = true
+
+    /**
      * Indicates whether the actor should terminate
      */
     private final AtomicBoolean stopFlag = new AtomicBoolean(true)
@@ -141,6 +152,15 @@ abstract public class AbstractPooledActor implements PooledActor {
         if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
         if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
         actorGroup = group
+    }
+
+    final void enableSendingReplies() {
+        sendRepliesFlag=true
+    }
+
+    final void disableSendingReplies() {
+        sendRepliesFlag=false
+        senders.clear()
     }
 
     /**
@@ -241,6 +261,10 @@ abstract public class AbstractPooledActor implements PooledActor {
     /**
      * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
      * The method never returns, but instead frees the processing thread back to the thread pool.
+     * Also adds reply() and replyIfExists() methods to the currentActor and the message.
+     * These methods will call send() on the target actor (the sender of the original message).
+     * The reply()/replyIfExists() methods invoked on the actor will be sent to all currently processed messages,
+     * reply()/replyIfExists() invoked on a message will send a reply to the sender of that particular message only.
      * @param timeout Time in miliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
      * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
      * the closure to send a reply back to the actor, which sent the original message.
@@ -256,8 +280,18 @@ abstract public class AbstractPooledActor implements PooledActor {
                 throw TIMEOUT
             }
 
-            ReplyEnhancer.enhanceWithReplyMethodsToMessages(this, messages)
-            maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
+            try {
+                if (sendRepliesFlag) {
+                    senders.clear()
+                    for (message in messages) {
+                        senders << message?.sender
+                    }
+                    ReplyEnhancer.enhanceWithReplyMethodsToMessages(messages)
+                }
+                maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
+            } finally {
+                senders.clear()
+            }
             this.repeatLoop()
         }
 
@@ -286,31 +320,35 @@ abstract public class AbstractPooledActor implements PooledActor {
         throw CONTINUE
     }
 
+    protected final void reply(Object message) {
+        assert senders != null
+        if (!senders.isEmpty()) {
+            for (sender in senders) {
+                if (sender != null) sender.send message
+                else throw new IllegalArgumentException("Cannot send a reply message ${msg} to a null recipient.")
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot send replies. The list of recipients is empty.")
+        }
+    }
+
+    protected final void replyIfExists(Object message) {
+        assert senders != null
+        try {
+            for (sender in senders) sender?.send message
+        } catch (IllegalStateException ignore) { }
+    }
+
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
      */
     public final Actor send(Object message) {
-        return doSend(message, true)
-    }
-
-    /**
-     * Adds a message to the Actor's queue. Can only be called on a started Actor.
-     * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
-     * Sending messages through the fastSend() method is about 6% faster than using send(), but recipients won't be able
-     * to send replies to messages sent through fastSend().
-     */
-    public final Actor fastSend(Object message) {
-        return doSend(message, false)
-    }
-
-    //todo should be private but woudn't be visible
-    final Actor doSend(Object message, boolean enhanceForReplies) {
         synchronized (lock) {
             if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
             cancelCurrentTimeoutTimer(message)
 
-            def actorMessage = ActorMessage.build(message, enhanceForReplies)
+            def actorMessage = ActorMessage.build(message)
 
             final Closure currentReference = codeReference.get()
             if (currentReference) {
@@ -343,9 +381,9 @@ abstract public class AbstractPooledActor implements PooledActor {
         Actor representative
 
         message.getMetaClass().onDeliveryError = {
-            representative.fastSend new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
+            representative << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
         }
-        
+
         representative = actorGroup.actor {
             this << message
             react {
@@ -419,12 +457,16 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo loop without react stops after return, otherwise not
 
     //Planned for the next release
-    //todo abandoned actor group - what happens to the pool
+    //todo abandoned actor group - what happens to the pool, senders
 
     //todo add a fastSend() method to send a (singleton) message, which you never expect replies to
+    //todo doc for replies enhancements and senders
+    //todo update fastSend tests
+    //todo test enabling and disabling replies
+    //todo test disabled replies
+    //todo consider deleting previous reply enhancements
     //todo reconsider exception type and problems with reused messages
-    //todo test - some messages want replies, some not
-    //todo update replies to replies
+
     //todo add synchronous calls plus an operator
     //todo test the onDeliveryError handler
 

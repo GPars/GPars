@@ -15,10 +15,10 @@ new ActorBenchmark().perform(warmupIterations)
 println 'Actors with send and reply: ' + new ActorBenchmark().perform(iterations)
 
 new PooledActorBenchmarkWithoutReply().perform(warmupIterations)
-println 'PooledActors with fastSend: ' + new PooledActorBenchmarkWithoutReply().perform(iterations)
+println 'PooledActors with no replies: ' + new PooledActorBenchmarkWithoutReply().perform(iterations)
 
 new ActorBenchmarkWithoutReply().perform(warmupIterations)
-println 'Actors with fastSend: ' + new ActorBenchmarkWithoutReply().perform(iterations)
+println 'Actors with no seplies: ' + new ActorBenchmarkWithoutReply().perform(iterations)
 
 new PooledActorCreationBenchmark().perform(warmupIterations)
 println 'PooledActors creation: ' + new PooledActorCreationBenchmark().perform(iterations)

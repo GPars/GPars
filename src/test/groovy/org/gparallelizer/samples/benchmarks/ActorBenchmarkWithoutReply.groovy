@@ -13,12 +13,14 @@ public class ActorBenchmarkWithoutReply implements Benchmark {
         final Actor initiator
 
         final Actor bouncer = Actors.actor {
+            disableSendingReplies()
             receive()
-            initiator.fastSend '2'
+            initiator << '2'
         }.start()
 
         initiator = Actors.actor {
             if (iteration == numberOfIterations) {
+                disableSendingReplies()
                 latch.countDown()
                 Thread.yield()
                 stop()
@@ -26,7 +28,7 @@ public class ActorBenchmarkWithoutReply implements Benchmark {
             }
             iteration += 1
 
-            bouncer.fastSend '1'
+            bouncer << '1'
             receive()
         }
 

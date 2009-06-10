@@ -239,72 +239,38 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testReplyToReply() {
-        volatile Exception exception1, exception2
+        volatile String result
 
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.oneShotActor {
             receive {
                 reply 'Message2'
-                latch.await()
+                it.reply 'Message3'
+                receive {a, b->
+                    reply 'Message6'
+                    latch.await()
+                }
             }
         }.start()
 
-        Actors.oneShotActor {
+        Actors.oneShotActor{
             actor.send 'Message1'
             receive {
-                try {
-                    reply 'Message3'
-                } catch (Exception e) {
-                    exception1 = e
+                it.reply 'Message4'
+                receive {
+                    reply 'Message5'
+                    receive {a, b ->
+                        result = a+b
+                        latch.countDown()
+                    }
                 }
-                try {
-                    it.reply 'Message4'
-                } catch (Exception e) {
-                    exception2 = e
-                }
-                latch.countDown()
             }
 
         }.start()
 
         latch.await()
-        assertNotNull exception1
-        assertNotNull exception2
+        assertEquals 'Message6Message6', result
     }
 
-    public void testReplyToReplyOnMessage() {
-        volatile Exception exception1, exception2
-
-        final CountDownLatch latch = new CountDownLatch(1)
-
-        final Actor actor = Actors.oneShotActor {
-            receive {
-                it.reply 'Message2'
-                latch.await()
-            }
-        }.start()
-
-        Actors.oneShotActor {
-            actor.send 'Message1'
-            receive {
-                try {
-                    reply 'Message3'
-                } catch (Exception e) {
-                    exception1 = e
-                }
-                try {
-                    it.reply 'Message4'
-                } catch (Exception e) {
-                    exception2 = e
-                }
-                latch.countDown()
-            }
-
-        }.start()
-
-        latch.await()
-        assertNotNull exception1
-        assertNotNull exception2
-    }
 }
