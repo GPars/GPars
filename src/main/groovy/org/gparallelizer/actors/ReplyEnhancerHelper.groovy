@@ -16,7 +16,7 @@ public abstract class ReplyEnhancerHelper {
         replier.getMetaClass().reply = {msg ->
             if (!senders.isEmpty()) {
                 for(sender in senders) {
-                    if (sender) sender.send msg
+                    if (sender!=null) sender.send msg
                     else throw new IllegalArgumentException("Cannot send a reply message ${msg} to a null recipient.")
                 }
             } else {

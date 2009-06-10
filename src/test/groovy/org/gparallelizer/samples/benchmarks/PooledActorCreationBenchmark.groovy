@@ -20,7 +20,7 @@ public class PooledActorCreationBenchmark implements Benchmark {
                 }
                 iteration += 1
 
-                new PooledBouncer().start() << 1
+                new PooledBouncer().start() << '1'
                 react { }
             }
         }
@@ -37,7 +37,7 @@ public class PooledActorCreationBenchmark implements Benchmark {
 class PooledBouncer extends AbstractPooledActor {
     void act() {
         react {
-            reply 2
+            reply '2'
         }
     }
 }

@@ -291,37 +291,16 @@ abstract public class AbstractPooledActor implements PooledActor {
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
      */
     public final Actor send(Object message) {
-        synchronized (lock) {
-            if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
-            cancelCurrentTimeoutTimer(message)
-
-            def actorMessage = ActorMessage.build(message, true)
-
-            final Closure currentReference = codeReference.get()
-            if (currentReference) {
-                assert bufferedMessages && !bufferedMessages.isReady()
-                bufferedMessages.addMessage actorMessage
-                if (bufferedMessages.ready) {
-                    final List<ActorMessage> messages = bufferedMessages.messages
-                    actorAction(this) { currentReference.call(messages) }
-                    codeReference.set(null)
-                    bufferedMessages = null
-                }
-            } else {
-                messageQueue.put(actorMessage)
-            }
-        }
-        return this
+        return doSend(message, true)
     }
 
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
-     * Sending messages through the signal() method is faster than using send(), but recipients won't be able
-     * to send replies to messages sent through signal().
+     * Sending messages through the fastSend() method is about 6% faster than using send(), but recipients won't be able
+     * to send replies to messages sent through fastSend().
      */
-    public final Actor signal(Object message) {
-        //todo test and document
+    public final Actor fastSend(Object message) {
         return doSend(message, false)
     }
 
@@ -350,14 +329,24 @@ abstract public class AbstractPooledActor implements PooledActor {
         return this
     }
 
-    //todo test
-    //todo document
+    //todo test including delivery errors
+    /**
+     * Sends a message and waits for a reply.
+     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     * @return The message that came in reply to the original send.
+     */
     public sendAndWait(Object message) {
         volatile Object result = null
         //todo use Phaser instead once available to keep the thread running
         final def latch = new CountDownLatch(1)
 
-        actorGroup.actor {
+        Actor representative
+
+        message.getMetaClass().onDeliveryError = {
+            representative.fastSend new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
+        }
+        
+        representative = actorGroup.actor {
             this << message
             react {
                 result = it
@@ -366,7 +355,7 @@ abstract public class AbstractPooledActor implements PooledActor {
         }.start()
 
         latch.await()
-        return result
+        if (result instanceof Exception) throw result else return result
     }
 
     /**
@@ -384,6 +373,7 @@ abstract public class AbstractPooledActor implements PooledActor {
         if (savedBufferedMessages) messages.addAll savedBufferedMessages
         Object message = messageQueue.poll()
         while (message != null) {
+            if (message.respondsTo('onDeliveryError')) message.onDeliveryError()
             messages << message
             message = messageQueue.poll()
         }
@@ -397,8 +387,10 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     protected final void loop(final Closure code) {
         assert loopCode.get() == null, "The loop method must be only called once"
-        loopCode.set(code)
-        doLoopCall(code)
+        final Closure enhancedCode = {code(); repeatLoop()}
+        enhancedCode.delegate = this
+        loopCode.set(enhancedCode)
+        doLoopCall(enhancedCode)
     }
 
     /**
@@ -423,30 +415,38 @@ abstract public class AbstractPooledActor implements PooledActor {
     //Document before next release
     //todo use @Delegate from group to pool
     //todo try @Immutable messages
+    //todo create a performance benchmarks
+    //todo loop without react stops after return, otherwise not
 
     //Planned for the next release
     //todo abandoned actor group - what happens to the pool
 
-    //todo add exit()
+    //todo add a fastSend() method to send a (singleton) message, which you never expect replies to
+    //todo reconsider exception type and problems with reused messages
+    //todo test - some messages want replies, some not
+    //todo update replies to replies
+    //todo add synchronous calls plus an operator
+    //todo test the onDeliveryError handler
 
-    //todo create a performance benchmarks
-    //todo add a signal() method to send a (singleton) message, which you never expect replies to
-    //todo add slowReply() + test replies to replies
-    //todo ActorAction into Java    
-    //todo switch each to for loops where helping performance
+    //todo make thread-bound reuse threads to speed-up their creation and make the compatible with Fork/Join
     //todo use ForkJoin
 
+    //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
+
+    //todo move Java sources and tests to the java folder
+
+    //Backlog
     //todo use Gradle
     //todo automate code sample download
     //todo automate javadoc download
 
-    //todo add synchronous calls plus an operator
-    
-    //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
-
-    //todo move Java sources and tests to the java folder
-    
-    //Backlog
+    //todo maven
+    //todo put into maven repo
+    //todo add transitive mvn dependencies
+    //todo ActorAction into Java
+    //todo speedup actor creation
+    //todo switch each to for loops where helping performance
+    //todo reconsider locking in Actors
     //todo consider asynchronous metaclass
     //todo use AST transformation to turn actors methods into async processing
     //todo implement in Java
@@ -454,12 +454,11 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo try the fixes for the MixinTest
     //todo consider flow control to throttle message production
     //todo resize the pool if all threads are busy or blocked
-    //todo maven
-    //todo put into maven repo
-    //todo add transitive mvn dependencies
     //todo support mixins for event-driven actors
 
     //To consider
+    //todo multiple loops
+    //todo exit the current loop
     //todo test on Google App Engine
     //todo consider other types of queues
     //todo actor groups could manage actors and give public access to them

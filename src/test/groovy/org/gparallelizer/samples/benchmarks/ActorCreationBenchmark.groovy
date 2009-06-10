@@ -22,7 +22,7 @@ public class ActorCreationBenchmark implements Benchmark {
             }
             iteration += 1
 
-            new Bouncer().start() << 1
+            new Bouncer().start() << '1'
             receive()
         }
 
@@ -38,7 +38,7 @@ public class ActorCreationBenchmark implements Benchmark {
 class Bouncer extends DefaultActor {
     void act() {
         receive()
-        reply 2
+        reply '2'
         stop()
     }
 }

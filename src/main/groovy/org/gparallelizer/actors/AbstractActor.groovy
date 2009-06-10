@@ -31,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
  * Date: Jan 7, 2009
  */
 abstract public class AbstractActor implements ThreadedActor {
+
     /**
      * Queue for the messages
      */
@@ -284,13 +285,12 @@ abstract public class AbstractActor implements ThreadedActor {
      * Adds the message to the Actor's message queue.
      * The method will wait for space to become available in the queue, if it is full.
      * It can only be called on a started Actor.
-     * Sending messages through the signal() method is faster than using send(), but recipients won't be able
-     * to send replies to messages sent through signal().
+     * Sending messages through the fastSend()() method is about 6% faster than using send(), but recipients won't be able
+     * to send replies to messages sent through fastSend().
      * @return The same Actor instance
      * @throws InterruptedException If the thread is interrupted during the wait.
      */
-    public final Actor signal(Object message) throws InterruptedException {
-        //todo test and document
+    public final Actor fastSend(Object message) throws InterruptedException {
         return doSend(message, false)
     }
 
@@ -301,14 +301,25 @@ abstract public class AbstractActor implements ThreadedActor {
         return this
     }
 
-    //todo test
-    //todo document
+    //todo test including delivery errors
+    /**
+     * Sends a message and waits for a reply.
+     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     * @return The message that came in reply to the original send.
+     */
     public sendAndWait(Object message) {
         volatile Object result = null
+
         //todo use Phaser instead once available to keep the thread running
         final def latch = new CountDownLatch(1)
 
-        actorGroup.oneShotActor {
+        Actor representative
+
+        message.getMetaClass().onDeliveryError = {
+            representative.fastSend new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
+        }
+
+        representative = actorGroup.oneShotActor {
             this << message
             receive {
                 result = it
@@ -317,7 +328,7 @@ abstract public class AbstractActor implements ThreadedActor {
         }.start()
 
         latch.await()
-        return result
+        if (result instanceof Exception) throw result else return result
     }
 
     /**
@@ -370,6 +381,7 @@ abstract public class AbstractActor implements ThreadedActor {
         def messages = []
         Object message = messageQueue.poll()
         while (message != null) {
+            if (message.respondsTo('onDeliveryError')) message.onDeliveryError()
             messages << message
             message = messageQueue.poll()
         }

@@ -243,4 +243,74 @@ public class ReplyTest extends GroovyTestCase {
 
         assert flag.get()
     }
+
+    public void testReplyToReply() {
+        volatile Exception exception1, exception2
+
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final AbstractPooledActor actor = PooledActors.actor {
+            react {
+                reply 'Message2'
+                latch.await()
+            }
+        }.start()
+
+        PooledActors.actor {
+            actor.send 'Message1'
+            react {
+                try {
+                    reply 'Message3'
+                } catch (Exception e) {
+                    exception1 = e
+                }
+                try {
+                    it.reply 'Message4'
+                } catch (Exception e) {
+                    exception2 = e
+                }
+                latch.countDown()
+            }
+
+        }.start()
+
+        latch.await()
+        assertNotNull exception1
+        assertNotNull exception2
+    }
+
+    public void testReplyToReplyOnMessage() {
+        volatile Exception exception1, exception2
+
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final AbstractPooledActor actor = PooledActors.actor {
+            react {
+                it.reply 'Message2'
+                latch.await()
+            }
+        }.start()
+
+        PooledActors.actor {
+            actor.send 'Message1'
+            react {
+                try {
+                    reply 'Message3'
+                } catch (Exception e) {
+                    exception1 = e
+                }
+                try {
+                    it.reply 'Message4'
+                } catch (Exception e) {
+                    exception2 = e
+                }
+                latch.countDown()
+            }
+
+        }.start()
+
+        latch.await()
+        assertNotNull exception1
+        assertNotNull exception2
+    }
 }

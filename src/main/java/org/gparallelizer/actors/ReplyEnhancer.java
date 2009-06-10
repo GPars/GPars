@@ -20,6 +20,7 @@ public abstract class ReplyEnhancer {
      */
     public static void enhanceWithReplyMethods(final Actor actor, final ActorMessage message) {
         assert actor != null;
+        if (!message.isEnhanceForReplies()) return;
         final Actor sender = message!=null ? message.getSender() : null;
         ReplyEnhancerHelper.enhanceObject(actor, Arrays.asList(sender));
         if (message!=null) ReplyEnhancerHelper.enhanceObject(message.getPayLoad(), Arrays.asList(sender));
@@ -36,15 +37,16 @@ public abstract class ReplyEnhancer {
     public static void enhanceWithReplyMethodsToMessages(final Actor actor, final List<ActorMessage> messages) {
         assert actor != null;
         for (final ActorMessage message : messages) {
-            if (message != null) {
+            if (message != null && message.isEnhanceForReplies()) {
                 ReplyEnhancerHelper.enhanceObject(message.getPayLoad(), Arrays.asList(message.getSender()));
             }
         }
         final List<Actor> senders = new ArrayList<Actor>();
         for(final ActorMessage message : messages) {
-            senders.add(message!=null ? message.getSender() : null);
+            //todo is the null check necessary?
+            if (message==null || message.isEnhanceForReplies()) senders.add(message!=null ? message.getSender() : null);
         }
-        ReplyEnhancerHelper.enhanceObject(actor, senders);
+        if (!senders.isEmpty()) ReplyEnhancerHelper.enhanceObject(actor, senders);
     }
 
 }

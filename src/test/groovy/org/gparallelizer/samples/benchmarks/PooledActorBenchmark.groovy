@@ -12,7 +12,7 @@ public class PooledActorBenchmark implements Benchmark {
         final AbstractPooledActor bouncer = PooledActors.actor {
             loop {
                 react {
-                    reply 2
+                    reply '2'
                 }
             }
         }.start()
@@ -20,16 +20,15 @@ public class PooledActorBenchmark implements Benchmark {
         final AbstractPooledActor initiator = PooledActors.actor {
                 int iteration = 0
                 loop {
-                    if (iteration == numberOfIterations) {
+                    if (iteration >= numberOfIterations) {
                         latch.countDown()
                         Thread.yield()
-                        bouncer.stop()
                         stop()
                         return
                     }
                     iteration += 1
 
-                    bouncer <<  1
+                    bouncer <<  '1'
                     react { }
                 }
         }
@@ -38,6 +37,7 @@ public class PooledActorBenchmark implements Benchmark {
         initiator.start()
         latch.await()
         final long t2 = System.currentTimeMillis()
+        bouncer.stop()
 
         return (t2 - t1)
     }

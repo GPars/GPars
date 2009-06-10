@@ -14,7 +14,7 @@ public class ActorBenchmarkWithoutReply implements Benchmark {
 
         final Actor bouncer = Actors.actor {
             receive()
-            initiator.signal 2
+            initiator.fastSend '2'
         }.start()
 
         initiator = Actors.actor {
@@ -22,12 +22,11 @@ public class ActorBenchmarkWithoutReply implements Benchmark {
                 latch.countDown()
                 Thread.yield()
                 stop()
-                bouncer.stop()
                 return
             }
             iteration += 1
 
-            bouncer.signal 1
+            bouncer.fastSend '1'
             receive()
         }
 
@@ -35,6 +34,7 @@ public class ActorBenchmarkWithoutReply implements Benchmark {
         initiator.start()
         latch.await()
         final long t2 = System.currentTimeMillis()
+        bouncer.stop()
 
         return (t2 - t1)
     }
