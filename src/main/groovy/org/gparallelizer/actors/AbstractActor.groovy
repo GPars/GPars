@@ -64,7 +64,6 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     private volatile boolean groupMembershipChangeable = true
 
-
     //todo should be private ut wouldm't work
     /**
      * A list of senders for the currently procesed messages
@@ -74,7 +73,7 @@ abstract public class AbstractActor implements ThreadedActor {
     /**
      * Indicates whether the actor should enhance messages to enable sending replies to their senders
      */
-    private boolean sendRepliesFlag = true
+    private volatile boolean sendRepliesFlag = true
 
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
@@ -95,14 +94,21 @@ abstract public class AbstractActor implements ThreadedActor {
     }
 
     /**
-     * Only supposed to be caled from the actor thread
+     * Enabled the actor and received messages to have the reply()/replyIfExists() methods called on them.
+     * Sending replies is enabled by default.
      */
     final void enableSendingReplies() {
-        sendRepliesFlag=true
+        sendRepliesFlag = true
     }
 
+    /**
+     * Disables the actor and received messages to have the reply()/replyIfExists() methods called on them.
+     * Calling reply()/replyIfExist() on the actor will result in IllegalStateException being thrown.
+     * Calling reply()/replyIfExist() on a received message will result in MissingMethodException being thrown.
+     * Sending replies is enabled by default.
+     */
     final void disableSendingReplies() {
-        sendRepliesFlag=false
+        sendRepliesFlag = false
         senders.clear()
     }
 
@@ -333,8 +339,16 @@ abstract public class AbstractActor implements ThreadedActor {
         receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler)
     }
 
+    /**
+     * Sends a reply to all currently processed messages. Throws IllegalArgumentException if some messages
+     * have not been sent by an actor. For such cases use replyIfExists().
+     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
+     * will result in IllegalStateException being thrown.
+     * Sending replies is enabled by default.
+     */
     protected final void reply(Object message) {
         assert senders != null
+        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
         if (!senders.isEmpty()) {
             for (sender in senders) {
                 if (sender != null) sender.send message
@@ -345,11 +359,20 @@ abstract public class AbstractActor implements ThreadedActor {
         }
     }
 
+    /**
+     * Sends a reply to all currently processed messages, which have been sent by an actor.
+     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
+     * will result in IllegalStateException being thrown.
+     * Sending replies is enabled by default.
+     */
     protected final void replyIfExists(Object message) {
         assert senders != null
-        try {
-            for (sender in senders) sender?.send message
-        } catch (IllegalStateException ignore) { }
+        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
+        for (sender in senders) {
+            try {
+                sender?.send message
+            } catch (IllegalStateException ignore) { }
+        }
     }
 
     /**

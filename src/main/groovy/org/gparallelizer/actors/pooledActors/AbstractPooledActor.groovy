@@ -100,7 +100,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     /**
      * Indicates whether the actor should enhance messages to enable sending replies to their senders
      */
-    boolean sendRepliesFlag = true
+    volatile boolean sendRepliesFlag = true
 
     /**
      * Indicates whether the actor should terminate
@@ -154,12 +154,22 @@ abstract public class AbstractPooledActor implements PooledActor {
         actorGroup = group
     }
 
+    /**
+     * Enabled the actor and received messages to have the reply()/replyIfExists() methods called on them.
+     * Sending replies is enabled by default.
+     */
     final void enableSendingReplies() {
-        sendRepliesFlag=true
+        sendRepliesFlag = true
     }
 
+    /**
+     * Disables the actor and received messages to have the reply()/replyIfExists() methods called on them.
+     * Calling reply()/replyIfExist() on the actor will result in IllegalStateException being thrown.
+     * Calling reply()/replyIfExist() on a received message will result in MissingMethodException being thrown.
+     * Sending replies is enabled by default.
+     */
     final void disableSendingReplies() {
-        sendRepliesFlag=false
+        sendRepliesFlag = false
         senders.clear()
     }
 
@@ -320,8 +330,16 @@ abstract public class AbstractPooledActor implements PooledActor {
         throw CONTINUE
     }
 
+    /**
+     * Sends a reply to all currently processed messages. Throws IllegalArgumentException if some messages
+     * have not been sent by an actor. For such cases use replyIfExists().
+     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
+     * will result in IllegalStateException being thrown.
+     * Sending replies is enabled by default.
+     */
     protected final void reply(Object message) {
         assert senders != null
+        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
         if (!senders.isEmpty()) {
             for (sender in senders) {
                 if (sender != null) sender.send message
@@ -332,11 +350,20 @@ abstract public class AbstractPooledActor implements PooledActor {
         }
     }
 
+    /**
+     * Sends a reply to all currently processed messages, which have been sent by an actor.
+     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
+     * will result in IllegalStateException being thrown.
+     * Sending replies is enabled by default.
+     */
     protected final void replyIfExists(Object message) {
         assert senders != null
-        try {
-            for (sender in senders) sender?.send message
-        } catch (IllegalStateException ignore) { }
+        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
+        for (sender in senders) {
+            try {
+                sender?.send message
+            } catch (IllegalStateException ignore) { }
+        }
     }
 
     /**
@@ -460,7 +487,10 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo abandoned actor group - what happens to the pool, senders
 
     //todo add a fastSend() method to send a (singleton) message, which you never expect replies to
-    //todo doc for replies enhancements and senders
+    //todo test replies in no-arg closure
+    //todo test replies in multimessage closures when some messages have no recipient
+    //todo test replyIfExists in multimessage closures when some messages have no recipient
+    //todo reconsider IllegalStateException handling in reply() - do best effort delivery, test
     //todo update fastSend tests
     //todo test enabling and disabling replies
     //todo test disabled replies

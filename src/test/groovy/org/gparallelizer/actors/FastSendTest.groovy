@@ -3,8 +3,7 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 
 
-//todo enable
-public abstract class FastSendTest extends GroovyTestCase {
+public class FastSendTest extends GroovyTestCase {
 
     public void testFastSend() {
         volatile Exception exception1, exception2
@@ -12,6 +11,7 @@ public abstract class FastSendTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.oneShotActor {
+            disableSendingReplies()
             receive {
                 try {
                     reply 'Message'
@@ -27,11 +27,12 @@ public abstract class FastSendTest extends GroovyTestCase {
             }
         }.start()
 
-        actor.fastSend 'Message'
+        actor << 'Message'
         latch.await()
         assertNotNull exception1
+        assert exception1 instanceof IllegalStateException
         assertNotNull exception2
-        println exception1
+        assert exception2 instanceof MissingMethodException
     }
 
     public void testFastSendFromActor() {
@@ -40,6 +41,7 @@ public abstract class FastSendTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.oneShotActor {
+            disableSendingReplies()
             receive {
                 try {
                     reply 'Message'
@@ -56,14 +58,15 @@ public abstract class FastSendTest extends GroovyTestCase {
         }.start()
 
         Actors.oneShotActor {
-            actor.fastSend 'Message'
+            actor << 'Message'
             latch.await()
 
         }.start()
 
         latch.await()
         assertNotNull exception1
+        assert exception1 instanceof IllegalStateException
         assertNotNull exception2
-        println exception1
+        assert exception2 instanceof MissingMethodException
     }
 }

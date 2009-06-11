@@ -13,6 +13,13 @@ public abstract class ReplyEnhancer {
     /**
      * Adds reply() and replyIfExists() methods to all the messages.
      * These methods will call send() on the target actor (the sender of the original message).
+     * Calling reply()/replyIfExist() on messages from within an actor with disabled replying (through the disableSendingReplies()
+     * method) may result in unexpected behavior. The MissingMethodException may be thrown from reply()/replyIfExists(),
+     * however, if the messages have been received by a different actor, with enabled replying) before
+     * and then reused, the reply()/replyIfExists() methods on the message would reply to that actor,
+     * not the immediate sender of the message.
+     * Sending replies is enabled by default.
+
      * @param messages The instance of ActorMessage wrapping the sender actor, which we need to be able to respond to,
      * plus the original message
      */
