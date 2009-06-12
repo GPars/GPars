@@ -53,6 +53,7 @@ public class ActorsTest extends GroovyTestCase {
         final Actor actor = Actors.defaultOneShotActor {
             throw new RuntimeException('test')
         }
+        actor.metaClass.onException = {}
         actor.metaClass.afterStop = {
             flag.set(true)
             latch.countDown()
@@ -105,6 +106,7 @@ public class ActorsTest extends GroovyTestCase {
         final Actor actor = Actors.synchronousOneShotActor {
             if (true) throw new RuntimeException('test')
         }
+        actor.metaClass.onException = {}
         actor.metaClass.afterStop = {
             flag.set(true)
             latch.countDown()
@@ -158,6 +160,7 @@ public class ActorsTest extends GroovyTestCase {
         final Actor actor = Actors.boundedOneShotActor {
             if (true) throw new RuntimeException('test')
         }
+        actor.metaClass.onException = {}
         actor.metaClass.afterStop = {
             flag.set(true)
             latch.countDown()

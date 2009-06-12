@@ -75,6 +75,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
             if (true) throw new RuntimeException('test')
         }
 
+        actor.metaClass.onException = {}
         actor.metaClass.afterStop = {
             latch.countDown()
         }

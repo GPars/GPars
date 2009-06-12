@@ -401,10 +401,26 @@ abstract public class AbstractPooledActor implements PooledActor {
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
      * @return The message that came in reply to the original send.
      */
-    public sendAndWait(Object message) {
-        Actor representative = new SendAndWaitPooledActor(this, message)
-        representative.start()
-        return representative.result
+    public final sendAndWait(Object message) {
+        new SendAndWaitPooledActor(this, message).start().result
+    }
+
+    /**
+     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
+     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     * @return The message that came in reply to the original send.
+     */
+    public final sendAndWait(long timeout, TimeUnit timeUnit, Object message) {
+        new SendAndWaitPooledActor(this, message, timeUnit.toMillis(timeout)).start().result
+    }
+
+    /**
+     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
+     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     * @return The message that came in reply to the original send.
+     */
+    public final sendAndWait(Duration duration, Object message) {
+        return sendAndWait(duration.toMilliseconds(), TimeUnit.MILLISECONDS, message)
     }
 
     /**
@@ -547,16 +563,27 @@ val fib = actor { loop { react {
      */
 }
 
+/**
+ * Sends a message to the specified actor and waits for reply.
+ * The message is enhanced to send notification in case the target actor terminates without processing the message.
+ * Exceptions are re-throvn from the getResult() method.
+ */
 final class SendAndWaitPooledActor extends AbstractPooledActor {
     private Actor targetActor
     private Object message
     //todo use Phaser instead once available to keep the thread running
     private CountDownLatch latch = new CountDownLatch(1)
     private Object result
+    private long timeout = -1
 
     def SendAndWaitPooledActor(final targetActor, final message) {
         this.targetActor = targetActor;
         this.message = message
+    }
+
+    def SendAndWaitPooledActor(final targetActor, final message, final long timeout) {
+        this(targetActor, message)
+        this.timeout = timeout
     }
 
     void act() {
@@ -565,18 +592,16 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
         }
 
         targetActor << message
-        react {
-            result = it
+        if (timeout < 0) {
+            react { result = it }
+        } else {
+            react(timeout) { result = it }
         }
     }
 
-    void onException(Exception e) {
-        result = e
-    }
-
-    void afterStop(undeliveredMessages) {
-        latch.countDown()
-    }
+    void onTimeout() { result = null }
+    void onException(Exception e) { result = e }
+    void afterStop(undeliveredMessages) { latch.countDown() }
 
     Object getResult() {
         latch.await()

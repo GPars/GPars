@@ -400,10 +400,26 @@ abstract public class AbstractActor implements ThreadedActor {
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
      * @return The message that came in reply to the original send.
      */
-    public sendAndWait(Object message) {
-        Actor representative = new SendAndWaitActor(this, message)
-        representative.start()
-        return representative.result
+    public final sendAndWait(Object message) {
+        new SendAndWaitActor(this, message).start().result
+    }
+
+    /**
+     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
+     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     * @return The message that came in reply to the original send.
+     */
+    public final sendAndWait(long timeout, TimeUnit timeUnit, Object message) {
+        new SendAndWaitActor(this, message, timeUnit.toMillis(timeout)).start().result
+    }
+
+    /**
+     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
+     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     * @return The message that came in reply to the original send.
+     */
+    public final sendAndWait(Duration duration, Object message) {
+        return sendAndWait(duration.toMilliseconds(), TimeUnit.MILLISECONDS, message)
     }
 
     /**
@@ -484,20 +500,29 @@ abstract public class AbstractActor implements ThreadedActor {
      * Unique counter for Actors' threads
      */
     private static final AtomicLong threadCount = new AtomicLong(0)
-
-
 }
 
+/**
+ * Sends a message to the specified actor and waits for reply.
+ * The message is enhanced to send notification in case the target actor terminates without processing the message.
+ * Exceptions are re-throvn from the getResult() method.
+ */
 final class SendAndWaitActor extends DefaultActor {
     private Actor targetActor
     private Object message
     //todo use Phaser instead once available to keep the thread running
     private CountDownLatch latch = new CountDownLatch(1)
     private Object result
+    private long timeout = -1
 
     def SendAndWaitActor(final targetActor, final message) {
         this.targetActor = targetActor;
         this.message = message
+    }
+
+    def SendAndWaitActor(final targetActor, final message, final long timeout) {
+        this(targetActor, message)
+        this.timeout = timeout
     }
 
     void act() {
@@ -507,9 +532,7 @@ final class SendAndWaitActor extends DefaultActor {
 
         try {
             targetActor << message
-            receive {
-                result = it
-            }
+            result = (timeout < 0) ? receive() : receive(timeout, TimeUnit.MILLISECONDS)
         } catch (Exception e) {
             result = e
         } finally {

@@ -85,6 +85,7 @@ public class DeliveryErrorTest  extends GroovyTestCase {
             }
         }
 
+        actor.metaClass.onException = {}
         actor.metaClass.afterStop = {
             latch.countDown()
         }

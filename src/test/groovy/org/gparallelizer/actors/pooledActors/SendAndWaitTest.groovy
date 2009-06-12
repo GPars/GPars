@@ -3,6 +3,7 @@ package org.gparallelizer.actors.pooledActors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import org.gparallelizer.actors.Actor
+import java.util.concurrent.TimeUnit
 
 
 public class SendAndWaitTest extends GroovyTestCase {
@@ -93,8 +94,11 @@ public class SendAndWaitTest extends GroovyTestCase {
             }
         }
 
-        actor.metaClass.afterStop = {
-            latch.countDown()
+        actor.metaClass {
+            onException = {}
+            afterStop = {
+                latch.countDown()
+            }
         }
 
         actor.start()
@@ -107,5 +111,82 @@ public class SendAndWaitTest extends GroovyTestCase {
 
         latch.await()
         assertEquals 2, result
+    }
+
+    public void testTimeoutSuccessfulMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final Actor actor = PooledActors.actor {
+            barrier.await()
+            Thread.sleep 1000
+            react {
+                reply 2
+                react {
+                    reply 4
+                }
+            }
+        }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
+
+        actor.start()
+
+        barrier.await()
+        def result1 = actor.sendAndWait(5, TimeUnit.SECONDS, 1)
+        def result2 = actor.sendAndWait(5, TimeUnit.SECONDS, 3)
+
+        latch.await()
+        assertEquals 2, result1
+        assertEquals 4, result2
+    }
+
+    public void testTimeoutMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final Actor actor = PooledActors.actor {
+            barrier.await()
+            react {
+                barrier.await()
+            }
+        }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
+
+        actor.start()
+
+        barrier.await()
+        def result = actor.sendAndWait(2, TimeUnit.SECONDS, 1)
+        barrier.await()
+
+        latch.await()
+        assertNull result
+    }
+
+    public void testTimeoutWithActorStopMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final Actor actor = PooledActors.actor {
+            barrier.await()
+            react { }
+        }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
+
+        actor.start()
+
+        barrier.await()
+        def result = actor.sendAndWait(2, TimeUnit.SECONDS, 1)
+
+        latch.await()
+        assertNull result
     }
 }
