@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.Actor
 import static org.gparallelizer.actors.Actors.actor
 import static org.gparallelizer.actors.Actors.oneShotActor
+import org.gparallelizer.actors.pooledActors.ActorReplyException
 
 /**
  *
@@ -273,4 +274,87 @@ public class ReplyTest extends GroovyTestCase {
         assertEquals 'Message6Message6', result
     }
 
+    public void testReplyFromNoArgHandler() {
+        volatile String result
+
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final Actor actor = Actors.oneShotActor {
+            receive {->
+                reply 'Message2'
+            }
+        }.start()
+
+        Actors.oneShotActor {
+            actor.send 'Message1'
+            receive {
+                result = it
+                latch.countDown()
+            }
+
+        }.start()
+
+        latch.await()
+        assertEquals 'Message2', result 
+
+    }
+
+    public void testMultipleClientsWithReply() {
+        final List<CountDownLatch> latches = [new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1)]
+        def volatile issues
+
+        final def bouncer = oneShotActor {
+            latches[0].await()
+            receive {a, b, c ->
+                replyIfExists 4
+                latches[1].countDown()
+            }
+            latches[2].await()
+            receive {a, b, c ->
+                try {
+                    reply 8
+                } catch (ActorReplyException e) {
+                    issues = e.issues
+                    latches[3].countDown()
+                }
+            }
+        }.start()
+
+        //send and terminate
+        final DefaultActor actor1 = oneShotActor {
+            bouncer << 1
+            stop()
+        }
+        actor1.metaClass.afterStop = {
+            latches[0].countDown()
+        }
+        actor1.start()
+
+        //wait, send and terminate
+        final DefaultActor actor2 = oneShotActor {
+            latches[1].await()
+            bouncer << 5
+            stop()
+        }
+        actor2.metaClass.afterStop = {
+            latches[2].countDown()
+        }
+        actor2.start()
+
+        //keep conversation going
+        oneShotActor {
+            bouncer << 2
+            receive()
+            bouncer << 6
+            receive()
+        }.start()
+
+        bouncer << 3
+        latches[2].await()
+        bouncer << 7
+        latches[3].await()
+        assertEquals 2, issues.size()
+        assert (issues[0] instanceof IllegalArgumentException) || (issues[1] instanceof IllegalArgumentException)
+        assert (issues[0] instanceof IllegalStateException) || (issues[1] instanceof IllegalStateException)
+    }
 }

@@ -119,7 +119,6 @@ final class ActorAction implements Runnable {
 
     private def handleTermination() {
         this.actor.indicateStop()
-        this.actor.senders.clear()
         if (actor.respondsTo('afterStop')) actor.afterStop(actor.sweepQueue())
     }
 

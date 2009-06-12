@@ -7,7 +7,9 @@ import java.util.concurrent.atomic.AtomicLong
 import org.gparallelizer.actors.util.EnhancedSemaphore
 import org.codehaus.groovy.runtime.TimeCategory
 import groovy.time.Duration
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CountDownLatch
+import org.gparallelizer.actors.pooledActors.ActorReplyException
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Default Actor implementation designed to be extended with actual message queue and the act() method.
@@ -109,7 +111,6 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     final void disableSendingReplies() {
         sendRepliesFlag = false
-        senders.clear()
     }
 
     /**
@@ -340,27 +341,33 @@ abstract public class AbstractActor implements ThreadedActor {
     }
 
     /**
-     * Sends a reply to all currently processed messages. Throws IllegalArgumentException if some messages
+     * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
      * have not been sent by an actor. For such cases use replyIfExists().
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
+     * @throws ActorReplyException If some of the replies failed to be sent.
      */
     protected final void reply(Object message) {
         assert senders != null
         if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
         if (!senders.isEmpty()) {
+            List<Exception> exceptions = []
             for (sender in senders) {
-                if (sender != null) sender.send message
-                else throw new IllegalArgumentException("Cannot send a reply message ${msg} to a null recipient.")
+                if (sender != null) {
+                    try { sender.send message } catch (IllegalStateException e) {exceptions << e }
+                }
+                else exceptions << new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient.")
             }
+            if (!exceptions.empty) throw new ActorReplyException('Failed sending some replies. See the issues field for details', exceptions)
         } else {
-            throw new IllegalArgumentException("Cannot send replies. The list of recipients is empty.")
+            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.")
         }
     }
 
     /**
      * Sends a reply to all currently processed messages, which have been sent by an actor.
+     * Ignores potential errors when sending the replies, like no sender or sender already stopped.
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
@@ -388,34 +395,15 @@ abstract public class AbstractActor implements ThreadedActor {
         return this
     }
 
-    //todo test including delivery errors
     /**
      * Sends a message and waits for a reply.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
      * @return The message that came in reply to the original send.
      */
     public sendAndWait(Object message) {
-        volatile Object result = null
-
-        //todo use Phaser instead once available to keep the thread running
-        final def latch = new CountDownLatch(1)
-
-        Actor representative
-
-        message.getMetaClass().onDeliveryError = {
-            representative << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
-        }
-
-        representative = actorGroup.oneShotActor {
-            this << message
-            receive {
-                result = it
-                latch.countDown()
-            }
-        }.start()
-
-        latch.await()
-        if (result instanceof Exception) throw result else return result
+        Actor representative = new SendAndWaitActor(this, message)
+        representative.start()
+        return representative.result
     }
 
     /**
@@ -466,9 +454,9 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     final List sweepQueue() {
         def messages = []
-        Object message = messageQueue.poll()
+        ActorMessage message = messageQueue.poll()
         while (message != null) {
-            if (message.respondsTo('onDeliveryError')) message.onDeliveryError()
+            if (message.payLoad.respondsTo('onDeliveryError')) message.payLoad.onDeliveryError()
             messages << message
             message = messageQueue.poll()
         }
@@ -498,4 +486,40 @@ abstract public class AbstractActor implements ThreadedActor {
     private static final AtomicLong threadCount = new AtomicLong(0)
 
 
+}
+
+final class SendAndWaitActor extends DefaultActor {
+    private Actor targetActor
+    private Object message
+    //todo use Phaser instead once available to keep the thread running
+    private CountDownLatch latch = new CountDownLatch(1)
+    private Object result
+
+    def SendAndWaitActor(final targetActor, final message) {
+        this.targetActor = targetActor;
+        this.message = message
+    }
+
+    void act() {
+        message.getMetaClass().onDeliveryError = {->
+            this << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
+        }
+
+        try {
+            targetActor << message
+            receive {
+                result = it
+            }
+        } catch (Exception e) {
+            result = e
+        } finally {
+            latch.countDown()
+            stop()
+        }
+    }
+
+    Object getResult() {
+        latch.await()
+        if (result instanceof Exception) throw result else return result
+    }
 }

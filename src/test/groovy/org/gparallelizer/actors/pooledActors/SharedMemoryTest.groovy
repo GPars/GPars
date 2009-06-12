@@ -42,6 +42,7 @@ public class SharedMemoryTest extends GroovyTestCase {
 
 
         latch.await()
+        PooledActors.defaultPooledActorGroup.resize(5)
         assertEquals MAX_COUNTER, counter
     }
 }

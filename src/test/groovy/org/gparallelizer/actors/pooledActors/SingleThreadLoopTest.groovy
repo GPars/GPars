@@ -11,4 +11,9 @@ public class SingleThreadLoopTest extends LoopTest {
         super.setUp();
         PooledActors.defaultPooledActorGroup.resize(1)
     }
+
+    protected void tearDown() {
+        super.tearDown();
+        PooledActors.defaultPooledActorGroup.resize(5)
+    }
 }

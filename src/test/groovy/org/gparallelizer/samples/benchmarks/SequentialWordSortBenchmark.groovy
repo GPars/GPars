@@ -17,7 +17,7 @@ public class SequentialWordSortBenchmark implements Benchmark {
 
         sorted = null
         System.gc()
-        Thread.sleep 10000
+        Thread.sleep 3000
         
         return (t2 - t1)
     }

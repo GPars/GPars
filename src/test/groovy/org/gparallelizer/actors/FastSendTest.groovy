@@ -9,25 +9,34 @@ public class FastSendTest extends GroovyTestCase {
         volatile Exception exception1, exception2
 
         final CountDownLatch latch = new CountDownLatch(1)
+        final CountDownLatch replyLatch = new CountDownLatch(1)
 
         final Actor actor = Actors.oneShotActor {
             disableSendingReplies()
             receive {
                 try {
-                    reply 'Message'
+                    reply 'Message42'
                 } catch (Exception e) {
                     exception1 = e
                 }
                 try {
-                    it.reply 'Message'
+                    it.reply 'Message43'
                 } catch (Exception e) {
                     exception2 = e
+                }
+                enableSendingReplies()
+                replyLatch.countDown()
+                receive {
+                    replyIfExists 'Message'
+                    it.replyIfExists 'Message'
                 }
                 latch.countDown()
             }
         }.start()
 
-        actor << 'Message'
+        actor << 'Message41'
+        replyLatch.await()
+        actor << 'Enabled message'
         latch.await()
         assertNotNull exception1
         assert exception1 instanceof IllegalStateException
@@ -39,28 +48,36 @@ public class FastSendTest extends GroovyTestCase {
         volatile Exception exception1, exception2
 
         final CountDownLatch latch = new CountDownLatch(1)
+        final CountDownLatch replyLatch = new CountDownLatch(1)
 
         final Actor actor = Actors.oneShotActor {
             disableSendingReplies()
             receive {
                 try {
-                    reply 'Message'
+                    reply 'Message52'
                 } catch (Exception e) {
                     exception1 = e
                 }
                 try {
-                    it.reply 'Message'
+                    it.reply 'Message53'
                 } catch (Exception e) {
                     exception2 = e
                 }
-                latch.countDown()
+                enableSendingReplies()
+                replyLatch.countDown()
+                receive {
+                    reply 'Message'
+                    it.reply 'Message'
+                }
             }
         }.start()
 
         Actors.oneShotActor {
-            actor << 'Message'
-            latch.await()
-
+            actor << 'Message51'
+            replyLatch.await()
+            actor << 'Enabled message'
+            receive{a, b-> }
+            latch.countDown()
         }.start()
 
         latch.await()

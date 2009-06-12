@@ -3,7 +3,7 @@ package org.gparallelizer.samples.benchmarks
 import org.gparallelizer.actors.pooledActors.PooledActors
 
 
-PooledActors.defaultPooledActorGroup.resize 3
+PooledActors.defaultPooledActorGroup.resize 10
 
 final int iterations = 10000
 final int warmupIterations = 3000

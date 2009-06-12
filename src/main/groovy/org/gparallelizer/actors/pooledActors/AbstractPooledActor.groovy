@@ -14,6 +14,7 @@ import org.gparallelizer.actors.pooledActors.*
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
 import org.gparallelizer.actors.ReplyEnhancer
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 /**
@@ -170,7 +171,6 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     final void disableSendingReplies() {
         sendRepliesFlag = false
-        senders.clear()
     }
 
     /**
@@ -281,6 +281,7 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     protected final void react(final long timeout, final Closure code) {
 
+        senders.clear()
         final int maxNumberOfParameters = code.maximumNumberOfParameters
 
         Closure reactCode = {List<ActorMessage> messages ->
@@ -290,18 +291,13 @@ abstract public class AbstractPooledActor implements PooledActor {
                 throw TIMEOUT
             }
 
-            try {
-                if (sendRepliesFlag) {
-                    senders.clear()
-                    for (message in messages) {
-                        senders << message?.sender
-                    }
-                    ReplyEnhancer.enhanceWithReplyMethodsToMessages(messages)
+            if (sendRepliesFlag) {
+                for (message in messages) {
+                    senders << message?.sender
                 }
-                maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
-            } finally {
-                senders.clear()
+                ReplyEnhancer.enhanceWithReplyMethodsToMessages(messages)
             }
+            maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
             this.repeatLoop()
         }
 
@@ -331,27 +327,33 @@ abstract public class AbstractPooledActor implements PooledActor {
     }
 
     /**
-     * Sends a reply to all currently processed messages. Throws IllegalArgumentException if some messages
+     * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
      * have not been sent by an actor. For such cases use replyIfExists().
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
+     * @throws ActorReplyException If some of the replies failed to be sent.
      */
     protected final void reply(Object message) {
         assert senders != null
         if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
         if (!senders.isEmpty()) {
+            List<Exception> exceptions = []
             for (sender in senders) {
-                if (sender != null) sender.send message
-                else throw new IllegalArgumentException("Cannot send a reply message ${msg} to a null recipient.")
+                if (sender != null) {
+                    try { sender.send message } catch (IllegalStateException e) {exceptions << e }
+                }
+                else exceptions << new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient.")
             }
+            if (!exceptions.empty) throw new ActorReplyException('Failed sending some replies. See the issues field for details', exceptions)
         } else {
-            throw new IllegalArgumentException("Cannot send replies. The list of recipients is empty.")
+            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.")
         }
     }
 
     /**
      * Sends a reply to all currently processed messages, which have been sent by an actor.
+     * Ignores potential errors when sending the replies, like no sender or sender already stopped.
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
@@ -394,33 +396,15 @@ abstract public class AbstractPooledActor implements PooledActor {
         return this
     }
 
-    //todo test including delivery errors
     /**
      * Sends a message and waits for a reply.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
      * @return The message that came in reply to the original send.
      */
     public sendAndWait(Object message) {
-        volatile Object result = null
-        //todo use Phaser instead once available to keep the thread running
-        final def latch = new CountDownLatch(1)
-
-        Actor representative
-
-        message.getMetaClass().onDeliveryError = {
-            representative << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
-        }
-
-        representative = actorGroup.actor {
-            this << message
-            react {
-                result = it
-                latch.countDown()
-            }
-        }.start()
-
-        latch.await()
-        if (result instanceof Exception) throw result else return result
+        Actor representative = new SendAndWaitPooledActor(this, message)
+        representative.start()
+        return representative.result
     }
 
     /**
@@ -436,9 +420,9 @@ abstract public class AbstractPooledActor implements PooledActor {
     final List sweepQueue() {
         def messages = []
         if (savedBufferedMessages) messages.addAll savedBufferedMessages
-        Object message = messageQueue.poll()
+        ActorMessage message = messageQueue.poll()
         while (message != null) {
-            if (message.respondsTo('onDeliveryError')) message.onDeliveryError()
+            if (message.payLoad.respondsTo('onDeliveryError')) message.payLoad.onDeliveryError()
             messages << message
             message = messageQueue.poll()
         }
@@ -482,30 +466,19 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo try @Immutable messages
     //todo create a performance benchmarks
     //todo loop without react stops after return, otherwise not
+    //todo add a fastSend() method to send a (singleton) message, which you never expect replies to
+    //todo test the onDeliveryError handler
+    //todo add synchronous calls plus an operator
 
     //Planned for the next release
+    //todo timeouts for sendAndWait()
+
     //todo abandoned actor group - what happens to the pool, senders
 
-    //todo add a fastSend() method to send a (singleton) message, which you never expect replies to
-    //todo test replies in no-arg closure
-    //todo test replies in multimessage closures when some messages have no recipient
-    //todo test replyIfExists in multimessage closures when some messages have no recipient
-    //todo reconsider IllegalStateException handling in reply() - do best effort delivery, test
-    //todo update fastSend tests
-    //todo test enabling and disabling replies
-    //todo test disabled replies
-    //todo consider deleting previous reply enhancements
-    //todo reconsider exception type and problems with reused messages
-
-    //todo add synchronous calls plus an operator
-    //todo test the onDeliveryError handler
-
+    //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
+    //todo move Java sources and tests to the java folder
     //todo make thread-bound reuse threads to speed-up their creation and make the compatible with Fork/Join
     //todo use ForkJoin
-
-    //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
-
-    //todo move Java sources and tests to the java folder
 
     //Backlog
     //todo use Gradle
@@ -515,6 +488,7 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo maven
     //todo put into maven repo
     //todo add transitive mvn dependencies
+    //todo remove type info for speed-up
     //todo ActorAction into Java
     //todo speedup actor creation
     //todo switch each to for loops where helping performance
@@ -571,4 +545,41 @@ val fib = actor { loop { react {
    self.forward(Add2(a, b))
 } } }
      */
+}
+
+final class SendAndWaitPooledActor extends AbstractPooledActor {
+    private Actor targetActor
+    private Object message
+    //todo use Phaser instead once available to keep the thread running
+    private CountDownLatch latch = new CountDownLatch(1)
+    private Object result
+
+    def SendAndWaitPooledActor(final targetActor, final message) {
+        this.targetActor = targetActor;
+        this.message = message
+    }
+
+    void act() {
+        message.getMetaClass().onDeliveryError = {->
+            this << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
+        }
+
+        targetActor << message
+        react {
+            result = it
+        }
+    }
+
+    void onException(Exception e) {
+        result = e
+    }
+
+    void afterStop(undeliveredMessages) {
+        latch.countDown()
+    }
+
+    Object getResult() {
+        latch.await()
+        if (result instanceof Exception) throw result else return result
+    }
 }
