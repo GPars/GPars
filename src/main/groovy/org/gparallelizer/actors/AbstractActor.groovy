@@ -1,15 +1,14 @@
 package org.gparallelizer.actors
 
+import groovy.time.Duration
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
-import org.gparallelizer.actors.util.EnhancedSemaphore
 import org.codehaus.groovy.runtime.TimeCategory
-import groovy.time.Duration
-import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.pooledActors.ActorReplyException
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.gparallelizer.actors.util.EnhancedSemaphore
+import org.gparallelizer.actors.*
 
 /**
  * Default Actor implementation designed to be extended with actual message queue and the act() method.
@@ -32,7 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-abstract public class AbstractActor implements ThreadedActor {
+abstract public class AbstractActor extends CommonActorImpl implements ThreadedActor {
 
     /**
      * Queue for the messages
@@ -52,30 +51,9 @@ abstract public class AbstractActor implements ThreadedActor {
 
     //todo Is it required?
     /**
-     * PRevents race condition on the started flag
+     * Prevents race condition on the started flag
      */
     private final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
-
-    /**
-     * The actor group to which the actor belongs
-     */
-    volatile ActorGroup actorGroup = Actors.defaultActorGroup
-
-    /**
-     * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
-     */
-    private volatile boolean groupMembershipChangeable = true
-
-    //todo should be private ut wouldm't work
-    /**
-     * A list of senders for the currently procesed messages
-     */
-    List senders = []
-
-    /**
-     * Indicates whether the actor should enhance messages to enable sending replies to their senders
-     */
-    private volatile boolean sendRepliesFlag = true
 
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
@@ -83,41 +61,14 @@ abstract public class AbstractActor implements ThreadedActor {
     public AbstractActor(final BlockingQueue<ActorMessage> messageQueue) {
         if (messageQueue == null) throw new IllegalArgumentException("Actor message queue must not be null.")
         this.messageQueue = messageQueue;
-    }
-
-    /**
-     * Sets the actor's group.
-     * It can only be invoked before the actor is started.
-     */
-    public final void setActorGroup(ActorGroup group) {
-        if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
-        if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
-        actorGroup = group
-    }
-
-    /**
-     * Enabled the actor and received messages to have the reply()/replyIfExists() methods called on them.
-     * Sending replies is enabled by default.
-     */
-    final void enableSendingReplies() {
-        sendRepliesFlag = true
-    }
-
-    /**
-     * Disables the actor and received messages to have the reply()/replyIfExists() methods called on them.
-     * Calling reply()/replyIfExist() on the actor will result in IllegalStateException being thrown.
-     * Calling reply()/replyIfExist() on a received message will result in MissingMethodException being thrown.
-     * Sending replies is enabled by default.
-     */
-    final void disableSendingReplies() {
-        sendRepliesFlag = false
+        actorGroup = Actors.defaultActorGroup
     }
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
      */
     public final Actor start() {
-        groupMembershipChangeable = false
+        disableGroupMembershipChange()
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
         def localStarted = started
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
@@ -214,7 +165,7 @@ abstract public class AbstractActor implements ThreadedActor {
             for (message in messages) {
                 senders << message?.sender
             }
-            ReplyEnhancer.enhanceWithReplyMethodsToMessages(messages)
+            enhanceWithReplyMethodsToMessages(messages)
         }
     }
 
@@ -338,48 +289,6 @@ abstract public class AbstractActor implements ThreadedActor {
      */
     protected final void receive(Duration duration, Closure handler) throws InterruptedException {
         receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler)
-    }
-
-    /**
-     * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
-     * have not been sent by an actor. For such cases use replyIfExists().
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
-     * @throws ActorReplyException If some of the replies failed to be sent.
-     */
-    protected final void reply(Object message) {
-        assert senders != null
-        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
-        if (!senders.isEmpty()) {
-            List<Exception> exceptions = []
-            for (sender in senders) {
-                if (sender != null) {
-                    try { sender.send message } catch (IllegalStateException e) {exceptions << e }
-                }
-                else exceptions << new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient.")
-            }
-            if (!exceptions.empty) throw new ActorReplyException('Failed sending some replies. See the issues field for details', exceptions)
-        } else {
-            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.")
-        }
-    }
-
-    /**
-     * Sends a reply to all currently processed messages, which have been sent by an actor.
-     * Ignores potential errors when sending the replies, like no sender or sender already stopped.
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
-     */
-    protected final void replyIfExists(Object message) {
-        assert senders != null
-        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
-        for (sender in senders) {
-            try {
-                sender?.send message
-            } catch (IllegalStateException ignore) { }
-        }
     }
 
     /**

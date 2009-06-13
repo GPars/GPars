@@ -9,13 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.ActorMessage
-import org.gparallelizer.actors.ReplyEnhancer
-import org.gparallelizer.actors.pooledActors.*
+import org.gparallelizer.actors.CommonActorImpl
+import org.gparallelizer.actors.pooledActors.ActorAction
+import org.gparallelizer.actors.pooledActors.MessageHolder
+import org.gparallelizer.actors.pooledActors.PooledActor
+import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
-import org.gparallelizer.actors.ReplyEnhancer
-import java.util.concurrent.CopyOnWriteArrayList
-
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -69,7 +69,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * @author Vaclav Pech
  * Date: Feb 7, 2009
  */
-abstract public class AbstractPooledActor implements PooledActor {
+abstract public class AbstractPooledActor extends CommonActorImpl implements PooledActor {
 
     /**
      * Queue for the messages
@@ -91,17 +91,6 @@ abstract public class AbstractPooledActor implements PooledActor {
      * A copy of buffer in case of timeout.
      */
     volatile List savedBufferedMessages = null
-
-    /**
-     * A list of senders for the currently procesed messages
-     */
-    List senders = []
-
-    //todo should be private, nut wouldn't work
-    /**
-     * Indicates whether the actor should enhance messages to enable sending replies to their senders
-     */
-    volatile boolean sendRepliesFlag = true
 
     /**
      * Indicates whether the actor should terminate
@@ -135,49 +124,15 @@ abstract public class AbstractPooledActor implements PooledActor {
      */
     private static final Timer timer = new Timer(true)
 
-    /**
-     * The actor group to which the actor belongs
-     */
-    volatile PooledActorGroup actorGroup = PooledActors.defaultPooledActorGroup
-
-    /**
-     * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
-     */
-    private volatile boolean groupMembershipChangeable = true
-
-    /**
-     * Sets the actor's group.
-     * It can only be invoked before the actor is started.
-     */
-    public final void setActorGroup(PooledActorGroup group) {
-        if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
-        if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
-        actorGroup = group
-    }
-
-    /**
-     * Enabled the actor and received messages to have the reply()/replyIfExists() methods called on them.
-     * Sending replies is enabled by default.
-     */
-    final void enableSendingReplies() {
-        sendRepliesFlag = true
-    }
-
-    /**
-     * Disables the actor and received messages to have the reply()/replyIfExists() methods called on them.
-     * Calling reply()/replyIfExist() on the actor will result in IllegalStateException being thrown.
-     * Calling reply()/replyIfExist() on a received message will result in MissingMethodException being thrown.
-     * Sending replies is enabled by default.
-     */
-    final void disableSendingReplies() {
-        sendRepliesFlag = false
+    def AbstractPooledActor() {
+        actorGroup = PooledActors.defaultPooledActorGroup
     }
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
      */
     public final AbstractPooledActor start() {
-        groupMembershipChangeable = false
+        disableGroupMembershipChange()
         if (!stopFlag.getAndSet(false)) throw new IllegalStateException("Actor has alredy been started.")
         actorAction(this) {
             if (delegate.respondsTo('afterStart')) delegate.afterStart()
@@ -295,7 +250,7 @@ abstract public class AbstractPooledActor implements PooledActor {
                 for (message in messages) {
                     senders << message?.sender
                 }
-                ReplyEnhancer.enhanceWithReplyMethodsToMessages(messages)
+                enhanceWithReplyMethodsToMessages(messages)
             }
             maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
             this.repeatLoop()
@@ -324,48 +279,6 @@ abstract public class AbstractPooledActor implements PooledActor {
             }
         }
         throw CONTINUE
-    }
-
-    /**
-     * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
-     * have not been sent by an actor. For such cases use replyIfExists().
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
-     * @throws ActorReplyException If some of the replies failed to be sent.
-     */
-    protected final void reply(Object message) {
-        assert senders != null
-        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
-        if (!senders.isEmpty()) {
-            List<Exception> exceptions = []
-            for (sender in senders) {
-                if (sender != null) {
-                    try { sender.send message } catch (IllegalStateException e) {exceptions << e }
-                }
-                else exceptions << new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient.")
-            }
-            if (!exceptions.empty) throw new ActorReplyException('Failed sending some replies. See the issues field for details', exceptions)
-        } else {
-            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.")
-        }
-    }
-
-    /**
-     * Sends a reply to all currently processed messages, which have been sent by an actor.
-     * Ignores potential errors when sending the replies, like no sender or sender already stopped.
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
-     */
-    protected final void replyIfExists(Object message) {
-        assert senders != null
-        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
-        for (sender in senders) {
-            try {
-                sender?.send message
-            } catch (IllegalStateException ignore) { }
-        }
     }
 
     /**
@@ -486,10 +399,10 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo test the onDeliveryError handler
     //todo add synchronous calls plus an operator
     //todo timeouts for sendAndWait()
+    //todo introduce a common actor superclass, move send(), ReplyEnhancer, thread local storage
+    //todo fix the Mixin test
 
     //Planned for the next release
-    //todo abandoned actor group - what happens to the pool, senders
-    //todo introduce a common actor superclass, move send(), ReplyEnhancer, thread local storage
     //todo class and instance async enhancer
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
@@ -505,6 +418,8 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo maven
     //todo put into maven repo
     //todo add transitive mvn dependencies
+
+    //todo abandoned actor group - what happens to the pool, senders
     //todo remove type info for speed-up
     //todo ActorAction into Java
     //todo speedup actor creation
