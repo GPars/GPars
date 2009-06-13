@@ -10,7 +10,7 @@ cleanMemory()
 
 final long memory1 = Runtime.runtime.freeMemory()
 println 'Threads at start: ' + Thread.threads.length
-for (i in 0..5000000) {
+for (i in 0..10000) {
     final CountDownLatch latch = new CountDownLatch(2)
     final PooledActorGroup group = new PooledActorGroup(i % 2 == 0, Math.max(1, random.nextInt(20)))
     final AbstractPooledActor actor = group.actor {
@@ -21,15 +21,15 @@ for (i in 0..5000000) {
                 latch.countDown()
             }
         }
-    }//.start()
+    }.start()
 
     group.actor {
         actor << 'Message'
         react {
             latch.countDown()
         }
-    }//.start()
-//    latch.await()
+    }.start()
+    latch.await()
     group.shutdown()
 }
 cleanMemory()

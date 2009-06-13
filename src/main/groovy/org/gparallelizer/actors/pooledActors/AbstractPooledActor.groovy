@@ -485,11 +485,12 @@ abstract public class AbstractPooledActor implements PooledActor {
     //todo add a fastSend() method to send a (singleton) message, which you never expect replies to
     //todo test the onDeliveryError handler
     //todo add synchronous calls plus an operator
-
-    //Planned for the next release
     //todo timeouts for sendAndWait()
 
+    //Planned for the next release
     //todo abandoned actor group - what happens to the pool, senders
+    //todo introduce a common actor superclass, move send(), ReplyEnhancer, thread local storage
+    //todo class and instance async enhancer
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
     //todo move Java sources and tests to the java folder

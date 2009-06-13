@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.Semaphore
 
 /**
  * This class forms the core of the DSL initialized by <i>Asynchronizer</i>. The static methods of <i>AsyncInvokerUtil</i>
@@ -120,22 +121,31 @@ public class AsyncInvokerUtil {
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static def eachAsync(Object collection, Closure cl) {
-        def internalCollection = collection.collect{it}
-        final CountDownLatch latch = new CountDownLatch(internalCollection.size());
-        final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
+        //todo remove
+//        for(element in collection) internalCollection << element
 
-        def result = internalCollection.each(async({Object ... args ->
+//        def internalCollection = (collection instanceof Iterator) ? collection.collect{it} : collection
+//        final CountDownLatch latch = new CountDownLatch(internalCollection.size());
+        final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
+        final Semaphore semaphore = new Semaphore(0)
+
+        Closure code = async({Object ... args ->
             try {
                 cl(args)
             } catch (Throwable e) {
                 exceptions.add(e)
             } finally {
-                latch.countDown()
+                semaphore.release()
             }
-        }))
-        latch.await()
+        })
+        int count = 0
+        for(element in collection) {
+            count += 1
+            code.call(element)
+        }
+        semaphore.acquire(count)
         if (!exceptions.empty) throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
-        else return result
+        else return collection
     }
 
     /**

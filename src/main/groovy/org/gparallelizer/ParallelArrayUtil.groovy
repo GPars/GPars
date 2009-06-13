@@ -28,7 +28,10 @@ public class ParallelArrayUtil {
     }
 
     static java.util.Collection createCollection(Object object) {
-        return object.collect{it}
+        def collection = []
+        for(element in object) collection << element
+        return collection
+//        return object.collect{it}  //todo remove
     }
 
     /**
