@@ -31,7 +31,6 @@ public class ParallelArrayUtil {
         def collection = []
         for(element in object) collection << element
         return collection
-//        return object.collect{it}  //todo remove
     }
 
     /**

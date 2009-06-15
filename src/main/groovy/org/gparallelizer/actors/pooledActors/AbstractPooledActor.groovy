@@ -401,12 +401,12 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo timeouts for sendAndWait()
     //todo introduce a common actor superclass, move send(), ReplyEnhancer, thread local storage
     //todo fix the Mixin test
+    //todo move Java sources and tests to the java folder
 
     //Planned for the next release
     //todo class and instance async enhancer
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
-    //todo move Java sources and tests to the java folder
     //todo make thread-bound reuse threads to speed-up their creation and make the compatible with Fork/Join
     //todo use ForkJoin
 

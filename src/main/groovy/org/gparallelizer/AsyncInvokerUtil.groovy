@@ -121,11 +121,6 @@ public class AsyncInvokerUtil {
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static def eachAsync(Object collection, Closure cl) {
-        //todo remove
-//        for(element in collection) internalCollection << element
-
-//        def internalCollection = (collection instanceof Iterator) ? collection.collect{it} : collection
-//        final CountDownLatch latch = new CountDownLatch(internalCollection.size());
         final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
         final Semaphore semaphore = new Semaphore(0)
 

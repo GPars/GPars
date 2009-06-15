@@ -49,6 +49,15 @@ public class AsynchronizerTest extends GroovyTestCase {
         }
     }
 
+    public void testEachAsyncOnEmpty() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            [].eachAsync{throw new RuntimeException('Should not be thrown')}
+            ''.eachAsync{throw new RuntimeException('Should not be thrown')}
+            [].iterator().eachAsync{throw new RuntimeException('Should not be thrown')}
+            ''.iterator().eachAsync{throw new RuntimeException('Should not be thrown')}
+        }
+    }
+
     public void testCollectAsync() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].collectAsync{Number number -> number * 10}
