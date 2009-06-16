@@ -13,18 +13,18 @@ public class CommonActorImpl {
     /**
      * A list of senders for the currently procesed messages
      */
-    private final List senders = []
+    protected final List senders = []
 
     //todo necessary for mixins
-    protected List getSenders() {senders}
+    protected final List getSenders() {senders}
 
     /**
      * Indicates whether the actor should enhance messages to enable sending replies to their senders
      */
-    private volatile boolean sendRepliesFlag = true
+    protected volatile boolean sendRepliesFlag = true
 
     //todo necessary for mixins
-    protected boolean getSendRepliesFlag() {sendRepliesFlag}
+    protected final boolean getSendRepliesFlag() {sendRepliesFlag}
 
     /**
      * Enabled the actor and received messages to have the reply()/replyIfExists() methods called on them.
