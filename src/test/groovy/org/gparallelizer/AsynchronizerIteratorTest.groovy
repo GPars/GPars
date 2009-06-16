@@ -1,11 +1,13 @@
 package org.gparallelizer
 
+import java.util.concurrent.ConcurrentSkipListSet
+
 public class AsynchronizerIteratorTest extends GroovyTestCase {
     public void testIteratorEach() {
         def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
         Asynchronizer.withAsynchronizer {
-            def result = []
+            def result = new ConcurrentSkipListSet()
             list.iterator().eachAsync {
                 result << it
             }

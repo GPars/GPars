@@ -20,5 +20,30 @@ public final class StraightDataFlowVariable<T> {
         }
     }
 
+   /**
+     * Reads the value of the variable. Blocks, if the value has not been assigned yet.
+    * @return
+    * @throws InterruptedException
+    */
+    public T bitwiseNegate() throws InterruptedException {
+       return retrieve();
+   }
 
+    /**
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * @param value
+     */
+    public void leftShift(final T value) {
+        bind(value);
+    }
+
+    /**
+     * Assigns a value from one DataFlowVariable instance to this variable.
+     * Can only be invoked once on each instance of DataFlowVariable
+     * @param ref
+     * @throws InterruptedException
+     */
+    public void leftShift(final StraightDataFlowVariable<T> ref) throws InterruptedException {
+        bind(ref.retrieve());
+    }
 }
