@@ -1,14 +1,14 @@
 package org.gparallelizer.samples
 
 import org.gparallelizer.actors.Actors
-import org.gparallelizer.actors.DefaultActor
+import org.gparallelizer.actors.DefaultThreadActor
 
 /**
  * Two actors are created to show possible ways to handle all lifecycle events of thread-bound actors.
  * @author Vaclav Pech
  */
 
-final DefaultActor actor1 = Actors.actor {
+final DefaultThreadActor actor1 = Actors.actor {
     println("Running actor1")
     if (true) throw new RuntimeException('test')
 }
@@ -38,7 +38,7 @@ actor1.start()
 
 Thread.sleep 1000
 
-class LifeCycleSampleActor extends DefaultActor {
+class LifeCycleSampleActor extends DefaultThreadActor {
 
     protected void act() {
         println("Running actor2")

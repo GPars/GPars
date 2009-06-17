@@ -11,8 +11,8 @@ import java.util.concurrent.SynchronousQueue;
  * Date: Jan 7, 2009
  */
 
-public class SynchronousActor extends AbstractActor {
-    SynchronousActor() {
+public class SynchronousThreadActor extends AbstractThreadActor {
+    def SynchronousThreadActor() {
         super(new SynchronousQueue<ActorMessage>(false));
     }
 }

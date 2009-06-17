@@ -27,7 +27,7 @@ public class DefaultActorTest extends GroovyTestCase {
     }
 }
 
-class DefaultTestActor extends DefaultActor {
+class DefaultTestActor extends DefaultThreadActor {
 
     final AtomicBoolean flag = new AtomicBoolean(false)
     final CountDownLatch latch = new CountDownLatch(1)

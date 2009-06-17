@@ -17,13 +17,13 @@ public abstract class AbstractActorGroup {
     /**
      * Indicates whether actors in this group use ForkJoin thread pool
      */
-    private final boolean usedForkJoin
+    private final boolean forkJoinUsed
 
-    boolean isUsedForkJoin() {usedForkJoin}
+    boolean isForkJoinUsed() {forkJoinUsed}
 
-    def AbstractActorGroup() { this.usedForkJoin = useFJPool() }
+    def AbstractActorGroup() { this.forkJoinUsed = useFJPool() }
 
-    def AbstractActorGroup(final boolean usedForkJoin) { this.usedForkJoin = usedForkJoin }
+    def AbstractActorGroup(final boolean forkJoinUsed) { this.forkJoinUsed = forkJoinUsed }
 
     /**
      * Checks the gparallelizer.useFJPool system property and returns, whether or not to use a fork join pool

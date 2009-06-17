@@ -38,7 +38,7 @@ public class ArraySumTest extends GroovyTestCase {
     }
 }
 
-class Processor extends DefaultActor {
+class Processor extends DefaultThreadActor {
 
     Actor parent
 
@@ -76,7 +76,7 @@ class Processor extends DefaultActor {
     }
 }
 
-class ReplyActor extends DefaultActor {
+class ReplyActor extends DefaultThreadActor {
 
     Actor parent
 
@@ -97,7 +97,7 @@ class ReplyActor extends DefaultActor {
         stop()
     }
 }
-class ArrayCalculator extends DefaultActor {
+class ArrayCalculator extends DefaultThreadActor {
 
     List<Integer> listToCalculate;
 

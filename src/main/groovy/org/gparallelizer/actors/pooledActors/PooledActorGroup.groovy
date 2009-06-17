@@ -49,7 +49,7 @@ public class PooledActorGroup extends AbstractPooledActorGroup {
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
     def PooledActorGroup() {
-        threadPool = usedForkJoin ? new FJPool() : new DefaultPool(true)
+        threadPool = forkJoinUsed ? new FJPool() : new DefaultPool(true)
     }
 
     /**
@@ -58,7 +58,7 @@ public class PooledActorGroup extends AbstractPooledActorGroup {
      */
     def PooledActorGroup(final boolean useForkJoinPool) {
         super(useForkJoinPool)
-        threadPool = usedForkJoin ? new FJPool() : new DefaultPool(true)
+        threadPool = forkJoinUsed ? new FJPool() : new DefaultPool(true)
     }
 
     /**
@@ -66,7 +66,7 @@ public class PooledActorGroup extends AbstractPooledActorGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     def PooledActorGroup(final int poolSize) {
-        threadPool = usedForkJoin ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
+        threadPool = forkJoinUsed ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
     }
 
     /**
@@ -76,6 +76,6 @@ public class PooledActorGroup extends AbstractPooledActorGroup {
      */
     def PooledActorGroup(final int poolSize, final boolean useForkJoinPool) {
         super(useForkJoinPool)
-        threadPool = usedForkJoin ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
+        threadPool = forkJoinUsed ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
     }
 }

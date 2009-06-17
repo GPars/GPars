@@ -11,11 +11,11 @@ import org.gparallelizer.actors.*
 import java.util.concurrent.CountDownLatch
 
 /**
- * AbstractActor provides the default thread-bound actor implementation. It represents a standalone active object (actor),
+ * AbstractThreadActor provides the default thread-bound actor implementation. It represents a standalone active object (actor),
  * which reacts asynchronously to messages sent to it from outside through the send() method.
  * Each Actor has its own message queue and a thread that runs actor's body. The thread is taken from a pool at actor's
- * start time and returned back to the pool after the actor termminates. The pool is shared with other AbstractActors by means of an instance
- * of the ActorGroup, which they have in common.
+ * start time and returned back to the pool after the actor termminates. The pool is shared with other AbstractThreadActors
+ * by means of an instance of the ActorGroup, which they have in common.
  * The ActorGroup instance is responsible for the pool creation, management and shutdown.
  * Whenever a PooledActor looks for a new message through the receive() method, the actor's thread gets blocked
  * until a message arrives into the actors message queue. Since the thread is physically blocked in the receive() method,
@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch
  * to the number of active actore it the group.
  * Use pooled actors instead of thread-bound actors if the number of cuncurrently run thread is of a concern.
  * On the other hand, thread-bound actors are generaly faster than pooled actors.
- * The AbstractActor class is the default Actor implementation.
+ * The AbstractThreadActor class is the default Actor implementation.
  * It is designed with extensibility in mind and so different message queues as well as the act method body can be
  * specified by subclasses. The actor must be started after construction by calling the start() method. This will
  * associate a thread with the actor.
@@ -45,7 +45,7 @@ import java.util.concurrent.CountDownLatch
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-abstract public class AbstractActor extends CommonActorImpl implements ThreadedActor {
+abstract public class AbstractThreadActor extends CommonActorImpl implements ThreadedActor {
 
     /**
      * Queue for the messages
@@ -88,7 +88,7 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
-    public AbstractActor(final BlockingQueue<ActorMessage> messageQueue) {
+    public AbstractThreadActor(final BlockingQueue<ActorMessage> messageQueue) {
         if (messageQueue == null) throw new IllegalArgumentException("Actor message queue must not be null.")
         this.messageQueue = messageQueue;
         actorGroup = Actors.defaultActorGroup
@@ -428,11 +428,11 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
  * The message is enhanced to send notification in case the target actor terminates without processing the message.
  * Exceptions are re-throvn from the getResult() method.
  */
-final class SendAndWaitActor extends DefaultActor {
+final class SendAndWaitActor extends DefaultThreadActor {
 
     final private Actor targetActor
     final private Object message
-    final private CountDownLatch actorBarrier
+    final private CountDownLatch actorBarrier = new CountDownLatch(1)
     private Object result
     private long timeout = -1
 
@@ -440,8 +440,6 @@ final class SendAndWaitActor extends DefaultActor {
         this.targetActor = targetActor;
         this.message = message
         this.actorGroup = targetActor.actorGroup
-        final boolean fjUsed = isFJUsed()
-        actorBarrier = new CountDownLatch(1)
     }
 
     def SendAndWaitActor(final targetActor, final message, final long timeout) {

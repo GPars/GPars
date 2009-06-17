@@ -1,7 +1,7 @@
 package org.gparallelizer.samples
 
 import org.gparallelizer.actors.Actors
-import org.gparallelizer.actors.DefaultActor
+import org.gparallelizer.actors.DefaultThreadActor
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor

@@ -140,11 +140,4 @@ public class CommonActorImpl {
             }
         }
     }
-
-    /**
-     * Checks whether the assigned actorGroup uses a Fork/Join pool and whether the calling thread is a Fork/Join thread.
-     */
-    final boolean isFJUsed() {
-        return actorGroup.isUsedForkJoin() && "jsr166y.forkjoin.ForkJoinWorkerThread" == Thread.currentThread().class.name
-    }
 }

@@ -13,7 +13,7 @@ public class LifecycleTest extends GroovyTestCase {
         volatile Object exception = null
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultActor actor = Actors.actor {throw new InterruptedException('test')}
+        final DefaultThreadActor actor = Actors.actor {throw new InterruptedException('test')}
         actor.metaClass.onInterrupt = {
             exception=it
             latch.countDown()
@@ -30,7 +30,7 @@ public class LifecycleTest extends GroovyTestCase {
         volatile Object exception = null
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultActor actor = Actors.actor {throw new RuntimeException('test')}
+        final DefaultThreadActor actor = Actors.actor {throw new RuntimeException('test')}
         actor.metaClass.onException = {
             exception=it
             latch.countDown()
@@ -51,7 +51,7 @@ public class LifecycleTest extends GroovyTestCase {
         volatile Object exception = null
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultActor actor = Actors.oneShotActor {throw new InterruptedException('test')}
+        final DefaultThreadActor actor = Actors.oneShotActor {throw new InterruptedException('test')}
         actor.metaClass.onInterrupt = {
             exception=it
             latch.countDown()
@@ -68,7 +68,7 @@ public class LifecycleTest extends GroovyTestCase {
         volatile Object exception = null
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultActor actor = Actors.oneShotActor {throw new RuntimeException('test')}
+        final DefaultThreadActor actor = Actors.oneShotActor {throw new RuntimeException('test')}
         actor.metaClass.onException = {
             exception=it
         }
@@ -90,7 +90,7 @@ public class LifecycleTest extends GroovyTestCase {
         volatile Object exception = null
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultActor actor = Actors.actor {throw new RuntimeException('test')}
+        final DefaultThreadActor actor = Actors.actor {throw new RuntimeException('test')}
         actor.metaClass.onException = {
             exception=it
             stop()
@@ -112,7 +112,7 @@ public class LifecycleTest extends GroovyTestCase {
         volatile Object exception = null
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultActor actor = Actors.actor {throw new RuntimeException('test')}
+        final DefaultThreadActor actor = Actors.actor {throw new RuntimeException('test')}
         actor.metaClass.onException = {
             exception=it
             throw new RuntimeException('testing failed handler')

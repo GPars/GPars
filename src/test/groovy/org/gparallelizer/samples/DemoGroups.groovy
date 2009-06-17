@@ -1,10 +1,11 @@
 package org.gparallelizer.samples
 
 import org.gparallelizer.actors.AbstractThreadActorGroup
-import org.gparallelizer.actors.DefaultActor
+import org.gparallelizer.actors.DefaultThreadActor
 import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.ThreadActorGroup
+import org.gparallelizer.actors.DefaultThreadActor
 
 
 /**
@@ -25,7 +26,7 @@ sampleGroup.oneShotActor {
 
 Thread.sleep 1000
 
-class GroupSampleActor extends DefaultActor {
+class GroupSampleActor extends DefaultThreadActor {
 
     protected void act() {
         println ((actorGroup==Actors.defaultActorGroup) ? "I am in the default group" : "I am in the sample group")

@@ -22,7 +22,7 @@ import org.gparallelizer.actors.pooledActors.ResizablePool
  * actor.stop()
  * </pre>
  *
- * Otherwise, if constructing Actors directly through their constructors, the AbstractActor.actorGroup property,
+ * Otherwise, if constructing Actors directly through their constructors, the CommonActorImpl.actorGroup property,
  * which defaults to the Actors.defaultActorGroup, can be set before the actor is started.
  *
  * <pre>
@@ -53,7 +53,7 @@ public class ThreadActorGroup extends AbstractThreadActorGroup {
      */
     protected def ThreadActorGroup(final boolean useForkJoinPool) {
         super(useForkJoinPool)
-        threadPool = usedForkJoin ? new ResizableFJPool() : new ResizablePool(true)
+        threadPool = forkJoinUsed ? new ResizableFJPool() : new ResizablePool(true)
     }
 
     /**
@@ -61,7 +61,7 @@ public class ThreadActorGroup extends AbstractThreadActorGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     protected def ThreadActorGroup(final int poolSize) {
-        threadPool = usedForkJoin ? new ResizableFJPool(poolSize) : new ResizablePool(true, poolSize)
+        threadPool = forkJoinUsed ? new ResizableFJPool(poolSize) : new ResizablePool(true, poolSize)
     }
 
     /**
@@ -71,6 +71,6 @@ public class ThreadActorGroup extends AbstractThreadActorGroup {
      */
     protected def ThreadActorGroup(final int poolSize, final boolean useForkJoinPool) {
         super(useForkJoinPool)
-        threadPool = usedForkJoin ? new ResizableFJPool(poolSize) : new ResizablePool(true, poolSize)
+        threadPool = forkJoinUsed ? new ResizableFJPool(poolSize) : new ResizablePool(true, poolSize)
     }
 }

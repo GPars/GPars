@@ -3,7 +3,7 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import org.gparallelizer.actors.BoundedActor
+import org.gparallelizer.actors.BoundedThreadActor
 
 /**
  *
@@ -21,7 +21,7 @@ public class BoundedActorTest extends GroovyTestCase{
     }
 }
 
-class BoundedtTestActor extends BoundedActor {
+class BoundedtTestActor extends BoundedThreadActor {
     final AtomicBoolean flag = new AtomicBoolean(false)
     final CountDownLatch latch = new CountDownLatch(1)
 

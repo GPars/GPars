@@ -8,8 +8,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-public class DefaultActor extends AbstractActor {
-    DefaultActor() {
+public class DefaultThreadActor extends AbstractThreadActor {
+    def DefaultThreadActor() {
         super(new LinkedBlockingQueue<ActorMessage>());
     }
 }

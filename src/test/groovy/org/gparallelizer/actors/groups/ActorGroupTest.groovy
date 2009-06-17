@@ -3,16 +3,17 @@ package org.gparallelizer.actors.groups
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.AbstractThreadActorGroup
-import org.gparallelizer.actors.AbstractActor
+import org.gparallelizer.actors.AbstractThreadActor
 import org.gparallelizer.actors.ActorMessage
 import java.util.concurrent.LinkedBlockingQueue
 import org.gparallelizer.actors.ThreadActorGroup
 import org.gparallelizer.actors.NonDaemonActorGroup
 import org.gparallelizer.actors.AbstractThreadActorGroup
+import org.gparallelizer.actors.AbstractThreadActor
 
 public class ActorGroupTest extends GroovyTestCase {
     public void testDefaultGroupDaemon() {
-        if (Actors.defaultActorGroup.isUsedForkJoin()) return
+        if (Actors.defaultActorGroup.isForkJoinUsed()) return
         volatile boolean daemon = false;
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -27,7 +28,7 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 
     public void testDefaultFJGroupDaemon() {
-        if (!Actors.defaultActorGroup.isUsedForkJoin()) return
+        if (!Actors.defaultActorGroup.isForkJoinUsed()) return
         volatile boolean daemon = false;
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -42,7 +43,7 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 
     public void testGroupDaemonFlag() {
-        if (Actors.defaultActorGroup.isUsedForkJoin()) return
+        if (Actors.defaultActorGroup.isForkJoinUsed()) return
         volatile boolean daemon = false;
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
@@ -70,7 +71,7 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 
     public void testFJGroupDaemonFlag() {
-        if (!Actors.defaultActorGroup.isUsedForkJoin()) return
+        if (!Actors.defaultActorGroup.isForkJoinUsed()) return
         volatile boolean daemon = false;
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
@@ -98,7 +99,7 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 
     public void testGroupsWithActorInheritance() {
-        if (Actors.defaultActorGroup.isUsedForkJoin()) return
+        if (Actors.defaultActorGroup.isForkJoinUsed()) return
         volatile boolean daemon = false;
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
@@ -154,7 +155,7 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 }
 
-class GroupTestActor extends AbstractActor {
+class GroupTestActor extends AbstractThreadActor {
 
     def GroupTestActor(AbstractThreadActorGroup group) {
         super(new LinkedBlockingQueue<ActorMessage>());

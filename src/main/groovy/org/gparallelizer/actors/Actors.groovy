@@ -15,14 +15,14 @@ public class Actors {
     public final static AbstractThreadActorGroup defaultActorGroup = new ThreadActorGroup()
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      */
     public static Actor actor(Closure handler) {
         defaultActorGroup.actor handler
     }
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      * The actor will stop after one iteration through the passed-in closure.
      */
     public static Actor oneShotActor(Closure handler) {
@@ -30,14 +30,14 @@ public class Actors {
     }
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      */
     public static Actor defaultActor(Closure handler) {
         defaultActorGroup.defaultActor handler
     }
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      * The actor will stop after one iteration through the passed-in closure.
      */
     public static Actor defaultOneShotActor(Closure handler) {

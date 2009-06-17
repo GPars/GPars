@@ -426,6 +426,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo document default daemon flag for thread-bound actors
     //todo decument the possibility to run actors without the jsr-166y jar file
     //todo document pool resizing
+    //todo document DefaultThreadActor and AbstractThreadActor rename
     //todo test wiki samples
 
     //Planned for the next release
@@ -464,7 +465,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo support mixins for event-driven actors
 
     //Speed-up tips
-    //todo use TaskBarrier instead of CountDownLatch in AbstractActor - need to resolve blocking on the message queue
+    //todo use TaskBarrier instead of CountDownLatch in AbstractThreadActor - need to resolve blocking on the message queue
     //todo use LinkedTransferQueue with ForkJoin
     //todo remove type info for speed-up
     //todo ActorAction into Java

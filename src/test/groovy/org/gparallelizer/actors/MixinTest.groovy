@@ -18,7 +18,7 @@ public class MixinTest extends GroovyTestCase {
         final AtomicBoolean stopFlag = new AtomicBoolean(false)
 
         Company.metaClass {
-            mixin DefaultActor
+            mixin DefaultThreadActor
 
             act = {->
                 receive {
@@ -52,7 +52,7 @@ public class MixinTest extends GroovyTestCase {
 
         final Corporation corp   = new Corporation(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
         corp.metaClass {
-            mixin DefaultActor
+            mixin DefaultThreadActor
 
             act = {->
                 receive {

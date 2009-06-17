@@ -323,7 +323,7 @@ public class ReplyTest extends GroovyTestCase {
         }.start()
 
         //send and terminate
-        final DefaultActor actor1 = oneShotActor {
+        final DefaultThreadActor actor1 = oneShotActor {
             bouncer << 1
             stop()
         }
@@ -333,7 +333,7 @@ public class ReplyTest extends GroovyTestCase {
         actor1.start()
 
         //wait, send and terminate
-        final DefaultActor actor2 = oneShotActor {
+        final DefaultThreadActor actor2 = oneShotActor {
             latches[1].await()
             bouncer << 5
             stop()

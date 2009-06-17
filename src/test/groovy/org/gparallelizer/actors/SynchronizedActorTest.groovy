@@ -19,7 +19,7 @@ public class SynchronousActorTest extends GroovyTestCase {
     }
 }
 
-class SynchronoustTestActor extends SynchronousActor {
+class SynchronoustTestActor extends SynchronousThreadActor {
     final AtomicBoolean flag = new AtomicBoolean(false)
     final CountDownLatch latch = new CountDownLatch(1)
 

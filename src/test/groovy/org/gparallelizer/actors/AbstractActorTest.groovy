@@ -51,7 +51,7 @@ public class AbstractActorTest extends GroovyTestCase {
         afterStart:{->
             flag.set(true)
             latch.countDown()
-        }] as DefaultActor
+        }] as DefaultThreadActor
 
         actor.start()
         latch.await(30, TimeUnit.SECONDS)
@@ -118,7 +118,7 @@ public class AbstractActorTest extends GroovyTestCase {
     }
 }
 
-class InterruptionTestActor extends DefaultActor {
+class InterruptionTestActor extends DefaultThreadActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
     final AtomicBoolean beforeStopFlag = new AtomicBoolean(false)
@@ -145,7 +145,7 @@ class InterruptionTestActor extends DefaultActor {
     }
 }
 
-class AfterStopTestActor extends DefaultActor {
+class AfterStopTestActor extends DefaultThreadActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
     final AtomicBoolean beforeStopFlag = new AtomicBoolean(false)

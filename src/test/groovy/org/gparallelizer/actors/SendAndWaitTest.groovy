@@ -9,7 +9,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testSuccessfulMessages() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultActor actor = Actors.oneShotActor {
+        final DefaultThreadActor actor = Actors.oneShotActor {
             receive() {
                 reply 2
             }
@@ -30,7 +30,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testMessagesToStoppedActor() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultActor actor = Actors.oneShotActor {
+        final DefaultThreadActor actor = Actors.oneShotActor {
             receive()
             reply 2
         }
@@ -54,7 +54,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultActor actor = Actors.oneShotActor {
+        final DefaultThreadActor actor = Actors.oneShotActor {
             receive()
             reply 2
             barrier.await()
@@ -81,7 +81,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultActor actor = Actors.oneShotActor {
+        final DefaultThreadActor actor = Actors.oneShotActor {
             receive()
             reply 2
             barrier.await()
@@ -112,7 +112,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultActor actor = Actors.oneShotActor {
+        final DefaultThreadActor actor = Actors.oneShotActor {
             barrier.await()
             Thread.sleep 1000
             receive() {
@@ -141,7 +141,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultActor actor = Actors.oneShotActor {
+        final DefaultThreadActor actor = Actors.oneShotActor {
             barrier.await()
             receive()
             barrier.await()
@@ -165,7 +165,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultActor actor = Actors.oneShotActor {
+        final DefaultThreadActor actor = Actors.oneShotActor {
             barrier.await()
             receive()
         }

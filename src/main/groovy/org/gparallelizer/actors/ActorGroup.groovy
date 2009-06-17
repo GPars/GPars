@@ -20,14 +20,14 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     protected def AbstractThreadActorGroup(final boolean useForkJoinPool) { super(useForkJoinPool) }
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      */
     public final Actor actor(Closure handler) {
         defaultActor(handler)
     }
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      * The actor will stop after one iteration through the passed-in closure.
      */
     public final Actor oneShotActor(Closure handler) {
@@ -35,22 +35,22 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     }
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      */
     public final Actor defaultActor(Closure handler = {throw new UnsupportedOperationException()}) {
-        final Actor actor = [act: handler] as DefaultActor
+        final Actor actor = [act: handler] as DefaultThreadActor
         handler.delegate = actor
         actor.actorGroup = this
         return actor
     }
 
     /**
-     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      * The actor will stop after one iteration through the passed-in closure.
      */
     public final Actor defaultOneShotActor(Closure handler = {throw new UnsupportedOperationException()}) {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
-        final DefaultActor actor = [act: enhancedHandler] as DefaultActor
+        final DefaultThreadActor actor = [act: enhancedHandler] as DefaultThreadActor
         handler.delegate = actor
         enhancedHandler.delegate = actor
         actor.actorGroup = this
@@ -61,7 +61,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
      * Creates a new instance of SynchronousActor, using the passed-in closure as the body of the actor's act() method.
      */
     public final Actor synchronousActor(Closure handler = {throw new UnsupportedOperationException()}) {
-        final Actor actor = [act: handler] as SynchronousActor
+        final Actor actor = [act: handler] as SynchronousThreadActor
         handler.delegate = actor
         actor.actorGroup = this
         return actor
@@ -73,7 +73,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
      */
     public final Actor synchronousOneShotActor(Closure handler = {throw new UnsupportedOperationException()}) {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
-        final Actor actor = [act: enhancedHandler] as SynchronousActor
+        final Actor actor = [act: enhancedHandler] as SynchronousThreadActor
         handler.delegate = actor
         enhancedHandler.delegate = actor
         actor.actorGroup = this
@@ -130,7 +130,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     }
 }
 
-final class InlinedBoundedActor extends BoundedActor {
+final class InlinedBoundedActor extends BoundedThreadActor {
 
     final Closure handler
 
