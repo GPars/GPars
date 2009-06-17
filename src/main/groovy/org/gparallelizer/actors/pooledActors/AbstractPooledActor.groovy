@@ -428,12 +428,12 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo document pool resizing
     //todo document DefaultThreadActor and AbstractThreadActor rename
     //todo test wiki samples
+    //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
 
     //Planned for the next release
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
 
-    //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
     //todo simplify group hierarchy and daemon + fj settings
     //todo reconsider the option to select pool type
     //todo reconsider the name for groups
