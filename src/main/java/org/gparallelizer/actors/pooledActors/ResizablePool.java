@@ -39,7 +39,7 @@ public final class ResizablePool extends DefaultPool {
      */
     @Override protected ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
-         return new ThreadPoolExecutor(poolSize, 100*poolSize, 10, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
+         return new ThreadPoolExecutor(poolSize, 1000, 10, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
             public Thread newThread(final Runnable r) {
                 final Thread thread = new Thread(r, createThreadName());
                 thread.setDaemon(daemon);
@@ -51,6 +51,14 @@ public final class ResizablePool extends DefaultPool {
                 });
                 return thread;
             }
-        });
+        }, new RejectedExecutionHandler() {
+             public void rejectedExecution(final Runnable r, final ThreadPoolExecutor executor) {
+                 final int currentPoolSize = executor.getPoolSize();
+                 final int maximumPoolSize = executor.getMaximumPoolSize();
+                 throw new IllegalStateException("The thread pool executor cannot run the task. " +
+                         "The upper limit of the thread pool size has probably been reached. " +
+                         "Current pool size: " + currentPoolSize + " Maximum pool size: " + maximumPoolSize);
+             }
+         });
     }
 }

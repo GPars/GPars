@@ -193,7 +193,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testSuccessfulMessagesFromActor() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final PooledActorGroup group = new PooledActorGroup(1, true)
+        final PooledActorGroup group = new PooledActorGroup(2, true)
 
         final Actor actor = group.actor {
             react {
@@ -203,7 +203,6 @@ public class SendAndWaitTest extends GroovyTestCase {
         actor.start()
 
         volatile def result
-
         group.actor {
             result = actor.sendAndWait(1)
             latch.countDown()

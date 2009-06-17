@@ -16,6 +16,7 @@ import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.util.ActorBarrier
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
+import java.util.concurrent.CountDownLatch
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -431,18 +432,17 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
 
-    //todo make FJPool resizable - upper boundary, test
     //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
+    //todo simplify group hierarchy and daemon + fj settings
     //todo reconsider the option to select pool type
+    //todo reconsider the name for groups
+    //todo update ActorGroupTest with non daemon groups
+    //todo test all samples
     //todo more practical samples to use both types of actors and combine them, plus samples on collections
     //todo abandoned actor group - what happens to the pool, senders - update for thread-bounds pools and FJPool
     //todo update javadoc with respect to the new changes
-    //todo reconsider work stealing for sendAndWait()thread-bound threads, since they may run for long time - SendAndWait actor should not use ActorBarrier
-    //todo remove ResizableFJPool and ActorBarrier if not needed
-    //todo update ActorGroupTest with non daemon groups
-    //todo reconsider the name for groups
-    //todo test all samples
 
+    //todo remove ResizableFJPool and ActorBarrier if not needed
 
     //Backlog
     //todo rename AbstractActor to ThreadActor
@@ -529,7 +529,7 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
 
     final private Actor targetActor
     final private Object message
-    final private ActorBarrier actorBarrier
+    final private CountDownLatch actorBarrier=new CountDownLatch(1)
     private Object result
     private long timeout = -1
 
@@ -537,7 +537,6 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
         this.targetActor = targetActor;
         this.message = message
         this.actorGroup = targetActor.actorGroup
-        actorBarrier = ActorBarrier.create(isFJUsed())
     }
 
     def SendAndWaitPooledActor(final targetActor, final message, final long timeout) {
@@ -559,14 +558,14 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
 
     void onTimeout() { result = null }
     void onException(Exception e) { result = e }
-    void afterStop(undeliveredMessages) { actorBarrier.done() }
+    void afterStop(undeliveredMessages) { actorBarrier.countDown() }
 
     /**
      * Retrieves the result, waiting for it, if needed.
      * Non-blocking under Fork/oin pool.
      */
     Object getResult() {
-        actorBarrier.awaitCompletion()
+        actorBarrier.await()
         if (result instanceof Exception) throw result else return result
     }
 }

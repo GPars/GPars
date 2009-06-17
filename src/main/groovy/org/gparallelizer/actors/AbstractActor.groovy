@@ -8,6 +8,7 @@ import org.codehaus.groovy.runtime.TimeCategory
 import org.gparallelizer.actors.util.ActorBarrier
 import org.gparallelizer.actors.util.EnhancedSemaphore
 import org.gparallelizer.actors.*
+import java.util.concurrent.CountDownLatch
 
 /**
  * AbstractActor provides the default thread-bound actor implementation. It represents a standalone active object (actor),
@@ -107,13 +108,11 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
             if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
         }
 
-        //todo enable runtime FJ detection once receive() doesn't block threads on the messageQueue
-        final ActorBarrier actorBarrier = ActorBarrier.create(false)
-//        final ActorBarrier actorBarrier = ActorBarrier.create(isFJUsed())
+        final CountDownLatch actorBarrier = new CountDownLatch(1)
 
         actorGroup.execute {
             adjustActorThreadAfterStart()
-            actorBarrier.done()
+            actorBarrier.countDown()
             try {
                 ReplyRegistry.registerCurrentActorWithThread this
                 if (delegate.respondsTo('afterStart')) delegate.afterStart()
@@ -149,7 +148,7 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
                 ReplyRegistry.deregisterCurrentActorWithThread()
             }
         } as Runnable
-        actorBarrier.awaitCompletion()
+        actorBarrier.await()
         return this
     }
 
@@ -433,7 +432,7 @@ final class SendAndWaitActor extends DefaultActor {
 
     final private Actor targetActor
     final private Object message
-    final private ActorBarrier actorBarrier
+    final private CountDownLatch actorBarrier
     private Object result
     private long timeout = -1
 
@@ -442,7 +441,7 @@ final class SendAndWaitActor extends DefaultActor {
         this.message = message
         this.actorGroup = targetActor.actorGroup
         final boolean fjUsed = isFJUsed()
-        actorBarrier = ActorBarrier.create(isFJUsed())
+        actorBarrier = new CountDownLatch(1)
     }
 
     def SendAndWaitActor(final targetActor, final message, final long timeout) {
@@ -461,7 +460,7 @@ final class SendAndWaitActor extends DefaultActor {
         } catch (Exception e) {
             result = e
         } finally {
-            actorBarrier.done()
+            actorBarrier.countDown()
             stop()
         }
     }
@@ -471,7 +470,7 @@ final class SendAndWaitActor extends DefaultActor {
      * Non-blocking under Fork/oin pool.
      */
     Object getResult() {
-        actorBarrier.awaitCompletion()
+        actorBarrier.await()
         if (result instanceof Exception) throw result else return result
     }
 }

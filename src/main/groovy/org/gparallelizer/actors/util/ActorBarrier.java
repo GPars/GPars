@@ -23,11 +23,11 @@ public abstract class ActorBarrier {
 
     /**
      * Creates the appropriate ActorBarrier implementation based on the fjUsed flag.
-     * @param fjUsed Indicates, whether Fork/Join is being used
+     * @param useForkJoin Indicates, whether Fork/Join is being used
      * @return The appropriate ActorBarrier implementation
      */
-    public static ActorBarrier create(final boolean fjUsed) {
-        if (fjUsed) {
+    public static ActorBarrier create(final boolean useForkJoin) {
+        if (useForkJoin) {
             return new FJActorBarrier();
         } else {
             return new LatchActorBarrier();
