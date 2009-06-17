@@ -2,7 +2,7 @@ package org.gparallelizer.actors.pooledActors;
 
 import jsr166y.forkjoin.ForkJoinPool;
 
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents the actors' thread pool, which performs tasks on behalf of the actors. Uses a ForkJoinPool from JSR-166y
@@ -13,37 +13,36 @@ import java.util.concurrent.*;
  * @author Vaclav Pech
  * Date: Feb 27, 2009
  */
-public final class FJPool implements Pool {
-    private ForkJoinPool pool;
+public class FJPool implements Pool {
+    protected ForkJoinPool pool;
+    private final int configuredPoolSize;
 
     /**
      * Creates the pool with default number of threads.
-     * @param daemon Sets the daemon flag of threads in the pool.
      */
-    public FJPool(final boolean daemon) {
-        this(daemon, FJPool.retrieveDefaultPoolSize());
+    public FJPool() {
+        this(FJPool.retrieveDefaultPoolSize());
     }
 
     /**
      * Creates the pool with specified number of threads.
-     * @param daemon Sets the daemon flag of threads in the pool.
-     * @param poolSize The required size of the pool
+     * @param configuredPoolSize The required size of the pool
      */
-    public FJPool(final boolean daemon, final int poolSize) {
-        if (poolSize<0) throw new IllegalStateException("Pool size must be a non-negative number.");
-        pool = createPool(daemon, poolSize);
+    public FJPool(final int configuredPoolSize) {
+        if (configuredPoolSize <0) throw new IllegalStateException("Pool size must be a non-negative number.");
+        this.configuredPoolSize = configuredPoolSize;
+        pool = createPool(configuredPoolSize);
     }
 
     /**
      * Creates a fork/join pool of given size. Each thread will have the uncaught exception handler set
      * to print the unhandled exception to standard error output.
-     * @param daemon Sets the daemon flag of threads in the pool.
      * @param poolSize The required pool size  @return The created thread pool
      * @return The newly created thread pool
      */
-    private ForkJoinPool createPool(final boolean daemon, final int poolSize) {
-        //todo use the daemon flag
+    private ForkJoinPool createPool(final int poolSize) {
         assert poolSize > 0;
+
         final ForkJoinPool pool =  new ForkJoinPool(poolSize);
         pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(final Thread t, final Throwable e) {
@@ -58,7 +57,7 @@ public final class FJPool implements Pool {
      * Resizes the thread pool to the specified value
      * @param poolSize The new pool size
      */
-    public void resize(final int poolSize) {
+    public final void resize(final int poolSize) {
         if (poolSize<0) throw new IllegalStateException("Pool size must be a non-negative number.");
         pool.setPoolSize(poolSize);
     }
@@ -66,7 +65,7 @@ public final class FJPool implements Pool {
     /**
      * Sets the pool size to the default
      */
-    public void resetDefaultSize() {
+    public final void resetDefaultSize() {
         resize(FJPool.retrieveDefaultPoolSize());
     }
 
@@ -75,21 +74,21 @@ public final class FJPool implements Pool {
      * @param task The task to schedule
      */
     public void execute(final Runnable task) {
-//        pool.execute(task);
+        pool.submit(new FJRunnableTask(task));
     }
 
     /**
      * Retrieves the internal executor service.
      * @return The underlying thread pool
      */
-    public ForkJoinPool getForkJoinPool() {
+    public final ForkJoinPool getForkJoinPool() {
         return pool;
     }
 
     /**
      * Gently stops the pool
      */
-    public void shutdown() {
+    public final void shutdown() {
         pool.shutdown();
         try {
             pool.awaitTermination(30, TimeUnit.SECONDS);
@@ -106,4 +105,6 @@ public final class FJPool implements Pool {
             return Runtime.getRuntime().availableProcessors() + 1;
         }
     }
+
+    protected final int getConfiguredPoolSize() { return configuredPoolSize; }
 }

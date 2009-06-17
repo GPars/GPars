@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-
 public class DefaultActorTest extends GroovyTestCase {
     public void testDefaultMessaging() {
         DefaultTestActor actor = new DefaultTestActor()
@@ -22,7 +21,8 @@ public class DefaultActorTest extends GroovyTestCase {
     public void testThreadName() {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
-        assert actor.threadName.startsWith("Actor Thread ")
+
+        assert actor.threadName.startsWith("Actor Thread ") || actor.threadName.startsWith("ForkJoinPool-")
         actor.stop()
     }
 }

@@ -1,5 +1,7 @@
 package org.gparallelizer.actors.pooledActors
 
+import org.gparallelizer.actors.AbstractActorGroup
+
 /**
  * Provides logical grouping for pooled actors. Each group has an underlying thread pool, which will perform actions
  * on behalf of the actors belonging to the group. Actors created through the PooledActorGroup.actor() method
@@ -35,48 +37,45 @@ package org.gparallelizer.actors.pooledActors
  *
  * </pre>
  *
+ * To specify whether a ForkJoinPool from JSR-166y should be used or the pool based on JDK's executor services,
+ * you can either use the appropriate constructors or the 'gparallelizer.useFJPool' system property.
+ *
  * @author Vaclav Pech
  * Date: May 4, 2009
  */
-public class PooledActorGroup {
+public class PooledActorGroup extends AbstractPooledActorGroup {
 
     /**
-     * Stored the group actors' thread pool
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
-    private final @Delegate Pool threadPool
-
-    /**
-     * Creates a group of actors. The actors will share a common thread pool of non-daemon threads.
-     */
-    def PooledActorGroup() { this(false) }
-
-    /**
-     * Creates a group of actors. The actors will share a common thread pool.
-     * @param daemon Sets the daemon flag of threads in the group's thread pool.
-     */
-    def PooledActorGroup(final boolean daemon) {
-        threadPool = new DefaultPool(daemon)
+    def PooledActorGroup() {
+        threadPool = usedForkJoin ? new FJPool() : new DefaultPool(true)
     }
 
     /**
-     * Creates a group of actors. The actors will share a common thread pool.
-     * @param daemon Sets the daemon flag of threads in the group's thread pool.
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * @param useForkJoinPool Indicates, whether the group should use a fork join pool underneath or the executor-service-based default pool
+     */
+    def PooledActorGroup(final boolean useForkJoinPool) {
+        super(useForkJoinPool)
+        threadPool = usedForkJoin ? new FJPool() : new DefaultPool(true)
+    }
+
+    /**
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      * @param poolSize The initial size of the underlying thread pool
      */
-    def PooledActorGroup(final boolean daemon, final int poolSize) {
-        threadPool = new DefaultPool(daemon, poolSize)
+    def PooledActorGroup(final int poolSize) {
+        threadPool = usedForkJoin ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
     }
 
     /**
-     * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
-     * The created actor will belong to the pooled actor group.
-     * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * @param poolSize The initial size of the underlying thread pool
+     * @param useForkJoinPool Indicates, whether the group should use a fork join pool underneath or the executor-service-based default pool
      */
-    public final AbstractPooledActor actor(Closure handler) {
-        final AbstractPooledActor actor = [act: handler] as AbstractPooledActor
-        handler.delegate = actor
-        actor.actorGroup = this
-        return actor
+    def PooledActorGroup(final int poolSize, final boolean useForkJoinPool) {
+        super(useForkJoinPool)
+        threadPool = usedForkJoin ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
     }
 }

@@ -2,13 +2,17 @@ package org.gparallelizer.actors.groups
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actors
-import org.gparallelizer.actors.ActorGroup
+import org.gparallelizer.actors.AbstractThreadActorGroup
 import org.gparallelizer.actors.AbstractActor
 import org.gparallelizer.actors.ActorMessage
 import java.util.concurrent.LinkedBlockingQueue
+import org.gparallelizer.actors.ThreadActorGroup
+import org.gparallelizer.actors.NonDaemonActorGroup
+import org.gparallelizer.actors.AbstractThreadActorGroup
 
 public class ActorGroupTest extends GroovyTestCase {
     public void testDefaultGroupDaemon() {
+        if (Actors.defaultActorGroup.isUsedForkJoin()) return
         volatile boolean daemon = false;
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -22,13 +26,57 @@ public class ActorGroupTest extends GroovyTestCase {
         assertFalse daemon
     }
 
+    public void testDefaultFJGroupDaemon() {
+        if (!Actors.defaultActorGroup.isUsedForkJoin()) return
+        volatile boolean daemon = false;
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        def actor = Actors.oneShotActor {
+            daemon = Thread.currentThread().isDaemon()
+            latch.countDown()
+        }.start()
+
+        assertEquals Actors.defaultActorGroup, actor.actorGroup
+        latch.await()
+        assert daemon
+    }
+
     public void testGroupDaemonFlag() {
+        if (Actors.defaultActorGroup.isUsedForkJoin()) return
         volatile boolean daemon = false;
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
 
-        final ActorGroup daemonGroup = new ActorGroup(true)
-        final ActorGroup nonDaemonGroup = new ActorGroup(false)
+        final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+
+        def actor1 = daemonGroup.oneShotActor {
+            daemon = Thread.currentThread().isDaemon()
+            latch1.countDown()
+        }.start()
+
+        assertEquals daemonGroup, actor1.actorGroup
+        latch1.await()
+        assert daemon
+
+        def actor2 = nonDaemonGroup.oneShotActor {
+            daemon = Thread.currentThread().isDaemon()
+            latch2.countDown()
+        }.start()
+
+        assertEquals nonDaemonGroup, actor2.actorGroup
+        latch2.await()
+        assertFalse daemon
+    }
+
+    public void testFJGroupDaemonFlag() {
+        if (!Actors.defaultActorGroup.isUsedForkJoin()) return
+        volatile boolean daemon = false;
+        final CountDownLatch latch1 = new CountDownLatch(1)
+        final CountDownLatch latch2 = new CountDownLatch(1)
+
+        final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
 
         def actor1 = daemonGroup.oneShotActor {
             daemon = Thread.currentThread().isDaemon()
@@ -50,12 +98,13 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 
     public void testGroupsWithActorInheritance() {
+        if (Actors.defaultActorGroup.isUsedForkJoin()) return
         volatile boolean daemon = false;
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
 
-        final ActorGroup daemonGroup = new ActorGroup(true)
-        final ActorGroup nonDaemonGroup = new ActorGroup(false)
+        final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
 
         final GroupTestActor actor1 = new GroupTestActor(daemonGroup)
         actor1.metaClass.act = {->
@@ -83,8 +132,8 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 
     public void testValidGroupReset() {
-        final ActorGroup daemonGroup = new ActorGroup(true)
-        final ActorGroup nonDaemonGroup = new ActorGroup(false)
+        final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
 
         assertEquals daemonGroup, actor.actorGroup
@@ -94,8 +143,8 @@ public class ActorGroupTest extends GroovyTestCase {
     }
 
     public void testInvalidGroupReset() {
-        final ActorGroup daemonGroup = new ActorGroup(true)
-        final ActorGroup nonDaemonGroup = new ActorGroup(false)
+        final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
         actor.start()
         assertEquals daemonGroup, actor.actorGroup
@@ -103,27 +152,11 @@ public class ActorGroupTest extends GroovyTestCase {
             actor.actorGroup = nonDaemonGroup
         }
     }
-
-    public void testDifferentThreadFactories() {
-        final ActorGroup daemonGroup1 = new ActorGroup(true)
-        final ActorGroup daemonGroup2 = new ActorGroup(true)
-        final ActorGroup nonDaemonGroup1 = new ActorGroup(false)
-        final ActorGroup nonDaemonGroup2 = new ActorGroup(false)
-        final ActorGroup defaultGroup = Actors.defaultActorGroup
-
-        assert daemonGroup1.threadFactory != daemonGroup2.threadFactory
-        assert daemonGroup1.threadFactory != nonDaemonGroup1.threadFactory
-        assert daemonGroup1.threadFactory != defaultGroup.threadFactory
-
-        assert nonDaemonGroup1.threadFactory != daemonGroup2.threadFactory
-        assert nonDaemonGroup1.threadFactory != nonDaemonGroup2.threadFactory
-        assert nonDaemonGroup1.threadFactory != defaultGroup.threadFactory
-    }
 }
 
 class GroupTestActor extends AbstractActor {
 
-    def GroupTestActor(ActorGroup group) {
+    def GroupTestActor(AbstractThreadActorGroup group) {
         super(new LinkedBlockingQueue<ActorMessage>());
         actorGroup = group
     }

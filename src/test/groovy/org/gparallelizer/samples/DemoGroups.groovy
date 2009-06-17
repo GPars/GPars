@@ -1,9 +1,10 @@
 package org.gparallelizer.samples
 
-import org.gparallelizer.actors.ActorGroup
+import org.gparallelizer.actors.AbstractThreadActorGroup
 import org.gparallelizer.actors.DefaultActor
 import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.ThreadActorGroup
 
 
 /**
@@ -12,7 +13,7 @@ import org.gparallelizer.actors.Actor
  * @author Vaclav Pech
  */
 
-final ActorGroup sampleGroup = new ActorGroup(true)
+final AbstractThreadActorGroup sampleGroup = new ThreadActorGroup()
 
 println "Sample Group $sampleGroup"
 println "Default group ${Actors.defaultActorGroup}"
@@ -39,3 +40,8 @@ Thread.sleep 1000
 final Actor actor = new GroupSampleActor()
 actor.actorGroup = sampleGroup
 actor.start()
+
+System.in.read()
+
+sampleGroup.shutdown()
+Actors.defaultActorGroup.shutdown()

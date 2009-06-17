@@ -129,6 +129,8 @@ public class ReplyToMessageTest extends GroovyTestCase {
         }.start()
 
         completedBarrier.await()
+        incrementor.stop()
+        decrementor.stop()
         assertEquals 4, replies1.size()
         assert replies1.containsAll([3, 5, 4, 8])
         assertEquals 4, replies2.size()

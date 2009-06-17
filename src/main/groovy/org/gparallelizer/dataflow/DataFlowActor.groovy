@@ -14,7 +14,7 @@ abstract class DataFlowActor extends AbstractPooledActor {
     /**
      * The actor group used by all Dataflow Concurrency actors by default.
      */
-    public static final PooledActorGroup DATA_FLOW_GROUP = new PooledActorGroup(true, 50)
+    public static final PooledActorGroup DATA_FLOW_GROUP = new PooledActorGroup(50)
 
     /**
      * Sets the default Dataflow Concurrency actor group on the actor.

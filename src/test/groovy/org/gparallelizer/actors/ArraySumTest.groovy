@@ -59,19 +59,7 @@ class Processor extends DefaultActor {
                     def splitList1
                     def splitList2
                     (splitList1, splitList2) = split(list)
-                    def sum=0
-                    Actor replyActor
-                    replyActor=Actors.actor {
-                        replyActor.receive {
-                            sum+=it[0]
-                            replyActor.receive {
-                                sum+=it[0]
-                            }
-                        }
-                        parent.send([sum])
-                        replyActor.stop()
-                    }
-                    replyActor.start()
+                    Actor replyActor = new ReplyActor(parent).start()
                     new Processor(replyActor).start().send(splitList1)
                     new Processor(replyActor).start().send(splitList2)
             }
@@ -88,6 +76,27 @@ class Processor extends DefaultActor {
     }
 }
 
+class ReplyActor extends DefaultActor {
+
+    Actor parent
+
+    def ReplyActor(Actor parent) {
+        this.parent = parent
+    }
+
+    void act() {
+        def sum=0
+        
+        receive {
+            sum+=it[0]
+            receive {
+                sum+=it[0]
+            }
+        }
+        parent.send([sum])
+        stop()
+    }
+}
 class ArrayCalculator extends DefaultActor {
 
     List<Integer> listToCalculate;

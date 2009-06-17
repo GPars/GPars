@@ -12,7 +12,7 @@ public class Actors {
     /**
      * The default actor group to share by all actors created through the Actors class.
      */
-    public final static ActorGroup defaultActorGroup = new ActorGroup(false)
+    public final static AbstractThreadActorGroup defaultActorGroup = new ThreadActorGroup()
 
     /**
      * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.

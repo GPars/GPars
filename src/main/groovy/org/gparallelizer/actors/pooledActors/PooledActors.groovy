@@ -30,7 +30,7 @@ public abstract class PooledActors {
     /**
      * The default actor group to share by all actors created through the PooledActors class.
      */
-    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(true)
+    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup()
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.

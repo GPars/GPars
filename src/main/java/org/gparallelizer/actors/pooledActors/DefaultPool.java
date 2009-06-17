@@ -1,6 +1,7 @@
 package org.gparallelizer.actors.pooledActors;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Represents the actors' thread pool, which performs tasks on behalf of the actors.
@@ -11,7 +12,7 @@ import java.util.concurrent.*;
  * @author Vaclav Pech
  * Date: Feb 27, 2009
  */
-public final class DefaultPool implements Pool {
+public class DefaultPool implements Pool {
     private ThreadPoolExecutor pool;
 
     /**
@@ -39,11 +40,11 @@ public final class DefaultPool implements Pool {
      * @param poolSize The required pool size  @return The created thread pool
      * @return The newly created thread pool
      */
-    private ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
+    protected ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
         return (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
             public Thread newThread(final Runnable r) {
-                final Thread thread = new Thread(r);
+                final Thread thread = new Thread(r, createThreadName());
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                     public void uncaughtException(final Thread t, final Throwable e) {
@@ -57,10 +58,23 @@ public final class DefaultPool implements Pool {
     }
 
     /**
+     * Created a JVM-unique name for Actors' threads.
+     * @return The name prefix
+     */
+    protected final String createThreadName() {
+        return "Actor Thread " + DefaultPool.threadCount.incrementAndGet();
+    }
+
+    /**
+     * Unique counter for Actors' threads
+     */
+    private static final AtomicLong threadCount = new AtomicLong(0);
+
+    /**
      * Resizes the thread pool to the specified value
      * @param poolSize The new pool size
      */
-    public void resize(final int poolSize) {
+    public final void resize(final int poolSize) {
         if (poolSize<0) throw new IllegalStateException("Pool size must be a non-negative number.");
         pool.setCorePoolSize(poolSize);
     }
@@ -68,7 +82,7 @@ public final class DefaultPool implements Pool {
     /**
      * Sets the pool size to the default
      */
-    public void resetDefaultSize() {
+    public final void resetDefaultSize() {
         resize(DefaultPool.retrieveDefaultPoolSize());
     }
 
@@ -76,7 +90,7 @@ public final class DefaultPool implements Pool {
      * schedules a new task for processing with the pool
      * @param task The task to schedule
      */
-    public void execute(final Runnable task) {
+    public final void execute(final Runnable task) {
         pool.execute(task);
     }
 
@@ -84,14 +98,14 @@ public final class DefaultPool implements Pool {
      * Retrieves the internal executor service.
      * @return The underlying thread pool
      */
-    public ExecutorService getExecutorService() {
+    public final ExecutorService getExecutorService() {
         return pool;
     }
 
     /**
      * Gently stops the pool
      */
-    public void shutdown() {
+    public final void shutdown() {
         pool.shutdown();
         try {
             pool.awaitTermination(30, TimeUnit.SECONDS);

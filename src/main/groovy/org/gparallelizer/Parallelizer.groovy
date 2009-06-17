@@ -5,7 +5,8 @@ import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.TimeUnit
 
 /**
- * Enables a ParallelArray-based (from JSR-166y) DSL on collections.
+ * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
+ * shows to be much faster (10 - 20 times) compared to the executor service implementation in Asynchronizer.
  * E.g.
  * Parallelizer.withParallelizer(5) {
  *     final AtomicInteger result = new AtomicInteger(0)

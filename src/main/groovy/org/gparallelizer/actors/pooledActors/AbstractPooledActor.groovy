@@ -2,7 +2,6 @@ package org.gparallelizer.actors.pooledActors
 
 import groovy.time.Duration
 import java.util.concurrent.BlockingQueue
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -14,14 +13,17 @@ import org.gparallelizer.actors.pooledActors.ActorAction
 import org.gparallelizer.actors.pooledActors.MessageHolder
 import org.gparallelizer.actors.pooledActors.PooledActor
 import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.util.ActorBarrier
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
  * which reacts asynchronously to messages sent to it from outside through the send() method.
- * Each PooledActor has its own message queue and a thread pool shared with other PooledActors.
- * The work performed by a PooledActor is divided into chunks, which are sequentially submitted as independent tasks
+ * Each PooledActor has its own message queue and a thread pool shared with other PooledActors by means of an instance
+ * of the PooledActorGroup, which they have in common.
+ * The PooledActorGroup instance is responsible for the pool creation, management and shutdown.
+ * All work performed by a PooledActor is divided into chunks, which are sequentially submitted as independent tasks
  * to the thread pool for processing.
  * Whenever a PooledActor looks for a new message through the react() method, the actor gets detached
  * from the thread, making the thread available for other actors. Thanks to the ability to dynamically attach and detach
@@ -33,10 +35,14 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
  *
- * def actor = actor {*     loop {*         react {message ->
+ * def actor = actor {
+ *     loop {
+ *         react {message ->
  *             println message
- *}*         //this line will never be reached
- *}*     //this line will never be reached
+ *         }
+ *         //this line will never be reached
+ *     }
+ *     //this line will never be reached
  *}.start()
  *
  * actor.send 'Hi!'
@@ -44,12 +50,17 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  * This requires the code to be structured accordingly.
  *
  * <pre>
- * def adder = actor {*     loop {*         react {a ->
+ * def adder = actor {
+ *     loop {
+ *         react {a ->
  *             react {b ->
  *                 println a+b
  *                 replyIfExists a+b  //sends reply, if b was sent by a PooledActor
- *}*}*         //this line will never be reached
- *}*     //this line will never be reached
+ *             }
+ *         }
+ *         //this line will never be reached
+ *     }
+ *     //this line will never be reached
  *}.start()
  * </pre>
  * The closures passed to the react() method can call reply() or replyIfExists(), which will send a message back to
@@ -57,8 +68,10 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  * if the original message wasn't sent by an actor nor if the original sender actor is no longer running.
  * The react() method accepts timout specified using the TimeCategory DSL.
  * <pre>
- * react(10.MINUTES) {*     println 'Received message: ' + it
- *}* </pre>
+ * react(10.MINUTES) {
+ *     println 'Received message: ' + it
+ *}
+ * * </pre>
  * If not message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
  * and the actor terminates.
  * Each PooledActor has at any point in time at most one active instance of ActorAction associated, which abstracts
@@ -403,14 +416,39 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo fix the Mixin test
     //todo move Java sources and tests to the java folder
     //todo class and instance async enhancer - wiki, document exception differences
+    //todo document the gparallelizer.useFJPool property
+    //todo use ForkJoin
+    //todo unify actor group classes - document pool for thread-bound, shutdown and FJPool flag
+    //todo FJPool only allows daemon threads - javadoc, wiki
+    //todo make thread-bound reuse threads to speed-up their creation and make them compatible with Fork/Join - wiki resizable pools
+    //todo implement and test thread-bound actors' sendAndWait() method
+    //todo document default daemon flag for thread-bound actors
+    //todo decument the possibility to run actors without the jsr-166y jar file
+    //todo document pool resizing
+    //todo test wiki samples
 
     //Planned for the next release
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
-    //todo make thread-bound reuse threads to speed-up their creation and make the compatible with Fork/Join
-    //todo use ForkJoin
+
+    //todo make FJPool resizable - upper boundary, test
+    //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
+    //todo reconsider the option to select pool type
+    //todo more practical samples to use both types of actors and combine them, plus samples on collections
+    //todo abandoned actor group - what happens to the pool, senders - update for thread-bounds pools and FJPool
+    //todo update javadoc with respect to the new changes
+    //todo reconsider work stealing for sendAndWait()thread-bound threads, since they may run for long time - SendAndWait actor should not use ActorBarrier
+    //todo remove ResizableFJPool and ActorBarrier if not needed
+    //todo update ActorGroupTest with non daemon groups
+    //todo reconsider the name for groups
+    //todo test all samples
+
 
     //Backlog
+    //todo rename AbstractActor to ThreadActor
+    //todo add join() to actors
+    //todo clean issues and todos
+    //todo add samples
     //todo use Gradle
     //todo automate code sample download
     //todo automate javadoc download
@@ -419,20 +457,23 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo put into maven repo
     //todo add transitive mvn dependencies
 
-    //todo abandoned actor group - what happens to the pool, senders
+    //todo consider the asynchronous metaclass
+    //todo use AST transformation to turn actors methods into async processing
+    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
+    //todo try the fixes for the MixinTest
+    //todo support mixins for event-driven actors
+
+    //Speed-up tips
+    //todo use TaskBarrier instead of CountDownLatch in AbstractActor - need to resolve blocking on the message queue
+    //todo use LinkedTransferQueue with ForkJoin
     //todo remove type info for speed-up
     //todo ActorAction into Java
     //todo speedup actor creation
     //todo switch each to for loops where helping performance
     //todo reconsider locking in Actors
-    //todo consider asynchronous metaclass
-    //todo use AST transformation to turn actors methods into async processing
     //todo implement in Java
-    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
-    //todo try the fixes for the MixinTest
     //todo consider flow control to throttle message production
     //todo resize the pool if all threads are busy or blocked
-    //todo support mixins for event-driven actors
 
     //To consider
     //todo multiple loops
@@ -485,16 +526,18 @@ val fib = actor { loop { react {
  * Exceptions are re-throvn from the getResult() method.
  */
 final class SendAndWaitPooledActor extends AbstractPooledActor {
-    private Actor targetActor
-    private Object message
-    //todo use Phaser instead once available to keep the thread running
-    private CountDownLatch latch = new CountDownLatch(1)
+
+    final private Actor targetActor
+    final private Object message
+    final private ActorBarrier actorBarrier
     private Object result
     private long timeout = -1
 
     def SendAndWaitPooledActor(final targetActor, final message) {
         this.targetActor = targetActor;
         this.message = message
+        this.actorGroup = targetActor.actorGroup
+        actorBarrier = ActorBarrier.create(isFJUsed())
     }
 
     def SendAndWaitPooledActor(final targetActor, final message, final long timeout) {
@@ -506,7 +549,6 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
         message.getMetaClass().onDeliveryError = {->
             this << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
         }
-
         targetActor << message
         if (timeout < 0) {
             react { result = it }
@@ -517,10 +559,14 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
 
     void onTimeout() { result = null }
     void onException(Exception e) { result = e }
-    void afterStop(undeliveredMessages) { latch.countDown() }
+    void afterStop(undeliveredMessages) { actorBarrier.done() }
 
+    /**
+     * Retrieves the result, waiting for it, if needed.
+     * Non-blocking under Fork/oin pool.
+     */
     Object getResult() {
-        latch.await()
+        actorBarrier.awaitCompletion()
         if (result instanceof Exception) throw result else return result
     }
 }

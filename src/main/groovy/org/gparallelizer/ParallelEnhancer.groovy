@@ -21,7 +21,7 @@ public final class ParallelEnhancer {
     /**
      * Holds the internal ForkJoinPool instance wrapped into a FJPool
      */
-    private final static FJPool threadPool = new FJPool(true)
+    private final static FJPool threadPool = new FJPool()
 
     /**
      * Enhances a single instance by mixing-in an instance of ParallelEnhancer.
@@ -45,7 +45,7 @@ public final class ParallelEnhancer {
 
     /**
      * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure
-     * to evaluate each collection's element. A CountDownLatch is used to make the calling thread wait for all the results.
+     * to evaluate each collection's element.
      * After this method returns, all the closures have been finished and all the potential shared resources have been updated
      * by the threads.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.

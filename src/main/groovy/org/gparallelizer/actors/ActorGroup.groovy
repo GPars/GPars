@@ -1,63 +1,23 @@
 package org.gparallelizer.actors
 
-import java.util.concurrent.ThreadFactory
-
 /**
- * Provides logical grouping for actors. Each group holds a thread factory, which will create threads for all
- * actors created in that group. Actors created through the ActorGroup.actor*() methods will automatically belong
- * to the group through which they were created.
- * <pre>
- *
- * def group = new ActorGroup()
- *
- * def actor = group.actor {
- *     receive {message ->
- *         println message
- *     }
- * }.start()
- *
- * actor.send 'Hi!'
- * ...
- * actor.stop()
- * </pre>
- *
- * Otherwise, if constructing Actors directly through their constructors, the AbstractActor.actorGroup property,
- * which defaults to the Actors.defaultActorGroup, can be set before the actor is started.
- *
- * <pre>
- * def group = new ActorGroup(false)
- *
- * def actor = new MyActor()
- * actor.actorGroup = group
- * actor.start()
- *
- * </pre>
+ * Provides a common super class fo thread-actor's groups.
  *
  * @author Vaclav Pech
  * Date: May 8, 2009
  */
-public class ActorGroup {
-    /**
-     * Stored the group actors' thread pool
-     */
-    final ThreadFactory threadFactory
+public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
 
     /**
-     * Creates a group of actors. The actors will share a common thread pool of non-daemon threads.
+     * Creates a group of actors. The actors will share a common thread pool of threads.
      */
-    def ActorGroup() { this(false) }
+    protected def AbstractThreadActorGroup() {  }
 
     /**
      * Creates a group of actors. The actors will share a common thread pool.
-     * @param daemon Sets the daemon flag of threads in the group's thread pool.
+     * @param useForkJoinPool Indicates, whether the group should use a fork join pool underneath or the executor-service-based default pool
      */
-    def ActorGroup(final boolean daemon) {
-        threadFactory = {Runnable r ->
-            final Thread thread = new Thread(r)
-            thread.daemon = daemon
-            return thread
-        } as ThreadFactory
-    }
+    protected def AbstractThreadActorGroup(final boolean useForkJoinPool) { super(useForkJoinPool) }
 
     /**
      * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
@@ -174,7 +134,7 @@ final class InlinedBoundedActor extends BoundedActor {
 
     final Closure handler
 
-    def InlinedBoundedActor(ActorGroup actorGroup, Closure handler) {
+    def InlinedBoundedActor(AbstractThreadActorGroup actorGroup, Closure handler) {
         this.handler = handler
         this.actorGroup = actorGroup
         handler.delegate = this

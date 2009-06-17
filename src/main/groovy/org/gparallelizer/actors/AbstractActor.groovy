@@ -2,18 +2,31 @@ package org.gparallelizer.actors
 
 import groovy.time.Duration
 import java.util.concurrent.BlockingQueue
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicLong
 import org.codehaus.groovy.runtime.TimeCategory
+import org.gparallelizer.actors.util.ActorBarrier
 import org.gparallelizer.actors.util.EnhancedSemaphore
 import org.gparallelizer.actors.*
 
 /**
- * Default Actor implementation designed to be extended with actual message queue and the act() method.
- * The actor must be started after construction  by calling the start() method. This will start the background
- * actor thread, which first calls an afterStart() method of the Actor, if the method exists, and then keeps
+ * AbstractActor provides the default thread-bound actor implementation. It represents a standalone active object (actor),
+ * which reacts asynchronously to messages sent to it from outside through the send() method.
+ * Each Actor has its own message queue and a thread that runs actor's body. The thread is taken from a pool at actor's
+ * start time and returned back to the pool after the actor termminates. The pool is shared with other AbstractActors by means of an instance
+ * of the ActorGroup, which they have in common.
+ * The ActorGroup instance is responsible for the pool creation, management and shutdown.
+ * Whenever a PooledActor looks for a new message through the receive() method, the actor's thread gets blocked
+ * until a message arrives into the actors message queue. Since the thread is physically blocked in the receive() method,
+ * it cannot be reused for other actors and so the thread pool for thread-bound actors automatically resizes
+ * to the number of active actore it the group.
+ * Use pooled actors instead of thread-bound actors if the number of cuncurrently run thread is of a concern.
+ * On the other hand, thread-bound actors are generaly faster than pooled actors.
+ * The AbstractActor class is the default Actor implementation.
+ * It is designed with extensibility in mind and so different message queues as well as the act method body can be
+ * specified by subclasses. The actor must be started after construction by calling the start() method. This will
+ * associate a thread with the actor.
+ * The afterStart() method of the Actor, if the method exists, is called and then the thread keeps
  * calling the act() method, until the stop() method is called or the actor thread is interrupted directly.
  * Before the actor thread finishes an beforeStop() method is called, if exists.
  * After it stops the afterStop(List unprocessedMessages) is called, if exists,
@@ -43,6 +56,22 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
      * The actors background thread.
      */
     protected volatile Thread actorThread;
+
+    /**
+     * Sets the actorThread to the current thread.
+     */
+    protected final void adjustActorThreadAfterStart() {
+        this.actorThread = Thread.currentThread()
+    }
+
+    /**
+     * Sets the actorThread to null and clears the interrupted flag on the current flag.
+     */
+    protected final void clearActorThreadAfterStart() {
+        this.actorThread = null
+        final Thread thread = Thread.currentThread()
+        thread.interrupted()
+    }
 
     /**
      * Flag indicating Actor's liveness status.
@@ -78,7 +107,13 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
             if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
         }
 
-        actorThread = actorGroup.threadFactory.newThread({
+        //todo enable runtime FJ detection once receive() doesn't block threads on the messageQueue
+        final ActorBarrier actorBarrier = ActorBarrier.create(false)
+//        final ActorBarrier actorBarrier = ActorBarrier.create(isFJUsed())
+
+        actorGroup.execute {
+            adjustActorThreadAfterStart()
+            actorBarrier.done()
             try {
                 ReplyRegistry.registerCurrentActorWithThread this
                 if (delegate.respondsTo('afterStart')) delegate.afterStart()
@@ -108,12 +143,13 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
                     try {
                         reportError(delegate, e)
                     } catch (Throwable ex) {ex.printStackTrace(System.err)} //invoked when the onException handler threw an exception
+                } finally {
+                    clearActorThreadAfterStart()
                 }
                 ReplyRegistry.deregisterCurrentActorWithThread()
             }
-        } as Runnable)
-        actorThread.name = createThreadName()
-        actorThread.start()
+        } as Runnable
+        actorBarrier.awaitCompletion()
         return this
     }
 
@@ -222,9 +258,7 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
 
         } else {
             final List<ActorMessage> messages = []
-            for (i in 1..maxNumberOfParameters) {
-                messages << doReceive {messageQueue.take()}
-            }
+            for (i in 1..maxNumberOfParameters) { messages << doReceive {messageQueue.take()} }
             try {
                 enhanceReplies(messages)
                 handler.call(* messages*.payLoad)
@@ -355,14 +389,6 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
      */
     protected final Thread getActorThread() { actorThread }
 
-    /**
-     * Joins the actor's thread
-     * @param milis Timeout in miliseconds
-     */
-    public final void join(long milis) {
-        actorThread?.join(milis)
-    }
-
     //todo should be private, but closures demand higher visibility
     void reportError(def delegate, Throwable e) {
         if (delegate.respondsTo('onException')) delegate.onException(e)
@@ -396,19 +422,6 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
     void checkState() {
         if (!started.get()) throw new IllegalStateException("The actor hasn't been started.");
     }
-
-    //todo should be private but closures demand higher visibility
-    /**
-     * Created a JVM-unique name for Actors' threads.
-     */
-    final String createThreadName() {
-        "Actor Thread ${threadCount.incrementAndGet()}"
-    }
-
-    /**
-     * Unique counter for Actors' threads
-     */
-    private static final AtomicLong threadCount = new AtomicLong(0)
 }
 
 /**
@@ -417,16 +430,19 @@ abstract public class AbstractActor extends CommonActorImpl implements ThreadedA
  * Exceptions are re-throvn from the getResult() method.
  */
 final class SendAndWaitActor extends DefaultActor {
-    private Actor targetActor
-    private Object message
-    //todo use Phaser instead once available to keep the thread running
-    private CountDownLatch latch = new CountDownLatch(1)
+
+    final private Actor targetActor
+    final private Object message
+    final private ActorBarrier actorBarrier
     private Object result
     private long timeout = -1
 
     def SendAndWaitActor(final targetActor, final message) {
         this.targetActor = targetActor;
         this.message = message
+        this.actorGroup = targetActor.actorGroup
+        final boolean fjUsed = isFJUsed()
+        actorBarrier = ActorBarrier.create(isFJUsed())
     }
 
     def SendAndWaitActor(final targetActor, final message, final long timeout) {
@@ -445,13 +461,17 @@ final class SendAndWaitActor extends DefaultActor {
         } catch (Exception e) {
             result = e
         } finally {
-            latch.countDown()
+            actorBarrier.done()
             stop()
         }
     }
 
+    /**
+     * Retrieves the result, waiting for it, if needed.
+     * Non-blocking under Fork/oin pool.
+     */
     Object getResult() {
-        latch.await()
+        actorBarrier.awaitCompletion()
         if (result instanceof Exception) throw result else return result
     }
 }

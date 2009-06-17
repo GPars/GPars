@@ -189,4 +189,27 @@ public class SendAndWaitTest extends GroovyTestCase {
         latch.await()
         assertNull result
     }
+
+    public void testSuccessfulMessagesFromActor() {
+        CountDownLatch latch = new CountDownLatch(1)
+
+        final PooledActorGroup group = new PooledActorGroup(1, true)
+
+        final Actor actor = group.actor {
+            react {
+                reply 2
+            }
+        }
+        actor.start()
+
+        volatile def result
+
+        group.actor {
+            result = actor.sendAndWait(1)
+            latch.countDown()
+        }.start()
+
+        latch.await()
+        assertEquals 2, result
+    }
 }

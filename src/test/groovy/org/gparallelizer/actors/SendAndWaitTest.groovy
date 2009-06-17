@@ -55,7 +55,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DefaultActor actor = Actors.oneShotActor {
-            final def a = receive()
+            receive()
             reply 2
             barrier.await()
             Thread.sleep 3000  //give the second message time to hit the queue
@@ -82,7 +82,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DefaultActor actor = Actors.oneShotActor {
-            final def a = receive()
+            receive()
             reply 2
             barrier.await()
             Thread.sleep 3000  //give the second message time to hit the queue
@@ -181,5 +181,28 @@ public class SendAndWaitTest extends GroovyTestCase {
 
         latch.await()
         assertNull result
+    }
+
+    public void testSuccessfulMessagesFromActor() {
+        CountDownLatch latch = new CountDownLatch(1)
+
+        final AbstractThreadActorGroup group = new ThreadActorGroup(3, true)
+
+        final Actor actor = group.oneShotActor {
+            receive {
+                reply 2
+            }
+        }
+        actor.start()
+
+        volatile def result
+
+        group.oneShotActor {
+            result = actor.sendAndWait(1)
+            latch.countDown()
+        }.start()
+
+        latch.await()
+        assertEquals 2, result
     }
 }

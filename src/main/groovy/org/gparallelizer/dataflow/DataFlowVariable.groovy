@@ -162,6 +162,7 @@ private final class Out<T> extends DataFlowActor {
 
     private volatile T result = null
     private volatile Exception reason = null
+    //todo replace with ActorBarrier
     private final def latch = new CountDownLatch(1)
 
     void act() {
