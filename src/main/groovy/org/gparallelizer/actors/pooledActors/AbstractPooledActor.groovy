@@ -434,7 +434,6 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
 
-    //todo update ActorGroupTest with non daemon groups
     //todo more practical samples to use both types of actors and combine them, plus samples on collections and enhancers
     //todo abandoned actor group - what happens to the pool, senders - update for thread-bounds pools and FJPool
     //todo update javadoc with respect to the new changes
