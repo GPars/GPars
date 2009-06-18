@@ -14,7 +14,7 @@ import org.gparallelizer.actors.pooledActors.PooledActorGroup
  * @author Vaclav Pech
  */
 
-final PooledActorGroup group = new PooledActorGroup(true, 1)
+final PooledActorGroup group = new PooledActorGroup(1)
 
 final AbstractPooledActor actor = group.actor {
     react {offerA, offerB, offerC ->

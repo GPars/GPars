@@ -406,47 +406,41 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //Document before next release
     //todo use @Delegate from group to pool
-    //todo try @Immutable messages
     //todo create a performance benchmarks
-    //todo loop without react stops after return, otherwise not
+    //todo Ability to suspend actor and message enhancements for replies, which has impact on message delivery speed
     //todo add a fastSend() method to send a (singleton) message, which you never expect replies to
+    //todo loop without react stops after return, otherwise not
     //todo test the onDeliveryError handler
     //todo add synchronous calls plus an operator
     //todo timeouts for sendAndWait()
     //todo introduce a common actor superclass, move send(), ReplyEnhancer, thread local storage
-    //todo fix the Mixin test
-    //todo move Java sources and tests to the java folder
     //todo class and instance async enhancer - wiki, document exception differences
     //todo document the gparallelizer.useFJPool property
     //todo use ForkJoin
     //todo unify actor group classes - document pool for thread-bound, shutdown and FJPool flag
     //todo FJPool only allows daemon threads - javadoc, wiki
     //todo make thread-bound reuse threads to speed-up their creation and make them compatible with Fork/Join - wiki resizable pools
-    //todo implement and test thread-bound actors' sendAndWait() method
     //todo document default daemon flag for thread-bound actors
     //todo decument the possibility to run actors without the jsr-166y jar file
     //todo document pool resizing
     //todo document DefaultThreadActor and AbstractThreadActor rename
     //todo test wiki samples
     //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
+    //todo rename AbstractActor to ThreadActor
+    //todo simplify group hierarchy and daemon + fj settings, reconsider the name for groups
+    //todo reconsider the option to select pool type
 
     //Planned for the next release
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
 
-    //todo simplify group hierarchy and daemon + fj settings
-    //todo reconsider the option to select pool type
-    //todo reconsider the name for groups
     //todo update ActorGroupTest with non daemon groups
-    //todo test all samples
-    //todo more practical samples to use both types of actors and combine them, plus samples on collections
+    //todo more practical samples to use both types of actors and combine them, plus samples on collections and enhancers
     //todo abandoned actor group - what happens to the pool, senders - update for thread-bounds pools and FJPool
     //todo update javadoc with respect to the new changes
 
-    //todo remove ResizableFJPool and ActorBarrier if not needed
-
     //Backlog
-    //todo rename AbstractActor to ThreadActor
+    //todo remove FJPool, ResizableFJPool and ActorBarrier if not needed
     //todo add join() to actors
     //todo clean issues and todos
     //todo add samples

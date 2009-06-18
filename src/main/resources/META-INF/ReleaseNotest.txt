@@ -1,9 +1,17 @@
 GParallelizer
 
 0.8
-Restructured pooled actor groups with respect to the thread pools
-Updated to support messages annotated with @Immutable
-Introduced fastSend() (no replies possible) and sendAndWait() (synchronous send) methods to actors
+Added DataFlow concurrency support
+Added sendAndWait() methods to actors to block the caller until a reply arrives
+Added an option to use the JSR-166y ForkJoin pool
+Enabled thread-bound actors to reuse threads from a resizeable common pool
+Added AsyncEnhancer and ParallelEnhancer classes enabling asynchronous collection processing through meta-class enhancements
+Restructured actor groups with respect to the thread-bound actor thread reuse and Fork/Join pool support
+Supported messages annotated with @Immutable
+Ability to suspend actor and message enhancements for replies, which has impact on message delivery speed
+Restructured actor classes to increase code reuse
+Fixed the event-driven actor's loop, when no react is called
+Several performance benchmarks included
 Minor performance optimizations
 Bugfixing
 
