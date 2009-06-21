@@ -1,12 +1,12 @@
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowStream
 import static org.gparallelizer.dataflow.DataFlow.thread
 
-//Example 3
-
-DataFlowActor.DATA_FLOW_GROUP.resize 4
+/**
+ * A producer consumer sample, where the producer generates numbers into the DataFlowStream and the consumer
+ * takes a snapshot of the DataFlowStream using the collect() method to calculate summary of the numbers in the stream.
+ */
 
 void ints(int n, int max, DataFlowStream<Integer> stream) {
     if (n != max) {

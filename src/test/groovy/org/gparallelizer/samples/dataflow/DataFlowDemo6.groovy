@@ -1,34 +1,27 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.*
-import org.gparallelizer.dataflow.DataFlowStream
-import org.gparallelizer.actors.pooledActors.PooledActors
-import org.gparallelizer.dataflow.DataFlowActor
-import org.gparallelizer.dataflow.DataFlowVariable
+import static org.gparallelizer.dataflow.DataFlow.thread
 
-DataFlowActor.DATA_FLOW_GROUP.resize 10
+/**
+ * Basic sample showing three green threads cooperating on three variables.
+ */
 
-def dzone = new DataFlowVariable()
-def jroller = new DataFlowVariable()
-def theserverside = new DataFlowVariable()
-
+final def x = new DataFlowVariable()
+final def y = new DataFlowVariable()
+final def z = new DataFlowVariable()
 
 thread {
-    dzone << 'http://www.dzone.com'.toURL().text
+    z << ~x + ~y
+    println "Result: ${~z}"
 }
 
 thread {
-    jroller << 'http://www.jroller.com'.toURL().text
+    x << 10
 }
 
 thread {
-    theserverside << 'http://www.theserverside.com'.toURL().text
-}
-
-thread {
-    println 'Number of Groovy sites today: ' + ([~dzone, ~jroller, ~theserverside].findAll {it.contains 'groovy'}).size()
-    System.exit 0
+    y << 5
 }
 
 System.in.read()

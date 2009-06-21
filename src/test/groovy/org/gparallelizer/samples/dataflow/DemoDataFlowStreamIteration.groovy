@@ -4,8 +4,8 @@ import org.gparallelizer.dataflow.DataFlowStream
 
 /**
  * This demo shows the ways to work with DataFlowStream.
- * It demonstrates use of iterative methods, which uses the current snapshot of the stream,
- * as well as the '~' operator to take elements away from the stream.
+ * It demonstrates the iterative methods, which use the current snapshot of the stream,
+ * as well as the '~' operator to gradually take elements away from the stream.
  */
 final CyclicBarrier barrier = new CyclicBarrier(2)
 

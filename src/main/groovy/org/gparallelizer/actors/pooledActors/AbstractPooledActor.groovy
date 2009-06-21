@@ -432,8 +432,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //Planned for the next release
 
-    //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
-
+    //todo dataflow concurrency - comment samples, consider non-daemon threads
     //todo update javadoc with respect to the new changes
 
     //Backlog

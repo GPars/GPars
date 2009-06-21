@@ -4,8 +4,10 @@ import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
 
-
-DataFlowActor.DATA_FLOW_GROUP.resize 2
+/**
+ * An example showing multiple threads calculating different parts of a complex physical calculation
+ * and one thread consolidating the results of individual calculations into a final report.
+ */
 
 final def mass = new DataFlowVariable()
 final def radius = new DataFlowVariable()

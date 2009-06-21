@@ -60,6 +60,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
             barrier.await()
             react {
                 stream << 11
+                barrier.await()
             }
         }
 
@@ -69,7 +70,8 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assertEquals 11, stream.length()
 
         thread << 'Proceed'
-        assertEquals 11, stream.length()  //todo sometimes fails
+        barrier.await()
+        assertEquals 12, stream.length()  //todo sometimes fails
         (0..10).each {
             assertEquals it, ~stream
         }

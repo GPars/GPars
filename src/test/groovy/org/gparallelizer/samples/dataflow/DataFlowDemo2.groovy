@@ -3,8 +3,10 @@ package org.gparallelizer.samples.dataflow
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.*
 
-//Example 2
-
+/**
+ * Example 2
+ * 
+ */
 List<Integer> ints(int n, int max) {
     if (n == max) return []
     else return [n, * ints(n + 1, max)]

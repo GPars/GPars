@@ -5,9 +5,9 @@ import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
 import org.gparallelizer.dataflow.DataFlowVariable
 
-//Example 5
-
-DataFlowActor.DATA_FLOW_GROUP.resize 4
+/**
+ * Shows threads manipulating mutually dependant 4 variables.
+ */
 
 DataFlowVariable<Integer> x = new DataFlowVariable<Integer>()
 DataFlowVariable<Integer> y = new DataFlowVariable<Integer>()

@@ -1,12 +1,14 @@
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowStream
 import static org.gparallelizer.dataflow.DataFlow.thread
 
-//Example 4
-
-DataFlowActor.DATA_FLOW_GROUP.resize 4
+/**
+ * A producer consumer sample, where the producer generates numbers into the DataFlowStream, the intermediate consumer
+ * keeps reading numbers from the producer, calculates the summary of numberf it saw so far and passes the summaries
+ * on to the final consumer, which prints them out.
+ * Since both consumers read elements using the '~' operator, they will keep reading until stopped explicitely.
+ */
 
 void ints(int n, int max, DataFlowStream<Integer> stream) {
     if (n != max) {

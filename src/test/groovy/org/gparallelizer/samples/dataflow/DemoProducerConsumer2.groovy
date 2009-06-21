@@ -6,7 +6,10 @@ import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
 import org.gparallelizer.dataflow.DataFlowVariable
 
-DataFlowActor.DATA_FLOW_GROUP.resize 10
+/**
+ * A producer-consumer demo using the DataFlowStream class. Producer downloads web content from a list of urls,
+ * the concumenr then counts number of sites refering Groovy. 
+ */
 
 def buffer = new DataFlowStream()
 
@@ -18,11 +21,9 @@ final def urls = [
 
 thread {
     for(url in urls) {
-        println 'AAAAAAAAAAAAAAAAAAA'
         final def site = new DataFlowVariable()
         buffer << site
         site << url.toURL().text
-        println 'CCCCCCCCCCCCCCCCCc'
     }
 }
 
@@ -30,7 +31,6 @@ thread {
     int count = 0
     0.upto(urls.size()-1) {
         def content = ~buffer
-        println 'BBBBBBBBBBBBBBBBBBBBBbb'
         if (content.contains('groovy')) count++
     }
     println "Number of Groovy sites today: $count"

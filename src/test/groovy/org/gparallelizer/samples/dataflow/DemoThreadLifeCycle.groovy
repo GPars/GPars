@@ -3,9 +3,13 @@ package org.gparallelizer.samples.dataflow
 import static org.gparallelizer.dataflow.DataFlow.*
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
+/**
+ * Demonstrates the way to handle lifecycle events on the thread.
+ * Threads are essentially pooled actors and so they have identical lifecycle methods.
+ */
 def throwException = true
 
-final def thread = thread {
+thread {
     enhance(delegate)
     println("Running thread")
     if (throwException) throw new RuntimeException('test')

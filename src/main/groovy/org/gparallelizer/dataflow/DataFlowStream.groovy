@@ -5,6 +5,8 @@ import java.util.concurrent.LinkedBlockingQueue
 /**
  * Represents a thread-safe data flow stream. Values or DataFlowVariables are added using the '<<' operator
  * and safely read once available using the '~' operator.
+ * The iterative methods like each(), collect(), iterator(), any(), all() or the for loops work with snapshots
+ * of the stream at the time of calling the particular method.
  *
  * @author Vaclav Pech
  * Date: Jun 5, 2009
