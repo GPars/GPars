@@ -58,9 +58,4 @@ class Offer {
     int price
 }
 
-assert 1.metaClass
-assert 'value'.metaClass
-assert [].metaClass
-assert [:].metaClass == null
-assert [metaClass:'ksdhfjksd'].metaClass
-assert [:].getMetaClass()
+

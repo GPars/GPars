@@ -40,7 +40,7 @@ import org.gparallelizer.actors.pooledActors.ResizablePool
  * @author Vaclav Pech
  * Date: Jun 17, 2009
  */
-public class ThreadActorGroup extends AbstractThreadActorGroup {
+public final class ThreadActorGroup extends AbstractThreadActorGroup {
 
     /**
      * Creates a group of actors. The actors will share a common thread pool of threads.

@@ -11,7 +11,7 @@ import org.gparallelizer.actors.pooledActors.PooledActors
  * @author Vaclav Pech
  */
 
-final PooledActorGroup sampleGroup = new PooledActorGroup(true)
+final PooledActorGroup sampleGroup = new PooledActorGroup()
 
 println "Sample Group $sampleGroup"
 println "Default group ${PooledActors.defaultPooledActorGroup}"

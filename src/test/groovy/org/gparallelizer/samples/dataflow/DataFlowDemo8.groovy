@@ -4,7 +4,8 @@ import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
 
-DataFlowActor.DATA_FLOW_GROUP.resize 10
+
+DataFlowActor.DATA_FLOW_GROUP.resize 2
 
 final def mass = new DataFlowVariable()
 final def radius = new DataFlowVariable()
@@ -16,6 +17,7 @@ final def velocity = new DataFlowVariable()
 final def decelerationForce = new DataFlowVariable()
 final def deceleration = new DataFlowVariable()
 final def distance = new DataFlowVariable()
+final def author = new DataFlowVariable()
 
 thread {
     println """
@@ -30,6 +32,7 @@ of ${~deceleration} m/s2 and so stop the ball at a distance of ${~distance} m.
 
 =======================================================================================================================
 This example has been calculated asynchronously in multiple threads using GParallelizer DataFlow concurrency in Groovy.
+Author: ${~author}
 """
 
     System.exit 0
@@ -51,6 +54,12 @@ thread {
 }
 
 thread {
+    println 'Enter your name:'
+    def name = new InputStreamReader(System.in).readLine()
+    author << (name?.trim()?.size()>0 ? name : 'anonymous')
+}
+
+thread {
     time << 10
     velocity << ~acceleration * ~time
 }
@@ -63,4 +72,4 @@ thread {
     distance << ~deceleration * ((~velocity/~deceleration) ** 2) * 0.5
 }
 
-System.in.read()
+Thread.sleep(30000)

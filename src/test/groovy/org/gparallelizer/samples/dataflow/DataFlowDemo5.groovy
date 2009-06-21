@@ -3,6 +3,7 @@ package org.gparallelizer.samples.dataflow
 import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
+import org.gparallelizer.dataflow.DataFlowVariable
 
 //Example 5
 
@@ -28,15 +29,13 @@ thread {
         z << y
         println("'z' set to 'y': " + ~z)
     }
-
-    [x, y, z, v].each {it.shutdown()}
-}
+ }
 
 thread {
     println("Thread 'setY', sleeping...")
     Thread.sleep(5000)
     y << 2
-    println("'y' set to: " + !y)
+    println("'y' set to: " + ~y)
 }
 
 thread {

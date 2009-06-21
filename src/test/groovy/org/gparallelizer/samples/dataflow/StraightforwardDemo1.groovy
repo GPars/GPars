@@ -1,7 +1,7 @@
 import org.gparallelizer.dataflow.DataFlow
-import org.gparallelizer.dataflow.StraightDataFlowVariable
+import org.gparallelizer.dataflow.DataFlowVariable
 
-final StraightDataFlowVariable variable = new StraightDataFlowVariable<Integer>()
+final DataFlowVariable variable = new DataFlowVariable<Integer>()
 
 DataFlow.thread {
     println variable.retrieve()

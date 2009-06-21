@@ -1,15 +1,9 @@
 package org.gparallelizer.samples
 
-import org.gparallelizer.actors.AbstractThreadActorGroup
-import org.gparallelizer.actors.DefaultThreadActor
-import org.gparallelizer.actors.Actors
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.ThreadActorGroup
-import org.gparallelizer.actors.DefaultThreadActor
-
+import org.gparallelizer.actors.*
 
 /**
- * Three actors are created, two of them in a newly created actor group, one in the fefault actor group using
+ * Three thread-bound actors are created, two of them in a newly created actor group, one in the fefault actor group using
  * the factory method of the Actors class.
  * @author Vaclav Pech
  */

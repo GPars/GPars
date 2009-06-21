@@ -5,13 +5,15 @@ import org.gparallelizer.actors.AbstractThreadActorGroup
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.ThreadActorGroup
 
+final Random random = new Random(System.currentTimeMillis())
 
 cleanMemory()
 
 final long memory1 = Runtime.runtime.freeMemory()
-for (i in 0..400) {
+println 'Threads at start: ' + Thread.threads.length
+for (i in 0..10000) {
     final CountDownLatch latch = new CountDownLatch(1)
-    final AbstractThreadActorGroup group = new ThreadActorGroup(i % 2 == 0)
+    final AbstractThreadActorGroup group = new ThreadActorGroup(Math.max(1, random.nextInt(20)), i % 2 == 0)
     final Actor actor = group.oneShotActor {
         receive {
             reply it
@@ -28,6 +30,7 @@ for (i in 0..400) {
     group.shutdown()
 }
 cleanMemory()
+println 'Threads at finish: ' + Thread.threads.length
 final long memory2 = Runtime.runtime.freeMemory()
 println memory2 - memory1
 assert memory2 - memory1 < 1000000

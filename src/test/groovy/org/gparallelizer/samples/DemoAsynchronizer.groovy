@@ -14,5 +14,12 @@ Asynchronizer.withAsynchronizer {
     }
     
     if (list.allAsync{it < 10 }) println 'The list contains only small numbers.'
+
+    final String text = 'want to be big'
+    println((text.collectAsync {it.toUpperCase()}).join())
+
+    def animals = ['dog', 'ant', 'cat', 'whale']
+    println (animals.anyAsync {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+    println (animals.allAsync {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 }
 

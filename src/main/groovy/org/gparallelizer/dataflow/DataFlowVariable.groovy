@@ -15,10 +15,11 @@ import org.gparallelizer.actors.ActorMessage
  * in its lifetime using the '<<' operator. Reads preceding assignment will be blocked until the value
  * is assigned.
  *
+ * Experimental implementation only. Implemented using pooled actors.
  * @author Vaclav Pech
  * Date: Jun 4, 2009
  */
-public final class DataFlowVariable<T> {
+public final class ActorBasedDataFlowVariable<T> {
 
     /**
      * Holds the value associated with the DataFlowVariable
@@ -51,7 +52,7 @@ public final class DataFlowVariable<T> {
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
      */
     public void leftShift(Object value) {
-        if (!state.compareAndSet(DataFlowState.UNASSIGNED, DataFlowState.ASSIGNED)) throw new IllegalStateException("The DataFlowVariable cannot be assigned a value.")
+        if (!state.compareAndSet(DataFlowState.UNASSIGNED, DataFlowState.ASSIGNED)) throw new IllegalStateException("The ActorBasedDataFlowVariable cannot be assigned a value.")
         inActor << new SetMessage(value)
     }
 
@@ -59,8 +60,8 @@ public final class DataFlowVariable<T> {
      * Assigns a value from one DataFlowVariable instance to this variable.
      * Can only be invoked once on each instance of DataFlowVariable
      */
-    public void leftShift(DataFlowVariable ref) {
-        if (!state.compareAndSet(DataFlowState.UNASSIGNED, DataFlowState.ASSIGNED)) throw new IllegalStateException("The DataFlowVariable cannot be assigned a value.")
+    public void leftShift(ActorBasedDataFlowVariable ref) {
+        if (!state.compareAndSet(DataFlowState.UNASSIGNED, DataFlowState.ASSIGNED)) throw new IllegalStateException("The ActorBasedDataFlowVariable cannot be assigned a value.")
         inActor << new SetMessage(~ref)
     }
 
@@ -68,7 +69,7 @@ public final class DataFlowVariable<T> {
      * Stops the variable by sending the EXIT message to the internal actor and all registered read actors.
      */
     public void shutdown() {
-        if (DataFlowState.STOPPED == state.getAndSet(DataFlowState.STOPPED)) throw new IllegalStateException("The DataFlowVariable has been stopped already.")
+        if (DataFlowState.STOPPED == state.getAndSet(DataFlowState.STOPPED)) throw new IllegalStateException("The ActorBasedDataFlowVariable has been stopped already.")
         if (inActor.isActive()) inActor << EXIT
     }
 }
@@ -184,7 +185,7 @@ private final class Out<T> extends DataFlowActor {
                         result = it.value
                         break
                     case EXIT:
-                        reason = new IllegalStateException("DataFlowVariable stopped before assignment")
+                        reason = new IllegalStateException("ActorBasedDataFlowVariable stopped before assignment")
                         break
                     default:
                         reason = new IllegalStateException("Cannot handle a message: $it")
@@ -196,7 +197,7 @@ private final class Out<T> extends DataFlowActor {
     }
 
     private void onException(Exception exception) {
-        reason = new IllegalStateException("The DataFlowVariable cannot be retrieved and has not been assigned a value.", exception)
+        reason = new IllegalStateException("The ActorBasedDataFlowVariable cannot be retrieved and has not been assigned a value.", exception)
         latch.countDown()
     }
 

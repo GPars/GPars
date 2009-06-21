@@ -4,6 +4,7 @@ import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
+import org.gparallelizer.dataflow.DataFlowVariable
 
 DataFlowActor.DATA_FLOW_GROUP.resize 10
 

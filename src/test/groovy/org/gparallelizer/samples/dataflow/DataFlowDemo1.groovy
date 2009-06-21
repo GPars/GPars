@@ -2,6 +2,7 @@ package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.*
+import org.gparallelizer.dataflow.DataFlowVariable
 
 //Example 1
 DataFlowVariable<Integer> x = new DataFlowVariable()

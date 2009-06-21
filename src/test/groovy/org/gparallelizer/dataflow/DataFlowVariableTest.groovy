@@ -16,7 +16,9 @@ public class DataFlowVariableTest extends GroovyTestCase {
         }
 
         shouldFail(IllegalStateException) {
-            variable << new DataFlowVariable()
+            final def v = new DataFlowVariable()
+            v << 1
+            variable << v
         }
         assertEquals 10, ~variable
     }
@@ -78,81 +80,5 @@ public class DataFlowVariableTest extends GroovyTestCase {
         assertEquals 10, ~variable
         latch.await()
         assertEquals 10, result
-    }
-
-    public void testExit() {
-        final DataFlowVariable variable = new DataFlowVariable()
-        DataFlow.thread {
-            Thread.sleep 3000
-            variable.shutdown()
-        }
-
-        shouldFail(IllegalStateException) {
-            ~variable
-        }
-    }
-
-    public void testDoubleShutdown() {
-        final DataFlowVariable variable = new DataFlowVariable()
-        variable.shutdown()
-        shouldFail(IllegalStateException) {
-            variable << 10
-        }
-        shouldFail(IllegalStateException) {
-            ~variable
-        }
-        shouldFail(IllegalStateException) {
-            variable.shutdown()
-        }
-    }
-
-    public void testAssignedVariableAfterShutdown() {
-        final DataFlowVariable variable = new DataFlowVariable()
-        variable << 10
-        ~variable
-        variable.shutdown()
-        shouldFail(IllegalStateException) {
-            variable << 20
-        }
-        assertEquals 10, ~variable
-        shouldFail(IllegalStateException) {
-            variable.shutdown()
-        }
-    }
-
-    public void testUnassignedVariableAfterShutdown() {
-        final DataFlowVariable variable = new DataFlowVariable()
-
-        DataFlow.thread {
-            Thread.sleep 3000
-            variable.shutdown()
-        }
-
-        shouldFail(IllegalStateException) {
-            ~variable
-        }
-        shouldFail(IllegalStateException) {
-            ~variable
-        }
-    }
-
-    public void testUnassignedVariableShortlyAfterShutdown() {
-        final DataFlowVariable variable = new DataFlowVariable()
-
-        variable.shutdown()
-        shouldFail(IllegalStateException) {
-            ~variable
-        }
-        shouldFail(IllegalStateException) {
-            ~variable
-        }
-    }
-
-    public void testAssignedVariableShortlyAfterShutdown() {
-        final DataFlowVariable variable = new DataFlowVariable()
-
-        variable << 10
-        variable.shutdown()
-        ~variable
     }
 }

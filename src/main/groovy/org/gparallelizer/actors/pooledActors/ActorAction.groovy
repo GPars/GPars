@@ -65,7 +65,7 @@ final class ActorAction implements Runnable {
      * the next work chunk, terminate the actor, handle timeout in react(),
      * thread interruption or an exception thrown from the code.
      */
-    protected void compute() {
+    public void run() {
         try {
             try {
                 this.actor.currentAction.set this
@@ -146,12 +146,5 @@ final class ActorAction implements Runnable {
      */
     static void actorAction(AbstractPooledActor actor, Closure code) {
         actor.actorGroup.execute new ActorAction(actor, code)
-    }
-
-    /**
-     * Performs the ActorAction
-     */
-    public void run() {
-        compute()
     }
 }

@@ -434,13 +434,14 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //todo dataflow concurrency - clarify, remove shutdown() and EXIT after SetMessage
 
-    //todo more practical samples to use both types of actors and combine them, plus samples on collections and enhancers
-    //todo abandoned actor group - what happens to the pool, senders - update for thread-bounds pools and FJPool
     //todo update javadoc with respect to the new changes
 
     //Backlog
+    //todo out-of-order message processing
     //todo remove FJPool, ResizableFJPool and ActorBarrier if not needed
+    //todo optimize AsyncUtil implementation to split collections among available threads
     //todo add join() to actors
+    //todo send returning Future for reply
     //todo clean issues and todos
     //todo add samples
     //todo use Gradle
@@ -468,6 +469,8 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo implement in Java
     //todo consider flow control to throttle message production
     //todo resize the pool if all threads are busy or blocked
+    //todo rewrite the pool implementation
+    //todo asynchronous race-free non-blocking queues
 
     //To consider
     //todo multiple loops
@@ -563,3 +566,4 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
         if (result instanceof Exception) throw result else return result
     }
 }
+

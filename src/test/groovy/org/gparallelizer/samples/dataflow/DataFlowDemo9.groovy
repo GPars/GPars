@@ -2,11 +2,10 @@ package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.thread
-import org.gparallelizer.dataflow.StraightDataFlowVariable
 
-final def x = new StraightDataFlowVariable()
-final def y = new StraightDataFlowVariable()
-final def z = new StraightDataFlowVariable()
+final def x = new DataFlowVariable()
+final def y = new DataFlowVariable()
+final def z = new DataFlowVariable()
 
 thread {
     z << ~x + ~y
