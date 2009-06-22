@@ -8,8 +8,8 @@ public class DataFlowVariableTest extends GroovyTestCase {
     public void testVariable() {
         final DataFlowVariable variable = new DataFlowVariable()
         variable << 10
-        assertEquals 10, ~variable
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
+        assertEquals 10, variable()
 
         shouldFail(IllegalStateException) {
             variable << 20
@@ -20,7 +20,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
             v << 1
             variable << v
         }
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
     }
 
     public void testVariableFromThread() {
@@ -32,8 +32,8 @@ public class DataFlowVariableTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         volatile List<Integer> result = []
         DataFlow.thread {
-            result << ~variable
-            result << ~variable
+            result << variable()
+            result << variable()
             latch.countDown()
         }
         latch.await()
@@ -47,7 +47,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         DataFlow.thread {
-            result = ~variable
+            result = variable()
             latch.countDown()
         }
         DataFlow.thread {
@@ -55,7 +55,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
             variable << 10
         }
 
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
         latch.await()
         assertEquals 10, result
     }
@@ -68,7 +68,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         volatile int result = 0
         DataFlow.thread {
             barrier.await()
-            result = ~variable
+            result = variable()
             latch.countDown()
         }
         DataFlow.thread {
@@ -77,7 +77,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
         latch.await()
         assertEquals 10, result
     }

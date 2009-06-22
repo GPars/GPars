@@ -11,7 +11,7 @@ import org.gparallelizer.actors.ActorMessage
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
- * Each instance of DataFlowVariable can be read repetadly any time using the '~' operator and assigned once
+ * Each instance of DataFlowVariable can be read repetadly any time using the '()' operator and assigned once
  * in its lifetime using the '<<' operator. Reads preceding assignment will be blocked until the value
  * is assigned.
  *
@@ -39,7 +39,7 @@ public final class ActorBasedDataFlowVariable<T> {
     /**
      * Reads the value of the variable. Blocks, if the value has not been assigned yet.
      */
-    public T bitwiseNegate() {
+    public T call() {
         final def currentValue = value.get()
         if (currentValue != null) return currentValue
         else {
@@ -62,7 +62,7 @@ public final class ActorBasedDataFlowVariable<T> {
      */
     public void leftShift(ActorBasedDataFlowVariable ref) {
         if (!state.compareAndSet(DataFlowState.UNASSIGNED, DataFlowState.ASSIGNED)) throw new IllegalStateException("The ActorBasedDataFlowVariable cannot be assigned a value.")
-        inActor << new SetMessage(~ref)
+        inActor << new SetMessage(ref())
     }
 
     /**

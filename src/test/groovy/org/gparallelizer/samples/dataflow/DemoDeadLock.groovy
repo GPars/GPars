@@ -25,13 +25,13 @@ final def actor = thread {
 }
 
 thread {
-    b << 20 + ~a
-    actor.send ~b
+    b << 20 + a()
+    actor.send b()
 }
 
 thread {
-    a << 10 + ~b
-    actor.send ~a
+    a << 10 + b()
+    actor.send a()
 }
 
 

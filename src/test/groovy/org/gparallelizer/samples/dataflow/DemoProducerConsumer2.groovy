@@ -30,7 +30,7 @@ thread {
 thread {
     int count = 0
     0.upto(urls.size()-1) {
-        def content = ~buffer
+        def content = buffer()
         if (content.contains('groovy')) count++
     }
     println "Number of Groovy sites today: $count"

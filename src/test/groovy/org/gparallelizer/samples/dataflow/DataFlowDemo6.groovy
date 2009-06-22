@@ -12,8 +12,8 @@ final def y = new DataFlowVariable()
 final def z = new DataFlowVariable()
 
 thread {
-    z << ~x + ~y
-    println "Result: ${~z}"
+    z << x() + y()
+    println "Result: ${z()}"
 }
 
 thread {

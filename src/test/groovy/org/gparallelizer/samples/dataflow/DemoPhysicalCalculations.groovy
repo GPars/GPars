@@ -25,27 +25,27 @@ thread {
     println """
 Calculating distance required to stop a moving ball.
 ====================================================
-The ball has a radius of ${~radius} meters and is made of a material with ${~density} kg/m3 density,
-which means that the ball has a volume of ${~volume} m3 and a mass of ${~mass} kg.
-The ball has been accelerating with ${~acceleration} m/s2 from 0 for ${~time} seconds and so reached a velocity of ${~velocity} m/s.
+The ball has a radius of ${radius()} meters and is made of a material with ${density()} kg/m3 density,
+which means that the ball has a volume of ${volume()} m3 and a mass of ${mass()} kg.
+The ball has been accelerating with ${acceleration()} m/s2 from 0 for ${time()} seconds and so reached a velocity of ${velocity()} m/s.
 
-Given our ability to push the ball backwards with a force of ${~decelerationForce} N (Newton), we can cause a deceleration
-of ${~deceleration} m/s2 and so stop the ball at a distance of ${~distance} m.
+Given our ability to push the ball backwards with a force of ${decelerationForce()} N (Newton), we can cause a deceleration
+of ${deceleration()} m/s2 and so stop the ball at a distance of ${distance()} m.
 
 =======================================================================================================================
 This example has been calculated asynchronously in multiple threads using GParallelizer DataFlow concurrency in Groovy.
-Author: ${~author}
+Author: ${author()}
 """
 
     System.exit 0
 }
 
 thread {
-    mass << ~volume * ~density
+    mass << volume() * density()
 }
 
 thread {
-    volume << Math.PI * (~radius ** 3)
+    volume << Math.PI * (radius() ** 3)
 }
 
 thread {
@@ -63,15 +63,15 @@ thread {
 
 thread {
     time << 10
-    velocity << ~acceleration * ~time
+    velocity << acceleration() * time()
 }
 
 thread {
-    deceleration << ~decelerationForce / ~mass
+    deceleration << decelerationForce() / mass()
 }
 
 thread {
-    distance << ~deceleration * ((~velocity/~deceleration) ** 2) * 0.5
+    distance << deceleration() * ((velocity()/deceleration()) ** 2) * 0.5
 }
 
 Thread.sleep(30000)

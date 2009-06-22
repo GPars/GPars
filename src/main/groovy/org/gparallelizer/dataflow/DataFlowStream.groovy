@@ -4,7 +4,7 @@ import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * Represents a thread-safe data flow stream. Values or DataFlowVariables are added using the '<<' operator
- * and safely read once available using the '~' operator.
+ * and safely read once available using the '()' operator.
  * The iterative methods like each(), collect(), iterator(), any(), all() or the for loops work with snapshots
  * of the stream at the time of calling the particular method.
  *
@@ -36,8 +36,8 @@ public final class DataFlowStream<T> {
     /**
      * Retrieves the value at the head of the buffer. Blocks until a value is available.
      */
-    public T bitwiseNegate() {
-        return ~(queue.take())
+    public T call() {
+        return (queue.take())()
     }
 
     /**
@@ -62,7 +62,7 @@ public final class DataFlowStream<T> {
         final def iterator = queue.iterator()
         [
                 hasNext: {iterator.hasNext()},
-                next: {~(iterator.next())}
+                next: {(iterator.next()())}
         ] as Iterator
     }
 }

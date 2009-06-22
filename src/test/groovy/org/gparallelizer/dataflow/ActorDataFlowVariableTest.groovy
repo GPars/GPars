@@ -8,8 +8,8 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
     public void testVariable() {
         final ActorBasedDataFlowVariable variable = new ActorBasedDataFlowVariable()
         variable << 10
-        assertEquals 10, ~variable
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
+        assertEquals 10, variable()
 
         shouldFail(IllegalStateException) {
             variable << 20
@@ -20,7 +20,7 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
             v << 1
             variable << v
         }
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
     }
 
     public void testVariableFromThread() {
@@ -32,8 +32,8 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         volatile List<Integer> result = []
         DataFlow.thread {
-            result << ~variable
-            result << ~variable
+            result << variable()
+            result << variable()
             latch.countDown()
         }
         latch.await()
@@ -47,7 +47,7 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         DataFlow.thread {
-            result = ~variable
+            result = variable()
             latch.countDown()
         }
         DataFlow.thread {
@@ -55,7 +55,7 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
             variable << 10
         }
 
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
         latch.await()
         assertEquals 10, result
     }
@@ -68,7 +68,7 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
         volatile int result = 0
         DataFlow.thread {
             barrier.await()
-            result = ~variable
+            result = variable()
             latch.countDown()
         }
         DataFlow.thread {
@@ -77,7 +77,7 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
         latch.await()
         assertEquals 10, result
     }
@@ -90,7 +90,7 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
         }
 
         shouldFail(IllegalStateException) {
-            ~variable
+            variable()
         }
     }
 
@@ -101,7 +101,7 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
             variable << 10
         }
         shouldFail(IllegalStateException) {
-            ~variable
+            variable()
         }
         shouldFail(IllegalStateException) {
             variable.shutdown()
@@ -111,12 +111,12 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
     public void testAssignedVariableAfterShutdown() {
         final ActorBasedDataFlowVariable variable = new ActorBasedDataFlowVariable()
         variable << 10
-        ~variable
+        variable()
         variable.shutdown()
         shouldFail(IllegalStateException) {
             variable << 20
         }
-        assertEquals 10, ~variable
+        assertEquals 10, variable()
         shouldFail(IllegalStateException) {
             variable.shutdown()
         }
@@ -131,10 +131,10 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
         }
 
         shouldFail(IllegalStateException) {
-            ~variable
+            variable()
         }
         shouldFail(IllegalStateException) {
-            ~variable
+            variable()
         }
     }
 
@@ -143,10 +143,10 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
 
         variable.shutdown()
         shouldFail(IllegalStateException) {
-            ~variable
+            variable()
         }
         shouldFail(IllegalStateException) {
-            ~variable
+            variable()
         }
     }
 
@@ -155,6 +155,6 @@ public class ActorDataFlowVariableTest extends GroovyTestCase {
 
         variable << 10
         variable.shutdown()
-        ~variable
+        variable()
     }
 }

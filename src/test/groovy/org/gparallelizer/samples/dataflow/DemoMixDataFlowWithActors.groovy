@@ -23,7 +23,7 @@ final AbstractPooledActor doubler = PooledActors.actor {
 final AbstractPooledActor thread = thread {
     react {
         doubler << it  //send a number to the doubler
-        println "Result ${~a}"  //wait for the result to be bound to 'a'
+        println "Result ${a()}"  //wait for the result to be bound to 'a'
     }
 }
 

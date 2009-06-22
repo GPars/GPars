@@ -28,7 +28,7 @@ thread {
 }
 
 thread {
-    println 'Number of Groovy sites today: ' + ([~dzone, ~jroller, ~theserverside].findAll {it.contains 'groovy'}).size()
+    println 'Number of Groovy sites today: ' + ([dzone(), jroller(), theserverside()].findAll {it.contains 'groovy'}).size()
     System.exit 0
 }
 

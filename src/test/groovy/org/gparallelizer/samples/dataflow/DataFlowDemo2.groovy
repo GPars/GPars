@@ -24,7 +24,7 @@ def x = new DataFlowVariable<List<Integer>>()
 def y = new DataFlowVariable<List<Integer>>()
 
 thread { x << ints(0, 1000) }
-thread { y << sum(0, ~x) }
-thread { println("List of sums: " + ~y); System.exit(0) }
+thread { y << sum(0, x()) }
+thread { println("List of sums: " + y()); System.exit(0) }
 
 Thread.sleep 5000

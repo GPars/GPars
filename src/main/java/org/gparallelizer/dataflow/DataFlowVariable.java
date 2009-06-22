@@ -5,7 +5,7 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
- * Each instance of DataFlowVariable can be read repetadly any time using the '~' operator and assigned once
+ * Each instance of DataFlowVariable can be read repetadly any time using the '()' operator and assigned once
  * in its lifetime using the '<<' operator. Reads preceding assignment will be blocked until the value
  * is assigned.
  * Implemented using a CountDownLatch.
@@ -45,7 +45,7 @@ public final class DataFlowVariable<T> {
     * @return The actual value
     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
     */
-    public T bitwiseNegate() throws InterruptedException {
+    public T call() throws InterruptedException {
        return retrieve();
    }
 

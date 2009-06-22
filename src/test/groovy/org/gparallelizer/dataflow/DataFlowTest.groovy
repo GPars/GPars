@@ -15,8 +15,8 @@ public class DataFlowTest extends GroovyTestCase {
         final def latch = new CountDownLatch(1)
 
         thread {
-            z << ~x + ~y
-            result = ~z
+            z << x() + y()
+            result = z()
             latch.countDown()
         }
 
@@ -48,9 +48,9 @@ public class DataFlowTest extends GroovyTestCase {
         final def latch = new CountDownLatch(1)
 
         thread { x << ints(0, 10) }
-        thread { y << sum(0, ~x) }
+        thread { y << sum(0, x()) }
         thread {
-            result = ~y
+            result = y()
             latch.countDown()
         }
 

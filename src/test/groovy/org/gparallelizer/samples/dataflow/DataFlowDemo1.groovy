@@ -1,23 +1,20 @@
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.dataflow.DataFlowVariable
+import org.gparallelizer.dataflow.DataFlowVariable as WAIT
 import static org.gparallelizer.dataflow.DataFlow.*
-import org.gparallelizer.dataflow.DataFlowVariable
 
 /**
  * Example 1
  * Basic sample showing three green threads cooperating on three variables.
  */
-DataFlowVariable<Integer> x = new DataFlowVariable()
-DataFlowVariable<Integer> y = new DataFlowVariable()
-DataFlowVariable<Integer> z = new DataFlowVariable()
-thread {
-    z << ~x + ~y
-    println "z=${~z}"
-    System.exit 0
-}
+WAIT<Integer> x = new WAIT()
+WAIT<Integer> y = new WAIT()
+WAIT<Integer> z = new WAIT()
 
-thread {x << 40}
-thread {y << 2}
+thread { z << x() + y() }
 
-Thread.sleep 5000
+thread { x << 40 }
+thread { y << 2 }
+
+println "z=${z()}"
+assert 42 == z()
