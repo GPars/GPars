@@ -1,5 +1,7 @@
 package org.gparallelizer.transformations
 
+import org.gparallelizer.actors.transformations.Asynchronous
+
 class A {
     @Asynchronous public String foo(String value) {
         return "Foo $value"
