@@ -442,6 +442,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo add join() to actors
     //todo send returning Future for reply
     //todo clean issues and todos
+    //todo samples on typical concurrency issues
     //todo add samples
     //todo use Gradle
     //todo automate code sample download
