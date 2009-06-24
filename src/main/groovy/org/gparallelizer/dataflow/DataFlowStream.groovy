@@ -36,8 +36,8 @@ public final class DataFlowStream<T> {
     /**
      * Retrieves the value at the head of the buffer. Blocks until a value is available.
      */
-    public T call() {
-        return (queue.take())()
+    public T getVal() {
+        return (queue.take()).val
     }
 
     /**
@@ -62,7 +62,7 @@ public final class DataFlowStream<T> {
         final def iterator = queue.iterator()
         [
                 hasNext: {iterator.hasNext()},
-                next: {(iterator.next()())}
+                next: {(iterator.next().val)}
         ] as Iterator
     }
 }

@@ -432,7 +432,8 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //Planned for the next release
 
-    //todo dataflow concurrency - comment samples, consider non-daemon threads, change the method name, update wiki with the new mathod name
+    //todo inspect volatile arrays
+    //todo dataflow concurrency - comment samples, consider non-daemon threads, change the method name, update wiki with the new method name
     //todo update javadoc with respect to the new changes
 
     //Backlog
@@ -455,6 +456,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo consider the asynchronous metaclass
     //todo use AST transformation to turn actors methods into async processing
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
+    //todo dining philosophers implementation
     //todo try the fixes for the MixinTest
     //todo support mixins for event-driven actors
 

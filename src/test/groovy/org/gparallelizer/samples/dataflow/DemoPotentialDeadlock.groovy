@@ -15,11 +15,11 @@ final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
 
 thread {
-    b << 20 + a()
+    b << 20 + a.val
 }
 
 thread {
-    println "Result: ${b()}"
+    println "Result: ${b.val}"
 }
 
 Thread.sleep 2000

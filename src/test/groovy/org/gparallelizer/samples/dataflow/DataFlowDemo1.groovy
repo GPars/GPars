@@ -11,10 +11,10 @@ WAIT<Integer> x = new WAIT()
 WAIT<Integer> y = new WAIT()
 WAIT<Integer> z = new WAIT()
 
-thread { z << x() + y() }
+thread { z << x.val + y.val }
 
 thread { x << 40 }
 thread { y << 2 }
 
-println "z=${z()}"
-assert 42 == z()
+println "z=${z.val}"
+assert 42 == z.val

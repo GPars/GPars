@@ -23,7 +23,7 @@ public final class DataFlowVariable<T> {
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
-    public T retrieve() throws InterruptedException {
+    public T getVal() throws InterruptedException {
         latch.await();
         return value.get();
     }
@@ -40,15 +40,6 @@ public final class DataFlowVariable<T> {
         }
     }
 
-   /**
-     * Reads the value of the variable. Blocks, if the value has not been assigned yet.
-    * @return The actual value
-    * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
-    */
-    public T call() throws InterruptedException {
-       return retrieve();
-   }
-
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
      * @param value The value to assign
@@ -64,6 +55,6 @@ public final class DataFlowVariable<T> {
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     public void leftShift(final DataFlowVariable<T> ref) throws InterruptedException {
-        bind(ref.retrieve());
+        bind(ref.getVal());
     }
 }

@@ -16,7 +16,7 @@ thread {
 }
 
 thread {
-    while(true) println buffer()
+    while(true) println buffer.val
 }
 
 System.in.read()

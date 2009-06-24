@@ -39,7 +39,7 @@ public final class ActorBasedDataFlowVariable<T> {
     /**
      * Reads the value of the variable. Blocks, if the value has not been assigned yet.
      */
-    public T call() {
+    public T getVal() {
         final def currentValue = value.get()
         if (currentValue != null) return currentValue
         else {

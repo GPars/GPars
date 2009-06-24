@@ -22,10 +22,10 @@ public class DataFlowStreamTest extends GroovyTestCase {
 
         latch.await()
         assertEquals 2, stream.length()
-        assertEquals 10, stream()
+        assertEquals 10, stream.val
         assertEquals 1, stream.length()
         thread << 'Proceed'
-        assertEquals 20, stream()
+        assertEquals 20, stream.val
         assertEquals 0, stream.length()
     }
 
@@ -48,7 +48,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assert retrievedVariable instanceof DataFlowVariable
         assertEquals 0, stream.length()
         thread << 'Proceed'
-        assertEquals 20, retrievedVariable()
+        assertEquals 20, retrievedVariable.val
     }
 
     public void testIteration() {
@@ -73,7 +73,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         barrier.await()
         assertEquals 12, stream.length()  //todo sometimes fails
         (0..10).each {
-            assertEquals it, stream()
+            assertEquals it, stream.val
         }
     }
 
