@@ -34,7 +34,6 @@ public class AbstractActorTest extends GroovyTestCase {
         }
         actor.stop()
 
-        actor.start()
         shouldFail(IllegalStateException) {
             actor.start()
         }
@@ -89,7 +88,6 @@ public class AbstractActorTest extends GroovyTestCase {
         actor.stop()
 
         actor.stopLatch.await(30, TimeUnit.SECONDS)
-        assert actor.beforeStopFlag.get()
         assert actor.afterStopFlag.get()
         assert !actor.proceedFlag.get()
         assert actor.deliveredMessages.isEmpty()
@@ -107,7 +105,6 @@ public class AbstractActorTest extends GroovyTestCase {
         actor.stop()
 
         actor.stopLatch.await(30, TimeUnit.SECONDS)
-        assert actor.beforeStopFlag.get()
         assert actor.afterStopFlag.get()
         assert !actor.proceedFlag.get()
         assert actor.deliveredMessages.contains('Message 1')
@@ -121,7 +118,6 @@ public class AbstractActorTest extends GroovyTestCase {
 class InterruptionTestActor extends DefaultThreadActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
-    final AtomicBoolean beforeStopFlag = new AtomicBoolean(false)
     final AtomicBoolean afterStopFlag = new AtomicBoolean(false)
     final CountDownLatch startLatch = new CountDownLatch(1)
     final CountDownLatch stopLatch = new CountDownLatch(1)
@@ -134,10 +130,6 @@ class InterruptionTestActor extends DefaultThreadActor {
         proceedFlag.set(true)  //should never reach this line
     }
 
-    public void beforeStop() {
-        beforeStopFlag.set(true)
-    }
-
     public void afterStop(List undeliveredMessages) {
         afterStopFlag.set(true)
         this.undeliveredMessages.set(undeliveredMessages)
@@ -148,7 +140,6 @@ class InterruptionTestActor extends DefaultThreadActor {
 class AfterStopTestActor extends DefaultThreadActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
-    final AtomicBoolean beforeStopFlag = new AtomicBoolean(false)
     final AtomicBoolean afterStopFlag = new AtomicBoolean(false)
     final CountDownLatch startLatch = new CountDownLatch(1)
     final CountDownLatch stopLatch = new CountDownLatch(1)
@@ -164,10 +155,6 @@ class AfterStopTestActor extends DefaultThreadActor {
         receiveLatchLatch.await(30, TimeUnit.SECONDS)  //never opens, throws InterruptedException instead
 
         proceedFlag.set(true)  //should never reach this line
-    }
-
-    public void beforeStop() {
-        beforeStopFlag.set(true)
     }
 
     public void afterStop(List undeliveredMessages) {

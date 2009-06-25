@@ -29,14 +29,12 @@ import java.util.concurrent.CountDownLatch
  * associate a thread with the actor.
  * The afterStart() method of the Actor, if the method exists, is called and then the thread keeps
  * calling the act() method, until the stop() method is called or the actor thread is interrupted directly.
- * Before the actor thread finishes an beforeStop() method is called, if exists.
  * After it stops the afterStop(List unprocessedMessages) is called, if exists,
  * with all the unprocessed messages from the queue as a parameter.
  * The Actor can be restarted be calling start() again.
  * Each Actor can define lifecycle observing methods, which will be called by the Actor's background thread whenever a certain lifecycle event occurs.
  * <ul>
  * <li>afterStart() - called immediatelly after the Actor's background thread has been started, before the act() method is called the first time.</li>
- * <li>beforeStop() - called right before the actor stops.</li>
  * <li>afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the messages from the queue.</li>
  * <li>onInterrupt(InterruptedException? e) - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.</li>
  * <li>onException(Throwable e) - called when an exception occurs in the actor's thread. Throwing an exception from this method will stop the actor.</li>
@@ -80,6 +78,11 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
     private final AtomicBoolean started = new AtomicBoolean(false);
 
     /**
+     * Flag indicating that an actor has been stopped.
+     */
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
+
+    /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
     public AbstractThreadActor(final BlockingQueue<ActorMessage> messageQueue) {
@@ -92,11 +95,15 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * Starts the Actor. No messages can be send or received before an Actor is started.
      */
     public final Actor start() {
-        disableGroupMembershipChange()
+
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
         def localStarted = started
+        def localStopped = stopped
 
         if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
+        if (stopped.get()) throw new IllegalStateException("Actor cannot be restarted")
+
+        disableGroupMembershipChange()
 
         final CountDownLatch actorBarrier = new CountDownLatch(1)
 
@@ -122,12 +129,11 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
                 e.printStackTrace(System.err) //invoked when the onException handler threw an exception
             } finally {
                 senders.clear()
-                try {
-                    if (delegate.respondsTo('beforeStop')) delegate.beforeStop()
-                    final def queueContent = sweepQueue()
-                    localStarted.set(false)
+                localStopped.set(true)
+                localStarted.set(false)
 
-                    if (this.respondsTo('afterStop')) this.afterStop(queueContent)
+                try {
+                    if (this.respondsTo('afterStop')) this.afterStop(sweepQueue())
                 } catch (Throwable e) {
                     try {
                         reportError(delegate, e)
@@ -148,7 +154,6 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      */
     final void releaseJoinedThreads() {
         joinLatch.countDown()
-//        joinLatch = new CountDownLatch(1)   //todo remove if not restarting
     }
 
     /**

@@ -434,13 +434,12 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo rename AbstractActor to ThreadActor
     //todo simplify group hierarchy and daemon + fj settings, reconsider the name for groups
     //todo reconsider the option to select pool type
+    //todo add join() to actors - wiki
 
     //Planned for the next release
 
-    //todo remove beforeStop() - wiki
-    //todo add join() to actors - test, test actor restart, wiki, update samples
     //todo update javadoc with respect to the new changes
-    //todo dataflow concurrency - comment samples, consider non-daemon threads
+    //todo dataflow concurrency - comment samples, remove unused classes, consider non-daemon threads
     //todo reconsider lightweight threads for dataflow concurrency
     //todo consider simplified actors
     //todo consider extensibility for actors

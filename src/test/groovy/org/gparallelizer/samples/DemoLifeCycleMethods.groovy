@@ -17,10 +17,6 @@ actor1.metaClass {
         println "actor1 has started"
     }
 
-    beforeStop = {List undeliveredMessages ->
-        println "actor1 will stop"
-    }
-
     afterStop = {List undeliveredMessages ->
         println "actor1 has stopped"
     }
@@ -47,10 +43,6 @@ class LifeCycleSampleActor extends DefaultThreadActor {
 
     private void afterStart() {
         println "actor2 has started"
-    }
-
-    private void beforeStop(List undeliveredMessages) {
-        println "actor2 will stop"
     }
 
     private void afterStop(List undeliveredMessages) {

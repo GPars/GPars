@@ -71,7 +71,7 @@ public abstract class CommonActorImpl implements Actor {
     /**
      * Gets unblocked after the actor stops.
      */
-    protected volatile CountDownLatch joinLatch = new CountDownLatch(1)
+    protected final CountDownLatch joinLatch = new CountDownLatch(1)
 
     /**
      * Joins the actor. Waits fot its termination.
