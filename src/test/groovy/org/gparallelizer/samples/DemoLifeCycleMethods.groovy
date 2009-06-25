@@ -52,7 +52,7 @@ class LifeCycleSampleActor extends DefaultThreadActor {
     private void beforeStop(List undeliveredMessages) {
         println "actor2 will stop"
     }
-    
+
     private void afterStop(List undeliveredMessages) {
         println "actor2 has stopped"
     }
@@ -67,5 +67,5 @@ class LifeCycleSampleActor extends DefaultThreadActor {
     }
 }
 
-new LifeCycleSampleActor().start()
+new LifeCycleSampleActor().start().join()
 

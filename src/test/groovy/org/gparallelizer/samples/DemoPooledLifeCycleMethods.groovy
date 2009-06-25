@@ -76,6 +76,4 @@ class PooledLifeCycleSampleActor extends AbstractPooledActor {
     }
 }
 
-new PooledLifeCycleSampleActor().start()
-
-System.in.read()
+new PooledLifeCycleSampleActor().start().join()

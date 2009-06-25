@@ -37,11 +37,16 @@ public interface Actor {
     boolean isActorThread();
 
     /**
-     * Joins the actor's thread
+     * Joins the actor. Waits fot its termination.
+     */
+    void join();
+    
+    /**
+     * Joins the actor. Waits fot its termination.
      * @param milis Timeout in miliseconds
      */
-//    void join(long milis);
-    
+    void join(long milis);
+
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      */

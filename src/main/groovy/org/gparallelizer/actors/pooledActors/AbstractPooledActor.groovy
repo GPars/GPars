@@ -104,7 +104,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     /**
      * A copy of buffer in case of timeout.
      */
-    volatile List savedBufferedMessages = null
+    List savedBufferedMessages = null
 
     /**
      * Indicates whether the actor should terminate
@@ -296,6 +296,11 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     }
 
     /**
+     * Releases the latch with all threads that have called join on the actor
+     */
+    final void releaseJoinedThreads() { joinLatch.countDown() }
+
+    /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
      */
@@ -432,15 +437,19 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //Planned for the next release
 
-    //todo inspect volatile arrays
-    //todo dataflow concurrency - comment samples, consider non-daemon threads, change the method name, update wiki with the new method name
+    //todo remove beforeStop() - wiki
+    //todo add join() to actors - test, test actor restart, wiki, update samples
     //todo update javadoc with respect to the new changes
+    //todo dataflow concurrency - comment samples, consider non-daemon threads
+    //todo reconsider lightweight threads for dataflow concurrency
+    //todo consider simplified actors
+    //todo consider extensibility for actors
 
     //Backlog
+    //todo consider need for ThreadActor restarting capability
     //todo out-of-order message processing
-    //todo remove FJPool, ResizableFJPool and ActorBarrier if not needed
+    //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
     //todo optimize AsyncUtil implementation to split collections among available threads
-    //todo add join() to actors
     //todo send returning Future for reply
     //todo clean issues and todos
     //todo samples on typical concurrency issues

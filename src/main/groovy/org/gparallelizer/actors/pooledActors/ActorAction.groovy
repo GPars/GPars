@@ -36,11 +36,6 @@ final class ActorAction implements Runnable {
     volatile Thread actionThread
 
     /**
-     * Lock to prevent cancellation after the thread gets detached from the action
-     */
-    private final Object actionThreadCancellationLock = new Object()
-
-    /**
      * Indicates whether the cancel() method has been called
      */
     volatile boolean cancelled = false
@@ -76,9 +71,7 @@ final class ActorAction implements Runnable {
                 if (cancelled || !actor.isActive()) throw TERMINATE
                 use(TimeCategory) { code.call() }
             } finally {
-                synchronized (actionThreadCancellationLock) {
-                    actionThread = null
-                }
+                actionThread = null
             }
             handleTermination()
 
@@ -102,10 +95,8 @@ final class ActorAction implements Runnable {
      * Attempts to cancel the action and interrupt the thread processing it.
      */
     final void cancel() {
-        synchronized(actionThreadCancellationLock) {
-            cancelled = true
-            this.actionThread?.interrupt()
-        }
+        cancelled = true
+        this.actionThread?.interrupt()
     }
 
     private boolean clearInterruptionFlag() {
@@ -119,7 +110,11 @@ final class ActorAction implements Runnable {
 
     private def handleTermination() {
         this.actor.indicateStop()
-        if (actor.respondsTo('afterStop')) actor.afterStop(actor.sweepQueue())
+        try {
+            if (actor.respondsTo('afterStop')) actor.afterStop(actor.sweepQueue())
+        } finally {
+            actor.releaseJoinedThreads()
+        }
     }
 
     private def handleException(final Exception exception) {

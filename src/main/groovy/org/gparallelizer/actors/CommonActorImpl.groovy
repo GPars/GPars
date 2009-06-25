@@ -1,7 +1,9 @@
 package org.gparallelizer.actors
 
 import org.gparallelizer.actors.pooledActors.ActorReplyException
-import org.gparallelizer.actors.pooledActors.PooledActorGroup;
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents the common superclass to both thread-bound and event-driven actors.
@@ -9,7 +11,7 @@ import org.gparallelizer.actors.pooledActors.PooledActorGroup;
  * @author Vaclav Pech
  * Date: Jun 13, 2009
  */
-public class CommonActorImpl {
+public abstract class CommonActorImpl implements Actor {
 
     /**
      * A list of senders for the currently procesed messages
@@ -64,6 +66,25 @@ public class CommonActorImpl {
         if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
         if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
         actorGroup = group
+    }
+
+    /**
+     * Gets unblocked after the actor stops.
+     */
+    protected volatile CountDownLatch joinLatch = new CountDownLatch(1)
+
+    /**
+     * Joins the actor. Waits fot its termination.
+     */
+    public final void join() { join(0) }
+
+    /**
+     * Joins the actor. Waits fot its termination.
+     * @param milis Timeout in miliseconds, specifying how long to wait at most.
+     */
+    public final void join(long milis) {
+        if (milis > 0) joinLatch.await(milis, TimeUnit.MILLISECONDS)
+        else joinLatch.await()
     }
 
     /**

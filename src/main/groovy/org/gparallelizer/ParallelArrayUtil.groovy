@@ -19,7 +19,7 @@ public class ParallelArrayUtil {
 
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = Parallelizer.retrieveCurrentPool()
-        if (!pool) throw new IllegalStateException("No ForkJoinPool available for the current thread")
+        if (pool==null) throw new IllegalStateException("No ForkJoinPool available for the current thread")
         return pool
     }
 

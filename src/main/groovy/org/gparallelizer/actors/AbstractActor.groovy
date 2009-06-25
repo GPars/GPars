@@ -79,12 +79,6 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
-    //todo Is it required?
-    /**
-     * Prevents race condition on the started flag
-     */
-    private final EnhancedSemaphore startupLock = new EnhancedSemaphore(1);
-
     /**
      * Creates a new Actor using the passed-in queue to store incoming messages.
      */
@@ -101,12 +95,8 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
         disableGroupMembershipChange()
         //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
         def localStarted = started
-        //todo should be inlined but currently it wouldn't be visible inside the closure if mixin is used
-        def localStartupLock = startupLock
 
-        localStartupLock.withSemaphore {
-            if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
-        }
+        if (localStarted.getAndSet(true)) throw new IllegalStateException("Actor already started")
 
         final CountDownLatch actorBarrier = new CountDownLatch(1)
 
@@ -134,15 +124,16 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
                 senders.clear()
                 try {
                     if (delegate.respondsTo('beforeStop')) delegate.beforeStop()
-                    localStartupLock.withSemaphore {
-                        localStarted.set(false)
-                        if (this.respondsTo('afterStop')) this.afterStop(sweepQueue())
-                    }
+                    final def queueContent = sweepQueue()
+                    localStarted.set(false)
+
+                    if (this.respondsTo('afterStop')) this.afterStop(queueContent)
                 } catch (Throwable e) {
                     try {
                         reportError(delegate, e)
                     } catch (Throwable ex) {ex.printStackTrace(System.err)} //invoked when the onException handler threw an exception
                 } finally {
+                    releaseJoinedThreads()
                     clearActorThreadAfterStart()
                 }
                 ReplyRegistry.deregisterCurrentActorWithThread()
@@ -150,6 +141,14 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
         } as Runnable
         actorBarrier.await()
         return this
+    }
+
+    /**
+     * Releases the latch with all threads that have called join on the actor
+     */
+    final void releaseJoinedThreads() {
+        joinLatch.countDown()
+//        joinLatch = new CountDownLatch(1)   //todo remove if not restarting
     }
 
     /**

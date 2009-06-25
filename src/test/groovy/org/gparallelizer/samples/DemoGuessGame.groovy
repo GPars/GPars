@@ -28,7 +28,6 @@ class GameMaster extends AbstractPooledActor {
                                {
                                        reply 'you win'
                                        stop()
-                                   System.exit 0 
                                }
                        }
                }
@@ -60,7 +59,8 @@ class Player extends AbstractPooledActor {
        }
 }
 
-def master = new GameMaster().start()
-new Player( name: 'Player', server: master ).start()
+final def master = new GameMaster().start()
+final def player = new Player(name: 'Player', server: master).start()
 
-System.in.read()
+
+[master, player]*.join()

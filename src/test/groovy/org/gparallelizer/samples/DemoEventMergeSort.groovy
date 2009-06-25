@@ -72,4 +72,4 @@ def resultActor = actor {
 def sorter = actor(createMessageHandler(resultActor))
 sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
-System.in.read()
+resultActor.join()

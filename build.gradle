@@ -50,6 +50,11 @@ dependencies {
 //    include 'org/gparallelizer/**'
 //}
 
+task zipDoc(type: Zip, dependsOn: groovydoc) << {
+    baseName = 'docs'
+    fileSet(dir: explodedDistGroovydocsDir)
+    destinationDir =  ''
+}
 //createTask('zipdoc', dependsOn:'groovydoc') {
 //    ant.zip(baseDir: explodedDistGroovydocsDir, destFile:"$distsDir/GParallelizer-$version-doc.zip")
 //}

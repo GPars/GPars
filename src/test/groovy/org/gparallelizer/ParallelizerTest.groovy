@@ -18,6 +18,8 @@ public class ParallelizerTest extends GroovyTestCase {
     public void testEachAsyncOnEmpty() {
         Parallelizer.withParallelizer(5) {
             [].eachAsync{throw new RuntimeException('Should not be thrown')}
+            [].eachAsync{throw new RuntimeException('Should not be thrown')}
+            [].eachAsync{throw new RuntimeException('Should not be thrown')}
             ''.eachAsync{throw new RuntimeException('Should not be thrown')}
             [].iterator().eachAsync{throw new RuntimeException('Should not be thrown')}
             ''.iterator().eachAsync{throw new RuntimeException('Should not be thrown')}

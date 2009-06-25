@@ -1,16 +1,15 @@
 package org.gparallelizer.samples
 
-import org.gparallelizer.actors.Actors
-import org.gparallelizer.actors.DefaultThreadActor
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import static java.util.concurrent.TimeUnit.*
 
 /**
  * Demonstrates the ability to receive multiple messages and selectively reply to some of them.
  * Notice the ability to sent HashMaps as well as instances of the Offer class as messages.
  * A custom pooled actor group is used to group the actors with a single thread pool.
+ * The actors, which have submitted their offers, terminate, if they don't hear back from the actor within a timeout.
+ * The main threads joins all actors to wait for their termination, since we're using a non-deamon actor group.
  * @author Vaclav Pech
  */
 
@@ -25,34 +24,35 @@ final AbstractPooledActor actor = group.actor {
 }
 actor.start()
 
-group.actor {
-    actor << new Offer(price : 10)
+final def a1 = group.actor {
+    actor << new Offer(price: 10)
     loop {
-        react {
+        react(3, SECONDS) {
             println "Agent 1: $it"
         }
     }
-}.start()
+}
+a1.start()
 
-group.actor {
+final def a2 = group.actor {
     actor << [price:20]
     loop {
-        react {
+        react(3, SECONDS) {
             println "Agent 2: $it"
         }
     }
 }.start()
 
-group.actor {
+final def a3 = group.actor {
     actor << new Offer(price : 5)
     loop {
-        react {
+        react(3, SECONDS) {
             println "Agent 3: $it"
         }
     }
 }.start()
 
-System.in.read()
+[actor, a1, a2, a3]*.join()
 
 class Offer {
     int price

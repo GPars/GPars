@@ -36,7 +36,7 @@ final Actor actor = new GroupSampleActor()
 actor.actorGroup = sampleGroup
 actor.start()
 
-System.in.read()
+actor.join()
 
 sampleGroup.shutdown()
 Actors.defaultActorGroup.shutdown()
