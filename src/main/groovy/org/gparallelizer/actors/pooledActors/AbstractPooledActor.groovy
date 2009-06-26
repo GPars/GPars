@@ -461,18 +461,18 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo add join() to actors - wiki
     //todo consider need for ThreadActor restarting capability
     //todo reactor - document
+    //todo DynamicDispatchActor
 
     //Planned for the next release
 
-    //todo dataflow concurrency - remove unused classes, consider non-daemon threads
-    //todo reconsider lightweight threads for dataflow concurrency
     //todo onTimeout handler as a react parameter
 
-    //todo consider simplified actors
+    //Backlog
+    //todo reconsider lightweight threads for dataflow concurrency
+    //todo consider simplified fast actors
+    //todo dataflow concurrency - remove unused classes
     //todo consider extensibility for actors - custom schedulers
     //todo consider using builder for message handling
-
-    //Backlog
     //todo out-of-order message processing
     //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
     //todo optimize AsyncUtil implementation to split collections among available threads
