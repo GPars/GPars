@@ -18,7 +18,7 @@ new PooledActorBenchmarkWithoutReply().perform(warmupIterations)
 println 'PooledActors with no replies: ' + new PooledActorBenchmarkWithoutReply().perform(iterations)
 
 new ActorBenchmarkWithoutReply().perform(warmupIterations)
-println 'Actors with no seplies: ' + new ActorBenchmarkWithoutReply().perform(iterations)
+println 'Actors with no replies: ' + new ActorBenchmarkWithoutReply().perform(iterations)
 
 new PooledActorCreationBenchmark().perform(warmupIterations)
 println 'PooledActors creation: ' + new PooledActorCreationBenchmark().perform(iterations)
