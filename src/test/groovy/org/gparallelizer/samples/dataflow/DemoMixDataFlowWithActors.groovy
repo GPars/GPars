@@ -30,3 +30,4 @@ final AbstractPooledActor thread = thread {
 thread << 10
 
 System.in.read()
+System.exit 0 

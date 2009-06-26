@@ -14,6 +14,7 @@ final def z = new DataFlowVariable()
 thread {
     z << x.val + y.val
     println "Result: ${z.val}"
+    System.exit 0
 }
 
 thread {
@@ -23,5 +24,3 @@ thread {
 thread {
     y << 5
 }
-
-System.in.read()

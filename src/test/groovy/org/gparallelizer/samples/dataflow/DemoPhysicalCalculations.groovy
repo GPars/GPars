@@ -73,5 +73,3 @@ thread {
 thread {
     distance << deceleration.val * ((velocity.val/deceleration.val) ** 2) * 0.5
 }
-
-//Thread.sleep(30000)

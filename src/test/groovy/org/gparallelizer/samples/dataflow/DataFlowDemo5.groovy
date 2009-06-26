@@ -45,3 +45,4 @@ thread {
 }
 
 System.in.read()
+System.exit 0

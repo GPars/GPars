@@ -27,5 +27,3 @@ thread {
     println "Sum: ${producer.collect{it * it}.inject(0){sum, x -> sum + x}}"
     System.exit 0
 }
-
-System.in.read()

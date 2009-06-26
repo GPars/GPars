@@ -4,7 +4,6 @@ import org.gparallelizer.dataflow.DataFlowVariable as WAIT
 import static org.gparallelizer.dataflow.DataFlow.*
 
 /**
- * Example 1
  * Basic sample showing three green threads cooperating on three variables.
  */
 WAIT<Integer> x = new WAIT()

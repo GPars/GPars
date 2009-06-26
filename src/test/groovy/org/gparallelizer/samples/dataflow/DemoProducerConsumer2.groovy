@@ -36,5 +36,3 @@ thread {
     println "Number of Groovy sites today: $count"
     System.exit 0
 }
-
-System.in.read()

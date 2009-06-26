@@ -34,5 +34,3 @@ thread {
     actor.send a.val
 }
 
-
-System.in.read()

@@ -4,7 +4,7 @@ import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.*
 
 /**
- * Example 2
+ * Demonstrates three threads calculating a sum of numbers within a given interval using shared dataflow variables.
  * 
  */
 List<Integer> ints(int n, int max) {
@@ -26,5 +26,3 @@ def y = new DataFlowVariable<List<Integer>>()
 thread { x << ints(0, 1000) }
 thread { y << sum(0, x.val) }
 thread { println("List of sums: " + y.val); System.exit(0) }
-
-Thread.sleep 5000

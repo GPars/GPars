@@ -17,10 +17,4 @@ public abstract class DataFlow {
     public static PooledActor thread(final Closure code) {
         new SingleRunThread(body: code).start()
     }
-
-    //todo reconsider need for it
-//    public static <T, V> ReactiveEventBasedThread thread(final Closure<T, V> code) {
-//        new ReactiveEventBasedThread(body: code).start()
-//    }
-
 }

@@ -460,11 +460,11 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo reconsider the option to select pool type
     //todo add join() to actors - wiki
     //todo consider need for ThreadActor restarting capability
+    //todo reactor - document
 
     //Planned for the next release
 
-    //todo update javadoc with respect to the new changes
-    //todo dataflow concurrency - comment samples, remove unused classes, consider non-daemon threads
+    //todo dataflow concurrency - remove unused classes, consider non-daemon threads
     //todo reconsider lightweight threads for dataflow concurrency
     //todo onTimeout handler as a react parameter
 

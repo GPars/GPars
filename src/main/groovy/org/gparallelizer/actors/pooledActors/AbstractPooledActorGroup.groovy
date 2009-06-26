@@ -26,4 +26,15 @@ public abstract class AbstractPooledActorGroup extends AbstractActorGroup {
         actor.actorGroup = this
         return actor
     }
+
+    /**
+     * Creates a reactor around the supplied code.
+     * When a reactor receives a message, the supplied block of code is run with the message
+     * as a parameter and the result of the code is send in reply.
+     * @param The code to invoke for each received message
+     * @return A new instance of ReactiveEventBasedThread
+     */
+    public final AbstractPooledActor reactor(final Closure code) {
+        new ReactiveEventBasedThread(body: code)
+    }
 }
