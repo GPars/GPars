@@ -64,22 +64,46 @@ import java.util.concurrent.CountDownLatch
  *     //this line will never be reached
  *}.start()
  * </pre>
+ * The react method can acept multiple messages in the passed-in closure
+ * <pre>
+ * react {Integer a, String b ->
+ *     ...
+ * }
+ * </pre>
  * The closures passed to the react() method can call reply() or replyIfExists(), which will send a message back to
  * the originator of the currently processed message. The replyIfExists() method unlike the reply() method will not fail
  * if the original message wasn't sent by an actor nor if the original sender actor is no longer running.
+ * The reply() and replyIfExists() methods are also dynamically added to the processed messages.
+ * <pre>
+ * react {a, b ->
+ *     reply 'message'  //sent to senders of a as well as b
+ *     a.reply 'private message'  //sent to the sender of a only
+ * }
+ * </pre>
+ * To speed up actor message processing enhancing messges and actors with reply methods can be disabled by calling
+ * the disableSendingReplies() method. Calling enableSendingReplies() will initiate enhancements for reply again.
+ *
  * The react() method accepts timout specified using the TimeCategory DSL.
  * <pre>
  * react(10.MINUTES) {
  *     println 'Received message: ' + it
- *}
- * * </pre>
- * If not message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
+ * }
+ * </pre>
+ * If no message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
  * and the actor terminates.
  * Each PooledActor has at any point in time at most one active instance of ActorAction associated, which abstracts
  * the current chunk of actor's work to perform. Once a thread is assigned to the ActorAction, it moves the actor forward
  * till loop() or react() is called. These methods schedule another ActorAction for processing and throw dedicated exception
  * to terminate the current ActorAction. 
  *
+ * Each Actor can define lifecycle observing methods, which will be called by the Actor's background thread whenever a certain lifecycle event occurs.
+ * <ul>
+ * <li>afterStart() - called immediatelly after the Actor's background thread has been started, before the act() method is called the first time.</li>
+ * <li>afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the messages from the queue.</li>
+ * <li>onInterrupt(InterruptedException e) - called when a react() method timeouts. The actor will be terminated.
+ * <li>onTimeout() - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.</li>
+ * <li>onException(Throwable e) - called when an exception occurs in the actor's thread. Throwing an exception from this method will stop the actor.</li>
+ * </ul>
  * @author Vaclav Pech
  * Date: Feb 7, 2009
  */
@@ -435,21 +459,24 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo simplify group hierarchy and daemon + fj settings, reconsider the name for groups
     //todo reconsider the option to select pool type
     //todo add join() to actors - wiki
+    //todo consider need for ThreadActor restarting capability
 
     //Planned for the next release
 
     //todo update javadoc with respect to the new changes
     //todo dataflow concurrency - comment samples, remove unused classes, consider non-daemon threads
     //todo reconsider lightweight threads for dataflow concurrency
+    //todo onTimeout handler as a react parameter
+
     //todo consider simplified actors
-    //todo consider extensibility for actors
+    //todo consider extensibility for actors - custom schedulers
+    //todo consider using builder for message handling
 
     //Backlog
-    //todo consider need for ThreadActor restarting capability
     //todo out-of-order message processing
     //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
     //todo optimize AsyncUtil implementation to split collections among available threads
-    //todo send returning Future for reply
+    //todo send returning Future for actor reply
     //todo clean issues and todos
     //todo samples on typical concurrency issues
     //todo add samples

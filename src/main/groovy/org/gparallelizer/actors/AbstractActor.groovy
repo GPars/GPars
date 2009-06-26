@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch
  * start time and returned back to the pool after the actor termminates. The pool is shared with other AbstractThreadActors
  * by means of an instance of the ActorGroup, which they have in common.
  * The ActorGroup instance is responsible for the pool creation, management and shutdown.
- * Whenever a PooledActor looks for a new message through the receive() method, the actor's thread gets blocked
+ * Whenever a ThreadActor looks for a new message through the receive() method, the actor's thread gets blocked
  * until a message arrives into the actors message queue. Since the thread is physically blocked in the receive() method,
  * it cannot be reused for other actors and so the thread pool for thread-bound actors automatically resizes
  * to the number of active actore it the group.
@@ -31,12 +31,44 @@ import java.util.concurrent.CountDownLatch
  * calling the act() method, until the stop() method is called or the actor thread is interrupted directly.
  * After it stops the afterStop(List unprocessedMessages) is called, if exists,
  * with all the unprocessed messages from the queue as a parameter.
- * The Actor can be restarted be calling start() again.
+ * The Actor cannot be restarted after stopped.
+ *
+ * The receive method can acept multiple messages in the passed-in closure
+ * <pre>
+ * receive {Integer a, String b ->
+ *     ...
+ * }
+ * </pre>
+ * The closures passed to the receive() method can call reply() or replyIfExists(), which will send a message back to
+ * the originator of the currently processed message. The replyIfExists() method unlike the reply() method will not fail
+ * if the original message wasn't sent by an actor nor if the original sender actor is no longer running.
+ * The reply() and replyIfExists() methods are also dynamically added to the processed messages.
+ * <pre>
+ * receive {a, b ->
+ *     reply 'message'  //sent to senders of a as well as b
+ *     a.reply 'private message'  //sent to the sender of a only
+ * }
+ *
+ * def c = receive()
+ * reply 'message'  //sent to the sender of c
+ * c.reply 'message'  //sent to the sender of c
+ * </pre>
+ * To speed up actor message processing enhancing messges and actors with reply methods can be disabled by calling
+ * the disableSendingReplies() method. Calling enableSendingReplies() will initiate enhancements for reply again.
+ *
+ * The receive() method accepts timout specified using the TimeCategory DSL.
+ * <pre>
+ * receive(10.MINUTES) {
+ *     println 'Received message: ' + it
+ * }
+ * </pre>
+ * If no message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
+ * and the actor terminates.
  * Each Actor can define lifecycle observing methods, which will be called by the Actor's background thread whenever a certain lifecycle event occurs.
  * <ul>
  * <li>afterStart() - called immediatelly after the Actor's background thread has been started, before the act() method is called the first time.</li>
  * <li>afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the messages from the queue.</li>
- * <li>onInterrupt(InterruptedException? e) - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.</li>
+ * <li>onInterrupt(InterruptedException e) - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.</li>
  * <li>onException(Throwable e) - called when an exception occurs in the actor's thread. Throwing an exception from this method will stop the actor.</li>
  * </ul>
  *

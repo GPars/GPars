@@ -15,7 +15,7 @@ public class DataFlowActorGroup extends AbstractPooledActorGroup  {
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
     public DataFlowActorGroup() {
-        threadPool = isForkJoinUsed() ? new ResizableFJPool() : new ResizablePool(true);
+        threadPool = isForkJoinUsed() ? new ResizableFJPool() : new ResizablePool(false);
     }
 
     /**
@@ -24,7 +24,7 @@ public class DataFlowActorGroup extends AbstractPooledActorGroup  {
      */
     public DataFlowActorGroup(final boolean useForkJoinPool) {
         super(useForkJoinPool);
-        threadPool = isForkJoinUsed() ? new ResizableFJPool() : new ResizablePool(true);
+        threadPool = isForkJoinUsed() ? new ResizableFJPool() : new ResizablePool(false);
     }
 
     /**
@@ -32,7 +32,7 @@ public class DataFlowActorGroup extends AbstractPooledActorGroup  {
      * @param poolSize The initial size of the underlying thread pool
      */
     public DataFlowActorGroup(final int poolSize) {
-        threadPool = isForkJoinUsed() ? new ResizableFJPool(poolSize) : new ResizablePool(true, poolSize);
+        threadPool = isForkJoinUsed() ? new ResizableFJPool(poolSize) : new ResizablePool(false, poolSize);
     }
 
     /**
@@ -42,6 +42,6 @@ public class DataFlowActorGroup extends AbstractPooledActorGroup  {
      */
     public DataFlowActorGroup(final int poolSize, final boolean useForkJoinPool) {
         super(useForkJoinPool);
-        threadPool = isForkJoinUsed() ? new ResizableFJPool(poolSize) : new ResizablePool(true, poolSize);
+        threadPool = isForkJoinUsed() ? new ResizableFJPool(poolSize) : new ResizablePool(false, poolSize);
     }
 }
