@@ -40,6 +40,8 @@ import org.gparallelizer.actors.AbstractActorGroup
  * To specify whether a ForkJoinPool from JSR-166y should be used or the pool based on JDK's executor services,
  * you can either use the appropriate constructors or the 'gparallelizer.useFJPool' system property.
  *
+ * PooledActorGroups use pools of daemon threads.
+ *
  * @author Vaclav Pech
  * Date: May 4, 2009
  */

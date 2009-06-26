@@ -7,9 +7,11 @@ import org.gparallelizer.actors.AbstractThreadActor
 import org.gparallelizer.actors.ActorMessage
 import java.util.concurrent.LinkedBlockingQueue
 import org.gparallelizer.actors.ThreadActorGroup
-import org.gparallelizer.actors.NonDaemonActorGroup
+import org.gparallelizer.actors.NonDaemonThreadActorGroup
 import org.gparallelizer.actors.AbstractThreadActorGroup
 import org.gparallelizer.actors.AbstractThreadActor
+import org.gparallelizer.actors.NonDaemonThreadActorGroup
+import org.gparallelizer.actors.NonDaemonThreadActorGroup
 
 public class ActorGroupTest extends GroovyTestCase {
     public void testDefaultGroupDaemon() {
@@ -32,7 +34,7 @@ public class ActorGroupTest extends GroovyTestCase {
         final CountDownLatch latch2 = new CountDownLatch(1)
 
         final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
-        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonThreadActorGroup()
 
         def actor1 = daemonGroup.oneShotActor {
             daemon = Thread.currentThread().isDaemon()
@@ -59,7 +61,7 @@ public class ActorGroupTest extends GroovyTestCase {
         final CountDownLatch latch2 = new CountDownLatch(1)
 
         final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
-        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonThreadActorGroup()
 
         final GroupTestActor actor1 = new GroupTestActor(daemonGroup)
         actor1.metaClass.act = {->
@@ -88,7 +90,7 @@ public class ActorGroupTest extends GroovyTestCase {
 
     public void testValidGroupReset() {
         final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
-        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonThreadActorGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
 
         assertEquals daemonGroup, actor.actorGroup
@@ -99,7 +101,7 @@ public class ActorGroupTest extends GroovyTestCase {
 
     public void testInvalidGroupReset() {
         final AbstractThreadActorGroup daemonGroup = new ThreadActorGroup()
-        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final AbstractThreadActorGroup nonDaemonGroup = new NonDaemonThreadActorGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
         actor.start()
         assertEquals daemonGroup, actor.actorGroup
