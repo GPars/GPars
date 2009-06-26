@@ -12,6 +12,8 @@ Ability to suspend actor and message enhancements for replies, which has impact 
 Restructured actor classes to increase code reuse
 Removed beforeStop() lifecycle method from actors
 Fixed the event-driven actor's loop, when no react is called
+DynamicDispatchActor added to allow for an alternative message handling syntax - dynamic method dispatch to multiple onMessage() methods
+Added a Reactor implementation - a special purpose actor, which after receiving a message runs its body with the message as a parameter and the result of the code is send in reply.
 Several performance benchmarks included
 Minor performance optimizations
 Bugfixing

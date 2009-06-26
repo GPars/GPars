@@ -35,6 +35,6 @@ public abstract class AbstractPooledActorGroup extends AbstractActorGroup {
      * @return A new instance of ReactiveEventBasedThread
      */
     public final AbstractPooledActor reactor(final Closure code) {
-        new ReactiveEventBasedThread(body: code)
+        new ReactiveActor(body: code)
     }
 }
