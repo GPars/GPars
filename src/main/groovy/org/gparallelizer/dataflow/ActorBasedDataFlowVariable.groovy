@@ -11,7 +11,7 @@ import org.gparallelizer.actors.ActorMessage
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
- * Each instance of DataFlowVariable can be read repetadly any time using the '()' operator and assigned once
+ * Each instance of DataFlowVariable can be read repetadly any time using the 'val' property and assigned once
  * in its lifetime using the '<<' operator. Reads preceding assignment will be blocked until the value
  * is assigned.
  *
