@@ -465,21 +465,24 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //Planned for the next release
 
-    //todo onTimeout handler as a react parameter
+    //todo dataflow concurrency - remove unused classes
 
     //Backlog
-    //todo reconsider lightweight threads for dataflow concurrency
+    //todo onTimeout handler as a react parameter
+    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
     //todo consider simplified fast actors
-    //todo dataflow concurrency - remove unused classes
     //todo consider extensibility for actors - custom schedulers
+    //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
     //todo consider using builder for message handling
     //todo out-of-order message processing
-    //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
     //todo optimize AsyncUtil implementation to split collections among available threads
     //todo send returning Future for actor reply
+
     //todo clean issues and todos
-    //todo samples on typical concurrency issues
     //todo add samples
+    //todo samples on typical concurrency issues
+    //todo dining philosophers implementation
+
     //todo use Gradle
     //todo automate code sample download
     //todo automate javadoc download
@@ -490,8 +493,6 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
 
     //todo consider the asynchronous metaclass
     //todo use AST transformation to turn actors methods into async processing
-    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
-    //todo dining philosophers implementation
     //todo try the fixes for the MixinTest
     //todo support mixins for event-driven actors
 
