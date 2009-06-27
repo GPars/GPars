@@ -453,19 +453,13 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     //todo decument the possibility to run actors without the jsr-166y jar file
     //todo document pool resizing
     //todo document DefaultThreadActor and AbstractThreadActor rename
-    //todo test wiki samples
     //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
     //todo rename AbstractActor to ThreadActor
     //todo simplify group hierarchy and daemon + fj settings, reconsider the name for groups
     //todo reconsider the option to select pool type
-    //todo add join() to actors - wiki
-    //todo consider need for ThreadActor restarting capability
-    //todo reactor - document
-    //todo DynamicDispatchActor
+    //todo update wiki samples - use join(), group constructor parameters, imports, actor class names
 
     //Planned for the next release
-
-    //todo dataflow concurrency - remove unused classes
 
     //Backlog
     //todo onTimeout handler as a react parameter

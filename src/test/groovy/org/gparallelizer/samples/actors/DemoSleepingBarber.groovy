@@ -2,6 +2,10 @@ import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.Actor
 
+/**
+ * Shows solution to the popular Sleeping Barber concurrency problem - http://en.wikipedia.org/wiki/Sleeping_barber_problem
+ */
+
 final def group = new PooledActorGroup()
 
 final def barber = group.actor {
@@ -12,7 +16,7 @@ final def barber = group.actor {
                 case Enter:
                     message.customer.send new Start()
                     println "Barber: Processing customer ${message.customer.name}"
-                    Thread.sleep(random.nextInt(10)*1000)
+                    doTheWork(random)
                     message.customer.send new Done()
                     message.reply new Next()
                     break
@@ -23,6 +27,10 @@ final def barber = group.actor {
         }
     }
 }.start()
+
+private def doTheWork(Random random) {
+    Thread.sleep(random.nextInt(10) * 1000)
+}
 
 final Actor waitingRoom
 
@@ -101,4 +109,6 @@ new Customer(name:'Joe', localBarbers:waitingRoom).start()
 new Customer(name:'Dave', localBarbers:waitingRoom).start()
 new Customer(name:'Alice', localBarbers:waitingRoom).start()
 
+System.in.read()
+new Customer(name:'James', localBarbers:waitingRoom).start()
 System.in.read()

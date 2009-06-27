@@ -1,7 +1,7 @@
 package org.gparallelizer.actors.pooledActors
 /**
- * A pooled actor allowing for a different structure of the message handling code.
- * In general DynamicDispatchActor dispatches repeatedly scans for messages and dispatches arrived messages to one
+ * A pooled actor allowing for an alternative structure of the message handling code.
+ * In general DynamicDispatchActor repeatedly scans for messages and dispatches arrived messages to one
  * of the onMessage(message) methods defined on the actor.
  * <pre>
  * final class MyActor extends DynamicDispatchActor {

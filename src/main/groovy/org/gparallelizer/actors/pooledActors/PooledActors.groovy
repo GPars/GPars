@@ -41,4 +41,16 @@ public abstract class PooledActors {
     public static AbstractPooledActor actor(Closure handler) {
         return defaultPooledActorGroup.actor(handler)
     }
+
+    /**
+     * Creates a reactor around the supplied code.
+     * When a reactor receives a message, the supplied block of code is run with the message
+     * as a parameter and the result of the code is send in reply.
+     * The created actor will be part of the default actor group.
+     * @param The code to invoke for each received message
+     * @return A new instance of ReactiveEventBasedThread
+     */
+    public static AbstractPooledActor reactor(final Closure code) {
+        return defaultPooledActorGroup.reactor(code)
+    }
 }

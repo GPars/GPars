@@ -7,24 +7,25 @@ import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 final def group = new PooledActorGroup()
 
-final def processor = group.reactor {
+final def doubler = group.reactor {
     2 * it
 }.start()
 
 group.actor {
-    println 'Result1:' + processor.sendAndWait(10)
+    println 'Double of 10 = ' + doubler.sendAndWait(10)
 }.start()
 
 group.actor {
-    println 'Result2:' + processor.sendAndWait(20)
+    println 'Double of 20 = ' + doubler.sendAndWait(20)
 }.start()
 
 group.actor {
-    println 'Result3:' + processor.sendAndWait(30)
+    println 'Double of 30 = ' + doubler.sendAndWait(30)
 }.start()
 
-for(i in (1..100)) {
-    println "$i: ${processor.sendAndWait(i)}"
+for(i in (1..10)) {
+    println "Double of $i = ${doubler.sendAndWait(i)}"
 }
-processor.stop()
-processor.join()
+
+doubler.stop()
+doubler.join()
