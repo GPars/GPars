@@ -15,18 +15,14 @@ import java.util.concurrent.atomic.AtomicReference
 public class AsynchronizerExceptionTest extends GroovyTestCase {
     public void testDoInParralelWithException() {
         shouldFail {
-            Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-                AsyncInvokerUtil.doInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
-            }
+            AsyncInvokerUtil.doInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
         }
     }
 
     public void testExecuteInParralelWithException() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            List<Future<Object>> result = AsyncInvokerUtil.executeInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
-            shouldFail {
-                result*.get()
-            }
+        List<Future<Object>> result = AsyncInvokerUtil.executeInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+        shouldFail {
+            result*.get()
         }
     }
 

@@ -3,14 +3,15 @@ GParallelizer
 0.8
 Added DataFlow concurrency support
 Added sendAndWait() methods to actors to block the caller until a reply arrives
-Added an option to use the JSR-166y ForkJoin pool
+Added an experimental option to use the JSR-166y ForkJoin pool for actors
 Enabled thread-bound actors to reuse threads from a resizeable common pool
 Added AsyncEnhancer and ParallelEnhancer classes enabling asynchronous collection processing through meta-class enhancements
 Restructured actor groups with respect to the thread-bound actor thread reuse and Fork/Join pool support
 Supported @Immutable for messages
+Ability to join actors to await their termination
 Ability to suspend actor and message enhancements for replies, which has impact on message delivery speed
 Restructured actor classes to increase code reuse
-Removed beforeStop() lifecycle method from actors
+Removed the beforeStop() lifecycle method from actors
 Fixed the event-driven actor's loop, when no react is called
 DynamicDispatchActor added to allow for an alternative message handling syntax - dynamic method dispatch to multiple onMessage() methods
 Added a Reactor implementation - a special purpose actor, which after receiving a message runs its body with the message as a parameter and the result of the code is send in reply.

@@ -17,8 +17,8 @@ public class AsyncEnhancerTest extends GroovyTestCase {
     }
 
     public void testClassEnhancement() {
-        AsyncEnhancer.enhanceClass ArrayList
-        final List list = [1, 2, 3, 4, 5]
+        AsyncEnhancer.enhanceClass LinkedList
+        final List list = new LinkedList([1, 2, 3, 4, 5])
         assert list.anyAsync {it > 4}
         assert list.allAsync {it > 0}
         assertEquals 1, list.findAsync {it < 2}
@@ -38,8 +38,8 @@ public class AsyncEnhancerTest extends GroovyTestCase {
     }
 
     public void testMapClassEnhancement() {
-        AsyncEnhancer.enhanceClass LinkedHashMap
-        final Map map = [1: 1, 2: 2, 3: 3, 4: 4, 5: 5]
+        AsyncEnhancer.enhanceClass HashMap
+        final Map map = new HashMap([1: 1, 2: 2, 3: 3, 4: 4, 5: 5])
         assert map.anyAsync {it.key > 4}
         assert map.allAsync {it.value > 0}
     }
@@ -52,21 +52,21 @@ public class AsyncEnhancerTest extends GroovyTestCase {
 
     public void testClassEnhancementException() {
         AsyncEnhancer.threadPool.resize 20
-        AsyncEnhancer.enhanceClass ArrayList
-        final List list = [1, 2, 3, 4, 5]
+        AsyncEnhancer.enhanceClass LinkedList
+        final List list = new LinkedList([1, 2, 3, 4, 5])
         performExceptionCheck(list)
         AsyncEnhancer.threadPool.resetDefaultSize()
     }
 
     public void testDualEnhancement() {
-        AsyncEnhancer.enhanceClass ArrayList
-        final List list = [1, 2, 3, 4, 5]
+        AsyncEnhancer.enhanceClass LinkedList
+        final List list = new LinkedList([1, 2, 3, 4, 5])
         assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
 
         AsyncEnhancer.enhanceInstance list
         assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
 
-        assertEquals([2, 4, 6, 8, 10], [1, 2, 3, 4, 5].collectAsync {2 * it})
+        assertEquals([2, 4, 6, 8, 10], new LinkedList([1, 2, 3, 4, 5]).collectAsync {2 * it})
     }
 
     private String performExceptionCheck(List list) {

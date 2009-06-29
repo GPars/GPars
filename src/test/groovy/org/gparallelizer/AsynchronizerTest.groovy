@@ -23,15 +23,11 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testDoInParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assertEquals([10, 20], AsyncInvokerUtil.doInParallel({10}, {20}))
-        }
+        assertEquals([10, 20], AsyncInvokerUtil.doInParallel({10}, {20}))
     }
 
     public void testExecuteInParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assertEquals([10, 20], AsyncInvokerUtil.executeInParallel({10}, {20})*.get())
-        }
+        assertEquals([10, 20], AsyncInvokerUtil.executeInParallel({10}, {20})*.get())
     }
 
     public void testAsyncWithCollectionAndResult() {
@@ -49,8 +45,21 @@ public class AsynchronizerTest extends GroovyTestCase {
         }
     }
 
+    public void testEachAsyncOnsingleElementCollections() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            [1].eachAsync{}
+            [1].eachAsync{}
+            [1].eachAsync{}
+            'a'.eachAsync{}
+            [1].iterator().eachAsync{}
+            'a'.iterator().eachAsync{}
+        }
+    }
+
     public void testEachAsyncOnEmpty() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            [].eachAsync{throw new RuntimeException('Should not be thrown')}
+            [].eachAsync{throw new RuntimeException('Should not be thrown')}
             [].eachAsync{throw new RuntimeException('Should not be thrown')}
             ''.eachAsync{throw new RuntimeException('Should not be thrown')}
             [].iterator().eachAsync{throw new RuntimeException('Should not be thrown')}

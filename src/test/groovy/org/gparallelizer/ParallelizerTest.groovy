@@ -15,6 +15,17 @@ public class ParallelizerTest extends GroovyTestCase {
         }
     }
 
+    public void testEachAsyncOnOneElementCollections() {
+        Parallelizer.withParallelizer(5) {
+            [1].eachAsync{}
+            [1].eachAsync{}
+            [1].eachAsync{}
+            'a'.eachAsync{}
+            [1].iterator().eachAsync{}
+            'a'.iterator().eachAsync{}
+        }
+    }
+
     public void testEachAsyncOnEmpty() {
         Parallelizer.withParallelizer(5) {
             [].eachAsync{throw new RuntimeException('Should not be thrown')}
