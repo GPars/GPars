@@ -17,6 +17,7 @@ public final class NonDaemonThreadActorGroup extends AbstractThreadActorGroup {
      * Creates a group of actors. The actors will share a common non-daemon thread pool.
      */
     def NonDaemonThreadActorGroup() {
+        super(false)
         threadPool = new ResizablePool(false)
     }
 
@@ -25,11 +26,7 @@ public final class NonDaemonThreadActorGroup extends AbstractThreadActorGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     def NonDaemonThreadActorGroup(final int poolSize) {
+        super(false)
         threadPool = new ResizablePool(false, poolSize)
     }
-
-    /**
-     * Fork/Join not used by this group
-     */
-    boolean getUsedForkJoin() { false }
 }

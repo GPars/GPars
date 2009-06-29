@@ -1,26 +1,28 @@
     //Document before next release
-    //todo use @Delegate from group to pool
-    //todo document pool resizing
-    //todo Ability to suspend actor and message enhancements for replies, which has impact on message delivery speed
     //todo test the onDeliveryError handler
     //todo class and instance async enhancer - wiki, document exception differences
-    //todo document the gparallelizer.useFJPool property and the new pool flag
-    //todo unify actor group classes - document pool for thread-bound, shutdown and FJPool flag
-    //todo FJPool only allows daemon threads - javadoc, wiki
-    //todo document default daemon flag for thread-bound actors
-    //todo decument the possibility to run actors without the jsr-166y jar file
-    //todo document DefaultThreadActor and AbstractThreadActor rename
-    //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
-    //todo simplify group hierarchy and daemon + fj settings, reconsider the name for groups
-    //todo rename AbstractActor to ThreadActor
-    //todo reconsider the option to select pool type
     //todo update wiki samples - use join(), group constructor parameters, imports, actor class names
+
+    //todo document pool resizing
+    //todo use @Delegate from group to pool
+    //todo unify actor group classes - document pool for thread-bound, shutdown and FJPool flag
+    //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
+    //todo document default daemon flag for thread-bound actors
+
+    //todo Ability to suspend actor and message enhancements for replies, which has impact on message delivery speed
+    //todo document the gparallelizer.useFJPool property and the new pool flag
+    //todo document DefaultThreadActor and AbstractThreadActor rename
+    //todo FJPool only allows daemon threads - javadoc, wiki
+    //todo reconsider the option to select pool type
+    //todo decument the possibility to run actors without the jsr-166y jar file
+    //todo rename AbstractActor to ThreadActor
 
 DataFlow concurrency, refactored actors and actor groups, sendAndWait(), AsyncEnhancer, Fork/Join pool
 
     //Planned for the next release
-    //todo fix testEachAsyncOnEmpty()
-    //todo toString() for dataflow variable and stream
+    //todo toString() for dataflow variable and stream - test
+    //todo samples on typical concurrency issues
+
 
     //Backlog
     //todo look into MINA
@@ -37,7 +39,6 @@ DataFlow concurrency, refactored actors and actor groups, sendAndWait(), AsyncEn
 
     //todo clean issues and todos
     //todo add samples
-    //todo samples on typical concurrency issues
     //todo dining philosophers implementation
 
     //todo use Gradle

@@ -17,9 +17,7 @@ public abstract class AbstractActorGroup {
     /**
      * Indicates whether actors in this group use ForkJoin thread pool
      */
-    private final boolean forkJoinUsed
-
-    boolean isForkJoinUsed() {forkJoinUsed}
+    final boolean forkJoinUsed
 
     def AbstractActorGroup() { this.forkJoinUsed = useFJPool() }
 

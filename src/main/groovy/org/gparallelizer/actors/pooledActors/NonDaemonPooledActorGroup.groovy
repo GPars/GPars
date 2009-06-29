@@ -14,6 +14,7 @@ public final class NonDaemonPooledActorGroup extends AbstractPooledActorGroup {
      * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
      */
     def NonDaemonPooledActorGroup() {
+        super(false)
         threadPool = new DefaultPool(false)
     }
 
@@ -22,6 +23,7 @@ public final class NonDaemonPooledActorGroup extends AbstractPooledActorGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     def NonDaemonPooledActorGroup(final int poolSize) {
+        super(false)
         threadPool = new DefaultPool(false, poolSize)
     }
 

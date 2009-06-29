@@ -47,7 +47,9 @@ public final class ThreadActorGroup extends AbstractThreadActorGroup {
     /**
      * Creates a group of actors. The actors will share a common thread pool of threads.
      */
-    protected def ThreadActorGroup() { this(true) }
+    protected def ThreadActorGroup() {
+        threadPool = forkJoinUsed ? new ResizableFJPool() : new ResizablePool(true)
+    }
 
     /**
      * Creates a group of actors. The actors will share a common thread pool.

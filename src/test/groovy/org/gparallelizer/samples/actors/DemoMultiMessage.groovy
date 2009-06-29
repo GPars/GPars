@@ -20,6 +20,7 @@ final AbstractPooledActor actor = group.actor {
         reply 'Received your kind offer. Now processing it and comparing with others.'  //sent to all senders
         def winnerOffer = [offerA, offerB, offerC].min {it.price}
         winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
+        ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the losers only
     }
 }
 actor.start()
