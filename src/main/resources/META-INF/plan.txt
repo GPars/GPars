@@ -22,6 +22,7 @@ DataFlow concurrency, refactored actors and actor groups, sendAndWait(), AsyncEn
     //Planned for the next release
     //todo toString() for dataflow variable and stream - test
     //todo samples on typical concurrency issues
+    //todo resolve the generics update
 
 
     //Backlog
@@ -39,7 +40,6 @@ DataFlow concurrency, refactored actors and actor groups, sendAndWait(), AsyncEn
 
     //todo clean issues and todos
     //todo add samples
-    //todo dining philosophers implementation
 
     //todo use Gradle
     //todo automate code sample download
