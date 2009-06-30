@@ -128,4 +128,24 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         Thread.sleep 1000
         assert flag
     }
+
+    public void testInterruptionFlag() {
+        volatile boolean flag = true
+        CountDownLatch latch = new CountDownLatch(1)
+
+        final Actor actor = PooledActors.actor {
+            latch.await()
+            stop()
+        }
+        actor.start()
+
+        def message = 1
+        message.metaClass.onDeliveryError = {->
+            flag = Thread.currentThread().isInterrupted()
+        }
+        actor << message
+        latch.countDown()
+        Thread.sleep 1000
+        assertFalse flag
+    }
 }

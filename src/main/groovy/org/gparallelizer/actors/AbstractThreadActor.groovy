@@ -98,7 +98,7 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
     /**
      * Sets the actorThread to null and clears the interrupted flag on the current flag.
      */
-    protected final void clearActorThreadAfterStart() {
+    protected final void clearActorThread() {
         this.actorThread = null
         final Thread thread = Thread.currentThread()
         thread.interrupted()
@@ -173,7 +173,7 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
                     } catch (Throwable ex) {ex.printStackTrace(System.err)} //invoked when the onException handler threw an exception
                 } finally {
                     releaseJoinedThreads()
-                    clearActorThreadAfterStart()
+                    clearActorThread()
                 }
                 ReplyRegistry.deregisterCurrentActorWithThread()
             }

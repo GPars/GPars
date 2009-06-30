@@ -110,6 +110,7 @@ final class ActorAction implements Runnable {
 
     private def handleTermination() {
         this.actor.indicateStop()
+        Thread.currentThread().interrupted()
         try {
             final List queuedMessages = actor.sweepQueue()
             if (actor.respondsTo('afterStop')) actor.afterStop(queuedMessages)
