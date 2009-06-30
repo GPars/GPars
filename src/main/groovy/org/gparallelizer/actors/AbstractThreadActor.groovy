@@ -165,7 +165,8 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
                 localStarted.set(false)
 
                 try {
-                    if (this.respondsTo('afterStop')) this.afterStop(sweepQueue())
+                    final List queuedMessages = sweepQueue()
+                    if (this.respondsTo('afterStop')) this.afterStop(queuedMessages)
                 } catch (Throwable e) {
                     try {
                         reportError(delegate, e)

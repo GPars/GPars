@@ -109,4 +109,23 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         assertFalse flag1
         assert flag2
     }
+
+    public void testMessagesWithoutAfterStop() {
+        volatile boolean flag = false
+        CountDownLatch latch = new CountDownLatch(1)
+
+        final Actor actor = PooledActors.actor {
+            latch.await()
+        }
+        actor.start()
+
+        def message = 1
+        message.metaClass.onDeliveryError = {->
+            flag = true
+        }
+        actor << message
+        latch.countDown()
+        Thread.sleep 1000
+        assert flag
+    }
 }

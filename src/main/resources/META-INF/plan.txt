@@ -20,9 +20,9 @@
 DataFlow concurrency, refactored actors and actor groups, sendAndWait(), AsyncEnhancer, Fork/Join pool
 
     //Planned for the next release
-    //todo toString() for dataflow variable and stream - test
     //todo samples on typical concurrency issues
     //todo resolve the generics update
+    //todo test onDeliveryError() options - reply, reference to the target actor
 
 
     //Backlog

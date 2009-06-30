@@ -111,7 +111,8 @@ final class ActorAction implements Runnable {
     private def handleTermination() {
         this.actor.indicateStop()
         try {
-            if (actor.respondsTo('afterStop')) actor.afterStop(actor.sweepQueue())
+            final List queuedMessages = actor.sweepQueue()
+            if (actor.respondsTo('afterStop')) actor.afterStop(queuedMessages)
         } finally {
             actor.releaseJoinedThreads()
         }

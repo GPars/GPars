@@ -1,6 +1,10 @@
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.PooledActors
 
+/**
+ * Shows actor solution to The Dining Philosophers problem
+ */
+
 PooledActors.defaultPooledActorGroup.resize 5
 
 final class Philosopher extends AbstractPooledActor {

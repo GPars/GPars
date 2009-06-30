@@ -77,4 +77,25 @@ public class DataFlowStreamTest extends GroovyTestCase {
         }
     }
 
+    public void testToString() {
+        final DataFlowStream<Integer> stream = new DataFlowStream<Integer>()
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+        stream << 10
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=10)])', stream.toString()
+        stream << 20
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=10), DataFlowVariable(value=20)])', stream.toString()
+        stream.val
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=20)])', stream.toString()
+        stream.val
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+        final DataFlowVariable variable = new DataFlowVariable()
+        stream << variable
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=null)])', stream.toString()
+        variable << '30'
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
+        stream.val
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+    }
 }

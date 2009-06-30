@@ -81,4 +81,12 @@ public class DataFlowVariableTest extends GroovyTestCase {
         latch.await()
         assertEquals 10, result
     }
+
+    public void testToString() {
+        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
+        assertEquals 'DataFlowVariable(value=null)', variable.toString()
+        variable << 10
+        assertEquals 'DataFlowVariable(value=10)', variable.toString()
+        assertEquals 'DataFlowVariable(value=10)', variable.toString()
+    }
 }
