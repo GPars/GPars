@@ -1,27 +1,6 @@
     //Document before next release
-    //todo class and instance async enhancer - wiki, document exception differences
-    //todo update wiki samples - use join(), group constructor parameters, imports, actor class names
-
-    //todo use @Delegate from group to pool
-    //todo unify actor group classes - document pool for thread-bound, shutdown and FJPool flag
-    //todo reconsider removing the daemon flag from groups since FJPool ignores the flag - do checks in Group constructors
-    //todo document default daemon flag for thread-bound actors
-
-    //todo document pool resizing
-    //todo test the onDeliveryError handler
-    //todo Ability to suspend actor and message enhancements for replies, which has impact on message delivery speed
-    //todo document the gparallelizer.useFJPool property and the new pool flag
-    //todo document DefaultThreadActor and AbstractThreadActor rename
-    //todo FJPool only allows daemon threads - javadoc, wiki
-    //todo reconsider the option to select pool type
-    //todo decument the possibility to run actors without the jsr-166y jar file
-    //todo rename AbstractActor to ThreadActor
-
-DataFlow concurrency, refactored actors and actor groups, sendAndWait(), AsyncEnhancer, Fork/Join pool
 
     //Planned for the next release
-    //todo resolve the generics update
-
 
     //Backlog
     //todo look into MINA
