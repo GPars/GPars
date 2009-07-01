@@ -1,20 +1,6 @@
     //Document before next release
 
     //Planned for the next release
-
-    //Backlog
-    //todo look into MINA
-    //todo test with java.nio
-    //todo onTimeout handler as a react parameter - pass TIMEOUT into the react handler
-    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
-    //todo consider simplified fast actors
-    //todo consider extensibility for actors - custom schedulers
-    //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
-    //todo consider using builder for message handling
-    //todo out-of-order message processing
-    //todo optimize AsyncUtil implementation to split collections among available threads
-    //todo send returning Future for actor reply
-
     //todo clean issues and todos
     //todo add samples
     //todo samples on typical concurrency issues
@@ -26,6 +12,20 @@
     //todo maven
     //todo put into maven repo
     //todo add transitive mvn dependencies
+
+    //todo look into MINA
+    //todo test with java.nio
+    //todo onTimeout handler as a react parameter - pass TIMEOUT into the react handler
+    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
+
+    //Backlog
+    //todo consider simplified fast actors
+    //todo consider extensibility for actors - custom schedulers
+    //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
+    //todo consider using builder for message handling
+    //todo out-of-order message processing
+    //todo optimize AsyncUtil implementation to split collections among available threads
+    //todo send returning Future for actor reply
 
     //todo consider the asynchronous metaclass
     //todo use AST transformation to turn actors methods into async processing
