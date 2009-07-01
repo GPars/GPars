@@ -57,4 +57,8 @@ public final class DataFlowVariable<T> {
     public void leftShift(final DataFlowVariable<T> ref) throws InterruptedException {
         bind(ref.getVal());
     }
+
+    @Override public String toString() {
+        return "DataFlowVariable(value=" + value.get() + ')';
+    }
 }

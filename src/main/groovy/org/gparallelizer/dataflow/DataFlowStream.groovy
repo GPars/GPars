@@ -12,6 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue
  * Date: Jun 5, 2009
  */
 public final class DataFlowStream<T> {
+
     /**
      * Stores the DataFlowVariables in the buffer.
      */
@@ -64,5 +65,9 @@ public final class DataFlowStream<T> {
                 hasNext: {iterator.hasNext()},
                 next: {(iterator.next().val)}
         ] as Iterator
+    }
+
+    @Override public String toString() {
+        return "DataFlowStream(queue=${new ArrayList(queue).toString()})" ;
     }
 }
