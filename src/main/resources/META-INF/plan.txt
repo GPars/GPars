@@ -13,6 +13,7 @@
     //todo put into maven repo
     //todo add transitive mvn dependencies
 
+    //todo look into Agents
     //todo look into MINA
     //todo test with java.nio
     //todo onTimeout handler as a react parameter - pass TIMEOUT into the react handler
