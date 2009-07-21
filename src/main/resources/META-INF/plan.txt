@@ -22,7 +22,7 @@
     //Backlog
     //todo consider simplified fast actors
     //todo consider extensibility for actors - custom schedulers
-    //todo remove FJPool, ResizableFJPool, ActorBasedDataFlowVariable and ActorBarrier if not needed
+    //todo remove FJPool, ResizableFJPool and ActorBarrier if not needed
     //todo consider using builder for message handling
     //todo out-of-order message processing
     //todo optimize AsyncUtil implementation to split collections among available threads

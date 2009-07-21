@@ -24,12 +24,11 @@ public class ParallelArrayUtil {
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {
-        return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
-    }
+        return ParallelArray.createFromCopy(collection.toArray(new Object[collection.size()]), pool)
+
 //todo should be using generics, but groovyc blows on that
-//    private static ParallelArray createPA(Collection collection, ForkJoinExecutor pool) {
-//        return ParallelArray.createFromCopy(collection.toArray(new Object[collection.size()]), pool)
-//    }
+//        return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
+    }
 
     static java.util.Collection createCollection(Object object) {
         def collection = []

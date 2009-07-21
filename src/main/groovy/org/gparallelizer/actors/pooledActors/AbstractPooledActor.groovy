@@ -2,6 +2,7 @@ package org.gparallelizer.actors.pooledActors
 
 import groovy.time.Duration
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -13,10 +14,8 @@ import org.gparallelizer.actors.pooledActors.ActorAction
 import org.gparallelizer.actors.pooledActors.MessageHolder
 import org.gparallelizer.actors.pooledActors.PooledActor
 import org.gparallelizer.actors.pooledActors.PooledActors
-import org.gparallelizer.actors.util.ActorBarrier
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
-import java.util.concurrent.CountDownLatch
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),

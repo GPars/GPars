@@ -1,6 +1,7 @@
-package org.gparallelizer.dataflow
+package org.gparallelizer.dataflow;
 
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.Iterator;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Represents a thread-safe data flow stream. Values or DataFlowVariables are added using the '<<' operator
@@ -16,43 +17,43 @@ public final class DataFlowStream<T> {
     /**
      * Stores the DataFlowVariables in the buffer.
      */
-    private LinkedBlockingQueue<DataFlowVariable<T>> queue = new LinkedBlockingQueue<DataFlowVariable<T>>()
+    private final LinkedBlockingQueue<DataFlowVariable<T>> queue = new LinkedBlockingQueue<DataFlowVariable<T>>();
 
     /**
      * Adds a DataFlowVariable to the buffer.
      */
     public void leftShift(DataFlowVariable<T> ref) {
-        queue.offer(ref)
+        queue.offer(ref);
     }
 
     /**
      * Adds a DataFlowVariable representing the passed in value to the buffer.
      */
     public void leftShift(T value) {
-        final def ref = new DataFlowVariable<T>()
-        ref << value
-        queue.offer(ref)
+        final DataFlowVariable<T> ref = new DataFlowVariable<T>();
+        ref.leftShift(value);
+        queue.offer(ref);
     }
 
     /**
      * Retrieves the value at the head of the buffer. Blocks until a value is available.
      */
-    public T getVal() {
-        return (queue.take()).val
+    public T getVal() throws InterruptedException {
+        return (queue.take()).getVal();
     }
 
     /**
      * Retrieves the DataFlowVariable at the head of the buffer. Blocks until the buffer is not empty.
      */
-    public DataFlowVariable<T> take() {
-        queue.take()
+    public DataFlowVariable<T> take() throws InterruptedException {
+        return queue.take();
     }
 
     /**
      * Returns the current size of the buffer
      */
     public int length() {
-        queue.size()
+        return queue.size();
     }
 
     /**
@@ -60,11 +61,26 @@ public final class DataFlowStream<T> {
      * not the DataFlowVariables.
      */
     public Iterator iterator() {
-        final def iterator = queue.iterator()
-        [
-                hasNext: {iterator.hasNext()},
-                next: {(iterator.next().val)}
-        ] as Iterator
+        final Iterator<DataFlowVariable<T>> iterator = queue.iterator();
+        return new Iterator<T>() {
+
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            public T next() {
+                try {
+                    return iterator.next().getVal();
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException("The thread has been interrupted, which prevented the iterator from retrieving the next element.");
+                }
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("Remove not available");
+            }
+        };
+
     }
 
     @Override public String toString() {
