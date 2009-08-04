@@ -62,9 +62,6 @@ public class SafeVariable<T> extends DynamicDispatchActor {
         start()
     }
 
-    //todo document
-    //todo shutdown
-    //todo various copy strategies
     /**
      * Accepts and invokes the closure
      */
