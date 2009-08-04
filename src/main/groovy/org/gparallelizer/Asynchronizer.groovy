@@ -54,6 +54,7 @@ class Asynchronizer {
     /**
      * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
      * and runs the supplied closure.
+     * It is an identical alternative for withAsynchronizer() with a shorter name.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
      * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>AsyncInvokerUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
@@ -63,7 +64,81 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     * Asynchronizer.doAsync {ExecutorService service ->
+     *     [1, 2, 3, 4, 5].eachAsync{Number number -> result.add(number * 10)}
+     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * }
+     * </pre>
+     * @param cl The block of code to invoke with the DSL enabled
+     */
+    public static doAsync(Closure cl) {
+        return withAsynchronizer(cl)
+    }
+
+  /**
+   * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
+   * and runs the supplied closure.
+   * It is an identical alternative for withAsynchronizer() with a shorter name.
+   * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
+   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>AsyncInvokerUtil</i>
+   * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
+   * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
+   * for processing in the pool.
+   * Calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * operation on each image in the <i>images</i> collection in parallel.
+   * <pre>
+   * def result = new ConcurrentSkipListSet()
+   * Asynchronizer.doAsync(5) {ExecutorService service ->
+   *     [1, 2, 3, 4, 5].eachAsync{Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   * }
+   * </pre>
+   * @param numberOfThreads Number of threads in the newly created thread pool
+   * @param cl The block of code to invoke with the DSL enabled
+   */
+    public static doAsync(int numberOfThreads, Closure cl) {
+        return withAsynchronizer(numberOfThreads, cl)
+    }
+
+    /**
+     * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
+     * and runs the supplied closure.
+     * It is an identical alternative for withAsynchronizer() with a shorter name.
+     * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
+     * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>AsyncInvokerUtil</i>
+     * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
+     * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
+     * for processing in the pool.
+     * Calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+     * operation on each image in the <i>images</i> collection in parallel.
+     * <pre>
+     * def result = new ConcurrentSkipListSet()
+     * Asynchronizer.doAsync(5) {ExecutorService service ->
+     *     [1, 2, 3, 4, 5].eachAsync{Number number -> result.add(number * 10)}
+     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * }
+     * </pre>
+     * @param numberOfThreads Number of threads in the newly created thread pool
+     * @param threadFactory Factory for threads in the pool
+     * @param cl The block of code to invoke with the DSL enabled
+     */
+      public static doAsync(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
+          return withAsynchronizer(numberOfThreads, threadFactory, cl)
+      }
+
+    /**
+     * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
+     * and runs the supplied closure.
+     * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
+     * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>AsyncInvokerUtil</i>
+     * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
+     * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
+     * for processing in the pool.
+     * Calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+     * operation on each image in the <i>images</i> collection in parallel.
+     * <pre>
+     * def result = new ConcurrentSkipListSet()
+     * Asynchronizer.withAsynchronizer {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachAsync{Number number -> result.add(number * 10)}
      *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      * }

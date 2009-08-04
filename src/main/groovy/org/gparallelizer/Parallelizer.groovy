@@ -60,6 +60,7 @@ public class Parallelizer {
     /**
      * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
+     * It is an identical alternative for withParallelizer() with a shorter name.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
      * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
      * category class.
@@ -67,7 +68,78 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
+     * Parallelizer.doParallel {ForkJoinPool pool ->
+     *     def result = Collections.synchronizedSet(new HashSet())
+     *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * }
+     * </pre>
+     * @param cl The block of code to invoke with the DSL enabled
+     */
+    public static doParallel(Closure cl) {
+        return withParallelizer(cl)
+    }
+
+  /**
+   * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
+   * and runs the supplied closure.
+   * It is an identical alternative for withParallelizer() with a shorter name.
+   * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
+   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * category class.
+   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * operation on each image in the <i>images</i> collection in parallel.
+   * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
+   * <pre>
+   * Parallelizer.doParallel(5) {ForkJoinPool pool ->
+   *     def result = Collections.synchronizedSet(new HashSet())
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   * }
+   * </pre>
+   * @param numberOfThreads Number of threads in the newly created thread pool
+   * @param cl The block of code to invoke with the DSL enabled
+   */
+    public static doParallel(int numberOfThreads, Closure cl) {
+        return withParallelizer(numberOfThreads, cl)
+    }
+
+  /**
+   * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
+   * and runs the supplied closure.
+   * It is an identical alternative for withParallelizer() with a shorter name.
+   * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
+   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * category class.
+   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * operation on each image in the <i>images</i> collection in parallel.
+   * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
+   * <pre>
+   * Parallelizer.doParallel(5) {ForkJoinPool pool ->
+   *     def result = Collections.synchronizedSet(new HashSet())
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   * }
+   * </pre>
+   * @param numberOfThreads Number of threads in the newly created thread pool
+   * @param handler Handler for uncaught exceptions raised in code performed by the pooled threads
+   * @param cl The block of code to invoke with the DSL enabled
+   */
+    public static doParallel(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
+        return withParallelizer(numberOfThreads, handler, cl)
+    }
+    
+    /**
+     * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
+     * and runs the supplied closure.
+     * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
+     * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+     * category class.
+     * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+     * operation on each image in the <i>images</i> collection in parallel.
+     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
+     * <pre>
+     * Parallelizer.withParallelizer {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
      *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
