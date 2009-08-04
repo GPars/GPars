@@ -1,3 +1,5 @@
+package org.gparallelizer.samples.actors.safevariable
+
 import org.gparallelizer.actors.pooledActors.SafeVariable
 
 class PrinterService {

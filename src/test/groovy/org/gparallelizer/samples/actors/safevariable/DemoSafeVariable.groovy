@@ -1,3 +1,5 @@
+package org.gparallelizer.samples.actors.safevariable
+
 import org.gparallelizer.actors.pooledActors.SafeVariable
 
 def jugMembers = new SafeVariable<List>(['Me'])  //add Me
