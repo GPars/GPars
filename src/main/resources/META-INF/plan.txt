@@ -1,6 +1,11 @@
     //Document before next release
+    //todo fix the nested actor creation issue - create test + update DemoSwing
+    //todo update DataFlowStreamTest
 
     //Planned for the next release
+    //todo test org.gparallelizer.dataflow.DataFlowVariable and org.gparallelizer.dataflow.DataFlowStream with null values
+    //todo look into Agents
+    
     //todo clean issues and todos
     //todo add samples
     //todo samples on typical concurrency issues
@@ -13,7 +18,6 @@
     //todo put into maven repo
     //todo add transitive mvn dependencies
 
-    //todo look into Agents
     //todo look into MINA
     //todo test with java.nio
     //todo onTimeout handler as a react parameter - pass TIMEOUT into the react handler

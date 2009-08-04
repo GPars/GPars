@@ -1,5 +1,6 @@
 package org.gparallelizer.dataflow;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -84,6 +85,6 @@ public final class DataFlowStream<T> {
     }
 
     @Override public String toString() {
-        return "DataFlowStream(queue=${new ArrayList(queue).toString()})" ;
+        return "DataFlowStream(queue=" + new ArrayList<DataFlowVariable<T>>(queue).toString() + ")" ;
     }
 }

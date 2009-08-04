@@ -39,6 +39,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
      */
     public final Actor defaultActor(Closure handler = {throw new UnsupportedOperationException()}) {
         final Actor actor = [act: handler] as DefaultThreadActor
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
         handler.delegate = actor
         actor.actorGroup = this
         return actor
@@ -51,7 +52,9 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     public final Actor defaultOneShotActor(Closure handler = {throw new UnsupportedOperationException()}) {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
         final DefaultThreadActor actor = [act: enhancedHandler] as DefaultThreadActor
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
         handler.delegate = actor
+        enhancedHandler.resolveStrategy=Closure.DELEGATE_FIRST
         enhancedHandler.delegate = actor
         actor.actorGroup = this
         return actor
@@ -62,6 +65,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
      */
     public final Actor synchronousActor(Closure handler = {throw new UnsupportedOperationException()}) {
         final Actor actor = [act: handler] as SynchronousThreadActor
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
         handler.delegate = actor
         actor.actorGroup = this
         return actor
@@ -74,7 +78,9 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     public final Actor synchronousOneShotActor(Closure handler = {throw new UnsupportedOperationException()}) {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
         final Actor actor = [act: enhancedHandler] as SynchronousThreadActor
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
         handler.delegate = actor
+        enhancedHandler.resolveStrategy=Closure.DELEGATE_FIRST
         enhancedHandler.delegate = actor
         actor.actorGroup = this
         return actor
@@ -101,6 +107,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     public final Actor boundedOneShotActor(Closure handler = {throw new UnsupportedOperationException()}) {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
         Actor actor = new InlinedBoundedActor(this, enhancedHandler)
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
         handler.delegate = actor
         actor.actorGroup = this
         return actor
@@ -114,6 +121,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
         Actor actor = new InlinedBoundedActor(capacity, enhancedHandler)
         handler.delegate = actor
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
         actor.actorGroup = this
         return actor
     }
@@ -138,12 +146,14 @@ final class InlinedBoundedActor extends BoundedThreadActor {
         this.handler = handler
         this.actorGroup = actorGroup
         handler.delegate = this
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
     }
 
     def InlinedBoundedActor(final int capacity, Closure handler) {
         super(capacity);
         this.handler = handler
         handler.delegate = this
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
     }
 
     @Override

@@ -1,8 +1,7 @@
 package org.gparallelizer.enhancer;
 
 import groovy.lang.MetaClass;
-
-import java.util.concurrent.CountDownLatch;
+import org.gparallelizer.dataflow.DataFlowVariable;
 
 /**
  * A message used to invoke intercepted constructors or methods.
@@ -12,11 +11,10 @@ import java.util.concurrent.CountDownLatch;
  * @author Jan Kotek, Vaclav Pech
  * Date: Apr 28, 2009
  */
+@SuppressWarnings({"MethodReturnOfConcreteClass", "InstanceVariableOfConcreteClass"})
 class AsyncMessage {
     private final MetaClass objectMetaClass;
-    private volatile Object returnValue=null;
-
-    private final CountDownLatch latch = new CountDownLatch(1);
+    private final DataFlowVariable<Object> returnValue=new DataFlowVariable<Object>();
 
     protected static final Object NULL = new Object();
 
@@ -24,22 +22,13 @@ class AsyncMessage {
         this.objectMetaClass = objectMetaClass;
     }
 
-    public final void await() throws InterruptedException {
-        latch.await();
+    final MetaClass getObjectMetaClass() { return objectMetaClass; }
+
+    final Object getReturnValue() throws InterruptedException { return returnValue.getVal(); }
+
+    final void setReturnValue(final Object returnValue) {
+        this.returnValue.bind(returnValue);
     }
 
-    public MetaClass getObjectMetaClass() {
-        return objectMetaClass;
-    }
-
-    public final Object getReturnValue() {
-        return returnValue;
-    }
-
-    public final void setReturnValue(final Object returnValue) {
-        if (this.returnValue != null)
-            throw new IllegalStateException("Cannot set the return value on a amessage twice.");
-        this.returnValue = returnValue;
-        latch.countDown();
-    }
+    final DataFlowVariable getResultHolder() { return returnValue; }
 }

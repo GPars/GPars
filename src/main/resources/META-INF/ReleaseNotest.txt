@@ -1,5 +1,10 @@
 GParallelizer
 
+0.8.1
+Migrated DataFlowStream to Java
+Fixed problem with nested actor creation closures
+Added SafeVariable
+
 0.8
 Added DataFlow concurrency support
 Added sendAndWait() methods to actors to block the caller until a reply arrives

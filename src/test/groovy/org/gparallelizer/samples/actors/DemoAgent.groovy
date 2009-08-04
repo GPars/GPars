@@ -6,7 +6,6 @@ final Closure cl = {
 }
 
 final SafeVariable<List> agent = new SafeVariable<List>([1], cl)
-agent.start()
 
 agent << {it << 2}
 agent << {println it}
@@ -23,7 +22,7 @@ agent.stop()
 agent.join()
 
 
-def name = new SafeVariable<String>().start()
+def name = new SafeVariable<String>()
 
 name << {updateValue 'Joe' }
 name << {updateValue(it + ' and Dave')}

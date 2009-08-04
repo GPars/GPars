@@ -11,7 +11,7 @@ class PrinterService {
     }
 }
 
-def printer = new SafeVariable<PrinterService>(new PrinterService()).start()
+def printer = new SafeVariable<PrinterService>(new PrinterService())
 
 final Thread thread1 = Thread.start {
     for (num in (1..3)) {

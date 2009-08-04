@@ -280,6 +280,8 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(Closure handler) throws InterruptedException {
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
+        handler.delegate = this              
         int maxNumberOfParameters = handler.maximumNumberOfParameters
         if (maxNumberOfParameters == 0) {
             ActorMessage message = doReceive {messageQueue.take()}
@@ -313,6 +315,8 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
+        handler.delegate = this
         int maxNumberOfParameters = handler.maximumNumberOfParameters
         if (maxNumberOfParameters == 0) {
             ActorMessage message = doReceive {messageQueue.poll(timeout, timeUnit)}

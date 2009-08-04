@@ -292,6 +292,8 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
             maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
             this.repeatLoop()
         }
+        code.resolveStrategy=Closure.DELEGATE_FIRST
+        code.delegate = this
 
         synchronized (lock) {
             if (stopFlag.get()) throw TERMINATE

@@ -1,10 +1,10 @@
 package org.gparallelizer.actors.pooledActors
 
-import org.gparallelizer.actors.pooledActors.PooledActors
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import org.gparallelizer.actors.pooledActors.PooledActors
+import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 
 /**
  *

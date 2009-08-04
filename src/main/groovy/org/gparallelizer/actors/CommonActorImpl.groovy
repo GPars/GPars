@@ -149,12 +149,12 @@ public abstract class CommonActorImpl implements Actor {
                 //Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
                 def replier = message.payLoad
                 def sender = message.sender
-                replier.getMetaClass().reply = {msg ->
+                replier?.getMetaClass()?.reply = {msg ->
                     if (sender != null) sender.send msg
                     else throw new IllegalArgumentException("Cannot send a reply message ${msg} to a null recipient.")
                 }
 
-                replier.getMetaClass().replyIfExists = {msg ->
+                replier?.getMetaClass()?.replyIfExists = {msg ->
                     try {
                         sender?.send msg
                     } catch (IllegalStateException ignore) { }

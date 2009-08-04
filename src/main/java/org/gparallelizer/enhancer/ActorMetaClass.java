@@ -15,29 +15,28 @@ import org.gparallelizer.actors.Actor;
  */
 public class ActorMetaClass extends DelegatingMetaClass {
 
+    public static void enhanceClass(final Class clazz) {
+        InvokerHelper.metaRegistry.setMetaClass(clazz, new ActorMetaClass(clazz));
+    }
     /**
      * The background actor for processing all incoming method calls
      */
-    private final Actor actor;
-
-    /**
-     * Creates a new instance with an event-driven actor associated
-     * @param clazz The class to intercept
-     */
-    public ActorMetaClass(final Class clazz) {
-        this(clazz, false);
-    }
+    final Actor actor;
 
     /**
      * Creates a new instance with an actor associated
      * @param clazz The class to intercept
-     * @param pooledActor True if an event-driven (pooled) actor should be used, false for a thread-bound actor
      */
-    public ActorMetaClass(final Class clazz, final boolean pooledActor) {
+    public ActorMetaClass(final Class clazz) {
         super(clazz);
-        if (pooledActor) actor = new EnhancerPooledActor();
-        else actor = new EnhancerActor();
+        actor = new EnhancerPooledActor();
         actor.start();
+        //todo DataFlowVariable should re-throw exceptions from the val property
+        //todo DataFlowVariable should be able to hold null values
+        //todo split meta class based on actor type
+        //todo one actor per instance, not class
+        //todo remove constructor enhancement
+        //todo return DataFlowVariable
         //todo hide constructors
         //TODO shutdown of thread-bound actor
         //todo test
@@ -58,7 +57,7 @@ public class ActorMetaClass extends DelegatingMetaClass {
      * @param pooledActor True if an event-driven (pooled) actor should be used, false for a thread-bound actor
      */
     public static void intercept(final Class clazz, final boolean pooledActor) {
-        InvokerHelper.metaRegistry.setMetaClass(clazz, new ActorMetaClass(clazz, pooledActor));
+        InvokerHelper.metaRegistry.setMetaClass(clazz, new ActorMetaClass(clazz));
     }
 
     /**
@@ -115,7 +114,6 @@ public class ActorMetaClass extends DelegatingMetaClass {
     private Object performAsyncMethodCall(final AsyncMessage msg) {
         try {
             actor.send(msg);
-            msg.await();
             final Object value = msg.getReturnValue();
             if (value instanceof Throwable) {
                 throw new RuntimeException((Throwable) value);

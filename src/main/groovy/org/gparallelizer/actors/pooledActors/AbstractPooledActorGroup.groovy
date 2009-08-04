@@ -22,6 +22,7 @@ public abstract class AbstractPooledActorGroup extends AbstractActorGroup {
      */
     public final AbstractPooledActor actor(Closure handler) {
         final AbstractPooledActor actor = [act: handler] as AbstractPooledActor
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
         handler.delegate = actor
         actor.actorGroup = this
         return actor

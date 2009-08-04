@@ -43,7 +43,7 @@ time = time - System.currentTimeMillis();
 println("$NTIMES method invocations without actor $time ms");
 
 //install event driven metaclass
-InvokerHelper.metaRegistry.setMetaClass(Incrementor.class, new ActorMetaClass(Incrementor.class, true))
+InvokerHelper.metaRegistry.setMetaClass(Incrementor.class, new ActorMetaClass(Incrementor.class))
 
 
 time = System.currentTimeMillis();
@@ -57,7 +57,7 @@ time = time - System.currentTimeMillis();
 println("$NTIMES method invocations with actor $time ms");
 
 
-InvokerHelper.metaRegistry.setMetaClass(SynchronizedIncrementor.class, new ActorMetaClass(SynchronizedIncrementor.class, true))
+InvokerHelper.metaRegistry.setMetaClass(SynchronizedIncrementor.class, new ActorMetaClass(SynchronizedIncrementor.class))
 time = System.currentTimeMillis();
 SynchronizedIncrementor i2 = new SynchronizedIncrementor();
 for(int i=0;i<NTIMES;i++){
