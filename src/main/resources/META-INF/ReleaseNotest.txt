@@ -1,9 +1,10 @@
 GParallelizer
 
 0.8.1
+Added SafeVariable
 Migrated DataFlowStream to Java
 Fixed problem with nested actor creation closures
-Added SafeVariable
+Added short-hand methods for concurrent collection processing to Asynchronizer and Parallelizer
 
 0.8
 Added DataFlow concurrency support

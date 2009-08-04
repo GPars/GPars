@@ -1,11 +1,11 @@
     //Document before next release
     //todo fix the nested actor creation issue - create test + update DemoSwing
     //todo update DataFlowStreamTest
+    //todo look into Agents
+    //todo test org.gparallelizer.dataflow.DataFlowVariable and org.gparallelizer.dataflow.DataFlowStream with null values
 
     //Planned for the next release
-    //todo test org.gparallelizer.dataflow.DataFlowVariable and org.gparallelizer.dataflow.DataFlowStream with null values
-    //todo look into Agents
-    
+
     //todo clean issues and todos
     //todo add samples
     //todo samples on typical concurrency issues
