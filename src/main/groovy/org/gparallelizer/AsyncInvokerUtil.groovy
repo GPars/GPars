@@ -30,8 +30,8 @@ public class AsyncInvokerUtil {
     /**
      * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
      */
-    public static Future callAsync(Closure cl, Object ... args) {
-        callAsync {cl(args)}
+    public static Future callAsync(final Closure cl, final Object ... args) {
+        callAsync {->cl(*args)}
     }
 
     /**
@@ -48,7 +48,7 @@ public class AsyncInvokerUtil {
      * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
      */
     public static Closure async(Closure cl) {
-        return {Object ... args -> callAsync(cl, args)}
+        return {Object ... args -> callAsync(cl, *args)}
     }
 
     /**
@@ -126,7 +126,7 @@ public class AsyncInvokerUtil {
 
         Closure code = async({Object ... args ->
             try {
-                cl(args)
+                cl(*args)
             } catch (Throwable e) {
                 exceptions.add(e)
             } finally {

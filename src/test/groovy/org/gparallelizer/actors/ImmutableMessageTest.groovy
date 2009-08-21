@@ -25,7 +25,6 @@ public class ImmutableMessageTest extends GroovyTestCase {
 
         latch.await()
         assertEquals 'Value', result
-
     }
 }
 
