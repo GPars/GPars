@@ -1,0 +1,10 @@
+package org.gparallelizer
+
+enhanceClass(classname:"java.lang.Object") {
+   method name:"eachAsync", type:"void", params:[closure:'groovy.lang.Closure']
+   method name:"collectAsync", type:"Object", params:[closure:'groovy.lang.Closure']
+   method name:"findAsync", type:"Object", params:[closure:'groovy.lang.Closure']
+   method name:"findAllAsync", type:"Object", params:[closure:'groovy.lang.Closure']
+   method name:"anyAsync", type:"boolean", params:[closure:'groovy.lang.Closure']
+   method name:"allAsync", type:"boolean", params:[closure:'groovy.lang.Closure']
+}

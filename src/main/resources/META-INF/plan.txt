@@ -9,6 +9,7 @@
     //todo clean issues and todos
     //todo add samples
     //todo samples on typical concurrency issues
+    //todo add custom DSL definitions
 
     //todo use Gradle
     //todo automate code sample download
