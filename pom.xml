@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>[1.6,)</version>
+            <version>1.6.4</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

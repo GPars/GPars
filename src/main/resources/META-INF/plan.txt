@@ -1,15 +1,13 @@
     //Document before next release
-    //todo fix the nested actor creation issue - create test + update DemoSwing
-    //todo update DataFlowStreamTest
-    //todo look into Agents
-    //todo test org.gparallelizer.dataflow.DataFlowVariable and org.gparallelizer.dataflow.DataFlowStream with null values
+    //todo updated to groovy 1.6.4
+    //todo add custom DSL definitions
 
     //Planned for the next release
 
     //todo clean issues and todos
     //todo add samples
     //todo samples on typical concurrency issues
-    //todo add custom DSL definitions
+    //todo SafeVariables should give readers higher priority - do them synchronously
 
     //todo use Gradle
     //todo automate code sample download
