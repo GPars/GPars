@@ -11,12 +11,12 @@ public class ImmutableMessageTest extends GroovyTestCase {
 
         final Actor bouncer = Actors.oneShotActor {
             receive {
-                it.reply new TestMessage(it.value)
+                it.reply new TestMessage(value : it.value)
             }
         }.start()
 
         Actors.oneShotActor {
-            bouncer << new TestMessage('Value')
+            bouncer << new TestMessage(value : 'Value')
             receive {
                 result = it.value
                 latch.countDown()

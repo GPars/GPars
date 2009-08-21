@@ -10,12 +10,12 @@ public class ImmutableMessageTest extends GroovyTestCase {
 
         final AbstractPooledActor bouncer = PooledActors.actor {
             react {
-                it.reply new TestMessage(it.value)
+                it.reply new TestMessage(value : it.value)
             }
         }.start()
 
         PooledActors.actor {
-            bouncer << new TestMessage('Value')
+            bouncer << new TestMessage(value : 'Value')
             react {
                 result = it.value
                 latch.countDown()

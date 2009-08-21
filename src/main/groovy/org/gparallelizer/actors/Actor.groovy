@@ -50,7 +50,7 @@ public interface Actor {
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      */
-    Actor send(Object message) throws InterruptedException;
+    Actor send(Object message)
 
     /**
      * Sends a message and waits for a reply.

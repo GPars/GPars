@@ -370,7 +370,7 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * @return The same Actor instance
      * @throws InterruptedException If the thread is interrupted during the wait.
      */
-    public final Actor send(Object message) throws InterruptedException {
+    public final Actor send(Object message) {
         checkState()
         messageQueue.put(ActorMessage.build(message))
         return this

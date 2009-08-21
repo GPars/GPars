@@ -52,11 +52,7 @@ public class NonBlockingActorMetaClass extends ActorMetaClass {
     }
 
     private Object performAsyncMethodCallWithoutWait(final AsyncMessage msg) {
-        try {
-            actor.send(msg);
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.//todo handle
-        }
+        actor.send(msg);
         return msg.getResultHolder();
     }
 }

@@ -6,5 +6,5 @@ final @Immutable class TestMessage {
 
 final class Foo {}
 
-if (new Foo() == new TestMessage('Value')) println 'Equal'
-if (new TestMessage('Value') == new Foo()) println 'Equal'
+if (new Foo() == new TestMessage(value : 'Value')) println 'Equal'
+if (new TestMessage(value : 'Value') == new Foo()) println 'Equal'
