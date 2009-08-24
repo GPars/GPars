@@ -1,14 +1,13 @@
     //Document before next release
     //todo updated to groovy 1.6.4
     //todo add custom DSL definitions
+    //todo SafeVariables should give readers higher priority - do them synchronously
+    todo enable wait for SafeVariable
 
     //Planned for the next release
 
     //todo clean issues and todos
-    //todo add samples
     //todo samples on typical concurrency issues
-    //todo SafeVariables should give readers higher priority - do them synchronously
-    todo enable wait for SafeVariable
 
     //todo use Gradle
     //todo automate code sample download

@@ -5,6 +5,7 @@ import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.dataflow.DataFlowVariable
 import org.gparallelizer.dataflow.DataFlowStream
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.CountDownLatch
 
 public class SafeVariableTest extends GroovyTestCase {
     public void testList() {
@@ -156,12 +157,25 @@ public class SafeVariableTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         counter << {
             updateValue it + 1
-            Thread.sleep 2000
+            Thread.sleep 1000
             updateValue it + 1
             flag.set true
         }
         assertFalse flag.get()
         counter.await()
         assert flag.get()
+    }
+
+    public void testInstantVal() {
+        final SafeVariable counter = new SafeVariable<Long>(0L)
+
+        counter << {
+            Thread.sleep 1000
+            updateValue it + 1
+        }
+        assertEquals 0, counter.instantVal
+        counter.await()
+        assertEquals 1, counter.instantVal
+        assertEquals 1, counter.val
     }
 }

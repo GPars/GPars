@@ -3,6 +3,7 @@ GParallelizer
 0.8.2
 Updated for groovy 1.6.4
 Added the await() method to the SafeVariable class
+Added the instantVal property to the SafeVariable class to prioritize read requests
 
 0.8.1
 Added SafeVariable
