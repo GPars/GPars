@@ -98,4 +98,8 @@ public class SafeVariable<T> extends DynamicDispatchActor {
             callback.call(this.getVal())
         }.start()
     }
+
+    void await() {
+        this.sendAndWait {}
+    }
 }

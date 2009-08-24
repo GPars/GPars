@@ -4,6 +4,7 @@ import org.gparallelizer.actors.pooledActors.SafeVariable
 import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.dataflow.DataFlowVariable
 import org.gparallelizer.dataflow.DataFlowStream
+import java.util.concurrent.atomic.AtomicBoolean
 
 public class SafeVariableTest extends GroovyTestCase {
     public void testList() {
@@ -74,7 +75,7 @@ public class SafeVariableTest extends GroovyTestCase {
 
         def result = new DataFlowStream()
         PooledActors.actor {
-            counter << {reply 'Explicit reply';10}
+            counter << {reply 'Explicit reply'; 10}
             react {a, b ->
                 result << a
                 result << b
@@ -147,5 +148,20 @@ public class SafeVariableTest extends GroovyTestCase {
         }.start()
         assertNull result.val
 
+    }
+
+    public void testAwait() {
+        final SafeVariable counter = new SafeVariable<Long>(0L)
+
+        final AtomicBoolean flag = new AtomicBoolean(false)
+        counter << {
+            updateValue it + 1
+            Thread.sleep 2000
+            updateValue it + 1
+            flag.set true
+        }
+        assertFalse flag.get()
+        counter.await()
+        assert flag.get()
     }
 }

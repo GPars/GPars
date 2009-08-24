@@ -1,5 +1,9 @@
 GParallelizer
 
+0.8.2
+Updated for groovy 1.6.4
+Added the await() method to the SafeVariable class
+
 0.8.1
 Added SafeVariable
 Migrated DataFlowStream to Java

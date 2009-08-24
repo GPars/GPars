@@ -8,6 +8,7 @@
     //todo add samples
     //todo samples on typical concurrency issues
     //todo SafeVariables should give readers higher priority - do them synchronously
+    todo enable wait for SafeVariable
 
     //todo use Gradle
     //todo automate code sample download
