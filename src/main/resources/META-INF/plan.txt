@@ -6,6 +6,8 @@
 
     //Planned for the next release
 
+    todo Think of an example on SafeVariable subclass
+    todo Maybe SafeVariables could be used for ActorMetaClass
     //todo clean issues and todos
     //todo samples on typical concurrency issues
 
