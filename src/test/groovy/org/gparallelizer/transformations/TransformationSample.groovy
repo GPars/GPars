@@ -1,6 +1,6 @@
 package org.gparallelizer.transformations
 
-import org.gparallelizer.actors.transformations.Asynchronous
+import org.gparallelizer.transformations.Asynchronous
 
 class A {
     @Asynchronous public String foo(String value) {

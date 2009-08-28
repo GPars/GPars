@@ -1,6 +1,6 @@
 package org.gparallelizer.issues
 
-final @Immutable class TestMessage {
+final class TestMessage {
     String value
 }
 

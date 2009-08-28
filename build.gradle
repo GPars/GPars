@@ -1,5 +1,5 @@
 archivesBaseName = 'GParallelizer'
-version = '0.8'
+version = '0.8.3'
 
 usePlugin 'groovy'
 
@@ -8,11 +8,11 @@ manifest.mainAttributes(
     'Implementation-Version': version
 )
 
-srcRootName = 'src'
-srcDirNames = []
-testSrcDirNames = []
-groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
-groovyTestSrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly', 'test/groovy', 'test/java']
+//srcRootName = 'src'
+//srcDirNames = []
+//testSrcDirNames = []
+//groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
+groovyTestSrcDirNames = ['main/groovy', 'test/groovy']  //todo remove
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
 //buildTime = new Date()

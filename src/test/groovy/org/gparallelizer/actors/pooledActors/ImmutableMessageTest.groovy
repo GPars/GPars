@@ -28,6 +28,6 @@ public class ImmutableMessageTest extends GroovyTestCase {
     }
 }
 
-final @Immutable class TestMessage {
+final class TestMessage {
     String value
 }

@@ -1,8 +1,7 @@
 package org.gparallelizer.actors.pooledActors
 
-import org.gparallelizer.actors.Actor
-import java.util.concurrent.locks.ReentrantLock
-import java.util.concurrent.locks.ReadWriteLock
+import org.gparallelizer.actors.pooledActors.DynamicDispatchActor
+import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.util.EnhancedRWLock
 
 /**
@@ -31,13 +30,15 @@ import org.gparallelizer.actors.util.EnhancedRWLock
  * @author Vaclav Pech
  * Date: Jul 2, 2009
  */
-public class SafeVariable<T> extends DynamicDispatchActor {
+public class SafeVariable extends DynamicDispatchActor {
 
+    //todo generics were not accepted by Gradle :compile
+    
     private EnhancedRWLock lock = new EnhancedRWLock()
     /**
      * Holds the internal mutable state
      */
-    protected T data
+    protected Object data
     final Closure copy = {it}
 
     /**
@@ -51,7 +52,7 @@ public class SafeVariable<T> extends DynamicDispatchActor {
      * Creates a new SafeVariable around the supplied modifiable object
      * @param data The object to use for storing the variable's internal state     *
      */
-    def SafeVariable(final T data) {
+    def SafeVariable(final Object data) {
         this.data = data
         start()
     }
@@ -61,7 +62,7 @@ public class SafeVariable<T> extends DynamicDispatchActor {
      * @param data The object to use for storing the variable's internal state
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      */
-    def SafeVariable(final T data, final Closure copy) {
+    def SafeVariable(final Object data, final Closure copy) {
         this.data = data
         this.copy = copy
         start()
@@ -80,7 +81,7 @@ public class SafeVariable<T> extends DynamicDispatchActor {
     /**
      * Other messages than closures are accepted as new values for the internal state
      */
-    final void onMessage(T message) {
+    final void onMessage(Object message) {
         lock.withWriteLock {
             updateValue message
         }
@@ -89,14 +90,14 @@ public class SafeVariable<T> extends DynamicDispatchActor {
     /**
      * Allows closures to set the new internal state as a whole
      */
-    final void updateValue(T newValue) { data = newValue }
+    final void updateValue(Object newValue) { data = newValue }
 
     /**
      * A shorthand method for safe message-based retrieval of the internal state.
      * Retrieves the internal state immediately by-passing the queue of tasks waiting to be processed.
      */
-    final public T getInstantVal() {
-        T result = null
+    final public Object getInstantVal() {
+        Object result = null
         lock.withReadLock { result = copy(data) }
         return result
     }
@@ -104,7 +105,7 @@ public class SafeVariable<T> extends DynamicDispatchActor {
     /**
      * A shorthand method for safe message-based retrieval of the internal state.
      */
-    final public T getVal() {
+    final public Object getVal() {
         this.sendAndWait { getInstantVal() }
     }
 
@@ -118,7 +119,8 @@ public class SafeVariable<T> extends DynamicDispatchActor {
         }.start()
     }
 
-    void await() {
+    //todo javadoc
+    final public void await() {
         this.sendAndWait {}
     }
 }
