@@ -23,7 +23,7 @@ public class SafeVariableTest extends GroovyTestCase {
         }
 
         [t1, t2]*.join()
-        assertEquals(['Me', 'James', 'Joe', 'Dave', 'Alice'], jugMembers.val)
+        assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
     }
 
     public void testCounter() {
