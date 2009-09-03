@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentMap
  * Date: Sep 3, 2009
  */
 public class DataFlows {
-//   todo javaodc
+//   todo javadoc
 
     private ConcurrentMap variables = new ConcurrentHashMap()
 
@@ -25,5 +25,7 @@ public class DataFlows {
         variables[name].val
     }
 
-    private def ensureToContainVariable(String name) { return variables.putIfAbsent(name, new DF()) }
+    private ensureToContainVariable(String name) { 
+	    variables.putIfAbsent(name, new DF()) 
+	}
 }
