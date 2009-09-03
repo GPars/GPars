@@ -6,6 +6,10 @@
 
     //Planned for the next release
 
+todo add generics to SafeVariable
+todo add @Immutable back
+todo make @Grab work
+todo include jsr166y.jar
     todo Think of an example on SafeVariable subclass
     todo Maybe SafeVariables could be used for ActorMetaClass
     //todo clean issues and todos
@@ -23,6 +27,24 @@
     //todo test with java.nio
     //todo onTimeout handler as a react parameter - pass TIMEOUT into the react handler
     //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
+
+
+
+@Grab(group='org.gparallelizer', module='GParallelizer', version='0.8.3')
+void playInParallel() {
+    println org.gparallelizer.actors.Actors
+    def actor = org.gparallelizer.actors.Actors.oneShotActor {
+        println 'Actor running'
+    }.start()
+    actor.join()
+
+}
+
+groovy.grape.Grape.grab(group:'org.gparallelizer', module:'GParallelizer', version:'0.8.3')
+println 'AAAAAAAAAAAAAAAAAAAA'
+playInParallel()
+
+    mavenRepo urls: ["http://download.java.net/maven/2/"]
 
     //Backlog
     //todo consider simplified fast actors

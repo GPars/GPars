@@ -1,11 +1,13 @@
-archivesBaseName = 'GParallelizer'
-version = '0.8.3'
-
 usePlugin 'groovy'
+usePlugin 'maven'
 
+archivesBaseName = 'GParallelizer'
+group = 'org.gparallelizer'
+version = '0.8.3'
 manifest.mainAttributes(
-    'Implementation-Title': 'GParallelizer',
-    'Implementation-Version': version
+        'Implementation-Title': 'GParallelizer',
+        'Implementation-Version': version,
+        'provider': 'Vaclav Pech'
 )
 
 //srcRootName = 'src'
@@ -17,17 +19,57 @@ sourceCompatibility = 1.5
 targetCompatibility = 1.5
 //buildTime = new Date()
 //type = 'jar'
-group = 'org.gparallelizer'
 
 repositories {
     mavenCentral()
+    mavenRepo urls: ["http://download.java.net/maven/2/"]
+}
+
+configurations {
+    deployerJars
 }
 
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.4'
     testCompile group: 'junit', name: 'junit', version: '4.5'
     compile "org.coconut.forkjoin:jsr166y:070108"
+    deployerJars "org.jvnet.wagon-svn:wagon-svn:1.9"
 }
+
+uploadArchives {
+    repositories.mavenDeployer {
+            uniqueVersion = false
+        configuration = configurations.deployerJars
+        repository(url: "java-net:/maven2-repository/trunk/repository/") {
+        }
+    }
+}
+
+//zipDoc << {
+//    basedir = 'build/docs'
+//}
+//zipDoc.dependsOn javadoc
+//zipDoc2.doFirst {
+//    println 'AAAAAAAAAAAAAAAAAAAAAAA'
+//}
+
+//basedir = 'build/docs'
+
+//zip sources
+//zip samples
+//zip docs
+//upload jar into a mvn repo
+
+//zipSources(type:Zip) {
+//
+//}
+
+//todo check groovydoc validity in IDEs
+//todo set title
+
+
+//javadocDirName = "build/docs/groovydoc"
+//groovydoc.dependsOn javadoc
 
 //jar(type:Jar) {
 //
@@ -38,13 +80,6 @@ dependencies {
 //explodedDistJavadocsDir = new File(explodedDistDocsDir, 'javadoc')
 //explodedDistGroovydocsDir = new File(explodedDistDocsDir, 'groovydoc')
 
-//groovydoc {
-    //todo set title
-    //todo check validity in IDEs
-//    title = "GParallelizer API $version"
-//    destinationDir = explodedDistGroovydocsDir
-//}
-
 //javadoc {
 //    title = "GParallelizer API $version"
 //    destinationDir = explodedDistJavadocsDir
@@ -54,7 +89,7 @@ dependencies {
 task zipDoc(type: Zip, dependsOn: groovydoc) << {
     baseName = 'docs'
     fileSet(dir: explodedDistGroovydocsDir)
-    destinationDir =  ''
+    destinationDir = ''
 }
 //createTask('zipdoc', dependsOn:'groovydoc') {
 //    ant.zip(baseDir: explodedDistGroovydocsDir, destFile:"$distsDir/GParallelizer-$version-doc.zip")
