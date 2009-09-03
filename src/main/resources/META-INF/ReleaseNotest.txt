@@ -1,5 +1,9 @@
 GParallelizer
 
+0.8.3
+Enabled Gradle builds
+Uploaded into a maven repository
+
 0.8.2
 Updated for groovy 1.6.4
 Added the await() method to the SafeVariable class
