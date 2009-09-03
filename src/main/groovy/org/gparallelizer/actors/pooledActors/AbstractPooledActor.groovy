@@ -27,11 +27,11 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  * to the thread pool for processing.
  * Whenever a PooledActor looks for a new message through the react() method, the actor gets detached
  * from the thread, making the thread available for other actors. Thanks to the ability to dynamically attach and detach
- * threads to actors, PooledActors can scale far beyond the limits of the underlying platform on number of cuncurrently
+ * threads to actors, PooledActors can scale far beyond the limits of the underlying platform on number of concurrently
  * available threads.
- * The loop() method allows repeatedly invoke a closure and yet perform each of the iterations sequentially
+ * The loop() method allows to repeatedly invoke a closure and yet perform each of the iterations sequentially
  * in different thread from the thread pool.
- * To suport continuations correctly the react() and loop() methods never return.
+ * To support continuations correctly the react() and loop() methods never return.
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
  *
@@ -63,7 +63,7 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  *     //this line will never be reached
  *}.start()
  * </pre>
- * The react method can acept multiple messages in the passed-in closure
+ * The react method can accept multiple messages in the passed-in closure
  * <pre>
  * react {Integer a, String b ->
  *     ...
@@ -79,10 +79,10 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  *     a.reply 'private message'  //sent to the sender of a only
  * }
  * </pre>
- * To speed up actor message processing enhancing messges and actors with reply methods can be disabled by calling
+ * To speed up actor message processing enhancing messages and actors with reply methods can be disabled by calling
  * the disableSendingReplies() method. Calling enableSendingReplies() will initiate enhancements for reply again.
  *
- * The react() method accepts timout specified using the TimeCategory DSL.
+ * The react() method accepts timeout specified using the TimeCategory DSL.
  * <pre>
  * react(10.MINUTES) {
  *     println 'Received message: ' + it
@@ -97,7 +97,7 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  *
  * Each Actor can define lifecycle observing methods, which will be called by the Actor's background thread whenever a certain lifecycle event occurs.
  * <ul>
- * <li>afterStart() - called immediatelly after the Actor's background thread has been started, before the act() method is called the first time.</li>
+ * <li>afterStart() - called immediately after the Actor's background thread has been started, before the act() method is called the first time.</li>
  * <li>afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the messages from the queue.</li>
  * <li>onInterrupt(InterruptedException e) - called when a react() method timeouts. The actor will be terminated.
  * <li>onTimeout() - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.</li>
@@ -251,7 +251,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     /**
      * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
      * The method never returns, but instead frees the processing thread back to the thread pool.
-     * @param timeout Time in miliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
+     * @param timeout Time in milliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
      * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
      * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
      * the closure to send a reply back to the actor, which sent the original message.
@@ -267,7 +267,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
      * These methods will call send() on the target actor (the sender of the original message).
      * The reply()/replyIfExists() methods invoked on the actor will be sent to all currently processed messages,
      * reply()/replyIfExists() invoked on a message will send a reply to the sender of that particular message only.
-     * @param timeout Time in miliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
+     * @param timeout Time in milliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
      * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
      * the closure to send a reply back to the actor, which sent the original message.
      */
@@ -403,7 +403,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     }
 
     /**
-     * Ensures that the suplied closure will be invoked repeatedly in a loop.
+     * Ensures that the supplied closure will be invoked repeatedly in a loop.
      * The method never returns, but instead frees the processing thread back to the thread pool.
      * @param code The closure to invoke repeatedly
      */
@@ -477,7 +477,7 @@ final class SendAndWaitPooledActor extends AbstractPooledActor {
 
     /**
      * Retrieves the result, waiting for it, if needed.
-     * Non-blocking under Fork/oin pool.
+     * Non-blocking under Fork/Join pool.
      */
     Object getResult() {
         actorBarrier.await()
