@@ -1,6 +1,8 @@
 usePlugin 'groovy'
 usePlugin 'maven'
 
+defaultTasks 'clean', 'test'
+
 archivesBaseName = 'GParallelizer'
 group = 'org.gparallelizer'
 version = '0.8.3'
