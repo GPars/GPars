@@ -4,7 +4,7 @@ import org.gparallelizer.actors.pooledActors.PooledActor
 import org.gparallelizer.dataflow.SingleRunThread
 
 /**
- * Conains factory methods to create Dataflow Concurrency threads.
+ * Contains factory methods to create Dataflow Concurrency threads.
  *
  * @author Vaclav Pech
  * Date: Jun 4, 2009
