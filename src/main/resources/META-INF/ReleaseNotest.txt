@@ -1,5 +1,9 @@
 GParallelizer
 
+0.8.4
+DataFlows
+Improved Gradle build
+
 0.8.3
 Enabled Gradle builds
 Uploaded into a maven repository

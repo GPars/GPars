@@ -1,5 +1,4 @@
     //Document before next release
-    //todo updated to groovy 1.6.4
     //todo add custom DSL definitions
     //todo SafeVariables should give readers higher priority - do them synchronously
     todo enable wait for SafeVariable
@@ -12,6 +11,9 @@ todo make @Grab work
 todo include jsr166y.jar
     todo Think of an example on SafeVariable subclass
     todo Maybe SafeVariables could be used for ActorMetaClass
+
+    todo DataFlows
+    todo Detecting deadlock in the DataFlows class 
     //todo clean issues and todos
     //todo samples on typical concurrency issues
 
