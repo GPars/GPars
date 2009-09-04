@@ -1,8 +1,7 @@
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * An example showing multiple threads calculating different parts of a complex physical calculation
@@ -21,7 +20,7 @@ final def deceleration = new DataFlowVariable()
 final def distance = new DataFlowVariable()
 final def author = new DataFlowVariable()
 
-thread {
+start {
     println """
 Calculating distance required to stop a moving ball.
 ====================================================
@@ -40,36 +39,36 @@ Author: ${author.val}
     System.exit 0
 }
 
-thread {
+start {
     mass << volume.val * density.val
 }
 
-thread {
+start {
     volume << Math.PI * (radius.val ** 3)
 }
 
-thread {
+start {
     radius << 2.5
     density << 	998.2071  //water
     acceleration << 9.80665 //free fall
     decelerationForce << 900
 }
 
-thread {
+start {
     println 'Enter your name:'
     def name = new InputStreamReader(System.in).readLine()
     author << (name?.trim()?.size()>0 ? name : 'anonymous')
 }
 
-thread {
+start {
     time << 10
     velocity << acceleration.val * time.val
 }
 
-thread {
+start {
     deceleration << decelerationForce.val / mass.val
 }
 
-thread {
+start {
     distance << deceleration.val * ((velocity.val/deceleration.val) ** 2) * 0.5
 }

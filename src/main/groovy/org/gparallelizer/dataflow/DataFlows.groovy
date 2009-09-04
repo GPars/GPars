@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentMap
  * This allows a rather compact usage of DataFlowVariables like
  * <pre>
 final df = new DataFlows()
-thread { df.result = df.x + df.y }
-thread { df.x = 10 }
-thread { df.y = 5 }
+start { df.result = df.x + df.y }
+start { df.x = 10 }
+start { df.y = 5 }
 assert 15 == df.result
  * </pre>
  *

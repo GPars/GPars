@@ -5,10 +5,10 @@ import static org.gparallelizer.dataflow.DataFlow.*
 
 final df = new DataFlows()
 
-thread { df.result = df.x + df.y }
+start { df.result = df.x + df.y }
 
-thread { df.x = 10 }
+start { df.x = 10 }
 
-thread { df.y = 5 }
+start { df.y = 5 }
 
 assert 15 == df.result

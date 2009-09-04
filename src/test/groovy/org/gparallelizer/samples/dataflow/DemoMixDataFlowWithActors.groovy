@@ -1,11 +1,9 @@
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.dataflow.DataFlowVariable
 
 /**
  * Shows cooperation between an actor and a dataflow thread.
@@ -20,7 +18,7 @@ final AbstractPooledActor doubler = PooledActors.actor {
     }
 }.start()
 
-final AbstractPooledActor thread = thread {
+final AbstractPooledActor thread = start {
     react {
         doubler << it  //send a number to the doubler
         println "Result ${a.val}"  //wait for the result to be bound to 'a'

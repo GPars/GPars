@@ -23,6 +23,6 @@ List<Integer> sum(int s, List<Integer> stream) {
 def x = new DataFlowVariable<List<Integer>>()
 def y = new DataFlowVariable<List<Integer>>()
 
-thread { x << ints(0, 1000) }
-thread { y << sum(0, x.val) }
-thread { println("List of sums: " + y.val); System.exit(0) }
+start { x << ints(0, 1000) }
+start { y << sum(0, x.val) }
+start { println("List of sums: " + y.val); System.exit(0) }

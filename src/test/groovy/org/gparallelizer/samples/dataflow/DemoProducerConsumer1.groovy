@@ -1,7 +1,7 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowStream
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * A simple producer consumer sample showing use of the DataFlowStream class. 
@@ -9,13 +9,13 @@ import static org.gparallelizer.dataflow.DataFlow.thread
 def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GParallelizer', 'data', 'flow']
 final def buffer = new DataFlowStream()
 
-thread {
+start {
     for (word in words) {
         buffer << word.toUpperCase()
     }
 }
 
-thread {
+start {
     while(true) println buffer.val
 }
 

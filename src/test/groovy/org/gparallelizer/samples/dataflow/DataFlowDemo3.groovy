@@ -1,7 +1,7 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowStream
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * A producer consumer sample, where the producer generates numbers into the DataFlowStream and the consumer
@@ -18,11 +18,11 @@ void ints(int n, int max, DataFlowStream<Integer> stream) {
 
 final def producer = new DataFlowStream<Integer>()
 
-thread {
+start {
     ints(0, 1000, producer)
 }
 
-thread {
+start {
     Thread.sleep(1000)
     println "Sum: ${producer.collect{it * it}.inject(0){sum, x -> sum + x}}"
     System.exit 0

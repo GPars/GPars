@@ -3,6 +3,8 @@
     //todo SafeVariables should give readers higher priority - do them synchronously
     todo enable wait for SafeVariable
 
+    todo when uploading next release: - update wiki to reflect change from DataFlow.thread{} to start{}
+
     //Planned for the next release
 
     todo add generics to SafeVariable

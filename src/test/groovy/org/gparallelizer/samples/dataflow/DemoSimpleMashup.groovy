@@ -2,7 +2,7 @@ package org.gparallelizer.samples.dataflow
 
 import static org.gparallelizer.Asynchronizer.*
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 
 /**
@@ -13,25 +13,25 @@ def dzone = new DataFlowVariable()
 def jroller = new DataFlowVariable()
 def theserverside = new DataFlowVariable()
 
-thread {
+start {
     println 'Started downloading from DZone'
     dzone << 'http://www.dzone.com'.toURL().text
     println 'Done downloading from DZone'
 }
 
-thread {
+start {
     println 'Started downloading from JRoller'
     jroller << 'http://www.jroller.com'.toURL().text
     println 'Done downloading from JRoller'
 }
 
-thread {
+start {
     println 'Started downloading from TheServerSide'
     theserverside << 'http://www.theserverside.com'.toURL().text
     println 'Done downloading from TheServerSide'
 }
 
-thread {
+start {
     doAsync {
         println "Number of Groovy sites today: " +
                 ([dzone, jroller, theserverside].findAllAsync {

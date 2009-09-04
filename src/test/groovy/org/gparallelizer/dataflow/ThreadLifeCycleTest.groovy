@@ -8,7 +8,7 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
     public void testActorGroup() {
-        final AbstractPooledActor actor = thread {
+        final AbstractPooledActor actor = start {
             react {}
         }
         assertEquals DataFlowActor.DATA_FLOW_GROUP, actor.actorGroup
@@ -19,7 +19,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def thread = thread {
+        final def thread = start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
         }
@@ -31,7 +31,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def thread = thread {
+        final def thread = start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
             if (true) throw new RuntimeException('test')
@@ -43,7 +43,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def thread = thread {
+        final def thread = start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
                 react(10.milliseconds) {}  //will timeout

@@ -14,14 +14,14 @@ public class DataFlowTest extends GroovyTestCase {
         volatile def result = 0
         final def latch = new CountDownLatch(1)
 
-        thread {
+        start {
             z << x.val + y.val
             result = z.val
             latch.countDown()
         }
 
-        thread {x << 40}
-        thread {y << 2}
+        start {x << 40}
+        start {y << 2}
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals 42, result
@@ -47,9 +47,9 @@ public class DataFlowTest extends GroovyTestCase {
         volatile def result = 0
         final def latch = new CountDownLatch(1)
 
-        thread { x << ints(0, 10) }
-        thread { y << sum(0, x.val) }
-        thread {
+        start { x << ints(0, 10) }
+        start { y << sum(0, x.val) }
+        start {
             result = y.val
             latch.countDown()
         }

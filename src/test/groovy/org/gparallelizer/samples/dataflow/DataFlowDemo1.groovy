@@ -10,10 +10,10 @@ WAIT<Integer> x = new WAIT()
 WAIT<Integer> y = new WAIT()
 WAIT<Integer> z = new WAIT()
 
-thread { z << x.val + y.val }
+start { z << x.val + y.val }
 
-thread { x << 40 }
-thread { y << 2 }
+start { x << 40 }
+start { y << 2 }
 
 println "z=${z.val}"
 assert 42 == z.val

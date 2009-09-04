@@ -10,7 +10,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.thread {
+        final AbstractPooledActor thread = DataFlow.start {
             stream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
@@ -33,7 +33,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.thread {
+        final AbstractPooledActor thread = DataFlow.start {
             stream << null
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
@@ -56,7 +56,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.thread {
+        final AbstractPooledActor thread = DataFlow.start {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
@@ -78,7 +78,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.thread {
+        final AbstractPooledActor thread = DataFlow.start {
             (0..10).each {stream << it}
             barrier.await()
             react {
@@ -104,7 +104,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DataFlowStream stream = new DataFlowStream()
-        DataFlow.thread {
+        DataFlow.start {
             (0..10).each {stream << null}
             barrier.await()
         }

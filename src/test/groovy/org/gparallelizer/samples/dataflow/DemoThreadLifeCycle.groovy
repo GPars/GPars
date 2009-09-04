@@ -9,7 +9,7 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
  */
 def throwException = true
 
-thread {
+start {
     enhance(delegate)
     println("Running thread")
     if (throwException) throw new RuntimeException('test')

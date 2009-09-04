@@ -2,7 +2,7 @@ package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowActor
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * Demonstrates pool resizing. The code would end up deadlocked when the pool didn't resize, since the first two threads
@@ -14,17 +14,17 @@ DataFlowActor.DATA_FLOW_GROUP.resize 1
 final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
 
-thread {
+start {
     b << 20 + a.val
 }
 
-thread {
+start {
     println "Result: ${b.val}"
     System.exit 0
 }
 
 Thread.sleep 2000
 
-thread {
+start {
     a << 10
 }

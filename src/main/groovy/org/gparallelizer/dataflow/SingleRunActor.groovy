@@ -3,10 +3,10 @@ package org.gparallelizer.dataflow
 /**
  * An actor representing a dataflow thread. Runs the supplied block of code inside the act() actor method once.
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Dierk Koenig
  * Date: Jun 5, 2009
  */
-final class SingleRunThread extends DataFlowActor {
+final class SingleRunActor extends DataFlowActor {
 
     Closure body
 

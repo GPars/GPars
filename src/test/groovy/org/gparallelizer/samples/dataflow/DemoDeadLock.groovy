@@ -1,7 +1,7 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * Demonstrates that deadlocks are deterministic in dataflow concurrency model. The deadlock appears reliably every time
@@ -12,7 +12,7 @@ import static org.gparallelizer.dataflow.DataFlow.thread
 final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
 
-final def actor = thread {
+final def actor = start {
 
     delegate.metaClass.onTimeout = {
         println 'Deadlock detected'
@@ -24,12 +24,12 @@ final def actor = thread {
     }
 }
 
-thread {
+start {
     b << 20 + a.val
     actor.send b.val
 }
 
-thread {
+start {
     a << 10 + b.val
     actor.send a.val
 }

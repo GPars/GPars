@@ -2,7 +2,7 @@ package org.gparallelizer.samples.dataflow
 
 import static org.gparallelizer.Asynchronizer.*
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 
 /**
@@ -10,7 +10,7 @@ import static org.gparallelizer.dataflow.DataFlow.thread
  */
 final List urls = ['http://www.dzone.com', 'http://www.jroller.com', 'http://www.theserverside.com']
 
-thread {
+start {
     def pages = urls.collect { downloadPage(it) }
     doAsync {
         println "Number of Groovy sites today: " +
@@ -23,7 +23,7 @@ thread {
 
 def downloadPage(def url) {
     def page = new DataFlowVariable()
-    thread {
+    start {
         println "Started downloading from $url"
         page << url.toURL().text
         println "Done downloading from $url"

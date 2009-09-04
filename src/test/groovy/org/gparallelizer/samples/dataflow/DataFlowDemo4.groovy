@@ -1,7 +1,7 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowStream
-import static org.gparallelizer.dataflow.DataFlow.thread
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * A producer consumer sample, where the producer generates numbers into the DataFlowStream, the intermediate consumer
@@ -32,15 +32,15 @@ void printSum(DataFlowStream stream) {
 final def producer = new DataFlowStream<Integer>()
 final def consumer = new DataFlowStream<Integer>()
 
-thread {
+start {
     ints(0, 1000, producer)
 }
 
-thread {
+start {
     sum(0, producer, consumer)
 }
 
-thread {
+start {
     printSum (consumer)
 }
 
