@@ -1,6 +1,5 @@
 package org.gparallelizer
 
-import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.ExecutorService
 
 /**
@@ -10,7 +9,7 @@ import java.util.concurrent.ExecutorService
 public class AsynchronizerStringTest extends GroovyTestCase {
 
     public void testEachAsyncWithString() {
-        def result = new ConcurrentSkipListSet()
+      def result = Collections.synchronizedSet(new HashSet())
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             'abc'.eachAsync {result.add(it.toUpperCase())}
             assertEquals(new HashSet(['A', 'B', 'C']), result)

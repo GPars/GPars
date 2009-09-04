@@ -1,7 +1,5 @@
 package org.gparallelizer
 
-import java.util.concurrent.ConcurrentSkipListSet
-
 /**
  * @author Vaclav Pech
  * Date: Oct 23, 2008
@@ -9,7 +7,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 public class ParallelizerStringTest extends GroovyTestCase {
     public void testEachAsyncWithThreadPoolAndString() {
         Parallelizer.withParallelizer(5) {
-            def result = new ConcurrentSkipListSet()
+          def result = Collections.synchronizedSet(new HashSet())
             'abc'.eachAsync {result.add(it.toUpperCase())}
             assertEquals(new HashSet(['A', 'B', 'C']), result)
         }

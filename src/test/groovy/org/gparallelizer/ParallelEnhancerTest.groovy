@@ -1,7 +1,5 @@
 package org.gparallelizer
 
-import java.util.concurrent.ConcurrentSkipListSet
-
 public class ParallelEnhancerTest extends GroovyTestCase {
     public void testInstanceEnhancement() {
         final List list = [1, 2, 3, 4, 5]
@@ -10,7 +8,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assertEquals 1, list.findAsync {it < 2}
         assertEquals([1, 2], list.findAllAsync {it < 3})
         assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
-        def result = new ConcurrentSkipListSet()
+        def result = Collections.synchronizedSet(new HashSet())
         list.eachAsync {result << 2 * it}
         assertEquals(new HashSet([2, 4, 6, 8, 10]), result)
     }
@@ -23,7 +21,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assertEquals 1, list.findAsync {it < 2}
         assertEquals([1, 2], list.findAllAsync {it < 3})
         assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
-        def result = new ConcurrentSkipListSet()
+        def result = Collections.synchronizedSet(new HashSet())
         list.eachAsync {result << 2 * it}
         assertEquals(5, result.size())
         assertEquals(new HashSet([2, 4, 6, 8, 10]), result)

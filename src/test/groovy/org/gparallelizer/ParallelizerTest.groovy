@@ -1,7 +1,5 @@
 package org.gparallelizer
 
-import java.util.concurrent.ConcurrentSkipListSet
-
 /**
  * @author Vaclav Pech
  * Date: Oct 23, 2008
@@ -9,7 +7,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 public class ParallelizerTest extends GroovyTestCase {
     public void testEachAsyncWithThreadPool() {
         Parallelizer.doParallel(5) {
-            def result = new ConcurrentSkipListSet()
+          def result = Collections.synchronizedSet(new HashSet())
             [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
             assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
         }

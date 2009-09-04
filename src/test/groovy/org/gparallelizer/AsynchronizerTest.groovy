@@ -1,6 +1,5 @@
 package org.gparallelizer
 
-import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -38,7 +37,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testEachAsync() {
-        def result = new ConcurrentSkipListSet()
+      def result = Collections.synchronizedSet(new HashSet())
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             [1, 2, 3, 4, 5].eachAsync{Number number -> result.add(number * 10)}
             assertEquals(new HashSet([10, 20, 30, 40, 50]), result)

@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * A message used to invoke intercepted methods
  *
- * @author Jan Kotek, Vaclav Pech
+ * @author Jan Kotek, Vaclav Pech, Alex Tkachman
  * Date: Apr 28, 2009
  */
 final class MethodAsyncMessage extends AsyncMessage {
@@ -21,7 +21,7 @@ final class MethodAsyncMessage extends AsyncMessage {
         this.object = object;
         this.methodName = methodName;
         this.argument = argument;
-        this.arguments = Arrays.copyOf(arguments, arguments.length);
+        this.arguments = copyOf(arguments);
     }
 
     public Object getObject() {
@@ -37,6 +37,6 @@ final class MethodAsyncMessage extends AsyncMessage {
     }
 
     public Object[] getArguments() {
-        return Arrays.copyOf(arguments, arguments.length);
+        return copyOf(arguments);
     }
 }

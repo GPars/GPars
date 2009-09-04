@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.ConcurrentSkipListSet
 
 /**
  *
@@ -121,7 +120,8 @@ class InterruptionTestActor extends DefaultThreadActor {
     final AtomicBoolean afterStopFlag = new AtomicBoolean(false)
     final CountDownLatch startLatch = new CountDownLatch(1)
     final CountDownLatch stopLatch = new CountDownLatch(1)
-    volatile Set deliveredMessages=new ConcurrentSkipListSet()
+    volatile Set deliveredMessages = Collections.synchronizedSet(new HashSet())
+
     final AtomicReference undeliveredMessages=new AtomicReference()
 
     @Override protected void act() {
@@ -144,7 +144,8 @@ class AfterStopTestActor extends DefaultThreadActor {
     final CountDownLatch startLatch = new CountDownLatch(1)
     final CountDownLatch stopLatch = new CountDownLatch(1)
     final CountDownLatch receiveLatchLatch = new CountDownLatch(1)
-    volatile Set deliveredMessages=new ConcurrentSkipListSet()
+    volatile Set deliveredMessages= Collections.synchronizedSet(new HashSet())
+
     final AtomicReference undeliveredMessages=new AtomicReference()
 
     @Override protected void act() {

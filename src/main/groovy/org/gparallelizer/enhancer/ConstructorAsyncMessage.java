@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * A message used to invoke intercepted constructors
  *
- * @author Jan Kotek, Vaclav Pech
+ * @author Jan Kotek, Vaclav Pech, Alex Tkachman
  * Date: Apr 28, 2009
  */
 final class ConstructorAsyncMessage extends AsyncMessage {
@@ -15,10 +15,10 @@ final class ConstructorAsyncMessage extends AsyncMessage {
 
     ConstructorAsyncMessage(final MetaClass objectMetaClass, final Object[] arguments) {
         super(objectMetaClass);
-        this.arguments = Arrays.copyOf(arguments, arguments.length);
+        this.arguments = copyOf(arguments);
     }
 
     public Object[] getArguments() {
-        return Arrays.copyOf(arguments, arguments.length);
+        return copyOf(arguments);
     }
 }
