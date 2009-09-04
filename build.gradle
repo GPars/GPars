@@ -17,8 +17,8 @@ manifest.mainAttributes(
 //testSrcDirNames = []
 //groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
 groovyTestSrcDirNames = ['main/groovy', 'test/groovy']  //todo remove
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 //buildTime = new Date()
 //type = 'jar'
 
