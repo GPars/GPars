@@ -89,4 +89,19 @@ public class DataFlowsTest extends GroovyTestCase {
         latch.await()
         assertEquals 10, result
     }
+
+      public void testIndexes() {
+          final DataFlows data = new DataFlows()
+
+          DataFlow.start {
+            data[2] = data [0] - data [1]
+          }
+          DataFlow.start {
+            data [1] = 5
+          }
+          DataFlow.start {
+            data [0] = 7
+          }
+          assertEquals 2, data[2]
+      }
 }

@@ -19,10 +19,12 @@ start { df.y = 5 }
 assert 15 == df.result
  * </pre>
  *
- * @author Vaclav Pech, Dierk Koenig
+ * @author Vaclav Pech, Dierk Koenig, Alex Tkachman
  * Date: Sep 3, 2009
  */
 public class DataFlows {
+
+  private final static DF DUMMY = new DF ()
 
     private ConcurrentMap variables = new ConcurrentHashMap()
 
@@ -32,8 +34,7 @@ public class DataFlows {
      * @see DataFlowVariable#bind
      */
     void setProperty(String name, value) {
-        ensureToContainVariable(name)
-        variables[name] << value
+        ensureToContainVariable(name) << value
     }
 
     /**
@@ -42,11 +43,58 @@ public class DataFlows {
      * @see DataFlowVariable#getVal
      */
     def getProperty(String name) {
-        ensureToContainVariable(name)
-        variables[name].val
+        ensureToContainVariable(name).val
     }
 
-    private ensureToContainVariable(String name) { 
-	    variables.putIfAbsent(name, new DF()) 
+  /**
+   * @return the value of the DataFlowVariable associated with the property "name".
+   * May block if the value is not scalar.
+   * @see DataFlowVariable#getVal
+   */
+    def getAt (index) {
+      ensureToContainVariable(index).val
+    }
+
+  /**
+   * Binds the value to the DataFlowVariable that is associated with the property "index".
+   * @param value a scalar or a DataFlowVariable that may block on value access
+   * @see DataFlowVariable#bind
+   */
+    void putAt (index,value) {
+      ensureToContainVariable(index) << value
+    }
+
+   /**
+    * The idea is following:
+    * - we try to putIfAbsent dummy DFV in to map
+    * - if something real already there we are done
+    * - if not we obtain lock and put new DFV with double check
+    *
+    * Unfortunately we have to sync on this as there is no better option (God forbid to sync on name)
+    *
+    * @return DataFlowVariable corresponding to name
+    */
+    private def ensureToContainVariable(name) {
+	    def df = variables.putIfAbsent(name, DUMMY)
+        if (!df || df == DUMMY) {
+          df = putNewUnderLock(name, df)
+        }
+        df
 	}
+
+  /**
+   * Utility method extracted just to help JIT
+   *
+   * @return DFV
+   */
+    private def putNewUnderLock(name, df) {
+      synchronized (this) {
+        df = variables.get(name)
+        if (df == DUMMY) {
+          df = new DF()
+          variables.put(name, df);
+        }
+      }
+      return df
+    }
 }
