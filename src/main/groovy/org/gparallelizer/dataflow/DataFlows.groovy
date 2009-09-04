@@ -6,17 +6,21 @@ import java.util.concurrent.ConcurrentMap
 
 /**
  * Convenience class that makes working with DataFlowVariables more comfortable.
+ *
  * See the implementation of {@link org.gparallelizer.samples.dataflow.DemoDataFlows} for a full example.
+ *
  * A DataFlows instance is a bean with properties of type DataFlowVariable.
  * Property access is relayed to the access methods of DataFlowVariable.
  * Each property is initialized lazily the first time it is accessed.
+ * Non-String named properties can be also accessed using array indexing syntax  
  * This allows a rather compact usage of DataFlowVariables like
+ *
  * <pre>
 final df = new DataFlows()
-start { df.result = df.x + df.y }
+start { df[0] = df.x + df.y }
 start { df.x = 10 }
 start { df.y = 5 }
-assert 15 == df.result
+assert 15 == df[0]
  * </pre>
  *
  * @author Vaclav Pech, Dierk Koenig, Alex Tkachman
