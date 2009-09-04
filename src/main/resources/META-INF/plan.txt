@@ -5,15 +5,14 @@
 
     //Planned for the next release
 
-todo add generics to SafeVariable
-todo add @Immutable back
-todo make @Grab work
-todo include jsr166y.jar
+    todo add generics to SafeVariable
+    todo add @Immutable back
     todo Think of an example on SafeVariable subclass
     todo Maybe SafeVariables could be used for ActorMetaClass
 
     todo DataFlows
-    todo Detecting deadlock in the DataFlows class 
+    todo Detecting deadlock in the DataFlows class
+     todo allow join on groups of actors or Dataflow treads
     //todo clean issues and todos
     //todo samples on typical concurrency issues
 
