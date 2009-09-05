@@ -32,15 +32,21 @@ public class DataFlows {
 
     private ConcurrentMap variables = null
 
+    // copy from ConcurrentHashMap for jdk 1.5 backwards compatibility
+    static final int    DEFAULT_INITIAL_CAPACITY = 16
+    static final float  DEFAULT_LOAD_FACTOR = 0.75f
+    static final int    DEFAULT_CONCURRENCY_LEVEL = 16
+    static final int    MAX_SEGMENTS = 1 << 16;
+
     /**
      * Constructor that supports the various constructors of the underlying
      * ConcurrentHashMap (unless the one with Map parameter).
      * @see java.util.concurrent.ConcurrentHashMap
      */
     DataFlows(
-            int initialCapacity = ConcurrentHashMap.DEFAULT_INITIAL_CAPACITY,
-            float loadFactor    = ConcurrentHashMap.DEFAULT_LOAD_FACTOR,
-            int concurrencyLevel= ConcurrentHashMap.DEFAULT_CONCURRENCY_LEVEL) {
+            int initialCapacity = DEFAULT_INITIAL_CAPACITY,
+            float loadFactor    = DEFAULT_LOAD_FACTOR,
+            int concurrencyLevel= DEFAULT_CONCURRENCY_LEVEL) {
         variables = new ConcurrentHashMap(initialCapacity, loadFactor, concurrencyLevel)
     }
 

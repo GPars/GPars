@@ -2,11 +2,10 @@ package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlows
 import static org.gparallelizer.dataflow.DataFlow.*
-import java.util.concurrent.ConcurrentHashMap
 
 static final LIMIT = 3*100*1000
 
-final df = new DataFlows(LIMIT+1, 0.9f, ConcurrentHashMap.MAX_SEGMENTS)
+final df = new DataFlows(LIMIT+1, 0.9f, DataFlows.MAX_SEGMENTS)
 
 final many = 1..LIMIT
 
