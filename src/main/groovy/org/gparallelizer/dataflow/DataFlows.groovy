@@ -28,9 +28,21 @@ assert 15 == df[0]
  */
 public class DataFlows {
 
-  private final static DF DUMMY = new DF ()
+    private final static DF DUMMY = new DF()
 
-    private ConcurrentMap variables = new ConcurrentHashMap()
+    private ConcurrentMap variables = null
+
+    /**
+     * Constructor that supports the various constructors of the underlying
+     * ConcurrentHashMap (unless the one with Map parameter).
+     * @see java.util.concurrent.ConcurrentHashMap
+     */
+    DataFlows(
+            int initialCapacity = ConcurrentHashMap.DEFAULT_INITIAL_CAPACITY,
+            float loadFactor    = ConcurrentHashMap.DEFAULT_LOAD_FACTOR,
+            int concurrencyLevel= ConcurrentHashMap.DEFAULT_CONCURRENCY_LEVEL) {
+        variables = new ConcurrentHashMap(initialCapacity, loadFactor, concurrencyLevel)
+    }
 
     /**
      * Binds the value to the DataFlowVariable that is associated with the property "name".

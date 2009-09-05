@@ -2,18 +2,19 @@ package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlows
 import static org.gparallelizer.dataflow.DataFlow.*
+import java.util.concurrent.ConcurrentHashMap
 
-final df = new DataFlows()
+static final LIMIT = 3*100*1000
 
-final many = 1..(2*100*1000)
+final df = new DataFlows(LIMIT+1, 0.9f, ConcurrentHashMap.MAX_SEGMENTS)
 
-// df."1" + df."2" +  ... + df."200000"
-start { df.result = many.collect{ df."$it" }.sum() }
+final many = 1..LIMIT
+
+start { df.result = many.collect{ df[it] }.sum() }
 
 // each in a newly started actor:
-// df."1" = 1;  df."2" = 1;  ... ;  df."200000" = 1
 many.each { num ->
-    start { df."$num" = 1 }
+    start { df[num] = 1 }
 }
 
 // Wait for the result to be available
