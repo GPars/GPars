@@ -1,56 +1,36 @@
-    //Document before next release
-    //todo add custom DSL definitions
-    //todo SafeVariables should give readers higher priority - do them synchronously
+    Document before next release
+    todo add custom DSL definitions
+    todo SafeVariables should give readers higher priority - do them synchronously
     todo enable wait for SafeVariable
-
     todo when uploading next release: - update wiki to reflect change from DataFlow.thread{} to start{}
 
-    //Planned for the next release
+    Planned for the next release
 
     todo add generics to SafeVariable
-    todo add @Immutable back
+    todo add @Immutable back to three tests
     todo Think of an example on SafeVariable subclass
-    todo Maybe SafeVariables could be used for ActorMetaClass
 
     todo DataFlows
     todo Detecting deadlock in the DataFlows class
     todo used generics with DataFlows to support DataFlowVariable.val type hints in IDE
-     todo allow join on groups of actors or Dataflow treads
-    //todo clean issues and todos
-    //todo samples on typical concurrency issues
 
-    //todo use Gradle
-    //todo automate code sample download
-    //todo automate javadoc download
+    todo allow join on groups of actors or Dataflow treads
+    todo clean issues and todos
+    todo samples on typical concurrency issues
+    todo Resizable pools policy should perhaps be change so as not to blow on more than 1000 threads
+    todo Logging policy - perhaps leveraging the current lifecycle methods
+    todo automate creation of code sample download, javadoc download, source download
+    todo tune maven repository upload
 
-    //todo maven
-    //todo put into maven repo
-    //todo add transitive mvn dependencies
-
-    //todo look into MINA
-    //todo test with java.nio
-    //todo onTimeout handler as a react parameter - pass TIMEOUT into the react handler
-    //todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
-
+    Backlog
+    todo Maybe SafeVariables could be used for ActorMetaClass
+    todo build with maven
+    todo look into MINA
+    todo test with java.nio
+    todo onTimeout handler as a react parameter - pass TIMEOUT into the react handler
+    todo unify actors and pooled actors behavior on timeout and exception, (retry after timeout and exception or stop)
 
 
-@Grab(group='org.gparallelizer', module='GParallelizer', version='0.8.3')
-void playInParallel() {
-    println org.gparallelizer.actors.Actors
-    def actor = org.gparallelizer.actors.Actors.oneShotActor {
-        println 'Actor running'
-    }.start()
-    actor.join()
-
-}
-
-groovy.grape.Grape.grab(group:'org.gparallelizer', module:'GParallelizer', version:'0.8.3')
-println 'AAAAAAAAAAAAAAAAAAAA'
-playInParallel()
-
-    mavenRepo urls: ["http://download.java.net/maven/2/"]
-
-    //Backlog
     //todo consider simplified fast actors
     //todo consider extensibility for actors - custom schedulers
     //todo remove FJPool, ResizableFJPool and ActorBarrier if not needed
@@ -64,7 +44,7 @@ playInParallel()
     //todo try the fixes for the MixinTest
     //todo support mixins for event-driven actors
 
-    //Speed-up tips
+    Speed-up tips
     //todo use TaskBarrier instead of CountDownLatch in AbstractThreadActor - need to resolve blocking on the message queue
     //todo use LinkedTransferQueue with ForkJoin
     //todo remove type info for speed-up
@@ -78,7 +58,7 @@ playInParallel()
     //todo rewrite the pool implementation
     //todo asynchronous race-free non-blocking queues
 
-    //To consider
+    To consider
     //todo multiple loops
     //todo exit the current loop
     //todo test on Google App Engine
@@ -92,32 +72,3 @@ playInParallel()
     //todo associate a mail box with each thread, not only with actors
     //todo add generics to actors
     //todo implement remote actors
-
-    /*
-import scala.actors.Actor._
-import scala.actors.Future
-
-case class Fib(n: Int)
-case class Add(a: Future[Int], b: Future[Int])
-case class Add2(a: Int, b: Future[Int])
-
-val fib = actor { loop { react {
- case Fib(n) if n <= 2 => reply(1)
- case Fib(n) =>
-   val a = self !! (Fib(n-1), { case x => x.asInstanceOf[Int] })
-   val b = self !! (Fib(n-2), { case x => x.asInstanceOf[Int] })
-   self.forward(Add(a, b))
- case Add(a, b) if a.isSet && b.isSet =>
-   reply(a() + b())
- case Add(a, b) if a.isSet =>
-   self.forward(Add2(a(), b))
- case Add(a, b) if b.isSet =>
-   self.forward(Add2(b(), a))
- case Add(a, b) =>
-   self.forward(Add(a, b))
- case Add2(a, b) if b.isSet =>
-   reply(a + b())
- case Add2(a, b) =>
-   self.forward(Add2(a, b))
-} } }
-     */
