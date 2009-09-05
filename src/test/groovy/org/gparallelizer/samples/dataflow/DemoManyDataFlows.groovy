@@ -20,3 +20,4 @@ many.each { num ->
 // Wait for the result to be available
 // This is in the main thread, which is DF unaware!
 assert many.size() == df.result
+println "done"
