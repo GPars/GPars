@@ -20,8 +20,12 @@ public class DataFlowTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        start {x << 40}
-        start {y << 2}
+        start {
+          x << 40
+        }
+        start {
+          y << 2
+        }
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals 42, result
@@ -56,5 +60,56 @@ public class DataFlowTest extends GroovyTestCase {
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals([0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45], result)
+    }
+
+    void testRightShift() {
+        DataFlowVariable<Integer> x = new DataFlowVariable()
+        DataFlowVariable<Integer> y = new DataFlowVariable()
+        DataFlowVariable<Integer> z = new DataFlowVariable()
+
+        volatile def result = 0
+        final def latch = new CountDownLatch(1)
+
+        z >> { res ->
+          result = res
+          latch.countDown()
+        }
+
+        start {
+            z << x.val + y.val
+        }
+
+        start {x << 40}
+        start {y << 2}
+
+        latch.await(30, TimeUnit.SECONDS)
+        assertEquals 42, result
+    }
+
+    void testMethodSyntax () {
+      def df = new DataFlows ()
+
+      volatile def result = 0
+      final def latch = new CountDownLatch(1)
+
+      df.z { res ->
+        result = res
+        latch.countDown()
+      }
+
+      start {
+          def v = df.x + df.y
+          df.z = v
+      }
+
+      start {
+        df.x = 40
+      }
+      start {
+        df.y = 2
+      }
+
+      latch.await(30, TimeUnit.SECONDS)
+      assertEquals 42, result
     }
 }

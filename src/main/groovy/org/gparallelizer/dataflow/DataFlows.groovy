@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap
  * A DataFlows instance is a bean with properties of type DataFlowVariable.
  * Property access is relayed to the access methods of DataFlowVariable.
  * Each property is initialized lazily the first time it is accessed.
- * Non-String named properties can be also accessed using array indexing syntax  
+ * Non-String named properties can be also accessed using array-like indexing syntax
  * This allows a rather compact usage of DataFlowVariables like
  *
  * <pre>
@@ -66,6 +66,22 @@ public class DataFlows {
      */
     def getProperty(String name) {
         ensureToContainVariable(name).val
+    }
+
+
+    /**
+     * Invokes the given method.
+     *
+     * @param name the name of the method to call
+     * @param args the arguments to use for the method call
+     * @return the result of invoking the method
+     */
+    def invokeMethod(String name, Object args) {
+        def df = ensureToContainVariable(name)
+        if (args instanceof Object[] && args.length == 1 && args[0] instanceof Closure)
+          df >> args[0]
+        else
+          throw new MissingMethodException(name, DataFlows, args)
     }
 
   /**
