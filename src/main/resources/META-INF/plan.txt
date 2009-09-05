@@ -14,6 +14,7 @@
 
     todo DataFlows
     todo Detecting deadlock in the DataFlows class
+    todo used generics with DataFlows to support DataFlowVariable.val type hints in IDE
      todo allow join on groups of actors or Dataflow treads
     //todo clean issues and todos
     //todo samples on typical concurrency issues
