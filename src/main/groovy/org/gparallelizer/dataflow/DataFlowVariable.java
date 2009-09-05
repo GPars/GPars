@@ -1,7 +1,5 @@
 package org.gparallelizer.dataflow;
 
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
@@ -76,11 +74,11 @@ public final class DataFlowVariable<T> extends AbstractQueuedSynchronizer {
         return "DataFlowVariable(value=" + value + ')';
     }
 
-    protected int tryAcquireShared(int acquires) {
+    @Override protected int tryAcquireShared(final int acquires) {
         return getState() == S_INITIALIZED ? 1 : -1;
     }
 
-    protected boolean tryReleaseShared(int releases) {
+    @Override protected boolean tryReleaseShared(final int releases) {
         if (getState() != S_INITIALIZED) {
             throw new IllegalStateException("State broken");
         }
