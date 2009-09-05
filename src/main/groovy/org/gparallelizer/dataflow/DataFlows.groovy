@@ -99,7 +99,7 @@ public class DataFlows {
     private def ensureToContainVariable(name) {
 	    def df = variables.putIfAbsent(name, DUMMY)
         if (!df || df == DUMMY) {
-          df = putNewUnderLock(name, df)
+          df = putNewUnderLock(name)
         }
         df
 	}
@@ -109,14 +109,14 @@ public class DataFlows {
    *
    * @return DFV
    */
-    private def putNewUnderLock(name, df) {
+    private def putNewUnderLock(name) {
       synchronized (this) {
-        df = variables.get(name)
+        def df = variables.get(name)
         if (df == DUMMY) {
           df = new DF()
           variables.put(name, df);
         }
+        return df
       }
-      return df
     }
 }
