@@ -102,6 +102,14 @@ public class DataFlows {
       ensureToContainVariable(index) << value
     }
 
+    /**
+     * Removes a DataFlowVariable associated with the given name
+     */
+    public void prune(name) {
+        //todo remove the method or make it play nicely with the rest of the class, needed for DeoManyDataFlows to work
+        variables.remove name
+    }
+
    /**
     * The idea is following:
     * - we try to putIfAbsent dummy DFV in to map
