@@ -1,3 +1,5 @@
+package org.gparallelizer.samples.actors
+
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActors
 

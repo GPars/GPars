@@ -1,3 +1,5 @@
+package org.gparallelizer.samples.actors
+
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.actors.pooledActors.PooledActor
 import groovy.swing.SwingBuilder

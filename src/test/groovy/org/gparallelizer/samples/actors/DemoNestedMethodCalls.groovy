@@ -1,4 +1,4 @@
-package org.gparallelizer.samples
+package org.gparallelizer.samples.actors
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
@@ -11,7 +11,7 @@ import org.gparallelizer.actors.pooledActors.PooledActors
  * @author Vaclav Pech
  */
 
-class MyActor extends AbstractPooledActor {
+class MyPooledActor extends AbstractPooledActor {
 
     protected void act() {
         handleA()
@@ -31,7 +31,7 @@ class MyActor extends AbstractPooledActor {
         }
     }
 }
-testActor(new MyActor())
+testActor(new MyPooledActor())
 
 
 Actor actor2 = actor {

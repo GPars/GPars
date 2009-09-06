@@ -1,4 +1,4 @@
-package org.gparallelizer.samples
+package org.gparallelizer.samples.actors
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.pooledActors.PooledActors
