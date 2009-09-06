@@ -1,17 +1,22 @@
 package org.gparallelizer.samples.dataflow
 
 import static org.gparallelizer.dataflow.DataFlow.*
-import org.gparallelizer.dataflow.DataFlowVariable 
+import org.gparallelizer.dataflow.DataFlowVariable
+import org.gparallelizer.scheduler.Scheduler
 
 final many = 1..(limit)
 
 List dfs = many.collect{ new DataFlowVariable() }
 def result = new DataFlowVariable()
 
-start { result << dfs.sum { it.val } }
+def scheduler = new Scheduler ()
+
+scheduler.execute { result << dfs.sum { it.val } }
 
 dfs.each { df ->
-    start { df << 1 }
+    scheduler.execute { df << 1 }
 }
 
 assert many.size() == result.val
+
+scheduler.shutdown ()

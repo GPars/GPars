@@ -13,7 +13,7 @@ long measure (int limit, Script worker) {
 }
 
 def dfv = new BenchmarkManyDataFlowVariables()
-def limits = [1, 10, 100, 1000, 10000, 100000, 200000] * 3
+def limits = [1, 10, 100, 1000, 10000, 100000, 200000, 500000, 1000000, 2500000] * 3
 def times = limits.sort().collect { sleep 100; measure (it, dfv) }
 
 for (i in 0..<limits.size()) {

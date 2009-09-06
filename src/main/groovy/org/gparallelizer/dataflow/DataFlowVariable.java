@@ -23,53 +23,51 @@ import java.util.concurrent.locks.LockSupport;
 public final class DataFlowVariable<T> {
     private volatile T value;
 
-    private volatile int state;
+    private volatile AtomicInteger state = new AtomicInteger();
 
-    private volatile WaitingThread waiting;
+    private final AtomicReference<WaitingThread> waiting = new AtomicReference<WaitingThread> ();
 
     private static final int S_NOT_INITIALIZED = 0;
-    private static final int S_INITIALIZED     = 1;
-
-    private static final int T_NOT_ENQUEED = 0;
-    private static final int T_ENQUEED     = 1;
-    private static final int T_DEQUEED     = 2;
+    private static final int S_INITIALIZING    = 1;
+    private static final int S_INITIALIZED     = 2;
 
     private static class WaitingThread {
         final Thread thread;
         volatile WaitingThread previous;
         private final DataCallback callback;
-        volatile int state;
 
         public WaitingThread(Thread thread, WaitingThread previous, DataCallback callback) {
             this.callback = callback;
-            state = T_NOT_ENQUEED;
             this.thread = thread;
             this.previous = previous;
         }
     }
+
+    private static final WaitingThread dummyWaitingThread = new WaitingThread(null, null, null);
 
     public static interface DataCallback<T> {
         void onData (T data);
     }
 
     public DataFlowVariable () {
-        state = S_NOT_INITIALIZED;
+        state.set(S_NOT_INITIALIZED);
     }
 
     public void getVal(DataCallback<T> callback) {
-        if (state != S_INITIALIZED) {
-            WaitingThread newWaiting = new WaitingThread(null, null, callback);
-            synchronized (this) {
-                newWaiting.previous = waiting;
-                waiting = newWaiting;
-            }
+        WaitingThread newWaiting = null;
+        while (state.get() != S_INITIALIZED) {
+            if (newWaiting == null)
+                newWaiting = new WaitingThread(null, null, callback);
 
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
-            synchronized (newWaiting) {
-                if(newWaiting.state == T_NOT_ENQUEED) {
-                    newWaiting.state = T_ENQUEED;
-                    return;
-                }
+            final WaitingThread previous = waiting.get();
+            // it means that writer already started processing queue, so value is already in place
+            if (previous == dummyWaitingThread)
+                break;
+
+            newWaiting.previous = previous;
+            if (waiting.compareAndSet(previous, newWaiting)) {
+                // ok, we are in the queue, so writer is responsible to process us
+                return;
             }
         }
 
@@ -82,29 +80,25 @@ public final class DataFlowVariable<T> {
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     public T getVal() throws InterruptedException {
-        if (state != S_INITIALIZED) {
-            WaitingThread newWaiting = new WaitingThread(Thread.currentThread(), null, null);
-            synchronized (this) {
-                newWaiting.previous = waiting;
-                waiting = newWaiting;
-            }
+        WaitingThread newWaiting = null;
+        while (state.get() != S_INITIALIZED) {
+            if (newWaiting == null)
+                newWaiting = new WaitingThread(Thread.currentThread(), null, null);
 
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
-            synchronized (newWaiting) {
-                if(newWaiting.state == T_NOT_ENQUEED) {
-                    newWaiting.state = T_ENQUEED;
-                }
-                else {
-                    // writer thread already asked us to take responsibility
-                    // so let us go to return value
-                    return value;
-                }
-            }
+            final WaitingThread previous = waiting.get();
+            // it means that writer already started processing queue, so value is already in place
+            if (previous == dummyWaitingThread)
+                break;
 
-            while (state != S_INITIALIZED) {
-                LockSupport.park();
-                if (Thread.currentThread().isInterrupted())
-                    throw new InterruptedException();
+            newWaiting.previous = previous;
+            if (waiting.compareAndSet(previous, newWaiting)) {
+                // ok, we are in the queue, so writer is responsible to process us
+                while (state.get() != S_INITIALIZED) {
+                    LockSupport.park();
+                    if (Thread.currentThread().isInterrupted())
+                        throw new InterruptedException();
+                }
+                break;
             }
         }
 
@@ -116,47 +110,22 @@ public final class DataFlowVariable<T> {
      * @param value The value to assign
      */
     public final void bind(final T value) {
-        synchronized (this) {
-            if (state != S_NOT_INITIALIZED)
-                throw new IllegalStateException("A DataFlowVariable can only be assigned once.");
+        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING))
+            throw new IllegalStateException("A DataFlowVariable can only be assigned once.");
 
-            this.value = value;
-            state = S_INITIALIZED;
-        }
+        this.value = value;
+        state.set(S_INITIALIZED);
+
+        final WaitingThread waitingQueue = waiting.getAndSet(dummyWaitingThread);
+        // no more new waiting threads since that point
 
         // no more new waiting threads since that point
-        WaitingThread w = waiting;
-        waiting = null;
-        for ( ; w != null; w = w.previous) {
-            boolean unpark;
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
-            synchronized (w) {
-                if (w.state == T_ENQUEED) {
-                    w.state = T_DEQUEED;
-                    unpark = true;
-                }
-                else {
-                    if (w.state == T_NOT_ENQUEED) {
-                        w.state = T_DEQUEED;
-                        // reader has to take care for itself
-                        unpark = false;
-                    }
-                    else {
-                        unpark = true;
-                    }
-                }
+        for ( WaitingThread waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
+            if (waiting.thread != null)
+                LockSupport.unpark(waiting.thread);
+            else {
+                scheduleCallback(waiting.callback);
             }
-
-            if (unpark)
-                unparkOrCallback(w);
-        }
-    }
-
-    private void unparkOrCallback(WaitingThread waiting) {
-        if (waiting.thread != null)
-            LockSupport.unpark(waiting.thread);
-        else {
-            scheduleCallback(waiting.callback);
         }
     }
 
