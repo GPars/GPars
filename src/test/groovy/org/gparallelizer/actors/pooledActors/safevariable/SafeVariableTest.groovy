@@ -157,7 +157,7 @@ public class SafeVariableTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         counter << {
             updateValue it + 1
-            Thread.sleep 1000
+            Thread.sleep 3000
             updateValue it + 1
             flag.set true
         }
@@ -170,7 +170,7 @@ public class SafeVariableTest extends GroovyTestCase {
         final SafeVariable counter = new SafeVariable<Long>(0L)
 
         counter << {
-            Thread.sleep 1000
+            Thread.sleep 3000
             updateValue it + 1
         }
         assertEquals 0, counter.instantVal
