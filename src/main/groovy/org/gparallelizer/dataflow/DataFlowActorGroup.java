@@ -26,7 +26,7 @@ public final class DataFlowActorGroup extends AbstractPooledActorGroup  {
     }
 
     /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      * @param poolSize The initial size of the underlying thread pool
      */
     public DataFlowActorGroup(final int poolSize) {
@@ -35,10 +35,10 @@ public final class DataFlowActorGroup extends AbstractPooledActorGroup  {
 
     /**
      * Creates a group of pooled actors. The actors will share a common thread pool.
-     * @param demon determinate if demon or non-demon threads will be used 
+     * @param daemon determinate if demon or non-demon threads will be used
      * @param poolSize The initial size of the underlying thread pool
      */
-    public DataFlowActorGroup(boolean demon, final int poolSize) {
-        threadPool = new ResizablePool(demon, poolSize);
+    public DataFlowActorGroup(boolean daemon, final int poolSize) {
+        threadPool = new ResizablePool(daemon, poolSize);
     }
 }
