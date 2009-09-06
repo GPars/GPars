@@ -122,7 +122,7 @@ public final class DataFlowVariable<T> {
         // no more new waiting threads since that point
         for ( WaitingThread waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
             if (waiting.thread != null)
-                LockSupport.unpark(waiting.thread);
+                LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread 
             else {
                 scheduleCallback(waiting.callback);
             }
