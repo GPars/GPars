@@ -90,14 +90,14 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
      * Creates a new instance of BoundedActor, using the passed-in closure as the body of the actor's act() method.
      */
     public final Actor boundedActor(Closure handler = {throw new UnsupportedOperationException()}) {
-        return new InlinedBoundedActor(this, handler)
+        return new InlinedBoundActor(this, handler)
     }
 
     /**
      * Creates a new instance of BoundedActor, using the passed-in closure as the body of the actor's act() method.
      */
     public final Actor boundedActor(int capacity, Closure handler = {throw new UnsupportedOperationException()}) {
-        return new InlinedBoundedActor(capacity, handler)
+        return new InlinedBoundActor(capacity, handler)
     }
 
     /**
@@ -106,7 +106,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
      */
     public final Actor boundedOneShotActor(Closure handler = {throw new UnsupportedOperationException()}) {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
-        Actor actor = new InlinedBoundedActor(this, enhancedHandler)
+        Actor actor = new InlinedBoundActor(this, enhancedHandler)
         handler.resolveStrategy=Closure.DELEGATE_FIRST
         handler.delegate = actor
         actor.actorGroup = this
@@ -119,7 +119,7 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
      */
     public final Actor boundedOneShotActor(int capacity, Closure handler = {throw new UnsupportedOperationException()}) {
         Closure enhancedHandler = enhanceOneShotHandler(handler)
-        Actor actor = new InlinedBoundedActor(capacity, enhancedHandler)
+        Actor actor = new InlinedBoundActor(capacity, enhancedHandler)
         handler.delegate = actor
         handler.resolveStrategy=Closure.DELEGATE_FIRST
         actor.actorGroup = this
@@ -138,18 +138,18 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     }
 }
 
-final class InlinedBoundedActor extends BoundedThreadActor {
+final class InlinedBoundActor extends BoundThreadActor {
 
     final Closure handler
 
-    def InlinedBoundedActor(AbstractThreadActorGroup actorGroup, Closure handler) {
+    def InlinedBoundActor(AbstractThreadActorGroup actorGroup, Closure handler) {
         this.handler = handler
         this.actorGroup = actorGroup
         handler.delegate = this
         handler.resolveStrategy=Closure.DELEGATE_FIRST
     }
 
-    def InlinedBoundedActor(final int capacity, Closure handler) {
+    def InlinedBoundActor(final int capacity, Closure handler) {
         super(capacity);
         this.handler = handler
         handler.delegate = this
