@@ -9,15 +9,17 @@ import java.util.concurrent.ArrayBlockingQueue;
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-public class BoundedThreadActor extends AbstractThreadActor {
+public class BoundThreadActor extends AbstractThreadActor {
 
     public static final int DEFAULT_CAPACITY=1000;
 
-    def BoundedThreadActor() {
+
+
+    def BoundThreadActor() {
         this(DEFAULT_CAPACITY);
     }
 
-    def BoundedThreadActor(int capacity) {
+    def BoundThreadActor(int capacity) {
         super(new ArrayBlockingQueue<ActorMessage>(capacity, false));
     }
 }
