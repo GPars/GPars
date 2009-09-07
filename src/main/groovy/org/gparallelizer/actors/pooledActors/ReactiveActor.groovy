@@ -15,18 +15,21 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
  *
  * </pre>
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  * Date: Jun 26, 2009
  */
-public class ReactiveActor extends AbstractPooledActor {
-    Closure body
+public class ReactiveActor extends RunnableBackedPooledActor {
 
-    void act() {
-        body.delegate = this
+    ReactiveActor (Closure body) {
+      setAction {
+        def cloned = body.clone ()
+        cloned.delegate = this
+        cloned.resolveStrategy = Closure.DELEGATE_FIRST
         loop {
             react {
-                it.replyIfExists body(it)
+                it.replyIfExists b(it)
             }
         }
+      }
     }
 }

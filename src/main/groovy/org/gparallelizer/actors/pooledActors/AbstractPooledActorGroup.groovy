@@ -15,15 +15,13 @@ public abstract class AbstractPooledActorGroup extends AbstractActorGroup {
     def AbstractPooledActorGroup(final boolean usedForkJoin) { super(usedForkJoin); }
 
     /**
-     * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of PooledActor, using the passed-in runnable/closure as the body of the actor's act() method.
      * The created actor will belong to the pooled actor group.
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the AbstractPooledActor class
      */
-    public final AbstractPooledActor actor(Closure handler) {
-        final AbstractPooledActor actor = [act: handler] as AbstractPooledActor
-        handler.resolveStrategy=Closure.DELEGATE_FIRST
-        handler.delegate = actor
+    public final AbstractPooledActor actor(Runnable handler) {
+        final AbstractPooledActor actor = new RunnableBackedPooledActor (handler)
         actor.actorGroup = this
         return actor
     }
@@ -36,6 +34,6 @@ public abstract class AbstractPooledActorGroup extends AbstractActorGroup {
      * @return A new instance of ReactiveEventBasedThread
      */
     public final AbstractPooledActor reactor(final Closure code) {
-        new ReactiveActor(body: code)
+        new ReactiveActor(code)
     }
 }
