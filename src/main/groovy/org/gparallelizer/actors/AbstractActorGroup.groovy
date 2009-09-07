@@ -26,7 +26,7 @@ public abstract class AbstractActorGroup {
     /**
      * Checks the gparallelizer.useFJPool system property and returns, whether or not to use a fork join pool
      */
-    private boolean useFJPool() {
+    protected final boolean useFJPool() {
         return 'true' == System.getProperty("gparallelizer.useFJPool")?.trim()?.toLowerCase()
     }
 }

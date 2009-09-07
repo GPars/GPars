@@ -27,7 +27,7 @@ public class ReactiveActor extends RunnableBackedPooledActor {
         cloned.resolveStrategy = Closure.DELEGATE_FIRST
         loop {
             react {
-                it.replyIfExists b(it)
+                it.replyIfExists cloned(it)
             }
         }
       }
