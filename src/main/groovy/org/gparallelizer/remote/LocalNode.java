@@ -1,10 +1,7 @@
 package org.gparallelizer.remote;
 
 import org.gparallelizer.scheduler.Scheduler;
-import org.gparallelizer.remote.sharedmemory.SharedMemoryTransport;
 import org.gparallelizer.actors.Actor;
-import org.gparallelizer.actors.Actors;
-import org.gparallelizer.actors.pooledActors.PooledActors;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 
 import java.util.*;
@@ -14,10 +11,8 @@ import groovy.lang.Closure;
 /**
  * Representation of local node
  */
-public class LocalNode extends RemoteNode {
+public class LocalNode {
     private final List<RemoteNodeDiscoveryListener> listeners = Collections.synchronizedList(new LinkedList<RemoteNodeDiscoveryListener> ());
-
-    private static Set<LocalNode> registry = Collections.synchronizedSet(new HashSet<LocalNode> ());
 
     private final Scheduler scheduler;
 
@@ -25,14 +20,14 @@ public class LocalNode extends RemoteNode {
 
     private final AbstractPooledActorGroup actorGroup;
 
-    public LocalNode(Scheduler scheduler) {
-        this(scheduler, null);
+    private final UUID id = UUID.randomUUID();
+
+    public LocalNode() {
+        this(null);
     }
 
-    public LocalNode(final Scheduler scheduler, Runnable runnable) {
-        super(new SharedMemoryTransport());
-        ((SharedMemoryTransport)getTransport()).setNode(this);
-        this.scheduler = scheduler;
+    public LocalNode(Runnable runnable) {
+        this.scheduler = new Scheduler();
 
         actorGroup = new AbstractPooledActorGroup() {{threadPool = scheduler;}};
 
@@ -48,39 +43,16 @@ public class LocalNode extends RemoteNode {
             mainActor = null;
         }
 
-        connect();
+        if (runnable != null)
+            connect();
     }
 
     public void connect() {
-        registry.add(this);
-
-        for (final LocalNode n : registry) {
-            if (n == this)
-                continue;
-
-            scheduler.execute(new Runnable(){
-                public void run() {
-                    onConnect(n);
-                    n.onConnect(LocalNode.this);
-                }
-            });
-        }
+        LocalNodeRegistry.connect(this);
     }
 
     public void disconnect() {
-        registry.remove(this);
-
-        for (final LocalNode n : registry) {
-            if (n == this)
-                continue;
-
-            scheduler.execute(new Runnable(){
-                public void run() {
-                    onDisonnect(n);
-                    n.onDisonnect(LocalNode.this);
-                }
-            });
-        }
+        LocalNodeRegistry.disconnect(this);
     }
 
     public void addDiscoveryListener (RemoteNodeDiscoveryListener l) {
@@ -114,7 +86,7 @@ public class LocalNode extends RemoteNode {
             });
     }
 
-    public void onDisonnect (final RemoteNode node) {
+    public void onDisconnect(final RemoteNode node) {
         for(final RemoteNodeDiscoveryListener l : listeners)
             scheduler.execute(new Runnable(){
                 public void run() {
@@ -125,5 +97,18 @@ public class LocalNode extends RemoteNode {
 
     public Actor getMainActor() {
         return mainActor;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return getId().toString();
     }
 }

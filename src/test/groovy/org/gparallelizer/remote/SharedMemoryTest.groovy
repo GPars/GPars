@@ -1,59 +1,103 @@
 package org.gparallelizer.remote
 
 import org.gparallelizer.scheduler.Scheduler
-import static org.gparallelizer.actors.pooledActors.PooledActors.*;
+import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import org.gparallelizer.dataflow.DataFlowVariable
+import java.util.concurrent.CountDownLatch;
 
 public class SharedMemoryTest extends GroovyTestCase {
     void testShared () {
-      def scheduler = new Scheduler()
-
-      def node1 = new LocalNode(scheduler)
-      def node2 = new LocalNode(scheduler)
-      def node3 = new LocalNode(scheduler)
+      def node1 = new LocalNode()
+      def node2 = new LocalNode()
+      def node3 = new LocalNode()
 
       def res = [:]
       def nodes = [node1, node2, node3]
 
-      nodes.each {
-         res [it] = [connected:[], disconnected:[]]
-         it.addDiscoveryListener { node, op ->
-           println "$it $op $node"
-           res.get(it)[op].add(node)
+      def latch
+      latch = new CountDownLatch (nodes.size()*(nodes.size()-1))
+
+      nodes.each { node ->
+         def info = res [node.id] = [connected:[], disconnected:[]]
+         node.addDiscoveryListener { anotherNode, op ->
+           synchronized (info) {
+               println "$node $op $anotherNode"
+               info[op] << anotherNode.id
+               latch.countDown ()
+           }
          }
-         it.connect ()
+         node.connect ()
       }
 
-      nodes.each { it.disconnect () }
+      latch.await ()
 
-      Thread.currentThread().sleep 500
-      
-      scheduler.shutdown ()
+      assertEquals ([node2.id, node3.id] as SortedSet, res[node1.id].connected as SortedSet)
+      assertEquals ([node1.id, node3.id] as SortedSet, res[node2.id].connected as SortedSet)
+      assertEquals ([node1.id, node2.id] as SortedSet, res[node3.id].connected as SortedSet) 
+
+      latch = new CountDownLatch (nodes.size()*(nodes.size()-1))
+
+      nodes.each { id ->
+        id.disconnect ()
+      }
+
+      latch.await ()
+
+      assertEquals ([node2.id, node3.id] as SortedSet, res[node1.id].disconnected as SortedSet)
+      assertEquals ([node1.id, node3.id] as SortedSet, res[node2.id].disconnected as SortedSet)
+      assertEquals ([node1.id, node2.id] as SortedSet, res[node3.id].disconnected as SortedSet)
 
       res.each { k, v -> println "$k : $v"}
     }
 
     void testMainActor () {
-      def scheduler = new Scheduler()
+      def latch, latch2
+      latch = new CountDownLatch (12)
+      latch2 = new CountDownLatch (24)
 
       def nodes = [:]
-      (0..5).each { id ->
-        nodes[id] = new LocalNode(scheduler,{
+      (0..3).each { id ->
+        nodes[id] = new LocalNode({
           addDiscoveryListener { n, op ->
-            n.mainActor << "Hi, from $id"
+            try {
+              def msg = "${op == 'connected' ? 'Hi' : 'Bye'}, from $id"
+              println msg
+              n.mainActor << msg
+            }
+            catch (Throwable t) {
+              t.printStackTrace ()
+            }
+            finally {
+              latch.countDown ()
+            }
           }
 
           loop {
             react { msg ->
-              println "$id: $msg"
+              try {
+                println "To $id: $msg"
+              }
+              catch (Throwable t) {
+                t.printStackTrace ()
+              }
+              finally {
+                latch2.countDown ()
+              }
             }
           }
         })
       }
 
-      Thread.currentThread().sleep 500
+      latch.await ()
+      println "Discovery finished"
 
-      (0..5).each { id ->
+      latch = new CountDownLatch (12)
+
+      (0..3).each { id ->
         nodes[id].disconnect ()
       }
+
+      latch.await ()
+      latch2.await ()
     }
 }

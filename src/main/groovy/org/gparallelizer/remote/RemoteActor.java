@@ -8,12 +8,11 @@ import java.util.UUID;
 import groovy.time.Duration;
 
 public class RemoteActor implements Actor {
-    private RemoteNode remoteNode;
-    private UUID       id;
+    private final RemoteNode remoteNode;
+    private       UUID       id;
 
-    public RemoteActor(RemoteNode remoteNode, UUID id) {
+    public RemoteActor(RemoteNode remoteNode) {
         this.remoteNode = remoteNode;
-        this.id = id;
     }
 
     public Actor start() {
@@ -65,6 +64,8 @@ public class RemoteActor implements Actor {
     }
 
     public UUID getId() {
+        if (id == null)
+          id = UUID.randomUUID();
         return id;
     }
 }
