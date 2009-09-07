@@ -4,12 +4,12 @@ package org.gparallelizer.actors;
  * An internal representation of received messages holding both the original message plus the sender actor reference.
  * This class is not intented to be use directly by users.
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  * Date: Feb 27, 2009
  */
 @SuppressWarnings({"MethodReturnOfConcreteClass"})
-public final class ActorMessage {
-    final private Object payLoad;
+public final class ActorMessage<T> {
+    final private T payLoad;
     final private Actor sender;
 
     /**
@@ -17,12 +17,12 @@ public final class ActorMessage {
      * @param payLoad The original message
      * @param sender The sending actor, null, if the message was not sent by an actor
      */
-    private ActorMessage(final Object payLoad, final Actor sender) {
+    private ActorMessage(final T payLoad, final Actor sender) {
         this.payLoad = payLoad;
         this.sender = sender;
     }
 
-    public Object getPayLoad() {
+    public T getPayLoad() {
         return payLoad;
     }
 
@@ -36,8 +36,8 @@ public final class ActorMessage {
      * @param payLoad The original message
      * @return The newly created message
      */
-    public static ActorMessage build(final Object payLoad) {
-        return new ActorMessage(payLoad, ReplyRegistry.threadBoundActor());
+    public static <T> ActorMessage build(final T payLoad) {
+        return new ActorMessage<T>(payLoad, ReplyRegistry.threadBoundActor());
     }
 
     @Override public String toString() {
