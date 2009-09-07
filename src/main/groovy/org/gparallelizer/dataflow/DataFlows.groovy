@@ -84,6 +84,11 @@ public class DataFlows {
           throw new MissingMethodException(name, DataFlows, args)
     }
 
+    //todo readdress, used only by a benchmarking demo to avoid OOM. Maybe a proper way to prune no-longer-needer variables from the DataFlows would be useful
+    private def retrieveVariables() {
+        variables
+    }
+
   /**
    * @return the value of the DataFlowVariable associated with the property "name".
    * May block if the value is not scalar.
@@ -100,14 +105,6 @@ public class DataFlows {
    */
     void putAt (index,value) {
       ensureToContainVariable(index) << value
-    }
-
-    /**
-     * Removes a DataFlowVariable associated with the given name
-     */
-    public void prune(name) {
-        //todo remove the method or make it play nicely with the rest of the class, needed for DeoManyDataFlows to work
-        variables.remove name
     }
 
    /**

@@ -6,6 +6,9 @@
 
     Planned for the next release
 
+    todo automate creation of code sample download, javadoc download, source download
+    todo tune maven repository upload
+
     todo add generics to SafeVariable
     todo add @Immutable back to three tests
     todo Think of an example on SafeVariable subclass
@@ -14,15 +17,11 @@
     todo Detecting deadlock in the DataFlows class
     todo used generics with DataFlows to support DataFlowVariable.val type hints in IDE
 
-    todo allow join on groups of actors or Dataflow treads
-    todo clean issues and todos
-    todo samples on typical concurrency issues
-    todo Resizable pools policy should perhaps be change so as not to blow on more than 1000 threads
-    todo Logging policy - perhaps leveraging the current lifecycle methods
-    todo automate creation of code sample download, javadoc download, source download
-    todo tune maven repository upload
 
     Backlog
+    todo allow join on groups of actors or Dataflow treads
+    todo clean issues and todos
+    todo Logging policy - perhaps leveraging the current lifecycle methods
     todo Maybe SafeVariables could be used for ActorMetaClass
     todo build with maven
     todo look into MINA
