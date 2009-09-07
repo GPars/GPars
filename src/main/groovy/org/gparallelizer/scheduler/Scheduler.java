@@ -54,6 +54,16 @@ public final class Scheduler implements Pool {
         }
     }
 
+    public Runnable loop(final Runnable operation) {
+        return new Runnable() {
+            public void run() {
+                operation.run ();
+                if (!terminating)
+                    execute(this);
+            }
+        };
+    }
+
     private void startNewThread() {
             threadCount.incrementAndGet();
             new WorkerThread().start();
@@ -105,7 +115,7 @@ public final class Scheduler implements Pool {
                             // ignore
                         }
                     }
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e) {//
                 }
             }
             finally {

@@ -382,7 +382,7 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * @return The message that came in reply to the original send.
      */
     public final sendAndWait(Object message) {
-        new SendAndWaitActor(this, message).start().result
+        new SendAndWaitThreadedActor(this, message).start().result
     }
 
     /**
@@ -391,7 +391,7 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * @return The message that came in reply to the original send.
      */
     public final sendAndWait(long timeout, TimeUnit timeUnit, Object message) {
-        new SendAndWaitActor(this, message, timeUnit.toMillis(timeout)).start().result
+        new SendAndWaitThreadedActor(this, message, timeUnit.toMillis(timeout)).start().result
     }
 
     /**
@@ -467,7 +467,7 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
  * The message is enhanced to send notification in case the target actor terminates without processing the message.
  * Exceptions are re-throvn from the getResult() method.
  */
-final class SendAndWaitActor extends DefaultThreadActor {
+final class SendAndWaitThreadedActor extends DefaultThreadActor {
 
     final private Actor targetActor
     final private Object message
@@ -475,18 +475,18 @@ final class SendAndWaitActor extends DefaultThreadActor {
     private Object result
     private long timeout = -1
 
-    def SendAndWaitActor(final targetActor, final message) {
+    def SendAndWaitThreadedActor(final targetActor, final message) {
         this.targetActor = targetActor;
         this.message = message
         this.actorGroup = targetActor.actorGroup
     }
 
-    def SendAndWaitActor(final targetActor, final message, final long timeout) {
+    def SendAndWaitThreadedActor(final targetActor, final message, final long timeout) {
         this(targetActor, message)
         this.timeout = timeout
     }
 
-    void act() {
+  void act() {
         message.getMetaClass().onDeliveryError = {->
             this << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
         }
