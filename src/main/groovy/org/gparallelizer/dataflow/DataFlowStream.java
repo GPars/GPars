@@ -23,16 +23,16 @@ public final class DataFlowStream<T> {
     /**
      * Adds a DataFlowVariable to the buffer.
      */
-    public void leftShift(DataFlowVariable<T> ref) {
+    public void leftShift(final DataFlowVariable<T> ref) {
         queue.offer(ref);
     }
 
     /**
      * Adds a DataFlowVariable representing the passed in value to the buffer.
      */
-    public void leftShift(T value) {
+    public void leftShift(final T value) {
         final DataFlowVariable<T> ref = new DataFlowVariable<T>();
-        ref.leftShift(value);
+        ref.bind(value);
         queue.offer(ref);
     }
 
@@ -40,7 +40,7 @@ public final class DataFlowStream<T> {
      * Retrieves the value at the head of the buffer. Blocks until a value is available.
      */
     public T getVal() throws InterruptedException {
-        return (queue.take()).getVal();
+        return queue.take().getVal();
     }
 
     /**
