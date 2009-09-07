@@ -3,7 +3,8 @@ package org.gparallelizer.remote
 import org.gparallelizer.scheduler.Scheduler
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
 import org.gparallelizer.dataflow.DataFlowVariable
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CountDownLatch
+import org.gparallelizer.remote.nonsharedmemory.NonSharedMemoryNode;
 
 public class SharedMemoryTest extends GroovyTestCase {
     void testShared () {

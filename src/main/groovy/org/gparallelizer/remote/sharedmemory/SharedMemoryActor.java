@@ -12,7 +12,7 @@ public class SharedMemoryActor extends RemoteActor {
     private final Actor delegate;
 
     public SharedMemoryActor(RemoteNode remoteNode, Actor delegate) {
-        super(remoteNode);
+        super(remoteNode, null);
         this.delegate = delegate;
     }
 

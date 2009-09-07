@@ -1,6 +1,7 @@
 package org.gparallelizer.remote;
 
 import org.gparallelizer.actors.Actor;
+import org.gparallelizer.actors.ActorMessage;
 
 import java.util.concurrent.TimeUnit;
 import java.util.UUID;
@@ -9,10 +10,12 @@ import groovy.time.Duration;
 
 public class RemoteActor implements Actor {
     private final RemoteNode remoteNode;
+
     private       UUID       id;
 
-    public RemoteActor(RemoteNode remoteNode) {
+    public RemoteActor(RemoteNode remoteNode, UUID id) {
         this.remoteNode = remoteNode;
+        this.id = id;
     }
 
     public Actor start() {
@@ -40,7 +43,8 @@ public class RemoteActor implements Actor {
     }
 
     public Actor send(Object message) {
-        throw new UnsupportedOperationException();
+        remoteNode.send(this, ActorMessage.build(message));
+        return this;
     }
 
     public Object sendAndWait(Object message) {
@@ -65,7 +69,11 @@ public class RemoteActor implements Actor {
 
     public UUID getId() {
         if (id == null)
-          id = UUID.randomUUID();
+            id = UUID.randomUUID();
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 }

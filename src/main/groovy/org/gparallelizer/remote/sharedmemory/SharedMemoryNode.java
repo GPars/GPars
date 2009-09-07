@@ -6,6 +6,7 @@ import org.gparallelizer.remote.RemoteActor;
 import org.gparallelizer.actors.ActorMessage;
 
 import java.io.Serializable;
+import java.io.IOException;
 import java.util.UUID;
 
 public class SharedMemoryNode extends RemoteNode {
@@ -28,7 +29,7 @@ public class SharedMemoryNode extends RemoteNode {
         return localNode;
     }
 
-    public void onDisconnect(SharedMemoryNode smn) {
+    public void onDisconnect(RemoteNode smn) {
         localNode.onDisconnect(smn);
     }
 
@@ -36,6 +37,10 @@ public class SharedMemoryNode extends RemoteNode {
         if (uid == RemoteNode.MAIN_ACTOR_ID)
             return new SharedMemoryActor(this, localNode.getMainActor());
 
+        throw new UnsupportedOperationException();
+    }
+
+    protected void deliver(byte[] bytes) throws IOException {
         throw new UnsupportedOperationException();
     }
 }

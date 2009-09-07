@@ -112,7 +112,7 @@ public final class Scheduler implements Pool {
                             task.run();
                         }
                         catch (Throwable t){
-                            // ignore
+                            t.printStackTrace();
                         }
                     }
                 } catch (InterruptedException e) {//
