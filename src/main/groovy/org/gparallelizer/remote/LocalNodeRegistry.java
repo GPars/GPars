@@ -9,9 +9,9 @@ public class LocalNodeRegistry {
     public static final Set<RemoteTransportProvider> transportProviders
             = Collections.synchronizedSet(new HashSet<RemoteTransportProvider>());
 
-    public static void connect(final LocalNode node) {
+    public synchronized static void connect(final LocalNode node) {
         if (transportProviders.isEmpty())
-            transportProviders.add(NonSharedMemoryTransportProvider.getInstance());
+            transportProviders.add(SharedMemoryTransportProvider.getInstance());
 
         for (final RemoteTransportProvider transportProvider : transportProviders) {
             node.getScheduler().execute(new Runnable(){
@@ -22,9 +22,9 @@ public class LocalNodeRegistry {
         }
     }
 
-    public static void disconnect(final LocalNode node) {
+    public synchronized static void disconnect(final LocalNode node) {
         if (transportProviders.isEmpty())
-            transportProviders.add(NonSharedMemoryTransportProvider.getInstance());
+            transportProviders.add(SharedMemoryTransportProvider.getInstance());
 
         for (final RemoteTransportProvider transportProvider : transportProviders) {
             node.getScheduler().execute(new Runnable(){
@@ -33,5 +33,13 @@ public class LocalNodeRegistry {
                 }
             });
         }
+    }
+
+    public static synchronized void removeTransportProvider (RemoteTransportProvider provider) {
+        transportProviders.remove(provider);
+    }
+
+    public static synchronized void addTransportProvider (RemoteTransportProvider provider) {
+        transportProviders.add(provider);
     }
 }

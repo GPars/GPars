@@ -3,7 +3,7 @@ package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlows
 import static org.gparallelizer.dataflow.DataFlow.*
-import org.gparallelizer.scheduler.Scheduler
+import java.util.concurrent.Executors
 
 static final LIMIT = 3*100*1000
 
@@ -11,7 +11,7 @@ final df = new DataFlows(LIMIT+1, 0.9f, DataFlows.MAX_SEGMENTS)
 
 final many = 1..LIMIT
 
-def scheduler = new Scheduler ()
+def scheduler = Executors.newFixedThreadPool (20)
 
 scheduler.execute { df.result = many.collect{
     def v = df[it]

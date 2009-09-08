@@ -2,10 +2,12 @@ package org.gparallelizer.remote;
 
 import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.actors.Actor;
+import org.gparallelizer.actors.pooledActors.Pool;
 
 import java.io.*;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 
 /**
  * Representation of remote node
@@ -28,7 +30,9 @@ public abstract class RemoteNode {
 
     public abstract UUID getId ();
 
-    public abstract void onDisconnect(RemoteNode smn);
+    public abstract void onConnect(RemoteNode node);
+
+    public abstract void onDisconnect(RemoteNode node);
 
     @Override
     public String toString() {
@@ -57,7 +61,12 @@ public abstract class RemoteNode {
         return actor;
     }
 
-    protected abstract RemoteActor createRemoteActor(UUID uid);
+    protected RemoteActor createRemoteActor(UUID uid) {
+        if (uid == RemoteNode.MAIN_ACTOR_ID)
+            return new RemoteActor(this, uid);
+
+        throw new UnsupportedOperationException();
+    }
 
     protected abstract void deliver(byte[] bytes) throws IOException;
 
@@ -81,36 +90,42 @@ public abstract class RemoteNode {
     }
 
     protected void send(RemoteActor receiver, ActorMessage<Serializable> message) {
+        byte [] data = new byte[0];
         try {
-           byte [] data = encodeMessage(receiver, message);
-           deliver(data);
-        }
-        catch (IOException e) { //
+            data = encodeMessage(receiver, message);
+            deliver(data);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     protected byte[] encodeMessage(RemoteActor receiver, ActorMessage<Serializable> message) throws IOException {
         final RemoteMessage toSend = new RemoteMessage(receiver.getId(), getLocalActorId(message.getSender()), message.getPayLoad());
         final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        try {
-            final ObjectOutputStream oout = new ObjectOutputStream(bout);
-            oout.writeObject(toSend);
-            oout.close();
-            return bout.toByteArray();
-        } catch (IOException e) {
-            throw e;
-        }
+        final ObjectOutputStream oout = new ObjectOutputStream(bout);
+        oout.writeObject(toSend);
+        oout.close();
+        return bout.toByteArray();
     }
 
-    protected RemoteMessage decodeMessage (byte [] data) {
+    protected RemoteMessage decodeMessage (byte [] data) throws IOException {
         try {
             return (RemoteMessage) new ObjectInputStream(new ByteArrayInputStream(data)).readObject();
-        } catch (Throwable e) {
-            return null;
+        } catch (ClassNotFoundException e) {
+            throw new IOException(e.getMessage());
         }
     }
 
     public Actor getLocalActor(UUID uuid) {
         return localActorsId.get(uuid);
+    }
+
+    protected final void onMessageReceived(byte [] bytes, final Executor scheduler) throws IOException {
+        final RemoteMessage remoteMessage = decodeMessage(bytes);
+        scheduler.execute(new Runnable(){
+            public void run() {
+                getLocalActor(remoteMessage.getTo()).send(remoteMessage.getPayload());
+            }
+        });
     }
 }

@@ -2,14 +2,14 @@ package org.gparallelizer.samples.dataflow
 
 import static org.gparallelizer.dataflow.DataFlow.*
 import org.gparallelizer.dataflow.DataFlowVariable
-import org.gparallelizer.scheduler.Scheduler
+import java.util.concurrent.Executors
 
 final many = 1..(limit)
 
 List dfs = many.collect{ new DataFlowVariable() }
 def result = new DataFlowVariable()
 
-def scheduler = new Scheduler ()
+def scheduler = Executors.newFixedThreadPool (20)
 
 scheduler.execute { result << dfs.sum { it.val } }
 

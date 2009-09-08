@@ -3,8 +3,10 @@ package org.gparallelizer.remote;
 import org.gparallelizer.scheduler.Scheduler;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
+import org.gparallelizer.actors.pooledActors.DefaultPool;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import groovy.lang.Closure;
 
@@ -14,22 +16,48 @@ import groovy.lang.Closure;
 public class LocalNode {
     private final List<RemoteNodeDiscoveryListener> listeners = Collections.synchronizedList(new LinkedList<RemoteNodeDiscoveryListener> ());
 
-    private final Scheduler scheduler;
+    private final ThreadPoolExecutor scheduler;
 
     private final Actor mainActor;
 
     private final AbstractPooledActorGroup actorGroup;
 
     private final UUID id = UUID.randomUUID();
+    protected ThreadFactory threadFactory;
 
     public LocalNode() {
         this(null);
     }
 
     public LocalNode(Runnable runnable) {
-        this.scheduler = new Scheduler();
+        this.scheduler = new ThreadPoolExecutor(1, Integer.MAX_VALUE,
+                60L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>(100),
+                new ThreadFactory(){
+                    ThreadFactory threadFactory = Executors.defaultThreadFactory();
 
-        actorGroup = new AbstractPooledActorGroup() {{threadPool = scheduler;}};
+                    public Thread newThread(Runnable r) {
+                        final Thread thread = threadFactory.newThread(r);
+                        thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                            public void uncaughtException(final Thread t, final Throwable e) {
+                                System.err.println("Uncaught exception occured in actor pool " + t.getName());
+                                e.printStackTrace(System.err);
+                            }
+                        });
+                        return thread;
+                    }
+                });
+
+        actorGroup = new AbstractPooledActorGroup() {
+            {
+                threadPool = new DefaultPool(true){
+                    @Override
+                    protected ThreadPoolExecutor createPool(boolean daemon, int poolSize) {
+                        return scheduler;
+                    }
+                };
+            }
+        };
 
         if (runnable != null) {
             if (runnable instanceof Closure) {
@@ -99,7 +127,7 @@ public class LocalNode {
         return mainActor;
     }
 
-    public Scheduler getScheduler() {
+    public Executor getScheduler() {
         return scheduler;
     }
 

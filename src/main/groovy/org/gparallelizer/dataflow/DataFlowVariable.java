@@ -147,6 +147,7 @@ public final class DataFlowVariable<T> {
     }
 
     private void scheduleCallback(final DataCallback<T> callback) {
+        // TODO: we don't need actor here. Unfortunately DataFlowActor.DATA_FLOW_GROUP.getThreadPool is not acessible here
         new DataFlowActor() {
             @Override
             protected void act() {

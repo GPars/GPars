@@ -21,16 +21,16 @@ public class SharedMemoryNode extends RemoteNode {
         return localNode.getId();
     }
 
+    public void onConnect(RemoteNode node) {
+        localNode.onConnect(node);
+    }
+
+    public void onDisconnect(RemoteNode node) {
+        localNode.onDisconnect(node);
+    }
+
     public void send(RemoteActor receiver, ActorMessage<Serializable> message) {
         throw new UnsupportedOperationException();
-    }
-
-    public LocalNode getLocalNode() {
-        return localNode;
-    }
-
-    public void onDisconnect(RemoteNode smn) {
-        localNode.onDisconnect(smn);
     }
 
     protected RemoteActor createRemoteActor(UUID uid) {
