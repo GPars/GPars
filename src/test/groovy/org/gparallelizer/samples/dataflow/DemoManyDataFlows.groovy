@@ -15,7 +15,7 @@ def scheduler = new Scheduler ()
 
 scheduler.execute { df.result = many.collect{
     def v = df[it]
-    df.retrieveVariables().remove it
+    df.remove it
     v
 }.sum() }
 

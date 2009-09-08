@@ -68,7 +68,6 @@ public class DataFlows {
         ensureToContainVariable(name).val
     }
 
-
     /**
      * Invokes the given method.
      *
@@ -82,11 +81,6 @@ public class DataFlows {
           df >> args[0]
         else
           throw new MissingMethodException(name, DataFlows, args)
-    }
-
-    //todo readdress, used only by a benchmarking demo to avoid OOM. Maybe a proper way to prune no-longer-needer variables from the DataFlows would be useful
-    private def retrieveVariables() {
-        variables
     }
 
   /**
@@ -133,11 +127,18 @@ public class DataFlows {
     private def putNewUnderLock(name) {
       synchronized (this) {
         def df = variables.get(name)
-        if (df == DUMMY) {
+        if (!df || (df == DUMMY)) {
           df = new DF()
           variables.put(name, df);
         }
         return df
       }
+    }
+
+    public def remove(name) {
+        synchronized(this) {
+            def df = variables.remove(name)
+            df.bindSafely(null)
+        }
     }
 }

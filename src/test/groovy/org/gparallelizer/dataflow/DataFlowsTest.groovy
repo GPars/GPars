@@ -104,4 +104,45 @@ public class DataFlowsTest extends GroovyTestCase {
           }
           assertEquals 2, data[2]
       }
+
+    public void testValueRemoval() {
+        final DataFlows data = new DataFlows()
+
+        data.y = 'value1'
+        shouldFail {
+            data.y = 'value2'
+        }
+        data.remove('y')
+        data.y = 'value3'
+
+        final def y = data.y
+        assert y instanceof String
+        assertEquals 'value3', y
+        assertEquals 'value3', data.y
+    }
+
+    public void testUnblockingAfterValueRemoval() {
+        final DataFlows data = new DataFlows()
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        DataFlow.start {
+            barrier.await()
+            data.y = 'value'
+        }
+
+        DataFlow.start {
+            Thread.sleep 1000
+            data.remove('y')
+            barrier.await()
+        }
+
+        final def y = data.y
+        assertNull y
+
+        y=data.y  //retry
+        assert y instanceof String
+        assertEquals 'value', y
+        assertEquals 'value', data.y
+    }
+
 }
