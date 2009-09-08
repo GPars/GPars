@@ -145,4 +145,24 @@ public class DataFlowsTest extends GroovyTestCase {
         assertEquals 'value', data.y
     }
 
+    public void testWhenValueBound() {
+        final DataFlows data = new DataFlows()
+        final def result1 = new DataFlowVariable()
+        final def result2 = new DataFlowVariable()
+
+        data.y {result1 << it }
+        data.y = 'value'
+        data.y {result2 << it }
+
+        assert result1.val instanceof String
+        assertEquals 'value', result1.val
+        assert result2.val instanceof String
+        assertEquals 'value', result2.val
+        assertEquals 'value', data.y
+
+        shouldFail(IllegalStateException) {
+            data.y = 20
+        }
+    }
+
 }
