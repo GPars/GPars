@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/groovy"/>
+	<classpathentry excluding="org/gparallelizer/samples/benchmarks/|org/gparallelizer/samples/|org/gparallelizer/enhancer/|org/gparallelizer/samples/dataflow/|org/gparallelizer/samples/actors/safevariable/" kind="src" path="src/test/groovy"/>
+	<classpathentry kind="lib" path="lib/jsr166y-070108.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="con" path="GROOVY_SUPPORT"/>
+	<classpathentry kind="output" path="build/classes/main"/>
+</classpath>
