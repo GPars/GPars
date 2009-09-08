@@ -28,7 +28,7 @@ dependencies {
   deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: '1.9'
 }
 
-compileTest.dependsOn  compile
+compileTests.dependsOn  compile
 
 uploadArchives {
   repositories.mavenDeployer {
