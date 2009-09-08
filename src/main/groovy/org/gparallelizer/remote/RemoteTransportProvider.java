@@ -5,35 +5,25 @@ import java.util.Map;
 import java.util.HashMap;
 
 public abstract class RemoteTransportProvider<T extends RemoteNode> {
-    private final Map<UUID,T> registry = new HashMap<UUID, T>();
+    protected final Map<UUID,T> registry = new HashMap<UUID, T>();
 
-    protected abstract T createRemoteNode(LocalNode node);
+    protected void connect(LocalNode local, T remote) {
+        local.onConnect(remote);
+    }
+
+    protected void disconnect(LocalNode local, T remote) {
+        local.onDisconnect(remote);
+    }
 
     public synchronized void connect(final LocalNode node) {
-        final T smn = createRemoteNode(node);
-
         for (final T n : registry.values()) {
-            node.getScheduler().execute(new Runnable(){
-                public void run() {
-                    node.onConnect(n);
-                    n.onConnect(smn);
-                }
-            });
+          connect(node, n);
         }
-
-        registry.put(node.getId(), smn);
     }
 
     public synchronized void disconnect(final LocalNode node) {
-        final T smn = registry.remove(node.getId());
-
         for (final T n : registry.values()) {
-            node.getScheduler().execute(new Runnable(){
-                public void run() {
-                    node.onDisconnect(n);
-                    n.onDisconnect(smn);
-                }
-            });
+            disconnect(node, n);
         }
     }
 }

@@ -1,15 +1,15 @@
 package org.gparallelizer.remote
 
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
-import org.gparallelizer.dataflow.DataFlowVariable
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.remote.nonsharedmemory.NonSharedMemoryNode;
 
 public abstract class CommunicationTestBase extends GroovyTestCase{
-    void testShared () {
-      def node1 = new LocalNode()
-      def node2 = new LocalNode()
-      def node3 = new LocalNode()
+
+  RemoteTransportProvider getTransportProvider () {}
+
+  void testDiscovery () {
+      def node1 = new LocalNode(transportProvider)
+      def node2 = new LocalNode(transportProvider)
+      def node3 = new LocalNode(transportProvider)
 
       def res = [:]
       def nodes = [node1, node2, node3]
@@ -57,11 +57,11 @@ public abstract class CommunicationTestBase extends GroovyTestCase{
 
       def nodes = [:]
       (0..3).each { id ->
-        nodes[id] = new LocalNode({
+        nodes[id] = new LocalNode(transportProvider, {
           addDiscoveryListener { n, op ->
             try {
               def msg = "${op == 'connected' ? 'Hi' : 'Bye'}, from $id"
-              println msg
+              println "sending $msg"
               n.mainActor << msg
             }
             catch (Throwable t) {
@@ -75,7 +75,7 @@ public abstract class CommunicationTestBase extends GroovyTestCase{
           loop {
             react { msg ->
               try {
-                println "To $id: $msg"
+                println "received $id: $msg"
               }
               catch (Throwable t) {
                 t.printStackTrace ()

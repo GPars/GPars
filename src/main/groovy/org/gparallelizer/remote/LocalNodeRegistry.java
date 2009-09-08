@@ -1,31 +1,20 @@
 package org.gparallelizer.remote;
 
-import org.gparallelizer.remote.sharedmemory.SharedMemoryTransportProvider;
-import org.gparallelizer.remote.nonsharedmemory.NonSharedMemoryTransportProvider;
+import org.gparallelizer.remote.memory.SharedMemoryTransportProvider;
 
 import java.util.*;
 
 public class LocalNodeRegistry {
     public static final Set<RemoteTransportProvider> transportProviders
-            = Collections.synchronizedSet(new HashSet<RemoteTransportProvider>());
+            = Collections.synchronizedSet(new HashSet<RemoteTransportProvider>(Arrays.asList(SharedMemoryTransportProvider.getInstance())));
 
     public synchronized static void connect(final LocalNode node) {
-        if (transportProviders.isEmpty())
-            transportProviders.add(SharedMemoryTransportProvider.getInstance());
-
         for (final RemoteTransportProvider transportProvider : transportProviders) {
-            node.getScheduler().execute(new Runnable(){
-                public void run() {
-                    transportProvider.connect(node);
-                }
-            });
+            node.connect(transportProvider);
         }
     }
 
     public synchronized static void disconnect(final LocalNode node) {
-        if (transportProviders.isEmpty())
-            transportProviders.add(SharedMemoryTransportProvider.getInstance());
-
         for (final RemoteTransportProvider transportProvider : transportProviders) {
             node.getScheduler().execute(new Runnable(){
                 public void run() {

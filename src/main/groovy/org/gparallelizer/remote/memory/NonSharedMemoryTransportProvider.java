@@ -1,9 +1,9 @@
-package org.gparallelizer.remote.nonsharedmemory;
+package org.gparallelizer.remote.memory;
 
 import org.gparallelizer.remote.RemoteTransportProvider;
 import org.gparallelizer.remote.LocalNode;
 
-public class NonSharedMemoryTransportProvider extends RemoteTransportProvider<NonSharedMemoryNode> {
+public class NonSharedMemoryTransportProvider extends MemoryTransportProvider<NonSharedMemoryNode> {
 
     private final static RemoteTransportProvider instance = new NonSharedMemoryTransportProvider();
 

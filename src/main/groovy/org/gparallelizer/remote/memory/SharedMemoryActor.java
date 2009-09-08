@@ -1,4 +1,4 @@
-package org.gparallelizer.remote.sharedmemory;
+package org.gparallelizer.remote.memory;
 
 import org.gparallelizer.remote.RemoteActor;
 import org.gparallelizer.remote.RemoteNode;

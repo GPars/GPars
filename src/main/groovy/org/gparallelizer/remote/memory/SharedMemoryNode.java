@@ -1,4 +1,4 @@
-package org.gparallelizer.remote.sharedmemory;
+package org.gparallelizer.remote.memory;
 
 import org.gparallelizer.remote.RemoteNode;
 import org.gparallelizer.remote.LocalNode;
@@ -9,24 +9,9 @@ import java.io.Serializable;
 import java.io.IOException;
 import java.util.UUID;
 
-public class SharedMemoryNode extends RemoteNode {
-    private final LocalNode localNode;
-
+public class SharedMemoryNode extends MemoryNode {
     public SharedMemoryNode(LocalNode node) {
-        super();
-        this.localNode = node;
-    }
-
-    public UUID getId() {
-        return localNode.getId();
-    }
-
-    public void onConnect(RemoteNode node) {
-        localNode.onConnect(node);
-    }
-
-    public void onDisconnect(RemoteNode node) {
-        localNode.onDisconnect(node);
+        super(node);
     }
 
     public void send(RemoteActor receiver, ActorMessage<Serializable> message) {

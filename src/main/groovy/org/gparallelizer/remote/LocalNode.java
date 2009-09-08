@@ -1,6 +1,5 @@
 package org.gparallelizer.remote;
 
-import org.gparallelizer.scheduler.Scheduler;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
@@ -23,13 +22,21 @@ public class LocalNode {
     private final AbstractPooledActorGroup actorGroup;
 
     private final UUID id = UUID.randomUUID();
-    protected ThreadFactory threadFactory;
+    private RemoteTransportProvider transportProvider;
 
     public LocalNode() {
-        this(null);
+        this(null, null);
     }
 
     public LocalNode(Runnable runnable) {
+        this(null, runnable);
+    }
+
+    public LocalNode(RemoteTransportProvider provider) {
+        this(provider, null);
+    }
+
+    public LocalNode(RemoteTransportProvider provider, Runnable runnable) {
         this.scheduler = new ThreadPoolExecutor(1, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(100),
@@ -71,16 +78,36 @@ public class LocalNode {
             mainActor = null;
         }
 
-        if (runnable != null)
-            connect();
+        transportProvider = provider;
+        if (runnable != null) {
+            connect(provider);
+        }
     }
 
     public void connect() {
-        LocalNodeRegistry.connect(this);
+        if (transportProvider != null)
+            connect(transportProvider);
+        else
+            LocalNodeRegistry.connect(this);
+    }
+
+    public void connect(final RemoteTransportProvider provider) {
+        scheduler.execute(new Runnable(){
+            public void run() {
+                provider.connect(LocalNode.this);
+            }
+        });
     }
 
     public void disconnect() {
-        LocalNodeRegistry.disconnect(this);
+        if (transportProvider == null)
+            LocalNodeRegistry.disconnect(this);
+        else
+            scheduler.execute(new Runnable(){
+                public void run() {
+                    transportProvider.disconnect(LocalNode.this);
+                }
+            });
     }
 
     public void addDiscoveryListener (RemoteNodeDiscoveryListener l) {
@@ -139,4 +166,5 @@ public class LocalNode {
     public String toString() {
         return getId().toString();
     }
+
 }
