@@ -20,46 +20,48 @@ import java.util.concurrent.locks.LockSupport;
  * Date: Jun 4, 2009
  * @param <T> Type of values to bind with the DataFlowVariable
  */
+@SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
 public final class DataFlowVariable<T> {
+    @SuppressWarnings({"InstanceVariableMayNotBeInitialized"})
     private volatile T value;
 
-    private volatile AtomicInteger state = new AtomicInteger();
+    private final AtomicInteger state = new AtomicInteger();
 
-    private final AtomicReference<WaitingThread> waiting = new AtomicReference<WaitingThread> ();
+    private final AtomicReference<WaitingThread<T>> waiting = new AtomicReference<WaitingThread<T>> ();
 
     private static final int S_NOT_INITIALIZED = 0;
     private static final int S_INITIALIZING    = 1;
     private static final int S_INITIALIZED     = 2;
 
-    private static class WaitingThread {
-        final Thread thread;
-        volatile WaitingThread previous;
-        private final DataCallback callback;
+    private static class WaitingThread<V> {
+        private final Thread thread;
+        private volatile WaitingThread<V> previous;
+        private final DataCallback<V> callback;
 
-        public WaitingThread(Thread thread, WaitingThread previous, DataCallback callback) {
+        private WaitingThread(final Thread thread, final WaitingThread<V> previous, final DataCallback<V> callback) {
             this.callback = callback;
             this.thread = thread;
             this.previous = previous;
         }
     }
 
-    private static final WaitingThread dummyWaitingThread = new WaitingThread(null, null, null);
+    private static final WaitingThread dummyWaitingThread = new WaitingThread<Object>(null, null, null);
 
-    public static interface DataCallback<T> {
-        void onData (T data);
+    private interface DataCallback<U> {
+        void onData (U data);
     }
 
     public DataFlowVariable () {
         state.set(S_NOT_INITIALIZED);
     }
 
-    public void getVal(DataCallback<T> callback) {
-        WaitingThread newWaiting = null;
+    public void getVal(final DataCallback<T> callback) {
+        WaitingThread<T> newWaiting = null;
         while (state.get() != S_INITIALIZED) {
             if (newWaiting == null)
-                newWaiting = new WaitingThread(null, null, callback);
+                newWaiting = new WaitingThread<T>(null, null, callback);
 
-            final WaitingThread previous = waiting.get();
+            final WaitingThread<T> previous = waiting.get();
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread)
                 break;
@@ -80,12 +82,12 @@ public final class DataFlowVariable<T> {
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     public T getVal() throws InterruptedException {
-        WaitingThread newWaiting = null;
+        WaitingThread<T> newWaiting = null;
         while (state.get() != S_INITIALIZED) {
             if (newWaiting == null)
-                newWaiting = new WaitingThread(Thread.currentThread(), null, null);
+                newWaiting = new WaitingThread<T>(Thread.currentThread(), null, null);
 
-            final WaitingThread previous = waiting.get();
+            final WaitingThread<T> previous = waiting.get();
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread)
                 break;
@@ -109,18 +111,18 @@ public final class DataFlowVariable<T> {
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
      * @param value The value to assign
      */
-    public final void bind(final T value) {
+    public void bind(final T value) {
         if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING))
             throw new IllegalStateException("A DataFlowVariable can only be assigned once.");
 
         this.value = value;
         state.set(S_INITIALIZED);
 
-        final WaitingThread waitingQueue = waiting.getAndSet(dummyWaitingThread);
+        final WaitingThread<T> waitingQueue = waiting.getAndSet(dummyWaitingThread);
         // no more new waiting threads since that point
 
         // no more new waiting threads since that point
-        for ( WaitingThread waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
+        for ( WaitingThread<T> waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
             if (waiting.thread != null)
                 LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread 
             else {
@@ -129,7 +131,7 @@ public final class DataFlowVariable<T> {
         }
     }
 
-    private void scheduleCallback(final DataCallback callback) {
+    private void scheduleCallback(final DataCallback<T> callback) {
         new DataFlowActor() {
             @Override
             protected void act() {
@@ -156,6 +158,7 @@ public final class DataFlowVariable<T> {
         bind(ref.getVal());
     }
 
+    @SuppressWarnings({"ArithmeticOnVolatileField"})
     @Override public String toString() {
         return "DataFlowVariable(value=" + value + ')';
     }
@@ -180,7 +183,7 @@ public final class DataFlowVariable<T> {
      */
     public void whenBound (final Closure closure)  {
         getVal(new DataCallback<T> () {
-            public void onData(T data) {
+            public void onData(final T data) {
                 closure.call(data);
             }
         });
