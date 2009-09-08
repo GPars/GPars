@@ -19,6 +19,8 @@
  * Requires the jsr166y jar on the class path.
  */
 
+package org.gparallelizer.samples
+
 import org.gparallelizer.Parallelizer
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]

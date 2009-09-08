@@ -14,6 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
+package org.gparallelizer.samples
+
 import org.gparallelizer.Asynchronizer
 
 /**
@@ -38,4 +40,3 @@ Asynchronizer.withAsynchronizer {
     println (animals.anyAsync {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
     println (animals.allAsync {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 }
-

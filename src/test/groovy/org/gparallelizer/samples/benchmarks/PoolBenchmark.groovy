@@ -14,6 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
+package org.gparallelizer.samples.benchmarks
+
 import org.gparallelizer.actors.pooledActors.DefaultPool
 import org.gparallelizer.actors.pooledActors.FJPool
 import java.util.concurrent.CyclicBarrier

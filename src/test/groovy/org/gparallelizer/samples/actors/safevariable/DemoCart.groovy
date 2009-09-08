@@ -14,6 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
+package org.gparallelizer.samples.actors.safevariables
+
 import org.gparallelizer.actors.pooledActors.SafeVariable
 
 class ShoppingCart {
