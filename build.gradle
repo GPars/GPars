@@ -1,110 +1,106 @@
 usePlugin 'groovy'
 usePlugin 'maven'
 
-defaultTasks 'clean', 'test'
+defaultTasks 'test'
 
 archivesBaseName = 'GParallelizer'
 group = 'org.gparallelizer'
 version = '0.8.3'
-manifest.mainAttributes(
-        'Implementation-Title': 'GParallelizer',
-        'Implementation-Version': version,
-        'provider': 'Vaclav Pech'
-)
-
-//srcRootName = 'src'
-//srcDirNames = []
-//testSrcDirNames = []
-//groovySrcDirNames = ['main/groovy', 'main/java', 'main/resources', 'main/assembly']
-groovyTestSrcDirNames = ['main/groovy', 'test/groovy']  //todo remove
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
-//buildTime = new Date()
-//type = 'jar'
+manifest.mainAttributes (
+                         'Implementation-Title': 'GParallelizer' ,
+                         'Implementation-Version': version ,
+                         'provider': 'Vaclav Pech'
+                         )
 
 repositories {
-    mavenCentral()
-    mavenRepo urls: ["http://download.java.net/maven/2/"]
+  mavenCentral ( )
+  mavenRepo urls: [ 'http://download.java.net/maven/2/' ]
 }
 
 configurations {
-    deployerJars
+  deployerJars
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.4'
-    testCompile group: 'junit', name: 'junit', version: '4.5'
-    compile "org.coconut.forkjoin:jsr166y:070108"
-    deployerJars "org.jvnet.wagon-svn:wagon-svn:1.9"
+  groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.4'
+  testCompile group: 'junit', name: 'junit', version: '4.7'
+  compile group: 'org.coconut.forkjoin' , name: 'jsr166y', version: '070108'
+  deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: '1.9'
 }
+
+compileTest.dependsOn  compile
 
 uploadArchives {
-    repositories.mavenDeployer {
-            uniqueVersion = false
-        configuration = configurations.deployerJars
-        repository(url: "java-net:/maven2-repository/trunk/repository/") {
-        }
+  repositories.mavenDeployer {
+    uniqueVersion = false
+    configuration = configurations.deployerJars
+    repository ( url: 'java-net:/maven2-repository/trunk/repository/' ) {
     }
+  }
 }
 
-//zipDoc << {
-//    basedir = 'build/docs'
-//}
-//zipDoc.dependsOn javadoc
-//zipDoc2.doFirst {
-//    println 'AAAAAAAAAAAAAAAAAAAAAAA'
-//}
+def titleForDocumentation = archivesBaseName + ' ' + version
+def copyrightString = 'Copyright &#169; 2008&#8211;2009  Vaclav Pech.  All Rights Reserved.'
 
-//basedir = 'build/docs'
+javadoc {
+  dependsOn ( 'compile' )
+  options.subPackages ( group )
+  options.overview ( 'overview.html' )
+  options.showAll ( )
+  options.encoding ( 'UTF-8' )
+  options.setUse ( true )
+  options.author ( true )
+  options.version ( true )
+  options.windowTitle ( titleForDocumentation )
+  options.docTitle ( titleForDocumentation )
+  options.footer ( copyrightString )
+}
+javadoc.doFirst {
+  javadoc.title = titleForDocumentation
+  javadoc.options.docTitle = javadoc.title
+}
 
-//zip sources
-//zip samples
-//zip docs
-//upload jar into a mvn repo
+groovydoc {
+  dependsOn ( 'compile' )
+  //options.subPackages ( 'gant' , 'org.codehaus.gant' )
+  //options.overview ( 'overview.html' )
+  //options.showAll ( )
+  //options.encoding ( 'UTF-8' )
+  //options.setUse ( true )
+  ////options.author ( true )
+  ////options.version ( true )
+  //options.windowTitle ( packageTitle )
+  //options.docTitle ( packageTitle )
+  //options.footer ( copyrightString )
+}
 
-//zipSources(type:Zip) {
-//
-//}
+task myGroovyDoc ( dependsOn : 'compile' , description : 'Create the GroovyDoc API documentation.' ) << {
+  def groovydocDirPath = 'build/' + groovydocDirName
+  def packageIncludeSpec = 'org.gparallelizer.*'
+  ant.delete ( dir : groovydocDirPath , quiet : 'true' )
+  ant.mkdir ( dir : groovydocDirPath )
+  def sourceDirectory = groovySrcDirs[0]
+  ant.groovydoc (
+                 sourcePath : sourceDirectory ,
+                 destDir : groovydocDirName ,
+                 packageNames : packageIncludeSpec ,
+                 overview : 'overview.html' ,
+                 'private' : 'true' ,
+                 use : 'true' ,
+                 //author : 'true' ,
+                 //version : 'true' ,
+                 windowTitle : packageTitle ,
+                 docTitle : packageTitle ,
+                 header : packageTitle ,
+                 footer : copyrightString,
+                 //source : sourceCompatibility
+                 )
+}
 
-//todo check groovydoc validity in IDEs
-//todo set title
-
-
-//javadocDirName = "build/docs/groovydoc"
-//groovydoc.dependsOn javadoc
-
-//jar(type:Jar) {
-//
-//}
-
-//explodedDistDir = new File(distsDir as File, 'exploded')
-//explodedDistDocsDir = new File(explodedDistDir, 'docs')
-//explodedDistJavadocsDir = new File(explodedDistDocsDir, 'javadoc')
-//explodedDistGroovydocsDir = new File(explodedDistDocsDir, 'groovydoc')
-
-//javadoc {
-//    title = "GParallelizer API $version"
-//    destinationDir = explodedDistJavadocsDir
-//    include 'org/gparallelizer/**'
-//}
+task documentation ( dependsOn: [ 'javadoc' , 'groovydoc' ] , description : 'Create the API documentation.' )
 
 task zipDoc(type: Zip, dependsOn: groovydoc) << {
-    baseName = 'docs'
-    fileSet(dir: explodedDistGroovydocsDir)
-    destinationDir = ''
+  baseName = 'docs'
+  fileSet(dir: explodedDistGroovydocsDir)
+  destinationDir = ''
 }
-//createTask('zipdoc', dependsOn:'groovydoc') {
-//    ant.zip(baseDir: explodedDistGroovydocsDir, destFile:"$distsDir/GParallelizer-$version-doc.zip")
-//}
-
-//createTask('release', dependsOn:['archive_jar', 'zipdoc']) {
-//    ant.zip(baseDir: explodedDistDocsDir, destFile:"$distsDir/GParallelizer-$version-doc.zip")
-//
-//}
-
-//uploadArchives {
-//    repositories {
-//       flatDir(dirs: file('repos'))
-//    }
-//}
-
