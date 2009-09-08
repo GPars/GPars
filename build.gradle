@@ -3,11 +3,11 @@ usePlugin 'maven'
 
 defaultTasks 'test'
 
-archivesBaseName = 'GParallelizer'
+archivesBaseName = 'gparallelizer'
 group = 'org.gparallelizer'
 version = '0.8.3'
 manifest.mainAttributes (
-                         'Implementation-Title': 'GParallelizer' ,
+                         'Implementation-Title': 'gparallelizer' ,
                          'Implementation-Version': version ,
                          'provider': 'Vaclav Pech'
                          )

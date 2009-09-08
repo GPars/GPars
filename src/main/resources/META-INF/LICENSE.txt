@@ -1,7 +1,6 @@
 /***
- * GParallelizer: a small DSL built around ParallekArrays from JSR-166y
- * and Java 1.5 Executor Service classes to enhance Groovy objects
- * and collections with multithreaded iterative methods.
+ * GParallelizer: a groovy concurrency library.
+ * It provides support for configuring parallel system using Groovy:
  */
 
 /*
