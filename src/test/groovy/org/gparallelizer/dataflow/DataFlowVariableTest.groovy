@@ -89,4 +89,32 @@ public class DataFlowVariableTest extends GroovyTestCase {
         assertEquals 'DataFlowVariable(value=10)', variable.toString()
         assertEquals 'DataFlowVariable(value=10)', variable.toString()
     }
+
+    public void testVariableBlockedBoundHandler() {
+        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
+        volatile def result = new DataFlowVariable()
+
+        variable >> {
+            result << variable.val
+        }
+        DataFlow.start {
+            variable << 10
+        }
+
+        assertEquals 10, variable.val
+        assertEquals 10, result.val
+    }
+
+    public void testVariableNonBlockedBoundHandler() {
+        final DataFlowVariable variable = new DataFlowVariable()
+        variable << 10
+
+        volatile def result = new DataFlowVariable()
+
+        variable >> {
+            result << it
+        }
+        assertEquals 10, result.val
+    }
+
 }

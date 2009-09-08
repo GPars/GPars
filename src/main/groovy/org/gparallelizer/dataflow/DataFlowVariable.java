@@ -108,13 +108,28 @@ public final class DataFlowVariable<T> {
     }
 
     /**
+     * Assigns a value to the variable. Returns silently if invoked on an already bound variable.
+     * @param value The value to assign
+     */
+    public void bindSafely(final T value) {
+        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING))
+            return;
+        doBind(value);
+    }
+
+    /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * Throws exception if invoked on an already bound variable.
      * @param value The value to assign
      */
     public void bind(final T value) {
         if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING))
             throw new IllegalStateException("A DataFlowVariable can only be assigned once.");
 
+        doBind(value);
+    }
+
+    private void doBind(final T value) {
         this.value = value;
         state.set(S_INITIALIZED);
 
@@ -124,7 +139,7 @@ public final class DataFlowVariable<T> {
         // no more new waiting threads since that point
         for ( WaitingThread<T> waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
             if (waiting.thread != null)
-                LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread 
+                LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread
             else {
                 scheduleCallback(waiting.callback);
             }
