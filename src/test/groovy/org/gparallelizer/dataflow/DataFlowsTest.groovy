@@ -165,4 +165,22 @@ public class DataFlowsTest extends GroovyTestCase {
         }
     }
 
+    public void testChainedWhenValueBound() {
+        final DataFlows data = new DataFlows()
+        final def result1 = new DataFlowVariable()
+        final def result2 = new DataFlowVariable()
+
+        data.y {}.x {
+            result1 << data.y
+            result2 << it
+        }
+        data.y = 'value1'
+        data.x = 'value2'
+
+        assertEquals 'value1', result1.val
+        assertEquals 'value2', result2.val
+        assertEquals 'value1', data.y
+        assertEquals 'value2', data.x
+    }
+
 }

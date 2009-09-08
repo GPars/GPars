@@ -84,10 +84,11 @@ public class DataFlows {
      */
     def invokeMethod(String name, Object args) {
         def df = ensureToContainVariable(name)
-        if (args instanceof Object[] && args.length == 1 && args[0] instanceof Closure)
-          df >> args[0]
-        else
-          throw new MissingMethodException(name, DataFlows, args)
+        if (args instanceof Object[] && args.length == 1 && args[0] instanceof Closure) {
+            df >> args[0]
+            return this
+        } else
+            throw new MissingMethodException(name, DataFlows, args)
     }
 
   /**
