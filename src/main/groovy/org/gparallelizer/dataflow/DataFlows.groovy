@@ -70,10 +70,17 @@ public class DataFlows {
 
     /**
      * Invokes the given method.
+     * Allows for invoking whenBound() on the dataflow variables.
+     * <pre>
+     * def df = new DataFlows()
+     * df.var {
+     *     println "Variable bound to $it"
+     * }
+     * </pre>
      *
-     * @param name the name of the method to call
-     * @param args the arguments to use for the method call
-     * @return the result of invoking the method
+     * @param name the name of the method to call (the variable name)
+     * @param args the arguments to use for the method call (a closure to invoke when a value is bound)
+     * @return the result of invoking the method (void)
      */
     def invokeMethod(String name, Object args) {
         def df = ensureToContainVariable(name)
