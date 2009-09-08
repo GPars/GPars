@@ -19,6 +19,8 @@
 
 
     Backlog
+    todo reimplement Dataflow concurrency with the concept of operators and channels
+    todo remove start/stop methods from actors
     todo allow join on groups of actors or Dataflow treads
     todo clean issues and todos
     todo Logging policy - perhaps leveraging the current lifecycle methods
