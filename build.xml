@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project name="sample" default="resolve">
+    <target name="clean">
+        <delete dir="antbuild/classes"/>
+    </target>
+    <taskdef name="groovyc"
+             classname="org.codehaus.groovy.ant.Groovyc">
+        <classpath>
+            <pathelement path="/Users/hans/checkouts/gparallelizer-read-only/libs/groovy-all-1.6.4.jar"/>
+        </classpath>
+    </taskdef>
+
+    <target name="compile">
+        <mkdir dir="antbuild/classes"/>
+        <groovyc srcdir="${basedir}/src/main/groovy" destdir="${basedir}/antbuild/classes">
+            <classpath>
+                <pathelement path="/Users/hans/checkouts/gparallelizer-read-only/libs/groovy-all-1.6.4.jar"/>
+                <pathelement path="/Users/hans/checkouts/gparallelizer-read-only/libs/jsr166y-070108.jar"/>
+            </classpath>
+            <javac source="1.5" target="1.5" debug="on"/>
+        </groovyc>
+    </target>
+
+    <target name="compileTests" depends="compile">
+        <mkdir dir="antbuild/test-classes"/>
+        <groovyc srcdir="${basedir}/src/test/groovy" destdir="${basedir}/antbuild/test-classes">
+            <classpath>
+                <pathelement path="${basedir}/build/classes"/>
+                <pathelement path="/Users/hans/checkouts/gparallelizer-read-only/libs/junit-4.7.jar"/>
+                <pathelement path="/Users/hans/checkouts/gparallelizer-read-only/libs/groovy-all-1.6.4.jar"/>
+                <pathelement path="/Users/hans/checkouts/gparallelizer-read-only/libs/jsr166y-070108.jar"/>
+            </classpath>
+            <javac source="1.5" target="1.5" debug="on"/>
+        </groovyc>
+    </target>
+</project>

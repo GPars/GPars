@@ -19,6 +19,7 @@
 
 
     Backlog
+    todo add a script task to download all dependencies for IDEs
     todo reimplement Dataflow concurrency with the concept of operators and channels
     todo remove start/stop methods from actors
     todo allow join on groups of actors or Dataflow treads
