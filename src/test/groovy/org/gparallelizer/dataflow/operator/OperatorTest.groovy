@@ -28,17 +28,14 @@ import org.gparallelizer.dataflow.DataFlow
 
 public class OperatorTest extends GroovyTestCase {
 
-    public void testSomething() {
-        
-    }
-    public void _testOperator() {
+    public void testOperator() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
         final DataFlowStream c = new DataFlowStream()
         final DataFlowVariable d = new DataFlowVariable()
         final DataFlowStream e = new DataFlowStream()
 
-        operator(inputs : [a, b, c], outputs : [d, e]) {x, y, z ->
+        def op = operator(inputs : [a, b, c], outputs : [d, e]) {x, y, z ->
             bindOutput 0, x + y + z
             bindOutput 1, x * y * z
         }
@@ -48,10 +45,12 @@ public class OperatorTest extends GroovyTestCase {
         DataFlow.start { c << 40 }
 
         assertEquals 65, d.val
-        assertEquals 4000, e.val   
+        assertEquals 4000, e.val
+
+        op.stop()
     }
 
-    public void _testCombinedOperators() {
+    public void testCombinedOperators() {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -64,22 +63,23 @@ public class OperatorTest extends GroovyTestCase {
         b << 7
 
         final DataFlowStream x = new DataFlowStream()
-        operator(inputs : [a], outputs : [x]) {v ->
+        def op1 = operator(inputs : [a], outputs : [x]) {v ->
             bindOutput 0, v * v
         }
 
         final DataFlowStream y = new DataFlowStream()
-        operator(inputs : [b], outputs : [y]) {v ->
+        def op2 = operator(inputs : [b], outputs : [y]) {v ->
             bindOutput 0, v * v
         }
 
-        operator(inputs : [x, y], outputs : [c]) {v1, v2 ->
+        def op3 = operator(inputs : [x, y], outputs : [c]) {v1, v2 ->
             bindOutput 0, v1 + v2
         }
 
         assertEquals 17, c.val
         assertEquals 29, c.val
         assertEquals 45, c.val
+        [op1, op2, op3]*.stop()
     }
 
 }

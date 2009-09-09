@@ -17,6 +17,8 @@
 package org.gparallelizer.dataflow.operator
 
 import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.Actor
 
 /**
  * @author Vaclav Pech
@@ -24,18 +26,16 @@ import org.gparallelizer.actors.pooledActors.PooledActors
  */
 public final class DFOperator {
 
-    public static void operator(final Map channels, final Closure code) {
-        final DFOperator operator = new DFOperator(channels, code)
-        PooledActors.actor {
-            loop {
-                operator.process()
-            }
-        }.start()
+    private static final dfOperatorActorGroup = new PooledActorGroup()
+
+    public static DFOperator operator(final Map channels, final Closure code) {
+        return new DFOperator(channels, code).start()
     }
 
     private final List inputs
     private final List outputs
     private final Closure code
+    private final Actor actor
 
     public def DFOperator(final Map channels, final Closure code) {
         this.inputs = channels.inputs.asImmutable()
@@ -44,8 +44,20 @@ public final class DFOperator {
         this.code.delegate = this
     }
 
+    private DFOperator start() {
+        actor = dfOperatorActorGroup.actor {
+            loop {
+                process()
+            }
+        }.start()
+        return this
+    }
 
-    public Map bindOutput(final int idx, final value) {
+    public void stop() {
+        actor.stop()
+    }
+
+    private Map bindOutput(final int idx, final value) {
         outputs[idx] << value
     }
 
