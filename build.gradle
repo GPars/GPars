@@ -28,6 +28,7 @@ dependencies {
   deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: '1.9'
 }
 
+//todo remove potentially once fixed
 compileTest.dependsOn  compile
 
 uploadArchives {
@@ -100,8 +101,15 @@ task myGroovyDoc ( dependsOn : 'compile' , description : 'Create the GroovyDoc A
 
 task documentation ( dependsOn: [ 'javadoc' , 'groovydoc' ] , description : 'Create the API documentation.' )
 
-task zipDoc(type: Zip, dependsOn: groovydoc) << {
+task zipDoc(type: Zip, dependsOn: groovydoc) {
   baseName = 'docs'
-  fileSet(dir: explodedDistGroovydocsDir)
-  destinationDir = ''
+//  fileSet(dir: explodedDistGroovydocsDir)
+//  destinationDir = ''
 }
+
+task wrapper(type:Wrapper) {
+    jarPath = 'wrapper'
+    gradleVersion = '0.8'
+}
+
+//todo fork frequency in gradle 0.9
