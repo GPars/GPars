@@ -5,7 +5,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gparallelizer'
 group = 'org.gparallelizer'
-version = '0.8.4-SNAPSHOT'
+version = '0.8.4-SNAPSHOT'          //todo make version include build number or a timestamp
 manifest.mainAttributes (
                          'Implementation-Title': 'gparallelizer' ,
                          'Implementation-Version': version ,
