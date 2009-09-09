@@ -28,7 +28,7 @@ dependencies {
   deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: '1.9'
 }
 
-//todo remove potentially once fixed
+//todo remove potentially once fixed in gradle
 compileTest.dependsOn  compile
 
 uploadArchives {
@@ -44,10 +44,11 @@ def titleForDocumentation = archivesBaseName + ' ' + version
 def copyrightString = 'Copyright &#169; 2008&#8211;2009  Vaclav Pech.  All Rights Reserved.'
 def packageTitle = group
 
+//todo consider removing javadoc
 javadoc {
   dependsOn ( 'compile' )
   options.subPackages ( packageTitle )
-  options.overview ( 'overview.html' )
+//  options.overview ( 'overview.html' )  /todo enable
   options.showAll ( )
   options.encoding ( 'UTF-8' )
   options.setUse ( true )
@@ -101,10 +102,22 @@ task myGroovyDoc ( dependsOn : 'compile' , description : 'Create the GroovyDoc A
 
 task documentation ( dependsOn: [ 'javadoc' , 'groovydoc' ] , description : 'Create the API documentation.' )
 
-task zipDoc(type: Zip, dependsOn: groovydoc) {
-  baseName = 'docs'
-//  fileSet(dir: explodedDistGroovydocsDir)
-//  destinationDir = ''
+task zipDoc(type: Zip, dependsOn: [groovydoc, javadoc]) {
+    appendix = 'docs'
+    fileSet(baseDir:docsDir)
+//    fileSet(dir:docsDir)  //todo enable
+}
+
+task zipSrc(type: Zip) {
+    appendix = 'src'
+    fileSet(baseDir:source.main.groovy.srcDirs.iterator().next())
+//    fileSet(dir:docsDir)  //todo enable
+}
+
+task zipSamples(type: Zip) {
+    appendix = 'samples'
+    fileSet(baseDir:source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
+//    fileSet(dir:docsDir)  //todo enable
 }
 
 task wrapper(type:Wrapper) {
