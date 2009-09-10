@@ -18,7 +18,7 @@ package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import static java.util.concurrent.TimeUnit.*
+import static java.util.concurrent.TimeUnit.SECONDS
 
 /**
  * Demonstrates the ability to receive multiple messages and selectively reply to some of them.

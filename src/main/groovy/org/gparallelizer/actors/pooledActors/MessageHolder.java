@@ -18,10 +18,10 @@ package org.gparallelizer.actors.pooledActors;
 
 import org.gparallelizer.actors.ActorMessage;
 
+import static java.lang.Math.max;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Collections;
-import static java.lang.Math.*;
+import java.util.List;
 
 /**
  * Buffers messages for the next continuation of an event-driven actor, handles timeouts and no-param continuations.

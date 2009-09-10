@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples.dataflow
 
-import static org.gparallelizer.dataflow.DataFlow.*
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * Demonstrates the way to handle lifecycle events on the thread.

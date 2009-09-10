@@ -16,10 +16,10 @@
 
 package org.gparallelizer.dataflow
 
-import static org.gparallelizer.dataflow.DataFlow.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import static org.gparallelizer.dataflow.DataFlow.start
 
 public class ThreadLifeCycleTest extends GroovyTestCase {
 

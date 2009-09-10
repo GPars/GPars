@@ -17,7 +17,7 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.DataFlow.*
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * Demonstrates three threads calculating a sum of numbers within a given interval using shared dataflow variables.

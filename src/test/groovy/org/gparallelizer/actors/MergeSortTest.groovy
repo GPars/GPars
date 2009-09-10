@@ -16,8 +16,8 @@
 
 package org.gparallelizer.actors
 
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  *

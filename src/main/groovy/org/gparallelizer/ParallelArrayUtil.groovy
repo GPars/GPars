@@ -17,10 +17,10 @@
 package org.gparallelizer
 
 import jsr166y.forkjoin.ForkJoinExecutor
-import jsr166y.forkjoin.Ops.Predicate
-import jsr166y.forkjoin.ParallelArray
 import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.Ops.Mapper
+import jsr166y.forkjoin.Ops.Predicate
+import jsr166y.forkjoin.ParallelArray
 
 /**
  * This class forms the core of the DSL initialized by <i>Parallelizer</i>. The static methods of <i>ParallelArrayUtil</i>

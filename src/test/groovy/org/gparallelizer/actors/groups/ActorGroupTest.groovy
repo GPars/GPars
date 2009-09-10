@@ -17,17 +17,8 @@
 package org.gparallelizer.actors.groups
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.Actors
-import org.gparallelizer.actors.AbstractThreadActorGroup
-import org.gparallelizer.actors.AbstractThreadActor
-import org.gparallelizer.actors.ActorMessage
 import java.util.concurrent.LinkedBlockingQueue
-import org.gparallelizer.actors.ThreadActorGroup
-import org.gparallelizer.actors.NonDaemonThreadActorGroup
-import org.gparallelizer.actors.AbstractThreadActorGroup
-import org.gparallelizer.actors.AbstractThreadActor
-import org.gparallelizer.actors.NonDaemonThreadActorGroup
-import org.gparallelizer.actors.NonDaemonThreadActorGroup
+import org.gparallelizer.actors.*
 
 public class ActorGroupTest extends GroovyTestCase {
     public void testDefaultGroupDaemon() {

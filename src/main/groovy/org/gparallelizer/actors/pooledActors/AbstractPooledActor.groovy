@@ -26,10 +26,8 @@ import java.util.concurrent.atomic.AtomicReference
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.ActorMessage
 import org.gparallelizer.actors.CommonActorImpl
-import org.gparallelizer.actors.pooledActors.ActorAction
-import org.gparallelizer.actors.pooledActors.MessageHolder
-import org.gparallelizer.actors.pooledActors.PooledActor
-import org.gparallelizer.actors.pooledActors.PooledActors
+import java.lang.*
+import org.gparallelizer.actors.pooledActors.*
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
 

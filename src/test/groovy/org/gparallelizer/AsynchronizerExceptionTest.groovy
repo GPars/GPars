@@ -16,12 +16,10 @@
 
 package org.gparallelizer
 
+import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
-import java.lang.Thread.UncaughtExceptionHandler
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 /**

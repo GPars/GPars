@@ -16,12 +16,11 @@
 
 package org.gparallelizer.actors.pooledActors.safevariable
 
-import org.gparallelizer.actors.pooledActors.SafeVariable
-import org.gparallelizer.actors.pooledActors.PooledActors
-import org.gparallelizer.dataflow.DataFlowVariable
-import org.gparallelizer.dataflow.DataFlowStream
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.CountDownLatch
+import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.dataflow.DataFlowStream
+import org.gparallelizer.dataflow.DataFlowVariable
 
 public class SafeVariableTest extends GroovyTestCase {
     public void testList() {

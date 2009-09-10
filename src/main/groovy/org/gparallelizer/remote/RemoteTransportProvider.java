@@ -16,30 +16,87 @@
 
 package org.gparallelizer.remote;
 
-import java.util.UUID;
-import java.util.Map;
+import org.gparallelizer.actors.Actor;
+
 import java.util.HashMap;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
-public abstract class RemoteTransportProvider<T extends RemoteNode> {
-    protected final Map<UUID,T> registry = new HashMap<UUID, T>();
+/**
+ * Represents communication method with remote hosts
+ *
+ * @author Alex Tkachman
+ */
+public abstract class RemoteTransportProvider {
+    /**
+     * Unique id of the provider
+     */
+    private final UUID id = UUID.randomUUID();
 
-    protected void connect(LocalNode local, T remote) {
-        local.onConnect(remote);
-    }
+    private final WeakHashMap<Actor,UUID> localActors = new WeakHashMap<Actor, UUID>();
 
-    protected void disconnect(LocalNode local, T remote) {
-        local.onDisconnect(remote);
-    }
+    protected final HashMap<UUID,Actor> localActorsId = new HashMap<UUID, Actor>();
 
-    public synchronized void connect(final LocalNode node) {
-        for (final T n : registry.values()) {
-          connect(node, n);
+    /**
+     * Registry of remote nodes known to the provider
+     */
+    protected final HashMap<UUID, RemoteNode> registry = new HashMap<UUID, RemoteNode>();
+
+    /**
+     * Connect local node to the provider
+     * @param node local node
+     */
+    public void connect(final LocalNode node) {
+        Actor mainActor = node.getMainActor();
+        if (mainActor != null) {
+            synchronized (localActors) {
+                localActors.put(mainActor, node.getId());
+                localActorsId.put(node.getId(), mainActor);
+            }
         }
     }
 
-    public synchronized void disconnect(final LocalNode node) {
-        for (final T n : registry.values()) {
-            disconnect(node, n);
+    /**
+     * Disconnect local node from the provider
+     *
+     * @param node local node
+     */
+    public void disconnect(final LocalNode node) {
+        synchronized (localActors) {
+            Actor actor = localActorsId.remove(node.getId());
+            if (actor != null)
+                localActors.remove(actor);
+        }
+    }
+
+    /**
+     * Getter for provider id
+     *
+     * @return unique id
+     */
+    public UUID getId() {
+        return id;
+    }
+
+    public UUID getLocalActorId (Actor actor) {
+        if (actor == null) {
+            return null;
+        }
+
+        synchronized (localActors) {
+            UUID uid = localActors.get(actor);
+            if (uid == null) {
+                uid = UUID.randomUUID();
+                localActors.put(actor, uid);
+                localActorsId.put(uid, actor);
+            }
+            return uid;
+        }
+    }
+
+    public Actor getLocalActor(UUID uuid) {
+        synchronized (localActors) {
+            return localActorsId.get(uuid);
         }
     }
 }

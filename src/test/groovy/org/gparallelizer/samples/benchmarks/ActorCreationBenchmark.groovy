@@ -17,11 +17,9 @@
 package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.DefaultThreadActor
-
 
 public class ActorCreationBenchmark implements Benchmark {
 

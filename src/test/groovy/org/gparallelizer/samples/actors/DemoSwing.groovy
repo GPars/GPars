@@ -16,10 +16,10 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.actors.pooledActors.PooledActor
 import groovy.swing.SwingBuilder
 import javax.swing.JFrame
+import org.gparallelizer.actors.pooledActors.PooledActor
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.actors.pooledActors.PooledActors
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {

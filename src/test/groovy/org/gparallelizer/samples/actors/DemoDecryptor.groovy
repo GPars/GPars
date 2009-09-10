@@ -16,7 +16,6 @@
 
 package org.gparallelizer.samples.actors
 
-import java.util.concurrent.CountDownLatch
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 
 /**

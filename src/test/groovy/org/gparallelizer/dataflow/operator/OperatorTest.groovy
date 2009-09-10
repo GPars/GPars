@@ -16,10 +16,10 @@
 
 package org.gparallelizer.dataflow.operator
 
-import org.gparallelizer.dataflow.DataFlowVariable
-import org.gparallelizer.dataflow.DataFlowStream
-import static org.gparallelizer.dataflow.operator.DFOperator.*
 import org.gparallelizer.dataflow.DataFlow
+import org.gparallelizer.dataflow.DataFlowStream
+import org.gparallelizer.dataflow.DataFlowVariable
+import static org.gparallelizer.dataflow.operator.DFOperator.operator
 
 /**
 * @author Vaclav Pech

@@ -17,7 +17,8 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.dataflow.DataFlowVariable as WAIT
-import static org.gparallelizer.dataflow.DataFlow.*
+
+import static org.gparallelizer.dataflow.DataFlow.start
 
 /**
  * Basic sample showing three green threads cooperating on three variables.

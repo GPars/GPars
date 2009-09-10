@@ -18,7 +18,8 @@ package org.gparallelizer
 
 import java.lang.Thread.UncaughtExceptionHandler
 import jsr166y.forkjoin.ForkJoinPool
-import static org.gparallelizer.Parallelizer.*
+import static org.gparallelizer.Parallelizer.withExistingParallelizer
+import static org.gparallelizer.Parallelizer.withParallelizer
 
 /**
  * @author Vaclav Pech

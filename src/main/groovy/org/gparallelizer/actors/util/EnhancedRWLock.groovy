@@ -18,7 +18,6 @@ package org.gparallelizer.actors.util
 
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-
 /**
  * Extends ReentrantReadWriteLock with handy withReadLock(Closure) and withWriteLock(Closure) methods to safely lock
  * and unlock the lock for the passed-in closure.

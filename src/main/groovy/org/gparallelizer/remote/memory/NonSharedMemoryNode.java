@@ -17,23 +17,24 @@
 package org.gparallelizer.remote.memory;
 
 import org.gparallelizer.remote.LocalNode;
-import org.gparallelizer.actors.Actor;
+import org.gparallelizer.remote.messages.MessageToActor;
 
 import java.io.IOException;
 
 public class NonSharedMemoryNode extends MemoryNode {
     private final LocalNode localNode;
 
-    public NonSharedMemoryNode(final LocalNode node) {
-        super(node);
+    public NonSharedMemoryNode(final LocalNode node, NonSharedMemoryTransportProvider provider) {
+        super(node, provider);
         this.localNode = node;
-
-        final Actor main = localNode.getMainActor();
-        if (main != null)
-            localActorsId.put(MAIN_ACTOR_ID, main);
     }
 
     protected void deliver(byte[] bytes) throws IOException {
-        onMessageReceived(bytes, localNode.getScheduler());
+        final MessageToActor remoteMessage = decodeMessage(bytes);
+        localNode.getScheduler().execute(new Runnable(){
+            public void run() {
+                getProvider().getLocalActor(remoteMessage.getTo()).send(remoteMessage.getPayload());
+            }
+        });
     }
 }

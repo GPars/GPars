@@ -20,7 +20,6 @@ import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.DefaultThreadActor
 import org.gparallelizer.samples.benchmarks.Benchmark
-import org.gparallelizer.actors.DefaultThreadActor
 
 public class ActorNetworkingBenchmark implements Benchmark {
 

@@ -16,8 +16,8 @@
 
 package org.gparallelizer.actors
 
+import groovy.time.Duration
 import java.util.concurrent.TimeUnit
-import groovy.time.Duration;
 
 /**
  * Actors are active objects, which either have their own thread processing repeatedly messages submitted to them

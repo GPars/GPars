@@ -16,9 +16,9 @@
 
 package org.gparallelizer.samples.benchmarks
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 final Random random = new Random(System.currentTimeMillis())
 

@@ -16,9 +16,9 @@
 
 package org.gparallelizer.dataflow
 
-import static org.gparallelizer.dataflow.DataFlow.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import static org.gparallelizer.dataflow.DataFlow.start
 
 public class DataFlowTest extends GroovyTestCase {
 

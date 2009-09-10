@@ -16,8 +16,6 @@
 
 package org.gparallelizer.actors.pooledActors
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-
 /**
  * An actor representing a reactor. When it receives a message, the supplied block of code is run with the message
  * as a parameter and the result of the code is send in reply.

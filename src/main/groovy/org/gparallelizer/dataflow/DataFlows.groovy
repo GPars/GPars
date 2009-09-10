@@ -17,6 +17,7 @@
 package org.gparallelizer.dataflow
 
 import org.gparallelizer.dataflow.DataFlowVariable as DF
+
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 

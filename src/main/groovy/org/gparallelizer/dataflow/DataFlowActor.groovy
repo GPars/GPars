@@ -17,10 +17,6 @@
 package org.gparallelizer.dataflow
 
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup
-import org.gparallelizer.actors.pooledActors.ResizableFJPool
-import org.gparallelizer.actors.pooledActors.ResizablePool
 
 /**
  * A parent actor for all actors used in Dataflow Concurrency implementation

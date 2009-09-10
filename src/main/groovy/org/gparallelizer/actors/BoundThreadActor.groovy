@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue
 
 /**
  * Provides an Actor implementation with bounded fair ArrayBlockingQueue storing the messages.

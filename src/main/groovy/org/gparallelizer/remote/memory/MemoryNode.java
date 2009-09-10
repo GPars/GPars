@@ -16,28 +16,32 @@
 
 package org.gparallelizer.remote.memory;
 
-import org.gparallelizer.remote.RemoteNode;
 import org.gparallelizer.remote.LocalNode;
+import org.gparallelizer.remote.RemoteActor;
+import org.gparallelizer.remote.RemoteNode;
 
 import java.util.UUID;
 
-public abstract class MemoryNode extends RemoteNode {
+public abstract class MemoryNode extends RemoteNode<MemoryTransportProvider> {
     protected final LocalNode localNode;
 
-    public MemoryNode(LocalNode node) {
-        super();
+    public MemoryNode(LocalNode node, MemoryTransportProvider provider) {
+        super(node.getId(), provider);
         localNode = node;
     }
 
-    public UUID getId() {
-        return localNode.getId();
+    public void onConnect(LocalNode node) {
+        localNode.onConnect(getProvider().getLocalRemote(node, true));
     }
 
-    public void onConnect(RemoteNode node) {
-        localNode.onConnect(node);
+    public void onDisconnect(LocalNode node) {
+        localNode.onDisconnect(getProvider().getLocalRemote(node,false));
     }
 
-    public void onDisconnect(RemoteNode node) {
-        localNode.onDisconnect(node);
+    protected RemoteActor createRemoteActor(UUID uid) {
+        if (uid == localNode.getId())
+            return new RemoteActor(this, uid);
+
+        throw new IllegalStateException();
     }
 }

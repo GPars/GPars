@@ -18,7 +18,6 @@ package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
 
-
 public class FastSendTest extends GroovyTestCase {
 
     public void testFastSend() {

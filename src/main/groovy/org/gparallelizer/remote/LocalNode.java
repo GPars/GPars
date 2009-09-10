@@ -16,17 +16,21 @@
 
 package org.gparallelizer.remote;
 
+import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.*;
-
-import groovy.lang.Closure;
 
 /**
  * Representation of local node
+ *
+ * @author Alex Tkachman
  */
 public class LocalNode {
     private final List<RemoteNodeDiscoveryListener> listeners = Collections.synchronizedList(new LinkedList<RemoteNodeDiscoveryListener> ());

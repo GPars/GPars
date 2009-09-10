@@ -16,12 +16,12 @@
 
 package org.gparallelizer.actors.pooledActors.groups
 
-import org.gparallelizer.actors.pooledActors.PooledActors
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.AbstractActorGroup
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.NonDaemonPooledActorGroup
-import org.gparallelizer.actors.AbstractActorGroup
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class PooledActorGroupTest extends GroovyTestCase {
 

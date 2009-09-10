@@ -16,9 +16,8 @@
 
 package org.gparallelizer.samples.dataflow
 
-import static org.gparallelizer.dataflow.DataFlow.*
-import org.gparallelizer.dataflow.DataFlowVariable
 import java.util.concurrent.Executors
+import org.gparallelizer.dataflow.DataFlowVariable
 
 final many = 1..(limit)
 

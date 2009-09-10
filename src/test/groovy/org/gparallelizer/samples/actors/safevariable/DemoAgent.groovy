@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.pooledActors.SafeVariable
 import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.pooledActors.SafeVariable
 
 final Closure cl = {
     it ? new LinkedList(it) : null

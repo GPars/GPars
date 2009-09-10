@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * Provides a default Actor implementation with unbounded LinkedBlockingQueue storing the messages.

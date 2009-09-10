@@ -16,11 +16,11 @@
 
 package org.gparallelizer.actors.pooledActors
 
-import java.util.concurrent.CyclicBarrier
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.Actor
+import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 
 /**
  *

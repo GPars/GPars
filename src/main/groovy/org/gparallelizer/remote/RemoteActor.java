@@ -16,14 +16,19 @@
 
 package org.gparallelizer.remote;
 
-import org.gparallelizer.actors.Actor;
-import org.gparallelizer.actors.ActorMessage;
-
-import java.util.concurrent.TimeUnit;
-import java.util.UUID;
-
 import groovy.time.Duration;
+import org.gparallelizer.actors.Actor;
+import org.gparallelizer.actors.ReplyRegistry;
 
+import java.io.Serializable;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Actor redirecting all calls to remote nodes
+ * 
+ * @author Alex Tkachman
+ */
 public class RemoteActor implements Actor {
     private final RemoteNode remoteNode;
 
@@ -59,7 +64,7 @@ public class RemoteActor implements Actor {
     }
 
     public Actor send(Object message) {
-        remoteNode.send(this, ActorMessage.build(message));
+        remoteNode.send(this, (Serializable) message, ReplyRegistry.threadBoundActor());
         return this;
     }
 

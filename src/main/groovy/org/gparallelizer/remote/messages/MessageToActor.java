@@ -14,17 +14,23 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.remote;
+package org.gparallelizer.remote.messages;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-public class RemoteMessage implements Serializable {
-    private final UUID         to;
-    private final UUID         from;
-    private final Serializable payload;
+/**
+ * Message set as call to send for remote actor
+ * 
+ * @author Alex Tkachman
+ */
+public class MessageToActor<T extends Serializable> extends BaseMsg {
+    private final UUID  to;
+    private final UUID  from;
+    private final T     payload;
 
-    public RemoteMessage(UUID to, UUID from, Serializable payload) {
+    public MessageToActor(UUID hostId, UUID to, UUID from, T payload) {
+        super(hostId);
         this.to = to;
         this.from = from;
         this.payload = payload;

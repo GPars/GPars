@@ -33,7 +33,7 @@ public final class ActorMessage<T> {
      * @param payLoad The original message
      * @param sender The sending actor, null, if the message was not sent by an actor
      */
-    private ActorMessage(final T payLoad, final Actor sender) {
+    public ActorMessage(final T payLoad, final Actor sender) {
         this.payLoad = payLoad;
         this.sender = sender;
     }

@@ -16,10 +16,9 @@
 
 package org.gparallelizer.samples.dataflow
 
-import static org.gparallelizer.Asynchronizer.*
 import org.gparallelizer.dataflow.DataFlowVariable
+import static org.gparallelizer.Asynchronizer.doAsync
 import static org.gparallelizer.dataflow.DataFlow.start
-
 
 /**
  * A simple mashup sample, downloads content of three websites and checks how many of them refer to Groovy.

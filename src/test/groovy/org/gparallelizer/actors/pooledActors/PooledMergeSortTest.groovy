@@ -15,10 +15,11 @@
 //  limitations under the License. 
 
 package org.gparallelizer.actors.pooledActors
-import java.util.concurrent.TimeUnit
+
 import java.util.concurrent.CountDownLatch
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import java.util.concurrent.TimeUnit
 import org.gparallelizer.actors.pooledActors.PooledActors
+import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 
 /**
  *

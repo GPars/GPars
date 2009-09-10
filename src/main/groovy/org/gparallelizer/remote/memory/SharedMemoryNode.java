@@ -16,18 +16,20 @@
 
 package org.gparallelizer.remote.memory;
 
-import org.gparallelizer.remote.RemoteNode;
+import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.remote.LocalNode;
 import org.gparallelizer.remote.RemoteActor;
-import org.gparallelizer.actors.ActorMessage;
 
-import java.io.Serializable;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * @author Alex Tkachman
+ */
 public class SharedMemoryNode extends MemoryNode {
-    public SharedMemoryNode(LocalNode node) {
-        super(node);
+    public SharedMemoryNode(LocalNode node, SharedMemoryTransportProvider provider) {
+        super(node, provider);
     }
 
     public void send(RemoteActor receiver, ActorMessage<Serializable> message) {
@@ -35,7 +37,7 @@ public class SharedMemoryNode extends MemoryNode {
     }
 
     protected RemoteActor createRemoteActor(UUID uid) {
-        if (uid == RemoteNode.MAIN_ACTOR_ID)
+        if (uid == localNode.getId())
             return new SharedMemoryActor(this, localNode.getMainActor());
 
         throw new UnsupportedOperationException();

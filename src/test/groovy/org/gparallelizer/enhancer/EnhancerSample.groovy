@@ -18,7 +18,6 @@ package org.gparallelizer.enhancer
 
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.gparallelizer.enhancer.ActorMetaClass
-import org.gparallelizer.actors.pooledActors.PooledActors
 
 /**
  * test execution

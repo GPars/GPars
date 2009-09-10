@@ -20,9 +20,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.pooledActors.ActorReplyException
 import static org.gparallelizer.actors.Actors.actor
 import static org.gparallelizer.actors.Actors.oneShotActor
-import org.gparallelizer.actors.pooledActors.ActorReplyException
 
 /**
  *

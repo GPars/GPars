@@ -16,15 +16,15 @@
 
 package org.gparallelizer.actors.pooledActors
 
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.CountDownLatch
 
 /**
  *

@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors;
+package org.gparallelizer.actors.pooledActors
 
 /**
  * Utility class to implement AbstractPooledActor backed by any Runnable (including Closure)
