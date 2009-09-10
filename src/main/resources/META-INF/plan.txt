@@ -16,6 +16,7 @@
     todo DataFlows
     todo Detecting deadlock in the DataFlows class
     todo used generics with DataFlows to support DataFlowVariable.val type hints in IDE
+    todo consider using AST transformations to generate CPS (continuation-passing style) for event-driven actors to offer a frendlier way to code them
 
 
     Backlog
@@ -74,3 +75,14 @@
     //todo associate a mail box with each thread, not only with actors
     //todo add generics to actors
     //todo implement remote actors
+
+
+
+CPS
+When I looked into Scala actors, I didn't like the fact that event-
+based actors needed to be written in continuation-passing style (CPS).
+A user really shouldn't have to worry about this (as in Erlang). Have
+you considered using an AST transform to rewrite event-based actor
+code to CPS? (Scala 2.8 will introduce continuations, implemented as a
+compiler plugin. I think it's planned to leverage them for the actors
+library).
