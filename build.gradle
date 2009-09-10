@@ -5,39 +5,49 @@ defaultTasks 'test'
 
 archivesBaseName = 'gparallelizer'
 group = 'org.gparallelizer'
-version = '0.8.4-SNAPSHOT'          //todo make version include build number or a timestamp
-manifest.mainAttributes (
-                         'Implementation-Title': 'gparallelizer' ,
-                         'Implementation-Version': version ,
-                         'provider': 'Vaclav Pech'
-                         )
+version = '0.8.4'          //todo make version include build number or a timestamp
+
+manifest.mainAttributes(
+        'Implementation-Title': 'gparallelizer',
+        'Implementation-Version': version,
+        'provider': 'Vaclav Pech'
+)
 
 repositories {
-  mavenCentral ( )
-  mavenRepo urls: [ 'http://download.java.net/maven/2/' ]
+    mavenCentral()
+    mavenRepo urls: ['http://download.java.net/maven/2/']
 }
 
 configurations {
-  deployerJars
+    deployerJars
 }
 
 dependencies {
-  groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.4'
-  testCompile group: 'junit', name: 'junit', version: '4.7'
-  compile group: 'org.coconut.forkjoin' , name: 'jsr166y', version: '070108'
-  deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: '1.9'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: '1.6.4'
+    testCompile group: 'junit', name: 'junit', version: '4.7'
+    compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: '070108'
+    deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: '1.9'
 }
 
 //todo remove potentially once fixed in gradle
-compileTest.dependsOn  compile
+compileTest.dependsOn compile
+
+gradle.taskGraph.whenReady {taskGraph ->
+    if (!taskGraph.hasTask(':release')) {
+        version += '-SNAPSHOT'
+    }
+}
+task release(dependsOn: ['dists', 'test']) << {
+    println 'We release now'
+}
 
 uploadArchives {
-  repositories.mavenDeployer {
-    uniqueVersion = false
-    configuration = configurations.deployerJars
-    repository ( url: 'java-net:/maven2-repository/trunk/repository/' ) {
+    repositories.mavenDeployer {
+        uniqueVersion = false
+        configuration = configurations.deployerJars
+        repository(url: 'java-net:/maven2-repository/trunk/repository/') {
+        }
     }
-  }
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
@@ -46,81 +56,81 @@ def packageTitle = group
 
 //todo consider removing javadoc
 javadoc {
-  dependsOn ( 'compile' )
-  options.subPackages ( packageTitle )
+    dependsOn('compile')
+    options.subPackages(packageTitle)
 //  options.overview ( 'overview.html' )  todo enable
-  options.showAll ( )
-  options.encoding ( 'UTF-8' )
-  options.setUse ( true )
-  options.author ( true )
-  options.version ( true )
-  options.windowTitle ( titleForDocumentation )
-  options.docTitle ( titleForDocumentation )
-  options.footer ( copyrightString )
+    options.showAll()
+    options.encoding('UTF-8')
+    options.setUse(true)
+    options.author(true)
+    options.version(true)
+    options.windowTitle(titleForDocumentation)
+    options.docTitle(titleForDocumentation)
+    options.footer(copyrightString)
 }
 javadoc.doFirst {
-  javadoc.title = titleForDocumentation
-  javadoc.options.docTitle = javadoc.title
+    javadoc.title = titleForDocumentation
+    javadoc.options.docTitle = javadoc.title
 }
 
 groovydoc {
-  dependsOn ( 'compile' )
-  //options.subPackages ( 'org.gparallelizer )
-  //options.overview ( 'overview.html' )
-  //options.showAll ( )
-  //options.encoding ( 'UTF-8' )
-  //options.setUse ( true )
-  ////options.author ( true )
-  ////options.version ( true )
-  //options.windowTitle ( packageTitle )
-  //options.docTitle ( packageTitle )
-  //options.footer ( copyrightString )
+    dependsOn('compile')
+    //options.subPackages ( 'org.gparallelizer )
+    //options.overview ( 'overview.html' )
+    //options.showAll ( )
+    //options.encoding ( 'UTF-8' )
+    //options.setUse ( true )
+    ////options.author ( true )
+    ////options.version ( true )
+    //options.windowTitle ( packageTitle )
+    //options.docTitle ( packageTitle )
+    //options.footer ( copyrightString )
 }
 
-task myGroovyDoc ( dependsOn : 'compile' , description : 'Create the GroovyDoc API documentation.' ) << {
-  def groovydocDirPath = 'build/' + groovydocDirName
-  def packageIncludeSpec = 'org.gparallelizer.*'
-  ant.delete ( dir : groovydocDirPath , quiet : 'true' )
-  ant.mkdir ( dir : groovydocDirPath )
-  def sourceDirectory = source.main.groovy.srcDirs.toArray ( )[0]
-  ant.groovydoc (
-                 sourcePath : sourceDirectory ,
-                 destDir : groovydocDirName ,
-                 packageNames : packageIncludeSpec ,
-                 overview : 'overview.html' ,
-                 'private' : 'true' ,
-                 use : 'true' ,
-                 //author : 'true' ,
-                 //version : 'true' ,
-                 windowTitle : packageTitle ,
-                 docTitle : packageTitle ,
-                 header : packageTitle ,
-                 footer : copyrightString,
-                 //source : sourceCompatibility
-                 )
+task myGroovyDoc(dependsOn: 'compile', description: 'Create the GroovyDoc API documentation.') << {
+    def groovydocDirPath = 'build/docs/groovydoc'
+    def packageIncludeSpec = 'org.gparallelizer.*'
+    ant.delete(dir: groovydocDirPath, quiet: 'true')
+    ant.mkdir(dir: groovydocDirPath)
+    def sourceDirectory = source.main.groovy.srcDirs.toArray()[0]
+    ant.groovydoc(
+            sourcePath: sourceDirectory,
+            destDir: groovydocDirPath,
+            packageNames: packageIncludeSpec,
+            overview: 'overview.html',
+            'private': 'true',
+            use: 'true',
+            //author : 'true' ,
+            //version : 'true' ,
+            windowTitle: packageTitle,
+            docTitle: packageTitle,
+            header: packageTitle,
+            footer: copyrightString,
+            //source : sourceCompatibility
+    )
 }
 
-task documentation ( dependsOn: [ 'javadoc' , 'groovydoc' ] , description : 'Create the API documentation.' )
+task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
 
 task zipDoc(type: Zip, dependsOn: [groovydoc, javadoc]) {
     appendix = 'docs'
-    fileSet(baseDir:docsDir)
+    fileSet(baseDir: docsDir)
 //    fileSet(dir:docsDir)  //todo enable
 }
 
 task zipSrc(type: Zip) {
     appendix = 'src'
-    fileSet(baseDir:source.main.groovy.srcDirs.iterator().next())
+    fileSet(baseDir: source.main.groovy.srcDirs.iterator().next())
 //    fileSet(dir:docsDir)  //todo enable
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
-    fileSet(baseDir:source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
+    fileSet(baseDir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
 //    fileSet(dir:docsDir)  //todo enable
 }
 
-task wrapper(type:Wrapper) {
+task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
     gradleVersion = '0.8'
 }
