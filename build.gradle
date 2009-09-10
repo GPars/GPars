@@ -54,7 +54,7 @@ uploadArchives {
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
-def copyrightString = 'Copyright &#169; 2008&#8211;2009  Vaclav Pech.  All Rights Reserved.'
+def copyrightString = 'Copyright &#169; 2008&#8211;2009  V&#225;clav Pech.  All Rights Reserved.'
 def packageTitle = group
 
 //todo consider removing javadoc
@@ -77,60 +77,61 @@ javadoc.doFirst {
 }
 
 groovydoc {
-    dependsOn('compile')
-    //options.subPackages ( 'org.gparallelizer )
-    //options.overview ( 'overview.html' )
-    //options.showAll ( )
-    //options.encoding ( 'UTF-8' )
-    //options.setUse ( true )
-    ////options.author ( true )
-    ////options.version ( true )
-    //options.windowTitle ( packageTitle )
-    //options.docTitle ( packageTitle )
-    //options.footer ( copyrightString )
+  dependsOn ( 'compile' )
+  //options.subPackages ( 'org.gparallelizer' )
+  //options.overview ( 'overview.html' )
+  //options.showAll ( )
+  //options.encoding ( 'UTF-8' )
+  //options.setUse ( true )
+  ////options.author ( true )
+  ////options.version ( true )
+  //options.windowTitle ( packageTitle )
+  //options.docTitle ( packageTitle )
+  //options.footer ( copyrightString )
 }
 
-task myGroovyDoc(dependsOn: 'compile', description: 'Create the GroovyDoc API documentation.') << {
-    def groovydocDirPath = 'build/docs/groovydoc'
-    def packageIncludeSpec = 'org.gparallelizer.*'
-    ant.delete(dir: groovydocDirPath, quiet: 'true')
-    ant.mkdir(dir: groovydocDirPath)
-    def sourceDirectory = source.main.groovy.srcDirs.toArray()[0]
-    ant.groovydoc(
-            sourcePath: sourceDirectory,
-            destDir: groovydocDirPath,
-            packageNames: packageIncludeSpec,
-            overview: 'overview.html',
-            'private': 'true',
-            use: 'true',
-            //author : 'true' ,
-            //version : 'true' ,
-            windowTitle: packageTitle,
-            docTitle: packageTitle,
-            header: packageTitle,
-            footer: copyrightString,
-            //source : sourceCompatibility
-    )
+task myGroovyDoc ( dependsOn : 'compile' , description : 'Create the GroovyDoc API documentation.' ) << {
+  def groovydocDirPath = groovydoc.destinationDir
+  def packageIncludeSpec = 'org.gparallelizer.*'
+  ant.delete ( dir : groovydocDirPath , quiet : 'true' )
+  ant.mkdir ( dir : groovydocDirPath )
+  def sourceDirectory = source.main.groovy.srcDirs.toArray ( )[0]
+  ant.taskdef ( name : 'groovydoc' , classname : 'org.codehaus.groovy.ant.Groovydoc' )
+  ant.groovydoc (
+                 sourcePath : sourceDirectory ,
+                 destDir : groovydocDirPath ,
+                 packageNames : packageIncludeSpec ,
+                 overview : 'overview.html' ,
+                 'private' : 'true' ,
+                 use : 'true' ,
+                 //author : 'true' ,
+                 //version : 'true' ,
+                 windowTitle : packageTitle ,
+                 docTitle : packageTitle ,
+                 header : packageTitle ,
+                 footer : copyrightString,
+                 //source : sourceCompatibility
+                 )
 }
 
-task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
+task documentation(dependsOn: ['javadoc', 'myGroovyDoc'], description: 'Create the API documentation.')
 
-task zipDoc(type: Zip, dependsOn: [groovydoc, javadoc]) {
+task zipDoc(type: Zip, dependsOn: documentation) {
     appendix = 'docs'
     fileSet(baseDir: docsDir)
-//    fileSet(dir:docsDir)  //todo enable
+//    fileSet(dir: docsDir)  //todo enable
 }
 
 task zipSrc(type: Zip) {
     appendix = 'src'
     fileSet(baseDir: source.main.groovy.srcDirs.iterator().next())
-//    fileSet(dir:docsDir)  //todo enable
+//    fileSet(dir: docsDir)  //todo enable
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
     fileSet(baseDir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
-//    fileSet(dir:docsDir)  //todo enable
+//    fileSet(dir: docsDir)  //todo enable
 }
 
 task wrapper(type: Wrapper) {
