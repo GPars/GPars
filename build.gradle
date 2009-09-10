@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 usePlugin 'groovy'
 usePlugin 'maven'
 
@@ -5,7 +7,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gparallelizer'
 group = 'org.gparallelizer'
-version = '0.8.4'          //todo make version include build number or a timestamp
+version = '0.8.4'
 
 manifest.mainAttributes(
         'Implementation-Title': 'gparallelizer',
@@ -34,7 +36,8 @@ compileTest.dependsOn compile
 
 gradle.taskGraph.whenReady {taskGraph ->
     if (!taskGraph.hasTask(':release')) {
-        version += '-SNAPSHOT'
+        final Date date = new Date()
+        version += '-SNAPSHOT' + new SimpleDateFormat('yyMMddHHmmssZ').format(date)
     }
 }
 task release(dependsOn: ['dists', 'test']) << {
