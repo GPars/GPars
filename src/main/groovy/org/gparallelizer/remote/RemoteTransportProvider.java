@@ -21,6 +21,7 @@ import org.gparallelizer.actors.Actor;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.ArrayList;
 
 /**
  * Represents communication method with remote hosts
@@ -67,6 +68,10 @@ public abstract class RemoteTransportProvider {
             if (actor != null)
                 localActors.remove(actor);
         }
+    }
+
+    public void disconnect () {
+        LocalNodeRegistry.removeTransportProvider(this);
     }
 
     /**

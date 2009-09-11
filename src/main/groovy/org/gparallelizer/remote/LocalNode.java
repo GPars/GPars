@@ -65,6 +65,7 @@ public class LocalNode {
 
                     public Thread newThread(Runnable r) {
                         final Thread thread = threadFactory.newThread(r);
+                        thread.setDaemon(true);
                         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                             public void uncaughtException(final Thread t, final Throwable e) {
                                 System.err.println("Uncaught exception occured in actor pool " + t.getName());
@@ -120,6 +121,9 @@ public class LocalNode {
     }
 
     public void disconnect() {
+        if (mainActor != null && mainActor.isActive())
+            mainActor.stop();
+
         if (transportProvider == null)
             LocalNodeRegistry.disconnect(this);
         else

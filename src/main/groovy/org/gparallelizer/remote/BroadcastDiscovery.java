@@ -8,6 +8,12 @@ public class BroadcastDiscovery {
     private static InetAddress GROUP;
     private static final int PORT = 4239;
     private static final int MAGIC = 0x23982391;
+    private UUID uid;
+    private InetSocketAddress address;
+    private Thread sendThread;
+    private Thread receiveThread;
+    private volatile boolean stopped;
+    private MulticastSocket socket;
 
     static {
         try {
@@ -18,8 +24,13 @@ public class BroadcastDiscovery {
     }
 
     public BroadcastDiscovery (final UUID uid, InetSocketAddress address) {
+        this.uid = uid;
+        this.address = address;
+    }
+
+    public void start() {
         try {
-            final MulticastSocket socket = new MulticastSocket(PORT);
+            socket = new MulticastSocket(PORT);
             InetAddress group = GROUP;
             socket.joinGroup(group);
 
@@ -37,10 +48,10 @@ public class BroadcastDiscovery {
 
             final byte[] bytes = out.toByteArray();
 
-            new Thread () {
+            sendThread = new Thread () {
                 @Override
                 public void run() {
-                    while(true) {
+                    while(!stopped) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
@@ -54,15 +65,16 @@ public class BroadcastDiscovery {
                         }
                     }
                 }
-            }.start ();
+            };
+            sendThread.start ();
 
-            new Thread () {
+            receiveThread = new Thread () {
                 @Override
                 public void run() {
                     byte buf [] = new byte [3*8+3*4];
                     byte addrBuf4 [] = new byte [4];
                     byte addrBuf6 [] = new byte [6];
-                    while(true) {
+                    while(!stopped) {
                         DatagramPacket packet = new DatagramPacket(buf, buf.length);
                         try {
                             socket.receive(packet);
@@ -85,10 +97,28 @@ public class BroadcastDiscovery {
                         }
                     }
                 }
-            }.start ();
+            };
+            receiveThread.start ();
         }
         catch (Throwable t) {
             t.printStackTrace();
+        }
+    }
+
+    public void stop () {
+        try {
+            stopped = true;
+
+            if (sendThread != null)
+                sendThread.join();
+
+            if (receiveThread != null)
+                receiveThread.join();
+
+            if (socket != null)
+                socket.close();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

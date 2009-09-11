@@ -43,4 +43,6 @@ public abstract class RemoteHostConnection {
     public void setHost(RemoteHost host) {
         this.host = host;
     }
+
+    public abstract void disconnect();
 }

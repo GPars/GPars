@@ -49,6 +49,12 @@ public class RemoteHost {
         }
     }
 
+    public void disconnect() {
+        for (RemoteHostConnection connection : connections) {
+            connection.disconnect ();
+        }
+    }
+
     public boolean isConnected() {
         return connections.size() != 0;
     }

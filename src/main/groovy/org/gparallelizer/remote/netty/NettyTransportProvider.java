@@ -17,16 +17,12 @@
 package org.gparallelizer.remote.netty;
 
 import org.gparallelizer.remote.BroadcastDiscovery;
-import org.gparallelizer.remote.RemoteHostConnection;
 import org.gparallelizer.remote.RemoteHostTransportProvider;
-import org.gparallelizer.remote.messages.BaseMsg;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -34,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Transport provider using Netty
@@ -44,14 +42,19 @@ public class NettyTransportProvider extends RemoteHostTransportProvider {
 
     private final Map<UUID,Client> clients = new HashMap<UUID,Client>();
 
+    final Server server = new Server();
+
+    final BroadcastDiscovery broadcastDiscovery;
+
     public NettyTransportProvider() {
-        Server server = new Server(this);
-        new BroadcastDiscovery(getId(), server.getAddress()) {
+        server.start (this);
+
+        broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
             @Override
             protected void onDiscovery(UUID uuid, SocketAddress address) {
                 if (uuid.equals(getId()))
                     return;
-                
+
                 synchronized (clients) {
                     Client client = clients.get(uuid);
                     if (client == null) {
@@ -60,51 +63,101 @@ public class NettyTransportProvider extends RemoteHostTransportProvider {
                 }
             }
         };
+
+        broadcastDiscovery.start ();
+    }
+
+    @Override
+    public void disconnect() {
+        broadcastDiscovery.stop ();
+
+        super.disconnect();
+
+        server.stop ();
+
+        for (Client client : clients.values()) {
+            client.stop ();
+        }
     }
 
     public static class Server {
         private InetSocketAddress address;
 
-        public Server(NettyTransportProvider provider) {
-            ChannelFactory factory =
-                new NioServerSocketChannelFactory(
-                        Executors.newCachedThreadPool(),
-                        Executors.newCachedThreadPool());
+        ChannelFactory factory;
 
-            ServerBootstrap bootstrap = new ServerBootstrap(factory);
+        ServerBootstrap bootstrap;
 
-            bootstrap.setPipelineFactory(new ServerPipelineFactory(provider));
-            bootstrap.setOption("child.tcpNoDelay", true);
-            bootstrap.setOption("child.keepAlive", true);
+        Channel channel;
+        private ServerPipelineFactory pipelineFactory;
 
-            Channel channel = bootstrap.bind(new InetSocketAddress(0));
-            address = ((InetSocketAddress)channel.getLocalAddress());
+        public Server() {
+            factory = new NioServerSocketChannelFactory(
+                    Executors.newCachedThreadPool(MyThreadFactory.instance),
+                    Executors.newCachedThreadPool(MyThreadFactory.instance));
+            bootstrap = new ServerBootstrap(factory);
         }
 
         public InetSocketAddress getAddress() {
             return address;
         }
+
+        public void start (NettyTransportProvider provider) {
+            pipelineFactory = new ServerPipelineFactory(provider);
+            bootstrap.setPipelineFactory(pipelineFactory);
+            bootstrap.setOption("child.tcpNoDelay", true);
+            bootstrap.setOption("child.keepAlive", true);
+
+            channel = bootstrap.bind(new InetSocketAddress(0));
+            address = ((InetSocketAddress)channel.getLocalAddress());
+        }
+
+        public void stop () {
+            final CountDownLatch latch = new CountDownLatch(1);
+            channel.close().addListener(new ChannelFutureListener(){
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    bootstrap.getFactory().releaseExternalResources();
+                    latch.countDown();
+                }
+            });
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public static class Client {
         private final NettyTransportProvider provider;
 
+        ChannelFuture channelFuture;
+
+        final ChannelFactory factory;
+
         public Client(NettyTransportProvider provider, SocketAddress address, UUID id) {
             this.provider = provider;
-            final ChannelFactory factory =
-                new NioClientSocketChannelFactory(
-                        Executors.newCachedThreadPool(),
-                        Executors.newCachedThreadPool());
+            factory = new NioClientSocketChannelFactory(
+                    Executors.newCachedThreadPool(MyThreadFactory.instance),
+                    Executors.newCachedThreadPool(MyThreadFactory.instance));
 
             ClientBootstrap bootstrap = new ClientBootstrap(factory);
 
-            Handler handler = new ClientHandler(this.provider, id);
+            NettyHandler handler = new ClientHandler(this.provider, id);
 
             bootstrap.getPipeline().addLast("handler", handler);
             bootstrap.setOption("tcpNoDelay", true);
             bootstrap.setOption("keepAlive", true);
 
-            bootstrap.connect(address);
+            channelFuture = bootstrap.connect(address);
+        }
+
+        public void stop() {
+            channelFuture.getChannel().close().addListener(new ChannelFutureListener(){
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    factory.releaseExternalResources();
+                }
+            });
         }
     }
 
@@ -117,57 +170,13 @@ public class NettyTransportProvider extends RemoteHostTransportProvider {
 
         public ChannelPipeline getPipeline() throws Exception {
             ChannelPipeline pipeline = org.jboss.netty.channel.Channels.pipeline();
-            pipeline.addLast("handler", new Handler(provider));
+            pipeline.addLast("handler", new NettyHandler(provider));
             return pipeline;
         }
     }
 
     @ChannelPipelineCoverage("one")
-    public static class Handler extends SimpleChannelHandler {
-
-        private Channel channel;
-
-        private final RemoteHostConnection connection;
-
-        public Handler(NettyTransportProvider provider) {
-            connection = new NettyRemoteConnection(provider, this);
-        }
-
-        @Override
-        public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-            channel = e.getChannel();
-            channel.getPipeline().addFirst("encoder", new ObjectEncoder());
-            channel.getPipeline().addFirst("decoder", new ObjectDecoder());
-        }
-
-        @Override
-        public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-            connection.onConnect();
-        }
-
-        @Override
-        public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-            connection.onDisconnect();
-        }
-
-        @Override
-        public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-            connection.onMessage((BaseMsg) e.getMessage());
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-            //noinspection ThrowableResultOfMethodCallIgnored
-            connection.onException(e.getCause());
-        }
-
-        public Channel getChannel() {
-            return channel;
-        }
-    }
-
-    @ChannelPipelineCoverage("one")
-    public static class ClientHandler extends Handler {
+    public static class ClientHandler extends NettyHandler {
         private UUID id;
 
         private NettyTransportProvider provider;
@@ -182,6 +191,16 @@ public class NettyTransportProvider extends RemoteHostTransportProvider {
         public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
             provider.clients.remove(id);
             super.channelDisconnected(ctx, e);
+        }
+    }
+
+    private static class MyThreadFactory implements ThreadFactory {
+        static MyThreadFactory instance = new MyThreadFactory();
+
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setDaemon(true);
+            return thread;
         }
     }
 }

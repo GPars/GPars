@@ -1,9 +1,6 @@
 package org.gparallelizer.remote;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Transport provider, which supports concept of remote hosts
@@ -74,6 +71,26 @@ public abstract class RemoteHostTransportProvider extends RemoteTransportProvide
         }
 
         super.disconnect(node);
+    }
+
+    public void disconnect () {
+        synchronized (localNodes) {
+            ArrayList<LocalNode> copy = new ArrayList<LocalNode>(localNodes.values());
+            localNodes.clear();
+            for (LocalNode localNode : copy) {
+                disconnect(localNode);
+            }
+        }
+
+        synchronized (remoteHosts) {
+            ArrayList<RemoteHost> copy = new ArrayList<RemoteHost>(remoteHosts.values());
+            remoteHosts.clear();
+            for (RemoteHost remoteHost : copy) {
+                remoteHost.disconnect();
+            }
+        }
+
+        super.disconnect();
     }
 
     protected RemoteHostNode createNode(UUID uuid, RemoteHost remoteHost) {

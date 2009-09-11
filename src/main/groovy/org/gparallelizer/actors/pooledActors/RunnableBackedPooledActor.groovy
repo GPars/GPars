@@ -16,6 +16,8 @@
 
 package org.gparallelizer.actors.pooledActors
 
+import org.codehaus.groovy.runtime.InvokerHelper
+
 /**
  * Utility class to implement AbstractPooledActor backed by any Runnable (including Closure)
  *
@@ -71,28 +73,28 @@ class RunnableBackedPooledActorDelegate {
 
   Object invokeMethod(String name, Object args) {
     try {
-      first.invokeMethod(name, args)
+      InvokerHelper.invokeMethod(first, name, args)
     }
     catch (MissingMethodException mme) {
-      second.invokeMethod(name, args)
+      InvokerHelper.invokeMethod(second, name, args)
     }
   }
 
   Object getProperty(String propertyName) {
     try {
-      first.getProperty(name)
+      InvokerHelper.getProperty(first, propertyName)
     }
     catch (MissingPropertyException mpe) {
-      second.getProperty(name)
+      InvokerHelper.getProperty(second, propertyName)
     }
   }
 
   void setProperty(String propertyName, Object newValue) {
     try {
-      first.setProperty(name, newValue)
+      InvokerHelper.setProperty(first, name, newValue)
     }
     catch (MissingPropertyException mpe) {
-      second.setProperty(name, newValue)
+      InvokerHelper.setProperty(second, name, newValue)
     }
   }
 }
