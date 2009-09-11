@@ -3,6 +3,7 @@ GParallelizer
 0.8.4
 DataFlows
 Improved Gradle build
+Maintenance
 
 0.8.3
 Enabled Gradle builds
