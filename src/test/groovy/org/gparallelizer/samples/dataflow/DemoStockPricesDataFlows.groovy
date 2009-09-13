@@ -8,7 +8,7 @@ def getYearEndClosing(String stock, int year) {
         def data = url.toURL().text
         return data.split("\n")[1].split(",")[4].toDouble()
     } catch (all) {
-        println "Could not get $stock, assuming value $price. $all.message"
+        println "Could not get $stock, assuming value 0. $all.message"
         return 0
     }
 }
