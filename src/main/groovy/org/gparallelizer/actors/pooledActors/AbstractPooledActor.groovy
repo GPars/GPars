@@ -219,6 +219,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     /**
      * Checks the current status of the Actor.
      */
+    @Override
     public final boolean isActive() {
         return !stopFlag.get()
     }
@@ -424,6 +425,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
     protected final void loop(final Closure code) {
         assert loopCode.get() == null, "The loop method must be only called once"
         final Closure enhancedCode = {code(); repeatLoop()}
+        enhancedCode.resolveStrategy=Closure.DELEGATE_FIRST
         enhancedCode.delegate = this
         loopCode.set(enhancedCode)
         doLoopCall(enhancedCode)

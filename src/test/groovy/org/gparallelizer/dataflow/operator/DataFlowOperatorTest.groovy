@@ -16,17 +16,19 @@
 
 package org.gparallelizer.dataflow.operator
 
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.dataflow.DataFlow
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.dataflow.operator.DFOperator.operator
+import org.gparallelizer.dataflow.operator.DataFlowOperator
+import static org.gparallelizer.dataflow.operator.DataFlowOperator.operator
 
 /**
 * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
 
-public class OperatorTest extends GroovyTestCase {
+public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testOperator() {
         final DataFlowVariable a = new DataFlowVariable()
@@ -50,7 +52,44 @@ public class OperatorTest extends GroovyTestCase {
         op.stop()
     }
 
+    public void testOperatorWithDoubleWaitOnChannel() {
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+
+        def op = operator(inputs : [a, a], outputs : [b]) {x, y ->
+            bindOutput 0, x + y
+        }
+
+        a << 1
+        a << 2
+        a << 3
+        a << 4
+
+        assertEquals 3, b.val
+        assertEquals 7, b.val
+
+        op.stop()
+    }
+
+    public void testNonCommutativeOperator() {
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+
+        def op = operator(inputs : [a, b], outputs : [c]) {x, y ->
+            bindOutput 0, 2*x + y
+        }
+
+        DataFlow.start { a << 5 }
+        DataFlow.start { b << 20 }
+
+        assertEquals 30, c.val
+
+        op.stop()
+    }
+
     public void testCombinedOperators() {
+        final PooledActorGroup group = new PooledActorGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -63,16 +102,16 @@ public class OperatorTest extends GroovyTestCase {
         b << 7
 
         final DataFlowStream x = new DataFlowStream()
-        def op1 = operator(inputs : [a], outputs : [x]) {v ->
+        def op1 = operator(inputs : [a], outputs : [x], group) {v ->
             bindOutput 0, v * v
         }
 
         final DataFlowStream y = new DataFlowStream()
-        def op2 = operator(inputs : [b], outputs : [y]) {v ->
+        def op2 = operator(inputs : [b], outputs : [y], group) {v ->
             bindOutput 0, v * v
         }
 
-        def op3 = operator(inputs : [x, y], outputs : [c]) {v1, v2 ->
+        def op3 = operator(inputs : [x, y], outputs : [c], group) {v1, v2 ->
             bindOutput 0, v1 + v2
         }
 

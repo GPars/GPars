@@ -83,11 +83,10 @@ public class DataFlowStreamTest extends GroovyTestCase {
 
         latch.await()
         assertEquals 1, stream.length()
-        final DataFlowVariable retrievedVariable = stream.take()
-        assert retrievedVariable instanceof DataFlowVariable
-        assertEquals 0, stream.length()
         thread << 'Proceed'
-        assertEquals 20, retrievedVariable.val
+        def value = stream.val
+        assertEquals 0, stream.length()
+        assertEquals 20, value
     }
 
     public void testIteration() {
@@ -148,6 +147,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         stream << variable
         assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=null)])', stream.toString()
         variable << '30'
+        Thread.sleep 1000  //let the value propagate asynchronously into the variable stored in the stream
         assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
         assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
         stream.val
