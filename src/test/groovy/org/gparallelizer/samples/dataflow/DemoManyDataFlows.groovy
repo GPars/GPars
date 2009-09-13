@@ -28,13 +28,9 @@ final many = 1..LIMIT
 
 def scheduler = Executors.newFixedThreadPool (20)
 
-scheduler.execute { df.result = many.collect{
-    def v = df[it]
-    df.remove it
-    v
-}.sum() }
+scheduler.execute { df.result = many.collect{ df[it] }.sum() }
 
-// each in a newly started actor:
+// each in a newly started executor:
 many.each { num ->
     scheduler.execute {
       df[num] = 1
@@ -45,4 +41,5 @@ many.each { num ->
 // Wait for the result to be available
 // This is in the main thread, which is DF unaware!
 assert many.size() == df.result
+scheduler.shutdown()
 println "done"
