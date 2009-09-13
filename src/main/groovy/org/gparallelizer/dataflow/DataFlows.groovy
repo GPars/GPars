@@ -166,4 +166,15 @@ public class DataFlows {
             df.bindSafely(null)
         }
     }
+
+    /**
+     * Convenience method to play nicely with Groovy's object iteration methods.
+     * The iteration restrictions of ConcurrentHashMap concerning parallel access and
+     * ConcurrentModificationException apply.
+     * @return iterator over the stored key:DataFlowVariable value pairs
+     * @see DataFlowsTest#testIterator
+     */
+    public Iterator iterator() {
+        variables.entrySet().iterator()
+    }
 }

@@ -199,4 +199,31 @@ public class DataFlowsTest extends GroovyTestCase {
         assertEquals 'value2', data.x
     }
 
+    public void testIterator() {
+        final DataFlows data = new DataFlows()
+
+        data.x = 0
+        data.y = 1
+        def log = []
+        data.each { entry ->
+            log << entry.key
+            log << entry.value
+        }
+        assert 'x' in log
+        assert 'y' in log
+        assertEquals 2, log.findAll { it in DataFlowVariable }.size()
+
+        def log2 = []
+        for (entry in data) {
+            log2 << entry.key
+            log2 << entry.value
+        }
+        assert log2 == log
+
+        assertEquals 'y', data.find { it.value.val == 1 }.key
+        assertEquals 2, data.findAll { it.key.size() == 1 }.size()
+        assert data.every { it.key.size() == 1 }
+        assert data.any  { it.key.size() == 1 }
+    }
+
 }
