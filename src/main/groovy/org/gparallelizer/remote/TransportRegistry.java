@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Regestry of local nodes
+ * Regestry of local transport providers
  *
  * @author Alex Tkachman
  */
