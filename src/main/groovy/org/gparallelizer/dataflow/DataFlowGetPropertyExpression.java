@@ -16,24 +16,28 @@
 
 package org.gparallelizer.dataflow;
 
+import org.codehaus.groovy.runtime.InvokerHelper;
+
 import java.util.Set;
 
 /**
  * @author Alex Tkachman
  */
-public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T>  {
-    protected Object[] args;
+public class DataFlowGetPropertyExpression extends DataFlowExpression {
+    private DataFlowExpression receiver;
+    private String name;
 
-    public DataFlowComplexExpression(final Object... elements) {
-        this.args = elements;
+    public DataFlowGetPropertyExpression(DataFlowExpression expression, String name) {
+        this.receiver = expression;
+        this.name = name;
+        init ();
     }
 
-    protected void collectDataFlowExpressions(Set<DataFlowExpression> collection) {
-        for (int i = 0; i != args.length; ++i) {
-            Object element = args[i];
-            if (element instanceof DataFlowExpression) {
-                collection.add((DataFlowExpression)element);
-            }
-        }
+    protected void collectDataFlowExpressions(Set collection) {
+        collection.add(receiver);
+    }
+
+    protected Object evaluate() {
+        return InvokerHelper.getProperty(receiver.value, name);
     }
 }

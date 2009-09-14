@@ -20,7 +20,6 @@ import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.dataflow.DataFlow
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
-import org.gparallelizer.dataflow.operator.DataFlowOperator
 import static org.gparallelizer.dataflow.operator.DataFlowOperator.operator
 
 /**

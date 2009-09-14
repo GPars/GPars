@@ -1,3 +1,19 @@
+//  GParallelizer
+//
+//  Copyright © 2008-9  The original author or authors
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
 package org.gparallelizer.dataflow;
 
 import org.gparallelizer.MessageStream;
@@ -9,6 +25,7 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
 
 import groovy.lang.*;
 
@@ -166,7 +183,6 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
 
         @SuppressWarnings({"unchecked"})
         final WaitingThread<T> waitingQueue = waiting.getAndSet(dummyWaitingThread);
-        // no more new waiting threads since that point
 
         // no more new waiting threads since that point
         for (WaitingThread<T> waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
@@ -231,21 +247,48 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
         getValAsync(new DataCallback(closure));
     }
 
-    protected abstract void collectVariables(Set<DataFlowVariable> collection);
+    protected void init() {
+        HashSet<DataFlowExpression> variables = new HashSet<DataFlowExpression>();
+        collectDataFlowExpressions(variables);
+
+        if (variables.isEmpty()) {
+            doBind(evaluate());
+        }
+        else {
+            final AtomicInteger count = new AtomicInteger(variables.size());
+            MessageStream listener = new MessageStream() {
+                public MessageStream send(Object message) {
+                    if (count.decrementAndGet() == 0) {
+                        doBind(evaluate());
+                    }
+                    return this;
+                }
+            };
+
+            for (DataFlowExpression variable : variables) {
+                variable.getValAsync (listener);
+            }
+        }
+    }
+
+    protected abstract T evaluate();
+
+    protected abstract void collectDataFlowExpressions(Set<DataFlowExpression> collection);
 
     public Object invokeMethod(String name, Object args) {
-        if (!getMetaClass().respondsTo(this, name).isEmpty())
-            return InvokerHelper.invokeMethod(this, name, args);
+        if (getMetaClass().respondsTo(this, name).isEmpty()) {
+            return new DataFlowInvocationExpression(this, name, (Object[]) args);
+        }
+        return InvokerHelper.invokeMethod(this, name, args);
 
-        return new DataFlowInvocationExpression(this, name, (Object[]) args);
     }
 
     public Object getProperty(String propertyName) {
-        return getMetaClass().getProperty(this, propertyName);
-    }
+        MetaProperty metaProperty = getMetaClass().hasProperty(this, propertyName);
+        if (metaProperty != null)
+            return metaProperty.getProperty(this);
 
-    public void setProperty(String propertyName, Object newValue) {
-        getMetaClass().setProperty(this, propertyName, newValue);
+        return new DataFlowGetPropertyExpression (this, propertyName);
     }
 
     public void setMetaClass(MetaClass metaClass) {

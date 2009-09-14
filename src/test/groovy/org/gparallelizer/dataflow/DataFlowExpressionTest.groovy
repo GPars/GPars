@@ -16,13 +16,12 @@
 
 package org.gparallelizer.dataflow
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.dataflow.DataFlow
-import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
-import org.gparallelizer.dataflow.operator.DataFlowOperator
-import static org.gparallelizer.dataflow.operator.DataFlowOperator.operator
 
+/**
+ * @author Alex Tkachman
+ */
 public class DataFlowExpressionTest extends GroovyTestCase {
 
     public void testInvoke() {
@@ -41,5 +40,19 @@ public class DataFlowExpressionTest extends GroovyTestCase {
         DataFlow.start { b << 20 }
 
         assertEquals 141, d.val
+    }
+
+    public void testProperty () {
+      final DataFlowVariable a = new DataFlowVariable()
+      final DataFlowVariable b = new DataFlowVariable()
+
+      def prod = a.x * b.x + a.y * b.y + a.z *b.z
+
+      DataFlow.start {
+        a << [x:3, y:2, z:1]
+        b << [x:1, y:2, z:3]
+      }
+
+      assertEquals 11, (prod + 1).val
     }
 }

@@ -62,8 +62,13 @@ public final class DataFlowVariable<T> extends DataFlowExpression<T> {
      * @param ref The DataFlowVariable instance the value of which to bind
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
-    public void leftShift(final DataFlowVariable<T> ref) throws InterruptedException {
-        bind(ref.getVal());
+    public void leftShift(final DataFlowExpression<T> ref) {
+        ref.getValAsync(new MessageStream(){
+            public MessageStream send(Object message) {
+                bind(ref.value);
+                return this;
+            }
+        });
     }
 
     @SuppressWarnings({"ArithmeticOnVolatileField"})
@@ -97,7 +102,11 @@ public final class DataFlowVariable<T> extends DataFlowExpression<T> {
         doBind(value);
     }
 
-    protected void collectVariables(Set<DataFlowVariable> collection) {
+    protected void collectDataFlowExpressions(Set<DataFlowExpression> collection) {
         collection.add(this);
+    }
+
+    protected T evaluate() {
+        return value;
     }
 }
