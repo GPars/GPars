@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * @author Alex Tkachman
  */
-public class DataFlowGetPropertyExpression extends DataFlowExpression {
+public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
     private DataFlowExpression receiver;
     private String name;
 
@@ -33,11 +33,12 @@ public class DataFlowGetPropertyExpression extends DataFlowExpression {
         init ();
     }
 
-    protected void collectDataFlowExpressions(Set collection) {
+    protected void collectDataFlowExpressions(Set<DataFlowExpression> collection) {
         collection.add(receiver);
     }
 
-    protected Object evaluate() {
-        return InvokerHelper.getProperty(receiver.value, name);
+    protected T evaluate() {
+        //noinspection unchecked
+        return (T) InvokerHelper.getProperty(receiver.value, name);
     }
 }
