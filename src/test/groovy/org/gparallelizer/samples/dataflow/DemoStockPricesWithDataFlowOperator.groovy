@@ -27,18 +27,24 @@ final DataFlowStream pricedStocks = new DataFlowStream()
 1.upto(3) {
     operator([inputs: [stocksStream], outputs: [pricedStocks]], group) {stock ->
         def price = getYearEndClosing(stock, 2008)
-//        def price = 10
         bindOutput(0, [stock: stock, price: price])
     }
 }
 
 def top = [stock: 'None', price: 0.0]
+
 operator([inputs: [pricedStocks], outputs: []], group) {pricedStock ->
     println "Received stock ${pricedStock.stock} priced to ${pricedStock.price}"
     if (top.price < pricedStock.price) {
         top = pricedStock
         println "Top stock so far is $top.stock with price ${top.price}"
     }
+}
+
+Thread.sleep 5000
+
+['AAPL', 'IBM'].each {
+    stocksStream << it
 }
 
 Thread.sleep 5000

@@ -160,10 +160,14 @@ public class DataFlows {
       }
     }
 
+    /**
+     * Removes a DFV from the map and binds it to null, if it has not been bound yet
+     * @param name The name of the DFV to remove.
+     */
     public def remove(name) {
         synchronized(this) {
             def df = variables.remove(name)
-            df.bindSafely(null)
+            if (df) df.bindSafely(null)
         }
     }
 
