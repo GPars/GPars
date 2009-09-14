@@ -19,7 +19,6 @@ package org.gparallelizer.samples.actors
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.samples.actors.*
 
 /**
  * Shows solution to the popular Sleeping Barber concurrency problem - http://en.wikipedia.org/wiki/Sleeping_barber_problem
