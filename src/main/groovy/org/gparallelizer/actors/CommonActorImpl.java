@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright Â© 2008-9  The original author or authors
+//  Copyright © 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -12,21 +12,31 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
-package org.gparallelizer.actors
+package org.gparallelizer.actors;
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import org.gparallelizer.actors.pooledActors.ActorReplyException
-import groovy.time.Duration
-import org.gparallelizer.MessageStream
-import java.lang.ref.WeakReference
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.gparallelizer.actors.pooledActors.ActorReplyException;
+import groovy.time.Duration;
+import groovy.lang.MetaClass;
+import groovy.lang.Closure;
+import org.gparallelizer.MessageStream;
+import org.omg.CORBA.portable.InvokeHandler;
+import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.runtime.DefaultGroovyMethods;
+import org.codehaus.groovy.runtime.GeneratedClosure;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Represents the common superclass to both thread-bound and event-driven actors.
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  * Date: Jun 13, 2009
  */
 public abstract class CommonActorImpl extends Actor {
@@ -36,24 +46,30 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * A list of senders for the currently procesed messages
      */
-    protected final List senders = []
+    protected final List<MessageStream> senders = new ArrayList<MessageStream>();
 
     //todo necessary for mixins
-    protected final List getSenders() {senders}
+    protected final List<MessageStream> getSenders() {
+        return senders;
+    }
 
     /**
      * Indicates whether the actor should enhance messages to enable sending replies to their senders
      */
-    protected volatile boolean sendRepliesFlag = true
+    protected volatile boolean sendRepliesFlag = true;
 
     //todo necessary for mixins
-    protected final boolean getSendRepliesFlag() {sendRepliesFlag}
+    protected final boolean getSendRepliesFlag() {
+        return sendRepliesFlag;
+    }
 
     /**
      * Enabled the actor and received messages to have the reply()/replyIfExists() methods called on them.
      * Sending replies is enabled by default.
      */
-    protected final void enableSendingReplies() { sendRepliesFlag = true }
+    protected final void enableSendingReplies() {
+        sendRepliesFlag = true;
+    }
 
     /**
      * Disables the actor and received messages to have the reply()/replyIfExists() methods called on them.
@@ -61,51 +77,62 @@ public abstract class CommonActorImpl extends Actor {
      * Calling reply()/replyIfExist() on a received message will result in MissingMethodException being thrown.
      * Sending replies is enabled by default.
      */
-    protected final void disableSendingReplies() { sendRepliesFlag = false }
+    protected final void disableSendingReplies() {
+        sendRepliesFlag = false;
+    }
 
     /**
      * The actor group to which the actor belongs
      */
-    volatile AbstractActorGroup actorGroup
+    private volatile AbstractActorGroup actorGroup;
 
     /**
      * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
      */
-    private volatile boolean groupMembershipChangeable = true
+    private volatile boolean groupMembershipChangeable = true;
 
     /**
      * Disallows any subsequent changes to the group attached to the actor.
      */
-    protected final void disableGroupMembershipChange() { groupMembershipChangeable = false }
+    protected final void disableGroupMembershipChange() { groupMembershipChangeable = false; }
 
     /**
      * Sets the actor's group.
      * It can only be invoked before the actor is started.
+     * @param group new group
      */
-    public final void setActorGroup(def group) {
-        if (!groupMembershipChangeable) throw new IllegalStateException("Cannot set actor's group on a started actor.")
-        if (!group) throw new IllegalArgumentException("Cannot set actor's group to null.")
-        actorGroup = group
+    public final void setActorGroup(AbstractActorGroup group) {
+        if (!groupMembershipChangeable)
+            throw new IllegalStateException("Cannot set actor's group on a started actor.");
+
+        if (group == null)
+            throw new IllegalArgumentException("Cannot set actor's group to null.");
+
+        actorGroup = group;
     }
 
     /**
      * Gets unblocked after the actor stops.
      */
-    private final CountDownLatch joinLatch = new CountDownLatch(1)
-    protected final CountDownLatch getJoinLatch() { joinLatch }
+    private final CountDownLatch joinLatch = new CountDownLatch(1);
+    protected final CountDownLatch getJoinLatch() { return joinLatch; }
 
     /**
      * Joins the actor. Waits fot its termination.
      */
-    public final void join() { join(0) }
+    public final void join() throws InterruptedException {
+        join(0);
+    }
 
     /**
      * Joins the actor. Waits fot its termination.
      * @param milis Timeout in miliseconds, specifying how long to wait at most.
      */
-    public final void join(long milis) {
-        if (milis > 0) joinLatch.await(milis, TimeUnit.MILLISECONDS)
-        else joinLatch.await()
+    public final void join(long milis) throws InterruptedException {
+        if (milis > 0)
+            joinLatch.await(milis, TimeUnit.MILLISECONDS);
+        else
+            joinLatch.await();
     }
 
     /**
@@ -114,22 +141,34 @@ public abstract class CommonActorImpl extends Actor {
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
+     * @param message reply message
      * @throws ActorReplyException If some of the replies failed to be sent.
      */
     protected final void reply(Object message) {
-        assert senders != null
-        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
+        assert senders != null;
+        if (!sendRepliesFlag)
+            throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.");
+
         if (!senders.isEmpty()) {
-            List<Exception> exceptions = []
-            for (sender in senders) {
+            List<Exception> exceptions = new ArrayList<Exception>();
+            for (MessageStream sender : senders) {
                 if (sender != null) {
-                    try { sender.send message } catch (IllegalStateException e) {exceptions << e }
+                    try {
+                        sender.send(message);
+                    }
+                    catch (IllegalStateException e)
+                    {
+                        exceptions.add(e);
+                    }
                 }
-                else exceptions << new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient.")
+                else
+                    //noinspection ThrowableInstanceNeverThrown
+                    exceptions.add(new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient."));
             }
-            if (!exceptions.empty) throw new ActorReplyException('Failed sending some replies. See the issues field for details', exceptions)
+            if (!exceptions.isEmpty())
+                throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
         } else {
-            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.")
+            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
         }
     }
 
@@ -139,14 +178,18 @@ public abstract class CommonActorImpl extends Actor {
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
+     * @param message reply message
      */
     protected final void replyIfExists(Object message) {
-        assert senders != null
-        if (!sendRepliesFlag) throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.")
-        for (sender in senders) {
+        assert senders != null;
+        if (!sendRepliesFlag)
+            throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.");
+        for (MessageStream sender : senders) {
             try {
-                sender?.send message
-            } catch (IllegalStateException ignore) { }
+                if (sender != null)
+                    sender.send (message);
+            } catch (IllegalStateException ignore) { // ignore
+            }
         }
     }
 
@@ -167,17 +210,16 @@ public abstract class CommonActorImpl extends Actor {
         for (final ActorMessage message: messages) {
             if (message != null) {
                 //Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
-                def replier = message.payLoad
-                def sender = message.sender
-                replier?.getMetaClass()?.reply = {msg ->
-                    if (sender != null) sender.send msg
-                    else throw new IllegalArgumentException("Cannot send a reply message ${msg} to a null recipient.")
-                }
+                Object replier = message.getPayLoad();
+                final MessageStream sender = message.getSender();
 
-                replier?.getMetaClass()?.replyIfExists = {msg ->
-                    try {
-                        sender?.send msg
-                    } catch (IllegalStateException ignore) { }
+                if (replier != null) {
+                    Object mc = DefaultGroovyMethods.getMetaClass(replier);
+                    if (mc != null) {
+                        InvokerHelper.setProperty(mc, "reply", new MyClosure(sender, true));
+                        mc = DefaultGroovyMethods.getMetaClass(replier);
+                        InvokerHelper.setProperty(mc, "replyIfExists", new MyClosure(sender, false));
+                    }
                 }
             }
         }
@@ -232,5 +274,44 @@ public abstract class CommonActorImpl extends Actor {
      */
     protected final Object receive(Duration duration) throws InterruptedException {
         return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
+    }
+
+    public AbstractActorGroup getActorGroup() {
+        return actorGroup;
+    }
+
+    private static class MyClosure extends Closure implements GeneratedClosure {
+        private final MessageStream sender;
+        private boolean throwable;
+
+        public MyClosure(MessageStream sender, boolean throwable) {
+            super(null, null);
+            this.sender = sender;
+            this.throwable = throwable;
+        }
+
+        public Object doCall() {
+            return doCall(null);
+        }
+
+        public Object doCall(Object msg) {
+            if (throwable) {
+                if (sender != null)
+                    return sender.send(msg);
+                else
+                      throw new IllegalArgumentException("Cannot send a reply message " + msg.toString() + " to a null recipient.");
+            }
+            else {
+                try {
+                    if (sender != null)
+                        return sender.send(msg);
+                    else
+                        return null;
+                }
+                catch (IllegalStateException e) {
+                    return null;
+                }
+            }
+        }
     }
 }

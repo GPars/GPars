@@ -17,7 +17,6 @@
 package org.gparallelizer.remote;
 
 import org.gparallelizer.actors.Actor;
-import org.apache.ivy.core.resolve.VisitNode;
 
 import java.util.UUID;
 

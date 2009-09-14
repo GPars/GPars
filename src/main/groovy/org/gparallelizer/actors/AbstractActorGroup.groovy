@@ -24,7 +24,6 @@ import org.gparallelizer.actors.pooledActors.Pool
  * @author Vaclav Pech
  */
 public abstract class AbstractActorGroup {
-
     /**
      * Stored the group actors' thread pool
      */
@@ -44,5 +43,9 @@ public abstract class AbstractActorGroup {
      */
     protected final boolean useFJPool() {
         return 'true' == System.getProperty("gparallelizer.useFJPool")?.trim()?.toLowerCase()
+    }
+
+    public Pool getThreadPool() {
+      return threadPool;
     }
 }

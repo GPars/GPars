@@ -18,6 +18,7 @@ package org.gparallelizer.dataflow;
 
 import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
+import org.gparallelizer.MessageStream;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +69,7 @@ public final class DataFlowVariable<T> {
     private static class WaitingThread<V> {
         private final Thread thread;
         private volatile WaitingThread<V> previous;
-        private final Actor callback;
+        private final MessageStream callback;
         private final Integer index;
 
         /**
@@ -78,7 +79,7 @@ public final class DataFlowVariable<T> {
          * @param index A logical identifier to match the original value request with a reply in the operators, which receive values asynchronously
          * @param callback An actor or operator to send a message to once a value is bound
          */
-        private WaitingThread(final Thread thread, final WaitingThread<V> previous, final Integer index, final Actor callback) {
+        private WaitingThread(final Thread thread, final WaitingThread<V> previous, final Integer index, final MessageStream callback) {
             this.callback = callback;
             this.index = index;
             this.thread = thread;
@@ -105,7 +106,7 @@ public final class DataFlowVariable<T> {
      * with the value of the Dataflow Variable.
      * @param callback An actor to send the bound value to.
      */
-    public void getValAsync(final Actor callback) {
+    public void getValAsync(final MessageStream callback) {
         getValAsync(CHANNEL_INDEX_NOT_REQUIRED, callback);
     }
 
@@ -120,7 +121,7 @@ public final class DataFlowVariable<T> {
      * @param index An arbitrary value to identify operator channels and so match requests and replies
      * @param callback An actor to send the bound value plus the supplied index to.
      */
-    void getValAsync(final Integer index, final Actor callback) {
+    void getValAsync(final Integer index, final MessageStream callback) {
         WaitingThread<T> newWaiting = null;
         while (state.get() != S_INITIALIZED) {
             if (newWaiting == null) {
@@ -234,7 +235,7 @@ public final class DataFlowVariable<T> {
      * @param callback The actor to send the message to
      */
     @SuppressWarnings({"TypeMayBeWeakened"})
-    private void scheduleCallback(final Integer index, final Actor callback) {
+    private void scheduleCallback(final Integer index, final MessageStream callback) {
         if (index == CHANNEL_INDEX_NOT_REQUIRED) {
             callback.send(value);
         } else {
@@ -289,7 +290,7 @@ public final class DataFlowVariable<T> {
      * @param closure closure to execute when data available
      */
     public void whenBound(final Closure closure) {
-        getValAsync(new DataCallback(closure, this).start());
+        getValAsync(new DataCallback(closure));
     }
 
     /**
@@ -301,6 +302,6 @@ public final class DataFlowVariable<T> {
      * @param closure An object with a method matching the 'perform(Object value)' signature
      */
     void whenBound(final Object closure) {
-        getValAsync(new DataCallback(closure, this).start());
+        getValAsync(new DataCallback(closure));
     }
 }

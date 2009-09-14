@@ -57,13 +57,13 @@ public abstract class Actor extends MessageStream {
     /**
      * Joins the actor. Waits for its termination.
      */
-    public abstract void join();
+    public abstract void join() throws InterruptedException;
 
     /**
      * Joins the actor. Waits fot its termination.
      * @param milis Timeout in miliseconds
      */
-    public abstract void join(long milis);
+    public abstract void join(long milis) throws InterruptedException;
 
     public Class getRemoteClass() {
         return RemoteActor.class;
