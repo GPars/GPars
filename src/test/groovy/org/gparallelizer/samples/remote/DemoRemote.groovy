@@ -8,7 +8,6 @@ Every line you will type will be printed on all JVM, which runs this script.
 Type '@bye' to exit
 Type '@kill <UUID of other node>' to stop it
 Type '@kill all' to stop all other nodes
-Type '@groovy <piece of groovy code>' to execute the code on all other nodes
 """
 
 // transport provider communicating over IP
@@ -35,14 +34,14 @@ def mainNode = new LocalNode(transport, {
     System.err.println "${node.id} $operation"
 
     if (operation == "connected") {
-      // let us remember who we connected with
-      connected.put(node.id, node)
-
       // every node (in this case RemoteNode, which is proxy to another LocalNode)
       // expose it's main actor
       // this actor can be used as main communication point
       // so here we send command to this distributed actor
       node.mainActor << [command: "print", line: welcome, id: id]
+
+      // let us remember who we connected with
+      connected.put(node.id, node)
     }
     else {
       // disconnected, so log and forget it
@@ -128,6 +127,7 @@ def mainNode = new LocalNode(transport, {
         case "kill":
           connected[msg.victim].mainActor << [command: "die", id: id]
           return
+
 
         case "print":
           println "${msg.id} says ${msg.line}"

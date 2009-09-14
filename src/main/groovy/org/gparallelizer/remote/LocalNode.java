@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
+import org.gparallelizer.remote.serial.WithSerialId;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -42,6 +43,7 @@ public class LocalNode {
     private final AbstractPooledActorGroup actorGroup;
 
     private final UUID id = UUID.randomUUID();
+
     private RemoteTransportProvider transportProvider;
 
     public LocalNode() {
@@ -109,7 +111,7 @@ public class LocalNode {
         if (transportProvider != null)
             connect(transportProvider);
         else
-            LocalNodeRegistry.connect(this);
+            TransportRegistry.connect(this);
     }
 
     public void connect(final RemoteTransportProvider provider) {
@@ -125,7 +127,7 @@ public class LocalNode {
             mainActor.stop();
 
         if (transportProvider == null)
-            LocalNodeRegistry.disconnect(this);
+            TransportRegistry.disconnect(this);
         else
             scheduler.execute(new Runnable(){
                 public void run() {
@@ -191,4 +193,7 @@ public class LocalNode {
         return getId().toString();
     }
 
+    public RemoteTransportProvider getTransportProvider() {
+        return transportProvider;
+    }
 }

@@ -24,4 +24,4 @@ package org.gparallelizer.actors
  * @author Vaclav Pech
  * Date: Feb 20, 2009
  */
-public interface ThreadedActor extends Actor {}
+public abstract class ThreadedActor extends CommonActorImpl {}

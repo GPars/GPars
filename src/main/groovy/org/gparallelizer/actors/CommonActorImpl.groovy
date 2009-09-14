@@ -19,6 +19,9 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.gparallelizer.actors.pooledActors.ActorReplyException
+import groovy.time.Duration
+import org.gparallelizer.MessageStream
+import java.lang.ref.WeakReference
 
 /**
  * Represents the common superclass to both thread-bound and event-driven actors.
@@ -26,7 +29,9 @@ import org.gparallelizer.actors.pooledActors.ActorReplyException
  * @author Vaclav Pech
  * Date: Jun 13, 2009
  */
-public abstract class CommonActorImpl implements Actor {
+public abstract class CommonActorImpl extends Actor {
+
+    protected WeakReference<MessageStream> senderOfLastMessage;
 
     /**
      * A list of senders for the currently procesed messages
@@ -176,5 +181,56 @@ public abstract class CommonActorImpl implements Actor {
                 }
             }
         }
+    }
+
+    protected final Object receive () {
+        Object msg = receiveImpl();
+        if (msg instanceof ActorMessage) {
+            ActorMessage messageAndReply = (ActorMessage) msg;
+            senderOfLastMessage = new WeakReference<MessageStream>(messageAndReply.getSender());
+            return messageAndReply.getPayLoad();
+        }
+        else {
+            senderOfLastMessage = null;
+            return msg;
+        }
+    }
+
+    protected final Object receive (long timeout, TimeUnit units) throws InterruptedException {
+        Object msg = receiveImpl(timeout, units);
+        if (msg instanceof ActorMessage) {
+            ActorMessage messageAndReply = (ActorMessage) msg;
+            senderOfLastMessage = new WeakReference<MessageStream>(messageAndReply.getSender());
+            return messageAndReply.getPayLoad();
+        }
+        else {
+            senderOfLastMessage = null;
+            return msg;
+        }
+    }
+
+    protected Object receiveImpl () {
+        throw new UnsupportedOperationException("'receiveImpl' method should be implemented by subclass of MessageStream");
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
+        throw new UnsupportedOperationException("'receiveImpl' method should be implemented by subclass of MessageStream");
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * @param duration how long to wait before giving up, in units of unit
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final Object receive(Duration duration) throws InterruptedException {
+        return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 }

@@ -17,103 +17,41 @@
 package org.gparallelizer.remote;
 
 import org.gparallelizer.actors.Actor;
-import org.gparallelizer.remote.messages.MessageToActor;
+import org.apache.ivy.core.resolve.VisitNode;
 
-import java.io.*;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Representation of remote node
  *
  * @author Alex Tkachman
  */
- public abstract class RemoteNode<T extends RemoteTransportProvider> {
-    protected final static RemoteActor DUMMY = new RemoteActor(null,null);
-
-    // TODO: DANGER of memory leak
-    private final ConcurrentHashMap<UUID,RemoteActor> remoteActors = new ConcurrentHashMap<UUID,RemoteActor> ();
-
+ public final class RemoteNode<T extends RemoteTransportProvider> {
     private final UUID id;
 
-    private final T provider;
+    private final RemoteHost remoteHost;
+    private final Actor mainActor;
 
-    public RemoteNode(UUID id, T provider) {
+    public RemoteNode(UUID id, RemoteHost remoteHost, Actor mainActor) {
         this.id = id;
-        this.provider = provider;
+        this.remoteHost = remoteHost;
+        this.mainActor = mainActor;
     }
 
     public final UUID getId () {
         return id;
     }
 
-    public abstract void onConnect(LocalNode node);
-
-    public abstract void onDisconnect(LocalNode node);
-
     @Override
     public String toString() {
         return getId().toString();
     }
 
-    public final RemoteActor getMainActor () {
-        return getRemoteActor (getId());
+    public final Actor getMainActor () {
+        return mainActor;
     }
 
-    protected abstract void deliver(byte[] bytes) throws IOException;
-
-    protected void send(RemoteActor receiver, Serializable message, Actor sender) {
-        byte [] data = new byte[0];
-        try {
-            data = encodeMessage(receiver, message, sender);
-            deliver(data);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected byte[] encodeMessage(RemoteActor receiver, Serializable message, Actor sender) throws IOException {
-        final MessageToActor toSend = createMessage(receiver, message, sender);
-        final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        final ObjectOutputStream oout = new ObjectOutputStream(bout);
-        oout.writeObject(toSend);
-        oout.close();
-        return bout.toByteArray();
-    }
-
-    protected MessageToActor createMessage(RemoteActor receiver, Serializable message, Actor sender) {
-        return new MessageToActor(getId(), receiver.getId(), provider.getLocalActorId(sender), message);
-    }
-
-    protected MessageToActor decodeMessage (byte [] data) throws IOException {
-        try {
-            return (MessageToActor) new ObjectInputStream(new ByteArrayInputStream(data)).readObject();
-        } catch (ClassNotFoundException e) {
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    protected RemoteActor getRemoteActor(UUID uid) {
-        if (uid == null) {
-            return null;
-        }
-
-        RemoteActor actor = remoteActors.putIfAbsent(uid, DUMMY);
-        if (actor == null || actor == DUMMY) {
-            synchronized (remoteActors) {
-                actor = remoteActors.get(uid);
-                if (actor == null || actor == DUMMY) {
-                    actor = createRemoteActor(uid);
-                    remoteActors.put(uid, actor);
-                }
-            }
-        }
-        return actor;
-    }
-
-    protected abstract RemoteActor createRemoteActor(UUID uid);
-
-    public T getProvider() {
-        return provider;
+    public RemoteHost getRemoteHost() {
+        return remoteHost;
     }
 }

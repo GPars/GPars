@@ -17,10 +17,61 @@
 package org.gparallelizer.remote
 
 import java.util.concurrent.CountDownLatch
+import org.gparallelizer.actors.pooledActors.PooledActors
 
 public abstract class CommunicationTestBase extends GroovyTestCase{
 
   RemoteTransportProvider getTransportProvider () {}
+
+  void testRemote () {
+    def node1 = new LocalNode(transportProvider, {
+      def printer = PooledActors.actor {
+        loop {
+          react { msg ->
+            println "node1: $msg"
+          }
+        }
+      }.start ()
+
+      loop {
+        react { command ->
+          switch (command) {
+            case "getPrinter" :
+              reply printer
+              return 
+
+            case "stop" :
+              printer.stop ()
+              stop ()
+              return
+          }
+        }
+      }
+    })
+
+    def node2 = new LocalNode(transportProvider, {
+      addDiscoveryListener { anotherNode, op ->
+        if (op == "connected") {
+          def printer = anotherNode.mainActor.sendAndWait ("getPrinter")
+          println printer
+          printer << "Hi"
+          printer << "Bye"
+          anotherNode.mainActor << "stop"
+          stop ()
+        }
+      }
+
+      loop {
+        react {
+
+        }
+      }
+    })
+
+    node1.mainActor.join ()
+    node1.transportProvider.disconnect ()
+    node2.transportProvider.disconnect ()
+  }
 
   void testDiscovery () {
       def node1 = new LocalNode(transportProvider)

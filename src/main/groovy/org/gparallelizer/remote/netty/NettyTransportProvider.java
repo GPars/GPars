@@ -17,7 +17,7 @@
 package org.gparallelizer.remote.netty;
 
 import org.gparallelizer.remote.BroadcastDiscovery;
-import org.gparallelizer.remote.RemoteHostTransportProvider;
+import org.gparallelizer.remote.RemoteTransportProvider;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.*;
@@ -38,7 +38,7 @@ import java.util.concurrent.ThreadFactory;
  * 
  * @author Alex Tkachman
  */
-public class NettyTransportProvider extends RemoteHostTransportProvider {
+public class NettyTransportProvider extends RemoteTransportProvider {
 
     private final Map<UUID,Client> clients = new HashMap<UUID,Client>();
 

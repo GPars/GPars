@@ -30,6 +30,7 @@ import java.lang.*
 import org.gparallelizer.actors.pooledActors.*
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
 import static org.gparallelizer.actors.pooledActors.ActorException.*
+import org.gparallelizer.MessageStream
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -120,7 +121,7 @@ import static org.gparallelizer.actors.pooledActors.ActorException.*
  * @author Vaclav Pech
  * Date: Feb 7, 2009
  */
-abstract public class AbstractPooledActor extends CommonActorImpl implements PooledActor {
+abstract public class AbstractPooledActor extends PooledActor {
 
     /**
      * Queue for the messages
@@ -349,7 +350,11 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
             if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
             cancelCurrentTimeoutTimer(message)
 
-            def actorMessage = ActorMessage.build(message)
+            def actorMessage
+            if(message instanceof ActorMessage)
+              actorMessage = message;
+            else
+              actorMessage = ActorMessage.build(message);
 
             final Closure currentReference = codeReference.get()
             if (currentReference) {
@@ -357,9 +362,9 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
                 bufferedMessages.addMessage actorMessage
                 if (bufferedMessages.ready) {
                     final List<ActorMessage> messages = bufferedMessages.messages
-                    actorAction(this) { currentReference.call(messages) }
                     codeReference.set(null)
                     bufferedMessages = null
+                    actorAction(this) { currentReference.call(messages) }
                 }
             } else {
                 messageQueue.put(actorMessage)
@@ -367,39 +372,6 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
         }
         return this
     }
-
-    /**
-     * Sends a message and waits for a reply.
-     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
-     * @return The message that came in reply to the original send.
-     */
-    public final sendAndWait(Object message) {
-        new SendAndWaitPooledActor(this, message).start().result
-    }
-
-    /**
-     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
-     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
-     * @return The message that came in reply to the original send.
-     */
-    public final sendAndWait(long timeout, TimeUnit timeUnit, Object message) {
-        new SendAndWaitPooledActor(this, message, timeUnit.toMillis(timeout)).start().result
-    }
-
-    /**
-     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
-     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
-     * @return The message that came in reply to the original send.
-     */
-    public final sendAndWait(Duration duration, Object message) {
-        return sendAndWait(duration.toMilliseconds(), TimeUnit.MILLISECONDS, message)
-    }
-
-    /**
-     * Adds a message to the Actor's queue. Can only be called on a started Actor.
-     * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
-     */
-    public final Actor leftShift(Object message) { send message }
 
     /**
      * Clears the message queue returning all the messages it held.
@@ -410,7 +382,11 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
         if (savedBufferedMessages) messages.addAll savedBufferedMessages
         ActorMessage message = messageQueue.poll()
         while (message != null) {
-            if (message.payLoad.respondsTo('onDeliveryError')) message.payLoad.onDeliveryError()
+          if (message.payLoad.respondsTo('onDeliveryError'))
+            message.payLoad.onDeliveryError()
+          else
+            if (message.sender.respondsTo('onDeliveryError'))
+              message.sender.onDeliveryError ()
             messages << message
             message = messageQueue.poll()
         }
@@ -450,54 +426,3 @@ abstract public class AbstractPooledActor extends CommonActorImpl implements Poo
         if (TIMEOUT != message) timerTask.get()?.cancel()
     }
 }
-
-/**
- * Sends a message to the specified actor and waits for reply.
- * The message is enhanced to send notification in case the target actor terminates without processing the message.
- * Exceptions are re-throvn from the getResult() method.
- */
-final class SendAndWaitPooledActor extends AbstractPooledActor {
-
-    final private Actor targetActor
-    final private Object message
-    final private CountDownLatch actorBarrier=new CountDownLatch(1)
-    private Object result
-    private long timeout = -1
-
-    def SendAndWaitPooledActor(final targetActor, final message) {
-        this.targetActor = targetActor;
-        this.message = message
-        this.actorGroup = targetActor.actorGroup
-    }
-
-    def SendAndWaitPooledActor(final targetActor, final message, final long timeout) {
-        this(targetActor, message)
-        this.timeout = timeout
-    }
-
-    void act() {
-        message.getMetaClass().onDeliveryError = {->
-            this << new IllegalStateException('Cannot deliver the message. The target actor may not be active.')
-        }
-        targetActor << message
-        if (timeout < 0) {
-            react { result = it }
-        } else {
-            react(timeout) { result = it }
-        }
-    }
-
-    void onTimeout() { result = null }
-    void onException(Exception e) { result = e }
-    void afterStop(undeliveredMessages) { actorBarrier.countDown() }
-
-    /**
-     * Retrieves the result, waiting for it, if needed.
-     * Non-blocking under Fork/Join pool.
-     */
-    Object getResult() {
-        actorBarrier.await()
-        if (result instanceof Exception) throw result else return result
-    }
-}
-

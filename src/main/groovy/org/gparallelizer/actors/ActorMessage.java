@@ -16,6 +16,10 @@
 
 package org.gparallelizer.actors;
 
+import org.gparallelizer.MessageStream;
+
+import java.io.Serializable;
+
 /**
  * An internal representation of received messages holding both the original message plus the sender actor reference.
  * This class is not intented to be use directly by users.
@@ -23,26 +27,31 @@ package org.gparallelizer.actors;
  * @author Vaclav Pech, Alex Tkachman
  * Date: Feb 27, 2009
  */
-@SuppressWarnings({"MethodReturnOfConcreteClass"})
-public final class ActorMessage<T> {
-    final private T payLoad;
-    final private Actor sender;
+public class ActorMessage<T> implements Serializable {
+    private T payLoad;
+    private MessageStream sender;
 
     /**
      * Creates a new instance
      * @param payLoad The original message
      * @param sender The sending actor, null, if the message was not sent by an actor
      */
-    public ActorMessage(final T payLoad, final Actor sender) {
+    public ActorMessage(final T payLoad, final MessageStream sender) {
         this.payLoad = payLoad;
         this.sender = sender;
+    }
+
+    /**
+     * Constructor for serialization
+     */
+    protected ActorMessage () { //
     }
 
     public T getPayLoad() {
         return payLoad;
     }
 
-    public Actor getSender() {
+    public MessageStream getSender() {
         return sender;
     }
 
@@ -56,7 +65,8 @@ public final class ActorMessage<T> {
         return new ActorMessage<T>(payLoad, ReplyRegistry.threadBoundActor());
     }
 
-    @Override public String toString() {
-        return "Message from $sender: $payLoad";
+    @Override
+    public String toString() {
+        return "Message from " + sender + ": " + payLoad;
     }
 }

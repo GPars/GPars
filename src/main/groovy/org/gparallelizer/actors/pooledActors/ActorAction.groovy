@@ -40,7 +40,7 @@ final class ActorAction implements Runnable {
     /**
      * The code to invoke as part of this ActorAction
      */
-    private final Closure code
+    private final Runnable code
 
     /**
      * The associated PooledActor
@@ -86,7 +86,7 @@ final class ActorAction implements Runnable {
                 ReplyRegistry.registerCurrentActorWithThread(this.actor)
 
                 if (cancelled || !actor.isActive()) throw TERMINATE
-                use(TimeCategory) { code.call() }
+                use(TimeCategory) { code.run() }
             } finally {
                 actionThread = null
             }

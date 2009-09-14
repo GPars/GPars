@@ -16,8 +16,6 @@
 
 package org.gparallelizer.remote;
 
-import org.gparallelizer.remote.memory.SharedMemoryTransportProvider;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,9 +26,9 @@ import java.util.Set;
  *
  * @author Alex Tkachman
  */
-public class LocalNodeRegistry {
+public class TransportRegistry {
     public static final Set<RemoteTransportProvider> transportProviders
-            = Collections.synchronizedSet(new HashSet<RemoteTransportProvider>(Arrays.asList(SharedMemoryTransportProvider.getInstance())));
+            = Collections.synchronizedSet(new HashSet<RemoteTransportProvider>());
 
     public synchronized static void connect(final LocalNode node) {
         for (final RemoteTransportProvider transportProvider : transportProviders) {

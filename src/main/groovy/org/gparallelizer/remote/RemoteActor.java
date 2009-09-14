@@ -19,6 +19,8 @@ package org.gparallelizer.remote;
 import groovy.time.Duration;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ReplyRegistry;
+import org.gparallelizer.MessageStream;
+import org.gparallelizer.remote.serial.RemoteSerialized;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -29,14 +31,10 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Alex Tkachman
  */
-public class RemoteActor implements Actor {
-    private final RemoteNode remoteNode;
+public class RemoteActor extends Actor implements RemoteSerialized {
+    private RemoteHost remoteHost;
 
-    private       UUID       id;
-
-    public RemoteActor(RemoteNode remoteNode, UUID id) {
-        this.remoteNode = remoteNode;
-        this.id = id;
+    public RemoteActor() {
     }
 
     public Actor start() {
@@ -44,7 +42,8 @@ public class RemoteActor implements Actor {
     }
 
     public Actor stop() {
-        throw new UnsupportedOperationException();
+        remoteHost.stop(this);
+        return this;
     }
 
     public boolean isActive() {
@@ -63,38 +62,14 @@ public class RemoteActor implements Actor {
         throw new UnsupportedOperationException();
     }
 
-    public Actor send(Object message) {
-        remoteNode.send(this, (Serializable) message, ReplyRegistry.threadBoundActor());
+    public MessageStream send(Object message) {
+        remoteHost.send(this, message);
         return this;
     }
 
-    public Object sendAndWait(Object message) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Object sendAndWait(long timeout, TimeUnit timeUnit, Object message) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Object sendAndWait(Duration duration, Object message) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Actor leftShift(Object message) {
-        return send (message);
-    }
-
-    public RemoteNode getRemoteNode() {
-        return remoteNode;
-    }
-
-    public UUID getId() {
-        if (id == null)
-            id = UUID.randomUUID();
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
+    @Override
+    public void initDeserial(UUID serialId) {
+        remoteHost = RemoteHost.getThreadContext();
+        this.serialId = serialId;
     }
 }

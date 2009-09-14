@@ -17,6 +17,7 @@
 package org.gparallelizer.actors.pooledActors
 
 import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.CommonActorImpl
 
 /**
  * PooledActors are active objects, which do not have their own thread but borrow a thread from a thread pool
@@ -27,4 +28,4 @@ import org.gparallelizer.actors.Actor
  * @author Vaclav Pech
  * Date: Feb 20, 2009
  */
-public interface PooledActor extends Actor {}
+public abstract class PooledActor extends CommonActorImpl {}

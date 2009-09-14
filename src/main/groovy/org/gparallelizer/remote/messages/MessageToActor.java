@@ -16,6 +16,10 @@
 
 package org.gparallelizer.remote.messages;
 
+import org.gparallelizer.MessageStream;
+import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actors.Actor;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -24,27 +28,21 @@ import java.util.UUID;
  * 
  * @author Alex Tkachman
  */
-public class MessageToActor<T extends Serializable> extends BaseMsg {
-    private final UUID  to;
-    private final UUID  from;
-    private final T     payload;
+public class MessageToActor<T> extends BaseMsg {
+    private final MessageStream   to;
+    private final ActorMessage<T> message;
 
-    public MessageToActor(UUID hostId, UUID to, UUID from, T payload) {
+    public MessageToActor(UUID hostId, MessageStream to, ActorMessage<T> message) {
         super(hostId);
         this.to = to;
-        this.from = from;
-        this.payload = payload;
+        this.message = message;
     }
 
-    public UUID getTo() {
+    public MessageStream getTo() {
         return to;
     }
 
-    public UUID getFrom() {
-        return from;
-    }
-
-    public Serializable getPayload() {
-        return payload;
+    public ActorMessage<T> getMessage() {
+        return message;
     }
 }

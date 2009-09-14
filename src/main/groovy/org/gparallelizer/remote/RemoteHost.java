@@ -1,29 +1,36 @@
 package org.gparallelizer.remote;
 
-import org.gparallelizer.remote.messages.BaseMsg;
-import org.gparallelizer.remote.messages.MessageToActor;
-import org.gparallelizer.remote.messages.NodeConnectedMsg;
-import org.gparallelizer.remote.messages.NodeDisconnectedMsg;
+import org.gparallelizer.remote.messages.*;
+import org.gparallelizer.remote.serial.*;
+import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actors.ReplyRegistry;
+import org.gparallelizer.MessageStream;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
+import java.io.ObjectStreamException;
+import java.io.InvalidObjectException;
 
 /**
  * Representation of remote host connected to transport provider
  * 
  * @author Alex Tkachman
  */
-public class RemoteHost {
-    private final RemoteHostTransportProvider provider;
+public final class RemoteHost  {
+    private final RemoteTransportProvider provider;
+    private final UUID hostId;
 
-    private final ArrayList<RemoteHostConnection> connections = new ArrayList<RemoteHostConnection> ();
+    private final ArrayList<RemoteConnection> connections = new ArrayList<RemoteConnection> ();
 
-    public RemoteHost(RemoteHostTransportProvider provider) {
+    private static final ThreadLocal<RemoteHost> threadContext = new ThreadLocal<RemoteHost>();
+
+    public RemoteHost(RemoteTransportProvider provider, UUID hostId) {
         this.provider = provider;
+        this.hostId = hostId;
     }
 
-    public void addConnection(RemoteHostConnection connection) {
+    public void addConnection(RemoteConnection connection) {
         synchronized (connections) {
             boolean wasConnected = isConnected();
             connections.add(connection);
@@ -39,7 +46,7 @@ public class RemoteHost {
         }
     }
 
-    public void removeConnection(RemoteHostConnection connection) {
+    public void removeConnection(RemoteConnection connection) {
         synchronized (connections) {
             boolean wasConnected = isConnected();
             connections.remove(connection);
@@ -50,7 +57,7 @@ public class RemoteHost {
     }
 
     public void disconnect() {
-        for (RemoteHostConnection connection : connections) {
+        for (RemoteConnection connection : connections) {
             connection.disconnect ();
         }
     }
@@ -59,11 +66,11 @@ public class RemoteHost {
         return connections.size() != 0;
     }
 
-    public void send(BaseMsg msg) {
+    public void write(BaseMsg msg) {
         getConnection().write(msg);
     }
 
-    public RemoteHostConnection getConnection() {
+    public RemoteConnection getConnection() {
         return connections.get(0);
     }
 
@@ -74,7 +81,7 @@ public class RemoteHost {
     public void onMessage(BaseMsg msg) {
         if (msg instanceof NodeConnectedMsg) {
             NodeConnectedMsg connectedMsg = (NodeConnectedMsg) msg;
-            provider.connectRemoteNode(connectedMsg.nodeId, this);
+            provider.connectRemoteNode(connectedMsg.nodeId, this, connectedMsg.mainActor);
             return;
         }
 
@@ -86,19 +93,69 @@ public class RemoteHost {
 
         if (msg instanceof MessageToActor) {
             MessageToActor rm = (MessageToActor) msg;
-            provider.getLocalActor(rm.getTo()).send(rm.getPayload());
+            rm.getTo().send(rm.getMessage());
+        }
+
+        if (msg instanceof StopActorMsg) {
+            StopActorMsg sm = (StopActorMsg) msg;
+            sm.actor.stop();
         }
     }
 
     public void connect(LocalNode node) {
-        send(new NodeConnectedMsg(node, getId()));
+        write(new NodeConnectedMsg(node, getHostId()));
     }
 
     public void disconnect(LocalNode node) {
-        send(new NodeDisconnectedMsg(node, getId()));
+        write(new NodeDisconnectedMsg(node, getHostId()));
     }
 
     public RemoteTransportProvider getProvider() {
         return provider;
+    }
+
+    public void stop(RemoteActor remoteActor) {
+        write(new StopActorMsg(remoteActor, getHostId()));
+    }
+
+    public final void send(MessageStream receiver, Object message) {
+        if (!(message instanceof ActorMessage)) {
+            message = new ActorMessage<Object> (message, ReplyRegistry.threadBoundActor());
+        }
+        write(new MessageToActor(getHostId(), receiver, (ActorMessage)message));
+    }
+
+    public UUID getHostId() {
+        return hostId;
+    }
+
+    public static RemoteHost getThreadContext() {
+        return threadContext.get();
+    }
+
+    public void enter() {
+        threadContext.set(this);
+    }
+
+    public void leave() {
+        threadContext.set(null);
+    }
+
+    public WithSerialId readResolve(Object handle) throws ObjectStreamException {
+        if (handle == null)
+            return null;
+
+        return provider.readResolve(handle);
+    }
+
+    public Object writeReplace(WithSerialId object) throws ObjectStreamException {
+        if (object == null)
+            return null;
+
+        if (object instanceof RemoteSerialized) {
+            return new LocalHandle(object.serialId);
+        }
+
+        return provider.writeReplace (object);
     }
 }

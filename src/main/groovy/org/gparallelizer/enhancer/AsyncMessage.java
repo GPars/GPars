@@ -19,6 +19,8 @@ package org.gparallelizer.enhancer;
 import groovy.lang.MetaClass;
 import org.gparallelizer.dataflow.DataFlowVariable;
 
+import java.io.Serializable;
+
 /**
  * A message used to invoke intercepted constructors or methods.
  * It holds a reference back to the ActorMetaClass to allow for invokation of the intercepted methods.

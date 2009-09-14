@@ -1,9 +1,9 @@
 package org.gparallelizer.remote.netty;
 
 import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
-import org.gparallelizer.remote.RemoteHostConnection;
+import org.gparallelizer.remote.RemoteConnection;
+import org.gparallelizer.remote.netty.RemoteObjectEncoder;
+import org.gparallelizer.remote.netty.RemoteObjectDecoder;
 import org.gparallelizer.remote.messages.BaseMsg;
 
 /**
@@ -14,7 +14,7 @@ public class NettyHandler extends SimpleChannelHandler {
 
     private Channel channel;
 
-    private final RemoteHostConnection connection;
+    private final RemoteConnection connection;
 
     public NettyHandler(NettyTransportProvider provider) {
         connection = new NettyRemoteConnection(provider, this);
@@ -23,8 +23,8 @@ public class NettyHandler extends SimpleChannelHandler {
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         channel = e.getChannel();
-        channel.getPipeline().addFirst("encoder", new ObjectEncoder());
-        channel.getPipeline().addFirst("decoder", new ObjectDecoder());
+        channel.getPipeline().addFirst("encoder", new RemoteObjectEncoder(connection));
+        channel.getPipeline().addFirst("decoder", new RemoteObjectDecoder(connection));
     }
 
     @Override
@@ -46,6 +46,7 @@ public class NettyHandler extends SimpleChannelHandler {
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
         //noinspection ThrowableResultOfMethodCallIgnored
         connection.onException(e.getCause());
+        e.getCause().printStackTrace();
     }
 
     public Channel getChannel() {

@@ -90,7 +90,7 @@ import org.gparallelizer.actors.*
  * @author Vaclav Pech
  * Date: Jan 7, 2009
  */
-abstract public class AbstractThreadActor extends CommonActorImpl implements ThreadedActor {
+abstract public class AbstractThreadActor extends ThreadedActor {
 
     /**
      * Queue for the messages
@@ -261,7 +261,7 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * @return The message retrieved from the queue.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive() throws InterruptedException {
+    protected final Object receiveImpl() throws InterruptedException {
         Object message = doReceive {messageQueue.take()}
         enhanceReplies([message])
         return message?.payLoad
@@ -274,22 +274,12 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive(long timeout, TimeUnit timeUnit) throws InterruptedException {
+    protected final Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
         Object message = doReceive {messageQueue.poll(timeout, timeUnit)}
         enhanceReplies([message])
         return message?.payLoad
     }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     * @param duration how long to wait before giving up, in units of unit
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive(Duration duration) throws InterruptedException {
-        return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
-    }
-
+    
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * The message retrieved from the queue is passed into the handler as the only parameter.
@@ -389,45 +379,12 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
      */
     public final Actor send(Object message) {
         checkState()
-        messageQueue.put(ActorMessage.build(message))
+        if (message instanceof ActorMessage)
+          messageQueue.put((ActorMessage)message)
+        else
+          messageQueue.put(ActorMessage.build(message))
         return this
     }
-
-    /**
-     * Sends a message and waits for a reply.
-     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
-     * @return The message that came in reply to the original send.
-     */
-    public final sendAndWait(Object message) {
-        new SendAndWaitThreadedActor(this, message).start().result
-    }
-
-    /**
-     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
-     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
-     * @return The message that came in reply to the original send.
-     */
-    public final sendAndWait(long timeout, TimeUnit timeUnit, Object message) {
-        new SendAndWaitThreadedActor(this, message, timeUnit.toMillis(timeout)).start().result
-    }
-
-    /**
-     * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
-     * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
-     * @return The message that came in reply to the original send.
-     */
-    public final sendAndWait(Duration duration, Object message) {
-        return sendAndWait(duration.toMilliseconds(), TimeUnit.MILLISECONDS, message)
-    }
-
-    /**
-     * Adds the message to the Actor's message queue.
-     * The method will wait for space to become available in the queue, if it is full.
-     * It can only be called on a started Actor.
-     * @return The same Actor instance
-     * @throws InterruptedException If the thread is interrupted during the wait.
-     */
-    public final Actor leftShift(Object message) throws InterruptedException { send message }
 
     /**
      * This method is called periodically from the Actor's thread until the Actor is stopped
@@ -462,7 +419,11 @@ abstract public class AbstractThreadActor extends CommonActorImpl implements Thr
         def messages = []
         ActorMessage message = messageQueue.poll()
         while (message != null) {
-            if (message.payLoad.respondsTo('onDeliveryError')) message.payLoad.onDeliveryError()
+            if (message.payLoad.respondsTo('onDeliveryError'))
+              message.payLoad.onDeliveryError()
+            else
+              if (message.sender.respondsTo('onDeliveryError'))
+                message.sender.onDeliveryError ()
             messages << message
             message = messageQueue.poll()
         }

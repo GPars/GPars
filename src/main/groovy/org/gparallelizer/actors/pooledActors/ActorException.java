@@ -26,7 +26,7 @@ package org.gparallelizer.actors.pooledActors;
  * @author Vaclav Pech
  * Date: Feb 17, 2009
  */
-abstract class ActorException extends RuntimeException {
+public abstract class ActorException extends RuntimeException {
 
     public static final ActorException CONTINUE = new ActorContinuationException();
     public static final ActorException TERMINATE = new ActorTerminationException();

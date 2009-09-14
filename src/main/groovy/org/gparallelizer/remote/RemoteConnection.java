@@ -8,12 +8,12 @@ import org.gparallelizer.remote.messages.HostIdMsg;
  *
  * @author Alex Tkachman
  */
-public abstract class RemoteHostConnection {
-    private final RemoteHostTransportProvider provider;
+public abstract class RemoteConnection {
+    private final RemoteTransportProvider provider;
 
     private RemoteHost host;
 
-    public RemoteHostConnection(RemoteHostTransportProvider provider) {
+    public RemoteConnection(RemoteTransportProvider provider) {
         this.provider = provider;
     }
 
@@ -39,6 +39,11 @@ public abstract class RemoteHostConnection {
     }
 
     public abstract void write(BaseMsg msg);
+
+
+    public RemoteHost getHost() {
+        return host;
+    }
 
     public void setHost(RemoteHost host) {
         this.host = host;
