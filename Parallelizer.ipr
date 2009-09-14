@@ -87,6 +87,19 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="Gant_Groovy">
+        <modules>
+          <module name="Parallelizer">
+            <files>
+              <file url="file://$PROJECT_DIR$/build.gradle" />
+            </files>
+          </module>
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
   <component name="IdProvider" IDEtalkID="798405833E980F6DBFE0C8BDAEEB0CA9" />
   <component name="InspectionProjectProfileManager">
     <option name="PROJECT_PROFILE" value="Project Default" />

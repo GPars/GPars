@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright � 2008-9  The original author or authors
+//  Copyright © 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,20 +16,19 @@
 
 package org.gparallelizer.actors;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.List;
-import java.util.ArrayList;
-
-import org.gparallelizer.actors.pooledActors.ActorReplyException;
-import groovy.time.Duration;
 import groovy.lang.Closure;
-import org.gparallelizer.MessageStream;
-import org.codehaus.groovy.runtime.InvokerHelper;
+import groovy.time.Duration;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.GeneratedClosure;
+import org.codehaus.groovy.runtime.InvokerHelper;
+import org.gparallelizer.MessageStream;
+import org.gparallelizer.actors.pooledActors.ActorReplyException;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents the common superclass to both thread-bound and event-driven actors.
@@ -44,9 +43,8 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * A list of senders for the currently procesed messages
      */
-    protected final List<MessageStream> senders = new ArrayList<MessageStream>();
+    private final List<MessageStream> senders = new ArrayList<MessageStream>();
 
-    //todo necessary for mixins
     protected final List<MessageStream> getSenders() {
         return senders;
     }
@@ -54,9 +52,8 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * Indicates whether the actor should enhance messages to enable sending replies to their senders
      */
-    protected volatile boolean sendRepliesFlag = true;
+    private volatile boolean sendRepliesFlag = true;
 
-    //todo necessary for mixins
     protected final boolean getSendRepliesFlag() {
         return sendRepliesFlag;
     }
@@ -99,7 +96,7 @@ public abstract class CommonActorImpl extends Actor {
      * It can only be invoked before the actor is started.
      * @param group new group
      */
-    public final void setActorGroup(AbstractActorGroup group) {
+    public final void setActorGroup(final AbstractActorGroup group) {
         if (!groupMembershipChangeable)
             throw new IllegalStateException("Cannot set actor's group on a started actor.");
 
@@ -118,6 +115,7 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * Joins the actor. Waits fot its termination.
      */
+    @Override
     public final void join() throws InterruptedException {
         join(0);
     }
@@ -126,7 +124,8 @@ public abstract class CommonActorImpl extends Actor {
      * Joins the actor. Waits fot its termination.
      * @param milis Timeout in miliseconds, specifying how long to wait at most.
      */
-    public final void join(long milis) throws InterruptedException {
+    @Override
+    public final void join(final long milis) throws InterruptedException {
         if (milis > 0)
             joinLatch.await(milis, TimeUnit.MILLISECONDS);
         else
@@ -142,14 +141,14 @@ public abstract class CommonActorImpl extends Actor {
      * @param message reply message
      * @throws ActorReplyException If some of the replies failed to be sent.
      */
-    protected final void reply(Object message) {
+    protected final void reply(final Object message) {
         assert senders != null;
         if (!sendRepliesFlag)
             throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.");
 
         if (!senders.isEmpty()) {
-            List<Exception> exceptions = new ArrayList<Exception>();
-            for (MessageStream sender : senders) {
+            final List<Exception> exceptions = new ArrayList<Exception>();
+            for (final MessageStream sender : senders) {
                 if (sender != null) {
                     try {
                         sender.send(message);
@@ -178,11 +177,11 @@ public abstract class CommonActorImpl extends Actor {
      * Sending replies is enabled by default.
      * @param message reply message
      */
-    protected final void replyIfExists(Object message) {
+    protected final void replyIfExists(final Object message) {
         assert senders != null;
         if (!sendRepliesFlag)
             throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.");
-        for (MessageStream sender : senders) {
+        for (final MessageStream sender : senders) {
             try {
                 if (sender != null)
                     sender.send (message);
@@ -208,7 +207,7 @@ public abstract class CommonActorImpl extends Actor {
         for (final ActorMessage message: messages) {
             if (message != null) {
                 //Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
-                Object replier = message.getPayLoad();
+                final Object replier = message.getPayLoad();
                 final MessageStream sender = message.getSender();
 
                 if (replier != null) {
@@ -224,9 +223,9 @@ public abstract class CommonActorImpl extends Actor {
     }
 
     protected final Object receive () {
-        Object msg = receiveImpl();
+        final Object msg = receiveImpl();
         if (msg instanceof ActorMessage) {
-            ActorMessage messageAndReply = (ActorMessage) msg;
+            final ActorMessage messageAndReply = (ActorMessage) msg;
             senderOfLastMessage = new WeakReference<MessageStream>(messageAndReply.getSender());
             return messageAndReply.getPayLoad();
         }
@@ -236,10 +235,10 @@ public abstract class CommonActorImpl extends Actor {
         }
     }
 
-    protected final Object receive (long timeout, TimeUnit units) throws InterruptedException {
-        Object msg = receiveImpl(timeout, units);
+    protected final Object receive (final long timeout, final TimeUnit units) throws InterruptedException {
+        final Object msg = receiveImpl(timeout, units);
         if (msg instanceof ActorMessage) {
-            ActorMessage messageAndReply = (ActorMessage) msg;
+            final ActorMessage messageAndReply = (ActorMessage) msg;
             senderOfLastMessage = new WeakReference<MessageStream>(messageAndReply.getSender());
             return messageAndReply.getPayLoad();
         }
@@ -260,7 +259,7 @@ public abstract class CommonActorImpl extends Actor {
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
+    protected Object receiveImpl(final long timeout, final TimeUnit timeUnit) throws InterruptedException {
         throw new UnsupportedOperationException("'receiveImpl' method should be implemented by subclass of MessageStream");
     }
 
@@ -270,7 +269,7 @@ public abstract class CommonActorImpl extends Actor {
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive(Duration duration) throws InterruptedException {
+    protected final Object receive(final Duration duration) throws InterruptedException {
         return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
@@ -280,9 +279,9 @@ public abstract class CommonActorImpl extends Actor {
 
     private static class MyClosure extends Closure implements GeneratedClosure {
         private final MessageStream sender;
-        private boolean throwable;
+        private final boolean throwable;
 
-        public MyClosure(MessageStream sender, boolean throwable) {
+        private MyClosure(final MessageStream sender, final boolean throwable) {
             super(null, null);
             this.sender = sender;
             this.throwable = throwable;
@@ -292,7 +291,7 @@ public abstract class CommonActorImpl extends Actor {
             return doCall(null);
         }
 
-        public Object doCall(Object msg) {
+        public Object doCall(final Object msg) {
             if (throwable) {
                 if (sender != null)
                     return sender.send(msg);

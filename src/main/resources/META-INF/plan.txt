@@ -21,7 +21,31 @@
 
     todo reimplement Dataflow concurrency with the concept of operators and channels
 
-    todo new dataflow concurrency
+    todo make pooled actors use receive(), merge pooled and threaded actors
+
+    todo CSP
+
+    todo leverage dynamic Groovy dispatch
+def actor = actor {
+   loop {
+      react {
+         on.plus { int x, int y ->
+            reply x + y
+         }
+
+         on.minus { int x, int y ->
+            reply x - y
+         }
+      }
+   }
+}
+
+and the we can do
+
+assertEquals 5, actor.minus ( 10,  actor.plus(2, 3) )
+
+todo consider removing multiple messages for react()
+todo consider removing dynamic replies on messages
 
     Backlog
     todo consider using AST transformations to generate CPS (continuation-passing style) for event-driven actors to offer a frendlier way to code them
