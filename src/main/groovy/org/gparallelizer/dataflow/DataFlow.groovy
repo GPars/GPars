@@ -32,4 +32,8 @@ public abstract class DataFlow {
     public static PooledActor start(final Closure code) {
         new SingleRunActor(body: code).start()
     }
+
+    public static DataFlowExpression invoke (Object receiver, String methodName, Object... args) {
+      return new DataFlowInvocationExpression(receiver, methodName, args);
+    }
 }
