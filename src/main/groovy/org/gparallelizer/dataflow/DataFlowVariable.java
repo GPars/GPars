@@ -17,7 +17,6 @@
 package org.gparallelizer.dataflow;
 
 import groovy.lang.Closure;
-import org.gparallelizer.actors.Actor;
 import org.gparallelizer.MessageStream;
 
 import java.util.HashMap;

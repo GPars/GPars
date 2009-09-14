@@ -20,7 +20,6 @@ import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
-import org.gparallelizer.remote.serial.WithSerialId;
 
 import java.util.Collections;
 import java.util.LinkedList;

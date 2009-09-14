@@ -16,8 +16,6 @@
 
 package org.gparallelizer
 
-import java.util.*
-
 public class AsyncEnhancerTest extends GroovyTestCase {
     public void testInstanceEnhancement() {
         final List list = [1, 2, 3, 4, 5]

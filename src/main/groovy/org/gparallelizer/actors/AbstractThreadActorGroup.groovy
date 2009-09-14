@@ -16,8 +16,6 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.*
-
 /**
  * Provides a common super class fo thread-actor's groups.
  *

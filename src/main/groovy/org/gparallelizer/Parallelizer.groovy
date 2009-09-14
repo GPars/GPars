@@ -19,7 +19,6 @@ package org.gparallelizer
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.TimeUnit
 import jsr166y.forkjoin.ForkJoinPool
-import java.lang.*
 
 /**
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation

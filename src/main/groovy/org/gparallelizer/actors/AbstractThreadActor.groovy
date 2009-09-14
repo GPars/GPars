@@ -22,8 +22,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import org.codehaus.groovy.runtime.TimeCategory
-import java.lang.*
-import org.gparallelizer.actors.*
 
 /**
  * AbstractThreadActor provides the default thread-bound actor implementation. It represents a standalone active object (actor),

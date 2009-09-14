@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright ï¿½ 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 //  limitations under the License.
 
 package org.gparallelizer.remote.serial;
-
-import org.gparallelizer.remote.RemoteHost;
 
 import java.io.Serializable;
 import java.io.ObjectStreamException;

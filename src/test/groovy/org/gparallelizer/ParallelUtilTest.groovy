@@ -21,7 +21,6 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import jsr166y.forkjoin.ForkJoinPool
-import java.lang.*
 
 /**
  * @author Vaclav Pech

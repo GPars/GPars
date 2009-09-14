@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright Â© 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -21,12 +21,9 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 import org.gparallelizer.actors.ReplyRegistry;
-import org.gparallelizer.actors.Actor;
 
-import java.lang.*;
 import java.util.List;
 
-import org.gparallelizer.actors.pooledActors.*;
 import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE;
 import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;

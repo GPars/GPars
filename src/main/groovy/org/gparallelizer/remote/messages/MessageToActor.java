@@ -18,9 +18,7 @@ package org.gparallelizer.remote.messages;
 
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.ActorMessage;
-import org.gparallelizer.actors.Actor;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
