@@ -49,7 +49,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: ant.project.properties.junitVersion
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: ant.project.properties.jsr166yVersion
     compile group: 'org.jboss.netty', name: 'netty', version: ant.project.properties.nettyVersion
-    compile group: 'org.apache.ivy', name: 'ivy', version: ant.project.properties.ivyVersion
     deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: ant.project.properties.wagonSvnVersion
 }
 
