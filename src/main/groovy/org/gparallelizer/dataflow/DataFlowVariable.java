@@ -16,15 +16,7 @@
 
 package org.gparallelizer.dataflow;
 
-import groovy.lang.Closure;
 import org.gparallelizer.MessageStream;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
@@ -102,8 +94,8 @@ public final class DataFlowVariable<T> extends DataFlowExpression<T> {
         doBind(value);
     }
 
-    protected void collectDataFlowExpressions(Set<DataFlowExpression> collection) {
-        collection.add(this);
+    protected void subscribe(DataFlowExpressionsCollector listener) {
+        listener.subscribe(this);
     }
 
     protected T evaluate() {

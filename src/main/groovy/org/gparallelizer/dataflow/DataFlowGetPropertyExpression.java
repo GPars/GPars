@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright Â© 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.gparallelizer.dataflow;
 
 import org.codehaus.groovy.runtime.InvokerHelper;
 
-import java.util.Set;
-
 /**
+ * DFE which evaluate property when receiver became available
+ *
  * @author Alex Tkachman
  */
 public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
@@ -30,11 +30,11 @@ public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
     public DataFlowGetPropertyExpression(DataFlowExpression expression, String name) {
         this.receiver = expression;
         this.name = name;
-        init ();
+        subscribe();
     }
 
-    protected void collectDataFlowExpressions(Set<DataFlowExpression> collection) {
-        collection.add(receiver);
+    protected void subscribe(DataFlowExpressionsCollector listener) {
+        listener.subscribe(receiver);
     }
 
     protected T evaluate() {

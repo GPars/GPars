@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright Â© 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.gparallelizer.dataflow;
 
-import java.util.Set;
-
 /**
  * @author Alex Tkachman
  */
@@ -28,12 +26,9 @@ public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T>
         this.args = elements;
     }
 
-    protected void collectDataFlowExpressions(Set<DataFlowExpression> collection) {
+    protected void subscribe(DataFlowExpressionsCollector listener) {
         for (int i = 0; i != args.length; ++i) {
-            Object element = args[i];
-            if (element instanceof DataFlowExpression) {
-                collection.add((DataFlowExpression)element);
-            }
+            args [i] = listener.subscribe(args[i]);
         }
     }
 }

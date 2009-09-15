@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright Â© 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
 
 import groovy.lang.*;
 
 /**
+ *
  * @author Alex Tkachman
  */
 public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
@@ -247,33 +246,28 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
         getValAsync(new DataCallback(closure));
     }
 
-    protected void init() {
-        HashSet<DataFlowExpression> variables = new HashSet<DataFlowExpression>();
-        collectDataFlowExpressions(variables);
-
-        if (variables.isEmpty()) {
-            doBind(evaluate());
-        }
-        else {
-            final AtomicInteger count = new AtomicInteger(variables.size());
-            MessageStream listener = new MessageStream() {
-                public MessageStream send(Object message) {
-                    if (count.decrementAndGet() == 0) {
-                        doBind(evaluate());
-                    }
-                    return this;
-                }
-            };
-
-            for (DataFlowExpression variable : variables) {
-                variable.getValAsync (listener);
-            }
-        }
+    /**
+     * Utility method to call at the very end of constructor of derived expressions.
+     * Create and subscribe listener
+     */
+    protected final void subscribe() {
+        DataFlowExpressionsCollector listener = new DataFlowExpressionsCollector();
+        subscribe(listener);
+        listener.start ();
     }
 
+    /**
+     * Evaluate expression after the ones we depend from are ready
+     * @return value to bind
+     */
     protected abstract T evaluate();
 
-    protected abstract void collectDataFlowExpressions(Set<DataFlowExpression> collection);
+    /**
+     * Subscribe listener to expressions we depend from
+     *
+     * @param listener
+     */
+    protected abstract void subscribe(DataFlowExpressionsCollector listener);
 
     public Object invokeMethod(String name, Object args) {
         if (getMetaClass().respondsTo(this, name).isEmpty()) {
@@ -283,6 +277,13 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
 
     }
 
+    /**
+     * Returns either standard property of expression or
+     * creates expression, which will request given property when receiver became available
+     *
+     * @param propertyName
+     * @return
+     */
     public Object getProperty(String propertyName) {
         MetaProperty metaProperty = getMetaClass().hasProperty(this, propertyName);
         if (metaProperty != null)
@@ -293,5 +294,44 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
 
     public void setMetaClass(MetaClass metaClass) {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Listener for availability of data flow expressions we depend from
+     */
+    protected final class DataFlowExpressionsCollector extends MessageStream {
+        private final AtomicInteger count = new AtomicInteger(1);
+
+        public DataFlowExpressionsCollector() {
+        }
+
+        public MessageStream send(Object message) {
+            if (count.decrementAndGet() == 0) {
+                doBind(evaluate());
+            }
+            return this;
+        }
+
+        protected final Object subscribe(Object element) {
+            if (!(element instanceof DataFlowExpression)) {
+                return element;
+            }
+
+            DataFlowExpression dataFlowExpression = (DataFlowExpression) element;
+            if (dataFlowExpression.state.get() == S_INITIALIZED) {
+                return dataFlowExpression.value;
+            }
+
+            count.incrementAndGet();
+            dataFlowExpression.getValAsync(this);
+            return element;
+        }
+
+
+        protected void start() {
+            if (count.decrementAndGet() == 0) {
+                doBind(evaluate());
+            }
+        }
     }
 }

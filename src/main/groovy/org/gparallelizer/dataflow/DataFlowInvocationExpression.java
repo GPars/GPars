@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright Â© 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,10 +18,8 @@ package org.gparallelizer.dataflow;
 
 import org.codehaus.groovy.runtime.InvokerHelper;
 
-import java.util.Set;
-
 /**
- * Data flow expression which invokes method of object
+ * Data flow expression which invokes method of object after receiver and all arguments became available
  *
  * @author Alex Tkachman
  */
@@ -33,7 +31,7 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression{
         super(args);
         this.receiver = receiver;
         this.methodName = methodName;
-        init ();
+        subscribe();
     }
 
     protected Object evaluate() {
@@ -47,10 +45,10 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression{
         return InvokerHelper.invokeMethod(receiver, methodName, args);
     }
 
-    protected void collectDataFlowExpressions(Set collection) {
+    protected void subscribe(DataFlowExpressionsCollector listener) {
         if (receiver instanceof DataFlowExpression)
-            collection.add(receiver);
+            receiver = listener.subscribe(receiver);
 
-        super.collectDataFlowExpressions(collection);
+        super.subscribe(listener);
     }
 }
