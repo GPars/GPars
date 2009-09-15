@@ -22,8 +22,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 import groovy.lang.*;
 
@@ -52,7 +51,6 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
     protected static final int S_NOT_INITIALIZED = 0;
     protected static final int S_INITIALIZING = 1;
     protected static final int S_INITIALIZED = 2;
-    private static final int CHANNEL_INDEX_NOT_REQUIRED = -1;
 
     /**
      * A logical representation of a synchronous or asynchronous request to read the value once it is bound.
@@ -63,18 +61,18 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
         private final Thread thread;
         private volatile WaitingThread<V> previous;
         private final MessageStream callback;
-        private final Integer index;
+        private final Object attachment;
 
         /**
          * Creates a representation of the request to read the value once it is bound
          * @param thread The physical thread of the request, which will be suspended
          * @param previous The previous request in the chain of requests
-         * @param index A logical identifier to match the original value request with a reply in the operators, which receive values asynchronously
+         * @param attachment
          * @param callback An actor or operator to send a message to once a value is bound
          */
-        private WaitingThread(final Thread thread, final WaitingThread<V> previous, final Integer index, final MessageStream callback) {
+        private WaitingThread(final Thread thread, final WaitingThread<V> previous, final Object attachment, final MessageStream callback) {
             this.callback = callback;
-            this.index = index;
+            this.attachment = attachment;
             this.thread = thread;
             this.previous = previous;
         }
@@ -100,7 +98,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
      * @param callback An actor to send the bound value to.
      */
     public void getValAsync(final MessageStream callback) {
-        getValAsync(CHANNEL_INDEX_NOT_REQUIRED, callback);
+        getValAsync(null, callback);
     }
 
     /**
@@ -111,14 +109,14 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
      * Index is an arbitrary value helping the actor.operator match its request with the reply.
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
-     * @param index An arbitrary value to identify operator channels and so match requests and replies
+     * @param attachment arbitary non-null attachment if reader needs better identification of result
      * @param callback An actor to send the bound value plus the supplied index to.
      */
-    void getValAsync(final Integer index, final MessageStream callback) {
+    void getValAsync(final Object attachment, final MessageStream callback) {
         WaitingThread<T> newWaiting = null;
         while (state.get() != S_INITIALIZED) {
             if (newWaiting == null) {
-                newWaiting = new WaitingThread<T>(null, null, index, callback);
+                newWaiting = new WaitingThread<T>(null, null, attachment, callback);
             }
 
             final WaitingThread<T> previous = waiting.get();
@@ -134,7 +132,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
             }
         }
 
-        scheduleCallback(index, callback);
+        scheduleCallback(attachment, callback);
     }
 
     /**
@@ -188,7 +186,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
             if (waiting.thread != null) {
                 LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread
             } else {
-                scheduleCallback(waiting.index, waiting.callback);
+                scheduleCallback(waiting.attachment, waiting.callback);
             }
         }
     }
@@ -197,16 +195,16 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
      * Sends the result back to the actor, which is waiting asynchronously for the value to be bound.
      * The message will either be a map holding the index under the 'index' key and the actual bound value under the 'result' key,
      * or it will be the result itself if the callback doesn't care about the index.
-     * @param index The index associated with the original request (identifies operator's channels)
+     * @param attachment
      * @param callback The actor to send the message to
      */
     @SuppressWarnings({"TypeMayBeWeakened"})
-    private void scheduleCallback(final Integer index, final MessageStream callback) {
-        if (index == CHANNEL_INDEX_NOT_REQUIRED) {
+    private void scheduleCallback(final Object attachment, final MessageStream callback) {
+        if (attachment == null) {
             callback.send(value);
         } else {
             final Map<String, Object> message = new HashMap<String, Object>();
-            message.put("index", index);
+            message.put("attachment", attachment);
             message.put("result", value);
             callback.send(message);
         }
@@ -235,6 +233,59 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
     }
 
     /**
+     * Send result to provided stream when became available 
+     * @param stream stream where to send result
+     */
+    public void whenBound(MessageStream stream) {
+        getValAsync(stream);
+    }
+
+    public static <V> DataFlowExpression<V> transform(final Object another, final Closure closure) {
+        int pnum = closure.getMaximumNumberOfParameters();
+        if (pnum == 0) {
+            throw new IllegalArgumentException("Closure should have parameters");
+        }
+
+        if(pnum == 1) {
+            return new DataFlowExpression<V> () {
+                Object arg;
+                {
+                    arg = another;
+                }
+                protected V evaluate() {
+                    //noinspection unchecked
+                    return (V) closure.call(arg instanceof DataFlowExpression ? ((DataFlowExpression)arg).value : arg);
+                }
+
+                protected void subscribe(DataFlowExpression<V>.DataFlowExpressionsCollector listener) {
+                    arg = listener.subscribe(arg);
+                }
+            };
+        }
+        else {
+            if (another instanceof Collection) {
+                Collection collection = (Collection) another;
+                if (collection.size() != pnum)
+                    throw new IllegalArgumentException("Closure parameters don't match #of arguments");
+
+                return new DataFlowComplexExpression<V> (collection.toArray()) {
+                    {
+                        subscribe();
+                    }
+                    
+                    protected V evaluate() {
+                        //noinspection unchecked
+                        return (V) closure.call(args);
+                    }
+                };
+            }
+
+            throw new IllegalArgumentException("Collection expected");
+        }
+    }
+
+    /**
+     *
      * Schedule closure to be executed by pooled actor after data became available
      * It is important to notice that even if data already available the execution of closure
      * will not happen immediately but will be scheduled.
@@ -334,4 +385,5 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
             }
         }
     }
+
 }

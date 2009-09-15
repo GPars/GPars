@@ -17,6 +17,7 @@
 package org.gparallelizer.dataflow;
 
 import org.gparallelizer.actors.Actor;
+import org.gparallelizer.MessageStream;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,11 +58,12 @@ public final class DataFlowStream<T> {
      * is registered with the supplied DFV to update the one stired in the buffer.
      * @param ref The DFV to add to the stream
      */
-    public void leftShift(final DataFlowVariable<T> ref) {
+    public void leftShift(final DataFlowExpression<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
-        ref.whenBound(new Object() {
-            public void perform(final T value) {
-                originalRef.bind(value);
+        ref.getValAsync(new MessageStream() {
+            public MessageStream send(Object message) {
+                originalRef.bind((T) message);
+                return this;
             }
         });
     }
@@ -109,7 +111,7 @@ public final class DataFlowStream<T> {
      * @throws InterruptedException If the current thread is interrupted
      */
     public void getValAsync(final Actor actor) throws InterruptedException {
-        getValAsync(-1, actor);
+        getValAsync(null, actor);
     }
 
     /**
@@ -118,12 +120,12 @@ public final class DataFlowStream<T> {
      * the 'result' key once the value has been bound.
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
-     * @param index An arbitrary value to identify operator channels and so match requests and replies
+     * @param attachment An arbitrary value to identify operator channels and so match requests and replies
      * @param actor The actor / operator to notify when a value is bound
      * @throws InterruptedException If the current thread is interrupted
      */
-    public void getValAsync(final Integer index, final Actor actor) throws InterruptedException {
-        checkValue().getValAsync(index, actor);
+    public void getValAsync(final Object attachment, final Actor actor) throws InterruptedException {
+        checkValue().getValAsync(attachment, actor);
     }
 
     /**

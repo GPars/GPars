@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright Â© 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -54,5 +54,33 @@ public class DataFlowExpressionTest extends GroovyTestCase {
       }
 
       assertEquals 11, (prod + 1).val
+    }
+
+    public void testTransform () {
+      final DataFlowVariable a = new DataFlowVariable()
+      final DataFlowVariable b = new DataFlowVariable()
+
+      def prod = DataFlowExpression.transform([a, b]) {x, y ->
+        x + y
+      }
+
+      DataFlow.start {
+        a << 5
+        b << 7
+      }
+
+      shouldFail {
+        DataFlowExpression.transform([a]) {x, y ->}
+      }
+
+      shouldFail {
+        DataFlowExpression.transform([a, b, c]) { x, y ->}
+      }
+
+      shouldFail {
+        DataFlowExpression.transform([a])  {->}
+      }
+
+      assertEquals (13, (prod + 1).val)
     }
 }
