@@ -38,10 +38,8 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression{
         if (receiver instanceof DataFlowExpression)
             receiver = ((DataFlowExpression)receiver).value;
 
-        for (int i = 0; i != args.length; ++i)
-            if (args[i] instanceof DataFlowExpression)
-                args[i] = ((DataFlowExpression) args[i]).value;
-
+        super.evaluate();
+        
         return InvokerHelper.invokeMethod(receiver, methodName, args);
     }
 

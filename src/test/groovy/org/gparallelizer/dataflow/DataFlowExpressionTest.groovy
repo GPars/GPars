@@ -69,18 +69,18 @@ public class DataFlowExpressionTest extends GroovyTestCase {
         b << 7
       }
 
-      shouldFail {
+      assertEquals (13, (prod + 1).val)
+
+      shouldFail(IllegalArgumentException) {
         DataFlowExpression.transform([a]) {x, y ->}
       }
 
-      shouldFail {
-        DataFlowExpression.transform([a, b, c]) { x, y ->}
+      shouldFail(IllegalArgumentException) {
+        DataFlowExpression.transform([a, b, null]) { x, y ->}
       }
 
-      shouldFail {
+      shouldFail(IllegalArgumentException) {
         DataFlowExpression.transform([a])  {->}
       }
-
-      assertEquals (13, (prod + 1).val)
     }
 }

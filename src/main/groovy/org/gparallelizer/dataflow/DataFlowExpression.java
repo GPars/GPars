@@ -274,6 +274,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
                     }
                     
                     protected V evaluate() {
+                        super.evaluate();
                         //noinspection unchecked
                         return (V) closure.call(args);
                     }

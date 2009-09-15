@@ -31,4 +31,12 @@ public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T>
             args [i] = listener.subscribe(args[i]);
         }
     }
+
+    protected T evaluate() {
+        for (int i = 0; i != args.length; ++i)
+            if (args[i] instanceof DataFlowExpression)
+                args[i] = ((DataFlowExpression) args[i]).value;
+        
+        return null;
+    }
 }
