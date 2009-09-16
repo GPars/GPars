@@ -37,6 +37,7 @@ public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
         listener.subscribe(receiver);
     }
 
+    @SuppressWarnings("unchecked")
     protected T evaluate() {
         //noinspection unchecked
         return (T) InvokerHelper.getProperty(receiver.value, name);

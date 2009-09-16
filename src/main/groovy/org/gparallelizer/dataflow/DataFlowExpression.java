@@ -240,6 +240,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
         getValAsync(stream);
     }
 
+    @SuppressWarnings("unchecked")
     public static <V> DataFlowExpression<V> transform(final Object another, final Closure closure) {
         int pnum = closure.getMaximumNumberOfParameters();
         if (pnum == 0) {

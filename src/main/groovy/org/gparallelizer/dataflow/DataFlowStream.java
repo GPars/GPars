@@ -58,6 +58,7 @@ public final class DataFlowStream<T> {
      * is registered with the supplied DFV to update the one stired in the buffer.
      * @param ref The DFV to add to the stream
      */
+    @SuppressWarnings("unchecked")
     public void leftShift(final DataFlowExpression<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
         ref.getValAsync(new MessageStream() {
