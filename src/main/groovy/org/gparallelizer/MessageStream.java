@@ -21,8 +21,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actors.ReplyRegistry;
 import org.gparallelizer.remote.serial.WithSerialId;
-import org.gparallelizer.remote.RemoteMessageStream;
+import org.gparallelizer.remote.serial.RemoteSerialized;
+import org.gparallelizer.remote.RemoteHost;
+import org.gparallelizer.remote.RemoteConnection;
+import org.gparallelizer.remote.messages.AbstractMsg;
 
 /**
  * Stream of abstract messages
@@ -148,6 +152,46 @@ public abstract class MessageStream extends WithSerialId {
 
         public void onDeliveryError () {
             send(new IllegalStateException("Delivery error. Maybe target actor is not active"));
+        }
+    }
+
+    public static class RemoteMessageStream extends MessageStream implements RemoteSerialized {
+        private RemoteHost remoteHost;
+
+        public RemoteMessageStream(RemoteHost host) {
+            remoteHost = host;
+        }
+
+        public MessageStream send(Object message) {
+            if (!(message instanceof ActorMessage)) {
+                message = new ActorMessage<Object> (message, ReplyRegistry.threadBoundActor());
+            }
+            remoteHost.write(new SendTo(this, (ActorMessage) message));
+            return this;
+        }
+    }
+
+    public static class SendTo<T> extends AbstractMsg {
+        private final MessageStream   to;
+        private final ActorMessage<T> message;
+
+        public SendTo(MessageStream to, ActorMessage<T> message) {
+            super();
+            this.to = to;
+            this.message = message;
+        }
+
+        public MessageStream getTo() {
+            return to;
+        }
+
+        public ActorMessage<T> getMessage() {
+            return message;
+        }
+
+        @Override
+        public void execute(RemoteConnection conn) {
+            to.send(message);
         }
     }
 }

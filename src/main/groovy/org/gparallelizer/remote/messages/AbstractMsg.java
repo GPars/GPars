@@ -12,35 +12,27 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.remote.messages;
 
-import org.gparallelizer.MessageStream;
-import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.remote.RemoteConnection;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Message set as call to send for remote actor
- * 
+ * Base class for all messages
+ *
  * @author Alex Tkachman
  */
-public class MessageToActor<T> extends BaseMsg {
-    private final MessageStream   to;
-    private final ActorMessage<T> message;
+public abstract class AbstractMsg implements Serializable {
+    public UUID hostId;
 
-    public MessageToActor(UUID hostId, MessageStream to, ActorMessage<T> message) {
-        super(hostId);
-        this.to = to;
-        this.message = message;
+    public AbstractMsg() {
     }
 
-    public MessageStream getTo() {
-        return to;
-    }
-
-    public ActorMessage<T> getMessage() {
-        return message;
+    public void execute (RemoteConnection conn) {
+        conn.onMessage(this);
     }
 }

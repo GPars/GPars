@@ -17,14 +17,12 @@
 package org.gparallelizer.remote;
 
 import org.gparallelizer.actors.Actor;
-import org.gparallelizer.remote.serial.SerialHandle;
-import org.gparallelizer.remote.serial.WithSerialId;
-import org.gparallelizer.remote.serial.LocalHandle;
-import org.gparallelizer.remote.serial.RemoteHandle;
+import org.gparallelizer.remote.serial.*;
 
 import java.util.*;
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
+import java.io.WriteAbortedException;
 
 /**
  * Represents communication method with remote hosts
@@ -41,10 +39,8 @@ public abstract class RemoteTransportProvider {
     /**
      * Registry of remote nodes known to the provider
      */
-    protected final HashMap<UUID, RemoteNode> registry = new HashMap<UUID, RemoteNode>();
+    protected final HashMap<UUID, RemoteNode> nodeRegistry = new HashMap<UUID, RemoteNode>();
 
-
-    private final HashMap<UUID, SerialHandle> localHandles  = new HashMap<UUID, SerialHandle> ();
     /**
      * Hosts known to the provider
      */
@@ -54,6 +50,9 @@ public abstract class RemoteTransportProvider {
      */
     protected final Map<UUID,LocalNode> localNodes = new HashMap<UUID,LocalNode> ();
 
+    public final HashMap<UUID, SerialHandle> localHandles  = new HashMap<UUID, SerialHandle> ();
+
+    private final HashMap<UUID, SerialHandle> remoteHandles  = new HashMap<UUID, SerialHandle> ();
 
     /**
      * Getter for provider id
@@ -77,8 +76,8 @@ public abstract class RemoteTransportProvider {
             localNodes.put(node.getId(), node);
         }
 
-        synchronized (registry) {
-            for (final RemoteNode n : registry.values()) {
+        synchronized (nodeRegistry) {
+            for (final RemoteNode n : nodeRegistry.values()) {
                 if (!n.getId().equals(node.getId())) {
                     node.onConnect(n);
                 }
@@ -104,8 +103,8 @@ public abstract class RemoteTransportProvider {
             }
         }
 
-        synchronized (registry) {
-            for (final RemoteNode n : registry.values()) {
+        synchronized (nodeRegistry) {
+            for (final RemoteNode n : nodeRegistry.values()) {
                 if (!n.getId().equals(node.getId())) {
                     node.onDisconnect(n);
                 }
@@ -144,19 +143,21 @@ public abstract class RemoteTransportProvider {
                 host = new RemoteHost(this, hostId);
                 remoteHosts.put(hostId, host);
             }
-            connection.setHost(host);
-            host.addConnection(connection);
+            if (connection != null) {
+                connection.setHost(host);
+                host.addConnection(connection);
+            }
             return host;
         }
     }
 
     public void connectRemoteNode(UUID nodeId, RemoteHost host, Actor mainActor) {
         RemoteNode node;
-        synchronized (registry) {
-            node = registry.get(nodeId);
+        synchronized (nodeRegistry) {
+            node = nodeRegistry.get(nodeId);
             if (node == null) {
                 node = new RemoteNode(nodeId, host, mainActor);
-                registry.put(nodeId, node);
+                nodeRegistry.put(nodeId, node);
             }
         }
 
@@ -169,8 +170,8 @@ public abstract class RemoteTransportProvider {
 
     public void disconnectRemoteNode(UUID nodeId) {
         RemoteNode node;
-        synchronized (registry) {
-            node = registry.remove(nodeId);
+        synchronized (nodeRegistry) {
+            node = nodeRegistry.remove(nodeId);
         }
 
         if (node != null)
@@ -183,14 +184,14 @@ public abstract class RemoteTransportProvider {
 
     public void onDisconnect(RemoteHost host) {
         ArrayList<RemoteNode> toRemove = new ArrayList<RemoteNode> ();
-        synchronized (registry) {
-            for (RemoteNode t : registry.values()) {
+        synchronized (nodeRegistry) {
+            for (RemoteNode t : nodeRegistry.values()) {
                 if (t.getRemoteHost() == host) {
                   toRemove.add(t);
                 }
             }
             for (RemoteNode t : toRemove) {
-                registry.remove(t.getId());
+                nodeRegistry.remove(t.getId());
             }
         }
 
@@ -203,28 +204,4 @@ public abstract class RemoteTransportProvider {
         }
     }
 
-    public UUID getSerialId(WithSerialId value) {
-        if (value.serialId == null) {
-            synchronized (value) {
-                if (value.serialId == null) {
-                    value.serialId = UUID.randomUUID();
-                    value.hostId = getId();
-                    localHandles.put(value.serialId, new SerialHandle(value, this));
-                }
-            }
-        }
-        return value.serialId;
-    }
-
-    public WithSerialId readResolve(Object handle) throws ObjectStreamException {
-        if (handle instanceof LocalHandle) {
-            return localHandles.get(((LocalHandle)handle).getId()).get();
-        }
-
-        throw new InvalidObjectException(handle.getClass().getName());
-    }
-
-    public Object writeReplace(WithSerialId object) {
-        return new RemoteHandle(object.getSerialId(), object.getRemoteClass());
-    }
 }

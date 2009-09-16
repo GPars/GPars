@@ -17,6 +17,7 @@
 package org.gparallelizer.remote.messages;
 
 import org.gparallelizer.remote.LocalNode;
+import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.actors.Actor;
 
 import java.util.UUID;
@@ -26,7 +27,7 @@ import java.util.UUID;
  *
  * @author Alex Tkachman
  */
-public class NodeConnectedMsg extends BaseMsg {
+public class NodeConnectedMsg extends AbstractMsg {
 
     /**
      * Id of node connected
@@ -35,9 +36,14 @@ public class NodeConnectedMsg extends BaseMsg {
 
     public final Actor mainActor;
 
-    public NodeConnectedMsg(LocalNode node, UUID hostId) {
-        super(hostId);
+    public NodeConnectedMsg(LocalNode node) {
+        super();
         nodeId = node.getId();
         mainActor = node.getMainActor();
+    }
+
+    @Override
+    public void execute(RemoteConnection conn) {
+       conn.getHost().getProvider().connectRemoteNode(nodeId, conn.getHost(), mainActor);
     }
 }

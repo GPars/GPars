@@ -17,6 +17,10 @@
 package org.gparallelizer.dataflow;
 
 import org.gparallelizer.MessageStream;
+import org.gparallelizer.remote.serial.WithSerialId;
+import org.gparallelizer.remote.messages.AbstractMsg;
+import org.gparallelizer.remote.RemoteConnection;
+import org.gparallelizer.remote.RemoteHost;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,7 +34,9 @@ import groovy.lang.*;
  *
  * @author Alex Tkachman
  */
-public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
+public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject {
+
+    private MetaClass metaClass = InvokerHelper.getMetaClass(getClass());
 
     /**
      * Holds the actual value. Is null before a concrete value is bound to it.
@@ -113,6 +119,9 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
      * @param callback An actor to send the bound value plus the supplied index to.
      */
     void getValAsync(final Object attachment, final MessageStream callback) {
+        if (callback == null)
+            throw new NullPointerException();
+        
         WaitingThread<T> newWaiting = null;
         while (state.get() != S_INITIALIZED) {
             if (newWaiting == null) {
@@ -171,10 +180,41 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
     }
 
     /**
+     * Assigns a value to the variable. Returns silently if invoked on an already bound variable.
+     *
+     * @param value The value to assign
+     */
+    public void bindSafely(final T value) {
+        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+            return;
+        }
+        doBind(value);
+    }
+
+    /**
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * Throws exception if invoked on an already bound variable.
+     *
+     * @param value The value to assign
+     */
+    public void bind(final T value) {
+        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+            throw new IllegalStateException("A DataFlowVariable can only be assigned once.");
+        }
+
+        doBind(value);
+    }
+
+    /**
      * Performs the actual bind operation, unblocks all blocked threads and informs all asynchronously waiting actors.
      * @param value The value to assign
      */
-    protected void doBind(final T value) {
+    private void doBind(final T value) {
+        doBindImpl(value);
+        notifyRemote(null);
+    }
+
+    private void doBindImpl(T value) {
         this.value = value;
         state.set(S_INITIALIZED);
 
@@ -184,11 +224,45 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
         // no more new waiting threads since that point
         for (WaitingThread<T> waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
             if (waiting.thread != null) {
-                LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread
+                LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread, which is OK as in this case
             } else {
-                scheduleCallback(waiting.attachment, waiting.callback);
+                if (waiting.callback != null)
+                    scheduleCallback(waiting.attachment, waiting.callback);
             }
         }
+    }
+
+    public void doBindRemote(BindDataFlow msg) {
+        doBindImpl(value);
+        notifyRemote(msg.hostId);
+    }
+
+    private void notifyRemote(final UUID hostId) {
+        DataFlowActor.DATA_FLOW_GROUP.getThreadPool().execute(new Runnable(){
+            public void run() {
+                if (serialHandle != null) {
+                    Object sub = serialHandle.getSubscribers();
+                    if (sub instanceof RemoteHost) {
+                        RemoteHost host = (RemoteHost) sub;
+                        if (hostId == null || !host.getId().equals(hostId)) {
+                            host.write(new BindDataFlow(DataFlowExpression.this, value, host.getProvider().getId()));
+                        }
+                    }
+
+                    if(sub instanceof List) {
+                        //noinspection SynchronizeOnNonFinalField
+                        synchronized (serialHandle) {
+                            //noinspection unchecked
+                            for (RemoteHost host : (List<RemoteHost>) sub) {
+                                if (hostId == null || !host.getId().equals(hostId)) {
+                                    host.write(new BindDataFlow(DataFlowExpression.this, value, host.getProvider().getId()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -248,20 +322,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
         }
 
         if(pnum == 1) {
-            return new DataFlowExpression<V> () {
-                Object arg;
-                {
-                    arg = another;
-                }
-                protected V evaluate() {
-                    //noinspection unchecked
-                    return (V) closure.call(arg instanceof DataFlowExpression ? ((DataFlowExpression)arg).value : arg);
-                }
-
-                protected void subscribe(DataFlowExpression<V>.DataFlowExpressionsCollector listener) {
-                    arg = listener.subscribe(arg);
-                }
-            };
+            return new TransformOne<V>(another, closure);
         }
         else {
             if (another instanceof Collection) {
@@ -269,17 +330,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
                 if (collection.size() != pnum)
                     throw new IllegalArgumentException("Closure parameters don't match #of arguments");
 
-                return new DataFlowComplexExpression<V> (collection.toArray()) {
-                    {
-                        subscribe();
-                    }
-                    
-                    protected V evaluate() {
-                        super.evaluate();
-                        //noinspection unchecked
-                        return (V) closure.call(args);
-                    }
-                };
+                return new TransformMany<V>(collection, closure);
             }
 
             throw new IllegalArgumentException("Collection expected");
@@ -313,14 +364,13 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
      * Evaluate expression after the ones we depend from are ready
      * @return value to bind
      */
-    protected abstract T evaluate();
+    protected T evaluate() {
+        return value;
+    }
 
-    /**
-     * Subscribe listener to expressions we depend from
-     *
-     * @param listener
-     */
-    protected abstract void subscribe(DataFlowExpressionsCollector listener);
+    protected void subscribe(DataFlowExpressionsCollector listener) {
+        listener.subscribe(this);
+    }
 
     public Object invokeMethod(String name, Object args) {
         if (getMetaClass().respondsTo(this, name).isEmpty()) {
@@ -346,7 +396,15 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
     }
 
     public void setMetaClass(MetaClass metaClass) {
-        throw new UnsupportedOperationException();
+        this.metaClass = metaClass;
+    }
+
+    public void setProperty(String propertyName, Object newValue) {
+        metaClass.setProperty(this, propertyName, newValue);
+    }
+
+    public MetaClass getMetaClass() {
+        return metaClass;
     }
 
     /**
@@ -360,7 +418,7 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
 
         public MessageStream send(Object message) {
             if (count.decrementAndGet() == 0) {
-                doBind(evaluate());
+                bind(evaluate());
             }
             return this;
         }
@@ -388,4 +446,57 @@ public abstract class DataFlowExpression<T> extends GroovyObjectSupport {
         }
     }
 
+    @SuppressWarnings({"ArithmeticOnVolatileField"})
+    @Override public String toString() {
+        return getClass().getSimpleName() + "(value=" + value + ')';
+    }
+
+    private static class TransformOne<V> extends DataFlowExpression<V> {
+        Object arg;
+        private final Closure closure;
+
+        public TransformOne(Object another, Closure closure) {
+            this.closure = closure;
+            arg = another;
+        }
+
+        protected V evaluate() {
+            //noinspection unchecked
+            return (V) closure.call(arg instanceof DataFlowExpression ? ((DataFlowExpression)arg).value : arg);
+        }
+
+        protected void subscribe(DataFlowExpressionsCollector listener) {
+            arg = listener.subscribe(arg);
+        }
+    }
+
+    private static class TransformMany<V> extends DataFlowComplexExpression<V> {
+        private final Closure closure;
+
+        public TransformMany(Collection collection, Closure closure) {
+            super(collection.toArray());
+            this.closure = closure;
+            subscribe();
+        }
+
+        protected V evaluate() {
+            super.evaluate();
+            //noinspection unchecked
+            return (V) closure.call(args);
+        }
+    }
+
+    public static class BindDataFlow extends AbstractMsg {
+        private DataFlowExpression var;
+        private Object message;
+
+        public BindDataFlow(DataFlowExpression var, Object message, UUID hostId) {
+            this.var = var;
+            this.message = message;
+        }
+        @Override
+        public void execute(RemoteConnection conn) {
+            var.doBindRemote(this);
+        }
+    }
 }

@@ -33,7 +33,7 @@ public final class LocalHandle implements Serializable {
     }
 
     protected Object readResolve () throws ObjectStreamException {
-        return RemoteHost.getThreadContext().readResolve(this);
+        return RemoteHost.getThreadContext().getProvider().localHandles.get(id).get();
     }
 
     public UUID getId() {

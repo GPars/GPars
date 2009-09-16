@@ -200,6 +200,11 @@ public class NettyTransportProvider extends RemoteTransportProvider {
         public Thread newThread(Runnable r) {
             Thread thread = new Thread(r);
             thread.setDaemon(true);
+            thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+                public void uncaughtException(Thread t, Throwable e) {
+                    e.printStackTrace();
+                }
+            });
             return thread;
         }
     }

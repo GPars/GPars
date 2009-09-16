@@ -17,6 +17,10 @@
 package org.gparallelizer.dataflow;
 
 import org.gparallelizer.MessageStream;
+import org.gparallelizer.remote.serial.RemoteSerialized;
+import org.gparallelizer.remote.RemoteHost;
+
+import java.io.ObjectStreamException;
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
@@ -31,7 +35,7 @@ import org.gparallelizer.MessageStream;
  * @param <T> Type of values to bind with the DataFlowVariable
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
-public final class DataFlowVariable<T> extends DataFlowExpression<T> {
+public class DataFlowVariable<T> extends DataFlowExpression<T> {
     /**
      * Creates a new unbound Dataflow Variable
      */
@@ -63,42 +67,24 @@ public final class DataFlowVariable<T> extends DataFlowExpression<T> {
         });
     }
 
-    @SuppressWarnings({"ArithmeticOnVolatileField"})
-    @Override public String toString() {
-        return "DataFlowVariable(value=" + value + ')';
+    @Override
+    public Class getRemoteClass() {
+        return RemoteDataFlowVariable.class;
     }
 
-    /**
-     * Assigns a value to the variable. Returns silently if invoked on an already bound variable.
-     *
-     * @param value The value to assign
-     */
-    public void bindSafely(final T value) {
-        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
-            return;
+    public static class RemoteDataFlowVariable extends DataFlowVariable implements RemoteSerialized {
+        private final RemoteHost remoteHost;
+        private boolean disconnected;
+
+        public RemoteDataFlowVariable(RemoteHost host) {
+            remoteHost = host;
+            getValAsync(new MessageStream(){
+                public MessageStream send(Object message) {
+                    if (!disconnected)
+                        remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));
+                    return this;
+                }
+            });
         }
-        doBind(value);
-    }
-
-    /**
-     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
-     * Throws exception if invoked on an already bound variable.
-     *
-     * @param value The value to assign
-     */
-    public void bind(final T value) {
-        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
-            throw new IllegalStateException("A DataFlowVariable can only be assigned once.");
-        }
-
-        doBind(value);
-    }
-
-    protected void subscribe(DataFlowExpressionsCollector listener) {
-        listener.subscribe(this);
-    }
-
-    protected T evaluate() {
-        return value;
     }
 }

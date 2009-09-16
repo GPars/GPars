@@ -16,7 +16,10 @@
 package org.gparallelizer.actors;
 
 import org.gparallelizer.MessageStream;
-import org.gparallelizer.remote.RemoteActor;
+import org.gparallelizer.remote.RemoteHost;
+import org.gparallelizer.remote.RemoteConnection;
+import org.gparallelizer.remote.messages.AbstractMsg;
+import org.gparallelizer.remote.serial.RemoteSerialized;
 
 /**
  * Actors are active objects, which either have their own thread processing repeatedly messages submitted to them
@@ -67,5 +70,60 @@ public abstract class Actor extends MessageStream {
 
     public Class getRemoteClass() {
         return RemoteActor.class;
+    }
+
+    public static class RemoteActor extends Actor implements RemoteSerialized {
+        private final RemoteHost remoteHost;
+
+        public RemoteActor(RemoteHost host) {
+            remoteHost = host;
+        }
+
+        public Actor start() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Actor stop() {
+            remoteHost.write(new StopActorMsg(this));
+            return this;
+        }
+
+        public boolean isActive() {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean isActorThread() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void join() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void join(long milis) {
+            throw new UnsupportedOperationException();
+        }
+
+        public MessageStream send(Object message) {
+            if (!(message instanceof ActorMessage)) {
+                message = new ActorMessage<Object> (message, ReplyRegistry.threadBoundActor());
+            }
+            remoteHost.write(new SendTo(this, (ActorMessage) message));
+            return this;
+        }
+
+        public static class StopActorMsg extends AbstractMsg {
+            public final Actor actor;
+
+            public StopActorMsg(RemoteActor remoteActor) {
+                super();
+                actor = remoteActor;
+            }
+
+            @Override
+            public void execute(RemoteConnection conn) {
+                actor.stop();
+            }
+        }
     }
 }

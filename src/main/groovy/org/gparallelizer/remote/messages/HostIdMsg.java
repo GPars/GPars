@@ -16,21 +16,21 @@
 
 package org.gparallelizer.remote.messages;
 
-import org.gparallelizer.remote.RemoteTransportProvider;
+import java.util.UUID;
 
 /**
  * Message sent by NetTransportProvider immediately after connection to another host set up set up
  *
  * @author Alex Tkachman
  */
-public class HostIdMsg extends BaseMsg {
+public class HostIdMsg extends AbstractMsg {
 
     /**
      * Construct message representing current state of the transport provider
      *
-     * @param provider transport provider
      */
-    public HostIdMsg(RemoteTransportProvider provider) {
-        super(provider.getId());
+    public HostIdMsg(UUID id) {
+        super();
+        hostId = id;
     }
 }

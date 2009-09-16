@@ -17,7 +17,7 @@
 package org.gparallelizer.remote.netty;
 
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.remote.messages.BaseMsg;
+import org.gparallelizer.remote.messages.AbstractMsg;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelFuture;
 
@@ -38,7 +38,7 @@ public class NettyRemoteConnection extends RemoteConnection {
         this.handler = netHandler;
     }
 
-    public void write(BaseMsg msg) {
+    public void write(AbstractMsg msg) {
         if(handler.getChannel().isConnected() && handler.getChannel().isOpen()) {
             writeListener.incrementAndGet();
             handler.getChannel().write(msg).addListener(writeListener);

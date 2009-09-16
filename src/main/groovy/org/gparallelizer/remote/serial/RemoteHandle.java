@@ -16,31 +16,47 @@
 
 package org.gparallelizer.remote.serial;
 
+import org.gparallelizer.remote.RemoteHost;
+
 import java.io.Serializable;
 import java.io.ObjectStreamException;
+import java.io.InvalidObjectException;
 import java.io.WriteAbortedException;
 import java.util.UUID;
+import java.lang.reflect.Constructor;
 
 /**
 * @author Alex Tkachman
 */
 public class RemoteHandle implements Serializable {
     private final UUID serialId;
+    private final UUID hostId;
 
     private final Class klazz;
 
-    public RemoteHandle(UUID id, Class klazz) {
+    public RemoteHandle(UUID id, UUID hostId, Class klazz) {
         this.serialId = id;
+        this.hostId = hostId;
         this.klazz = klazz;
     }
 
     protected Object readResolve () throws ObjectStreamException {
-        try {
-            WithSerialId obj = (WithSerialId) klazz.newInstance();
-            obj.initDeserial(serialId);
-            return obj;
-        } catch (Exception t) {
-            throw new WriteAbortedException(t.getMessage(), t);
+        RemoteHost host = RemoteHost.getThreadContext();
+        SerialHandle serialHandle = host.getProvider().localHandles.get(serialId);
+
+        WithSerialId obj;
+        if (serialHandle == null || (obj = serialHandle.get()) == null) {
+            try {
+                if (!host.getId().equals(hostId))
+                    host = host.getProvider().getRemoteHost(hostId, null);
+                final Constructor constructor = klazz.getConstructor(RemoteHost.class);
+
+                obj = (WithSerialId) constructor.newInstance(host);
+                obj.serialHandle = new SerialHandle(obj, serialId);
+            } catch (Exception t) {
+                throw new WriteAbortedException(t.getMessage(), t);
+            }
         }
+        return obj;
     }
 }

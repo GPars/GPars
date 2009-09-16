@@ -20,7 +20,6 @@ import org.gparallelizer.remote.RemoteHost;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * Base class for objects which needs to be exposed to remote nodes via serialization.
@@ -28,24 +27,31 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public abstract class WithSerialId implements Serializable {
-    public volatile UUID hostId;
-    public volatile UUID serialId;
+    public transient volatile SerialHandle serialHandle;
 
-    protected final Object writeReplace () throws ObjectStreamException {
-        return RemoteHost.getThreadContext().writeReplace(this);
+    public final SerialHandle getOrCreateSerialHandle() {
+        if (serialHandle == null)
+            synchronized (this) {
+                if (serialHandle == null) {
+                    serialHandle = new SerialHandle(this);
+                }
+
+            }
+        return serialHandle;
     }
 
-    protected final Object readResolve () throws ObjectStreamException {
-        return RemoteHost.getThreadContext().readResolve(this);
-    }
-
-    public final UUID getSerialId () {
-        return RemoteHost.getThreadContext().getProvider().getSerialId(this);
-    }
-
-    public void initDeserial(UUID serialId) {
+    public Class getRemoteClass() {
         throw new UnsupportedOperationException();
     }
 
-    public abstract Class getRemoteClass();
+    protected final Object writeReplace () throws ObjectStreamException {
+        getOrCreateSerialHandle();
+        if (this instanceof RemoteSerialized) {
+            return new LocalHandle(serialHandle.getSerialId());
+        }
+
+        final RemoteHost host = RemoteHost.getThreadContext();
+        serialHandle.subscribe(host);
+        return new RemoteHandle(serialHandle.getSerialId(), host.getHostId(), getRemoteClass());
+    }
 }

@@ -20,7 +20,7 @@ import org.jboss.netty.channel.*;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.netty.RemoteObjectEncoder;
 import org.gparallelizer.remote.netty.RemoteObjectDecoder;
-import org.gparallelizer.remote.messages.BaseMsg;
+import org.gparallelizer.remote.messages.AbstractMsg;
 
 /**
  * @author Alex Tkachman
@@ -55,7 +55,7 @@ public class NettyHandler extends SimpleChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        connection.onMessage((BaseMsg) e.getMessage());
+        ((AbstractMsg) e.getMessage()).execute(connection);
     }
 
     @Override

@@ -14,27 +14,35 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.remote;
+package org.gparallelizer.dataflow;
 
+import org.gparallelizer.remote.RemoteHost;
 import org.gparallelizer.remote.serial.RemoteSerialized;
 import org.gparallelizer.MessageStream;
 
-import java.util.UUID;
+import java.io.ObjectStreamException;
 
 /**
  * @author Alex Tkachman
  */
-public class RemoteMessageStream extends MessageStream implements RemoteSerialized {
+public class RemoteDataFlowExpression extends DataFlowExpression implements RemoteSerialized {
     private RemoteHost remoteHost;
 
-    @Override
-    public void initDeserial(UUID serialId) {
+    public RemoteDataFlowExpression() {
         remoteHost = RemoteHost.getThreadContext();
-        this.serialId = serialId;
+        getValAsync(new MessageStream(){
+            public MessageStream send(Object message) {
+                remoteHost.write(new BindDataFlow(RemoteDataFlowExpression.this, message, remoteHost.getHostId()));
+                return this;
+            }
+        });
     }
 
-    public MessageStream send(Object message) {
-        remoteHost.send(this, message);
-        return this;
+    protected Object evaluate() {
+        return value;
+    }
+
+    protected void subscribe(DataFlowExpression.DataFlowExpressionsCollector listener) {
+        listener.subscribe(this);
     }
 }
