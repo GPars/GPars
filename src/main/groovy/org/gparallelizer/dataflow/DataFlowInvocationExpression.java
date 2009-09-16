@@ -27,13 +27,14 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression{
     private Object receiver;
     private final String methodName;
 
-    public DataFlowInvocationExpression(Object receiver, String methodName, Object [] args) {
+    public DataFlowInvocationExpression(final Object receiver, final String methodName, final Object [] args) {
         super(args);
         this.receiver = receiver;
         this.methodName = methodName;
         subscribe();
     }
 
+    @Override
     protected Object evaluate() {
         if (receiver instanceof DataFlowExpression)
             receiver = ((DataFlowExpression)receiver).value;
@@ -43,7 +44,8 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression{
         return InvokerHelper.invokeMethod(receiver, methodName, args);
     }
 
-    protected void subscribe(DataFlowExpressionsCollector listener) {
+    @Override
+    protected void subscribe(final DataFlowExpressionsCollector listener) {
         if (receiver instanceof DataFlowExpression)
             receiver = listener.subscribe(receiver);
 

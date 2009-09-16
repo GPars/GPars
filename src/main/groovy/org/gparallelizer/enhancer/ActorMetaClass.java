@@ -127,6 +127,7 @@ public class ActorMetaClass extends DelegatingMetaClass {
      * @param msg The message to pass to the actor
      * @return The original return value returned from the intercepted method
      */
+    @SuppressWarnings({"ProhibitedExceptionThrown", "ObjectEquality"})
     private Object performAsyncMethodCall(final AsyncMessage msg) {
         try {
             actor.send(msg);
@@ -138,7 +139,7 @@ public class ActorMetaClass extends DelegatingMetaClass {
             } else {
                 return value;
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
             return null;
         }

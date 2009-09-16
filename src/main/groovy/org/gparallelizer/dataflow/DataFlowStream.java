@@ -16,7 +16,6 @@
 
 package org.gparallelizer.dataflow;
 
-import org.gparallelizer.actors.Actor;
 import org.gparallelizer.MessageStream;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Vaclav Pech
  * Date: Jun 5, 2009
  */
-@SuppressWarnings({"LawOfDemeter", "MethodReturnOfConcreteClass"})
+@SuppressWarnings({"LawOfDemeter", "MethodReturnOfConcreteClass", "AnonymousInnerClass", "AnonymousInnerClassWithTooManyMethods"})
 public final class DataFlowStream<T> {
 
     /**
@@ -62,7 +61,8 @@ public final class DataFlowStream<T> {
     public void leftShift(final DataFlowExpression<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
         ref.getValAsync(new MessageStream() {
-            public MessageStream send(Object message) {
+            @Override
+            public MessageStream send(final Object message) {
                 originalRef.bind((T) message);
                 return this;
             }
@@ -100,7 +100,7 @@ public final class DataFlowStream<T> {
      * @throws InterruptedException If the current thread is interrupted
      */
     public T getVal() throws InterruptedException {
-        return checkValue().getVal();
+        return retrieveOrCreateVariable().getVal();
     }
 
     /**
@@ -108,11 +108,10 @@ public final class DataFlowStream<T> {
      * back the the supplied actor once the value has been bound.
      * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
-     * @param actor The actor to notify when a value is bound
-     * @throws InterruptedException If the current thread is interrupted
+     * @param messageStream The actor to notify when a value is bound
      */
-    public void getValAsync(final Actor actor) throws InterruptedException {
-        getValAsync(null, actor);
+    public void getValAsync(final MessageStream messageStream) {
+        getValAsync(null, messageStream);
     }
 
     /**
@@ -122,20 +121,18 @@ public final class DataFlowStream<T> {
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
      * @param attachment An arbitrary value to identify operator channels and so match requests and replies
-     * @param actor The actor / operator to notify when a value is bound
-     * @throws InterruptedException If the current thread is interrupted
+     * @param messageStream The actor / operator to notify when a value is bound
      */
-    public void getValAsync(final Object attachment, final Actor actor) throws InterruptedException {
-        checkValue().getValAsync(attachment, actor);
+    public void getValAsync(final Object attachment, final MessageStream messageStream) {
+        retrieveOrCreateVariable().getValAsync(attachment, messageStream);
     }
 
     /**
      * Checks whether there's a DFV waiting in the queue and retrieves it. If not, a new unmatch value request, represented
      * by a new DFV, is added to the requests queue.
      * @return The DFV to wait for value on
-     * @throws InterruptedException If the current thread gets interrupted
      */
-    private DataFlowVariable<T> checkValue() throws InterruptedException {
+    private DataFlowVariable<T> retrieveOrCreateVariable() {
         DataFlowVariable<T> dataFlowVariable;
         synchronized (queueLock) {
             dataFlowVariable = queue.poll();
@@ -160,7 +157,7 @@ public final class DataFlowStream<T> {
      * not the DataFlowVariables.
      * @return AN iterator over all DFVs in the queue
      */
-    public Iterator iterator() {
+    public Iterator<T> iterator() {
         final Iterator<DataFlowVariable<T>> iterator = queue.iterator();
         return new Iterator<T>() {
 
@@ -172,7 +169,7 @@ public final class DataFlowStream<T> {
                 try {
                     return iterator.next().getVal();
                 } catch (InterruptedException e) {
-                    throw new IllegalStateException("The thread has been interrupted, which prevented the iterator from retrieving the next element.");
+                    throw new IllegalStateException("The thread has been interrupted, which prevented the iterator from retrieving the next element.", e);
                 }
             }
 
@@ -184,6 +181,6 @@ public final class DataFlowStream<T> {
     }
 
     @Override public String toString() {
-        return "DataFlowStream(queue=" + new ArrayList<DataFlowVariable<T>>(queue).toString() + ")" ;
+        return "DataFlowStream(queue=" + new ArrayList<DataFlowVariable<T>>(queue).toString() + ')';
     }
 }

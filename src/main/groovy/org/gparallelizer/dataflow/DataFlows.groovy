@@ -47,6 +47,8 @@ public class DataFlows {
 
     private final static DF DUMMY = new DF()
 
+    private final lock = new Object()
+
     private ConcurrentMap variables = null
 
     // copy from ConcurrentHashMap for jdk 1.5 backwards compatibility
@@ -150,11 +152,11 @@ public class DataFlows {
    * @return DFV
    */
     private def putNewUnderLock(name) {
-      synchronized (this) {
-        def df = variables.get(name)
+      synchronized (lock) {
+        def df = variables[name]
         if (!df || (df == DUMMY)) {
           df = new DF()
-          variables.put(name, df);
+          variables[name] = df;
         }
         return df
       }
@@ -165,7 +167,7 @@ public class DataFlows {
      * @param name The name of the DFV to remove.
      */
     public def remove(name) {
-        synchronized(this) {
+        synchronized(lock) {
             def df = variables.remove(name)
             if (df) df.bindSafely(null)
         }

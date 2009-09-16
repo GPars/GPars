@@ -54,9 +54,8 @@ class AsyncMessage {
      * @param array array to copy
      * @return clone
      */
-    protected static Object [] copyOf (Object [] array) {
-        if (array == null)
-            return null;
+    protected static Object [] copyOf (final Object [] array) {
+        if (array == null) return null;
 
         final Object[] res = new Object[array.length];
         System.arraycopy(array, 0, res, 0, array.length);

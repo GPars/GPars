@@ -16,7 +16,6 @@
 
 package org.gparallelizer
 
-import org.gparallelizer.Asynchronizer
 import org.gparallelizer.actors.pooledActors.DefaultPool
 import org.gparallelizer.actors.pooledActors.Pool
 
@@ -36,12 +35,14 @@ public final class AsyncEnhancer {
     /**
      * Holds the internal ExecutorService instance wrapped into a DefaultPool
      */
+    @SuppressWarnings("GroovyConstantNamingConvention")
     private final static DefaultPool threadPool = new DefaultPool(true)
 
     /**
      * Enhances a single instance by mixing-in an instance of AsyncEnhancer.
      */
     public static void enhanceInstance(Object collection) {
+        //noinspection GroovyGetterCallCanBePropertyAccess
         collection.getMetaClass().mixin AsyncEnhancer
     }
 
@@ -50,6 +51,7 @@ public final class AsyncEnhancer {
      * Enhancing classes needs to be done with caution, since it may have impact in unrelated parts of the application.
      */
     public static void enhanceClass(Class clazz) {
+        //noinspection GroovyGetterCallCanBePropertyAccess
         clazz.getMetaClass().mixin AsyncEnhancer
     }
 

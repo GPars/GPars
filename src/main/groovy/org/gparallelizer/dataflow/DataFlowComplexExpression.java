@@ -22,16 +22,18 @@ package org.gparallelizer.dataflow;
 public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T>  {
     protected Object[] args;
 
-    public DataFlowComplexExpression(final Object... elements) {
+    protected DataFlowComplexExpression(final Object... elements) {
         this.args = elements;
     }
 
-    protected void subscribe(DataFlowExpressionsCollector listener) {
+    @Override
+    protected void subscribe(final DataFlowExpressionsCollector listener) {
         for (int i = 0; i != args.length; ++i) {
             args [i] = listener.subscribe(args[i]);
         }
     }
 
+    @Override
     protected T evaluate() {
         for (int i = 0; i != args.length; ++i)
             if (args[i] instanceof DataFlowExpression)
