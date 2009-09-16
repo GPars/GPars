@@ -5,6 +5,7 @@
 
     Planned for the next release
 
+    todo rename SafeVariable - Safe, Agent
     todo automate creation of code sample download, javadoc download, source download
     todo automate doc samples generation
     todo wiki versioning
