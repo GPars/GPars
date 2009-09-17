@@ -1,7 +1,7 @@
 package org.gparallelizer.remote;
 
-import org.gparallelizer.remote.messages.AbstractMsg;
 import org.gparallelizer.remote.messages.HostIdMsg;
+import org.gparallelizer.serial.AbstractMsg;
 
 /**
  * Represents connection to remote host
@@ -9,20 +9,19 @@ import org.gparallelizer.remote.messages.HostIdMsg;
  * @author Alex Tkachman
  */
 public abstract class RemoteConnection {
-    private final RemoteTransportProvider provider;
+    private final LocalHost localHost;
 
     private RemoteHost host;
 
-    public RemoteConnection(RemoteTransportProvider provider) {
-        this.provider = provider;
+    public RemoteConnection(LocalHost provider) {
+        this.localHost = provider;
     }
 
-    public void onMessage (AbstractMsg msg) {
+    public void onMessage(AbstractMsg msg) {
         if (host == null) {
             final HostIdMsg idMsg = (HostIdMsg) msg;
-            host = provider.getRemoteHost(idMsg.hostId, this);
-        }
-        else
+            host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
+        } else
             throw new IllegalStateException("Unexpected message: " + msg);
     }
 
@@ -30,11 +29,11 @@ public abstract class RemoteConnection {
     }
 
     public void onConnect() {
-        write(new HostIdMsg(provider.getId()));
+        write(new HostIdMsg(localHost.getId()));
     }
 
     public void onDisconnect() {
-        provider.onDisconnect(host);
+        localHost.onDisconnect(host);
     }
 
     public abstract void write(AbstractMsg msg);

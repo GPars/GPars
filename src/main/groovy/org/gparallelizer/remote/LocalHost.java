@@ -12,63 +12,53 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.remote;
 
 import org.gparallelizer.actors.Actor;
-import org.gparallelizer.remote.serial.*;
+import org.gparallelizer.serial.SerialContext;
+import org.gparallelizer.serial.SerialHandles;
 
-import java.util.*;
-import java.io.InvalidObjectException;
-import java.io.ObjectStreamException;
-import java.io.WriteAbortedException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * Represents communication method with remote hosts
+ * Represents communication point with other local hosts.
+ * Usually it is enough to have one LocalHost per JVM but it is possible to have several.
+ * <p/>
+ * It can be one or several local nodes hosted on local host. For most applications one should be enough
+ * but sometimes several can be useful as well.
+ * <p/>
+ * Local host contains
+ * - remote hosts connected with this one
+ * - remote nodes known to this host
+ * - local nodes available on this host
  *
  * @author Alex Tkachman
  */
-public abstract class RemoteTransportProvider {
-
-    /**
-     * Unique id of the provider
-     */
-    private final UUID id = UUID.randomUUID();
+public class LocalHost extends SerialHandles {
 
     /**
      * Registry of remote nodes known to the provider
      */
-    protected final HashMap<UUID, RemoteNode> nodeRegistry = new HashMap<UUID, RemoteNode>();
+    protected final HashMap<UUID, RemoteNode> remoteNodes = new HashMap<UUID, RemoteNode>();
 
     /**
      * Hosts known to the provider
      */
     protected final Map<UUID, RemoteHost> remoteHosts = new HashMap<UUID, RemoteHost>();
+
     /**
      * Local nodes known to the provider
      */
-    protected final Map<UUID,LocalNode> localNodes = new HashMap<UUID,LocalNode> ();
-
-    public final HashMap<UUID, SerialHandle> localHandles  = new HashMap<UUID, SerialHandle> ();
-
-    private final HashMap<UUID, SerialHandle> remoteHandles  = new HashMap<UUID, SerialHandle> ();
-
-    /**
-     * Getter for provider id
-     *
-     * @return unique id
-     */
-    public UUID getId() {
-        return id;
-    }
-
-    public void finalizeHandle(SerialHandle handle) {
-        localHandles.remove(handle.getSerialId());
-    }
+    protected final Map<UUID, LocalNode> localNodes = new HashMap<UUID, LocalNode>();
 
     /**
      * Connect local node to the provider
+     *
      * @param node local node
      */
     public void connect(LocalNode node) {
@@ -76,8 +66,8 @@ public abstract class RemoteTransportProvider {
             localNodes.put(node.getId(), node);
         }
 
-        synchronized (nodeRegistry) {
-            for (final RemoteNode n : nodeRegistry.values()) {
+        synchronized (remoteNodes) {
+            for (final RemoteNode n : remoteNodes.values()) {
                 if (!n.getId().equals(node.getId())) {
                     node.onConnect(n);
                 }
@@ -103,8 +93,8 @@ public abstract class RemoteTransportProvider {
             }
         }
 
-        synchronized (nodeRegistry) {
-            for (final RemoteNode n : nodeRegistry.values()) {
+        synchronized (remoteNodes) {
+            for (final RemoteNode n : remoteNodes.values()) {
                 if (!n.getId().equals(node.getId())) {
                     node.onDisconnect(n);
                 }
@@ -116,7 +106,7 @@ public abstract class RemoteTransportProvider {
         }
     }
 
-    public void disconnect () {
+    public void disconnect() {
         synchronized (localNodes) {
             ArrayList<LocalNode> copy = new ArrayList<LocalNode>(localNodes.values());
             localNodes.clear();
@@ -136,7 +126,8 @@ public abstract class RemoteTransportProvider {
         TransportRegistry.removeTransportProvider(this);
     }
 
-    public RemoteHost getRemoteHost(UUID hostId, RemoteConnection connection) {
+    public SerialContext getSerialHost(UUID hostId, Object conn) {
+        RemoteConnection connection = (RemoteConnection) conn;
         synchronized (remoteHosts) {
             RemoteHost host = remoteHosts.get(hostId);
             if (host == null) {
@@ -151,13 +142,13 @@ public abstract class RemoteTransportProvider {
         }
     }
 
-    public void connectRemoteNode(UUID nodeId, RemoteHost host, Actor mainActor) {
+    public void connectRemoteNode(UUID nodeId, SerialContext host, Actor mainActor) {
         RemoteNode node;
-        synchronized (nodeRegistry) {
-            node = nodeRegistry.get(nodeId);
+        synchronized (remoteNodes) {
+            node = remoteNodes.get(nodeId);
             if (node == null) {
                 node = new RemoteNode(nodeId, host, mainActor);
-                nodeRegistry.put(nodeId, node);
+                remoteNodes.put(nodeId, node);
             }
         }
 
@@ -170,8 +161,8 @@ public abstract class RemoteTransportProvider {
 
     public void disconnectRemoteNode(UUID nodeId) {
         RemoteNode node;
-        synchronized (nodeRegistry) {
-            node = nodeRegistry.remove(nodeId);
+        synchronized (remoteNodes) {
+            node = remoteNodes.remove(nodeId);
         }
 
         if (node != null)
@@ -182,16 +173,16 @@ public abstract class RemoteTransportProvider {
             }
     }
 
-    public void onDisconnect(RemoteHost host) {
-        ArrayList<RemoteNode> toRemove = new ArrayList<RemoteNode> ();
-        synchronized (nodeRegistry) {
-            for (RemoteNode t : nodeRegistry.values()) {
+    public void onDisconnect(SerialContext host) {
+        ArrayList<RemoteNode> toRemove = new ArrayList<RemoteNode>();
+        synchronized (remoteNodes) {
+            for (RemoteNode t : remoteNodes.values()) {
                 if (t.getRemoteHost() == host) {
-                  toRemove.add(t);
+                    toRemove.add(t);
                 }
             }
             for (RemoteNode t : toRemove) {
-                nodeRegistry.remove(t.getId());
+                remoteNodes.remove(t.getId());
             }
         }
 
@@ -203,5 +194,4 @@ public abstract class RemoteTransportProvider {
             }
         }
     }
-
 }

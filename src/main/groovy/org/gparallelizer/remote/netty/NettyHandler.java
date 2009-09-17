@@ -16,11 +16,9 @@
 
 package org.gparallelizer.remote.netty;
 
-import org.jboss.netty.channel.*;
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.remote.netty.RemoteObjectEncoder;
-import org.gparallelizer.remote.netty.RemoteObjectDecoder;
-import org.gparallelizer.remote.messages.AbstractMsg;
+import org.gparallelizer.serial.AbstractMsg;
+import org.jboss.netty.channel.*;
 
 /**
  * @author Alex Tkachman

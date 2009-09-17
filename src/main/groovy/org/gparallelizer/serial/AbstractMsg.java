@@ -14,10 +14,25 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.remote.serial;
+package org.gparallelizer.serial;
+
+import org.gparallelizer.remote.RemoteConnection;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 /**
- * @author Alwex Tkachman
+ * Base class for all messages
+ *
+ * @author Alex Tkachman
  */
-public interface RemoteSerialized {
+public abstract class AbstractMsg implements Serializable {
+    public UUID hostId;
+
+    public AbstractMsg() {
+    }
+
+    public void execute(RemoteConnection conn) {
+        conn.onMessage(this);
+    }
 }

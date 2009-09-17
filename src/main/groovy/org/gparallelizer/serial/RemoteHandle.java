@@ -14,20 +14,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.remote.serial;
+package org.gparallelizer.serial;
 
 import org.gparallelizer.remote.RemoteHost;
 
-import java.io.Serializable;
 import java.io.ObjectStreamException;
-import java.io.InvalidObjectException;
+import java.io.Serializable;
 import java.io.WriteAbortedException;
-import java.util.UUID;
 import java.lang.reflect.Constructor;
+import java.util.UUID;
 
 /**
-* @author Alex Tkachman
-*/
+ * @author Alex Tkachman
+ */
 public class RemoteHandle implements Serializable {
     private final UUID serialId;
     private final UUID hostId;
@@ -40,18 +39,16 @@ public class RemoteHandle implements Serializable {
         this.klazz = klazz;
     }
 
-    protected Object readResolve () throws ObjectStreamException {
-        RemoteHost host = RemoteHost.getThreadContext();
-        SerialHandle serialHandle = host.getProvider().localHandles.get(serialId);
+    protected Object readResolve() throws ObjectStreamException {
+        SerialContext context = SerialContext.get();
+        SerialHandle serialHandle = context.get(serialId);
 
         WithSerialId obj;
         if (serialHandle == null || (obj = serialHandle.get()) == null) {
             try {
-                if (!host.getId().equals(hostId))
-                    host = host.getProvider().getRemoteHost(hostId, null);
                 final Constructor constructor = klazz.getConstructor(RemoteHost.class);
 
-                obj = (WithSerialId) constructor.newInstance(host);
+                obj = (WithSerialId) constructor.newInstance(context);
                 obj.serialHandle = new SerialHandle(obj, serialId);
             } catch (Exception t) {
                 throw new WriteAbortedException(t.getMessage(), t);

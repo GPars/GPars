@@ -16,10 +16,10 @@
 package org.gparallelizer.actors;
 
 import org.gparallelizer.MessageStream;
-import org.gparallelizer.remote.RemoteHost;
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.remote.messages.AbstractMsg;
-import org.gparallelizer.remote.serial.RemoteSerialized;
+import org.gparallelizer.remote.RemoteHost;
+import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.RemoteSerialized;
 
 /**
  * Actors are active objects, which either have their own thread processing repeatedly messages submitted to them
@@ -34,6 +34,7 @@ public abstract class Actor extends MessageStream {
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
+     *
      * @return same actor
      */
     public abstract Actor start();
@@ -41,18 +42,21 @@ public abstract class Actor extends MessageStream {
     /**
      * Stops the Actor. Unprocessed messages will be passed to the afterStop method, if exists.
      * Has no effect if the Actor is not started.
+     *
      * @return same actor
      */
     public abstract Actor stop();
 
     /**
      * Checks the current status of the Actor.
+     *
      * @return current status of the Actor.
      */
     public abstract boolean isActive();
 
     /**
      * Checks whether the current thread is the actor's current thread.
+     *
      * @return whether the current thread is the actor's current thread
      */
     public abstract boolean isActorThread();
@@ -64,6 +68,7 @@ public abstract class Actor extends MessageStream {
 
     /**
      * Joins the actor. Waits fot its termination.
+     *
      * @param milis Timeout in miliseconds
      */
     public abstract void join(long milis) throws InterruptedException;
@@ -106,7 +111,7 @@ public abstract class Actor extends MessageStream {
 
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
-                message = new ActorMessage<Object> (message, ReplyRegistry.threadBoundActor());
+                message = new ActorMessage<Object>(message, ReplyRegistry.threadBoundActor());
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;

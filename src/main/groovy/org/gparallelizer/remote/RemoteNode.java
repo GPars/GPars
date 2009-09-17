@@ -12,11 +12,12 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.remote;
 
 import org.gparallelizer.actors.Actor;
+import org.gparallelizer.serial.SerialContext;
 
 import java.util.UUID;
 
@@ -25,19 +26,19 @@ import java.util.UUID;
  *
  * @author Alex Tkachman
  */
- public final class RemoteNode<T extends RemoteTransportProvider> {
+public final class RemoteNode<T extends LocalHost> {
     private final UUID id;
 
-    private final RemoteHost remoteHost;
+    private final SerialContext remoteHost;
     private final Actor mainActor;
 
-    public RemoteNode(UUID id, RemoteHost remoteHost, Actor mainActor) {
+    public RemoteNode(UUID id, SerialContext remoteHost, Actor mainActor) {
         this.id = id;
         this.remoteHost = remoteHost;
         this.mainActor = mainActor;
     }
 
-    public final UUID getId () {
+    public final UUID getId() {
         return id;
     }
 
@@ -46,11 +47,11 @@ import java.util.UUID;
         return getId().toString();
     }
 
-    public final Actor getMainActor () {
+    public final Actor getMainActor() {
         return mainActor;
     }
 
-    public RemoteHost getRemoteHost() {
+    public SerialContext getRemoteHost() {
         return remoteHost;
     }
 }

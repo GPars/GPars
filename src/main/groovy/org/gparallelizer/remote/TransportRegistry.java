@@ -12,11 +12,12 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.remote;
 
-import java.util.Arrays;
+import org.gparallelizer.serial.SerialHandles;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,18 +28,18 @@ import java.util.Set;
  * @author Alex Tkachman
  */
 public class TransportRegistry {
-    public static final Set<RemoteTransportProvider> transportProviders
-            = Collections.synchronizedSet(new HashSet<RemoteTransportProvider>());
+    public static final Set<LocalHost> transportProviders
+            = Collections.synchronizedSet(new HashSet<LocalHost>());
 
-    public synchronized static void connect(final LocalNode node) {
-        for (final RemoteTransportProvider transportProvider : transportProviders) {
+    public synchronized static void connect(final org.gparallelizer.remote.LocalNode node) {
+        for (final LocalHost transportProvider : transportProviders) {
             node.connect(transportProvider);
         }
     }
 
-    public synchronized static void disconnect(final LocalNode node) {
-        for (final RemoteTransportProvider transportProvider : transportProviders) {
-            node.getScheduler().execute(new Runnable(){
+    public synchronized static void disconnect(final org.gparallelizer.remote.LocalNode node) {
+        for (final LocalHost transportProvider : transportProviders) {
+            node.getScheduler().execute(new Runnable() {
                 public void run() {
                     transportProvider.disconnect(node);
                 }
@@ -46,11 +47,11 @@ public class TransportRegistry {
         }
     }
 
-    public static synchronized void removeTransportProvider (RemoteTransportProvider provider) {
+    public static synchronized void removeTransportProvider(SerialHandles provider) {
         transportProviders.remove(provider);
     }
 
-    public static synchronized void addTransportProvider (RemoteTransportProvider provider) {
+    public static synchronized void addTransportProvider(LocalHost provider) {
         transportProviders.add(provider);
     }
 }

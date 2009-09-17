@@ -12,12 +12,12 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.remote.netty;
 
 import org.gparallelizer.remote.BroadcastDiscovery;
-import org.gparallelizer.remote.RemoteTransportProvider;
+import org.gparallelizer.remote.LocalHost;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.*;
@@ -29,25 +29,25 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 /**
  * Transport provider using Netty
- * 
+ *
  * @author Alex Tkachman
  */
-public class NettyTransportProvider extends RemoteTransportProvider {
+public class NettyTransportProvider extends LocalHost {
 
-    private final Map<UUID,Client> clients = new HashMap<UUID,Client>();
+    private final Map<UUID, Client> clients = new HashMap<UUID, Client>();
 
     final Server server = new Server();
 
     final BroadcastDiscovery broadcastDiscovery;
 
     public NettyTransportProvider() {
-        server.start (this);
+        server.start(this);
 
         broadcastDiscovery = new BroadcastDiscovery(getId(), server.getAddress()) {
             @Override
@@ -64,19 +64,19 @@ public class NettyTransportProvider extends RemoteTransportProvider {
             }
         };
 
-        broadcastDiscovery.start ();
+        broadcastDiscovery.start();
     }
 
     @Override
     public void disconnect() {
-        broadcastDiscovery.stop ();
+        broadcastDiscovery.stop();
 
         super.disconnect();
 
-        server.stop ();
+        server.stop();
 
         for (Client client : clients.values()) {
-            client.stop ();
+            client.stop();
         }
     }
 
@@ -101,19 +101,19 @@ public class NettyTransportProvider extends RemoteTransportProvider {
             return address;
         }
 
-        public void start (NettyTransportProvider provider) {
+        public void start(NettyTransportProvider provider) {
             pipelineFactory = new ServerPipelineFactory(provider);
             bootstrap.setPipelineFactory(pipelineFactory);
             bootstrap.setOption("child.tcpNoDelay", true);
             bootstrap.setOption("child.keepAlive", true);
 
             channel = bootstrap.bind(new InetSocketAddress(0));
-            address = ((InetSocketAddress)channel.getLocalAddress());
+            address = ((InetSocketAddress) channel.getLocalAddress());
         }
 
-        public void stop () {
+        public void stop() {
             final CountDownLatch latch = new CountDownLatch(1);
-            channel.close().addListener(new ChannelFutureListener(){
+            channel.close().addListener(new ChannelFutureListener() {
                 public void operationComplete(ChannelFuture future) throws Exception {
                     bootstrap.getFactory().releaseExternalResources();
                     latch.countDown();
@@ -153,7 +153,7 @@ public class NettyTransportProvider extends RemoteTransportProvider {
         }
 
         public void stop() {
-            channelFuture.getChannel().close().addListener(new ChannelFutureListener(){
+            channelFuture.getChannel().close().addListener(new ChannelFutureListener() {
                 public void operationComplete(ChannelFuture future) throws Exception {
                     factory.releaseExternalResources();
                 }
@@ -200,7 +200,7 @@ public class NettyTransportProvider extends RemoteTransportProvider {
         public Thread newThread(Runnable r) {
             Thread thread = new Thread(r);
             thread.setDaemon(true);
-            thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+            thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(Thread t, Throwable e) {
                     e.printStackTrace();
                 }

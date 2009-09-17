@@ -14,29 +14,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.remote.serial;
-
-import org.gparallelizer.remote.RemoteHost;
-
-import java.util.UUID;
-import java.io.Serializable;
-import java.io.ObjectStreamException;
+package org.gparallelizer.serial;
 
 /**
+ * Marker interface for objects, which are proxies to objects on other nodes.
+ *
  * @author Alex Tkachman
  */
-public final class LocalHandle implements Serializable {
-    private UUID id;
-
-    public LocalHandle(UUID id) {
-        this.id = id;
-    }
-
-    protected Object readResolve () throws ObjectStreamException {
-        return RemoteHost.getThreadContext().getProvider().localHandles.get(id).get();
-    }
-
-    public UUID getId() {
-        return id;
-    }
+public interface RemoteSerialized {
 }

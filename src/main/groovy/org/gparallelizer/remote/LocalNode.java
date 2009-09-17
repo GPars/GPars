@@ -12,7 +12,7 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.remote;
 
@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
+import org.gparallelizer.serial.SerialHandles;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -33,7 +34,7 @@ import java.util.concurrent.*;
  * @author Alex Tkachman
  */
 public class LocalNode {
-    private final List<RemoteNodeDiscoveryListener> listeners = Collections.synchronizedList(new LinkedList<RemoteNodeDiscoveryListener> ());
+    private final List<RemoteNodeDiscoveryListener> listeners = Collections.synchronizedList(new LinkedList<RemoteNodeDiscoveryListener>());
 
     private final ThreadPoolExecutor scheduler;
 
@@ -43,7 +44,7 @@ public class LocalNode {
 
     private final UUID id = UUID.randomUUID();
 
-    private RemoteTransportProvider transportProvider;
+    private LocalHost transportProvider;
 
     public LocalNode() {
         this(null, null);
@@ -53,15 +54,15 @@ public class LocalNode {
         this(null, runnable);
     }
 
-    public LocalNode(RemoteTransportProvider provider) {
+    public LocalNode(LocalHost provider) {
         this(provider, null);
     }
 
-    public LocalNode(RemoteTransportProvider provider, Runnable runnable) {
+    public LocalNode(LocalHost provider, Runnable runnable) {
         this.scheduler = new ThreadPoolExecutor(1, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(100),
-                new ThreadFactory(){
+                new ThreadFactory() {
                     ThreadFactory threadFactory = Executors.defaultThreadFactory();
 
                     public Thread newThread(Runnable r) {
@@ -79,7 +80,7 @@ public class LocalNode {
 
         actorGroup = new AbstractPooledActorGroup() {
             {
-                threadPool = new DefaultPool(true){
+                threadPool = new DefaultPool(true) {
                     @Override
                     protected ThreadPoolExecutor createPool(boolean daemon, int poolSize) {
                         return scheduler;
@@ -90,13 +91,12 @@ public class LocalNode {
 
         if (runnable != null) {
             if (runnable instanceof Closure) {
-                ((Closure)runnable).setDelegate(this);
-                ((Closure)runnable).setResolveStrategy(Closure.DELEGATE_FIRST);
+                ((Closure) runnable).setDelegate(this);
+                ((Closure) runnable).setResolveStrategy(Closure.DELEGATE_FIRST);
             }
             mainActor = actorGroup.actor(runnable);
             mainActor.start();
-        }
-        else {
+        } else {
             mainActor = null;
         }
 
@@ -113,8 +113,8 @@ public class LocalNode {
             TransportRegistry.connect(this);
     }
 
-    public void connect(final RemoteTransportProvider provider) {
-        scheduler.execute(new Runnable(){
+    public void connect(final LocalHost provider) {
+        scheduler.execute(new Runnable() {
             public void run() {
                 provider.connect(LocalNode.this);
             }
@@ -128,18 +128,18 @@ public class LocalNode {
         if (transportProvider == null)
             TransportRegistry.disconnect(this);
         else
-            scheduler.execute(new Runnable(){
+            scheduler.execute(new Runnable() {
                 public void run() {
                     transportProvider.disconnect(LocalNode.this);
                 }
             });
     }
 
-    public void addDiscoveryListener (RemoteNodeDiscoveryListener l) {
+    public void addDiscoveryListener(RemoteNodeDiscoveryListener l) {
         listeners.add(l);
     }
 
-    public void addDiscoveryListener (final Closure l) {
+    public void addDiscoveryListener(final Closure l) {
         listeners.add(new RemoteNodeDiscoveryListener() {
             @Override
             public void onConnect(RemoteNode node) {
@@ -153,13 +153,13 @@ public class LocalNode {
         });
     }
 
-    public void removeDiscoveryListener (RemoteNodeDiscoveryListener l) {
+    public void removeDiscoveryListener(RemoteNodeDiscoveryListener l) {
         listeners.remove(l);
     }
 
-    public void onConnect (final RemoteNode node) {
-        for(final RemoteNodeDiscoveryListener l : listeners)
-            scheduler.execute(new Runnable(){
+    public void onConnect(final RemoteNode node) {
+        for (final RemoteNodeDiscoveryListener l : listeners)
+            scheduler.execute(new Runnable() {
                 public void run() {
                     l.onConnect(node);
                 }
@@ -167,8 +167,8 @@ public class LocalNode {
     }
 
     public void onDisconnect(final RemoteNode node) {
-        for(final RemoteNodeDiscoveryListener l : listeners)
-            scheduler.execute(new Runnable(){
+        for (final RemoteNodeDiscoveryListener l : listeners)
+            scheduler.execute(new Runnable() {
                 public void run() {
                     l.onDisconnect(node);
                 }
@@ -192,7 +192,7 @@ public class LocalNode {
         return getId().toString();
     }
 
-    public RemoteTransportProvider getTransportProvider() {
+    public SerialHandles getTransportProvider() {
         return transportProvider;
     }
 }

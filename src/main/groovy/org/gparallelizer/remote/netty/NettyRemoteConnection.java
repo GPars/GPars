@@ -17,9 +17,9 @@
 package org.gparallelizer.remote.netty;
 
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.remote.messages.AbstractMsg;
-import org.jboss.netty.channel.ChannelFutureListener;
+import org.gparallelizer.serial.AbstractMsg;
 import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +39,7 @@ public class NettyRemoteConnection extends RemoteConnection {
     }
 
     public void write(AbstractMsg msg) {
-        if(handler.getChannel().isConnected() && handler.getChannel().isOpen()) {
+        if (handler.getChannel().isConnected() && handler.getChannel().isOpen()) {
             writeListener.incrementAndGet();
             handler.getChannel().write(msg).addListener(writeListener);
         }
@@ -60,13 +60,13 @@ public class NettyRemoteConnection extends RemoteConnection {
         public void operationComplete(ChannelFuture future) throws Exception {
             if (decrementAndGet() == 0 && handler != null) {
                 final CountDownLatch cdl = new CountDownLatch(1);
-                handler.getChannel().close().addListener(new ChannelFutureListener(){
+                handler.getChannel().close().addListener(new ChannelFutureListener() {
                     public void operationComplete(ChannelFuture future) throws Exception {
                         cdl.countDown();
                     }
                 });
                 try {
-                    cdl.await ();
+                    cdl.await();
                 } catch (InterruptedException e) {//
                     e.printStackTrace();
                 }

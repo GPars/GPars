@@ -24,8 +24,9 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;
-import org.gparallelizer.remote.messages.AbstractMsg;
-import org.gparallelizer.remote.serial.WithSerialId;
+import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.SerialContext;
+import org.gparallelizer.serial.WithSerialId;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- *
  * @author Alex Tkachman
  */
 public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject {
@@ -73,10 +73,11 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
         /**
          * Creates a representation of the request to read the value once it is bound
-         * @param thread The physical thread of the request, which will be suspended
-         * @param previous The previous request in the chain of requests
+         *
+         * @param thread     The physical thread of the request, which will be suspended
+         * @param previous   The previous request in the chain of requests
          * @param attachment
-         * @param callback An actor or operator to send a message to once a value is bound
+         * @param callback   An actor or operator to send a message to once a value is bound
          */
         private WaitingThread(final Thread thread, final WaitingThread<V> previous, final Object attachment, final MessageStream callback) {
             this.callback = callback;
@@ -94,7 +95,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * Creates a new unbound Dataflow Expression
      */
-    protected DataFlowExpression() {
+    public DataFlowExpression() {
         state.set(S_NOT_INITIALIZED);
     }
 
@@ -103,6 +104,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * back the the supplied actor once the value has been bound.
      * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
+     *
      * @param callback An actor to send the bound value to.
      */
     public void getValAsync(final MessageStream callback) {
@@ -117,14 +119,14 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * Index is an arbitrary value helping the actor.operator match its request with the reply.
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
+     *
      * @param attachment arbitary non-null attachment if reader needs better identification of result
-     * @param callback An actor to send the bound value plus the supplied index to.
+     * @param callback   An actor to send the bound value plus the supplied index to.
      */
-    @SuppressWarnings({"ObjectEquality"})
     void getValAsync(final Object attachment, final MessageStream callback) {
         if (callback == null)
             throw new NullPointerException();
-        
+
         WaitingThread<T> newWaiting = null;
         while (state.get() != S_INITIALIZED) {
             if (newWaiting == null) {
@@ -153,7 +155,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
-    @SuppressWarnings({"ObjectEquality"})
     public T getVal() throws InterruptedException {
         WaitingThread<T> newWaiting = null;
         while (state.get() != S_INITIALIZED) {
@@ -211,6 +212,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
     /**
      * Performs the actual bind operation, unblocks all blocked threads and informs all asynchronously waiting actors.
+     *
      * @param value The value to assign
      */
     private void doBind(final T value) {
@@ -218,7 +220,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         notifyRemote(null);
     }
 
-    private void doBindImpl(final T value) {
+    private void doBindImpl(T value) {
         this.value = value;
         state.set(S_INITIALIZED);
 
@@ -236,30 +238,30 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
     }
 
-    public void doBindRemote(final BindDataFlow msg) {
+    public void doBindRemote(BindDataFlow msg) {
         doBindImpl(value);
         notifyRemote(msg.hostId);
     }
 
     private void notifyRemote(final UUID hostId) {
-        DataFlowActor.DATA_FLOW_GROUP.getThreadPool().execute(new Runnable(){
+        DataFlowActor.DATA_FLOW_GROUP.getThreadPool().execute(new Runnable() {
             public void run() {
                 if (serialHandle != null) {
-                    final Object sub = serialHandle.getSubscribers();
-                    if (sub instanceof RemoteHost) {
-                        final RemoteHost host = (RemoteHost) sub;
-                        if (hostId == null || !host.getId().equals(hostId)) {
-                            host.write(new BindDataFlow(DataFlowExpression.this, value, host.getProvider().getId()));
+                    Object sub = serialHandle.getSubscribers();
+                    if (sub instanceof SerialContext) {
+                        RemoteHost host = (RemoteHost) sub;
+                        if (hostId == null || !host.getHostId().equals(hostId)) {
+                            host.write(new BindDataFlow(DataFlowExpression.this, value, host.getLocalHost().getId()));
                         }
                     }
 
-                    if(sub instanceof List) {
+                    if (sub instanceof List) {
                         //noinspection SynchronizeOnNonFinalField
                         synchronized (serialHandle) {
                             //noinspection unchecked
-                            for (final RemoteHost host : (List<RemoteHost>) sub) {
-                                if (hostId == null || !host.getId().equals(hostId)) {
-                                    host.write(new BindDataFlow(DataFlowExpression.this, value, host.getProvider().getId()));
+                            for (SerialContext host : (List<SerialContext>) sub) {
+                                if (hostId == null || !host.getHostId().equals(hostId)) {
+                                    host.write(new BindDataFlow(DataFlowExpression.this, value, host.getLocalHostId()));
                                 }
                             }
                         }
@@ -273,15 +275,16 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * Sends the result back to the actor, which is waiting asynchronously for the value to be bound.
      * The message will either be a map holding the index under the 'index' key and the actual bound value under the 'result' key,
      * or it will be the result itself if the callback doesn't care about the index.
+     *
      * @param attachment
-     * @param callback The actor to send the message to
+     * @param callback   The actor to send the message to
      */
     @SuppressWarnings({"TypeMayBeWeakened"})
     private void scheduleCallback(final Object attachment, final MessageStream callback) {
         if (attachment == null) {
             callback.send(value);
         } else {
-            final Map<String, Object> message = new HashMap<String, Object>(5);
+            final Map<String, Object> message = new HashMap<String, Object>();
             message.put("attachment", attachment);
             message.put("result", value);
             callback.send(message);
@@ -311,26 +314,26 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Send result to provided stream when became available 
+     * Send result to provided stream when became available
+     *
      * @param stream stream where to send result
      */
-    public void whenBound(final MessageStream stream) {
+    public void whenBound(MessageStream stream) {
         getValAsync(stream);
     }
 
     @SuppressWarnings("unchecked")
     public static <V> DataFlowExpression<V> transform(final Object another, final Closure closure) {
-        final int pnum = closure.getMaximumNumberOfParameters();
+        int pnum = closure.getMaximumNumberOfParameters();
         if (pnum == 0) {
             throw new IllegalArgumentException("Closure should have parameters");
         }
 
-        if(pnum == 1) {
+        if (pnum == 1) {
             return new TransformOne<V>(another, closure);
-        }
-        else {
+        } else {
             if (another instanceof Collection) {
-                final Collection collection = (Collection) another;
+                Collection collection = (Collection) another;
                 if (collection.size() != pnum)
                     throw new IllegalArgumentException("Closure parameters don't match #of arguments");
 
@@ -342,7 +345,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     *
      * Schedule closure to be executed by pooled actor after data became available
      * It is important to notice that even if data already available the execution of closure
      * will not happen immediately but will be scheduled.
@@ -359,24 +361,25 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * Create and subscribe listener
      */
     protected final void subscribe() {
-        final DataFlowExpressionsCollector listener = new DataFlowExpressionsCollector();
+        DataFlowExpressionsCollector listener = new DataFlowExpressionsCollector();
         subscribe(listener);
-        listener.start ();
+        listener.start();
     }
 
     /**
      * Evaluate expression after the ones we depend from are ready
+     *
      * @return value to bind
      */
     protected T evaluate() {
         return value;
     }
 
-    protected void subscribe(final DataFlowExpressionsCollector listener) {
+    protected void subscribe(DataFlowExpressionsCollector listener) {
         listener.subscribe(this);
     }
 
-    public Object invokeMethod(final String name, final Object args) {
+    public Object invokeMethod(String name, Object args) {
         if (getMetaClass().respondsTo(this, name).isEmpty()) {
             return new DataFlowInvocationExpression(this, name, (Object[]) args);
         }
@@ -391,19 +394,19 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param propertyName
      * @return
      */
-    public Object getProperty(final String propertyName) {
-        final MetaProperty metaProperty = getMetaClass().hasProperty(this, propertyName);
+    public Object getProperty(String propertyName) {
+        MetaProperty metaProperty = getMetaClass().hasProperty(this, propertyName);
         if (metaProperty != null)
             return metaProperty.getProperty(this);
 
-        return new DataFlowGetPropertyExpression (this, propertyName);
+        return new DataFlowGetPropertyExpression(this, propertyName);
     }
 
-    public void setMetaClass(final MetaClass metaClass) {
+    public void setMetaClass(MetaClass metaClass) {
         this.metaClass = metaClass;
     }
 
-    public void setProperty(final String propertyName, final Object newValue) {
+    public void setProperty(String propertyName, Object newValue) {
         metaClass.setProperty(this, propertyName, newValue);
     }
 
@@ -417,23 +420,22 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     protected final class DataFlowExpressionsCollector extends MessageStream {
         private final AtomicInteger count = new AtomicInteger(1);
 
-        protected DataFlowExpressionsCollector() {
+        public DataFlowExpressionsCollector() {
         }
 
-        @Override
-        public MessageStream send(final Object message) {
+        public MessageStream send(Object message) {
             if (count.decrementAndGet() == 0) {
                 bind(evaluate());
             }
             return this;
         }
 
-        Object subscribe(final Object element) {
+        protected final Object subscribe(Object element) {
             if (!(element instanceof DataFlowExpression)) {
                 return element;
             }
 
-            final DataFlowExpression dataFlowExpression = (DataFlowExpression) element;
+            DataFlowExpression dataFlowExpression = (DataFlowExpression) element;
             if (dataFlowExpression.state.get() == S_INITIALIZED) {
                 return dataFlowExpression.value;
             }
@@ -444,7 +446,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
 
 
-        void start() {
+        protected void start() {
             if (count.decrementAndGet() == 0) {
                 doBind(evaluate());
             }
@@ -452,7 +454,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     @SuppressWarnings({"ArithmeticOnVolatileField"})
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return getClass().getSimpleName() + "(value=" + value + ')';
     }
 
@@ -460,19 +463,17 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         Object arg;
         private final Closure closure;
 
-        private TransformOne(final Object another, final Closure closure) {
+        public TransformOne(Object another, Closure closure) {
             this.closure = closure;
             arg = another;
         }
 
-        @Override
         protected V evaluate() {
             //noinspection unchecked
-            return (V) closure.call(arg instanceof DataFlowExpression ? ((DataFlowExpression)arg).value : arg);
+            return (V) closure.call(arg instanceof DataFlowExpression ? ((DataFlowExpression) arg).value : arg);
         }
 
-        @Override
-        protected void subscribe(final DataFlowExpressionsCollector listener) {
+        protected void subscribe(DataFlowExpressionsCollector listener) {
             arg = listener.subscribe(arg);
         }
     }
@@ -480,13 +481,12 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     private static class TransformMany<V> extends DataFlowComplexExpression<V> {
         private final Closure closure;
 
-        private TransformMany(final Collection collection, final Closure closure) {
+        public TransformMany(Collection collection, Closure closure) {
             super(collection.toArray());
             this.closure = closure;
             subscribe();
         }
 
-        @Override
         protected V evaluate() {
             super.evaluate();
             //noinspection unchecked
@@ -495,15 +495,16 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     public static class BindDataFlow extends AbstractMsg {
-        private final DataFlowExpression var;
-        private final Object message;
+        private DataFlowExpression var;
+        private Object message;
 
-        public BindDataFlow(final DataFlowExpression var, final Object message, final UUID hostId) {
+        public BindDataFlow(DataFlowExpression var, Object message, UUID hostId) {
             this.var = var;
             this.message = message;
         }
+
         @Override
-        public void execute(final RemoteConnection conn) {
+        public void execute(RemoteConnection conn) {
             var.doBindRemote(this);
         }
     }

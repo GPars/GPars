@@ -39,7 +39,7 @@ public class BroadcastDiscovery {
         }
     }
 
-    public BroadcastDiscovery (final UUID uid, InetSocketAddress address) {
+    public BroadcastDiscovery(final UUID uid, InetSocketAddress address) {
         this.uid = uid;
         this.address = address;
     }
@@ -64,10 +64,10 @@ public class BroadcastDiscovery {
 
             final byte[] bytes = out.toByteArray();
 
-            sendThread = new Thread () {
+            sendThread = new Thread() {
                 @Override
                 public void run() {
-                    while(!stopped) {
+                    while (!stopped) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
@@ -82,15 +82,15 @@ public class BroadcastDiscovery {
                     }
                 }
             };
-            sendThread.start ();
+            sendThread.start();
 
-            receiveThread = new Thread () {
+            receiveThread = new Thread() {
                 @Override
                 public void run() {
-                    byte buf [] = new byte [3*8+3*4];
-                    byte addrBuf4 [] = new byte [4];
-                    byte addrBuf6 [] = new byte [6];
-                    while(!stopped) {
+                    byte buf[] = new byte[3 * 8 + 3 * 4];
+                    byte addrBuf4[] = new byte[4];
+                    byte addrBuf6[] = new byte[6];
+                    while (!stopped) {
                         DatagramPacket packet = new DatagramPacket(buf, buf.length);
                         try {
                             socket.receive(packet);
@@ -101,11 +101,10 @@ public class BroadcastDiscovery {
                                 int addrLen = in.readInt();
                                 if (addrLen == 4) {
                                     in.read(addrBuf4);
-                                    onDiscovery (uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf4), port));
-                                }
-                                else {
+                                    onDiscovery(uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf4), port));
+                                } else {
                                     in.read(addrBuf6);
-                                    onDiscovery (uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf6), port));
+                                    onDiscovery(uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf6), port));
                                 }
                             }
                         } catch (IOException e) {
@@ -114,14 +113,14 @@ public class BroadcastDiscovery {
                     }
                 }
             };
-            receiveThread.start ();
+            receiveThread.start();
         }
         catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    public void stop () {
+    public void stop() {
         try {
             stopped = true;
 

@@ -16,9 +16,10 @@
 
 package org.gparallelizer.remote.messages;
 
+import org.gparallelizer.actors.Actor;
 import org.gparallelizer.remote.LocalNode;
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.actors.Actor;
+import org.gparallelizer.serial.AbstractMsg;
 
 import java.util.UUID;
 
@@ -44,6 +45,6 @@ public class NodeConnectedMsg extends AbstractMsg {
 
     @Override
     public void execute(RemoteConnection conn) {
-       conn.getHost().getProvider().connectRemoteNode(nodeId, conn.getHost(), mainActor);
+        conn.getHost().getLocalHost().connectRemoteNode(nodeId, conn.getHost(), mainActor);
     }
 }

@@ -16,7 +16,10 @@
 
 package org.gparallelizer.remote;
 
-import org.gparallelizer.remote.messages.*;
+import org.gparallelizer.remote.messages.NodeConnectedMsg;
+import org.gparallelizer.remote.messages.NodeDisconnectedMsg;
+import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.SerialContext;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -24,20 +27,14 @@ import java.util.UUID;
 
 /**
  * Representation of remote host connected to transport provider
- * 
+ *
  * @author Alex Tkachman
  */
-public final class RemoteHost  {
-    private final RemoteTransportProvider provider;
-    private final UUID hostId;
+public final class RemoteHost extends SerialContext {
+    private final ArrayList<RemoteConnection> connections = new ArrayList<RemoteConnection>();
 
-    private final ArrayList<RemoteConnection> connections = new ArrayList<RemoteConnection> ();
-
-    private static final ThreadLocal<RemoteHost> threadContext = new ThreadLocal<RemoteHost>();
-
-    public RemoteHost(RemoteTransportProvider provider, UUID hostId) {
-        this.provider = provider;
-        this.hostId = hostId;
+    public RemoteHost(LocalHost localHost, UUID hostId) {
+        super(localHost, hostId);
     }
 
     public void addConnection(RemoteConnection connection) {
@@ -45,7 +42,7 @@ public final class RemoteHost  {
             boolean wasConnected = isConnected();
             connections.add(connection);
             if (wasConnected != isConnected()) {
-                Map<UUID,LocalNode> localNodes = provider.localNodes;
+                Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (localNodes) {
                     for (LocalNode localNode : localNodes.values()) {
@@ -68,7 +65,7 @@ public final class RemoteHost  {
 
     public void disconnect() {
         for (RemoteConnection connection : connections) {
-            connection.disconnect ();
+            connection.disconnect();
         }
     }
 
@@ -77,16 +74,12 @@ public final class RemoteHost  {
     }
 
     public void write(AbstractMsg msg) {
-        msg.hostId = getProvider().getId();
+        msg.hostId = getLocalHost().getId();
         getConnection().write(msg);
     }
 
     public RemoteConnection getConnection() {
         return connections.get(0);
-    }
-
-    public UUID getId() {
-        return provider.getId();
     }
 
     public void connect(LocalNode node) {
@@ -97,24 +90,7 @@ public final class RemoteHost  {
         write(new NodeDisconnectedMsg(node));
     }
 
-    public RemoteTransportProvider getProvider() {
-        return provider;
+    public LocalHost getLocalHost() {
+        return (LocalHost) localHost;
     }
-
-    public UUID getHostId() {
-        return hostId;
-    }
-
-    public static RemoteHost getThreadContext() {
-        return threadContext.get();
-    }
-
-    public void enter() {
-        threadContext.set(this);
-    }
-
-    public void leave() {
-        threadContext.set(null);
-    }
-
 }

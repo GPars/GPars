@@ -16,17 +16,16 @@
 package org.gparallelizer;
 
 import groovy.time.Duration;
+import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actors.ReplyRegistry;
+import org.gparallelizer.remote.RemoteConnection;
+import org.gparallelizer.remote.RemoteHost;
+import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.RemoteSerialized;
+import org.gparallelizer.serial.WithSerialId;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
-
-import org.gparallelizer.actors.ActorMessage;
-import org.gparallelizer.actors.ReplyRegistry;
-import org.gparallelizer.remote.serial.WithSerialId;
-import org.gparallelizer.remote.serial.RemoteSerialized;
-import org.gparallelizer.remote.RemoteHost;
-import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.remote.messages.AbstractMsg;
 
 /**
  * Stream of abstract messages
@@ -40,52 +39,56 @@ public abstract class MessageStream extends WithSerialId {
      * @param message message to send
      * @return always return message stream itself
      */
-    public abstract MessageStream send (Object message);
+    public abstract MessageStream send(Object message);
 
-    public final <T> MessageStream send (T message, MessageStream replyTo) {
-        return send (new ActorMessage<T>(message, replyTo));
+    public final <T> MessageStream send(T message, MessageStream replyTo) {
+        return send(new ActorMessage<T>(message, replyTo));
     }
 
     /**
      * Same as send
+     *
      * @param message to send
      * @return original stream
      */
-    public final <T> MessageStream leftShift (T message) {
+    public final <T> MessageStream leftShift(T message) {
         return send(message);
     }
 
     /**
      * Sends a message and waits for a reply.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     *
      * @param message message to send
      * @return The message that came in reply to the original send.
      * @throws InterruptedException if interrupted while waiting
      */
-    public final <T> Object sendAndWait (T message) throws InterruptedException {
+    public final <T> Object sendAndWait(T message) throws InterruptedException {
         ReplyWaiter to = new ReplyWaiter();
-        send (new ActorMessage<T>(message, to));
+        send(new ActorMessage<T>(message, to));
         return to.getResult();
     }
 
     /**
      * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     *
      * @param message message to send
      * @param timeout timeout
-     * @param units units
+     * @param units   units
      * @return The message that came in reply to the original send.
      * @throws InterruptedException if interrupted while waiting
      */
-    public final <T> Object sendAndWait (long timeout, TimeUnit units, T message) throws InterruptedException {
+    public final <T> Object sendAndWait(long timeout, TimeUnit units, T message) throws InterruptedException {
         ReplyWaiter to = new ReplyWaiter();
-        send (new ActorMessage<T>(message, to));
+        send(new ActorMessage<T>(message, to));
         return to.getResult(timeout, units);
     }
 
     /**
      * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
+     *
      * @param duration timeout
      * @param message  message to send
      * @return The message that came in reply to the original send.
@@ -111,7 +114,7 @@ public abstract class MessageStream extends WithSerialId {
         public MessageStream send(Object message) {
             Thread thread = (Thread) this.value;
             if (message instanceof ActorMessage)
-                this.value = ((ActorMessage)message).getPayLoad();
+                this.value = ((ActorMessage) message).getPayLoad();
             else
                 this.value = message;
             isSet = true;
@@ -119,7 +122,7 @@ public abstract class MessageStream extends WithSerialId {
             return this;
         }
 
-        public Object getResult () throws InterruptedException {
+        public Object getResult() throws InterruptedException {
             Thread thread = Thread.currentThread();
             while (!isSet) {
                 LockSupport.park();
@@ -150,7 +153,7 @@ public abstract class MessageStream extends WithSerialId {
             return value;
         }
 
-        public void onDeliveryError () {
+        public void onDeliveryError() {
             send(new IllegalStateException("Delivery error. Maybe target actor is not active"));
         }
     }
@@ -164,7 +167,7 @@ public abstract class MessageStream extends WithSerialId {
 
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
-                message = new ActorMessage<Object> (message, ReplyRegistry.threadBoundActor());
+                message = new ActorMessage<Object>(message, ReplyRegistry.threadBoundActor());
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;
@@ -172,7 +175,7 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     public static class SendTo<T> extends AbstractMsg {
-        private final MessageStream   to;
+        private final MessageStream to;
         private final ActorMessage<T> message;
 
         public SendTo(MessageStream to, ActorMessage<T> message) {

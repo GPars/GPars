@@ -18,6 +18,7 @@ package org.gparallelizer.remote.messages;
 
 import org.gparallelizer.remote.LocalNode;
 import org.gparallelizer.remote.RemoteConnection;
+import org.gparallelizer.serial.AbstractMsg;
 
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class NodeDisconnectedMsg extends AbstractMsg {
     /**
      * Id of node disconnected
      */
-    public  final UUID nodeId;
+    public final UUID nodeId;
 
     public NodeDisconnectedMsg(LocalNode node) {
         super();
@@ -40,6 +41,6 @@ public class NodeDisconnectedMsg extends AbstractMsg {
 
     @Override
     public void execute(RemoteConnection conn) {
-        conn.getHost().getProvider().disconnectRemoteNode(nodeId);
+        conn.getHost().getLocalHost().disconnectRemoteNode(nodeId);
     }
 }

@@ -14,25 +14,27 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.remote.messages;
+package org.gparallelizer.serial;
 
-import org.gparallelizer.remote.RemoteConnection;
-
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Base class for all messages
- *
  * @author Alex Tkachman
  */
-public abstract class AbstractMsg implements Serializable {
-    public UUID hostId;
+public final class LocalHandle implements Serializable {
+    private UUID id;
 
-    public AbstractMsg() {
+    public LocalHandle(UUID id) {
+        this.id = id;
     }
 
-    public void execute (RemoteConnection conn) {
-        conn.onMessage(this);
+    protected Object readResolve() throws ObjectStreamException {
+        return SerialContext.get().get(id).get();
+    }
+
+    public UUID getId() {
+        return id;
     }
 }
