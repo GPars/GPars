@@ -55,7 +55,7 @@ public final class ResizablePool extends DefaultPool {
      */
     @Override protected ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
-         return new ThreadPoolExecutor(poolSize, 1000, 10, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
+         return new ThreadPoolExecutor(poolSize, 1000, 10L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
             public Thread newThread(final Runnable r) {
                 final Thread thread = new Thread(r, createThreadName());
                 thread.setDaemon(daemon);
