@@ -15,9 +15,11 @@
 //  limitations under the License.
 package org.gparallelizer;
 
+import groovy.lang.Closure;
 import groovy.time.Duration;
 import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.actors.ReplyRegistry;
+import org.gparallelizer.dataflow.DataCallback;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;
 import org.gparallelizer.serial.RemoteSerialized;
@@ -56,17 +58,6 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     /**
-     * Same as sendAndWait
-     *
-     * @param message to send
-     * @return original stream
-     * @throws InterruptedException
-     */
-    public final <T, V> V leftShiftUnsigned(T message) throws InterruptedException {
-        return this.<T, V>sendAndWait(message);
-    }
-
-    /**
      * Sends a message and waits for a reply.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
      *
@@ -78,6 +69,21 @@ public abstract class MessageStream extends WithSerialId {
         ReplyWaiter<V> to = new ReplyWaiter<V>();
         send(new ActorMessage<T>(message, to));
         return to.getResult();
+    }
+
+    /**
+     * Sends a message and execute continuation when reply became available.
+     *
+     * @param message message to send
+     * @param closure closure to execute when reply became available
+     * @return The message that came in reply to the original send.
+     * @throws InterruptedException if interrupted while waiting
+     */
+    public final <T> MessageStream sendAndContinue(T message, Closure closure) throws InterruptedException {
+        closure = (Closure) closure.clone();
+        closure.setDelegate(this);
+        closure.setResolveStrategy(Closure.DELEGATE_FIRST);
+        return send(message, new DataCallback(closure));
     }
 
     /**
