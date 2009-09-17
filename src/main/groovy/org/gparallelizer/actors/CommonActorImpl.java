@@ -44,6 +44,7 @@ public abstract class CommonActorImpl extends Actor {
      * A list of senders for the currently procesed messages
      */
     private final List<MessageStream> senders = new ArrayList<MessageStream>();
+    private static final String RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED = "'receiveImpl' method should be implemented by subclass of MessageStream";
 
     protected final List<MessageStream> getSenders() {
         return senders;
@@ -79,6 +80,7 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * The actor group to which the actor belongs
      */
+    //todo ensure proper serialization
     private volatile AbstractActorGroup actorGroup;
 
     /**
@@ -109,6 +111,7 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * Gets unblocked after the actor stops.
      */
+    //todo ensure proper serialization
     private final CountDownLatch joinLatch = new CountDownLatch(1);
     protected final CountDownLatch getJoinLatch() { return joinLatch; }
 
@@ -146,26 +149,25 @@ public abstract class CommonActorImpl extends Actor {
         if (!sendRepliesFlag)
             throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.");
 
-        if (!senders.isEmpty()) {
+        if (senders.isEmpty()) {
+            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
+        } else {
             final List<Exception> exceptions = new ArrayList<Exception>();
             for (final MessageStream sender : senders) {
                 if (sender != null) {
                     try {
                         sender.send(message);
                     }
-                    catch (IllegalStateException e)
-                    {
+                    catch (IllegalStateException e) {
                         exceptions.add(e);
                     }
-                }
-                else
-                    //noinspection ThrowableInstanceNeverThrown
+                } else {
                     exceptions.add(new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient."));
+                }
             }
-            if (!exceptions.isEmpty())
+            if (!exceptions.isEmpty()) {
                 throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
-        } else {
-            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
+            }
         }
     }
 
@@ -185,8 +187,7 @@ public abstract class CommonActorImpl extends Actor {
             try {
                 if (sender != null)
                     sender.send (message);
-            } catch (IllegalStateException ignore) { // ignore
-            }
+            } catch (IllegalStateException ignore) { }
         }
     }
 
@@ -249,7 +250,7 @@ public abstract class CommonActorImpl extends Actor {
     }
 
     protected Object receiveImpl () {
-        throw new UnsupportedOperationException("'receiveImpl' method should be implemented by subclass of MessageStream");
+        throw new UnsupportedOperationException(RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED);
     }
 
     /**
@@ -260,7 +261,7 @@ public abstract class CommonActorImpl extends Actor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected Object receiveImpl(final long timeout, final TimeUnit timeUnit) throws InterruptedException {
-        throw new UnsupportedOperationException("'receiveImpl' method should be implemented by subclass of MessageStream");
+        throw new UnsupportedOperationException(RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED);
     }
 
     /**
@@ -273,10 +274,18 @@ public abstract class CommonActorImpl extends Actor {
         return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Retrieves the group to which the actor belongs
+     * @return The actor's group
+     */
     public AbstractActorGroup getActorGroup() {
         return actorGroup;
     }
 
+    /**
+     * Specifies a reply handler on messages. Remembers the original sender and a flag, whether failed delivery
+     * should be treated as an failure or not.
+     */
     private static class MyClosure extends Closure implements GeneratedClosure {
         private final MessageStream sender;
         private final boolean throwable;
@@ -287,6 +296,7 @@ public abstract class CommonActorImpl extends Actor {
             this.throwable = throwable;
         }
 
+        @SuppressWarnings({"UnusedDeclaration"})
         public Object doCall() {
             return doCall(null);
         }
@@ -305,7 +315,7 @@ public abstract class CommonActorImpl extends Actor {
                     else
                         return null;
                 }
-                catch (IllegalStateException e) {
+                catch (IllegalStateException ignored) {
                     return null;
                 }
             }
