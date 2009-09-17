@@ -14,14 +14,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.samples.actors.safevariables
+package org.gparallelizer.samples.actors.safevariable
 
 import org.gparallelizer.actors.pooledActors.Safe
 
 class ShoppingCart {
 
-    private def cartState = new Safe([:])
-//    private Safe<Map<String, Integer>> cartState = new Safe<Map<String, Integer>>(new HashMap<String, Integer>())
+    private def cartState = new Safe<Map<String, Integer>>([:])
 
     public void addItem(String product, int quantity) {
         cartState << {it[product] = quantity}

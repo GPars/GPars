@@ -1,14 +1,14 @@
     Document before next release
     todo add custom DSL definitions
     todo SafeVariables should give readers higher priority - do them synchronously
-    todo enable wait for SafeVariable
     todo removed ForkJoin flag
+    todo enable wait for SafeVariable
+    todo rename SafeVariable - Safe, Agent
+    todo add generics to SafeVariable
 
     Planned for the next release
 
-    todo rename SafeVariable - Safe, Agent
-    todo add generics to SafeVariable
-    
+
     todo automate creation of code sample download, javadoc download, source download
     todo automate doc samples generation
     todo wiki versioning
@@ -16,7 +16,6 @@
     todo tag sources at releases
 
     todo add @Immutable back to three tests
-    todo Think of an example on SafeVariable subclass
 
     todo DataFlows
     todo Detecting deadlock in the DataFlows class

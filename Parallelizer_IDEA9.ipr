@@ -93,7 +93,6 @@
     <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/messages/NodeConnectedMsg.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/messages/NodeDisconnectedMsg.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/netty" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/serial" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/scheduler" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/transformations" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/META-INF" charset="UTF-8" />
@@ -441,12 +440,6 @@
         <inspection_tool class="GroovyAssignmentToMethodParameter" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyBreak" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyBusyWait" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyClassNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_regex" value="[A-Z][A-Za-z\d]*" />
-          <option name="m_minLength" value="8" />
-          <option name="m_maxLength" value="64" />
-        </inspection_tool>
-        <inspection_tool class="GroovyConditional" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeConditionalCall" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeElvis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
