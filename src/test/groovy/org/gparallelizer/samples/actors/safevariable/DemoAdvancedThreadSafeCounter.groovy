@@ -18,7 +18,7 @@ package org.gparallelizer.samples.actors.safevariable
 
 import org.gparallelizer.actors.pooledActors.Safe
 
-class Conference extends Safe {
+class Conference extends Safe<Long> {
     def Conference() { super(0L) }
     private def register(long num) { data += num }
     private def unregister(long num) { data -= num }
@@ -27,18 +27,18 @@ class Conference extends Safe {
 final Safe conference = new Conference()
 
 final Thread t1 = Thread.start {
-    conference << {register(10)}
+    conference << {register(10L)}
 }
 
 final Thread t2 = Thread.start {
-    conference << {register(5)}
+    conference << {register(5L)}
 }
 
 final Thread t3 = Thread.start {
-    conference << {unregister(3)}
+    conference << {unregister(3L)}
 }
 
 [t1, t2, t3]*.join()
 
-assert 12 == conference.val
+assert 12L == conference.val
 
