@@ -28,13 +28,14 @@ import java.util.concurrent.*;
  * Date: Feb 27, 2009
  */
 public final class ResizablePool extends DefaultPool {
+    private static final long KEEP_ALIVE_TIME = 10L;
 
     /**
      * Creates the pool with default number of threads.
      * @param daemon Sets the daemon flag of threads in the pool.
      */
     public ResizablePool(final boolean daemon) {
-        super(daemon);
+        this(daemon, Runtime.getRuntime().availableProcessors() + 1);
     }
 
     /**
@@ -43,7 +44,7 @@ public final class ResizablePool extends DefaultPool {
      * @param poolSize The required size of the pool
      */
     public ResizablePool(final boolean daemon, final int poolSize) {
-        super(daemon, poolSize);
+        super(createResizablePool(daemon, poolSize));
     }
 
     /**
@@ -53,9 +54,9 @@ public final class ResizablePool extends DefaultPool {
      * @param poolSize The required pool size  @return The created thread pool
      * @return The newly created thread pool
      */
-    @Override protected ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
+    private static ThreadPoolExecutor createResizablePool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
-         return new ThreadPoolExecutor(poolSize, 1000, 10L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
+         return new ThreadPoolExecutor(poolSize, 1000, KEEP_ALIVE_TIME, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
             public Thread newThread(final Runnable r) {
                 final Thread thread = new Thread(r, createThreadName());
                 thread.setDaemon(daemon);

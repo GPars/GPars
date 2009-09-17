@@ -31,15 +31,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * - if no tasks were taken for processing during last 0.5sec new worker starts
  */
 public final class Scheduler implements Pool {
-    protected final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 
-    protected AtomicInteger threadCount  = new AtomicInteger();
+    AtomicInteger threadCount  = new AtomicInteger();
 
-    protected volatile long lastTaskPoke = -10;
+    volatile long lastTaskPoke = -10;
 
-    protected volatile long schedulerTime;
+    volatile long schedulerTime;
 
-    protected volatile boolean terminating;
+    volatile boolean terminating;
 
     private final int coreSize;
 
