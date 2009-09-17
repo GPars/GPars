@@ -2,17 +2,19 @@
     todo add custom DSL definitions
     todo SafeVariables should give readers higher priority - do them synchronously
     todo enable wait for SafeVariable
+    todo removed ForkJoin flag
 
     Planned for the next release
 
     todo rename SafeVariable - Safe, Agent
+    todo add generics to SafeVariable
+    
     todo automate creation of code sample download, javadoc download, source download
     todo automate doc samples generation
     todo wiki versioning
     todo tune maven repository upload - from CI?
     todo tag sources at releases
 
-    todo add generics to SafeVariable
     todo add @Immutable back to three tests
     todo Think of an example on SafeVariable subclass
 

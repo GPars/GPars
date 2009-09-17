@@ -29,15 +29,8 @@ public abstract class AbstractActorGroup {
      */
     private @Delegate Pool threadPool
 
-    def AbstractActorGroup(final Pool threadPool) {
+    protected def AbstractActorGroup(final Pool threadPool) {
         this.threadPool = threadPool
-    }
-
-    /**
-     * Checks the gparallelizer.useFJPool system property and returns, whether or not to use a fork join pool
-     */
-    protected static boolean useFJPool() {
-        return 'true' == System.getProperty("gparallelizer.useFJPool")?.trim()?.toLowerCase()
     }
 
     public Pool getThreadPool() {
