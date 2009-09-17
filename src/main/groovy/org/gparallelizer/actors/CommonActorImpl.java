@@ -38,8 +38,6 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class CommonActorImpl extends Actor {
 
-    protected WeakReference<MessageStream> senderOfLastMessage;
-
     /**
      * A list of senders for the currently procesed messages
      */
@@ -231,11 +229,9 @@ public abstract class CommonActorImpl extends Actor {
         final Object msg = receiveImpl();
         if (msg instanceof ActorMessage) {
             final ActorMessage messageAndReply = (ActorMessage) msg;
-            senderOfLastMessage = new WeakReference<MessageStream>(messageAndReply.getSender());
             return messageAndReply.getPayLoad();
         }
         else {
-            senderOfLastMessage = null;
             return msg;
         }
     }
@@ -251,11 +247,9 @@ public abstract class CommonActorImpl extends Actor {
         final Object msg = receiveImpl(timeout, units);
         if (msg instanceof ActorMessage) {
             final ActorMessage messageAndReply = (ActorMessage) msg;
-            senderOfLastMessage = new WeakReference<MessageStream>(messageAndReply.getSender());
             return messageAndReply.getPayLoad();
         }
         else {
-            senderOfLastMessage = null;
             return msg;
         }
     }
