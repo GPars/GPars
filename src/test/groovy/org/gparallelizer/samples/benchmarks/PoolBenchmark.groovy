@@ -17,10 +17,11 @@
 package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CyclicBarrier
+import org.gparallelizer.scheduler.Scheduler
 import org.gparallelizer.actors.pooledActors.*
 
 List items = []
-for (i in 1..100000) {items << {i+it}}
+for (i in 1..1000) {items << {i+it}}
 
 final def numOfIterations = 1..100
 final def numOfWarmupIterations = 1..100
@@ -45,6 +46,10 @@ println "FJ Pool $time"
 meassurePool(numOfWarmupIterations, items, new ResizableFJPool(3))
 time = meassurePool(numOfIterations, items, new ResizableFJPool(3))
 println "Resizable FJ Pool $time"
+
+meassurePool(numOfWarmupIterations, items, new Scheduler(3))
+time = meassurePool(numOfIterations, items, new Scheduler(3))
+println "Custom Scheduler $time"
 
 long meassureSequential(iterations, List tasks) {
     final long t1 = System.currentTimeMillis()
