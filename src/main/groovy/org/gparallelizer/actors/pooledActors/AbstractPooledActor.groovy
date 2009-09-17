@@ -124,7 +124,7 @@ abstract public class AbstractPooledActor extends PooledActor {
     /**
      * Queue for the messages
      */
-    private final BlockingQueue messageQueue = new LinkedBlockingQueue();
+    final BlockingQueue messageQueue = new LinkedBlockingQueue();
 
     /**
      * Code for the next action
@@ -332,6 +332,147 @@ abstract public class AbstractPooledActor extends PooledActor {
             }
         }
         throw CONTINUE
+    }
+
+    //todo should be private but mixins woudn't work
+    /**
+     * Does the actual message receive using the supplied closure and wraps it with all necessary ceremony
+     */
+    final ActorMessage doReceive(Closure code) throws InterruptedException {
+        if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
+        return code()
+    }
+
+    //todo should be private, but woudn't be work
+    /**
+     * Adds reply() and replyIfExists() methods to the currentActor and the message.
+     * These methods will call send() on the target actor (the sender of the original message).
+     * The reply()/replyIfExists() methods invoked on the actor will be sent to all currently processed messages,
+     * reply()/replyIfExists() invoked on a message will send a reply to the sender of that particular message only.
+     * @param message The instance of ActorMessage wrapping the sender actor, who we need to be able to respond to,
+     * plus the original message
+     */
+    final void enhanceReplies(List<ActorMessage> messages) {
+        senders.clear()
+        if (sendRepliesFlag) {
+            for (message in messages) {
+                senders << message?.sender
+            }
+            enhanceWithReplyMethodsToMessages(messages)
+        }
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * @return The message retrieved from the queue.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final Object receiveImpl() throws InterruptedException {
+        Object message = doReceive {messageQueue.take()}
+        enhanceReplies([message])
+        return message?.payLoad
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
+        Object message = doReceive {messageQueue.poll(timeout, timeUnit)}
+        enhanceReplies([message])
+        return message?.payLoad
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * The message retrieved from the queue is passed into the handler as the only parameter.
+     * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final void receive(Closure handler) throws InterruptedException {
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
+        handler.delegate = this
+        int maxNumberOfParameters = handler.maximumNumberOfParameters
+        if (maxNumberOfParameters == 0) {
+            ActorMessage message = doReceive {messageQueue.take()}
+            try {
+                enhanceReplies([message])
+                handler.call()
+            } finally {
+                senders.clear()
+            }
+
+        } else {
+            final List<ActorMessage> messages = []
+            for (i in 1..maxNumberOfParameters) { messages << doReceive {messageQueue.take()} }
+            try {
+                enhanceReplies(messages)
+                handler.call(* messages*.payLoad)
+            } finally {
+                senders.clear()
+            }
+        }
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * The message retrieved from the queue is passed into the handler as the only parameter.
+     * A null value is passed into the handler, if the timeout expires
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
+     * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
+        handler.resolveStrategy=Closure.DELEGATE_FIRST
+        handler.delegate = this
+        int maxNumberOfParameters = handler.maximumNumberOfParameters
+        if (maxNumberOfParameters == 0) {
+            ActorMessage message = doReceive {messageQueue.poll(timeout, timeUnit)}
+            try {
+                enhanceReplies([message])
+                handler.call()
+            } finally {
+                senders.clear()
+            }
+
+        } else {
+            long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis()
+            boolean nullAppeared = false  //Ignore further potential messages once a null is retrieved (due to a timeout)
+
+            final List<ActorMessage> messages = []
+            for (i in 1..maxNumberOfParameters) {
+                if (nullAppeared) messages << null
+                else {
+                    ActorMessage message = doReceive {
+                        messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS)
+                    }
+                    nullAppeared = (message == null)
+                    messages << message
+                }
+            }
+            try {
+                enhanceReplies(messages)
+                handler.call(* messages*.payLoad)
+            } finally {
+                senders.clear()
+            }
+        }
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * The message retrieved from the queue is passed into the handler as the only parameter.
+     * A null value is passed into the handler, if the timeout expires
+     * @param duration how long to wait before giving up, in units of unit
+     * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final void receive(Duration duration, Closure handler) throws InterruptedException {
+        receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler)
     }
 
     /**
