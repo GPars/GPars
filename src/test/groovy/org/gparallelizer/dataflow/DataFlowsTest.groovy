@@ -203,6 +203,28 @@ public class DataFlowsTest extends GroovyTestCase {
         assertEquals 'value2', data.x
     }
 
+    public void testContains() {
+        final DataFlows data = new DataFlows()
+        assertFalse data.contains('key')
+        data.key1 = 'value1'
+        assertFalse data.contains('key2')
+        assertFalse data.contains('value1')
+        assertTrue data.contains('key1')
+    }
+
+    public void testUnboundContains() {
+        final DataFlows data = new DataFlows()
+        Thread.start { data.key1 }
+        Thread.sleep 500
+
+        assertTrue data.contains('key1')
+        data.key1 = 'value1'
+        assertTrue data.contains('key1')
+        assertFalse data.contains('key2')
+        assertFalse data.contains('value1')
+        assertTrue data.contains('key1')
+    }
+
     public void testIterator() {
         final DataFlows data = new DataFlows()
 

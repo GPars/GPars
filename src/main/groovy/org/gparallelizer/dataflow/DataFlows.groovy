@@ -174,6 +174,15 @@ public final class DataFlows {
     }
 
     /**
+     * Checks whether a certain key is contained in the map. Doesn't chack, whether the variable has already been bound.
+     * @param name The name of the DFV to check.
+     */
+    //todo test
+    public def contains(name) {
+        variables.containsKey(name)
+    }
+
+    /**
      * Convenience method to play nicely with Groovy's object iteration methods.
      * The iteration restrictions of ConcurrentHashMap concerning parallel access and
      * ConcurrentModificationException apply.
