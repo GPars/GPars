@@ -84,11 +84,11 @@ public class AsyncInvokerUtil {
     public static List<Future<Object>> executeInParallel(Closure ... closures) {
         Asynchronizer.withAsynchronizer(closures.size()) {ExecutorService executorService ->
             List<Future<Object>> result = closures.collect {cl ->
-                return executorService.submit({
-                    return cl.call()
+                executorService.submit({
+                    cl.call()
                 } as Callable<Object>)
             }
-            return result
+            result
         }
     }
 
@@ -154,8 +154,8 @@ public class AsyncInvokerUtil {
             code.call(element)
         }
         semaphore.acquire(count)
-        if (!exceptions.empty) throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
-        else return collection
+        if (exceptions.empty) return collection
+        else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
     }
 
     /**
@@ -260,8 +260,8 @@ public class AsyncInvokerUtil {
             }
         }
 
-        if (!exceptions.empty) throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
-        else return result
+        if (exceptions.empty) return result
+        else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
     }
 
     private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {

@@ -47,7 +47,7 @@ public final class Scheduler implements Pool {
         this(0);
     }
 
-    public Scheduler (int coreSize) {
+    public Scheduler (final int coreSize) {
         this.coreSize = coreSize;
         new WatchdogThread().start();
 
@@ -56,7 +56,7 @@ public final class Scheduler implements Pool {
         }
     }
 
-    public void execute(Runnable task) {
+    public void execute(final Runnable task) {
         if (terminating)
             throw new RuntimeException("Scheduler is shutting down");
 
@@ -65,7 +65,7 @@ public final class Scheduler implements Pool {
             if (threadCount.get() == 0) {
                 startNewThread();
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
     }
@@ -85,7 +85,7 @@ public final class Scheduler implements Pool {
             new WorkerThread().start();
     }
 
-    public void resize(int poolSize) {
+    public void resize(final int poolSize) {
         throw new UnsupportedOperationException();
     }
 
@@ -93,6 +93,7 @@ public final class Scheduler implements Pool {
         throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings({"ObjectAllocationInLoop"})
     public void shutdown () {
         terminating = true;
         final int count = threadCount.get();
@@ -103,7 +104,7 @@ public final class Scheduler implements Pool {
                         throw new RuntimeException("terminate");
                     }
                 });
-            } catch (InterruptedException e) { //
+            } catch (InterruptedException ignored) { //
                 Thread.currentThread().interrupt();
             }
     }
@@ -118,7 +119,7 @@ public final class Scheduler implements Pool {
             try {
                 try {
                     while (!terminating) {
-                        final Runnable task = queue.poll(10, TimeUnit.SECONDS);
+                        final Runnable task = queue.poll(10L, TimeUnit.SECONDS);
                         if (task == null) {
                             return;
                         }

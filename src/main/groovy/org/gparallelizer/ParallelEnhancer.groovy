@@ -16,8 +16,6 @@
 
 package org.gparallelizer
 
-import org.gparallelizer.ParallelArrayUtil
-import org.gparallelizer.Parallelizer
 import org.gparallelizer.actors.pooledActors.FJPool
 import org.gparallelizer.actors.pooledActors.Pool
 
@@ -43,6 +41,7 @@ public final class ParallelEnhancer {
      * Enhances a single instance by mixing-in an instance of ParallelEnhancer.
      */
     public static void enhanceInstance(Object collection) {
+        //noinspection GroovyGetterCallCanBePropertyAccess
         collection.getMetaClass().mixin ParallelEnhancer
     }
 
@@ -51,6 +50,7 @@ public final class ParallelEnhancer {
      * Enhancing classes needs to be done with caution, since it may have impact in unrelated parts of the application.
      */
     public static void enhanceClass(Class clazz) {
+        //noinspection GroovyGetterCallCanBePropertyAccess
         clazz.getMetaClass().mixin ParallelEnhancer
     }
 

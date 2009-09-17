@@ -16,11 +16,9 @@
 
 package org.gparallelizer.dataflow;
 
+import org.gparallelizer.MessageStream;
 import org.gparallelizer.remote.RemoteHost;
 import org.gparallelizer.remote.serial.RemoteSerialized;
-import org.gparallelizer.MessageStream;
-
-import java.io.ObjectStreamException;
 
 /**
  * @author Alex Tkachman
@@ -31,18 +29,18 @@ public class RemoteDataFlowExpression extends DataFlowExpression implements Remo
     public RemoteDataFlowExpression() {
         remoteHost = RemoteHost.getThreadContext();
         getValAsync(new MessageStream(){
-            public MessageStream send(Object message) {
+            @Override public MessageStream send(final Object message) {
                 remoteHost.write(new BindDataFlow(RemoteDataFlowExpression.this, message, remoteHost.getHostId()));
                 return this;
             }
         });
     }
 
-    protected Object evaluate() {
+    @Override protected Object evaluate() {
         return value;
     }
 
-    protected void subscribe(DataFlowExpression.DataFlowExpressionsCollector listener) {
+    @Override protected void subscribe(final DataFlowExpression.DataFlowExpressionsCollector listener) {
         listener.subscribe(this);
     }
 }

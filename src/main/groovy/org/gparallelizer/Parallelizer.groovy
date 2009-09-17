@@ -52,7 +52,7 @@ public class Parallelizer {
     }
 
     private static createPool() {
-        return createPool(Runtime.getRuntime().availableProcessors() + 1)
+        return createPool(Runtime.runtime.availableProcessors() + 1)
     }
 
     private static createPool(int poolSize) {

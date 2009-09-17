@@ -17,10 +17,8 @@
 package org.gparallelizer.dataflow;
 
 import org.gparallelizer.MessageStream;
-import org.gparallelizer.remote.serial.RemoteSerialized;
 import org.gparallelizer.remote.RemoteHost;
-
-import java.io.ObjectStreamException;
+import org.gparallelizer.remote.serial.RemoteSerialized;
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
@@ -36,11 +34,6 @@ import java.io.ObjectStreamException;
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
 public class DataFlowVariable<T> extends DataFlowExpression<T> {
-    /**
-     * Creates a new unbound Dataflow Variable
-     */
-    public DataFlowVariable() {
-    }
 
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
@@ -56,11 +49,10 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
      * Can only be invoked once on each instance of DataFlowVariable
      *
      * @param ref The DataFlowVariable instance the value of which to bind
-     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     public void leftShift(final DataFlowExpression<T> ref) {
         ref.getValAsync(new MessageStream(){
-            public MessageStream send(Object message) {
+            @Override public MessageStream send(final Object message) {
                 bind(ref.value);
                 return this;
             }
@@ -76,10 +68,10 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
         private final RemoteHost remoteHost;
         private boolean disconnected;
 
-        public RemoteDataFlowVariable(RemoteHost host) {
+        public RemoteDataFlowVariable(final RemoteHost host) {
             remoteHost = host;
             getValAsync(new MessageStream(){
-                public MessageStream send(Object message) {
+                @Override public MessageStream send(final Object message) {
                     if (!disconnected)
                         remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));
                     return this;

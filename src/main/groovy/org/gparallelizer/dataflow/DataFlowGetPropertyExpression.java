@@ -24,20 +24,20 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  * @author Alex Tkachman
  */
 public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
-    private DataFlowExpression receiver;
-    private String name;
+    private final DataFlowExpression receiver;
+    private final String name;
 
-    public DataFlowGetPropertyExpression(DataFlowExpression expression, String name) {
+    public DataFlowGetPropertyExpression(final DataFlowExpression expression, final String name) {
         this.receiver = expression;
         this.name = name;
         subscribe();
     }
 
-    protected void subscribe(DataFlowExpressionsCollector listener) {
+    @Override protected void subscribe(final DataFlowExpressionsCollector listener) {
         listener.subscribe(receiver);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override @SuppressWarnings("unchecked")
     protected T evaluate() {
         //noinspection unchecked
         return (T) InvokerHelper.getProperty(receiver.value, name);
