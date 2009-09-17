@@ -21,6 +21,7 @@ import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
 import org.gparallelizer.actors.pooledActors.Pool;
+import org.gparallelizer.actors.pooledActors.PooledActorGroup;
 import org.gparallelizer.serial.SerialHandles;
 
 import java.util.Collections;
@@ -79,11 +80,7 @@ public class LocalNode {
                     }
                 });
 
-        actorGroup = new AbstractPooledActorGroup() {
-            {
-                threadPool = new DefaultPool(scheduler);
-            }
-        };
+        actorGroup = new PooledActorGroup(new DefaultPool(scheduler));
 
         if (runnable != null) {
             if (runnable instanceof Closure) {

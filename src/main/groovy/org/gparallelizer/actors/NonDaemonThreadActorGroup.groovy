@@ -16,7 +16,6 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.AbstractThreadActorGroup
 import org.gparallelizer.actors.pooledActors.ResizablePool
 
 /**
@@ -33,8 +32,7 @@ public final class NonDaemonThreadActorGroup extends AbstractThreadActorGroup {
      * Creates a group of actors. The actors will share a common non-daemon thread pool.
      */
     def NonDaemonThreadActorGroup() {
-        super(false)
-        threadPool = new ResizablePool(false)
+        super(new ResizablePool(false))
     }
 
     /**
@@ -42,7 +40,6 @@ public final class NonDaemonThreadActorGroup extends AbstractThreadActorGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     def NonDaemonThreadActorGroup(final int poolSize) {
-        super(false)
-        threadPool = new ResizablePool(false, poolSize)
+        super(new ResizablePool(false, poolSize))
     }
 }

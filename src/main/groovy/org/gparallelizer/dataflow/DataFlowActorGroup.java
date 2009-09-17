@@ -34,27 +34,11 @@ import org.gparallelizer.actors.pooledActors.ResizablePool;
  * Date: Jun 21, 2009
  */
 public final class DataFlowActorGroup extends AbstractPooledActorGroup  {
-   /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
-     */
-    public DataFlowActorGroup() {
-        threadPool = new ResizablePool(false);
-    }
-
     /**
      * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
      * @param poolSize The initial size of the underlying thread pool
      */
     public DataFlowActorGroup(final int poolSize) {
-        threadPool = new ResizablePool(false, poolSize);
-    }
-
-    /**
-     * Creates a group of pooled actors. The actors will share a common thread pool.
-     * @param daemon determinate if demon or non-demon threads will be used
-     * @param poolSize The initial size of the underlying thread pool
-     */
-    public DataFlowActorGroup(final boolean daemon, final int poolSize) {
-        threadPool = new ResizablePool(daemon, poolSize);
+        super(new ResizablePool(false, poolSize));
     }
 }

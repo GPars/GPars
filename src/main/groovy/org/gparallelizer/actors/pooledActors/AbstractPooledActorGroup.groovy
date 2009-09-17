@@ -26,9 +26,12 @@ import org.gparallelizer.actors.AbstractActorGroup
  */
 public abstract class AbstractPooledActorGroup extends AbstractActorGroup {
 
-    def AbstractPooledActorGroup() { }
-
-    def AbstractPooledActorGroup(final boolean usedForkJoin) { super(usedForkJoin); }
+    /**
+     * Creates a group of actors. The actors will share a common thread pool of threads.
+     */
+    protected def AbstractPooledActorGroup(final Pool threadPool) {
+        super(threadPool);
+    }
 
     /**
      * Creates a new instance of PooledActor, using the passed-in runnable/closure as the body of the actor's act() method.

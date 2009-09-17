@@ -208,7 +208,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testSuccessfulMessagesFromActor() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final PooledActorGroup group = new PooledActorGroup(2, true)
+        final PooledActorGroup group = new PooledActorGroup(2)
 
         final Actor actor = group.actor {
             react {

@@ -33,6 +33,13 @@ public class DefaultPool implements Pool {
     private static final long SHUTDOWN_TIMEOUT = 30L;
 
     /**
+     * Creates the pool with default number of daemon threads.
+     */
+    public DefaultPool() {
+        this(true);
+    }
+
+    /**
      * Creates the pool with default number of threads.
      * @param daemon Sets the daemon flag of threads in the pool.
      */

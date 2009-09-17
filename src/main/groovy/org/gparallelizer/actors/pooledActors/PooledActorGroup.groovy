@@ -51,9 +51,6 @@ package org.gparallelizer.actors.pooledActors
  *
  * </pre>
  *
- * To specify whether a ForkJoinPool from JSR-166y should be used or the pool based on JDK's executor services,
- * you can either use the appropriate constructors or the 'gparallelizer.useFJPool' system property.
- *
  * PooledActorGroups use pools of daemon threads.
  *
  * @author Vaclav Pech
@@ -64,17 +61,15 @@ public final class PooledActorGroup extends AbstractPooledActorGroup {
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
-    def PooledActorGroup() {
-        threadPool = forkJoinUsed ? new FJPool() : new DefaultPool(true)
+    def PooledActorGroup(final Pool threadPool) {
+        super(threadPool);
     }
 
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
-     * @param useForkJoinPool Indicates, whether the group should use a fork join pool underneath or the executor-service-based default pool
      */
-    def PooledActorGroup(final boolean useForkJoinPool) {
-        super(useForkJoinPool)
-        threadPool = forkJoinUsed ? new FJPool() : new DefaultPool(true)
+    def PooledActorGroup() {
+        super(new DefaultPool(true))
     }
 
     /**
@@ -82,16 +77,6 @@ public final class PooledActorGroup extends AbstractPooledActorGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     def PooledActorGroup(final int poolSize) {
-        threadPool = forkJoinUsed ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
-    }
-
-    /**
-     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
-     * @param poolSize The initial size of the underlying thread pool
-     * @param useForkJoinPool Indicates, whether the group should use a fork join pool underneath or the executor-service-based default pool
-     */
-    def PooledActorGroup(final int poolSize, final boolean useForkJoinPool) {
-        super(useForkJoinPool)
-        threadPool = forkJoinUsed ? new FJPool(poolSize) : new DefaultPool(true, poolSize)
+        super(new DefaultPool(true, poolSize))
     }
 }

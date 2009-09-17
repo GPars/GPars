@@ -98,7 +98,7 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
-        final PooledActorGroup group = new PooledActorGroup(true)
+        final PooledActorGroup group = new PooledActorGroup()
         group.resize 5
 
         def actor = group.actor {
@@ -122,7 +122,7 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
-        final PooledActorGroup group = new PooledActorGroup(true)
+        final PooledActorGroup group = new PooledActorGroup()
         group.resize 5
 
         def actor = group.actor {

@@ -19,11 +19,13 @@ package org.gparallelizer.actors.pooledActors.groups
 import java.util.concurrent.CountDownLatch
 import jsr166y.forkjoin.ForkJoinWorkerThread
 import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.pooledActors.DefaultPool
+import org.gparallelizer.actors.pooledActors.FJPool
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 public class FJGroupTest extends GroovyTestCase {
     public void testFJGroup() {
-        final PooledActorGroup group = new PooledActorGroup(true)
+        final PooledActorGroup group = new PooledActorGroup(new FJPool())
 
         final CountDownLatch latch = new CountDownLatch(1)
         boolean result = false
@@ -38,7 +40,7 @@ public class FJGroupTest extends GroovyTestCase {
     }
 
     public void testNonFJGroup() {
-        final PooledActorGroup group = new PooledActorGroup(false)
+        final PooledActorGroup group = new PooledActorGroup(new DefaultPool())
 
         final CountDownLatch latch = new CountDownLatch(1)
         boolean result = false
@@ -53,8 +55,8 @@ public class FJGroupTest extends GroovyTestCase {
     }
 
     public void testFJNonFJGroupCommunication() {
-        final PooledActorGroup group1 = new PooledActorGroup(false)
-        final PooledActorGroup group2 = new PooledActorGroup(true)
+        final PooledActorGroup group1 = new PooledActorGroup(new DefaultPool())
+        final PooledActorGroup group2 = new PooledActorGroup(new FJPool())
 
         final CountDownLatch latch = new CountDownLatch(1)
         int result = 0

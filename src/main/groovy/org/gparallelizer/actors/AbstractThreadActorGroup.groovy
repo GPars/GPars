@@ -16,6 +16,8 @@
 
 package org.gparallelizer.actors
 
+import org.gparallelizer.actors.pooledActors.Pool
+
 /**
  * Provides a common super class fo thread-actor's groups.
  *
@@ -27,13 +29,9 @@ public abstract class AbstractThreadActorGroup extends AbstractActorGroup {
     /**
      * Creates a group of actors. The actors will share a common thread pool of threads.
      */
-    protected def AbstractThreadActorGroup() {  }
-
-    /**
-     * Creates a group of actors. The actors will share a common thread pool.
-     * @param useForkJoinPool Indicates, whether the group should use a fork join pool underneath or the executor-service-based default pool
-     */
-    protected def AbstractThreadActorGroup(final boolean useForkJoinPool) { super(useForkJoinPool) }
+    protected def AbstractThreadActorGroup(final Pool threadPool) {
+        super(threadPool);
+    }
 
     /**
      * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
