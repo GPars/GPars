@@ -16,12 +16,12 @@
 
 package org.gparallelizer.samples.actors.safevariables
 
-import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.actors.pooledActors.Safe
 
 class ShoppingCart {
 
-    private def cartState = new SafeVariable([:])
-//    private SafeVariable<Map<String, Integer>> cartState = new SafeVariable<Map<String, Integer>>(new HashMap<String, Integer>())
+    private def cartState = new Safe([:])
+//    private Safe<Map<String, Integer>> cartState = new Safe<Map<String, Integer>>(new HashMap<String, Integer>())
 
     public void addItem(String product, int quantity) {
         cartState << {it[product] = quantity}

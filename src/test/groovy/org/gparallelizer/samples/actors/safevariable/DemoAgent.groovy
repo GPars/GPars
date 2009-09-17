@@ -17,13 +17,13 @@
 package org.gparallelizer.samples.actors.safevariable
 
 import org.gparallelizer.actors.pooledActors.PooledActors
-import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.actors.pooledActors.Safe
 
 final Closure cl = {
     it ? new LinkedList(it) : null
 }
 
-final SafeVariable<List> agent = new SafeVariable<List>([1], cl)
+final Safe<List> agent = new Safe<List>([1], cl)
 
 agent << {it << 2}
 agent << {println it}
@@ -40,7 +40,7 @@ agent.stop()
 agent.join()
 
 
-def name = new SafeVariable<String>()
+def name = new Safe<String>()
 
 name << {updateValue 'Joe' }
 name << {updateValue(it + ' and Dave')}

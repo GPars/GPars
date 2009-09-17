@@ -16,9 +16,9 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.actors.pooledActors.Safe
 
-final SafeVariable counter = new SafeVariable<Long>(0L)
+final Safe counter = new Safe<Long>(0L)
 
 final Thread t1 = Thread.start {
     counter << {updateValue it + 1}

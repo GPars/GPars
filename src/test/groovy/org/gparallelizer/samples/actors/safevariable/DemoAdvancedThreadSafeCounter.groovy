@@ -16,15 +16,15 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.actors.pooledActors.Safe
 
-class Conference extends SafeVariable {
+class Conference extends Safe {
     def Conference() { super(0L) }
     private def register(long num) { data += num }
     private def unregister(long num) { data -= num }
 }
 
-final SafeVariable conference = new Conference()
+final Safe conference = new Conference()
 
 final Thread t1 = Thread.start {
     conference << {register(10)}

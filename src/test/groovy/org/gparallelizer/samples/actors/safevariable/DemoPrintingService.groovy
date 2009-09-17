@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.actors.pooledActors.Safe
 
 class PrinterService {
     String document
@@ -29,7 +29,7 @@ class PrinterService {
     }
 }
 
-def printer = new SafeVariable<PrinterService>(new PrinterService())
+def printer = new Safe<PrinterService>(new PrinterService())
 
 final Thread thread1 = Thread.start {
     for (num in (1..3)) {

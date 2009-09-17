@@ -16,9 +16,9 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.actors.pooledActors.Safe
 
-def jugMembers = new SafeVariable<List>(['Me'])  //add Me
+def jugMembers = new Safe<List>(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
 

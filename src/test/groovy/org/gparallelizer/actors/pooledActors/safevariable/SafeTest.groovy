@@ -18,13 +18,13 @@ package org.gparallelizer.actors.pooledActors.safevariable
 
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.pooledActors.PooledActors
-import org.gparallelizer.actors.pooledActors.SafeVariable
+import org.gparallelizer.actors.pooledActors.Safe
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
 
-public class SafeVariableTest extends GroovyTestCase {
+public class SafeTest extends GroovyTestCase {
     public void testList() {
-        def jugMembers = new SafeVariable<List>(['Me'])  //add Me
+        def jugMembers = new Safe<List>(['Me'])  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
 
@@ -42,7 +42,7 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testCounter() {
-        final SafeVariable counter = new SafeVariable<Long>(0L)
+        final Safe counter = new Safe<Long>(0L)
 
         final Thread t1 = Thread.start {
             counter << {updateValue it + 1}
@@ -62,7 +62,7 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testAsyncVal() {
-        final SafeVariable counter = new SafeVariable<Long>(0L)
+        final Safe counter = new Safe<Long>(0L)
 
         final Thread t1 = Thread.start {
             counter << {updateValue it + 1}
@@ -87,7 +87,7 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testExplicitReply() {
-        final SafeVariable counter = new SafeVariable<Long>(0L)
+        final Safe counter = new Safe<Long>(0L)
 
         def result = new DataFlowStream()
         PooledActors.actor {
@@ -103,7 +103,7 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testDirectMessage() {
-        final SafeVariable counter = new SafeVariable<Long>(0L)
+        final Safe counter = new Safe<Long>(0L)
 
         counter << null
         assertNull counter.val
@@ -120,14 +120,14 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testDirectMessageOnNullInitialValue() {
-        final SafeVariable counter = new SafeVariable<Long>()
+        final Safe counter = new Safe<Long>()
 
         counter << 10
         assertEquals 10, counter.val
     }
 
     public void testNullInitialValue() {
-        final SafeVariable counter = new SafeVariable<Long>()
+        final Safe counter = new Safe<Long>()
 
         final def result = new DataFlowVariable()
         counter << {result << it}
@@ -135,7 +135,7 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testReplies() {
-        final SafeVariable counter = new SafeVariable<Long>(0L)
+        final Safe counter = new Safe<Long>(0L)
 
         def result = new DataFlowVariable()
         PooledActors.actor {
@@ -167,7 +167,7 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testAwait() {
-        final SafeVariable counter = new SafeVariable<Long>(0L)
+        final Safe counter = new Safe<Long>(0L)
 
         final AtomicBoolean flag = new AtomicBoolean(false)
         counter << {
@@ -182,7 +182,7 @@ public class SafeVariableTest extends GroovyTestCase {
     }
 
     public void testInstantVal() {
-        final SafeVariable counter = new SafeVariable<Long>(0L)
+        final Safe counter = new Safe<Long>(0L)
 
         counter << {
             Thread.sleep 3000
