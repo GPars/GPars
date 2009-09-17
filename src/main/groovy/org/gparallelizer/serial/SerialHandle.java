@@ -18,10 +18,9 @@ package org.gparallelizer.serial;
 
 import org.codehaus.groovy.util.ManagedReference;
 import org.codehaus.groovy.util.ReferenceManager;
-import org.gparallelizer.remote.RemoteHost;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -115,22 +114,22 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
      *
      * @param host
      */
-    public void subscribe(SerialContext host) {
+    public void subscribe(final SerialContext host) {
         synchronized (this) {
             if (subscribers == null) {
                 subscribers = host;
             } else {
                 if (subscribers instanceof SerialContext) {
                     if (subscribers != host) {
-                        final ArrayList<SerialContext> list = new ArrayList<SerialContext>(2);
-                        list.add((RemoteHost) subscribers);
+                        final Collection<SerialContext> list = new ArrayList<SerialContext>(2);
+                        list.add((SerialContext) subscribers);
                         list.add(host);
                         subscribers = list;
                     }
                 } else {
                     @SuppressWarnings({"unchecked"})
-                    final List<SerialContext> list = (List<SerialContext>) subscribers;
-                    for (SerialContext remoteHost : list) {
+                    final Collection<SerialContext> list = (Collection<SerialContext>) subscribers;
+                    for (final SerialContext remoteHost : list) {
                         if (remoteHost == host)
                             return;
                     }

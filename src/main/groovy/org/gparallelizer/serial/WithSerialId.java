@@ -31,9 +31,9 @@ import java.io.Serializable;
  * <p/>
  * See {@link java.io.Serializable} for detailed description how methods writeReplace & readResolve works.
  * <p/>
- * It is very important to know that (de)serialization is never happens by itself but
+ * It is very important to know that (de)serialization never happens by itself but
  * always happens in context of {@link org.gparallelizer.remote.RemoteHost} and (@link LocalHost}.
- * Such context used to right resolution/transformation of objects
+ * Such context is used for right resolution/transformation of objects
  *
  * @author Alex Tkachman
  */
@@ -74,14 +74,15 @@ public abstract class WithSerialId implements Serializable {
      * @return handle to serialize
      * @throws ObjectStreamException
      */
+    @SuppressWarnings({"UnusedDeclaration"})
     protected final Object writeReplace() throws ObjectStreamException {
-        getOrCreateSerialHandle();
+        final SerialHandle handle = getOrCreateSerialHandle();
         if (this instanceof RemoteSerialized) {
-            return new LocalHandle(serialHandle.getSerialId());
+            return new LocalHandle(handle.getSerialId());
         }
 
         final SerialContext host = SerialContext.get();
-        serialHandle.subscribe(host);
-        return new RemoteHandle(serialHandle.getSerialId(), host.getHostId(), getRemoteClass());
+        handle.subscribe(host);
+        return new RemoteHandle(handle.getSerialId(), host.getHostId(), getRemoteClass());
     }
 }

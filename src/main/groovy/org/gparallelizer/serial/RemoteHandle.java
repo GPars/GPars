@@ -39,9 +39,10 @@ public class RemoteHandle implements Serializable {
         this.klazz = klazz;
     }
 
+    @SuppressWarnings({"CatchGenericClass", "UnusedDeclaration", "OverlyBroadCatchBlock"})
     protected Object readResolve() throws ObjectStreamException {
-        SerialContext context = SerialContext.get();
-        SerialHandle serialHandle = context.get(serialId);
+        final SerialContext context = SerialContext.get();
+        final SerialHandle serialHandle = context.get(serialId);
 
         WithSerialId obj;
         if (serialHandle == null || (obj = serialHandle.get()) == null) {

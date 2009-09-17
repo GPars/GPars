@@ -24,12 +24,13 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public final class LocalHandle implements Serializable {
-    private UUID id;
+    private final UUID id;
 
-    public LocalHandle(UUID id) {
+    public LocalHandle(final UUID id) {
         this.id = id;
     }
 
+    @SuppressWarnings({"UnusedDeclaration", "ProtectedMemberInFinalClass"})
     protected Object readResolve() throws ObjectStreamException {
         return SerialContext.get().get(id).get();
     }
