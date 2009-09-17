@@ -46,7 +46,7 @@ public class DefaultPool implements Pool {
      * @param poolSize The required size of the pool
      */
     public DefaultPool(final boolean daemon, final int poolSize) {
-        if (poolSize<0) throw new IllegalStateException("Pool size must be a non-negative number.");
+        if (poolSize<0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         pool = createPool(daemon, poolSize);
     }
 
@@ -73,7 +73,7 @@ public class DefaultPool implements Pool {
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                     public void uncaughtException(final Thread t, final Throwable e) {
-                        System.err.println("Uncaught exception occured in actor pool " + t.getName());
+                        System.err.println(UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
                         e.printStackTrace(System.err);
                     }
                 });
@@ -100,7 +100,7 @@ public class DefaultPool implements Pool {
      * @param poolSize The new pool size
      */
     public final void resize(final int poolSize) {
-        if (poolSize<0) throw new IllegalStateException("Pool size must be a non-negative number.");
+        if (poolSize<0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         pool.setCorePoolSize(poolSize);
     }
 
@@ -140,7 +140,7 @@ public class DefaultPool implements Pool {
     }
 
     private static int retrieveDefaultPoolSize() {
-        final String poolSizeValue = System.getProperty("gparallelizer.poolsize");
+        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
         try {
             return Integer.parseInt(poolSizeValue);
         } catch (NumberFormatException ignored) {

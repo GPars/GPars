@@ -45,7 +45,7 @@ public class FJPool implements Pool {
      * @param configuredPoolSize The required size of the pool
      */
     public FJPool(final int configuredPoolSize) {
-        if (configuredPoolSize <0) throw new IllegalStateException("Pool size must be a non-negative number.");
+        if (configuredPoolSize <0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         this.configuredPoolSize = configuredPoolSize;
         pool = createPool(configuredPoolSize);
     }
@@ -56,13 +56,13 @@ public class FJPool implements Pool {
      * @param poolSize The required pool size  @return The created thread pool
      * @return The newly created thread pool
      */
-    private ForkJoinPool createPool(final int poolSize) {
+    private static ForkJoinPool createPool(final int poolSize) {
         assert poolSize > 0;
 
         final ForkJoinPool pool =  new ForkJoinPool(poolSize);
         pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(final Thread t, final Throwable e) {
-                System.err.println("Uncaught exception occured in actor pool " + t.getName());
+                System.err.println(UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
                 e.printStackTrace(System.err);
             }
         });
@@ -74,7 +74,7 @@ public class FJPool implements Pool {
      * @param poolSize The new pool size
      */
     public final void resize(final int poolSize) {
-        if (poolSize<0) throw new IllegalStateException("Pool size must be a non-negative number.");
+        if (poolSize<0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         pool.setPoolSize(poolSize);
     }
 
@@ -114,7 +114,7 @@ public class FJPool implements Pool {
     }
 
     private static int retrieveDefaultPoolSize() {
-        final String poolSizeValue = System.getProperty("gparallelizer.poolsize");
+        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
         try {
             return Integer.parseInt(poolSizeValue);
         } catch (NumberFormatException e) {

@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
+import org.gparallelizer.actors.pooledActors.Pool;
 import org.gparallelizer.serial.SerialHandles;
 
 import java.util.Collections;
@@ -70,7 +71,7 @@ public class LocalNode {
                         thread.setDaemon(true);
                         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                             public void uncaughtException(final Thread t, final Throwable e) {
-                                System.err.println("Uncaught exception occured in actor pool " + t.getName());
+                                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
                                 e.printStackTrace(System.err);
                             }
                         });

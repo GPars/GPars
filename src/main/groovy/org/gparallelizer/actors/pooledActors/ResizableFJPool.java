@@ -31,9 +31,7 @@ public final class ResizableFJPool extends FJPool {
     /**
      * Creates the pool with default number of threads.
      */
-    public ResizableFJPool() {
-        super();
-    }
+    public ResizableFJPool() { }
 
     /**
      * Creates the pool with specified number of threads.

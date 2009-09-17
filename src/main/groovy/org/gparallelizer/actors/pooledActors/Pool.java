@@ -23,6 +23,10 @@ package org.gparallelizer.actors.pooledActors;
  * Date: Feb 27, 2009
  */
 public interface Pool {
+    String POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER = "Pool size must be a non-negative number.";
+    String UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL = "Uncaught exception occured in actor pool ";
+    String GPARS_POOLSIZE = "gparallelizer.poolsize";
+
     /**
      * Resizes the thread pool to the specified value
      * @param poolSize The new pool size

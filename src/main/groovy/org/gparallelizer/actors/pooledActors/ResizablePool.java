@@ -62,7 +62,7 @@ public final class ResizablePool extends DefaultPool {
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                     public void uncaughtException(final Thread t, final Throwable e) {
-                        System.err.println("Uncaught exception occured in actor pool " + t.getName());
+                        System.err.println();
                         e.printStackTrace(System.err);
                     }
                 });
