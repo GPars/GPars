@@ -24,7 +24,6 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.pooledActors.ActorReplyException;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -222,10 +221,11 @@ public abstract class CommonActorImpl extends Actor {
     }
 
     /**
-     * Retrieves a message from the message queue.
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive () {
+    protected final Object receive () throws InterruptedException {
         final Object msg = receiveImpl();
         if (msg instanceof ActorMessage) {
             final ActorMessage messageAndReply = (ActorMessage) msg;
@@ -254,7 +254,12 @@ public abstract class CommonActorImpl extends Actor {
         }
     }
 
-    protected Object receiveImpl () {
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected Object receiveImpl () throws InterruptedException {
         throw new UnsupportedOperationException(RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED);
     }
 
