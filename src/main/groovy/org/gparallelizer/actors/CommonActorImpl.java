@@ -223,6 +223,10 @@ public abstract class CommonActorImpl extends Actor {
         }
     }
 
+    /**
+     * Retrieves a message from the message queue.
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     */
     protected final Object receive () {
         final Object msg = receiveImpl();
         if (msg instanceof ActorMessage) {
@@ -236,6 +240,13 @@ public abstract class CommonActorImpl extends Actor {
         }
     }
 
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param units a TimeUnit determining how to interpret the timeout parameter
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
     protected final Object receive (final long timeout, final TimeUnit units) throws InterruptedException {
         final Object msg = receiveImpl(timeout, units);
         if (msg instanceof ActorMessage) {
@@ -256,11 +267,11 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * @param timeout how long to wait before giving up, in units of unit
-     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
+     * @param units a TimeUnit determining how to interpret the timeout parameter
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected Object receiveImpl(final long timeout, final TimeUnit timeUnit) throws InterruptedException {
+    protected Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
         throw new UnsupportedOperationException(RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED);
     }
 
