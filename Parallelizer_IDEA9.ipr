@@ -628,9 +628,6 @@
         <inspection_tool class="KeySetIterationMayUseEntrySet" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LabeledStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LabeledStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="LawOfDemeter" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignoreLibraryCalls" value="true" />
-        </inspection_tool>
         <inspection_tool class="LengthOneStringInIndexOf" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LengthOneStringsInConcatenation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LimitedScopeInnerClass" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -737,7 +734,6 @@
           <option name="m_ignoreNegatedNullComparison" value="true" />
         </inspection_tool>
         <inspection_tool class="NegatedIfStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="NestedAssignment" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NestedAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NestedConditionalExpression" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NestedConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />

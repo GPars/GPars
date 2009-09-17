@@ -110,7 +110,8 @@ public class DataFlowsTest extends GroovyTestCase {
           final DataFlows data = new DataFlows()
 
           DataFlow.start {
-            data[2] = data [0] - data [1]
+            //noinspection GroovyAssignmentCanBeOperatorAssignment
+              data[2] = data [0] - data [1]
           }
           DataFlow.start {
             data [1] = 5
@@ -185,13 +186,16 @@ public class DataFlowsTest extends GroovyTestCase {
         final DataFlows data = new DataFlows()
         final def result1 = new DataFlowVariable()
         final def result2 = new DataFlowVariable()
+        final def result3 = new DataFlowVariable()
 
-        data.y {}.x {
+        data.y {
+            result3 << it
+        }.x {
             result1 << data.y
             result2 << it
         }
-        data.y = 'value1'
         data.x = 'value2'
+        data.y = 'value1'
 
         assertEquals 'value1', result1.val
         assertEquals 'value2', result2.val
@@ -225,5 +229,4 @@ public class DataFlowsTest extends GroovyTestCase {
         assert data.every { it.key.size() == 1 }
         assert data.any  { it.key.size() == 1 }
     }
-
 }

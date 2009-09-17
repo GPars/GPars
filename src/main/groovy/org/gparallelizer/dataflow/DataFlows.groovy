@@ -43,7 +43,7 @@ assert 15 == df[0]
  * @author Vaclav Pech, Dierk Koenig, Alex Tkachman
  * Date: Sep 3, 2009
  */
-public class DataFlows {
+public final class DataFlows {
 
     private final static DF DUMMY = new DF()
 
