@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Prototype of self-regulated thread pooled scheduler
- *
+ * <p/>
  * Self regulation happened according to following rules
  * - worker thread, which had nothing to do 10 seconds dies
  * - if no tasks were taken for processing during last 0.5sec new worker starts
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class Scheduler implements Pool {
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 
-    AtomicInteger threadCount  = new AtomicInteger();
+    AtomicInteger threadCount = new AtomicInteger();
 
     volatile long lastTaskPoke = -10;
 
@@ -43,11 +43,13 @@ public final class Scheduler implements Pool {
 
     private final int coreSize;
 
-    public Scheduler () {
+    static final RuntimeException TERMINATE = new RuntimeException("terminate");
+
+    public Scheduler() {
         this(0);
     }
 
-    public Scheduler (final int coreSize) {
+    public Scheduler(final int coreSize) {
         this.coreSize = coreSize;
         new WatchdogThread().start();
 
@@ -57,8 +59,9 @@ public final class Scheduler implements Pool {
     }
 
     public void execute(final Runnable task) {
-        if (terminating)
+        if (terminating) {
             throw new RuntimeException("Scheduler is shutting down");
+        }
 
         try {
             queue.put(task);
@@ -73,16 +76,17 @@ public final class Scheduler implements Pool {
     public Runnable loop(final Runnable operation) {
         return new Runnable() {
             public void run() {
-                operation.run ();
-                if (!terminating)
+                operation.run();
+                if (!terminating) {
                     execute(this);
+                }
             }
         };
     }
 
     private void startNewThread() {
-            threadCount.incrementAndGet();
-            new WorkerThread().start();
+        threadCount.incrementAndGet();
+        new WorkerThread().start();
     }
 
     public void resize(final int poolSize) {
@@ -94,19 +98,18 @@ public final class Scheduler implements Pool {
     }
 
     @SuppressWarnings({"ObjectAllocationInLoop"})
-    public void shutdown () {
+    public void shutdown() {
         terminating = true;
         final int count = threadCount.get();
-        for (int i = 0; i != count; ++i)
+        for (int i = 0; i != count; ++i) {
             try {
-                queue.put(new Runnable(){
-                    public void run() {
-                        throw new RuntimeException("terminate");
-                    }
+                queue.put(new Runnable() {
+                    public void run() { throw TERMINATE; }
                 });
             } catch (InterruptedException ignored) { //
                 Thread.currentThread().interrupt();
             }
+        }
     }
 
     private class WorkerThread extends Thread {
@@ -128,8 +131,11 @@ public final class Scheduler implements Pool {
                         try {
                             task.run();
                         }
-                        catch (Throwable t){
-                            t.printStackTrace();
+                        catch (Throwable t) {
+                            if (TERMINATE != t) {
+                                //todo allow for a plugable handler
+                                t.printStackTrace();
+                            }
                         }
                     }
                 } catch (InterruptedException e) {//
@@ -151,8 +157,9 @@ public final class Scheduler implements Pool {
             while (!terminating) {
                 try {
                     schedulerTime++;
-                    if (schedulerTime > lastTaskPoke + 10)
+                    if (schedulerTime > lastTaskPoke + 10) {
                         startNewThread();
+                    }
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     break;
