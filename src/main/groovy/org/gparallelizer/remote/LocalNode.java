@@ -80,12 +80,7 @@ public class LocalNode {
 
         actorGroup = new AbstractPooledActorGroup() {
             {
-                threadPool = new DefaultPool(true) {
-                    @Override
-                    protected ThreadPoolExecutor createPool(boolean daemon, int poolSize) {
-                        return scheduler;
-                    }
-                };
+                threadPool = new DefaultPool(scheduler);
             }
         };
 
