@@ -1,7 +1,7 @@
 package org.gparallelizer.remote;
 
 import org.gparallelizer.remote.messages.HostIdMsg;
-import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.SerialMsg;
 
 /**
  * Represents connection to remote host
@@ -17,7 +17,7 @@ public abstract class RemoteConnection {
         this.localHost = provider;
     }
 
-    public void onMessage(AbstractMsg msg) {
+    public void onMessage(SerialMsg msg) {
         if (host == null) {
             final HostIdMsg idMsg = (HostIdMsg) msg;
             host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
@@ -36,7 +36,7 @@ public abstract class RemoteConnection {
         localHost.onDisconnect(host);
     }
 
-    public abstract void write(AbstractMsg msg);
+    public abstract void write(SerialMsg msg);
 
     public RemoteHost getHost() {
         return host;

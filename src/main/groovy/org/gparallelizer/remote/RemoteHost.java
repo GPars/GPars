@@ -18,8 +18,8 @@ package org.gparallelizer.remote;
 
 import org.gparallelizer.remote.messages.NodeConnectedMsg;
 import org.gparallelizer.remote.messages.NodeDisconnectedMsg;
-import org.gparallelizer.serial.AbstractMsg;
 import org.gparallelizer.serial.SerialContext;
+import org.gparallelizer.serial.SerialMsg;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -73,7 +73,7 @@ public final class RemoteHost extends SerialContext {
         return connections.size() != 0;
     }
 
-    public void write(AbstractMsg msg) {
+    public void write(SerialMsg msg) {
         msg.hostId = getLocalHost().getId();
         getConnection().write(msg);
     }

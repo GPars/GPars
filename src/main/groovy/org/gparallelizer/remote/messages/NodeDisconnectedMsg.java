@@ -18,7 +18,7 @@ package org.gparallelizer.remote.messages;
 
 import org.gparallelizer.remote.LocalNode;
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.SerialMsg;
 
 import java.util.UUID;
 
@@ -27,7 +27,7 @@ import java.util.UUID;
  *
  * @author Alex Tkachman
  */
-public class NodeDisconnectedMsg extends AbstractMsg {
+public class NodeDisconnectedMsg extends SerialMsg {
 
     /**
      * Id of node disconnected

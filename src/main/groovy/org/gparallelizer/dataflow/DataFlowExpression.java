@@ -24,8 +24,8 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;
-import org.gparallelizer.serial.AbstractMsg;
 import org.gparallelizer.serial.SerialContext;
+import org.gparallelizer.serial.SerialMsg;
 import org.gparallelizer.serial.WithSerialId;
 
 import java.util.*;
@@ -494,7 +494,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
     }
 
-    public static class BindDataFlow extends AbstractMsg {
+    public static class BindDataFlow extends SerialMsg {
         private DataFlowExpression var;
         private Object message;
 

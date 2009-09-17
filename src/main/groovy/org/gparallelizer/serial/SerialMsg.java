@@ -14,37 +14,25 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.remote.messages;
+package org.gparallelizer.serial;
 
-import org.gparallelizer.actors.Actor;
-import org.gparallelizer.remote.LocalNode;
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.serial.SerialMsg;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Message sent when local node connected to remote host
+ * Base class for all messages
  *
  * @author Alex Tkachman
  */
-public class NodeConnectedMsg extends SerialMsg {
+public abstract class SerialMsg implements Serializable {
+    public UUID hostId;
 
-    /**
-     * Id of node connected
-     */
-    public final UUID nodeId;
-
-    public final Actor mainActor;
-
-    public NodeConnectedMsg(LocalNode node) {
-        super();
-        nodeId = node.getId();
-        mainActor = node.getMainActor();
+    public SerialMsg() {
     }
 
-    @Override
     public void execute(RemoteConnection conn) {
-        conn.getHost().getLocalHost().connectRemoteNode(nodeId, conn.getHost(), mainActor);
+        conn.onMessage(this);
     }
 }

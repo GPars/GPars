@@ -14,25 +14,31 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.serial;
+package org.gparallelizer.remote;
 
-import org.gparallelizer.remote.RemoteConnection;
-
-import java.io.Serializable;
-import java.util.UUID;
+import groovy.lang.Closure;
 
 /**
- * Base class for all messages
+ * Discovery listener backed by closure with to params
+ * - node
+ * - "connected" | "disconnected"
  *
  * @author Alex Tkachman
  */
-public abstract class AbstractMsg implements Serializable {
-    public UUID hostId;
+public class RemoteNodeDiscoveryListenerClosure extends RemoteNodeDiscoveryListener {
+    private final Closure closure;
 
-    public AbstractMsg() {
+    public RemoteNodeDiscoveryListenerClosure(Closure closure) {
+        this.closure = (Closure) closure.clone();
     }
 
-    public void execute(RemoteConnection conn) {
-        conn.onMessage(this);
+    @Override
+    public void onConnect(RemoteNode node) {
+        closure.call(new Object[]{node, "connected"});
+    }
+
+    @Override
+    public void onDisconnect(RemoteNode node) {
+        closure.call(new Object[]{node, "disconnected"});
     }
 }

@@ -16,7 +16,7 @@
 
 package org.gparallelizer.remote.messages;
 
-import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.SerialMsg;
 
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ import java.util.UUID;
  *
  * @author Alex Tkachman
  */
-public class HostIdMsg extends AbstractMsg {
+public class HostIdMsg extends SerialMsg {
 
     /**
      * Construct message representing current state of the transport provider

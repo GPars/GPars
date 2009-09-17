@@ -17,63 +17,63 @@
 package org.gparallelizer.serial;
 
 import org.codehaus.groovy.util.ManagedReference;
+import org.codehaus.groovy.util.ReferenceBundle;
 import org.codehaus.groovy.util.ReferenceManager;
+import org.codehaus.groovy.util.ReferenceType;
+import org.gparallelizer.remote.RemoteConnection;
+import org.gparallelizer.remote.RemoteHost;
 
+import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * Weak reference to object, which was serialized to remote hosts.
  * Also keep ids of all hosts, where the object was serialized.
+ * <p/>
+ * While subscribed by remote nodes it keeps object alive by holding strong reference (anchor) to it
  *
  * @author Alex Tkachman
  */
 public class SerialHandle extends ManagedReference<WithSerialId> {
+
+    private final static ReferenceQueue queue = new ReferenceQueue();
+
+    private final static ReferenceManager manager = ReferenceManager.createThreadedManager(queue);
+
+    private final static ReferenceBundle bundle = new ReferenceBundle(manager, ReferenceType.WEAK);
+
     /**
      * serial id of the object
      */
     protected final UUID serialId;
 
     /**
-     * serial id of provider the object belongs to
-     */
-    protected final UUID providerId;
-
-    /**
      * local host
      */
-    private final SerialContext context;
+    protected final SerialContext context;
 
     /**
      * remote hosts subscribed to this objects
      */
     private volatile Object subscribers;
 
-    /**
-     * Construct handle for object and assign id to it
-     *
-     * @param value
-     */
-    public SerialHandle(WithSerialId value) {
-        this(value, null);
-    }
+    private volatile WithSerialId anchor;
 
     /**
      * Construct handle for object with given id to it
      *
      * @param value
      */
-    public SerialHandle(WithSerialId value, UUID id) {
-        super(ReferenceManager.getDefaultWeakBundle(), value);
+    private SerialHandle(WithSerialId value, UUID id) {
+        super(bundle, value);
 
         context = SerialContext.get();
         if (id == null) {
             serialId = UUID.randomUUID();
-            providerId = context.getLocalHostId();
         } else {
             serialId = id;
-            providerId = context.getHostId();
         }
         context.add(this);
     }
@@ -94,13 +94,6 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     }
 
     /**
-     * @return id of provider the referenced object belongs to
-     */
-    public UUID getProviderId() {
-        return providerId;
-    }
-
-    /**
      * Getter for subscribers
      *
      * @return
@@ -112,28 +105,95 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     /**
      * Subscribes host as interested in the object
      *
-     * @param host
+     * @param context
      */
-    public void subscribe(final SerialContext host) {
+    public void subscribe(SerialContext context) {
         synchronized (this) {
             if (subscribers == null) {
-                subscribers = host;
+                subscribers = context;
             } else {
                 if (subscribers instanceof SerialContext) {
-                    if (subscribers != host) {
-                        final Collection<SerialContext> list = new ArrayList<SerialContext>(2);
-                        list.add((SerialContext) subscribers);
-                        list.add(host);
+                    if (subscribers != context) {
+                        final ArrayList<SerialContext> list = new ArrayList<SerialContext>(2);
+                        list.add((RemoteHost) subscribers);
+                        list.add(context);
                         subscribers = list;
                     }
                 } else {
                     @SuppressWarnings({"unchecked"})
-                    final Collection<SerialContext> list = (Collection<SerialContext>) subscribers;
-                    for (final SerialContext remoteHost : list) {
-                        if (remoteHost == host)
+                    final List<SerialContext> list = (List<SerialContext>) subscribers;
+                    for (SerialContext remoteHost : list) {
+                        if (remoteHost == context)
                             return;
                     }
-                    list.add(host);
+                    list.add(context);
+                }
+            }
+
+            anchor = get();
+        }
+    }
+
+    public void unsubscribe(SerialContext context) {
+        synchronized (this) {
+            if (subscribers != null) {
+                if (subscribers instanceof SerialContext) {
+                    if (subscribers == context) {
+                        subscribers = null;
+                    }
+                } else {
+                    @SuppressWarnings({"unchecked"})
+                    final List<SerialContext> list = (List<SerialContext>) subscribers;
+                    list.remove(context);
+                    if (list.size() == 1)
+                        subscribers = list.get(0);
+                }
+            }
+
+            if (subscribers == null) {
+                anchor = null;
+            }
+        }
+    }
+
+    public static SerialHandle create(WithSerialId obj, UUID id) {
+        if (id == null)
+            return new LocalSerialHandle(obj, UUID.randomUUID());
+        else
+            return new RemoteSerialHandle(obj, id);
+    }
+
+
+    private static class LocalSerialHandle extends SerialHandle {
+        public LocalSerialHandle(WithSerialId obj, UUID uuid) {
+            super(obj, uuid);
+        }
+    }
+
+    private static class RemoteSerialHandle extends SerialHandle {
+        public RemoteSerialHandle(WithSerialId obj, UUID uuid) {
+            super(obj, uuid);
+        }
+
+        @Override
+        public void finalizeReference() {
+            super.finalizeReference();
+            context.write(new ReleaseHandle(serialId));
+        }
+
+        public static class ReleaseHandle extends SerialMsg {
+            private final UUID serialId;
+
+            public ReleaseHandle(UUID serialId) {
+                this.serialId = serialId;
+            }
+
+            @Override
+            public void execute(RemoteConnection conn) {
+                final RemoteHost remoteHost = conn.getHost();
+                final SerialHandle handle = remoteHost.get(serialId);
+                if (handle instanceof LocalSerialHandle) {
+                    handle.unsubscribe(remoteHost);
                 }
             }
         }

@@ -69,8 +69,8 @@ public abstract class CommunicationTestBase extends GroovyTestCase {
     })
 
     node1.mainActor.join()
-    node1.transportProvider.disconnect()
-    node2.transportProvider.disconnect()
+    node1.localHost.disconnect()
+    node2.localHost.disconnect()
   }
 
   void testDiscovery() {

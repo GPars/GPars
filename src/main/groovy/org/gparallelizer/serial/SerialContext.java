@@ -85,5 +85,5 @@ public abstract class SerialContext {
         return localHost.getSerialHost(hostId, attachment);
     }
 
-    public abstract void write(AbstractMsg msg);
+    public abstract void write(SerialMsg msg);
 }

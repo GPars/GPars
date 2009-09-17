@@ -46,7 +46,7 @@ public class LocalNode {
 
     private final UUID id = UUID.randomUUID();
 
-    private LocalHost transportProvider;
+    private LocalHost localHost;
 
     public LocalNode() {
         this(null, null);
@@ -93,17 +93,17 @@ public class LocalNode {
             mainActor = null;
         }
 
-        transportProvider = provider;
+        localHost = provider;
         if (runnable != null) {
             connect(provider);
         }
     }
 
     public void connect() {
-        if (transportProvider != null)
-            connect(transportProvider);
+        if (localHost != null)
+            connect(localHost);
         else
-            TransportRegistry.connect(this);
+            LocalHostRegistry.connect(this);
     }
 
     public void connect(final LocalHost provider) {
@@ -118,12 +118,12 @@ public class LocalNode {
         if (mainActor != null && mainActor.isActive())
             mainActor.stop();
 
-        if (transportProvider == null)
-            TransportRegistry.disconnect(this);
+        if (localHost == null)
+            LocalHostRegistry.disconnect(this);
         else
             scheduler.execute(new Runnable() {
                 public void run() {
-                    transportProvider.disconnect(LocalNode.this);
+                    localHost.disconnect(LocalNode.this);
                 }
             });
     }
@@ -185,7 +185,7 @@ public class LocalNode {
         return getId().toString();
     }
 
-    public SerialHandles getTransportProvider() {
-        return transportProvider;
+    public SerialHandles getLocalHost() {
+        return localHost;
     }
 }

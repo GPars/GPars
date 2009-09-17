@@ -17,7 +17,7 @@
 package org.gparallelizer.remote.netty;
 
 import org.gparallelizer.remote.RemoteConnection;
-import org.gparallelizer.serial.AbstractMsg;
+import org.gparallelizer.serial.SerialMsg;
 import org.jboss.netty.channel.*;
 
 /**
@@ -53,7 +53,8 @@ public class NettyHandler extends SimpleChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        ((AbstractMsg) e.getMessage()).execute(connection);
+        final SerialMsg msg = (SerialMsg) e.getMessage();
+        msg.execute(connection);
     }
 
     @Override

@@ -20,8 +20,8 @@ import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.actors.ReplyRegistry;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;
-import org.gparallelizer.serial.AbstractMsg;
 import org.gparallelizer.serial.RemoteSerialized;
+import org.gparallelizer.serial.SerialMsg;
 import org.gparallelizer.serial.WithSerialId;
 
 import java.util.concurrent.TimeUnit;
@@ -56,6 +56,17 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     /**
+     * Same as sendAndWait
+     *
+     * @param message to send
+     * @return original stream
+     * @throws InterruptedException
+     */
+    public final <T, V> V leftShiftUnsigned(T message) throws InterruptedException {
+        return this.<T, V>sendAndWait(message);
+    }
+
+    /**
      * Sends a message and waits for a reply.
      * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
      *
@@ -63,8 +74,8 @@ public abstract class MessageStream extends WithSerialId {
      * @return The message that came in reply to the original send.
      * @throws InterruptedException if interrupted while waiting
      */
-    public final <T> Object sendAndWait(T message) throws InterruptedException {
-        ReplyWaiter to = new ReplyWaiter();
+    public final <T, V> V sendAndWait(T message) throws InterruptedException {
+        ReplyWaiter<V> to = new ReplyWaiter<V>();
         send(new ActorMessage<T>(message, to));
         return to.getResult();
     }
@@ -98,11 +109,12 @@ public abstract class MessageStream extends WithSerialId {
         return sendAndWait(duration.toMilliseconds(), TimeUnit.MILLISECONDS, message);
     }
 
-    public Class getRemoteClass() {
+    @Override
+    public Class<RemoteMessageStream> getRemoteClass() {
         return RemoteMessageStream.class;
     }
 
-    private static class ReplyWaiter extends MessageStream {
+    private static class ReplyWaiter<V> extends MessageStream {
         private volatile Object value;
 
         private volatile boolean isSet;
@@ -122,7 +134,7 @@ public abstract class MessageStream extends WithSerialId {
             return this;
         }
 
-        public Object getResult() throws InterruptedException {
+        public V getResult() throws InterruptedException {
             Thread thread = Thread.currentThread();
             while (!isSet) {
                 LockSupport.park();
@@ -135,7 +147,7 @@ public abstract class MessageStream extends WithSerialId {
                 else
                     throw new RuntimeException((Throwable) value);
             }
-            return value;
+            return (V) value;
         }
 
         public Object getResult(long timeout, TimeUnit units) throws InterruptedException {
@@ -174,7 +186,7 @@ public abstract class MessageStream extends WithSerialId {
         }
     }
 
-    public static class SendTo<T> extends AbstractMsg {
+    public static class SendTo<T> extends SerialMsg {
         private final MessageStream to;
         private final ActorMessage<T> message;
 

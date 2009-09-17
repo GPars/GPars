@@ -41,7 +41,7 @@ public abstract class WithSerialId implements Serializable {
     /**
      * See SerialHandle class for details
      */
-    public transient volatile SerialHandle serialHandle;
+    public volatile SerialHandle serialHandle;
 
     /**
      * Gets serial handle for the object
@@ -53,7 +53,7 @@ public abstract class WithSerialId implements Serializable {
         if (serialHandle == null)
             synchronized (this) {
                 if (serialHandle == null) {
-                    serialHandle = new SerialHandle(this);
+                    serialHandle = SerialHandle.create(this, null);
                 }
             }
         return serialHandle;

@@ -18,8 +18,8 @@ package org.gparallelizer.actors;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;
-import org.gparallelizer.serial.AbstractMsg;
 import org.gparallelizer.serial.RemoteSerialized;
+import org.gparallelizer.serial.SerialMsg;
 
 /**
  * Actors are active objects, which either have their own thread processing repeatedly messages submitted to them
@@ -117,7 +117,7 @@ public abstract class Actor extends MessageStream {
             return this;
         }
 
-        public static class StopActorMsg extends AbstractMsg {
+        public static class StopActorMsg extends SerialMsg {
             public final Actor actor;
 
             public StopActorMsg(RemoteActor remoteActor) {

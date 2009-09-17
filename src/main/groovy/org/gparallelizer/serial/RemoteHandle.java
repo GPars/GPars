@@ -50,7 +50,7 @@ public class RemoteHandle implements Serializable {
                 final Constructor constructor = klazz.getConstructor(RemoteHost.class);
 
                 obj = (WithSerialId) constructor.newInstance(context);
-                obj.serialHandle = new SerialHandle(obj, serialId);
+                obj.serialHandle = SerialHandle.create(obj, serialId);
             } catch (Exception t) {
                 throw new WriteAbortedException(t.getMessage(), t);
             }

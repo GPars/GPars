@@ -16,29 +16,27 @@
 
 package org.gparallelizer.remote;
 
-import org.gparallelizer.serial.SerialHandles;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Regestry of local transport providers
+ * Registry of local hosts
  *
  * @author Alex Tkachman
  */
-public class TransportRegistry {
-    public static final Set<LocalHost> transportProviders
+public class LocalHostRegistry {
+    public static final Set<LocalHost> localHosts
             = Collections.synchronizedSet(new HashSet<LocalHost>());
 
-    public synchronized static void connect(final org.gparallelizer.remote.LocalNode node) {
-        for (final LocalHost transportProvider : transportProviders) {
+    public synchronized static void connect(final LocalNode node) {
+        for (final LocalHost transportProvider : localHosts) {
             node.connect(transportProvider);
         }
     }
 
-    public synchronized static void disconnect(final org.gparallelizer.remote.LocalNode node) {
-        for (final LocalHost transportProvider : transportProviders) {
+    public synchronized static void disconnect(final LocalNode node) {
+        for (final LocalHost transportProvider : localHosts) {
             node.getScheduler().execute(new Runnable() {
                 public void run() {
                     transportProvider.disconnect(node);
@@ -47,11 +45,11 @@ public class TransportRegistry {
         }
     }
 
-    public static synchronized void removeTransportProvider(SerialHandles provider) {
-        transportProviders.remove(provider);
+    public static synchronized void removeLocalHost(LocalHost localHost) {
+        localHosts.remove(localHost);
     }
 
-    public static synchronized void addTransportProvider(LocalHost provider) {
-        transportProviders.add(provider);
+    public static synchronized void addLocalHost(LocalHost localHost) {
+        localHosts.add(localHost);
     }
 }

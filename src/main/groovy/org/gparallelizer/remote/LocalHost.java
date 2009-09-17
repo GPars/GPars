@@ -123,7 +123,7 @@ public class LocalHost extends SerialHandles {
             }
         }
 
-        TransportRegistry.removeTransportProvider(this);
+        LocalHostRegistry.removeLocalHost(this);
     }
 
     public SerialContext getSerialHost(UUID hostId, Object conn) {
