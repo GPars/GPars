@@ -18,12 +18,13 @@ package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.dataflow.DataFlowVariable
+import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class NullMessageTest extends GroovyTestCase{
     public void testNullMesage() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final AbstractThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             receive {
                 result = it
                 latch.countDown()
@@ -35,18 +36,18 @@ public class NullMessageTest extends GroovyTestCase{
     }
 
     public void testNullMesageFromActor() {
+        PooledActors.defaultPooledActorGroup.resize(100)
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final AbstractThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             receive {
                 result = it
                 latch.countDown()
             }
         }.start()
-        Actors.actor {
+        Actors.oneShotActor {
             actor << null
             latch.await()
-            stop()
         }.start()
         latch.await()
         assertNull result
@@ -54,7 +55,7 @@ public class NullMessageTest extends GroovyTestCase{
 
     public void testNullMesageFromActorWithReply() {
         final def result = new DataFlowVariable()
-        final AbstractThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             receive {
                 reply 10
             }

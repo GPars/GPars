@@ -19,19 +19,19 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
-import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.Actors.oneShotActor
 
 public class ReplyToMessageTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        Actors.defaultActorGroup.resize 1
+        PooledActors.defaultPooledActorGroup.resize 10
     }
 
     protected void tearDown() {
         super.tearDown();
-        Actors.defaultActorGroup.resetDefaultSize()
+        PooledActors.defaultPooledActorGroup.resetDefaultSize()
     }
 
     public void testMultipleClients() {
@@ -40,10 +40,12 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def bouncer = actor {
-            receive {
-                it.reply it
-                barrier.await()
+        final def bouncer = PooledActors.actor {
+            loop {
+                receive {
+                    it.reply it
+                    barrier.await()
+                }
             }
         }.start()
 
@@ -94,12 +96,12 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def incrementor = actor {
-            receive { it.reply it + 1 }
+        final def incrementor = PooledActors.actor {
+            loop { receive { it.reply it + 1 }}
         }.start()
 
-        final def decrementor = actor {
-            receive { it.reply it - 1 }
+        final def decrementor = PooledActors.actor {
+            loop { receive { it.reply it - 1 }}
         }.start()
 
         oneShotActor {
@@ -157,9 +159,11 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = actor {
-            receive {
-                it.reply it
+        final Actor actor = PooledActors.actor {
+            loop {
+                receive {
+                    it.reply it
+                }
             }
         }
 
@@ -301,4 +305,5 @@ public class ReplyToMessageTest extends GroovyTestCase {
         assert replies1.contains(3)
         assert replies2.contains(3)
     }
+
 }

@@ -79,14 +79,13 @@ public class AbstractActorTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         final AtomicReference result = new AtomicReference()
 
-        Actor actor=Actors.actor {
+        Actor actor=Actors.oneShotActor {
             receive(1, TimeUnit.SECONDS) {
                 receiveFlag.set(true)
                 result.set it
             }
             flag.set(true)
             latch.countDown()
-            stop()
         }
         actor.start()
 

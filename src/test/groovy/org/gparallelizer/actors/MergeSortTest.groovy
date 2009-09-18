@@ -18,6 +18,8 @@ package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.pooledActors.ResizablePool
 
 /**
  *
@@ -49,6 +51,8 @@ public class MergeSortTest extends GroovyTestCase {
         return result
     }
 
+    def group = new PooledActorGroup(new ResizablePool(false, 50))
+
     Closure createMessageHandler(def parentActor) {
         return {
             receive {List<Integer> message ->
@@ -64,8 +68,8 @@ public class MergeSortTest extends GroovyTestCase {
                     default:
                         def splitList = split(message)
 
-                        def child1 = Actors.oneShotActor(createMessageHandler(delegate))
-                        def child2 = Actors.oneShotActor(createMessageHandler(delegate))
+                        def child1 = group.actor(createMessageHandler(delegate))
+                        def child2 = group.actor(createMessageHandler(delegate))
                         child1.start().send(splitList[0])
                         child2.start().send(splitList[1])
 

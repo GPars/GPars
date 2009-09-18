@@ -32,7 +32,7 @@ public class ArraySumTest extends GroovyTestCase {
         AtomicInteger result=new AtomicInteger(0)
         CountDownLatch latch=new CountDownLatch(1)
 
-        Actor actor=Actors.actor {
+        Actor actor=Actors.oneShotActor {
             new Processor(delegate).start().send([1, 2, 3, 4, 5])
             receive {
                 result.set it[0]

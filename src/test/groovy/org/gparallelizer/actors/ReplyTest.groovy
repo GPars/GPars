@@ -19,10 +19,10 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
-import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.ActorReplyException
-import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actors.pooledActors.PooledActors
 import static org.gparallelizer.actors.Actors.oneShotActor
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 /**
  *
@@ -41,10 +41,12 @@ public class ReplyTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def bouncer = actor {
-            receive {
-                reply it
-                barrier.await()
+        final def bouncer = PooledActors.actor {
+            loop {
+                receive {
+                    reply it
+                    barrier.await()
+                }
             }
         }.start()
 
@@ -92,18 +94,19 @@ public class ReplyTest extends GroovyTestCase {
     public void testMultipleActors() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CyclicBarrier completedBarrier = new CyclicBarrier(3)
+        final def group = new PooledActorGroup(5)
         def replies1 = []
         def replies2 = []
 
-        final def incrementor = actor {
-            receive { reply it + 1 }
+        final def incrementor = group.actor {
+            loop { receive { reply it + 1 }}
         }.start()
 
-        final def decrementor = actor {
-            receive { reply it - 1 }
+        final def decrementor = group.actor {
+            loop { receive { reply it - 1 }}
         }.start()
 
-        oneShotActor {
+        group.actor {
             barrier.await()
             incrementor.send 2
             decrementor.send 6
@@ -124,7 +127,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }.start()
 
-        oneShotActor {
+        group.actor {
             barrier.await()
             incrementor.send 20
             decrementor.send 60
@@ -158,9 +161,11 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = actor {
-            receive {
-                reply it
+        final Actor actor = PooledActors.actor {
+            loop {
+                receive {
+                    reply it
+                }
             }
         }
 
@@ -266,21 +271,21 @@ public class ReplyTest extends GroovyTestCase {
             receive {
                 reply 'Message2'
                 it.reply 'Message3'
-                receive {a, b->
+                receive {a, b ->
                     reply 'Message6'
                     latch.await()
                 }
             }
         }.start()
 
-        Actors.oneShotActor{
+        Actors.oneShotActor {
             actor.send 'Message1'
             receive {
                 it.reply 'Message4'
                 receive {
                     reply 'Message5'
                     receive {a, b ->
-                        result = a+b
+                        result = a + b
                         latch.countDown()
                     }
                 }
@@ -313,7 +318,7 @@ public class ReplyTest extends GroovyTestCase {
         }.start()
 
         latch.await()
-        assertEquals 'Message2', result 
+        assertEquals 'Message2', result
 
     }
 
@@ -339,7 +344,7 @@ public class ReplyTest extends GroovyTestCase {
         }.start()
 
         //send and terminate
-        final DefaultThreadActor actor1 = oneShotActor {
+        final Actor actor1 = oneShotActor {
             bouncer << 1
             stop()
         }
@@ -349,7 +354,7 @@ public class ReplyTest extends GroovyTestCase {
         actor1.start()
 
         //wait, send and terminate
-        final DefaultThreadActor actor2 = oneShotActor {
+        final Actor actor2 = oneShotActor {
             latches[1].await()
             bouncer << 5
             stop()
@@ -375,4 +380,5 @@ public class ReplyTest extends GroovyTestCase {
         assert (issues[0] instanceof IllegalArgumentException) || (issues[1] instanceof IllegalArgumentException)
         assert (issues[0] instanceof IllegalStateException) || (issues[1] instanceof IllegalStateException)
     }
+
 }

@@ -31,11 +31,13 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.defaultActor {
-            final int value = counter.incrementAndGet()
-            if (value==3) {
-                stop()
-                latch.countDown()
+        final Actor actor = Actors.defaultOneShotActor {
+            loop {
+                final int value = counter.incrementAndGet()
+                if (value == 3) {
+                    stop()
+                    latch.countDown()
+                }
             }
         }
         actor.start()
@@ -84,11 +86,13 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.synchronousActor {
-            final int value = counter.incrementAndGet()
-            if (value==3) {
-                stop()
-                latch.countDown()
+        final Actor actor = Actors.synchronousOneShotActor {
+            loop {
+                final int value = counter.incrementAndGet()
+                if (value == 3) {
+                    stop()
+                    latch.countDown()
+                }
             }
         }
         actor.start()
@@ -138,11 +142,13 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.boundedActor {
-            final int value = counter.incrementAndGet()
-            if (value==3) {
-                stop()
-                latch.countDown()
+        final Actor actor = Actors.boundedOneShotActor {
+            loop {
+                final int value = counter.incrementAndGet()
+                if (value == 3) {
+                    stop()
+                    latch.countDown()
+                }
             }
         }
         actor.start()
@@ -191,11 +197,13 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.boundedActor(5) {
-            final int value = counter.incrementAndGet()
-            if (value==3) {
-                stop()
-                latch.countDown()
+        final Actor actor = Actors.boundedOneShotActor(5) {
+            loop {
+                final int value = counter.incrementAndGet()
+                if (value == 3) {
+                    stop()
+                    latch.countDown()
+                }
             }
         }
         actor.start()

@@ -5,7 +5,7 @@
     todo enable wait for SafeVariable
     todo rename SafeVariable - Safe, Agent
     todo add generics to SafeVariable
-    todo make pooled actors use receive(), merge pooled and threaded actors
+    todo make pooled actors use receive()
 
     Planned for the next release
 
@@ -23,6 +23,8 @@
     todo used generics with DataFlows to support DataFlowVariable.val type hints in IDE
 
     todo reimplement Dataflow concurrency with the concept of operators and channels
+
+    todo merge pooled and threaded actors
 
     todo leverage dynamic Groovy dispatch for message dispatch
 def actor = actor {

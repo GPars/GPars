@@ -18,6 +18,7 @@ package org.gparallelizer.actors.groups
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
+import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.*
 
 public class ActorGroupTest extends GroovyTestCase {
@@ -30,7 +31,7 @@ public class ActorGroupTest extends GroovyTestCase {
             latch.countDown()
         }.start()
 
-        assertEquals Actors.defaultActorGroup, actor.actorGroup
+        assertEquals PooledActors.defaultPooledActorGroup, actor.actorGroup
         latch.await()
         assert daemon
     }

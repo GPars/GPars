@@ -16,6 +16,8 @@
 
 package org.gparallelizer.actors
 
+import org.gparallelizer.actors.pooledActors.PooledActors
+
 /**
  * Provides handy helper methods to create various types of actors and customize their behavior..
  * All actors created through the Actors class belong to the same ActorGroup - Actors.defaultActorGroup.
@@ -35,7 +37,7 @@ public class Actors {
      * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      */
     public static Actor actor(Closure handler) {
-        defaultActorGroup.actor handler
+        PooledActors.reactor handler
     }
 
     /**
@@ -43,14 +45,14 @@ public class Actors {
      * The actor will stop after one iteration through the passed-in closure.
      */
     public static Actor oneShotActor(Closure handler) {
-        defaultActorGroup.defaultOneShotActor handler
+        PooledActors.actor handler
     }
 
     /**
      * Creates a new instance of DefaultThreadActor, using the passed-in closure as the body of the actor's act() method.
      */
     public static Actor defaultActor(Closure handler) {
-        defaultActorGroup.defaultActor handler
+        PooledActors.reactor handler
     }
 
     /**
@@ -58,14 +60,14 @@ public class Actors {
      * The actor will stop after one iteration through the passed-in closure.
      */
     public static Actor defaultOneShotActor(Closure handler) {
-        defaultActorGroup.defaultOneShotActor handler
+        PooledActors.actor handler
     }
 
     /**
      * Creates a new instance of SynchronousActor, using the passed-in closure as the body of the actor's act() method.
      */
     public static Actor synchronousActor(Closure handler) {
-        defaultActorGroup.synchronousActor handler
+        PooledActors.reactor handler
     }
 
     /**
@@ -73,21 +75,21 @@ public class Actors {
      * The actor will stop after one iteration through the passed-in closure.
      */
     public static Actor synchronousOneShotActor(Closure handler) {
-        defaultActorGroup.synchronousOneShotActor handler
+        PooledActors.actor handler
     }
 
     /**
      * Creates a new instance of BoundedActor, using the passed-in closure as the body of the actor's act() method.
      */
     public static Actor boundedActor(Closure handler) {
-        defaultActorGroup.boundedActor handler
+        PooledActors.reactor handler
     }
 
     /**
      * Creates a new instance of BoundedActor, using the passed-in closure as the body of the actor's act() method.
      */
     public static Actor boundedActor(int capacity, Closure handler) {
-        defaultActorGroup.boundedActor capacity, handler
+        PooledActors.reactor handler
     }
 
     /**
@@ -95,7 +97,7 @@ public class Actors {
      * The actor will stop after one iteration through the passed-in closure.
      */
     public static Actor boundedOneShotActor(Closure handler) {
-        defaultActorGroup.boundedOneShotActor handler
+        PooledActors.actor handler
     }
 
     /**
@@ -103,6 +105,6 @@ public class Actors {
      * The actor will stop after one iteration through the passed-in closure.
      */
     public static Actor boundedOneShotActor(int capacity, Closure handler) {
-        defaultActorGroup.boundedOneShotActor capacity, handler
+        PooledActors.actor handler
     }
 }

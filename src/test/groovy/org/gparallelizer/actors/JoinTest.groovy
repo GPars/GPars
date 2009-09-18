@@ -18,7 +18,7 @@ package org.gparallelizer.actors
 
 public class JoinTest extends GroovyTestCase {
     public void testActorJoin() {
-        final def actor = Actors.actor { Thread.sleep 500; stop() }.start()
+        final def actor = Actors.oneShotActor { Thread.sleep 500; stop() }.start()
         actor.join()
         assertFalse actor.isActive()
     }

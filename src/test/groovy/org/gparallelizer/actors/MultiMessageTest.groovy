@@ -20,6 +20,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 public class MultiMessageTest extends GroovyTestCase {
     public void testReceive() {
@@ -98,8 +99,9 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
+        final def group = new PooledActorGroup(10)
 
-        def actor = Actors.oneShotActor {
+        def actor = group.actor {
             receive {a, b, c ->
                 a.reply(a + 1)
                 b.reply(b + 1)
@@ -107,9 +109,9 @@ public class MultiMessageTest extends GroovyTestCase {
             }
         }.start()
 
-        createReplyActor actor, 10, barrier, latch, result
-        createReplyActor actor, 100, barrier, latch, result
-        createReplyActor actor, 1000, barrier, latch, result
+        createReplyActor actor, 10, barrier, latch, result, group
+        createReplyActor actor, 100, barrier, latch, result, group
+        createReplyActor actor, 1000, barrier, latch, result, group
 
         latch.await(30, TimeUnit.SECONDS)
 
@@ -120,24 +122,25 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
+       final def group = new PooledActorGroup(10)
 
-        def actor = Actors.oneShotActor {
+        def actor = group.actor {
             receive {a, b, c ->
                 reply(20)
             }
         }.start()
 
-        createReplyActor actor, 10, barrier, latch, result
-        createReplyActor actor, 100, barrier, latch, result
-        createReplyActor actor, 1000, barrier, latch, result
+        createReplyActor actor, 10, barrier, latch, result, group
+        createReplyActor actor, 100, barrier, latch, result, group
+        createReplyActor actor, 1000, barrier, latch, result, group
 
         latch.await(30, TimeUnit.SECONDS)
 
         assertEquals 60, result.get()
     }
 
-    Actor createReplyActor(Actor actor, int num, CyclicBarrier barrier, CountDownLatch latch, AtomicInteger result) {
-        Actors.oneShotActor {
+    Actor createReplyActor(Actor actor, int num, CyclicBarrier barrier, CountDownLatch latch, AtomicInteger result, group) {
+        group.actor {
             barrier.await()
             actor.send(num)
             receive {

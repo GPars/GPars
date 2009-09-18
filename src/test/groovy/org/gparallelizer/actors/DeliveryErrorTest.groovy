@@ -24,7 +24,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             final def a = receive()
         }
 
@@ -50,7 +50,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             final def a = receive()
             barrier.await()
         }
@@ -85,7 +85,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DefaultThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             final def a = receive()
             barrier.await()
             if (true) throw new RuntimeException('test')
@@ -120,7 +120,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             latch.await()
         }
         actor.start()
@@ -139,7 +139,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         volatile boolean flag = true
         CountDownLatch latch = new CountDownLatch(1)
 
-        final DefaultThreadActor actor = Actors.oneShotActor {
+        final Actor actor = Actors.oneShotActor {
             latch.await()
             stop()
         }
