@@ -129,9 +129,9 @@ public class Safe<T> extends DynamicDispatchActor {
      * @param callback A closure to invoke with the internal state as a parameter
      */
     final public void valAsync(Closure callback) {
-        PooledActors.actor {
-            callback.call(this.getVal())
-        }.start()
+        sendAndContinue({getInstantVal()}) {
+            callback.call(it)
+        }
     }
 
     /**
