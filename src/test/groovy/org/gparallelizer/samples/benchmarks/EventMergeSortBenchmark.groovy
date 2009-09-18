@@ -16,7 +16,6 @@
 
 package org.gparallelizer.samples
 
-import org.gparallelizer.actors.ThreadActorGroup
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 
@@ -79,8 +78,8 @@ Closure createMessageHandler(def parentActor) {
     }
 }
 
-final PooledActorGroup pooledGroup = new PooledActorGroup(3, true)
-final ThreadActorGroup threadGroup = new ThreadActorGroup(3, false)
+final PooledActorGroup pooledGroup = new PooledActorGroup(3)
+final PooledActorGroup threadGroup = new PooledActorGroup(3)
 
 final List items = []
 final Random random = new Random()

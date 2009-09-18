@@ -18,6 +18,7 @@ package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.gparallelizer.actors.pooledActors.PooledActors
 
 /**
  *
@@ -30,7 +31,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def result=''
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             result = receive(3.seconds)
             latch.countDown()
         }
@@ -44,7 +45,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def result=''
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             receive(2.seconds) {
                 result = it
             }

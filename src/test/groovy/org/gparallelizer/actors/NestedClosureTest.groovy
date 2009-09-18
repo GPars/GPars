@@ -16,13 +16,14 @@
 
 package org.gparallelizer.actors
 
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.dataflow.DataFlowVariable
 
 public class NestedClosureTest extends GroovyTestCase {
     public void testNestedClosures() {
         final def result = new DataFlowVariable<Integer>()
 
-        final def group = new ThreadActorGroup(20)
+        final def group = new PooledActorGroup(20)
 
         final Actor actor = group.actor {
             final def nestedActor = group.actor {
@@ -38,13 +39,13 @@ public class NestedClosureTest extends GroovyTestCase {
         assertEquals 20, result.val
     }
 
-    public void testNestedClosuresForOneShotActors() {
+    public void testNestedClosuresForactors() {
         final def result = new DataFlowVariable<Integer>()
 
-        final def group = new ThreadActorGroup(20)
+        final def group = new PooledActorGroup(20)
 
-        final Actor actor = group.oneShotActor {
-            final def nestedActor = group.oneShotActor {
+        final Actor actor = group.actor {
+            final def nestedActor = group.actor {
                 receive {
                     reply 20
                 }

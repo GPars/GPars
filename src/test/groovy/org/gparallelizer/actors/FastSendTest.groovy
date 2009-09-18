@@ -17,6 +17,7 @@
 package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
+import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class FastSendTest extends GroovyTestCase {
 
@@ -26,7 +27,7 @@ public class FastSendTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         final CountDownLatch replyLatch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             disableSendingReplies()
             receive {
                 try {
@@ -65,7 +66,7 @@ public class FastSendTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         final CountDownLatch replyLatch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             disableSendingReplies()
             receive {
                 try {
@@ -87,7 +88,7 @@ public class FastSendTest extends GroovyTestCase {
             }
         }.start()
 
-        Actors.oneShotActor {
+        PooledActors.actor {
             actor << 'Message51'
             replyLatch.await()
             actor << 'Enabled message'

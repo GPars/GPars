@@ -32,7 +32,7 @@ public class CrossReplyTest extends GroovyTestCase {
         }
         incrementor.start()
 
-        Actor actor = Actors.oneShotActor {
+        Actor actor = PooledActors.actor {
             incrementor.send 2
             receive {
                 result = it
@@ -57,7 +57,7 @@ public class CrossReplyTest extends GroovyTestCase {
         }
         incrementor.start()
 
-        Actor actor = Actors.oneShotActor {
+        Actor actor = PooledActors.actor {
             incrementor.send 2
             receive {
                 result = it
@@ -74,7 +74,7 @@ public class CrossReplyTest extends GroovyTestCase {
         volatile int result = 0
         CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor incrementor = Actors.oneShotActor {
+        Actor incrementor = PooledActors.actor {
             receive {
                 reply it + 1
             }
@@ -99,7 +99,7 @@ public class CrossReplyTest extends GroovyTestCase {
         volatile int result = 0
         CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor incrementor = Actors.oneShotActor {
+        Actor incrementor = PooledActors.actor {
             receive {
                 it.reply it + 1
             }

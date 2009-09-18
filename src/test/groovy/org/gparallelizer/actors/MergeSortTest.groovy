@@ -19,6 +19,7 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.pooledActors.ResizablePool
 
 /**
@@ -84,45 +85,12 @@ public class MergeSortTest extends GroovyTestCase {
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
-        def resultActor = Actors.oneShotActor {
+        def resultActor = PooledActors.actor {
             result = receive(30, TimeUnit.SECONDS)
             latch.countDown()
         }.start()
 
-        def sorter = Actors.oneShotActor(createMessageHandler(resultActor))
-        sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
-
-        latch.await(30, TimeUnit.SECONDS)
-        assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
-    }
-
-    public void testBoundedMergeSort() {
-        volatile def result = null;
-        final CountDownLatch latch = new CountDownLatch(1)
-
-        def resultActor = Actors.boundedOneShotActor(5) {
-            result = receive(30, TimeUnit.SECONDS)
-            latch.countDown()
-        }.start()
-
-        Actor sorter = Actors.boundedOneShotActor(5, createMessageHandler(resultActor))
-
-        sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
-
-        latch.await(30, TimeUnit.SECONDS)
-        assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
-    }
-
-    public void testSynchronousdMergeSort() {
-        volatile def result = null;
-        final CountDownLatch latch = new CountDownLatch(1)
-
-        def resultActor = Actors.synchronousOneShotActor {
-            result = receive(30, TimeUnit.SECONDS)
-            latch.countDown()
-        }.start()
-
-        def sorter = Actors.synchronousOneShotActor (createMessageHandler(resultActor))
+        def sorter = PooledActors.actor(createMessageHandler(resultActor))
         sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(30, TimeUnit.SECONDS)

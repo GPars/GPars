@@ -20,6 +20,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.pooledActors.PooledActors
 
 /**
  *
@@ -49,9 +51,7 @@ public class AbstractActorTest extends GroovyTestCase {
         }
         actor.stop()
 
-        shouldFail(IllegalStateException) {
-            actor.start()
-        }
+        actor.start()
         actor.stop()
     }
 
@@ -65,7 +65,7 @@ public class AbstractActorTest extends GroovyTestCase {
         afterStart:{->
             flag.set(true)
             latch.countDown()
-        }] as DefaultThreadActor
+        }] as AbstractPooledActor
 
         actor.start()
         latch.await(30, TimeUnit.SECONDS)
@@ -79,7 +79,7 @@ public class AbstractActorTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         final AtomicReference result = new AtomicReference()
 
-        Actor actor=Actors.oneShotActor {
+        Actor actor=PooledActors.actor {
             receive(1, TimeUnit.SECONDS) {
                 receiveFlag.set(true)
                 result.set it
@@ -129,7 +129,7 @@ public class AbstractActorTest extends GroovyTestCase {
     }
 }
 
-class InterruptionTestActor extends DefaultThreadActor {
+class InterruptionTestActor extends AbstractPooledActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
     final AtomicBoolean afterStopFlag = new AtomicBoolean(false)
@@ -152,7 +152,7 @@ class InterruptionTestActor extends DefaultThreadActor {
     }
 }
 
-class AfterStopTestActor extends DefaultThreadActor {
+class AfterStopTestActor extends AbstractPooledActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
     final AtomicBoolean afterStopFlag = new AtomicBoolean(false)

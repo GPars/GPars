@@ -16,7 +16,9 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.pooledActors.ResizablePool
 
 /**
  * Performs merge sort using pooled actors.
@@ -46,6 +48,7 @@ List<Integer> merge(List<Integer> a, List<Integer> b) {
     return result
 }
 
+final def group = new PooledActorGroup(new ResizablePool(true))
 Closure createMessageHandler(def parentActor) {
     return {
         receive {List<Integer> message ->
@@ -61,8 +64,8 @@ Closure createMessageHandler(def parentActor) {
                 default:
                     def splitList = split(message)
 
-                    def child1 = Actors.oneShotActor(createMessageHandler(delegate))
-                    def child2 = Actors.oneShotActor(createMessageHandler(delegate))
+                    def child1 = group.actor(createMessageHandler(delegate))
+                    def child2 = group.actor(createMessageHandler(delegate))
                     child1.start().send(splitList[0])
                     child2.start().send(splitList[1])
 
@@ -73,11 +76,11 @@ Closure createMessageHandler(def parentActor) {
 
 }
 
-def resultActor = Actors.oneShotActor {
+def resultActor = PooledActors.actor {
     println "Sorted array:\t${receive()}"
 }.start()
 
-def sorter = Actors.oneShotActor(createMessageHandler(resultActor))
+def sorter = PooledActors.actor(createMessageHandler(resultActor))
 sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3,
         4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3])
 

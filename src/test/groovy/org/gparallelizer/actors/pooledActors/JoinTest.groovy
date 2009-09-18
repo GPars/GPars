@@ -23,7 +23,7 @@ public class JoinTest extends GroovyTestCase {
         assertFalse actor.isActive()
     }
 
-    public void testOneShotActorJoin() {
+    public void testactorJoin() {
         final def actor = PooledActors.actor { Thread.sleep 500 }.start()
         actor.join()
         assertFalse actor.isActive()

@@ -17,7 +17,6 @@
 package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.DefaultThreadActor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 /**
@@ -29,7 +28,7 @@ import org.gparallelizer.actors.pooledActors.AbstractPooledActor
  * to increase size of the worker pool.
  */
 
-final class LoadBalancer extends DefaultThreadActor {
+final class LoadBalancer extends AbstractPooledActor {
     int workers = 0
     List taskQueue = []
     private static final QUEUE_SIZE_TRIGGER = 10

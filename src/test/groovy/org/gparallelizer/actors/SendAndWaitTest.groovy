@@ -19,14 +19,15 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
-import org.gparallelizer.actors.*
+import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class SendAndWaitTest extends GroovyTestCase {
 
     public void testSuccessfulMessages() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             receive() {
                 reply 2
             }
@@ -47,7 +48,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testMessagesToStoppedActor() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             receive()
             reply 2
         }
@@ -71,7 +72,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             receive()
             reply 2
             barrier.await()
@@ -98,7 +99,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             receive()
             reply 2
             barrier.await()
@@ -129,7 +130,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             barrier.await()
             Thread.sleep 1000
             receive() {
@@ -158,7 +159,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             barrier.await()
             receive()
             barrier.await()
@@ -182,7 +183,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             barrier.await()
             receive()
         }
@@ -203,9 +204,9 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testSuccessfulMessagesFromActor() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractThreadActorGroup group = new ThreadActorGroup(3)
+        final AbstractActorGroup group = new PooledActorGroup(3)
 
-        final Actor actor = group.oneShotActor {
+        final Actor actor = group.actor {
             receive {
                 reply 2
             }
@@ -214,7 +215,7 @@ public class SendAndWaitTest extends GroovyTestCase {
 
         volatile def result
 
-        group.oneShotActor {
+        group.actor {
             result = actor.sendAndWait(1)
             latch.countDown()
         }.start()

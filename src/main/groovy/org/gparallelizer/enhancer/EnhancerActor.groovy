@@ -16,9 +16,7 @@
 
 package org.gparallelizer.enhancer
 
-import org.gparallelizer.actors.DefaultThreadActor
-import org.gparallelizer.enhancer.AsyncMessage
-import org.gparallelizer.enhancer.EnhancerHelper
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 /**
  * The thread-bound actor used in ActorMetaClass
@@ -26,7 +24,7 @@ import org.gparallelizer.enhancer.EnhancerHelper
  * @author Vaclav Pech
  * Date: Apr 28, 2009
  */
-public class EnhancerActor extends DefaultThreadActor {
+public class EnhancerActor extends AbstractPooledActor {
 
     def EnhancerActor() {
         super();

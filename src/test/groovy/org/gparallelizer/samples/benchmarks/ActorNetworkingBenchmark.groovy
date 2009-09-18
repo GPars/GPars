@@ -18,8 +18,7 @@ package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.DefaultThreadActor
-import org.gparallelizer.samples.benchmarks.Benchmark
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 public class ActorNetworkingBenchmark implements Benchmark {
 
@@ -35,7 +34,7 @@ public class ActorNetworkingBenchmark implements Benchmark {
     }
 }
 
-class WorkerActor extends DefaultThreadActor {
+class WorkerActor extends AbstractPooledActor {
     void act() {
         receive()
         reply '2'
@@ -43,7 +42,7 @@ class WorkerActor extends DefaultThreadActor {
 }
 
 //todo send strings
-final class NetworkingMaster extends DefaultThreadActor {
+final class NetworkingMaster extends AbstractPooledActor {
 
     int iterations = 1
     int numActors = 1

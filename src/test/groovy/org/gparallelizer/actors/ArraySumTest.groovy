@@ -19,6 +19,8 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 /**
  *
@@ -32,7 +34,7 @@ public class ArraySumTest extends GroovyTestCase {
         AtomicInteger result=new AtomicInteger(0)
         CountDownLatch latch=new CountDownLatch(1)
 
-        Actor actor=Actors.oneShotActor {
+        Actor actor=PooledActors.actor {
             new Processor(delegate).start().send([1, 2, 3, 4, 5])
             receive {
                 result.set it[0]
@@ -54,7 +56,7 @@ public class ArraySumTest extends GroovyTestCase {
     }
 }
 
-class Processor extends DefaultThreadActor {
+class Processor extends AbstractPooledActor {
 
     Actor parent
 
@@ -92,7 +94,7 @@ class Processor extends DefaultThreadActor {
     }
 }
 
-class ReplyActor extends DefaultThreadActor {
+class ReplyActor extends AbstractPooledActor {
 
     Actor parent
 
@@ -113,7 +115,7 @@ class ReplyActor extends DefaultThreadActor {
         stop()
     }
 }
-class ArrayCalculator extends DefaultThreadActor {
+class ArrayCalculator extends AbstractPooledActor {
 
     List<Integer> listToCalculate;
 

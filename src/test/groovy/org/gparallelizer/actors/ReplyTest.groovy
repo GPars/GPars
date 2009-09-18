@@ -21,7 +21,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.pooledActors.ActorReplyException
 import org.gparallelizer.actors.pooledActors.PooledActors
-import static org.gparallelizer.actors.Actors.oneShotActor
+import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 /**
@@ -52,7 +52,7 @@ public class ReplyTest extends GroovyTestCase {
 
         Thread.sleep 1000
 
-        oneShotActor {
+        actor {
             bouncer.send 1
             barrier.await()
             bouncer.send 2
@@ -68,7 +68,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }.start()
 
-        oneShotActor {
+        actor {
             bouncer.send 10
             barrier.await()
             bouncer.send 20
@@ -189,7 +189,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor receiver = oneShotActor {
+        final Actor receiver = actor {
             receive {
                 replyIfExists it
             }
@@ -197,7 +197,7 @@ public class ReplyTest extends GroovyTestCase {
 
         receiver.start()
 
-        oneShotActor {
+        actor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
@@ -214,7 +214,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = oneShotActor {
+        final Actor actor = actor {
             receive {
                 replyIfExists it
                 flag.set(true)
@@ -235,7 +235,7 @@ public class ReplyTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor replier = oneShotActor {
+        final Actor replier = actor {
             receive {
                 latch.await()
                 replyIfExists it
@@ -246,7 +246,7 @@ public class ReplyTest extends GroovyTestCase {
 
         replier.start()
 
-        final Actor sender = oneShotActor { replier.send 'messsage' }
+        final Actor sender = actor { replier.send 'messsage' }
 
         sender.metaClass {
             afterStop = {
@@ -267,7 +267,7 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             receive {
                 reply 'Message2'
                 it.reply 'Message3'
@@ -278,7 +278,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }.start()
 
-        Actors.oneShotActor {
+        PooledActors.actor {
             actor.send 'Message1'
             receive {
                 it.reply 'Message4'
@@ -302,13 +302,13 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oneShotActor {
+        final Actor actor = PooledActors.actor {
             receive {->
                 reply 'Message2'
             }
         }.start()
 
-        Actors.oneShotActor {
+        PooledActors.actor {
             actor.send 'Message1'
             receive {
                 result = it
@@ -326,7 +326,7 @@ public class ReplyTest extends GroovyTestCase {
         final List<CountDownLatch> latches = [new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1)]
         def volatile issues
 
-        final def bouncer = oneShotActor {
+        final def bouncer = actor {
             latches[0].await()
             receive {a, b, c ->
                 replyIfExists 4
@@ -344,7 +344,7 @@ public class ReplyTest extends GroovyTestCase {
         }.start()
 
         //send and terminate
-        final Actor actor1 = oneShotActor {
+        final Actor actor1 = actor {
             bouncer << 1
             stop()
         }
@@ -354,7 +354,7 @@ public class ReplyTest extends GroovyTestCase {
         actor1.start()
 
         //wait, send and terminate
-        final Actor actor2 = oneShotActor {
+        final Actor actor2 = actor {
             latches[1].await()
             bouncer << 5
             stop()
@@ -365,7 +365,7 @@ public class ReplyTest extends GroovyTestCase {
         actor2.start()
 
         //keep conversation going
-        oneShotActor {
+        actor {
             bouncer << 2
             receive()
             bouncer << 6

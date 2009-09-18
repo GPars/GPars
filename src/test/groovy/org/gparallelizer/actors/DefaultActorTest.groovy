@@ -19,6 +19,7 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 /**
  *
@@ -37,27 +38,29 @@ public class DefaultActorTest extends GroovyTestCase {
     public void testThreadName() {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
+        actor << ''
+        actor.latch.await(30, TimeUnit.SECONDS)
 
-        assert actor.threadName.startsWith("Actor Thread ") || actor.threadName.startsWith("ForkJoinPool-")
+        assert actor.threadName.startsWith("Actor Thread ")
         actor.stop()
     }
 }
 
-class DefaultTestActor extends DefaultThreadActor {
+class DefaultTestActor extends AbstractPooledActor {
 
     final AtomicBoolean flag = new AtomicBoolean(false)
     final CountDownLatch latch = new CountDownLatch(1)
 
+    volatile def threadName = ''
+
     @Override protected void act() {
+        threadName = Thread.currentThread().name
+        println threadName
         receive {
             flag.set true
             latch.countDown()
 
             stop()
         }
-    }
-
-    public String getThreadName() {
-        return getActorThread().name
     }
 }

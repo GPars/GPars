@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.pooledActors.PooledActors
-import static org.gparallelizer.actors.Actors.oneShotActor
+import static org.gparallelizer.actors.pooledActors.PooledActors.actor
 
 public class ReplyToMessageTest extends GroovyTestCase {
 
@@ -51,7 +51,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         Thread.sleep 1000
 
-        oneShotActor {
+        actor {
             bouncer.send 1
             barrier.await()
             bouncer.send 2
@@ -67,7 +67,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }.start()
 
-        oneShotActor {
+        actor {
             bouncer.send 10
             barrier.await()
             bouncer.send 20
@@ -104,7 +104,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             loop { receive { it.reply it - 1 }}
         }.start()
 
-        oneShotActor {
+        actor {
             barrier.await()
             incrementor.send 2
             decrementor.send 6
@@ -125,7 +125,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }.start()
 
-        oneShotActor {
+        actor {
             barrier.await()
             incrementor.send 20
             decrementor.send 60
@@ -187,7 +187,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor receiver = oneShotActor {
+        final Actor receiver = actor {
             receive {
                 it.replyIfExists it
             }
@@ -195,7 +195,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         receiver.start()
 
-        oneShotActor {
+        actor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
@@ -212,7 +212,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = oneShotActor {
+        final Actor actor = actor {
             receive {
                 it.replyIfExists it
                 flag.set(true)
@@ -233,7 +233,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor replier = oneShotActor {
+        final Actor replier = actor {
             receive {
                 latch.await()
                 it.replyIfExists it
@@ -244,7 +244,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         replier.start()
 
-        final Actor sender = oneShotActor {
+        final Actor sender = actor {
             replier.send 'messsage'
         }
 
@@ -268,7 +268,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def maxFinder = oneShotActor {
+        final def maxFinder = actor {
             barrier.await()
             receive {message1 ->
                 receive {message2 ->
@@ -280,7 +280,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         }.start()
 
 
-        oneShotActor {
+        actor {
             barrier.await()
             maxFinder.send 2
             receive {
@@ -289,7 +289,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }.start()
 
-        oneShotActor {
+        actor {
             barrier.await()
             maxFinder.send 3
             receive {
