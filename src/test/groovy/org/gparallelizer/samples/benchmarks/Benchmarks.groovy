@@ -35,9 +35,6 @@ println 'PooledActors creation: ' + new PooledActorCreationBenchmark().perform(i
 new PooledActorNetworkingBenchmark().perform(warmupIterations)
 println 'PooledActors networking: ' + new PooledActorNetworkingBenchmark().perform(iterations)
 
-new ActorNetworkingBenchmark().perform(warmupIterations)
-println 'Actors networking: ' + new ActorNetworkingBenchmark().perform(iterations)
-
 new SequentialWordSortBenchmark().perform(warmupIterations)
 println 'Sequential Word Sort: ' + new SequentialWordSortBenchmark().perform(0)
 

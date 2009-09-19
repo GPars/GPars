@@ -34,24 +34,26 @@ final class LoadBalancer extends AbstractPooledActor {
     private static final QUEUE_SIZE_TRIGGER = 10
 
     void act() {
-        def message = receive()
-        switch (message) {
-            case NeedMoreWork:
-                if (taskQueue.size()==0) {
-                    println 'No more tasks in the task queue. Terminating the worker.'
-                    message.reply DemoWorker.EXIT
-                    workers -= 1
-                } else message.reply taskQueue.remove(0)
-                break
-            case WorkToDo:
-                taskQueue << message
-                if ((workers==0) || (taskQueue.size()>=QUEUE_SIZE_TRIGGER)) {
-                    println 'Need more workers. Starting one.'
-                    workers += 1
-                    new DemoWorker(this).start()
-                }
+        loop {
+            def message = receive()
+            switch (message) {
+                case NeedMoreWork:
+                    if (taskQueue.size() == 0) {
+                        println 'No more tasks in the task queue. Terminating the worker.'
+                        message.reply DemoWorker.EXIT
+                        workers -= 1
+                    } else message.reply taskQueue.remove(0)
+                    break
+                case WorkToDo:
+                    taskQueue << message
+                    if ((workers == 0) || (taskQueue.size() >= QUEUE_SIZE_TRIGGER)) {
+                        println 'Need more workers. Starting one.'
+                        workers += 1
+                        new DemoWorker(this).start()
+                    }
+            }
+            println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
         }
-        println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
     }
 }
 
@@ -73,7 +75,7 @@ final class DemoWorker extends AbstractPooledActor {
                     case WorkToDo:
                         processMessage(it)
                         break
-                    case EXIT:stop()
+                    case EXIT: stop()
                 }
             }
         }
@@ -81,25 +83,25 @@ final class DemoWorker extends AbstractPooledActor {
     }
 
     private void processMessage(message) {
-        synchronized(random) {
+        synchronized (random) {
             Thread.sleep random.nextInt(5000)
         }
     }
 }
-final class WorkToDo{}
-final class NeedMoreWork{}
+final class WorkToDo {}
+final class NeedMoreWork {}
 
 final Actor balancer = new LoadBalancer().start()
 
 //produce tasks
-for(i in 1..20) {
+for (i in 1..20) {
     Thread.sleep 100
     balancer << new WorkToDo()
 }
 
 //produce tasks in a parallel thread
 Thread.start {
-    for(i in 1..10) {
+    for (i in 1..10) {
         Thread.sleep 1000
         balancer << new WorkToDo()
     }

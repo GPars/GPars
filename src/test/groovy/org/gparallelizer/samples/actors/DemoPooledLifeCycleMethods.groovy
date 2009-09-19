@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples.actors
 
+import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActor
 import org.gparallelizer.actors.pooledActors.PooledActors
 
 /**
@@ -29,7 +29,7 @@ private class ExceptionFlag {
     static final boolean THROW_EXCEPTIION = true  //change the flag to test either exception or timeout
 }
 
-final PooledActor actor1 = PooledActors.actor {
+final Actor actor1 = PooledActors.actor {
     println("Running actor1")
     if (ExceptionFlag.THROW_EXCEPTIION) throw new RuntimeException('test')
     else {

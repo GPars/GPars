@@ -18,6 +18,7 @@ package org.gparallelizer.samples.actors
 
 import groovy.swing.SwingBuilder
 import javax.swing.JFrame
+import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActor
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.actors.pooledActors.PooledActors
@@ -29,7 +30,7 @@ final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation:
             PooledActors.actor {
                 react {
                     doLater {
-                        println 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+                        println 'Invoked later'
                     }
                 }
             }.start().send 'Message'
@@ -54,7 +55,7 @@ public void foo() {
     }
     nestedActor.start()
 
-    final PooledActor actor = group.actor {
+    final Actor actor = group.actor {
         println 'Started an actor'
         nestedActor.sendAndWait(10)
         println 'Done'
@@ -66,7 +67,7 @@ public void foo() {
 public void bar() {
     final def group = new PooledActorGroup(20)
 
-    final PooledActor actor = group.actor {
+    final Actor actor = group.actor {
         println 'Started an actor ' + delegate + ":" + owner
         final def nestedActor = group.actor {
             println 'Started nested actor ' + delegate + ":" + owner

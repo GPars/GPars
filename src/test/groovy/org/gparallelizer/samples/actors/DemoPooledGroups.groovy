@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples.actors
 
+import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActor
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 import org.gparallelizer.actors.pooledActors.PooledActors
 
@@ -50,6 +50,6 @@ new GroupSamplePooledActor().start()
 
 Thread.sleep 1000
 
-final PooledActor actor = new GroupSamplePooledActor()
+final Actor actor = new GroupSamplePooledActor()
 actor.actorGroup = sampleGroup
 actor.start()

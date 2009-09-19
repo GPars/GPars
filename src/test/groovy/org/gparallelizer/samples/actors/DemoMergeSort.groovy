@@ -48,7 +48,10 @@ List<Integer> merge(List<Integer> a, List<Integer> b) {
     return result
 }
 
-final def group = new PooledActorGroup(new ResizablePool(true))
+class GroupTestHeper {
+    public static final def group = new PooledActorGroup(new ResizablePool(true))
+}
+
 Closure createMessageHandler(def parentActor) {
     return {
         receive {List<Integer> message ->
@@ -64,8 +67,8 @@ Closure createMessageHandler(def parentActor) {
                 default:
                     def splitList = split(message)
 
-                    def child1 = group.actor(createMessageHandler(delegate))
-                    def child2 = group.actor(createMessageHandler(delegate))
+                    def child1 = GroupTestHeper.group.actor(createMessageHandler(delegate))
+                    def child2 = GroupTestHeper.group.actor(createMessageHandler(delegate))
                     child1.start().send(splitList[0])
                     child2.start().send(splitList[1])
 

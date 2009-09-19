@@ -25,6 +25,7 @@ import org.codehaus.groovy.runtime.TimeCategory;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actors.CommonActorImpl;
 import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction;
 import static org.gparallelizer.actors.pooledActors.ActorException.*;
 
@@ -125,7 +126,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Feb 7, 2009
  */
-abstract public class AbstractPooledActor extends PooledActor {
+abstract public class AbstractPooledActor extends CommonActorImpl {
 
     /**
      * Queue for the messages
@@ -326,7 +327,7 @@ abstract public class AbstractPooledActor extends PooledActor {
             final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
 
             ActorMessage currentMessage;
-            while ((!reactCode.isReady()) && (currentMessage = messageQueue.poll()) != null) {
+            while (!reactCode.isReady() && (currentMessage = messageQueue.poll()) != null) {
                 reactCode.addMessage(currentMessage);
             }
             if (reactCode.isReady()) {
@@ -346,7 +347,6 @@ abstract public class AbstractPooledActor extends PooledActor {
         throw CONTINUE;
     }
 
-    //todo should be private, but woudn't be work
     /**
      * Adds reply() and replyIfExists() methods to the currentActor and the message.
      * These methods will call send() on the target actor (the sender of the original message).
@@ -356,11 +356,11 @@ abstract public class AbstractPooledActor extends PooledActor {
      * @param messages List of ActorMessage wrapping the sender actor, who we need to be able to respond to,
      *                 plus the original message
      */
-    final void enhanceReplies(List<ActorMessage> messages) {
+    private void enhanceReplies(final List<ActorMessage> messages) {
         final List<MessageStream> senders = getSenders();
         senders.clear();
         if (getSendRepliesFlag()) {
-            for (ActorMessage message : messages) {
+            for (final ActorMessage message : messages) {
                 senders.add(message == null ? null : message.getSender());
             }
             enhanceWithReplyMethodsToMessages(messages);
@@ -373,6 +373,7 @@ abstract public class AbstractPooledActor extends PooledActor {
      * @return The message retrieved from the queue.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
+    @Override
     protected final Object receiveImpl() throws InterruptedException {
         if (stopFlag.get())
             throw new IllegalStateException("The actor hasn't been started.");
