@@ -18,7 +18,7 @@ package org.gparallelizer.remote;
 
 import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
-import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
+import org.gparallelizer.actors.pooledActors.ActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
 import org.gparallelizer.actors.pooledActors.Pool;
 import org.gparallelizer.actors.pooledActors.PooledActorGroup;
@@ -42,7 +42,7 @@ public class LocalNode {
 
     private final Actor mainActor;
 
-    private final AbstractPooledActorGroup actorGroup;
+    private final ActorGroup actorGroup;
 
     private final UUID id = UUID.randomUUID();
 

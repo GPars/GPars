@@ -18,7 +18,7 @@ package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup
+import org.gparallelizer.actors.pooledActors.ActorGroup
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 final Random random = new Random(System.currentTimeMillis())
@@ -29,7 +29,7 @@ final long memory1 = Runtime.runtime.freeMemory()
 println 'Threads at start: ' + Thread.threads.length
 for (i in 0..10000) {
     final CountDownLatch latch = new CountDownLatch(1)
-    final AbstractPooledActorGroup group = new PooledActorGroup(Math.max(1, random.nextInt(20)))
+    final ActorGroup group = new PooledActorGroup(Math.max(1, random.nextInt(20)))
     final Actor actor = group.actor {
         receive {
             reply it

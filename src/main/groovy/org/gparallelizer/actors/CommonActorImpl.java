@@ -22,7 +22,7 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.GeneratedClosure;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gparallelizer.MessageStream;
-import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
+import org.gparallelizer.actors.pooledActors.ActorGroup;
 import org.gparallelizer.actors.pooledActors.ActorReplyException;
 
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public abstract class CommonActorImpl extends Actor {
      * The actor group to which the actor belongs
      */
     //todo ensure proper serialization
-    private volatile AbstractPooledActorGroup actorGroup;
+    private volatile ActorGroup actorGroup;
 
     /**
      * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
@@ -96,7 +96,7 @@ public abstract class CommonActorImpl extends Actor {
      * It can only be invoked before the actor is started.
      * @param group new group
      */
-    public final void setActorGroup(final AbstractPooledActorGroup group) {
+    public final void setActorGroup(final ActorGroup group) {
         if (!groupMembershipChangeable)
             throw new IllegalStateException("Cannot set actor's group on a started actor.");
 
@@ -289,7 +289,7 @@ public abstract class CommonActorImpl extends Actor {
      * Retrieves the group to which the actor belongs
      * @return The actor's group
      */
-    public AbstractPooledActorGroup getActorGroup() {
+    public ActorGroup getActorGroup() {
         return actorGroup;
     }
 

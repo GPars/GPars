@@ -22,7 +22,7 @@ package org.gparallelizer.actors.pooledActors
  * @author Vaclav Pech
  * Date: May 8, 2009
  */
-public abstract class AbstractPooledActorGroup {
+public abstract class ActorGroup {
 
     /**
      * Stored the group actors' thread pool
@@ -34,7 +34,7 @@ public abstract class AbstractPooledActorGroup {
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
-    protected def AbstractPooledActorGroup(final Pool threadPool) {
+    protected def ActorGroup(final Pool threadPool) {
         this.threadPool = threadPool
     }
 

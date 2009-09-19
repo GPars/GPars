@@ -18,7 +18,7 @@ package org.gparallelizer.dataflow.operator
 
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup
+import org.gparallelizer.actors.pooledActors.ActorGroup
 
 /**
  * @author Vaclav Pech
@@ -33,7 +33,7 @@ public final class DataFlowOperator {
         return new DataFlowOperator(channels, code).start(dfOperatorActorGroup)
     }
 
-    public static DataFlowOperator operator(final Map channels,  final AbstractPooledActorGroup group, final Closure code) {
+    public static DataFlowOperator operator(final Map channels,  final ActorGroup group, final Closure code) {
         return new DataFlowOperator(channels, code).start(group)
     }
 
@@ -49,7 +49,7 @@ public final class DataFlowOperator {
         this.code.delegate = this
     }
 
-    private DataFlowOperator start(AbstractPooledActorGroup group) {
+    private DataFlowOperator start(ActorGroup group) {
         actor = group.actor {
             loop {
                 inputs.eachWithIndex {input, index -> input.getValAsync(index, actor)}

@@ -16,7 +16,7 @@
 
 package org.gparallelizer.dataflow;
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup;
+import org.gparallelizer.actors.pooledActors.ActorGroup;
 import org.gparallelizer.actors.pooledActors.ResizablePool;
 
 /**
@@ -33,7 +33,7 @@ import org.gparallelizer.actors.pooledActors.ResizablePool;
  * @author Vaclav Pech, Alex Tkachman
  * Date: Jun 21, 2009
  */
-public final class DataFlowActorGroup extends AbstractPooledActorGroup  {
+public final class DataFlowActorGroup extends ActorGroup {
     /**
      * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
      * @param poolSize The initial size of the underlying thread pool

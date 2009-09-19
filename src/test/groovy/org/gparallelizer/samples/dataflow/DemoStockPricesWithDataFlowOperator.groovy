@@ -1,7 +1,7 @@
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActorGroup
-import org.gparallelizer.actors.pooledActors.NonDaemonPooledActorGroup
+import org.gparallelizer.actors.pooledActors.ActorGroup
+import org.gparallelizer.actors.pooledActors.NonDaemonActorGroup
 import org.gparallelizer.dataflow.DataFlowStream
 import static org.gparallelizer.dataflow.operator.DataFlowOperator.operator
 
@@ -16,7 +16,7 @@ def getYearEndClosing(String stock, int year) {
     }
 }
 
-final AbstractPooledActorGroup group = new NonDaemonPooledActorGroup(1)
+final ActorGroup group = new NonDaemonActorGroup(1)
 final DataFlowStream stocksStream = new DataFlowStream()
 final DataFlowStream pricedStocks = new DataFlowStream()
 

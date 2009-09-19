@@ -56,7 +56,7 @@ package org.gparallelizer.actors.pooledActors
  * @author Vaclav Pech
  * Date: May 4, 2009
  */
-public final class PooledActorGroup extends AbstractPooledActorGroup {
+public final class PooledActorGroup extends ActorGroup {
 
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
