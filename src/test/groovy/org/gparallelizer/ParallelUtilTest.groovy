@@ -36,6 +36,14 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testEachWithIndex() {
+        Parallelizer.withParallelizer(5) {
+            final AtomicInteger result = new AtomicInteger(0)
+            ParallelArrayUtil.eachWithIndexAsync([1, 2, 3, 4, 5],  {element, int index -> result.addAndGet(element*index)})
+            assertEquals 40, result
+        }
+    }
+
     public void testCollect() {
         Parallelizer.withParallelizer(5) {
             final List result = ParallelArrayUtil.collectAsync([1, 2, 3, 4, 5], {it * 2})
@@ -47,6 +55,18 @@ public class ParallelUtilTest extends GroovyTestCase {
     public void testFindAll() {
         Parallelizer.withParallelizer(5) {
             final List result = ParallelArrayUtil.findAllAsync([1, 2, 3, 4, 5], {it > 2})
+            assert !(1 in result)
+            assert !(1 in result)
+            assert (3 in result)
+            assert (4 in result)
+            assert (5 in result)
+            assertEquals 3, result.size()
+        }
+    }
+
+    public void testGrep() {
+        Parallelizer.withParallelizer(5) {
+            final List result = ParallelArrayUtil.grepAsync([1, 2, 3, 4, 5], 3..6)
             assert !(1 in result)
             assert !(1 in result)
             assert (3 in result)

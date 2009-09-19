@@ -6,6 +6,7 @@
     todo rename SafeVariable - Safe, Agent
     todo add generics to SafeVariable
     todo make pooled actors use receive()
+    todo eachWithIndexAsync(), grepAsync()
 
     Planned for the next release
 
@@ -50,6 +51,7 @@ todo consider removing dynamic replies on messages
 
     Backlog
     todo CSP
+    //todo out-of-order message processing
     todo actor groups could manage actors and give public access to them
     todo consider using AST transformations to generate CPS (continuation-passing style) for event-driven actors to offer a frendlier way to code them
     todo add a script task to download all dependencies for IDEs
@@ -65,7 +67,6 @@ todo consider removing dynamic replies on messages
 
     //todo consider extensibility for actors - custom schedulers
     //todo consider using builder for message handling
-    //todo out-of-order message processing
     //todo optimize AsyncUtil implementation to split collections among available threads
     //todo send returning Future for actor reply
 

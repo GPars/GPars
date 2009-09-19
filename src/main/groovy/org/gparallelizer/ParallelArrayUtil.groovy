@@ -98,6 +98,50 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the transformation operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>eachWithIndexAsync(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {
+     *     def result = new ConcurrentSkipListSet()
+     *     [1, 2, 3, 4, 5].eachWithIndexAsync {Number number, int index -> result.add(number * 10)}
+     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * }
+     * Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
+     */
+    public static <T> Collection<T> eachWithIndexAsync(Collection<T> collection, Closure cl) {
+        def indexedCollection = []
+        collection.eachWithIndex {element, index -> indexedCollection << [element, index]}
+        createPA(indexedCollection, retrievePool()).withMapping({cl(it[0], it[1])} as Mapper).all()
+        return collection
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
+     * closure as the transformation operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>eachWithIndexAsync(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {
+     *     def result = new ConcurrentSkipListSet()
+     *     [1, 2, 3, 4, 5].eachWithIndexAsync {Number number, int index -> result.add(number * 10)}
+     *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * }
+     * Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
+     */
+    public static Object eachWithIndexAsync(Object collection, Closure cl) {
+        eachWithIndexAsync(createCollection(collection), cl)
+        return collection
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
+     * closure as the transformation operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
@@ -146,6 +190,24 @@ public class ParallelArrayUtil {
      */
     public static <T> Collection<T> findAllAsync(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).all().asList()
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * rule as the filter predicate.
+     * The filter will be effectively used concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>grepAsync(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {
+     *     def result = [1, 2, 3, 4, 5].grepAsync(4..6)
+     *     assertEquals(new HashSet([4, 5]), result)
+     * }
+     */
+    public static <T> Collection<T> grepAsync(Collection<T> collection, filter) {
+        createPA(collection, retrievePool()).withFilter({filter.isCase it} as Predicate).all().asList()
     }
 
     /**

@@ -82,6 +82,36 @@ public class AsynchronizerTest extends GroovyTestCase {
         }
     }
 
+    public void testEachWithIndexAsync() {
+      def result = Collections.synchronizedSet(new HashSet())
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            [1, 2, 3, 4, 5].eachWithIndexAsync{Number number, int index -> result.add(number * index)}
+            assertEquals(new HashSet([0, 2, 6, 12, 20]), result)
+        }
+    }
+
+    public void testEachWithIndexAsyncOnsingleElementCollections() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            [1].eachWithIndexAsync{e, i ->}
+            [1].eachWithIndexAsync{e, i ->}
+            [1].eachWithIndexAsync{e, i ->}
+            'a'.eachWithIndexAsync{e, i ->}
+            [1].iterator().eachWithIndexAsync{e, i ->}
+            'a'.iterator().eachWithIndexAsync{e, i ->}
+        }
+    }
+
+    public void testEachWithIndexAsyncOnEmpty() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            [].eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
+            [].eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
+            [].eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
+            ''.eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
+            [].iterator().eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
+            ''.iterator().eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
+        }
+    }
+
     public void testCollectAsync() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].collectAsync{Number number -> number * 10}
@@ -92,6 +122,13 @@ public class AsynchronizerTest extends GroovyTestCase {
     public void testFindAllAsync() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].findAllAsync{Number number -> number > 2}
+            assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
+        }
+    }
+
+    public void testGrepAsync() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            def result = [1, 2, 3, 4, 5].grepAsync(3..6)
             assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
         }
     }

@@ -119,7 +119,7 @@ public class AsyncInvokerUtil {
 
     /**
      * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure
-     * to evaluate each collection's element. A CountDownLatch is used to make the calling thread wait for all the results.
+     * to evaluate each collection's element. A Semaphore is used to make the calling thread wait for all the results.
      * After this method returns, all the closures have been finished and all the potential shared resources have been updated
      * by the threads.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
@@ -138,7 +138,6 @@ public class AsyncInvokerUtil {
     public static def eachAsync(Object collection, Closure cl) {
         final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
         final Semaphore semaphore = new Semaphore(0)
-
         Closure code = async({Object ... args ->
             try {
                 cl(*args)
@@ -152,6 +151,48 @@ public class AsyncInvokerUtil {
         for(element in collection) {
             count += 1
             code.call(element)
+        }
+        semaphore.acquire(count)
+        if (exceptions.empty) return collection
+        else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
+    }
+
+    /**
+     * Iterates over a collection/object with the <i>eachWithIndex()</i> method using an asynchronous variant of the supplied closure
+     * to evaluate each collection's element. A Semaphore is used to make the calling thread wait for all the results.
+     * After this method returns, all the closures have been finished and all the potential shared resources have been updated
+     * by the threads.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Example:
+     *      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *          def result = Collections.synchronizedSet(new HashSet())
+     *          service.eachWithIndexAsync([1, 2, 3, 4, 5]) {Number number -> result.add(number * 10)}
+     *          assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
+     * have a new <i>eachAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     *    Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *         def result = Collections.synchronizedSet(new HashSet())
+     *        [1, 2, 3, 4, 5].eachWithIndexAsync { Number number, int index -> result.add(number * 10) }
+     *         assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public static def eachWithIndexAsync(Object collection, Closure cl) {
+        final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
+        final Semaphore semaphore = new Semaphore(0)
+        Closure code = async({Object element, int index ->
+            try {
+                cl(element, index)
+            } catch (Throwable e) {
+                exceptions.add(e)
+            } finally {
+                semaphore.release()
+            }
+        })
+        int count = 0
+        for(element in collection) {
+            code.call(element, count)
+            count += 1
         }
         semaphore.acquire(count)
         if (exceptions.empty) return collection
@@ -192,6 +233,26 @@ public class AsyncInvokerUtil {
      */
     public static def findAllAsync(Object collection, Closure cl) {
         collectAsync(collection, {if (cl(it)) return it else return null}).findAll {it != null}
+    }
+
+    /**
+     * Performs the <i>grep()()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *     def result = service.grepAsync([1, 2, 3, 4, 5])(3..6)
+     *     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
+     *}*
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
+     * have a new <i>findAllAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *     def result = [1, 2, 3, 4, 5].grepAsync(3..6)
+     *     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
+     *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public static def grepAsync(Object collection, filter) {
+        collectAsync(collection, {if (filter.isCase(it)) return it else return null}).findAll {it != null}
     }
 
     /**
