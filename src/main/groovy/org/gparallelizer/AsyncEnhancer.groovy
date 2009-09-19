@@ -75,6 +75,20 @@ public final class AsyncEnhancer {
     }
 
     /**
+     * Iterates over a collection/object with the <i>eachWithIndex()</i> method using an asynchronous variant of the supplied closure
+     * to evaluate each collection's element. A CountDownLatch is used to make the calling thread wait for all the results.
+     * After this method returns, all the closures have been finished and all the potential shared resources have been updated
+     * by the threads.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def eachWithIndexAsync(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.eachWithIndexAsync(mixedIn[Object], cl)
+        }
+    }
+
+    /**
      * Iterates over a collection/object with the <i>collect()</i> method using an asynchronous variant of the supplied closure
      * to evaluate each collection's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
@@ -97,6 +111,19 @@ public final class AsyncEnhancer {
     public def findAllAsync(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
             AsyncInvokerUtil.findAllAsync(mixedIn[Object], cl)
+        }
+    }
+
+    /**
+     * Performs the <i>grep()()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def grepAsync(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.grepAsync(mixedIn[Object], cl)
         }
     }
 

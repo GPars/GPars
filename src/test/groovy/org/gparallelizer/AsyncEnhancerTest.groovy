@@ -65,11 +65,9 @@ public class AsyncEnhancerTest extends GroovyTestCase {
     }
 
     public void testClassEnhancementException() {
-        AsyncEnhancer.threadPool.resize 20
         AsyncEnhancer.enhanceClass LinkedList
         final List list = new LinkedList([1, 2, 3, 4, 5])
         performExceptionCheck(list)
-        AsyncEnhancer.threadPool.resetDefaultSize()
     }
 
     public void testDualEnhancement() {

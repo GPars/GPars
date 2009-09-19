@@ -64,10 +64,8 @@ public class ParallelEnhancerTest extends GroovyTestCase {
     }
 
     public void testClassEnhancementException() {
-        AsyncEnhancer.threadPool.resize 20
         ParallelEnhancer.enhanceClass LinkedList
         performExceptionCheck(new LinkedList([1, 2, 3, 4, 5]))
-        AsyncEnhancer.threadPool.resetDefaultSize()
     }
 
     public void testDualEnhancement() {
