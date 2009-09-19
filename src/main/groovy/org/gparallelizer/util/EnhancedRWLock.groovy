@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.util
+package org.gparallelizer.util
 
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -23,44 +23,42 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
  * and unlock the lock for the passed-in closure.
  * Use:
  * def extendedLock = new ExtendedRWLock()
- * extendedLock.withReadLock() {
- *      //read lock locked here
- * }
- *
+ * extendedLock.withReadLock() {*      //read lock locked here
+ *}*
  * @author Vaclav Pech
  * Date: Feb 18, 2009
  */
 public class EnhancedRWLock extends ReentrantReadWriteLock {
 
-    def EnhancedRWLock() { super() }
+  def EnhancedRWLock() { super() }
 
-    def EnhancedRWLock(final boolean fair) { super(fair); }
+  def EnhancedRWLock(final boolean fair) { super(fair); }
 
-    /**
-     * Performs the passed-in closure with the read lock locked and unlocks the read lock automatically
-     * after the closure finishes.
-     * @param cl The closure to perform with the read lock held
-     */
-    public void withReadLock(Closure cl) {
-        readLock().lock()
-        try {
-            cl.call()
-        } finally {
-            readLock().unlock()
-        }
+  /**
+   * Performs the passed-in closure with the read lock locked and unlocks the read lock automatically
+   * after the closure finishes.
+   * @param cl The closure to perform with the read lock held
+   */
+  public void withReadLock(Closure cl) {
+    readLock().lock()
+    try {
+      cl.call()
+    } finally {
+      readLock().unlock()
     }
+  }
 
-    /**
-     * Performs the passed-in closure with the write lock locked and unlocks the write lock automatically
-     * after the closure finishes.
-     * @param cl The closure to perform with the write lock held
-     */
-    public void withWriteLock(Closure cl) {
-        writeLock().lock()
-        try {
-            cl.call()
-        } finally {
-            writeLock().unlock()
-        }
+  /**
+   * Performs the passed-in closure with the write lock locked and unlocks the write lock automatically
+   * after the closure finishes.
+   * @param cl The closure to perform with the write lock held
+   */
+  public void withWriteLock(Closure cl) {
+    writeLock().lock()
+    try {
+      cl.call()
+    } finally {
+      writeLock().unlock()
     }
+  }
 }

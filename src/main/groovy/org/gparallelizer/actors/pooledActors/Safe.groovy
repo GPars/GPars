@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors.pooledActors
 
-import org.gparallelizer.actors.util.EnhancedRWLock
+import org.gparallelizer.util.EnhancedRWLock
 
 /**
  * A special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
@@ -46,99 +46,99 @@ import org.gparallelizer.actors.util.EnhancedRWLock
  */
 public class Safe<T> extends DynamicDispatchActor {
 
-    private EnhancedRWLock lock = new EnhancedRWLock()
-    /**
-     * Holds the internal mutable state
-     */
-    protected T data
-    final Closure copy = {it}
+  private EnhancedRWLock lock = new EnhancedRWLock()
+  /**
+   * Holds the internal mutable state
+   */
+  protected T data
+  final Closure copy = {it}
 
-    /**
-     * Creates a new Safe with the internal state set to null
-     */
-    def Safe() {
-        this(null)
+  /**
+   * Creates a new Safe with the internal state set to null
+   */
+  def Safe() {
+    this(null)
+  }
+
+  /**
+   * Creates a new Safe around the supplied modifiable object
+   * @param data The object to use for storing the variable's internal state     *
+   */
+  def Safe(final T data) {
+    this.data = data
+    start()
+  }
+
+  /**
+   * Creates a new Safe around the supplied modifiable object
+   * @param data The object to use for storing the variable's internal state
+   * @param copy A closure to use to create a copy of the internal state when sending the internal state out
+   */
+  def Safe(final T data, final Closure copy) {
+    this.data = data
+    this.copy = copy
+    start()
+  }
+
+  /**
+   * Accepts and invokes the closure
+   */
+  final void onMessage(Closure code) {
+    lock.withWriteLock {
+      code.delegate = this
+      replyIfExists code.call(data)
     }
+  }
 
-    /**
-     * Creates a new Safe around the supplied modifiable object
-     * @param data The object to use for storing the variable's internal state     *
-     */
-    def Safe(final T data) {
-        this.data = data
-        start()
+  /**
+   * Other messages than closures are accepted as new values for the internal state
+   */
+  final void onMessage(T message) {
+    lock.withWriteLock {
+      updateValue message
     }
+  }
 
-    /**
-     * Creates a new Safe around the supplied modifiable object
-     * @param data The object to use for storing the variable's internal state
-     * @param copy A closure to use to create a copy of the internal state when sending the internal state out
-     */
-    def Safe(final T data, final Closure copy) {
-        this.data = data
-        this.copy = copy
-        start()
+  /**
+   * Allows closures to set the new internal state as a whole
+   */
+  final void updateValue(T newValue) { data = newValue }
+
+  /**
+   * A shorthand method for safe message-based retrieval of the internal state.
+   * Retrieves the internal state immediately by-passing the queue of tasks waiting to be processed.
+   */
+  final public T getInstantVal() {
+    T result = null
+    lock.withReadLock { result = copy(data) }
+    return result
+  }
+
+  /**
+   * A shorthand method for safe message-based retrieval of the internal state.
+   * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
+   */
+  @SuppressWarnings ("GroovyAssignabilityCheck")
+  final public T getVal() {
+    this.sendAndWait { getInstantVal() }
+  }
+
+  /**
+   * A shorthand method for safe asynchronous message-based retrieval of the internal state.
+   * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
+   * @param callback A closure to invoke with the internal state as a parameter
+   */
+  final public void valAsync(Closure callback) {
+    sendAndContinue({getInstantVal()}) {
+      callback.call(it)
     }
+  }
 
-    /**
-     * Accepts and invokes the closure
-     */
-    final void onMessage(Closure code) {
-        lock.withWriteLock {
-            code.delegate = this
-            replyIfExists code.call(data)
-        }
-    }
-
-    /**
-     * Other messages than closures are accepted as new values for the internal state
-     */
-    final void onMessage(T message) {
-        lock.withWriteLock {
-            updateValue message
-        }
-    }
-
-    /**
-     * Allows closures to set the new internal state as a whole
-     */
-    final void updateValue(T newValue) { data = newValue }
-
-    /**
-     * A shorthand method for safe message-based retrieval of the internal state.
-     * Retrieves the internal state immediately by-passing the queue of tasks waiting to be processed.
-     */
-    final public T getInstantVal() {
-        T result = null
-        lock.withReadLock { result = copy(data) }
-        return result
-    }
-
-    /**
-     * A shorthand method for safe message-based retrieval of the internal state.
-     * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
-     */
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    final public T getVal() {
-        this.sendAndWait { getInstantVal() }
-    }
-
-    /**
-     * A shorthand method for safe asynchronous message-based retrieval of the internal state.
-     * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
-     * @param callback A closure to invoke with the internal state as a parameter
-     */
-    final public void valAsync(Closure callback) {
-        sendAndContinue({getInstantVal()}) {
-            callback.call(it)
-        }
-    }
-
-    /**
-     * Blocks utntil all messages in the queue prior to call to await() complete.
-     * Provides a means to synchronize with the Safe
-     */
-    final public void await() {
-        this.sendAndWait {}
-    }
+  /**
+   * Blocks utntil all messages in the queue prior to call to await() complete.
+   * Provides a means to synchronize with the Safe
+   */
+  final public void await() {
+    this.sendAndWait {}
+  }
 }
