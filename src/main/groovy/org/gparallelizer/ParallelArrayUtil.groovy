@@ -16,6 +16,7 @@
 
 package org.gparallelizer
 
+import java.util.concurrent.ConcurrentHashMap
 import jsr166y.forkjoin.ForkJoinExecutor
 import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.Ops.Mapper
@@ -243,7 +244,6 @@ public class ParallelArrayUtil {
      * }
      */
     public static <T> Object findAsync(Collection<T> collection, Closure cl) {
-        //todo should return T, but gmaven rejects it
         createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).any()
     }
 
@@ -301,6 +301,50 @@ public class ParallelArrayUtil {
      */
     public static boolean anyAsync(Object collection, Closure cl) {
         return anyAsync(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * Elements in the same group gave identical results when the supplied closure was invoked on them.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>groupByAsync(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {
+     *     assert ([1, 2, 3, 4, 5].groupByAsync {Number number -> number % 2}).size() == 2
+     * }
+     */
+    public static <T> List<T> groupByAsync(Collection<T> collection, Closure cl) {
+        final def map = new ConcurrentHashMap()
+        eachAsync(collection, {
+            def result = cl(it)
+            final def myList = [it].asSynchronized()
+            def list = map.putIfAbsent(result, myList)
+            if (list!=null) list.add(it)
+        })
+        return map.values().asList()
+
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * Elements in the same group gave identical results when the supplied closure was invoked on them.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>groupByAsync(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {
+     *     assert ([1, 2, 3, 4, 5].groupByAsync {Number number -> number % 2}).size() == 2
+     * }
+     */
+    public static List<Object> groupByAsync(Object collection, Closure cl) {
+        return groupByAsync(createCollection(collection), cl)
     }
 
     /**

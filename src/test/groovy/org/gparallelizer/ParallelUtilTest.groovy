@@ -111,6 +111,20 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
+    @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
+    public void testGroupBy() {
+        Parallelizer.withParallelizer(5) {
+            assert ParallelArrayUtil.groupByAsync([1, 2, 3, 4, 5], {it > 2})
+            assert ParallelArrayUtil.groupByAsync([1, 2, 3, 4, 5], {Number number -> 1}).size() == 1
+            assert ParallelArrayUtil.groupByAsync([1, 2, 3, 4, 5],{Number number -> number}).size() == 5
+            final def groups = ParallelArrayUtil.groupByAsync([1, 2, 3, 4, 5], {Number number -> number % 2})
+            assert groups.size() == 2
+            assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
+            assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
+
+        }
+    }
+
     public void testParallelPools() {
         final AtomicReference reference = new AtomicReference()
         final CyclicBarrier barrier1 = new CyclicBarrier(2)

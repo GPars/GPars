@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * This class forms the core of the DSL initialized by <i>Asynchronizer</i>. The static methods of <i>AsyncInvokerUtil</i>
@@ -299,7 +300,7 @@ public class AsyncInvokerUtil {
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *     assert service.anyAsync([1, 2, 3, 4, 5]){Number number -> number > 2}*     assert !service.anyAsync([1, 2, 3, 4, 5]){Number number -> number > 6}*}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>findAllAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>anyAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *     assert [1, 2, 3, 4, 5].anyAsync{Number number -> number > 2}*     assert ![1, 2, 3, 4, 5].anyAsync{Number number -> number > 6}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
@@ -307,6 +308,29 @@ public class AsyncInvokerUtil {
         final AtomicBoolean flag = new AtomicBoolean(false)
         eachAsync(collection, {if (cl(it)) flag.set(true)})
         return flag.get()
+    }
+
+    /**
+     * Performs the <i>groupBy()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *     assert service.groupByAsync(([1, 2, 3, 4, 5]){Number number -> number % 2}).size() == 2
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
+     * have a new <i>groupByAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *     assert ([1, 2, 3, 4, 5].groupByAsync{Number number -> number % 2}).size() == 2
+     */
+    public static Collection groupByAsync(Object collection, Closure cl) {
+        final def map = new ConcurrentHashMap()
+        eachAsync(collection, {
+            def result = cl(it)
+            final def myList = [it].asSynchronized()
+            def list = map.putIfAbsent(result, myList)
+            if (list!=null) list.add(it)
+        })
+        return map.values().asList()
     }
 
     private static List<Object> processResult(List<Future<Object>> futures) {

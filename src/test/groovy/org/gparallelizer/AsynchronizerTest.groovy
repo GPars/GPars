@@ -155,6 +155,18 @@ public class AsynchronizerTest extends GroovyTestCase {
         }
     }
 
+    @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
+    public void testGroupByAsync() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            assert ([1, 2, 3, 4, 5].groupByAsync{Number number -> 1}).size() == 1
+            assert ([1, 2, 3, 4, 5].groupByAsync{Number number -> number}).size() == 5
+            final def groups = [1, 2, 3, 4, 5].groupByAsync {Number number -> number % 2}
+            assert groups.size() == 2
+            assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
+            assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
+        }
+    }
+
     public void testAsyncTask() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             final AtomicBoolean flag = new AtomicBoolean(false)
