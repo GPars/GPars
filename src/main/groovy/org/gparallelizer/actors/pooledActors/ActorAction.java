@@ -18,12 +18,9 @@ package org.gparallelizer.actors.pooledActors;
 
 import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;
-import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
-import org.codehaus.groovy.runtime.TimeCategory;
 import org.gparallelizer.actors.ReplyRegistry;
-
 import static org.gparallelizer.actors.pooledActors.ActorException.TERMINATE;
 
 import java.util.List;
@@ -39,7 +36,7 @@ import java.util.List;
  * to avoid race conditions with the new ActorAction and should terminate quickly by throwing a dedicated lifecycle exception..
  *
  * @author Vaclav Pech, Alex Tkachman
- * Date: Feb 7, 2009
+ *         Date: Feb 7, 2009
  */
 @SuppressWarnings({"AssignmentToNull"})
 public final class ActorAction implements Runnable {
@@ -66,13 +63,15 @@ public final class ActorAction implements Runnable {
 
     /**
      * Creates a new ActorAction asociated with a PooledActor, which will eventually perform the specified code.
+     *
      * @param actor The associated PooledActor
-     * @param code The code to perform on behalf of the actor
+     * @param code  The code to perform on behalf of the actor
      */
-    private ActorAction(final AbstractPooledActor actor, final Closure code) {
+    ActorAction(final AbstractPooledActor actor, final Runnable code) {
         super();
         this.actor = actor;
-        code.setDelegate(actor);
+        if (code instanceof Closure)
+            ((Closure) code).setDelegate(actor);
         this.code = code;
     }
 
@@ -87,14 +86,14 @@ public final class ActorAction implements Runnable {
     public void run() {
         try {
             try {
-                actor.getCurrentAction().set (this);
+                actor.getCurrentAction().set(this);
 
                 actionThread = Thread.currentThread();
                 ReplyRegistry.registerCurrentActorWithThread(this.actor);
 
                 if (cancelled || !actor.isActive()) throw TERMINATE;
                 try {
-                    GroovyCategorySupport.use(TimeCategory.class, (Closure) code);
+                    code.run();
                 } catch (GroovyRuntimeException gre) {
                     throw ScriptBytecodeAdapter.unwrap(gre);
                 }
@@ -115,7 +114,7 @@ public final class ActorAction implements Runnable {
         } finally {
             clearInterruptionFlag();
             ReplyRegistry.deregisterCurrentActorWithThread();
-            actor.getCurrentAction().compareAndSet (this, null);
+            actor.getCurrentAction().compareAndSet(this, null);
         }
     }
 
@@ -165,8 +164,8 @@ public final class ActorAction implements Runnable {
         handleTermination();
     }
 
-    private boolean callDynamic (final String method, final Object [] args) {
-        final List list = (List)InvokerHelper.invokeMethod(actor, "respondsTo", new Object[]{method});
+    private boolean callDynamic(final String method, final Object[] args) {
+        final List list = (List) InvokerHelper.invokeMethod(actor, "respondsTo", new Object[]{method});
         if (list != null && !list.isEmpty()) {
             InvokerHelper.invokeMethod(actor, method, args);
             return true;
@@ -176,11 +175,12 @@ public final class ActorAction implements Runnable {
 
     /**
      * Creates a new ActorAction and schedules it for processing in the thread pool belonging to the actor's group.
+     *
      * @param actor actor
      * @param code  code
      */
-    public static void actorAction(final AbstractPooledActor actor, final Closure code) {
-        actor.getActorGroup().getThreadPool().execute (new ActorAction(actor, code));
+    public static void actorAction(final AbstractPooledActor actor, final Runnable code) {
+        actor.getActorGroup().getThreadPool().execute(new ActorAction(actor, code));
     }
 
     public Thread getActionThread() {

@@ -16,7 +16,9 @@
 
 package org.gparallelizer.actors.pooledActors
 
+import org.codehaus.groovy.runtime.GroovyCategorySupport
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.codehaus.groovy.runtime.TimeCategory
 
 /**
  * Utility class to implement AbstractPooledActor backed by any Runnable (including Closure)
@@ -40,7 +42,7 @@ class RunnableBackedPooledActor extends AbstractPooledActor {
     }
     else {
       if (handler instanceof Closure) {
-        def cloned = (Closure)handler.clone ()
+        def cloned = (Closure) handler.clone()
         if (handler.owner == handler.delegate) {
           // otherwise someone else already took care for setting delegate for the closure
           cloned.delegate = this
@@ -59,15 +61,18 @@ class RunnableBackedPooledActor extends AbstractPooledActor {
 
   protected void act() {
     if (action != null)
-      action.run()
+      if (action instanceof Closure)
+        GroovyCategorySupport.use(TimeCategory.class, action);
+      else
+        action.run();
   }
 }
 
 class RunnableBackedPooledActorDelegate {
   final def first, second
 
-  RunnableBackedPooledActorDelegate (def f, def s) {
-    first  = f
+  RunnableBackedPooledActorDelegate(def f, def s) {
+    first = f
     second = s
   }
 

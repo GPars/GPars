@@ -12,23 +12,28 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors.pooledActors;
 
-import groovy.time.Duration
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.ActorMessage
-import org.gparallelizer.actors.CommonActorImpl
-import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction
-import static org.gparallelizer.actors.pooledActors.ActorException.*
-import org.gparallelizer.MessageStream
+import groovy.lang.Closure;
+import groovy.time.Duration;
+import org.codehaus.groovy.runtime.CurriedClosure;
+import org.codehaus.groovy.runtime.GroovyCategorySupport;
+import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.runtime.TimeCategory;
+import org.gparallelizer.MessageStream;
+import org.gparallelizer.actors.Actor;
+import org.gparallelizer.actors.ActorMessage;
+import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction;
+import static org.gparallelizer.actors.pooledActors.ActorException.*;
+
+import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -47,7 +52,7 @@ import org.gparallelizer.MessageStream
  * To support continuations correctly the react() and loop() methods never return.
  * <pre>
  * import static org.gparallelizer.actors.pooledActors.PooledActors.*
- *
+ * <p/>
  * def actor = actor {
  *     loop {
  *         react {message ->
@@ -56,12 +61,12 @@ import org.gparallelizer.MessageStream
  *         //this line will never be reached
  *     }
  *     //this line will never be reached
- *}.start()
- *
+ * }.start()
+ * <p/>
  * actor.send 'Hi!'
  * </pre>
  * This requires the code to be structured accordingly.
- *
+ * <p/>
  * <pre>
  * def adder = actor {
  *     loop {
@@ -74,7 +79,7 @@ import org.gparallelizer.MessageStream
  *         //this line will never be reached
  *     }
  *     //this line will never be reached
- *}.start()
+ * }.start()
  * </pre>
  * The react method can accept multiple messages in the passed-in closure
  * <pre>
@@ -94,7 +99,7 @@ import org.gparallelizer.MessageStream
  * </pre>
  * To speed up actor message processing enhancing messages and actors with reply methods can be disabled by calling
  * the disableSendingReplies() method. Calling enableSendingReplies() will initiate enhancements for reply again.
- *
+ * <p/>
  * The react() method accepts timeout specified using the TimeCategory DSL.
  * <pre>
  * react(10.MINUTES) {
@@ -106,8 +111,8 @@ import org.gparallelizer.MessageStream
  * Each PooledActor has at any point in time at most one active instance of ActorAction associated, which abstracts
  * the current chunk of actor's work to perform. Once a thread is assigned to the ActorAction, it moves the actor forward
  * till loop() or react() is called. These methods schedule another ActorAction for processing and throw dedicated exception
- * to terminate the current ActorAction. 
- *
+ * to terminate the current ActorAction.
+ * <p/>
  * Each Actor can define lifecycle observing methods, which will be called by the Actor's background thread whenever a certain lifecycle event occurs.
  * <ul>
  * <li>afterStart() - called immediately after the Actor's background thread has been started, before the act() method is called the first time.</li>
@@ -116,103 +121,116 @@ import org.gparallelizer.MessageStream
  * <li>onTimeout() - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.</li>
  * <li>onException(Throwable e) - called when an exception occurs in the actor's thread. Throwing an exception from this method will stop the actor.</li>
  * </ul>
- * @author Vaclav Pech
- * Date: Feb 7, 2009
+ *
+ * @author Vaclav Pech, Alex Tkachman
+ *         Date: Feb 7, 2009
  */
 abstract public class AbstractPooledActor extends PooledActor {
 
     /**
      * Queue for the messages
      */
-    final BlockingQueue messageQueue = new LinkedBlockingQueue();
+    final BlockingQueue<ActorMessage> messageQueue = new LinkedBlockingQueue<ActorMessage>();
 
     /**
      * Code for the next action
      */
-    private final AtomicReference<Closure> codeReference = new AtomicReference<Closure>(null)
-
-    /**
-     * Buffer to hold messages required by the scheduled next continuation. Null when no continuation scheduled.
-     */
-    private MessageHolder bufferedMessages = null
+    private final AtomicReference<Reaction> reaction = new AtomicReference<Reaction>();
 
     //todo should be private, but wouldn't work
     /**
      * A copy of buffer in case of timeout.
      */
-    List savedBufferedMessages = null
+    private List<ActorMessage> savedBufferedMessages;
 
     /**
      * Indicates whether the actor should terminate
      */
-    private final AtomicBoolean stopFlag = new AtomicBoolean(true)
+    private final AtomicBoolean stopFlag = new AtomicBoolean(true);
 
     /**
      * Code for the loop, if any
      */
-    private final AtomicReference<Closure> loopCode = new AtomicReference<Closure>(null)
+    private final AtomicReference<Runnable> loopCode = new AtomicReference<Runnable>();
 
     /**
      * The current active action (continuation) associated with the actor. An action must not use Actor's state
      * after it schedules a new action, only throw CONTINUE.
      */
-    final AtomicReference<ActorAction> currentAction = new AtomicReference<ActorAction>(null)
+    private final AtomicReference<ActorAction> currentAction = new AtomicReference<ActorAction>();
 
     /**
      * The current timeout task, which will send a TIMEOUT message to the actor if not cancelled by someone
      * calling the send() method within the timeout specified for the currently blocked react() method.
      */
-    private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>(null)
+    private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>();
 
     /**
      * Internal lock to synchronize access of external threads calling send() or stop() with the current active actor action
      */
-    private final Object lock = new Object()
+    private final Object lock = new Object();
 
     /**
      * Timer holding timeouts for react methods
      */
-    private static final Timer timer = new Timer(true)
+    private static final Timer timer = new Timer(true);
 
-    def AbstractPooledActor() {
-        actorGroup = PooledActors.defaultPooledActorGroup
+    public AbstractPooledActor() {
+        setActorGroup(PooledActors.defaultPooledActorGroup);
     }
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
      */
     public final AbstractPooledActor start() {
-        disableGroupMembershipChange()
-        if (!stopFlag.getAndSet(false)) throw new IllegalStateException("Actor has alredy been started.")
-        actorAction(this) {
-            if (delegate.respondsTo('afterStart')) delegate.afterStart()
-            act()
-        }
-        return this
+        disableGroupMembershipChange();
+        if (!stopFlag.getAndSet(false))
+            throw new IllegalStateException("Actor has already been started.");
+        actorAction(this, new Runnable() {
+            public void run() {
+                final Object list = InvokerHelper.invokeMethod(AbstractPooledActor.this, "respondsTo", new Object[]{"afterStart"});
+                if (list != null && !((List) list).isEmpty())
+                    InvokerHelper.invokeMethod(AbstractPooledActor.this, "afterStart", new Object[]{});
+                act();
+            }
+        });
+        return this;
     }
 
     /**
      * Sets the stopFlag
+     *
      * @return The previous value of the stopFlag
      */
     final boolean indicateStop() {
-        cancelCurrentTimeoutTimer('')
-        return stopFlag.getAndSet(true)
+        cancelCurrentTimeoutTimer("");
+        return stopFlag.getAndSet(true);
     }
 
     /**
      * Stops the Actor. The background thread will be interrupted, unprocessed messages will be passed to the afterStop
      * method, if exists.
      * Has no effect if the Actor is not started.
+     *
      * @return The actor
      */
     public final Actor stop() {
         synchronized (lock) {
             if (!indicateStop()) {
-                (codeReference.getAndSet(null)) ? actorAction(this) { throw TERMINATE } : currentAction.get()?.cancel()
+                if (reaction.getAndSet(null) != null)
+                    actorAction(this, new Runnable() {
+                        public void run() {
+                            throw TERMINATE;
+                        }
+                    });
+                else {
+                    final ActorAction action = currentAction.get();
+                    if (action != null)
+                        action.cancel();
+                }
             }
         }
-        return this
+        return this;
     }
 
     /**
@@ -220,14 +238,15 @@ abstract public class AbstractPooledActor extends PooledActor {
      */
     @Override
     public final boolean isActive() {
-        return !stopFlag.get()
+        return !stopFlag.get();
     }
 
     /**
      * Checks whether the current thread is the actor's current thread.
      */
     public final boolean isActorThread() {
-        return Thread.currentThread() == currentAction.get()?.actionThread
+        final ActorAction action = currentAction.get();
+        return action != null && Thread.currentThread() == action.getActionThread();
     }
 
     /**
@@ -237,41 +256,44 @@ abstract public class AbstractPooledActor extends PooledActor {
      * The default implementation throws UnsupportedOperationException.
      */
     protected void act() {
-        throw new UnsupportedOperationException("The act() method must be overriden")
+        throw new UnsupportedOperationException("The act() method must be overriden");
     }
 
     /**
      * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
      * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
      * @param duration Time to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
-     * The TimeCategory DSL to specify timeouts is available inside the Actor's act() method.
-     * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     * the closure to send a reply back to the actor, which sent the original message.
+     *                 The TimeCategory DSL to specify timeouts is available inside the Actor's act() method.
+     * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
+     *                 the closure to send a reply back to the actor, which sent the original message.
      */
     protected final void react(final Duration duration, final Closure code) {
-        react(duration.toMilliseconds(), code)
+        react(duration.toMilliseconds(), code);
     }
 
     /**
      * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
      * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
      * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     * the closure to send a reply back to the actor, which sent the original message.
+     *             the closure to send a reply back to the actor, which sent the original message.
      */
     protected final void react(final Closure code) {
-        react(-1, code)
+        react(-1, code);
     }
 
     /**
      * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
      * The method never returns, but instead frees the processing thread back to the thread pool.
-     * @param timeout Time in milliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
+     *
+     * @param timeout  Time in milliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
      * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
-     * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     * the closure to send a reply back to the actor, which sent the original message.
+     * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
+     *                 the closure to send a reply back to the actor, which sent the original message.
      */
     protected final void react(final long timeout, TimeUnit timeUnit, final Closure code) {
-        react(timeUnit.toMillis(timeout), code)
+        react(timeUnit.toMillis(timeout), code);
     }
 
     /**
@@ -281,66 +303,47 @@ abstract public class AbstractPooledActor extends PooledActor {
      * These methods will call send() on the target actor (the sender of the original message).
      * The reply()/replyIfExists() methods invoked on the actor will be sent to all currently processed messages,
      * reply()/replyIfExists() invoked on a message will send a reply to the sender of that particular message only.
+     *
      * @param timeout Time in milliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
-     * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     * the closure to send a reply back to the actor, which sent the original message.
+     * @param code    The code to handle the next message. The reply() and replyIfExists() methods are available inside
+     *                the closure to send a reply back to the actor, which sent the original message.
      */
     protected final void react(final long timeout, final Closure code) {
 
-        senders.clear()
-        final int maxNumberOfParameters = code.maximumNumberOfParameters
+        getSenders().clear();
+        final int maxNumberOfParameters = code.getMaximumNumberOfParameters();
 
-        Closure reactCode = {List<ActorMessage> messages ->
-
-            if (messages.any {ActorMessage actorMessage -> (TIMEOUT == actorMessage.payLoad)}) {
-                savedBufferedMessages = messages.findAll {it != null && TIMEOUT != it.payLoad}*.payLoad
-                throw TIMEOUT
-            }
-
-            if (sendRepliesFlag) {
-                for (message in messages) {
-                    senders << message?.sender
-                }
-                enhanceWithReplyMethodsToMessages(messages)
-            }
-            maxNumberOfParameters > 0 ? code.call(* (messages*.payLoad)) : code.call()
-            this.repeatLoop()
-        }
-        code.resolveStrategy=Closure.DELEGATE_FIRST
-        code.delegate = this
+        code.setResolveStrategy(Closure.DELEGATE_FIRST);
+        code.setDelegate(this);
 
         synchronized (lock) {
-            if (stopFlag.get()) throw TERMINATE
-            assert (codeReference.get() == null), "Cannot have more react called at the same time."
+            if (stopFlag.get())
+                throw TERMINATE;
 
-            bufferedMessages = new MessageHolder(maxNumberOfParameters)
+            if (reaction.get() != null)
+                throw new IllegalStateException("Cannot have more react called at the same time.");
 
-            ActorMessage currentMessage
-            while ((!bufferedMessages.ready) && (currentMessage = (ActorMessage) messageQueue.poll())) {
-                bufferedMessages.addMessage(currentMessage)
+            final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
+
+            ActorMessage currentMessage;
+            while ((!reactCode.isReady()) && (currentMessage = messageQueue.poll()) != null) {
+                reactCode.addMessage(currentMessage);
             }
-            if (bufferedMessages.ready) {
-                final List<ActorMessage> messages = bufferedMessages.messages
-                actorAction(this) { reactCode.call(messages) }
-                bufferedMessages = null
+            if (reactCode.isReady()) {
+                getActorGroup().getThreadPool().execute(new ActorAction(this, reactCode));
             } else {
-                codeReference.set(reactCode)
+                reaction.set(reactCode);
                 if (timeout >= 0) {
-                    timerTask.set([run: { this.send(TIMEOUT) }] as TimerTask)
-                    timer.schedule(timerTask.get(), timeout)
+                    timerTask.set(new TimerTask() {
+                        public void run() {
+                            send(TIMEOUT);
+                        }
+                    });
+                    timer.schedule(timerTask.get(), timeout);
                 }
             }
         }
-        throw CONTINUE
-    }
-
-    //todo should be private but mixins woudn't work
-    /**
-     * Does the actual message receive using the supplied closure and wraps it with all necessary ceremony
-     */
-    final ActorMessage doReceive(Closure code) throws InterruptedException {
-        if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
-        return code()
+        throw CONTINUE;
     }
 
     //todo should be private, but woudn't be work
@@ -349,70 +352,93 @@ abstract public class AbstractPooledActor extends PooledActor {
      * These methods will call send() on the target actor (the sender of the original message).
      * The reply()/replyIfExists() methods invoked on the actor will be sent to all currently processed messages,
      * reply()/replyIfExists() invoked on a message will send a reply to the sender of that particular message only.
-     * @param message The instance of ActorMessage wrapping the sender actor, who we need to be able to respond to,
-     * plus the original message
+     *
+     * @param messages List of ActorMessage wrapping the sender actor, who we need to be able to respond to,
+     *                 plus the original message
      */
     final void enhanceReplies(List<ActorMessage> messages) {
-        senders.clear()
-        if (sendRepliesFlag) {
-            for (message in messages) {
-                senders << message?.sender
+        final List<MessageStream> senders = getSenders();
+        senders.clear();
+        if (getSendRepliesFlag()) {
+            for (ActorMessage message : messages) {
+                senders.add(message == null ? null : message.getSender());
             }
-            enhanceWithReplyMethodsToMessages(messages)
+            enhanceWithReplyMethodsToMessages(messages);
         }
     }
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
      * @return The message retrieved from the queue.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receiveImpl() throws InterruptedException {
-        Object message = doReceive {messageQueue.take()}
-        enhanceReplies([message])
-        return message?.payLoad
+        if (stopFlag.get())
+            throw new IllegalStateException("The actor hasn't been started.");
+        ActorMessage message = messageQueue.take();
+        enhanceReplies(Arrays.asList(message));
+        if (message == null)
+            return null;
+        return message.getPayLoad();
     }
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     * @param timeout how long to wait before giving up, in units of unit
+     *
+     * @param timeout  how long to wait before giving up, in units of unit
      * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
-        Object message = doReceive {messageQueue.poll(timeout, timeUnit)}
-        enhanceReplies([message])
-        return message?.payLoad
+        if (stopFlag.get())
+            throw new IllegalStateException("The actor hasn't been started.");
+        ActorMessage message = messageQueue.poll(timeout, timeUnit);
+        enhanceReplies(Arrays.asList(message));
+        if (message == null)
+            return null;
+        return message.getPayLoad();
     }
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * The message retrieved from the queue is passed into the handler as the only parameter.
+     *
      * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(Closure handler) throws InterruptedException {
-        handler.resolveStrategy=Closure.DELEGATE_FIRST
-        handler.delegate = this
-        int maxNumberOfParameters = handler.maximumNumberOfParameters
+        handler.setResolveStrategy(Closure.DELEGATE_FIRST);
+        handler.setDelegate(this);
+        int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
         if (maxNumberOfParameters == 0) {
-            ActorMessage message = doReceive {messageQueue.take()}
+            if (stopFlag.get())
+                throw new IllegalStateException("The actor hasn't been started.");
+            ActorMessage message = messageQueue.take();
             try {
-                enhanceReplies([message])
-                handler.call()
+                enhanceReplies(Arrays.asList(message));
+                handler.call();
             } finally {
-                senders.clear()
+                getSenders().clear();
             }
 
         } else {
-            final List<ActorMessage> messages = []
-            for (i in 1..maxNumberOfParameters) { messages << doReceive {messageQueue.take()} }
+            final List<ActorMessage> messages = new ArrayList<ActorMessage>();
+            if (stopFlag.get())
+                throw new IllegalStateException("The actor hasn't been started.");
+            for (int i = 0; i != maxNumberOfParameters; ++i) {
+                messages.add(messageQueue.take());
+            }
             try {
-                enhanceReplies(messages)
-                handler.call(* messages*.payLoad)
+                enhanceReplies(messages);
+                Object args[] = new Object[messages.size()];
+                for (int i = 0; i < args.length; i++) {
+                    args[i] = messages.get(i).getPayLoad();
+                }
+                handler.call(args);
             } finally {
-                senders.clear()
+                getSenders().clear();
             }
         }
     }
@@ -421,44 +447,54 @@ abstract public class AbstractPooledActor extends PooledActor {
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * The message retrieved from the queue is passed into the handler as the only parameter.
      * A null value is passed into the handler, if the timeout expires
-     * @param timeout how long to wait before giving up, in units of unit
+     *
+     * @param timeout  how long to wait before giving up, in units of unit
      * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
-     * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
+     * @param handler  A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
-        handler.resolveStrategy=Closure.DELEGATE_FIRST
-        handler.delegate = this
-        int maxNumberOfParameters = handler.maximumNumberOfParameters
+        handler.setResolveStrategy(Closure.DELEGATE_FIRST);
+        handler.setDelegate(this);
+        int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
         if (maxNumberOfParameters == 0) {
-            ActorMessage message = doReceive {messageQueue.poll(timeout, timeUnit)}
+            if (stopFlag.get())
+                throw new IllegalStateException("The actor hasn't been started.");
+            ActorMessage message = messageQueue.poll(timeout, timeUnit);
             try {
-                enhanceReplies([message])
-                handler.call()
+                enhanceReplies(Arrays.asList(message));
+                handler.call();
             } finally {
-                senders.clear()
+                getSenders().clear();
             }
 
         } else {
-            long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis()
-            boolean nullAppeared = false  //Ignore further potential messages once a null is retrieved (due to a timeout)
+            long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
+            boolean nullAppeared = false;  //Ignore further potential messages once a null is retrieved (due to a timeout)
 
-            final List<ActorMessage> messages = []
-            for (i in 1..maxNumberOfParameters) {
-                if (nullAppeared) messages << null
+            final List<ActorMessage> messages = new ArrayList<ActorMessage>();
+            for (int i = 0; i != maxNumberOfParameters; ++i) {
+                if (nullAppeared)
+                    messages.add(null);
                 else {
-                    ActorMessage message = doReceive {
-                        messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS)
-                    }
-                    nullAppeared = (message == null)
-                    messages << message
+                    if (stopFlag.get())
+                        throw new IllegalStateException("The actor hasn't been started.");
+                    ActorMessage message =
+                            messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
+                    nullAppeared = (message == null);
+                    messages.add(message);
                 }
             }
             try {
-                enhanceReplies(messages)
-                handler.call(* messages*.payLoad)
+                enhanceReplies(messages);
+                Object args[] = new Object[messages.size()];
+                for (int i = 0; i < args.length; i++) {
+                    final ActorMessage am = messages.get(i);
+                    args[i] = am == null ? am : am.getPayLoad();
+                }
+                handler.call(args);
             } finally {
-                senders.clear()
+                getSenders().clear();
             }
         }
     }
@@ -467,18 +503,21 @@ abstract public class AbstractPooledActor extends PooledActor {
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      * The message retrieved from the queue is passed into the handler as the only parameter.
      * A null value is passed into the handler, if the timeout expires
+     *
      * @param duration how long to wait before giving up, in units of unit
-     * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
+     * @param handler  A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final void receive(Duration duration, Closure handler) throws InterruptedException {
-        receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler)
+        receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler);
     }
 
     /**
      * Releases the latch with all threads that have called join on the actor
      */
-    final void releaseJoinedThreads() { joinLatch.countDown() }
+    final void releaseJoinedThreads() {
+        getJoinLatch().countDown();
+    }
 
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
@@ -487,81 +526,141 @@ abstract public class AbstractPooledActor extends PooledActor {
     public final Actor send(Object message) {
         synchronized (lock) {
             if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
-            cancelCurrentTimeoutTimer(message)
+            cancelCurrentTimeoutTimer(message);
 
-            def actorMessage
-            if(message instanceof ActorMessage)
-              actorMessage = message;
+            ActorMessage actorMessage;
+            if (message instanceof ActorMessage)
+                actorMessage = (ActorMessage) message;
             else
-              actorMessage = ActorMessage.build(message);
+                actorMessage = ActorMessage.build(message);
 
-            final Closure currentReference = codeReference.get()
-            if (currentReference) {
-                assert bufferedMessages && !bufferedMessages.isReady()
-                bufferedMessages.addMessage actorMessage
-                if (bufferedMessages.ready) {
-                    final List<ActorMessage> messages = bufferedMessages.messages
-                    codeReference.set(null)
-                    bufferedMessages = null
-                    actorAction(this) { currentReference.call(messages) }
+            final Reaction reactCode = reaction.get();
+            if (reactCode != null) {
+                assert !reactCode.isReady();
+                reactCode.addMessage(actorMessage);
+                if (reactCode.isReady()) {
+                    reaction.set(null);
+                    getActorGroup().getThreadPool().execute(new ActorAction(this, reactCode));
                 }
             } else {
-                messageQueue.put(actorMessage)
+                messageQueue.offer(actorMessage);
             }
         }
-        return this
+        return this;
     }
 
     /**
      * Clears the message queue returning all the messages it held.
+     *
      * @return The messages stored in the queue
      */
     final List sweepQueue() {
-        def messages = []
-        if (savedBufferedMessages) messages.addAll savedBufferedMessages
-        ActorMessage message = messageQueue.poll()
+        ArrayList<ActorMessage> messages = new ArrayList<ActorMessage>();
+        if (savedBufferedMessages != null && !savedBufferedMessages.isEmpty())
+            messages.addAll(savedBufferedMessages);
+        ActorMessage message = messageQueue.poll();
         while (message != null) {
-          if (message.payLoad.respondsTo('onDeliveryError'))
-            message.payLoad.onDeliveryError()
-          else
-            if (message.sender.respondsTo('onDeliveryError'))
-              message.sender.onDeliveryError ()
-            messages << message
-            message = messageQueue.poll()
+            Object list = InvokerHelper.invokeMethod(message.getPayLoad(), "respondsTo", new Object[]{"onDeliveryError"});
+            if (list != null && !((List) list).isEmpty())
+                InvokerHelper.invokeMethod(message.getPayLoad(), "onDeliveryError", new Object[0]);
+            else {
+                list = InvokerHelper.invokeMethod(message.getSender(), "respondsTo", new Object[]{"onDeliveryError"});
+                if (list != null && !((List) list).isEmpty())
+                    InvokerHelper.invokeMethod(message.getSender(), "onDeliveryError", new Object[0]);
+            }
+
+            messages.add(message);
+            message = messageQueue.poll();
         }
-        return messages
+        return messages;
     }
 
     /**
      * Ensures that the supplied closure will be invoked repeatedly in a loop.
      * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
      * @param code The closure to invoke repeatedly
      */
-    protected final void loop(final Closure code) {
-        assert loopCode.get() == null, "The loop method must be only called once"
-        final Closure enhancedCode = {code(); repeatLoop()}
-        enhancedCode.resolveStrategy=Closure.DELEGATE_FIRST
-        enhancedCode.delegate = this
-        loopCode.set(enhancedCode)
-        doLoopCall(enhancedCode)
+    protected final void loop(final Runnable code) {
+        if (loopCode.get() != null)
+            throw new IllegalStateException("The loop method must be only called once");
+
+        if (code instanceof Closure) {
+            ((Closure) code).setResolveStrategy(Closure.DELEGATE_FIRST);
+            ((Closure) code).setDelegate(this);
+        }
+        final Runnable enhancedCode = new Runnable() {
+            public void run() {
+                if (code instanceof Closure)
+                    GroovyCategorySupport.use(TimeCategory.class, (Closure) code);
+                else
+                    code.run();
+                repeatLoop();
+            }
+        };
+        loopCode.set(enhancedCode);
+        doLoopCall(enhancedCode);
     }
 
     /**
      * Plans another loop iteration
      */
     protected final void repeatLoop() {
-        final Closure code = loopCode.get()
-        if (!code) return;
-        doLoopCall(code)
+        final Runnable code = loopCode.get();
+        if (code == null)
+            return;
+        doLoopCall(code);
     }
 
-    private def doLoopCall(Closure code) {
-        if (stopFlag.get()) throw TERMINATE
-        actorAction(this, code)
-        throw CONTINUE
+    private void doLoopCall(Runnable code) {
+        if (stopFlag.get())
+            throw TERMINATE;
+        getActorGroup().getThreadPool().execute(new ActorAction(this, code));
+        throw CONTINUE;
     }
 
-    private def cancelCurrentTimeoutTimer(message) {
-        if (TIMEOUT != message) timerTask.get()?.cancel()
+    private void cancelCurrentTimeoutTimer(Object message) {
+        if (TIMEOUT != message) {
+            final TimerTask task = timerTask.get();
+            if (task != null)
+                task.cancel();
+        }
+    }
+
+    public AtomicReference<ActorAction> getCurrentAction() {
+        return currentAction;
+    }
+
+    void runReaction(List<ActorMessage> messages, int maxNumberOfParameters, Closure code) {
+        for (ActorMessage message : messages) {
+            if (message.getPayLoad() == TIMEOUT) {
+                final ArrayList saved = new ArrayList();
+                for (ActorMessage m : messages) {
+                    if (m != null && m.getPayLoad() != TIMEOUT)
+                        saved.add(m.getPayLoad());
+                }
+                savedBufferedMessages = saved;
+                throw TIMEOUT;
+            }
+        }
+
+        if (getSendRepliesFlag()) {
+            for (ActorMessage message : messages) {
+                if (message != null)
+                    getSenders().add(message.getSender());
+            }
+            enhanceWithReplyMethodsToMessages(messages);
+        }
+
+        if (maxNumberOfParameters > 0) {
+            Object args[] = new Object[messages.size()];
+            for (int i = 0; i < args.length; i++) {
+                final ActorMessage am = messages.get(i);
+                args[i] = am == null ? null : am.getPayLoad();
+            }
+            code = new CurriedClosure(code, args);
+        }
+        GroovyCategorySupport.use(TimeCategory.class, code);
+        repeatLoop();
     }
 }

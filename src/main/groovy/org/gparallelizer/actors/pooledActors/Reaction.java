@@ -16,9 +16,9 @@
 
 package org.gparallelizer.actors.pooledActors;
 
+import groovy.lang.Closure;
 import org.gparallelizer.actors.ActorMessage;
 
-import static java.lang.Math.max;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,48 +26,65 @@ import java.util.List;
 /**
  * Buffers messages for the next continuation of an event-driven actor, handles timeouts and no-param continuations.
  *
- * @author Vaclav Pech
- * Date: May 22, 2009
+ * @author Vaclav Pech, Alex Tkachman
+ *         Date: May 22, 2009
  */
 @SuppressWarnings({"InstanceVariableOfConcreteClass"})
-public final class MessageHolder {
+final class Reaction implements Runnable {
     private final int numberOfExpectedMessages;
     private int currentSize = 0;
     private final ActorMessage[] messages;
     private boolean timeout = false;
+    private final AbstractPooledActor actor;
+    private final Closure code;
 
     /**
      * Creates a new instance.
-     * @param numberOfExpectedMessages The number of messages expected by the next continuation. If zero, the buffer
-     * will still wait for a message, but return an empty message list from the getMessages() method.
+     *
+     * @param numberOfExpectedMessages The number of messages expected by the next continuation
+     * @param code
      */
-    MessageHolder(final int numberOfExpectedMessages) {
-        this.numberOfExpectedMessages = max(1, numberOfExpectedMessages);  //the numberOfExpectedMessages field cannot be zero
-        messages = new ActorMessage[this.numberOfExpectedMessages];
+    Reaction(AbstractPooledActor actor, final int numberOfExpectedMessages, Closure code) {
+        this.actor = actor;
+        this.code = code;
+        this.numberOfExpectedMessages = numberOfExpectedMessages;
+        messages = new ActorMessage[numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages];
+    }
+
+    Reaction(final int numberOfExpectedMessages) {
+        this(null, numberOfExpectedMessages, null);
     }
 
     /**
      * Retrieves the current number of messages in the buffer.
+     *
      * @return The curent buffer size
      */
-    public int getCurrentSize() { return currentSize; }
+    public int getCurrentSize() {
+        return currentSize;
+    }
 
     /**
      * Indicates, whether a timeout message is held in the buffer
+     *
      * @return True, if a timeout event has been detected.
      */
-    public boolean isTimeout() { return timeout; }
+    public boolean isTimeout() {
+        return timeout;
+    }
 
     /**
      * Indicates whether the buffer contains all the messages required for the next continuation.
+     *
      * @return True, if the next continuation can start.
      */
     public boolean isReady() {
-        return timeout || getCurrentSize() == numberOfExpectedMessages;
+        return timeout || (getCurrentSize() == (numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages));
     }
 
     /**
      * Adds a new message to the buffer.
+     *
      * @param message The message to add.
      */
     public void addMessage(final ActorMessage message) {
@@ -79,6 +96,7 @@ public final class MessageHolder {
 
     /**
      * Retrieves messages for the next continuation once the MessageHolder is ready.
+     *
      * @return The messages to pass to the next continuation.
      */
     public List<ActorMessage> getMessages() {
@@ -89,9 +107,14 @@ public final class MessageHolder {
     /**
      * Dumps so far stored messages. Useful on timeout to restore the already delivered messages
      * to the afterStop() handler in the PooledActor's sweepQueue() method..
+     *
      * @return The messages stored so far.
      */
     List<ActorMessage> dumpMessages() {
         return Collections.unmodifiableList(Arrays.asList(messages));
+    }
+
+    public void run() {
+        actor.runReaction(Arrays.asList(messages), numberOfExpectedMessages, code);
     }
 }
