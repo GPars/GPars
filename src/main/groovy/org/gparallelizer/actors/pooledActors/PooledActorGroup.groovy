@@ -41,7 +41,7 @@ package org.gparallelizer.actors.pooledActors
  * which defaults to the PooledActors.defaultPooledActorGroup, can be set before the actor is started.
  *
  * <pre>
- * def group = new PooledActorGroup(false)
+ * def group = new PooledActorGroup()
  *
  * def actor = new MyActor()
  * actor.actorGroup = group
@@ -61,9 +61,10 @@ public final class PooledActorGroup extends AbstractPooledActorGroup {
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
-    def PooledActorGroup(final Pool threadPool) {
-        super(threadPool);
+    protected def PooledActorGroup(final Pool threadPool) {
+        super(threadPool)
     }
+
 
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.

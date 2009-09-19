@@ -16,21 +16,26 @@
 
 package org.gparallelizer.actors.pooledActors
 
-import org.gparallelizer.actors.AbstractActorGroup
-
 /**
  * Provides a common super class fo pooled actor's groups.
  *
  * @author Vaclav Pech
  * Date: May 8, 2009
  */
-public abstract class AbstractPooledActorGroup extends AbstractActorGroup {
+public abstract class AbstractPooledActorGroup {
 
     /**
-     * Creates a group of actors. The actors will share a common thread pool of threads.
+     * Stored the group actors' thread pool
+     */
+    private @Delegate Pool threadPool
+
+    public Pool getThreadPool() { return threadPool; }
+
+    /**
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
     protected def AbstractPooledActorGroup(final Pool threadPool) {
-        super(threadPool);
+        this.threadPool = threadPool
     }
 
     /**

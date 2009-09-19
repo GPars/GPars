@@ -6,7 +6,7 @@
     todo rename SafeVariable - Safe, Agent
     todo add generics to SafeVariable
     todo make pooled actors use receive()
-    todo eachWithIndexAsync(), grepAsync()
+    todo eachWithIndexAsync(), grepAsync(), groupByAsync()
 
     Planned for the next release
 
