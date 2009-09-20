@@ -11,6 +11,7 @@ public class SyncTest extends GroovyTestCase {
           def something = node.mainActor.sendAndWait("give me something")
           assertEquals "here is something", something
           node.mainActor.stop()
+          node.mainActor.join()
           stop()
         }
       }
@@ -18,7 +19,7 @@ public class SyncTest extends GroovyTestCase {
       loop { react {} }
     })
 
-    new LocalNode(new NettyTransportProvider(), {
+    def node2 = new LocalNode(new NettyTransportProvider(), {
       loop {
         react {msg ->
           switch (msg) {
@@ -31,6 +32,8 @@ public class SyncTest extends GroovyTestCase {
     })
 
     node1.mainActor.join()
+    node1.localHost.disconnect()
+    node2.localHost.disconnect()
   }
 
   void testSendAndContinue() {

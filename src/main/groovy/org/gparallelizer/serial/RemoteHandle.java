@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright � 2008-9  The original author or authors
+//  Copyright © 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,40 +16,33 @@
 
 package org.gparallelizer.serial;
 
-import org.gparallelizer.remote.RemoteHost;
-
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.io.WriteAbortedException;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 /**
  * @author Alex Tkachman
  */
-public class RemoteHandle implements Serializable {
-    private final UUID serialId;
-    private final UUID hostId;
+public abstract class RemoteHandle implements Serializable {
+    protected final UUID serialId;
+    protected final UUID hostId;
 
-    private final Class klazz;
-
-    public RemoteHandle(UUID id, UUID hostId, Class klazz) {
-        this.serialId = id;
+    public RemoteHandle(UUID hostId, UUID id) {
         this.hostId = hostId;
-        this.klazz = klazz;
+        serialId = id;
     }
 
     @SuppressWarnings({"CatchGenericClass", "UnusedDeclaration", "OverlyBroadCatchBlock"})
-    protected Object readResolve() throws ObjectStreamException {
+    protected final Object readResolve() throws ObjectStreamException {
         final SerialContext context = SerialContext.get();
         final SerialHandle serialHandle = context.get(serialId);
 
         WithSerialId obj;
         if (serialHandle == null || (obj = serialHandle.get()) == null) {
             try {
-                final Constructor constructor = klazz.getConstructor(RemoteHost.class);
-
-                obj = (WithSerialId) constructor.newInstance(context);
+                obj = createObject(context);
                 obj.serialHandle = SerialHandle.create(obj, serialId);
             } catch (Exception t) {
                 throw new WriteAbortedException(t.getMessage(), t);
@@ -57,4 +50,6 @@ public class RemoteHandle implements Serializable {
         }
         return obj;
     }
+
+    protected abstract WithSerialId createObject(SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 }

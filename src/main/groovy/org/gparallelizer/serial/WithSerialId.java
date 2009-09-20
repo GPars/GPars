@@ -83,6 +83,10 @@ public abstract class WithSerialId implements Serializable {
 
         final SerialContext host = SerialContext.get();
         handle.subscribe(host);
-        return new RemoteHandle(handle.getSerialId(), host.getHostId(), getRemoteClass());
+        return createRemoteHandle(handle, host);
+    }
+
+    protected RemoteHandle createRemoteHandle(SerialHandle handle, SerialContext host) {
+        return new DefaultRemoteHandle(handle.getSerialId(), host.getHostId(), getRemoteClass());
     }
 }

@@ -517,7 +517,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
      * Releases the latch with all threads that have called join on the actor
      */
     final void releaseJoinedThreads() {
-        getJoinLatch().countDown();
+        getJoinLatch().bind(null);
     }
 
     /**

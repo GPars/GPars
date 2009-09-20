@@ -15,11 +15,16 @@
 //  limitations under the License.
 package org.gparallelizer.actors;
 
+import groovy.time.Duration;
 import org.gparallelizer.MessageStream;
+import org.gparallelizer.dataflow.DataFlowExpression;
+import org.gparallelizer.dataflow.DataFlowVariable;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;
-import org.gparallelizer.serial.RemoteSerialized;
-import org.gparallelizer.serial.SerialMsg;
+import org.gparallelizer.serial.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Actors are active objects, which either have their own thread processing repeatedly messages submitted to them
@@ -31,6 +36,21 @@ import org.gparallelizer.serial.SerialMsg;
  * @author Vaclav Pech, Alex Tkachman
  */
 public abstract class Actor extends MessageStream {
+
+    private final DataFlowExpression joinLatch;
+
+    protected Actor() {
+        this(new DataFlowVariable());
+    }
+
+    /**
+     * Constructor to be used by deserialization
+     *
+     * @param joinLatch
+     */
+    protected Actor(DataFlowExpression joinLatch) {
+        this.joinLatch = joinLatch;
+    }
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
@@ -63,25 +83,81 @@ public abstract class Actor extends MessageStream {
 
     /**
      * Joins the actor. Waits for its termination.
+     *
+     * @throws InterruptedException when interrupted while waiting
      */
-    public abstract void join() throws InterruptedException;
+    public final void join() throws InterruptedException {
+        joinLatch.getVal();
+    }
 
     /**
-     * Joins the actor. Waits fot its termination.
+     * Notify listener when finished
      *
-     * @param milis Timeout in miliseconds
+     * @param listener listener to notify
+     * @throws InterruptedException if interrupted while waiting
      */
-    public abstract void join(long milis) throws InterruptedException;
+    public final void join(MessageStream listener) throws InterruptedException {
+        joinLatch.getValAsync(listener);
+    }
 
-    public Class getRemoteClass() {
-        return RemoteActor.class;
+    /**
+     * Joins the actor. Waits for its termination.
+     *
+     * @param timeout timeout
+     * @param unit    units of timeout
+     * @throws InterruptedException if interrupted while waiting
+     */
+    public final void join(final long timeout, TimeUnit unit) throws InterruptedException {
+        if (timeout > 0)
+            joinLatch.getVal(timeout, unit);
+        else
+            joinLatch.getVal();
+    }
+
+    /**
+     * Joins the actor. Waits for its termination.
+     *
+     * @param duration timeout to wait
+     * @throws InterruptedException if interrupted while waiting
+     */
+    public final void join(Duration duration) throws InterruptedException {
+        join(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Join-point for this actor
+     *
+     * @return
+     */
+    public DataFlowExpression getJoinLatch() {
+        return joinLatch;
+    }
+
+    @Override
+    protected RemoteHandle createRemoteHandle(SerialHandle handle, SerialContext host) {
+        return new MyRemoteHandle(handle, host, joinLatch);
+    }
+
+    public static class MyRemoteHandle extends DefaultRemoteHandle {
+        private final DataFlowExpression joinLatch;
+
+        public MyRemoteHandle(SerialHandle handle, SerialContext host, DataFlowExpression joinLatch) {
+            super(handle.getSerialId(), host.getHostId(), RemoteActor.class);
+            this.joinLatch = joinLatch;
+        }
+
+        @Override
+        protected WithSerialId createObject(SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+            return new RemoteActor(context, joinLatch);
+        }
     }
 
     public static class RemoteActor extends Actor implements RemoteSerialized {
         private final RemoteHost remoteHost;
 
-        public RemoteActor(RemoteHost host) {
-            remoteHost = host;
+        public RemoteActor(SerialContext host, DataFlowExpression jointLatch) {
+            super(jointLatch);
+            remoteHost = (RemoteHost) host;
         }
 
         public Actor start() {
@@ -101,14 +177,6 @@ public abstract class Actor extends MessageStream {
             throw new UnsupportedOperationException();
         }
 
-        public void join() {
-            throw new UnsupportedOperationException();
-        }
-
-        public void join(long milis) {
-            throw new UnsupportedOperationException();
-        }
-
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
                 message = new ActorMessage<Object>(message, ReplyRegistry.threadBoundActor());
@@ -118,10 +186,9 @@ public abstract class Actor extends MessageStream {
         }
 
         public static class StopActorMsg extends SerialMsg {
-            public final Actor actor;
+            private final Actor actor;
 
             public StopActorMsg(RemoteActor remoteActor) {
-                super();
                 actor = remoteActor;
             }
 

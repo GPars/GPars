@@ -29,6 +29,8 @@ import org.gparallelizer.serial.SerialMsg;
 import org.gparallelizer.serial.WithSerialId;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
@@ -65,7 +67,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param <V> The type of the value to bind
      */
-    private static class WaitingThread<V> {
+    private static class WaitingThread<V> extends AtomicBoolean {
         private final Thread thread;
         private volatile WaitingThread<V> previous;
         private final MessageStream callback;
@@ -174,6 +176,50 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                 while (state.get() != S_INITIALIZED) {
                     LockSupport.park();
                     if (Thread.currentThread().isInterrupted()) {
+                        newWaiting.set(true); // don't unpark please
+                        throw new InterruptedException();
+                    }
+                }
+                break;
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Reads the value of the variable. Blocks up to given timeout, if the value has not been assigned yet.
+     *
+     * @return The actual value
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
+    public T getVal(long timeout, TimeUnit units) throws InterruptedException {
+        long endNano = System.nanoTime() + units.toNanos(timeout);
+        WaitingThread<T> newWaiting = null;
+        while (state.get() != S_INITIALIZED) {
+            if (newWaiting == null) {
+                newWaiting = new WaitingThread<T>(Thread.currentThread(), null, null, null);
+            }
+
+            final WaitingThread<T> previous = waiting.get();
+            // it means that writer already started processing queue, so value is already in place
+            if (previous == dummyWaitingThread) {
+                break;
+            }
+
+            newWaiting.previous = previous;
+            if (waiting.compareAndSet(previous, newWaiting)) {
+                // ok, we are in the queue, so writer is responsible to process us
+                while (state.get() != S_INITIALIZED) {
+                    long toWait = endNano - System.nanoTime();
+                    if (toWait <= 0) {
+                        newWaiting.set(true); // don't unpark please
+                        return null;
+                    }
+
+                    LockSupport.parkNanos(toWait);
+                    if (Thread.currentThread().isInterrupted()) {
+                        newWaiting.set(true); // don't unpark please
                         throw new InterruptedException();
                     }
                 }
@@ -229,11 +275,16 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
         // no more new waiting threads since that point
         for (WaitingThread<T> waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
-            if (waiting.thread != null) {
-                LockSupport.unpark(waiting.thread);  //can be potentially called on a not parked thread, which is OK as in this case
-            } else {
-                if (waiting.callback != null)
-                    scheduleCallback(waiting.attachment, waiting.callback);
+            // maybe waiting thread canceled or was interrupted
+            if (waiting.compareAndSet(false, true)) {
+                if (waiting.thread != null) {
+                    // can be potentially called on a non-parked thread,
+                    // which is OK as in this case next park () will be ignored
+                    LockSupport.unpark(waiting.thread);
+                } else {
+                    if (waiting.callback != null)
+                        scheduleCallback(waiting.attachment, waiting.callback);
+                }
             }
         }
     }

@@ -43,6 +43,14 @@ public abstract class MessageStream extends WithSerialId {
      */
     public abstract MessageStream send(Object message);
 
+    /**
+     * Send message to stream and return immediately
+     *
+     * @param message message to send
+     * @param replyTo where to send reply
+     * @param <T>     type of message accepted by the stream
+     * @return always return message stream itself
+     */
     public final <T> MessageStream send(T message, MessageStream replyTo) {
         return send(new ActorMessage<T>(message, replyTo));
     }
@@ -66,7 +74,7 @@ public abstract class MessageStream extends WithSerialId {
      * @throws InterruptedException if interrupted while waiting
      */
     public final <T, V> V sendAndWait(T message) throws InterruptedException {
-        ReplyWaiter<V> to = new ReplyWaiter<V>();
+        ResultWaiter<V> to = new ResultWaiter<V>();
         send(new ActorMessage<T>(message, to));
         return to.getResult();
     }
@@ -97,7 +105,7 @@ public abstract class MessageStream extends WithSerialId {
      * @throws InterruptedException if interrupted while waiting
      */
     public final <T> Object sendAndWait(long timeout, TimeUnit units, T message) throws InterruptedException {
-        ReplyWaiter to = new ReplyWaiter();
+        ResultWaiter to = new ResultWaiter();
         send(new ActorMessage<T>(message, to));
         return to.getResult(timeout, units);
     }
@@ -120,12 +128,12 @@ public abstract class MessageStream extends WithSerialId {
         return RemoteMessageStream.class;
     }
 
-    private static class ReplyWaiter<V> extends MessageStream {
+    private static class ResultWaiter<V> extends MessageStream {
         private volatile Object value;
 
         private volatile boolean isSet;
 
-        private ReplyWaiter() {
+        private ResultWaiter() {
             value = Thread.currentThread();
         }
 

@@ -27,14 +27,13 @@ import org.gparallelizer.actors.pooledActors.ActorReplyException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Represents the common superclass to both thread-bound and event-driven actors.
  *
  * @author Vaclav Pech, Alex Tkachman
- * Date: Jun 13, 2009
+ *         Date: Jun 13, 2009
  */
 public abstract class CommonActorImpl extends Actor {
 
@@ -89,11 +88,14 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * Disallows any subsequent changes to the group attached to the actor.
      */
-    protected final void disableGroupMembershipChange() { groupMembershipChangeable = false; }
+    protected final void disableGroupMembershipChange() {
+        groupMembershipChangeable = false;
+    }
 
     /**
      * Sets the actor's group.
      * It can only be invoked before the actor is started.
+     *
      * @param group new group
      */
     public final void setActorGroup(final ActorGroup group) {
@@ -107,38 +109,12 @@ public abstract class CommonActorImpl extends Actor {
     }
 
     /**
-     * Gets unblocked after the actor stops.
-     */
-    //todo ensure proper serialization
-    private final CountDownLatch joinLatch = new CountDownLatch(1);
-    protected final CountDownLatch getJoinLatch() { return joinLatch; }
-
-    /**
-     * Joins the actor. Waits fot its termination.
-     */
-    @Override
-    public final void join() throws InterruptedException {
-        join(0);
-    }
-
-    /**
-     * Joins the actor. Waits fot its termination.
-     * @param milis Timeout in miliseconds, specifying how long to wait at most.
-     */
-    @Override
-    public final void join(final long milis) throws InterruptedException {
-        if (milis > 0)
-            joinLatch.await(milis, TimeUnit.MILLISECONDS);
-        else
-            joinLatch.await();
-    }
-
-    /**
      * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
      * have not been sent by an actor. For such cases use replyIfExists().
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
+     *
      * @param message reply message
      * @throws ActorReplyException If some of the replies failed to be sent.
      */
@@ -175,6 +151,7 @@ public abstract class CommonActorImpl extends Actor {
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
      * will result in IllegalStateException being thrown.
      * Sending replies is enabled by default.
+     *
      * @param message reply message
      */
     protected final void replyIfExists(final Object message) {
@@ -184,8 +161,9 @@ public abstract class CommonActorImpl extends Actor {
         for (final MessageStream sender : senders) {
             try {
                 if (sender != null)
-                    sender.send (message);
-            } catch (IllegalStateException ignore) { }
+                    sender.send(message);
+            } catch (IllegalStateException ignore) {
+            }
         }
     }
 
@@ -198,12 +176,12 @@ public abstract class CommonActorImpl extends Actor {
      * and then reused, the reply()/replyIfExists() methods on the message would reply to that actor,
      * not the immediate sender of the message.
      * Sending replies is enabled by default.
-
+     *
      * @param messages The instance of ActorMessage wrapping the sender actor, which we need to be able to respond to,
-     * plus the original message
+     *                 plus the original message
      */
     protected final void enhanceWithReplyMethodsToMessages(final List<ActorMessage> messages) {
-        for (final ActorMessage message: messages) {
+        for (final ActorMessage message : messages) {
             if (message != null) {
                 //Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
                 final Object replier = message.getPayLoad();
@@ -223,51 +201,53 @@ public abstract class CommonActorImpl extends Actor {
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive () throws InterruptedException {
+    protected final Object receive() throws InterruptedException {
         final Object msg = receiveImpl();
         if (msg instanceof ActorMessage) {
             final ActorMessage messageAndReply = (ActorMessage) msg;
             return messageAndReply.getPayLoad();
-        }
-        else {
+        } else {
             return msg;
         }
     }
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
      * @param timeout how long to wait before giving up, in units of unit
-     * @param units a TimeUnit determining how to interpret the timeout parameter
+     * @param units   a TimeUnit determining how to interpret the timeout parameter
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive (final long timeout, final TimeUnit units) throws InterruptedException {
+    protected final Object receive(final long timeout, final TimeUnit units) throws InterruptedException {
         final Object msg = receiveImpl(timeout, units);
         if (msg instanceof ActorMessage) {
             final ActorMessage messageAndReply = (ActorMessage) msg;
             return messageAndReply.getPayLoad();
-        }
-        else {
+        } else {
             return msg;
         }
     }
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected Object receiveImpl () throws InterruptedException {
+    protected Object receiveImpl() throws InterruptedException {
         throw new UnsupportedOperationException(RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED);
     }
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
      * @param timeout how long to wait before giving up, in units of unit
-     * @param units a TimeUnit determining how to interpret the timeout parameter
+     * @param units   a TimeUnit determining how to interpret the timeout parameter
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
@@ -277,6 +257,7 @@ public abstract class CommonActorImpl extends Actor {
 
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
      * @param duration how long to wait before giving up, in units of unit
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
@@ -287,6 +268,7 @@ public abstract class CommonActorImpl extends Actor {
 
     /**
      * Retrieves the group to which the actor belongs
+     *
      * @return The actor's group
      */
     public ActorGroup getActorGroup() {
@@ -317,9 +299,8 @@ public abstract class CommonActorImpl extends Actor {
                 if (sender != null)
                     return sender.send(msg);
                 else
-                      throw new IllegalArgumentException("Cannot send a reply message " + msg.toString() + " to a null recipient.");
-            }
-            else {
+                    throw new IllegalArgumentException("Cannot send a reply message " + msg.toString() + " to a null recipient.");
+            } else {
                 try {
                     if (sender != null)
                         return sender.send(msg);

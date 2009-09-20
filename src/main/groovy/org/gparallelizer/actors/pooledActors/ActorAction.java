@@ -112,7 +112,7 @@ public final class ActorAction implements Runnable {
         } catch (Throwable e) {
             handleException(e);
         } finally {
-            clearInterruptionFlag();
+            Thread.interrupted();
             ReplyRegistry.deregisterCurrentActorWithThread();
             actor.getCurrentAction().compareAndSet(this, null);
         }
@@ -156,7 +156,7 @@ public final class ActorAction implements Runnable {
     }
 
     private void handleInterrupt(final InterruptedException exception) {
-        clearInterruptionFlag();
+        Thread.interrupted();
         if (!callDynamic("onInterrupt", new Object[]{exception})) {
             System.err.println("The actor processing thread has been interrupted ${Thread.currentThread().name}");
             exception.printStackTrace(System.err);
