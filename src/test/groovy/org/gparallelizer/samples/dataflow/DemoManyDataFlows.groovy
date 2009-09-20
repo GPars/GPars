@@ -20,7 +20,7 @@ package org.gparallelizer.samples.dataflow
 import java.util.concurrent.Executors
 import org.gparallelizer.dataflow.DataFlows
 
-static final LIMIT = 3*100*1000
+final LIMIT = 3*100*1000
 
 final df = new DataFlows(LIMIT+1, 0.9f, DataFlows.MAX_SEGMENTS)
 
