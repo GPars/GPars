@@ -14,6 +14,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+//  Author:  Václav Pech
+//  Author: Russel Winder
+
 import java.text.SimpleDateFormat
 
 ant.property(file: 'local.build.properties')
