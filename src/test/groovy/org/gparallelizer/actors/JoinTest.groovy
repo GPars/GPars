@@ -25,6 +25,14 @@ public class JoinTest extends GroovyTestCase {
         assertFalse actor.isActive()
     }
 
+    public void testMultipleActorJoin() {
+        final def actor1 = PooledActors.actor { Thread.sleep 500; stop() }.start()
+        final def actor2 = PooledActors.actor { Thread.sleep 500; stop() }.start()
+        [actor1, actor2]*.join()
+        assertFalse actor1.isActive()
+        assertFalse actor2.isActive()
+    }
+
     public void testactorJoin() {
         final def actor = PooledActors.actor { Thread.sleep 500 }.start()
         actor.join()
