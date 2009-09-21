@@ -25,28 +25,24 @@ import org.gparallelizer.actors.pooledActors.PooledActorGroup
  */
 
 final def group = new PooledActorGroup()
+final def random = new Random()
 
-final def barber = group.actor {
-    final def random = new Random()
-    loop {
-        react {message ->
-            switch (message) {
-                case Enter:
-                    message.customer.send new Start()
-                    println "Barber: Processing customer ${message.customer.name}"
-                    doTheWork(random)
-                    message.customer.send new Done()
-                    message.reply new Next()
-                    break
-                case Wait:
-                    println "Barber: No customers. Going to have a sleep"
-                    break
-            }
-        }
+final def barber = group.reactor {message ->
+    switch (message) {
+        case Enter:
+            message.customer.send new Start()
+            println "Barber: Processing customer ${message.customer.name}"
+            doTheHaircut(random)
+            message.customer.send new Done()
+            message.reply new Next()
+            break
+        case Wait:
+            println "Barber: No customers. Going to have a sleep"
+            break
     }
 }.start()
 
-private def doTheWork(Random random) {
+private def doTheHaircut(Random random) {
     Thread.sleep(random.nextInt(10) * 1000)
 }
 
@@ -74,9 +70,9 @@ waitingRoom = group.actor {
                     }
                     break
                 case Next:
-                    if (waitingCustomers.size()>0) {
+                    if (waitingCustomers.size() > 0) {
                         def customer = waitingCustomers.remove(0)
-                        barber.send new Enter(customer:customer)
+                        barber.send new Enter(customer: customer)
                     } else {
                         barber.send new Wait()
                         barberAsleep = true
@@ -92,7 +88,7 @@ class Customer extends AbstractPooledActor {
     Actor localBarbers
 
     void act() {
-        localBarbers << new Enter(customer:this)
+        localBarbers << new Enter(customer: this)
         loop {
             react {message ->
                 switch (message) {
@@ -116,17 +112,19 @@ class Customer extends AbstractPooledActor {
     }
 }
 
-class Enter { Customer customer }
+class Enter {
+    Customer customer
+}
 class Full {}
 class Wait {}
 class Next {}
 class Start {}
 class Done {}
 
-new Customer(name:'Joe', localBarbers:waitingRoom).start()
-new Customer(name:'Dave', localBarbers:waitingRoom).start()
-new Customer(name:'Alice', localBarbers:waitingRoom).start()
+new Customer(name: 'Joe', localBarbers: waitingRoom).start()
+new Customer(name: 'Dave', localBarbers: waitingRoom).start()
+new Customer(name: 'Alice', localBarbers: waitingRoom).start()
 
 System.in.read()
-new Customer(name:'James', localBarbers:waitingRoom).start()
+new Customer(name: 'James', localBarbers: waitingRoom).start()
 System.in.read()
