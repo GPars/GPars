@@ -39,6 +39,6 @@ public final class DataFlowActorGroup extends ActorGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     public DataFlowActorGroup(final int poolSize) {
-        super(new ResizablePool(false, poolSize));
+        super(new ResizablePool(true, poolSize));
     }
 }

@@ -18,7 +18,6 @@ class Customer extends AbstractPooledActor {
         def result = seats.offer(this)
         if (!result) {
             println "customer $id leaves since no seat is available"
-            stop() // <- do we need this?
             return
         }
         println "customer $id is taking a seat"
@@ -26,7 +25,6 @@ class Customer extends AbstractPooledActor {
             println "customer $id get's a shave"
             sleep shaveTime
             reply "customer $id shaved"
-            stop() // <- do we need this?
         }
     }
 }
@@ -38,7 +36,10 @@ def barber = Thread.startDaemon {
 	}
 }
 
+def customers = []
 15.times {
-    new Customer(id:it, seats:seats, shaveTime: shaveTime).start()
+    customers << new Customer(id:it, seats:seats, shaveTime: shaveTime).start()
     sleep random.nextInt(shaveTime)
 }
+
+customers*.join()

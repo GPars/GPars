@@ -137,8 +137,9 @@ public abstract class MessageStream extends WithSerialId {
             value = Thread.currentThread();
         }
 
-        public MessageStream send(Object message) {
-            Thread thread = (Thread) this.value;
+        @Override
+        public MessageStream send(final Object message) {
+            final Thread thread = (Thread) this.value;
             if (message instanceof ActorMessage)
                 this.value = ((ActorMessage) message).getPayLoad();
             else
@@ -149,9 +150,9 @@ public abstract class MessageStream extends WithSerialId {
         }
 
         public V getResult() throws InterruptedException {
-            Thread thread = Thread.currentThread();
             while (!isSet) {
                 LockSupport.park();
+                final Thread thread = Thread.currentThread();
                 if (thread.isInterrupted())
                     throw new InterruptedException();
             }
