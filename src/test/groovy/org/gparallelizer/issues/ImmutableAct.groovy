@@ -14,7 +14,8 @@ package org.gparallelizer.issues
      }
  }
 
-@Immutable final class FailingB extends FailingA {
+//@Immutable
+final class FailingB extends FailingA {
     public void act() {
 
     }
