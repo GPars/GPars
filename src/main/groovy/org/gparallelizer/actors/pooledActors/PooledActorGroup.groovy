@@ -61,7 +61,7 @@ public final class PooledActorGroup extends ActorGroup {
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
-    protected def PooledActorGroup(final Pool threadPool) {
+    public def PooledActorGroup(final Pool threadPool) {
         super(threadPool)
     }
 
