@@ -24,8 +24,10 @@ import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -108,7 +110,13 @@ public class NettyTransportProvider extends LocalHost {
             bootstrap.setOption("child.keepAlive", true);
 
             channel = bootstrap.bind(new InetSocketAddress(0));
-            address = ((InetSocketAddress) channel.getLocalAddress());
+            InetAddress inetAddress;
+            try {
+                inetAddress = InetAddress.getLocalHost();
+            } catch (UnknownHostException e) { //
+                inetAddress = ((InetSocketAddress) channel.getLocalAddress()).getAddress();
+            }
+            address = new InetSocketAddress(inetAddress, ((InetSocketAddress) channel.getLocalAddress()).getPort());
         }
 
         public void stop() {
