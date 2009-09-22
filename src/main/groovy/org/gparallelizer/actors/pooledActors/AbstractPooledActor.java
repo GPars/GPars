@@ -17,16 +17,14 @@
 package org.gparallelizer.actors.pooledActors;
 
 import groovy.lang.Closure;
+import groovy.lang.GroovyRuntimeException;
 import groovy.time.Duration;
-import org.codehaus.groovy.runtime.CurriedClosure;
-import org.codehaus.groovy.runtime.GroovyCategorySupport;
-import org.codehaus.groovy.runtime.InvokerHelper;
-import org.codehaus.groovy.runtime.TimeCategory;
+import org.codehaus.groovy.runtime.*;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.actors.CommonActorImpl;
-import static org.gparallelizer.actors.pooledActors.ActorAction.actorAction;
+import org.gparallelizer.actors.ReplyRegistry;
 import static org.gparallelizer.actors.pooledActors.ActorException.*;
 
 import java.util.*;
@@ -187,14 +185,14 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
         disableGroupMembershipChange();
         if (!stopFlag.getAndSet(false))
             throw new IllegalStateException("Actor has already been started.");
-        actorAction(this, new Runnable() {
+        getActorGroup().getThreadPool().execute(new ActorAction(new Runnable() {
             public void run() {
                 final Object list = InvokerHelper.invokeMethod(AbstractPooledActor.this, "respondsTo", new Object[]{"afterStart"});
                 if (list != null && !((List) list).isEmpty())
                     InvokerHelper.invokeMethod(AbstractPooledActor.this, "afterStart", new Object[]{});
                 act();
             }
-        });
+        }));
         return this;
     }
 
@@ -219,11 +217,11 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
         synchronized (lock) {
             if (!indicateStop()) {
                 if (reaction.getAndSet(null) != null)
-                    actorAction(this, new Runnable() {
+                    getActorGroup().getThreadPool().execute(new ActorAction(new Runnable() {
                         public void run() {
                             throw TERMINATE;
                         }
-                    });
+                    }));
                 else {
                     final ActorAction action = currentAction.get();
                     if (action != null)
@@ -331,7 +329,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
                 reactCode.addMessage(currentMessage);
             }
             if (reactCode.isReady()) {
-                getActorGroup().getThreadPool().execute(new ActorAction(this, reactCode));
+                getActorGroup().getThreadPool().execute(new ActorAction(reactCode));
             } else {
                 reaction.set(reactCode);
                 if (timeout >= 0) {
@@ -541,7 +539,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
                 reactCode.addMessage(actorMessage);
                 if (reactCode.isReady()) {
                     reaction.set(null);
-                    getActorGroup().getThreadPool().execute(new ActorAction(this, reactCode));
+                    getActorGroup().getThreadPool().execute(new ActorAction(reactCode));
                 }
             } else {
                 messageQueue.offer(actorMessage);
@@ -616,7 +614,7 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
     private void doLoopCall(Runnable code) {
         if (stopFlag.get())
             throw TERMINATE;
-        getActorGroup().getThreadPool().execute(new ActorAction(this, code));
+        getActorGroup().getThreadPool().execute(new ActorAction(code));
         throw CONTINUE;
     }
 
@@ -663,5 +661,248 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
         }
         GroovyCategorySupport.use(TimeCategory.class, code);
         repeatLoop();
+    }
+
+    /**
+     * ActorAction represents a chunk of work to perform on behalf of an associated PooledActor in one go.
+     * A PooledActor has at most one active ActorAction associated with it at any given time, which represents the currently
+     * processed chunk of actor's work.
+     * ActorActions need to be scheduled for processing on a thread pool (ExecutorService), which is best achieved
+     * through the actorAction() factory method. An ActorAction may create and schedule a new ActorAction to continue processing
+     * another chunk of work on the actor's behalf (hence the term "continuations").
+     * After a new ActorAction has been scheduled, the original ActorAction must avoid touching the actor's state
+     * to avoid race conditions with the new ActorAction and should terminate quickly by throwing a dedicated lifecycle exception..
+     *
+     * @author Vaclav Pech, Alex Tkachman
+     *         Date: Feb 7, 2009
+     */
+    @SuppressWarnings({"AssignmentToNull"})
+    private class ActorAction implements Runnable {
+
+        /**
+         * The code to invoke as part of this ActorAction
+         */
+        private final Runnable code;
+
+        /**
+         * The thread from the pool assigned to process the current ActorAction
+         */
+        private volatile Thread actionThread = null;
+
+        /**
+         * Indicates whether the cancel() method has been called
+         */
+        private volatile boolean cancelled = false;
+
+        /**
+         * Creates a new ActorAction asociated with a PooledActor, which will eventually perform the specified code.
+         *
+         * @param code The code to perform on behalf of the actor
+         */
+        ActorAction(final Runnable code) {
+            super();
+            if (code instanceof Closure)
+                ((Closure) code).setDelegate(AbstractPooledActor.this);
+            this.code = code;
+        }
+
+        /**
+         * Performs the next chunk of work for the associated PooledActor.
+         * The actual processing is wrapped with setting and unsetting all the required dependencies between the ActorAction,
+         * the PooledActor and the current thread.
+         * Exception thrown from the performed code may indicate desired ways to move forward, like to continue processing
+         * the next work chunk, terminate the actor, handle timeout in react(),
+         * thread interruption or an exception thrown from the code.
+         */
+        public void run() {
+            try {
+                try {
+                    getCurrentAction().set(this);
+
+                    actionThread = Thread.currentThread();
+                    ReplyRegistry.registerCurrentActorWithThread(AbstractPooledActor.this);
+
+                    if (cancelled || !isActive()) throw TERMINATE;
+                    try {
+                        code.run();
+                    } catch (GroovyRuntimeException gre) {
+                        throw ScriptBytecodeAdapter.unwrap(gre);
+                    }
+                } finally {
+                    actionThread = null;
+                }
+                handleTermination();
+
+            } catch (ActorContinuationException continuation) {//
+            } catch (ActorTerminationException termination) {
+                handleTermination();
+            } catch (ActorTimeoutException timeout) {
+                handleTimeout();
+            } catch (InterruptedException e) {
+                handleInterrupt(e);
+            } catch (Throwable e) {
+                handleException(e);
+            } finally {
+                Thread.interrupted();
+                ReplyRegistry.deregisterCurrentActorWithThread();
+                getCurrentAction().compareAndSet(this, null);
+            }
+        }
+
+        /**
+         * Attempts to cancel the action and interrupt the thread processing it.
+         */
+        void cancel() {
+            cancelled = true;
+            if (actionThread != null)
+                actionThread.interrupt();
+        }
+
+        private boolean clearInterruptionFlag() {
+            return Thread.interrupted();
+        }
+
+        private void handleTimeout() {
+            callDynamic("onTimeout", new Object[0]);
+            handleTermination();
+        }
+
+        @SuppressWarnings({"FeatureEnvy"})
+        private void handleTermination() {
+            indicateStop();
+            Thread.interrupted();
+            try {
+                callDynamic("afterStop", new Object[]{sweepQueue()});
+            } finally {
+                releaseJoinedThreads();
+            }
+        }
+
+        private void handleException(final Throwable exception) {
+            if (!callDynamic("onException", new Object[]{exception})) {
+                System.err.println("An exception occurred in the Actor thread ${Thread.currentThread().name}");
+                exception.printStackTrace(System.err);
+            }
+            handleTermination();
+        }
+
+        private void handleInterrupt(final InterruptedException exception) {
+            Thread.interrupted();
+            if (!callDynamic("onInterrupt", new Object[]{exception})) {
+                System.err.println("The actor processing thread has been interrupted ${Thread.currentThread().name}");
+                exception.printStackTrace(System.err);
+            }
+            handleTermination();
+        }
+
+        private boolean callDynamic(final String method, final Object[] args) {
+            final List list = (List) InvokerHelper.invokeMethod(AbstractPooledActor.this, "respondsTo", new Object[]{method});
+            if (list != null && !list.isEmpty()) {
+                InvokerHelper.invokeMethod(AbstractPooledActor.this, method, args);
+                return true;
+            }
+            return false;
+        }
+
+        public Thread getActionThread() {
+            return actionThread;
+        }
+    }
+
+    /**
+     * Buffers messages for the next continuation of an event-driven actor, handles timeouts and no-param continuations.
+     *
+     * @author Vaclav Pech, Alex Tkachman
+     *         Date: May 22, 2009
+     */
+    @SuppressWarnings({"InstanceVariableOfConcreteClass"})
+    private static class Reaction implements Runnable {
+        private final int numberOfExpectedMessages;
+        private int currentSize = 0;
+        private final ActorMessage[] messages;
+        private boolean timeout = false;
+        private final Closure code;
+        private final AbstractPooledActor actor;
+
+        /**
+         * Creates a new instance.
+         *
+         * @param actor
+         * @param numberOfExpectedMessages The number of messages expected by the next continuation
+         * @param code
+         */
+        Reaction(AbstractPooledActor actor, final int numberOfExpectedMessages, Closure code) {
+            this.actor = actor;
+            this.code = code;
+            this.numberOfExpectedMessages = numberOfExpectedMessages;
+            messages = new ActorMessage[numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages];
+        }
+
+        Reaction(AbstractPooledActor actor, final int numberOfExpectedMessages) {
+            this(actor, numberOfExpectedMessages, null);
+        }
+
+        /**
+         * Retrieves the current number of messages in the buffer.
+         *
+         * @return The curent buffer size
+         */
+        public int getCurrentSize() {
+            return currentSize;
+        }
+
+        /**
+         * Indicates, whether a timeout message is held in the buffer
+         *
+         * @return True, if a timeout event has been detected.
+         */
+        public boolean isTimeout() {
+            return timeout;
+        }
+
+        /**
+         * Indicates whether the buffer contains all the messages required for the next continuation.
+         *
+         * @return True, if the next continuation can start.
+         */
+        public boolean isReady() {
+            return timeout || (getCurrentSize() == (numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages));
+        }
+
+        /**
+         * Adds a new message to the buffer.
+         *
+         * @param message The message to add.
+         */
+        public void addMessage(final ActorMessage message) {
+            if (isReady()) throw new IllegalStateException("The MessageHolder cannot accept new messages when ready");
+            messages[currentSize] = message;
+            currentSize++;
+            if (TIMEOUT.equals(message.getPayLoad())) timeout = true;
+        }
+
+        /**
+         * Retrieves messages for the next continuation once the MessageHolder is ready.
+         *
+         * @return The messages to pass to the next continuation.
+         */
+        public List<ActorMessage> getMessages() {
+            if (!isReady()) throw new IllegalStateException("Cannot build messages before being in the ready state");
+            return Collections.unmodifiableList(Arrays.asList(messages));
+        }
+
+        /**
+         * Dumps so far stored messages. Useful on timeout to restore the already delivered messages
+         * to the afterStop() handler in the PooledActor's sweepQueue() method..
+         *
+         * @return The messages stored so far.
+         */
+        List<ActorMessage> dumpMessages() {
+            return Collections.unmodifiableList(Arrays.asList(messages));
+        }
+
+        public void run() {
+            actor.runReaction(Arrays.asList(messages), numberOfExpectedMessages, code);
+        }
     }
 }

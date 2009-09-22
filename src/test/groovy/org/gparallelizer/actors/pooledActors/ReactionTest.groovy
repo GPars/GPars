@@ -17,10 +17,11 @@
 package org.gparallelizer.actors.pooledActors
 
 import org.gparallelizer.actors.ActorMessage
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor.Reaction
 
 public class ReactionTest extends GroovyTestCase {
   public void testHolder() {
-    final Reaction holder = new Reaction(5)
+    final Reaction holder = new Reaction(null, 5)
     assertEquals 0, holder.currentSize
     assertFalse holder.ready
 
@@ -53,7 +54,7 @@ public class ReactionTest extends GroovyTestCase {
   }
 
   public void testTimeout() {
-    final Reaction holder = new Reaction(5)
+    final Reaction holder = new Reaction(null, 5)
     assertFalse holder.ready
     assertFalse holder.timeout
 
@@ -63,7 +64,7 @@ public class ReactionTest extends GroovyTestCase {
   }
 
   public void testZeroHolder() {
-    final Reaction holder = new Reaction(0)
+    final Reaction holder = new Reaction(null, 0)
     assertFalse holder.ready
     assertFalse holder.timeout
 
@@ -73,7 +74,7 @@ public class ReactionTest extends GroovyTestCase {
   }
 
   public void testZeroHolderTimeout() {
-    final Reaction holder = new Reaction(0)
+    final Reaction holder = new Reaction(null, 0)
     assertFalse holder.ready
     assertFalse holder.timeout
 
@@ -83,7 +84,7 @@ public class ReactionTest extends GroovyTestCase {
   }
 
   public void testMessageDump() {
-    final Reaction holder = new Reaction(3)
+    final Reaction holder = new Reaction(null, 3)
     assertEquals([null, null, null], holder.dumpMessages())
 
     final ActorMessage msg1 = createMessage('Message 1')
