@@ -68,7 +68,7 @@ gradle.taskGraph.whenReady {taskGraph ->
         version += '-SNAPSHOT' + new SimpleDateFormat('yyMMddHHmmssZ').format(date)
     }
 }
-task release(dependsOn: ['dists', 'test']) << {
+task release(dependsOn: ['build']) << {
     println 'We release now'
 }
 
