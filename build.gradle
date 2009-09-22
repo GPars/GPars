@@ -41,6 +41,8 @@ repositories {
     mavenCentral()
     mavenRepo urls: ['http://download.java.net/maven/2/', 'http://repository.jboss.org/maven2/']
     mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
+    flatDir name: 'localRepository', dirs: 'lib'
+
 }
 
 configurations {
@@ -145,20 +147,20 @@ task documentation(dependsOn: ['javadoc', 'myGroovyDoc'], description: 'Create t
 
 task zipDoc(type: Zip, dependsOn: documentation) {
     appendix = 'docs'
-    fileSet(baseDir: docsDir)
-//    fileSet(dir: docsDir)  //todo enable
+//    fileSet(baseDir: docsDir)
+    fileSet(dir: docsDir)  //todo enable
 }
 
 task zipSrc(type: Zip) {
     appendix = 'src'
-    fileSet(baseDir: source.main.groovy.srcDirs.iterator().next())
-//    fileSet(dir: docsDir)  //todo enable
+//    fileSet(baseDir: source.main.groovy.srcDirs.iterator().next())
+    fileSet(dir: source.main.groovy.srcDirs.iterator().next())  //todo enable
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
-    fileSet(baseDir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
-//    fileSet(dir: docsDir)  //todo enable
+//    fileSet(baseDir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
+    fileSet(dir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])  //todo enable
 }
 
 task wrapper(type: Wrapper) {
