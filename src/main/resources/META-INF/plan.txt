@@ -7,6 +7,7 @@
     todo add generics to SafeVariable
     todo make pooled actors use receive()
     todo eachWithIndexAsync(), grepAsync(), groupByAsync()
+    todo merge pooled and threaded actors
 
     Planned for the next release
 
@@ -25,7 +26,8 @@
 
     todo reimplement Dataflow concurrency with the concept of operators and channels
 
-    todo merge pooled and threaded actors
+    todo remove messages and exceptions from the test output
+    todo change actor group for DFVs
 
     todo leverage dynamic Groovy dispatch for message dispatch
 def actor = actor {
