@@ -39,7 +39,7 @@ manifest.mainAttributes(
 
 repositories {
     mavenCentral()
-    mavenRepo urls: ['http://download.java.net/maven/2/', 'http://repository.jboss.org/maven2/']
+    mavenRepo urls: ['http://repository.jboss.org/maven2/']
     mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
     flatDir name: 'localRepository', dirs: 'lib'
 }
@@ -59,15 +59,13 @@ dependencies {
 //  To get the details of the "unchecked" issues.
 compile.compilerArgs = ['-Xlint:unchecked']
 
-//todo remove potentially once fixed in gradle
-compileTest.dependsOn compile
-
 gradle.taskGraph.whenReady {taskGraph ->
     if (!taskGraph.hasTask(':release')) {
         final Date date = new Date()
         version += '-SNAPSHOT' + new SimpleDateFormat('yyMMddHHmmssZ').format(date)
     }
 }
+
 task release(dependsOn: ['build']) << {
     println 'We release now'
 }
@@ -146,20 +144,17 @@ task documentation(dependsOn: ['javadoc', 'myGroovyDoc'], description: 'Create t
 
 task zipDoc(type: Zip, dependsOn: documentation) {
     appendix = 'docs'
-//    fileSet(baseDir: docsDir)
-    fileSet(dir: docsDir)  //todo enable
+    fileSet(dir: docsDir)
 }
 
 task zipSrc(type: Zip) {
     appendix = 'src'
-//    fileSet(baseDir: source.main.groovy.srcDirs.iterator().next())
-    fileSet(dir: source.main.groovy.srcDirs.iterator().next())  //todo enable
+    fileSet(dir: source.main.groovy.srcDirs.iterator().next())
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
-//    fileSet(baseDir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
-    fileSet(dir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])  //todo enable
+    fileSet(dir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
 }
 
 task wrapper(type: Wrapper) {
