@@ -1,0 +1,19 @@
+property ( file : 'build.properties' )
+
+includeTargets ** gant.targets.Maven * [
+                                        groupId : 'org.gparallelizer' ,
+                                        artifactId : 'gparallelizer' ,
+                                        version : '0.8.5' ,
+                                        javaCompileProperties : [ source : '1.5' , target : '1.5' , debug : 'true' ] ,
+                                        nestedJavaCompilerArgs : [ '-Xlint' ] ,
+                                        remoteRepositories : [ 'http://repository.jboss.org/maven2/' ] ,
+                                        compileDependencies : [
+                                                               [ groupId : 'commons-cli' , artifactId : 'commons-cli' , version : '1.2' ] ,
+                                                               [ groupId : 'asm' , artifactId : 'asm' , version : '3.1' ] ,
+                                                               [ groupId : 'antlr' , artifactId : 'antlr' , version : '2.7.7' ] ,
+                                                               [ groupId : 'org.coconut.forkjoin' , artifactId : 'jsr166y' , version : '070108' ] ,
+                                                               [ groupId : 'org.jboss.netty' , artifactId : 'netty' , version : '3.1.3.GA' ]
+                                                               ] ,
+                                        ] 
+
+setDefaultTarget ( test )
