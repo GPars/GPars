@@ -21,6 +21,7 @@ import org.gparallelizer.actors.pooledActors.PooledActors
 import org.gparallelizer.actors.pooledActors.Safe
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
+import java.util.concurrent.CyclicBarrier
 
 public class SafeTest extends GroovyTestCase {
     public void testList() {
@@ -183,12 +184,14 @@ public class SafeTest extends GroovyTestCase {
 
     public void testInstantVal() {
         final Safe counter = new Safe<Long>(0L)
+        final def barrier = new CyclicBarrier(2)
 
         counter << {
-            Thread.sleep 3000
+            barrier.await()
             updateValue it + 1
         }
         assertEquals 0, counter.instantVal
+        barrier.await()
         counter.await()
         assertEquals 1, counter.instantVal
         assertEquals 1, counter.val
