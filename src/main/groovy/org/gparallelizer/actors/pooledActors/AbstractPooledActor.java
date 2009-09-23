@@ -23,7 +23,6 @@ import org.codehaus.groovy.runtime.*;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
-import org.gparallelizer.actors.CommonActorImpl;
 import org.gparallelizer.actors.ReplyRegistry;
 import static org.gparallelizer.actors.pooledActors.ActorException.*;
 
@@ -124,7 +123,17 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Feb 7, 2009
  */
-abstract public class AbstractPooledActor extends CommonActorImpl {
+abstract public class AbstractPooledActor extends Actor {
+    /**
+     * The actor group to which the actor belongs
+     */
+    //todo ensure proper serialization
+    private volatile ActorGroup actorGroup;
+
+    /**
+     * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
+     */
+    private volatile boolean groupMembershipChangeable = true;
 
     /**
      * Queue for the messages
@@ -176,6 +185,38 @@ abstract public class AbstractPooledActor extends CommonActorImpl {
 
     public AbstractPooledActor() {
         setActorGroup(PooledActors.defaultPooledActorGroup);
+    }
+
+    /**
+     * Disallows any subsequent changes to the group attached to the actor.
+     */
+    protected final void disableGroupMembershipChange() {
+        groupMembershipChangeable = false;
+    }
+
+    /**
+     * Sets the actor's group.
+     * It can only be invoked before the actor is started.
+     *
+     * @param group new group
+     */
+    public final void setActorGroup(final ActorGroup group) {
+        if (!groupMembershipChangeable)
+            throw new IllegalStateException("Cannot set actor's group on a started actor.");
+
+        if (group == null)
+            throw new IllegalArgumentException("Cannot set actor's group to null.");
+
+        actorGroup = group;
+    }
+
+    /**
+     * Retrieves the group to which the actor belongs
+     *
+     * @return The actor's group
+     */
+    public ActorGroup getActorGroup() {
+        return actorGroup;
     }
 
     /**

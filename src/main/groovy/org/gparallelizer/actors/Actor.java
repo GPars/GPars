@@ -17,6 +17,7 @@ package org.gparallelizer.actors;
 
 import groovy.time.Duration;
 import org.gparallelizer.MessageStream;
+import org.gparallelizer.ReceivingMessageStream;
 import org.gparallelizer.dataflow.DataFlowExpression;
 import org.gparallelizer.dataflow.DataFlowVariable;
 import org.gparallelizer.remote.RemoteConnection;
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Vaclav Pech, Alex Tkachman
  */
-public abstract class Actor extends MessageStream {
+public abstract class Actor extends ReceivingMessageStream {
 
     private final DataFlowExpression joinLatch;
 
@@ -183,6 +184,14 @@ public abstract class Actor extends MessageStream {
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;
+        }
+
+        protected Object receiveImpl() throws InterruptedException {
+            throw new UnsupportedOperationException();
+        }
+
+        protected Object receiveImpl(long timeout, TimeUnit units) throws InterruptedException {
+            throw new UnsupportedOperationException();
         }
 
         public static class StopActorMsg extends SerialMsg {

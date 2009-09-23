@@ -14,15 +14,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.actors;
+package org.gparallelizer;
 
 import groovy.lang.Closure;
 import groovy.time.Duration;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.GeneratedClosure;
 import org.codehaus.groovy.runtime.InvokerHelper;
-import org.gparallelizer.MessageStream;
-import org.gparallelizer.actors.pooledActors.ActorGroup;
+import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.actors.pooledActors.ActorReplyException;
 
 import java.util.ArrayList;
@@ -30,18 +29,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Represents the common superclass to both thread-bound and event-driven actors.
- *
- * @author Vaclav Pech, Alex Tkachman
- *         Date: Jun 13, 2009
+ * @author Alex Tkachman
  */
-public abstract class CommonActorImpl extends Actor {
-
+public abstract class ReceivingMessageStream extends MessageStream {
     /**
      * A list of senders for the currently procesed messages
      */
     private final List<MessageStream> senders = new ArrayList<MessageStream>();
-    private static final String RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED = "'receiveImpl' method should be implemented by subclass of MessageStream";
 
     protected final List<MessageStream> getSenders() {
         return senders;
@@ -75,40 +69,6 @@ public abstract class CommonActorImpl extends Actor {
     }
 
     /**
-     * The actor group to which the actor belongs
-     */
-    //todo ensure proper serialization
-    private volatile ActorGroup actorGroup;
-
-    /**
-     * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
-     */
-    private volatile boolean groupMembershipChangeable = true;
-
-    /**
-     * Disallows any subsequent changes to the group attached to the actor.
-     */
-    protected final void disableGroupMembershipChange() {
-        groupMembershipChangeable = false;
-    }
-
-    /**
-     * Sets the actor's group.
-     * It can only be invoked before the actor is started.
-     *
-     * @param group new group
-     */
-    public final void setActorGroup(final ActorGroup group) {
-        if (!groupMembershipChangeable)
-            throw new IllegalStateException("Cannot set actor's group on a started actor.");
-
-        if (group == null)
-            throw new IllegalArgumentException("Cannot set actor's group to null.");
-
-        actorGroup = group;
-    }
-
-    /**
      * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
      * have not been sent by an actor. For such cases use replyIfExists().
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
@@ -116,7 +76,8 @@ public abstract class CommonActorImpl extends Actor {
      * Sending replies is enabled by default.
      *
      * @param message reply message
-     * @throws ActorReplyException If some of the replies failed to be sent.
+     * @throws org.gparallelizer.actors.pooledActors.ActorReplyException
+     *          If some of the replies failed to be sent.
      */
     protected final void reply(final Object message) {
         assert senders != null;
@@ -136,7 +97,7 @@ public abstract class CommonActorImpl extends Actor {
                         exceptions.add(e);
                     }
                 } else {
-                    exceptions.add(new IllegalArgumentException("Cannot send a reply message ${message} to a null recipient."));
+                    exceptions.add(new IllegalArgumentException("Cannot send a reply message " + message + " to a null recipient."));
                 }
             }
             if (!exceptions.isEmpty()) {
@@ -205,6 +166,24 @@ public abstract class CommonActorImpl extends Actor {
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
+    protected abstract Object receiveImpl() throws InterruptedException;
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param units   a TimeUnit determining how to interpret the timeout parameter
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected abstract Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException;
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
     protected final Object receive() throws InterruptedException {
         final Object msg = receiveImpl();
         if (msg instanceof ActorMessage) {
@@ -236,43 +215,12 @@ public abstract class CommonActorImpl extends Actor {
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      *
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected Object receiveImpl() throws InterruptedException {
-        throw new UnsupportedOperationException(RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED);
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param timeout how long to wait before giving up, in units of unit
-     * @param units   a TimeUnit determining how to interpret the timeout parameter
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
-        throw new UnsupportedOperationException(RECEIVE_IMPL_METHOD_SHOULD_BE_IMPLEMENTED);
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
      * @param duration how long to wait before giving up, in units of unit
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receive(final Duration duration) throws InterruptedException {
         return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Retrieves the group to which the actor belongs
-     *
-     * @return The actor's group
-     */
-    public ActorGroup getActorGroup() {
-        return actorGroup;
     }
 
     /**
