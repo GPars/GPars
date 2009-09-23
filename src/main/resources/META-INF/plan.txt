@@ -15,8 +15,8 @@
     todo tune maven repository upload - from CI?
     todo tag sources at releases
 
-    todo add @Immutable back to three tests
-
+    todo enable @Immutable in code with latest Maia
+    
     todo DataFlows
     todo Detecting deadlock in the DataFlows class
     todo used generics with DataFlows to support DataFlowVariable.val type hints in IDE

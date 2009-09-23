@@ -26,12 +26,12 @@ public class ImmutableMessageTest extends GroovyTestCase {
 
         final Actor bouncer = PooledActors.actor {
             receive {
-                it.reply new TestMessage(value : it.value)
+                it.reply new TestMessage(it.value)
             }
         }.start()
 
         PooledActors.actor {
-            bouncer << new TestMessage(value : 'Value')
+            bouncer << new TestMessage('Value')
             receive {
                 result = it.value
                 latch.countDown()
@@ -43,6 +43,6 @@ public class ImmutableMessageTest extends GroovyTestCase {
     }
 }
 
-final class TestMessage {
+@Immutable final class TestMessage {
     String value
 }
