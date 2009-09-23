@@ -159,7 +159,7 @@ abstract public class AbstractPooledActor extends Actor {
     /**
      * Code for the loop, if any
      */
-    private final AtomicReference<Runnable> loopCode = new AtomicReference<Runnable>();
+    private volatile Runnable loopCode;
 
     /**
      * The current active action (continuation) associated with the actor. An action must not use Actor's state
@@ -228,13 +228,17 @@ abstract public class AbstractPooledActor extends Actor {
             throw new IllegalStateException("Actor has already been started.");
         getActorGroup().getThreadPool().execute(new ActorAction(new Runnable() {
             public void run() {
-                final Object list = InvokerHelper.invokeMethod(AbstractPooledActor.this, "respondsTo", new Object[]{"afterStart"});
-                if (list != null && !((List) list).isEmpty())
-                    InvokerHelper.invokeMethod(AbstractPooledActor.this, "afterStart", new Object[]{});
+                onStart();
                 act();
             }
         }));
         return this;
+    }
+
+    protected void onStart() {
+        final Object list = InvokerHelper.invokeMethod(this, "respondsTo", new Object[]{"afterStart"});
+        if (list != null && !((List) list).isEmpty())
+            InvokerHelper.invokeMethod(this, "afterStart", new Object[]{});
     }
 
     /**
@@ -451,35 +455,32 @@ abstract public class AbstractPooledActor extends Actor {
     protected final void receive(Closure handler) throws InterruptedException {
         handler.setResolveStrategy(Closure.DELEGATE_FIRST);
         handler.setDelegate(this);
-        int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
-        if (maxNumberOfParameters == 0) {
-            if (stopFlag.get())
-                throw new IllegalStateException("The actor hasn't been started.");
-            ActorMessage message = messageQueue.take();
-            try {
-                enhanceReplies(Arrays.asList(message));
-                handler.call();
-            } finally {
-                getSenders().clear();
-            }
 
-        } else {
-            final List<ActorMessage> messages = new ArrayList<ActorMessage>();
+        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
+        int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
+        int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
+
+        for (int i = 0; i != toReceive; ++i) {
             if (stopFlag.get())
                 throw new IllegalStateException("The actor hasn't been started.");
-            for (int i = 0; i != maxNumberOfParameters; ++i) {
-                messages.add(messageQueue.take());
-            }
-            try {
-                enhanceReplies(messages);
+
+            messages.add(messageQueue.take());
+        }
+        enhanceReplies(messages);
+
+        try {
+            if (maxNumberOfParameters == 0)
+                handler.call();
+            else {
                 Object args[] = new Object[messages.size()];
                 for (int i = 0; i < args.length; i++) {
                     args[i] = messages.get(i).getPayLoad();
                 }
                 handler.call(args);
-            } finally {
-                getSenders().clear();
             }
+
+        } finally {
+            getSenders().clear();
         }
     }
 
@@ -496,46 +497,44 @@ abstract public class AbstractPooledActor extends Actor {
     protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
         handler.setResolveStrategy(Closure.DELEGATE_FIRST);
         handler.setDelegate(this);
+
         int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
-        if (maxNumberOfParameters == 0) {
-            if (stopFlag.get())
-                throw new IllegalStateException("The actor hasn't been started.");
-            ActorMessage message = messageQueue.poll(timeout, timeUnit);
-            try {
-                enhanceReplies(Arrays.asList(message));
+        int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
+
+        long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
+
+        boolean nullAppeared = false;  //Ignore further potential messages once a null is retrieved (due to a timeout)
+        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
+        for (int i = 0; i != toReceive; ++i) {
+            if (nullAppeared)
+                messages.add(null);
+            else {
+                if (stopFlag.get())
+                    throw new IllegalStateException("The actor hasn't been started.");
+                ActorMessage message =
+                        messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
+                nullAppeared = (message == null);
+                messages.add(message);
+            }
+        }
+
+
+        try {
+            enhanceReplies(messages);
+
+            if (maxNumberOfParameters == 0) {
                 handler.call();
-            } finally {
-                getSenders().clear();
-            }
-
-        } else {
-            long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
-            boolean nullAppeared = false;  //Ignore further potential messages once a null is retrieved (due to a timeout)
-
-            final List<ActorMessage> messages = new ArrayList<ActorMessage>();
-            for (int i = 0; i != maxNumberOfParameters; ++i) {
-                if (nullAppeared)
-                    messages.add(null);
-                else {
-                    if (stopFlag.get())
-                        throw new IllegalStateException("The actor hasn't been started.");
-                    ActorMessage message =
-                            messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
-                    nullAppeared = (message == null);
-                    messages.add(message);
-                }
-            }
-            try {
-                enhanceReplies(messages);
+            } else {
                 Object args[] = new Object[messages.size()];
                 for (int i = 0; i < args.length; i++) {
                     final ActorMessage am = messages.get(i);
                     args[i] = am == null ? am : am.getPayLoad();
                 }
                 handler.call(args);
-            } finally {
-                getSenders().clear();
             }
+        }
+        finally {
+            getSenders().clear();
         }
     }
 
@@ -622,7 +621,7 @@ abstract public class AbstractPooledActor extends Actor {
      * @param code The closure to invoke repeatedly
      */
     protected final void loop(final Runnable code) {
-        if (loopCode.get() != null)
+        if (loopCode != null)
             throw new IllegalStateException("The loop method must be only called once");
 
         if (code instanceof Closure) {
@@ -638,7 +637,7 @@ abstract public class AbstractPooledActor extends Actor {
                 repeatLoop();
             }
         };
-        loopCode.set(enhancedCode);
+        loopCode = enhancedCode;
         doLoopCall(enhancedCode);
     }
 
@@ -646,7 +645,7 @@ abstract public class AbstractPooledActor extends Actor {
      * Plans another loop iteration
      */
     protected final void repeatLoop() {
-        final Runnable code = loopCode.get();
+        final Runnable code = loopCode;
         if (code == null)
             return;
         doLoopCall(code);
@@ -797,10 +796,6 @@ abstract public class AbstractPooledActor extends Actor {
             cancelled = true;
             if (actionThread != null)
                 actionThread.interrupt();
-        }
-
-        private boolean clearInterruptionFlag() {
-            return Thread.interrupted();
         }
 
         private void handleTimeout() {
