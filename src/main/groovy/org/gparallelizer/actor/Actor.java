@@ -28,9 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Actors are active objects, which either have their own thread processing repeatedly messages submitted to them
- * or they borrow a thread from a thread pool. Actors implementing the ThreadedActor interface have their own thread,
- * whereas actors implementing PooledActor interface delegate processing to threads from a thread pool.
+ * Actors are active objects, which borrow a thread from a thread pool.
  * The Actor interface provides means to send messages to the actor, start and stop the background thread as well as
  * check its status.
  *
