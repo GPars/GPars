@@ -43,7 +43,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testCounter() {
-        final Safe counter = new Safe<Long>(0L)
+        final Safe counter = new Safe(0L)
 
         final Thread t1 = Thread.start {
             counter << {updateValue it + 1}
@@ -63,7 +63,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testAsyncVal() {
-        final Safe counter = new Safe<Long>(0L)
+        final Safe counter = new Safe(0L)
 
         final Thread t1 = Thread.start {
             counter << {updateValue it + 1}
@@ -88,7 +88,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testExplicitReply() {
-        final Safe counter = new Safe<Long>(0L)
+        final Safe counter = new Safe(0L)
 
         def result = new DataFlowStream()
         PooledActors.actor {
@@ -104,7 +104,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testDirectMessage() {
-        final Safe counter = new Safe<Long>(0L)
+        final Safe counter = new Safe(0L)
 
         counter << null
         assertNull counter.val
@@ -121,14 +121,14 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testDirectMessageOnNullInitialValue() {
-        final Safe counter = new Safe<Long>()
+        final Safe counter = new Safe()
 
         counter << 10
         assertEquals 10, counter.val
     }
 
     public void testNullInitialValue() {
-        final Safe counter = new Safe<Long>()
+        final Safe counter = new Safe()
 
         final def result = new DataFlowVariable()
         counter << {result << it}
@@ -136,7 +136,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testReplies() {
-        final Safe counter = new Safe<Long>(0L)
+        final Safe counter = new Safe(0L)
 
         def result = new DataFlowVariable()
         PooledActors.actor {
@@ -168,7 +168,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testAwait() {
-        final Safe counter = new Safe<Long>(0L)
+        final Safe counter = new Safe(0L)
 
         final AtomicBoolean flag = new AtomicBoolean(false)
         counter << {
@@ -183,15 +183,12 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testInstantVal() {
-        final Safe counter = new Safe<Long>(0L)
-        final def barrier = new CyclicBarrier(2)
+        final Safe counter = new Safe(0L)
 
+        assertEquals 0, counter.instantVal
         counter << {
-            barrier.await()
             updateValue it + 1
         }
-        assertEquals 0, counter.instantVal
-        barrier.await()
         counter.await()
         assertEquals 1, counter.instantVal
         assertEquals 1, counter.val

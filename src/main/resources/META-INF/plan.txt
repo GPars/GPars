@@ -16,6 +16,8 @@
     todo tag sources at releases
 
     todo enable @Immutable in code with latest Maia
+
+    todo build with Groovy 1.6.5
     
     todo DataFlows
     todo Detecting deadlock in the DataFlows class
