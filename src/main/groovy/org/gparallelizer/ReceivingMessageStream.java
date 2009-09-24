@@ -18,14 +18,14 @@ package org.gparallelizer;
 
 import groovy.lang.Closure;
 import groovy.time.Duration;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-import org.codehaus.groovy.runtime.GeneratedClosure;
-import org.codehaus.groovy.runtime.InvokerHelper;
+import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor;
 import org.gparallelizer.actors.pooledActors.ActorReplyException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,6 +36,8 @@ public abstract class ReceivingMessageStream extends MessageStream {
      * A list of senders for the currently procesed messages
      */
     private final List<MessageStream> senders = new ArrayList<MessageStream>();
+
+    protected final WeakHashMap<Object, MessageStream> obj2Sender = new WeakHashMap<Object, MessageStream>();
 
     protected final List<MessageStream> getSenders() {
         return senders;
@@ -129,38 +131,6 @@ public abstract class ReceivingMessageStream extends MessageStream {
     }
 
     /**
-     * Adds reply() and replyIfExists() methods to all the messages.
-     * These methods will call send() on the target actor (the sender of the original message).
-     * Calling reply()/replyIfExist() on messages from within an actor with disabled replying (through the disableSendingReplies()
-     * method) may result in unexpected behavior. The MissingMethodException may be thrown from reply()/replyIfExists(),
-     * however, if the messages have been received by a different actor, with enabled replying) before
-     * and then reused, the reply()/replyIfExists() methods on the message would reply to that actor,
-     * not the immediate sender of the message.
-     * Sending replies is enabled by default.
-     *
-     * @param messages The instance of ActorMessage wrapping the sender actor, which we need to be able to respond to,
-     *                 plus the original message
-     */
-    protected final void enhanceWithReplyMethodsToMessages(final List<ActorMessage> messages) {
-        for (final ActorMessage message : messages) {
-            if (message != null) {
-                //Enhances the replier's metaClass with reply() and replyIfExists() methods to send messages to the sender
-                final Object replier = message.getPayLoad();
-                final MessageStream sender = message.getSender();
-
-                if (replier != null) {
-                    Object mc = DefaultGroovyMethods.getMetaClass(replier);
-                    if (mc != null) {
-                        InvokerHelper.setProperty(mc, "reply", new MyClosure(sender, true));
-                        mc = DefaultGroovyMethods.getMetaClass(replier);
-                        InvokerHelper.setProperty(mc, "replyIfExists", new MyClosure(sender, false));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      *
      * @return The message retrieved from the queue, or null, if the timeout expires.
@@ -223,41 +193,49 @@ public abstract class ReceivingMessageStream extends MessageStream {
         return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * Specifies a reply handler on messages. Remembers the original sender and a flag, whether failed delivery
-     * should be treated as an failure or not.
-     */
-    private static class MyClosure extends Closure implements GeneratedClosure {
-        private final MessageStream sender;
-        private final boolean throwable;
+    public static final class ReplyCategory {
+        public static void reply(Object original, Object reply) {
+            if (original instanceof ReceivingMessageStream) {
+                ((ReceivingMessageStream) original).reply(reply);
+                return;
+            }
 
-        private MyClosure(final MessageStream sender, final boolean throwable) {
-            super(null, null);
-            this.sender = sender;
-            this.throwable = throwable;
+            if (original instanceof Closure) {
+                ((ReceivingMessageStream) ((Closure) original).getDelegate()).reply(reply);
+                return;
+            }
+
+            final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
+            if (actor == null)
+                throw new IllegalStateException("reply from non-actor");
+
+            MessageStream sender = actor.obj2Sender.get(original);
+            if (sender == null)
+                throw new IllegalStateException("Cannot send a reply message " + original.toString() + " to a null recipient.");
+
+            sender.send(reply);
         }
 
-        @SuppressWarnings({"UnusedDeclaration"})
-        public Object doCall() {
-            return doCall(null);
-        }
+        public static void replyIfExists(Object original, Object reply) {
+            if (original instanceof ReceivingMessageStream) {
+                ((ReceivingMessageStream) original).replyIfExists(reply);
+                return;
+            }
 
-        public Object doCall(final Object msg) {
-            if (throwable) {
+            if (original instanceof Closure) {
+                ((ReceivingMessageStream) ((Closure) original).getDelegate()).replyIfExists(reply);
+                return;
+            }
+
+            final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
+            if (actor != null) {
+                MessageStream sender = actor.obj2Sender.get(original);
                 if (sender != null)
-                    return sender.send(msg);
-                else
-                    throw new IllegalArgumentException("Cannot send a reply message " + msg.toString() + " to a null recipient.");
-            } else {
-                try {
-                    if (sender != null)
-                        return sender.send(msg);
-                    else
-                        return null;
-                }
-                catch (IllegalStateException ignored) {
-                    return null;
-                }
+                    try {
+                        sender.send(reply);
+                    }
+                    catch (IllegalStateException e) {//
+                    }
             }
         }
     }

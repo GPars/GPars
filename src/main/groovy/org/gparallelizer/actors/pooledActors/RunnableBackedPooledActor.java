@@ -24,6 +24,8 @@ import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.TimeCategory;
 
+import java.util.Arrays;
+
 /**
  * Utility class to implement AbstractPooledActor backed by any Runnable (including Closure)
  *
@@ -63,7 +65,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
     protected void act() {
         if (action != null)
             if (action instanceof Closure)
-                GroovyCategorySupport.use(TimeCategory.class, (Closure) action);
+                GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) action);
             else
                 action.run();
     }

@@ -25,7 +25,7 @@ import java.io.Serializable;
  * This class is not intented to be use directly by users.
  *
  * @author Vaclav Pech, Alex Tkachman
- * Date: Feb 27, 2009
+ *         Date: Feb 27, 2009
  */
 public class ActorMessage<T> implements Serializable {
     private T payLoad;
@@ -33,8 +33,9 @@ public class ActorMessage<T> implements Serializable {
 
     /**
      * Creates a new instance
+     *
      * @param payLoad The original message
-     * @param sender The sending actor, null, if the message was not sent by an actor
+     * @param sender  The sending actor, null, if the message was not sent by an actor
      */
     public ActorMessage(final T payLoad, final MessageStream sender) {
         this.payLoad = payLoad;
@@ -44,7 +45,7 @@ public class ActorMessage<T> implements Serializable {
     /**
      * Constructor for serialization
      */
-    protected ActorMessage () { //
+    protected ActorMessage() { //
     }
 
     public T getPayLoad() {
@@ -58,11 +59,12 @@ public class ActorMessage<T> implements Serializable {
     /**
      * Factory method to create instances of ActorMessage with given payload.
      * The sender of the ActorMessage is retrieved from the ReplyRegistry.
+     *
      * @param payLoad The original message
      * @return The newly created message
      */
     public static <T> ActorMessage build(final T payLoad) {
-        return new ActorMessage<T>(payLoad, ReplyRegistry.threadBoundActor());
+        return new ActorMessage<T>(payLoad, Actor.threadBoundActor());
     }
 
     @Override

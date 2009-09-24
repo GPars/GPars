@@ -38,6 +38,12 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class Actor extends ReceivingMessageStream {
 
+    /**
+     * Maps each thread to the actor it currently processes.
+     * Used in the send() method to remember the sender of each message for potential replies
+     */
+    private static final ThreadLocal<Actor> currentActorPerThread = new ThreadLocal<Actor>();
+
     private final DataFlowExpression joinLatch;
 
     protected Actor() {
@@ -134,6 +140,31 @@ public abstract class Actor extends ReceivingMessageStream {
         return joinLatch;
     }
 
+    /**
+     * Registers the actor with the current thread
+     *
+     * @param currentActor The actor to register
+     */
+    protected static void registerCurrentActorWithThread(final Actor currentActor) {
+        currentActorPerThread.set(currentActor);
+    }
+
+    /**
+     * Deregisters the actor registered from the thread
+     */
+    protected static void deregisterCurrentActorWithThread() {
+        currentActorPerThread.set(null);
+    }
+
+    /**
+     * Retrieves the actor registered with the current thread
+     *
+     * @return The associated actor
+     */
+    public static Actor threadBoundActor() {
+        return currentActorPerThread.get();
+    }
+
     @Override
     protected RemoteHandle createRemoteHandle(SerialHandle handle, SerialContext host) {
         return new MyRemoteHandle(handle, host, joinLatch);
@@ -180,7 +211,7 @@ public abstract class Actor extends ReceivingMessageStream {
 
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
-                message = new ActorMessage<Object>(message, ReplyRegistry.threadBoundActor());
+                message = new ActorMessage<Object>(message, threadBoundActor());
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;

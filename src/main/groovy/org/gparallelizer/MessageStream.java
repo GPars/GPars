@@ -17,8 +17,8 @@ package org.gparallelizer;
 
 import groovy.lang.Closure;
 import groovy.time.Duration;
+import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
-import org.gparallelizer.actors.ReplyRegistry;
 import org.gparallelizer.dataflow.DataCallback;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;
@@ -194,7 +194,7 @@ public abstract class MessageStream extends WithSerialId {
 
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
-                message = new ActorMessage<Object>(message, ReplyRegistry.threadBoundActor());
+                message = new ActorMessage<Object>(message, Actor.threadBoundActor());
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;

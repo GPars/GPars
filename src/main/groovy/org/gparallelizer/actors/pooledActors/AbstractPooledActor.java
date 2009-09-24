@@ -23,7 +23,6 @@ import org.codehaus.groovy.runtime.*;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
-import org.gparallelizer.actors.ReplyRegistry;
 import static org.gparallelizer.actors.pooledActors.ActorException.*;
 
 import java.util.*;
@@ -405,8 +404,10 @@ abstract public class AbstractPooledActor extends Actor {
         if (getSendRepliesFlag()) {
             for (final ActorMessage message : messages) {
                 senders.add(message == null ? null : message.getSender());
+                if (message != null)
+                    obj2Sender.put(message.getPayLoad(), message.getSender());
             }
-            enhanceWithReplyMethodsToMessages(messages);
+//            enhanceWithReplyMethodsToMessages(messages);
         }
     }
 
@@ -631,7 +632,7 @@ abstract public class AbstractPooledActor extends Actor {
         final Runnable enhancedCode = new Runnable() {
             public void run() {
                 if (code instanceof Closure)
-                    GroovyCategorySupport.use(TimeCategory.class, (Closure) code);
+                    GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) code);
                 else
                     code.run();
                 repeatLoop();
@@ -685,10 +686,11 @@ abstract public class AbstractPooledActor extends Actor {
 
         if (getSendRepliesFlag()) {
             for (ActorMessage message : messages) {
-                if (message != null)
+                if (message != null) {
                     getSenders().add(message.getSender());
+                    obj2Sender.put(message.getPayLoad(), message.getSender());
+                }
             }
-            enhanceWithReplyMethodsToMessages(messages);
         }
 
         if (maxNumberOfParameters > 0) {
@@ -699,7 +701,7 @@ abstract public class AbstractPooledActor extends Actor {
             }
             code = new CurriedClosure(code, args);
         }
-        GroovyCategorySupport.use(TimeCategory.class, code);
+        GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), code);
         repeatLoop();
     }
 
@@ -760,7 +762,7 @@ abstract public class AbstractPooledActor extends Actor {
                     getCurrentAction().set(this);
 
                     actionThread = Thread.currentThread();
-                    ReplyRegistry.registerCurrentActorWithThread(AbstractPooledActor.this);
+                    registerCurrentActorWithThread(AbstractPooledActor.this);
 
                     if (cancelled || !isActive()) throw TERMINATE;
                     try {
@@ -784,7 +786,7 @@ abstract public class AbstractPooledActor extends Actor {
                 handleException(e);
             } finally {
                 Thread.interrupted();
-                ReplyRegistry.deregisterCurrentActorWithThread();
+                deregisterCurrentActorWithThread();
                 getCurrentAction().compareAndSet(this, null);
             }
         }
