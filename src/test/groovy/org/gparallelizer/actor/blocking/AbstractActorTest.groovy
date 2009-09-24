@@ -12,7 +12,7 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.actor
 
@@ -20,11 +20,11 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import org.gparallelizer.actor.impl.AbstractPooledActor
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 /**
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Dierk Koenig
  * Date: Jan 7, 2009
  */
 public class AbstractActorTest extends GroovyTestCase {
@@ -54,6 +54,14 @@ public class AbstractActorTest extends GroovyTestCase {
         actor.stop()
     }
 
+    public void testMessageMayBeNull() {
+        Actor actor = new DefaultTestActor()
+        actor.start()
+        actor.send null
+        assert actor.receiveWasCalled
+        actor.stop()
+    }
+
     public void testAfterStart() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
@@ -78,7 +86,7 @@ public class AbstractActorTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         final AtomicReference result = new AtomicReference()
 
-        Actor actor=Actors.actor {
+        Actor actor=PooledActors.actor {
             receive(1, TimeUnit.SECONDS) {
                 receiveFlag.set(true)
                 result.set it
@@ -178,4 +186,3 @@ class AfterStopTestActor extends AbstractPooledActor {
         stopLatch.countDown()
     }
 }
-
