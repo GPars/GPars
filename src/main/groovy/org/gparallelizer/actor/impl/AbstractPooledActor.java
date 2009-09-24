@@ -121,7 +121,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * <li>onException(Throwable e) - called when an exception occurs in the actor's thread. Throwing an exception from this method will stop the actor.</li>
  * </ul>
  *
- * @author Vaclav Pech, Alex Tkachman
+ * @author Vaclav Pech, Alex Tkachman, Dierk Koenig
  *         Date: Feb 7, 2009
  */
 abstract public class AbstractPooledActor extends Actor {
@@ -222,6 +222,7 @@ abstract public class AbstractPooledActor extends Actor {
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
+     * @return this (the actor itself) to allow method chaining
      */
     public final AbstractPooledActor start() {
         disableGroupMembershipChange();
@@ -257,7 +258,7 @@ abstract public class AbstractPooledActor extends Actor {
      * method, if exists.
      * Has no effect if the Actor is not started.
      *
-     * @return The actor
+     * @return this (the actor itself) to allow method chaining
      */
     public final Actor stop() {
         synchronized (lock) {
@@ -409,7 +410,7 @@ abstract public class AbstractPooledActor extends Actor {
                 if (message != null)
                     obj2Sender.put(message.getPayLoad(), message.getSender());
             }
-//            enhanceWithReplyMethodsToMessages(messages);
+//            enhanceWithReplyMethodsToMessages(messages); // todo (dk) why is this commented?
         }
     }
 
@@ -564,6 +565,8 @@ abstract public class AbstractPooledActor extends Actor {
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
+     * @param message may be null to simply trigger the actors receive/react
+     * @return this (the actor itself) to allow method chaining
      */
     public final Actor send(Object message) {
         synchronized (lock) {
