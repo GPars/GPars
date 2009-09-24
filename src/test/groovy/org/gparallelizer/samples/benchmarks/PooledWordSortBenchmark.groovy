@@ -18,7 +18,7 @@ package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 import org.gparallelizer.actors.PooledActors
 
 public class PooledWordSortBenchmark implements Benchmark {

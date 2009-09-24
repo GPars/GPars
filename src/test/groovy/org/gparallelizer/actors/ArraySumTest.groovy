@@ -19,7 +19,7 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 /**
  *

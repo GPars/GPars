@@ -18,7 +18,7 @@ package org.gparallelizer.samples.actors
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 import org.gparallelizer.actors.PooledActors
 
 PooledActors.defaultPooledActorGroup.resize 23

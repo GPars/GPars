@@ -1,7 +1,6 @@
 package org.gparallelizer.samples
 
-import java.util.concurrent.ArrayBlockingQueue as Queue
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 def shaveTime   = 100
 def random      = new Random()

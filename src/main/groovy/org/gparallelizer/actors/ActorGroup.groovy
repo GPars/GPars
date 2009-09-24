@@ -17,8 +17,8 @@
 package org.gparallelizer.actors
 
 import org.gparallelizer.scheduler.Pool
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.RunnableBackedPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
+import org.gparallelizer.actors.impl.RunnableBackedPooledActor
 
 /**
  * Provides a common super class fo pooled actor's groups.

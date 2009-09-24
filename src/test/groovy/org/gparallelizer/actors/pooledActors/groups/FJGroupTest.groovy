@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors.groups
+package org.gparallelizer.actors.impl.groups
 
 import java.util.concurrent.CountDownLatch
 import jsr166y.forkjoin.ForkJoinWorkerThread

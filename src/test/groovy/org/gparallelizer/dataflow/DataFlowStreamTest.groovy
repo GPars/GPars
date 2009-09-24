@@ -18,7 +18,7 @@ package org.gparallelizer.dataflow
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 public class DataFlowStreamTest extends GroovyTestCase {
 

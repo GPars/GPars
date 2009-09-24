@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors.impl
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.dataflow.DataFlowVariable

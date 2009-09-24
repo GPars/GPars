@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 /**
  * Default non-abstract AbstractPooledActor subclass for use in e.g. mixins.

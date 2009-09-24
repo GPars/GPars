@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors.safevariable
+package org.gparallelizer.actors.impl.safevariable
 
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.PooledActors

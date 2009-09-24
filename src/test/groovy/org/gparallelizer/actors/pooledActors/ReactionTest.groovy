@@ -14,10 +14,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors.impl
 
 import org.gparallelizer.actors.ActorMessage
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor.Reaction
+import org.gparallelizer.actors.impl.AbstractPooledActor.Reaction
 
 public class ReactionTest extends GroovyTestCase {
   public void testHolder() {

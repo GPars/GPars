@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 import org.gparallelizer.actors.PooledActors
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.start

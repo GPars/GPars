@@ -16,12 +16,12 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 /**
  * A guess game. A player actor guesses a number and the master replies with either'too large', 'too small' or 'guessed'.
  * The player continues guessing until he guesses the correct number.
- * @author Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàlisi, MAiA Facultat de Matemàtiques, Universitat de Barcelona
+ * @author Jordi Campos i Miralles, Departament de Matemï¿½tica Aplicada i Anï¿½lisi, MAiA Facultat de Matemï¿½tiques, Universitat de Barcelona
  */
 class GameMaster extends AbstractPooledActor {
        int secretNum

@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 /**
  * A pooled actor allowing for an alternative structure of the message handling code.

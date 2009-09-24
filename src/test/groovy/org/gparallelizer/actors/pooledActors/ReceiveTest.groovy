@@ -1,4 +1,4 @@
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors.impl
 
 import org.gparallelizer.dataflow.DataFlows
 import java.util.concurrent.CyclicBarrier

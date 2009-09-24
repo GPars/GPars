@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.pooledActors.RunnableBackedPooledActor
+import org.gparallelizer.actors.impl.RunnableBackedPooledActor
 
 /**
  * An actor representing a reactor. When it receives a message, the supplied block of code is run with the message

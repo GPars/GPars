@@ -20,8 +20,8 @@ import groovy.lang.Closure;
 import groovy.time.Duration;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor;
-import org.gparallelizer.actors.pooledActors.ActorReplyException;
+import org.gparallelizer.actors.impl.AbstractPooledActor;
+import org.gparallelizer.actors.impl.ActorReplyException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +78,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
      * Sending replies is enabled by default.
      *
      * @param message reply message
-     * @throws org.gparallelizer.actors.pooledActors.ActorReplyException
+     * @throws org.gparallelizer.actors.impl.ActorReplyException
      *          If some of the replies failed to be sent.
      */
     protected final void reply(final Object message) {

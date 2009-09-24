@@ -16,7 +16,7 @@
 
 package org.gparallelizer.enhancer
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 /**
  * The event-driven actor used in ActorMetaClass

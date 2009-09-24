@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package org.gparallelizer.actors.pooledActors;
+package org.gparallelizer.actors.impl;
 
 import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;
@@ -25,7 +25,7 @@ import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.actors.ActorGroup;
 import org.gparallelizer.actors.PooledActors;
-import static org.gparallelizer.actors.pooledActors.ActorException.*;
+import static org.gparallelizer.actors.impl.ActorException.*;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;

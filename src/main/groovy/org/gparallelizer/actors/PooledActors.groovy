@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.impl.AbstractPooledActor
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.

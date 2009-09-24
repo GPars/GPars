@@ -14,16 +14,16 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors;
+package org.gparallelizer.actors.impl;
 
 /**
- * An exception indicating Actor termination request.
+ * An exception indicating end of a work chunk (ActorAction) allowing other ActorAction to get scheduled.
  * Implementing singleton pattern, ActorException holds the unique reference.
  *
  * @author Vaclav Pech
  * Date: Feb 17, 2009
  */
-final class ActorTerminationException extends ActorException {
+final class ActorContinuationException extends ActorException {
 
-    ActorTerminationException() { }
+    ActorContinuationException() { }
 }
