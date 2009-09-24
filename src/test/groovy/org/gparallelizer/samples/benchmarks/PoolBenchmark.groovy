@@ -18,7 +18,12 @@ package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CyclicBarrier
 import org.gparallelizer.scheduler.Scheduler
-import org.gparallelizer.actors.pooledActors.*
+
+import org.gparallelizer.scheduler.DefaultPool
+import org.gparallelizer.scheduler.ResizableFJPool
+import org.gparallelizer.scheduler.Pool
+import org.gparallelizer.scheduler.FJPool
+import org.gparallelizer.scheduler.ResizablePool
 
 List items = []
 for (i in 1..1000) {items << {i+it}}

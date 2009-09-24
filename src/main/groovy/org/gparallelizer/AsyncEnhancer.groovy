@@ -16,8 +16,8 @@
 
 package org.gparallelizer
 
-import org.gparallelizer.actors.pooledActors.DefaultPool
-import org.gparallelizer.actors.pooledActors.Pool
+import org.gparallelizer.scheduler.DefaultPool
+import org.gparallelizer.scheduler.Pool
 
 /**
  * AsyncEnhancer allows classes or instances to be enhanced with asynchronous variants of iterative methods,

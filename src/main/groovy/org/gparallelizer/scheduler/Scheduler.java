@@ -16,7 +16,7 @@
 
 package org.gparallelizer.scheduler;
 
-import org.gparallelizer.actors.pooledActors.Pool;
+import org.gparallelizer.scheduler.Pool;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -16,8 +16,8 @@
 
 package org.gparallelizer
 
-import org.gparallelizer.actors.pooledActors.FJPool
-import org.gparallelizer.actors.pooledActors.Pool
+import org.gparallelizer.scheduler.FJPool
+import org.gparallelizer.scheduler.Pool
 
 /**
  * ParallelEnhancer allows classes or instances to be enhanced with asynchronous variants of iterative methods,

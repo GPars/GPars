@@ -17,7 +17,7 @@
 package org.gparallelizer.dataflow;
 
 import org.gparallelizer.actors.ActorGroup;
-import org.gparallelizer.actors.pooledActors.ResizablePool;
+import org.gparallelizer.scheduler.ResizablePool;
 
 /**
  * Groups all dataflow threads, which are effectively pooled actors.

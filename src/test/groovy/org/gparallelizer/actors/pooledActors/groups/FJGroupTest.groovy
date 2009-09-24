@@ -19,8 +19,8 @@ package org.gparallelizer.actors.pooledActors.groups
 import java.util.concurrent.CountDownLatch
 import jsr166y.forkjoin.ForkJoinWorkerThread
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.DefaultPool
-import org.gparallelizer.actors.pooledActors.FJPool
+import org.gparallelizer.scheduler.DefaultPool
+import org.gparallelizer.scheduler.FJPool
 import org.gparallelizer.actors.PooledActorGroup
 
 public class FJGroupTest extends GroovyTestCase {

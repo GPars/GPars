@@ -16,9 +16,8 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.ActorGroup
-import org.gparallelizer.actors.pooledActors.Pool
-import org.gparallelizer.actors.pooledActors.DefaultPool
+import org.gparallelizer.scheduler.Pool
+import org.gparallelizer.scheduler.DefaultPool
 
 /**
  * Provides logical grouping for pooled actors. Each group has an underlying thread pool, which will perform actions

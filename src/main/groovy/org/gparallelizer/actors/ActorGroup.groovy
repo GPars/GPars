@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.pooledActors.Pool
+import org.gparallelizer.scheduler.Pool
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 import org.gparallelizer.actors.pooledActors.RunnableBackedPooledActor
 

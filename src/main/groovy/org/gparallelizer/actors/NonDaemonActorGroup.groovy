@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors
 
-import org.gparallelizer.actors.pooledActors.DefaultPool
+import org.gparallelizer.scheduler.DefaultPool
 
 /**
  * Represents a group of pooled-bound actors, which share a pool of non-daemon threads. Since Fork/Join doesn't support
