@@ -19,7 +19,7 @@ package org.gparallelizer.actor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actor.impl.AbstractPooledActor
 
 /**
  * @author Vaclav Pech, Dierk Koenig
