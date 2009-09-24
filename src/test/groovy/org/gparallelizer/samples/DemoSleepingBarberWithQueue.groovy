@@ -1,5 +1,6 @@
 package org.gparallelizer.samples
 
+import java.util.concurrent.ArrayBlockingQueue as Queue
 import org.gparallelizer.actor.impl.AbstractPooledActor
 
 def shaveTime   = 100
