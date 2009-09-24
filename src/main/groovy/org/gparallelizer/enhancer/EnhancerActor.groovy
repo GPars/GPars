@@ -16,7 +16,7 @@
 
 package org.gparallelizer.enhancer
 
-import org.gparallelizer.actors.impl.AbstractPooledActor
+import org.gparallelizer.actor.impl.AbstractPooledActor
 
 /**
  * The thread-bound actor used in ActorMetaClass

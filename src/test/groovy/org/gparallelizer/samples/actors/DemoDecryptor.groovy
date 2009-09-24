@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors
 
-import static org.gparallelizer.actors.Actors.actor
+import static org.gparallelizer.actor.Actors.actor
 
 /**
  * A demo showing two cooperating actors. The decryptor decrypts received messages and replies them back.

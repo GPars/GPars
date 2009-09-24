@@ -16,7 +16,7 @@
 
 package org.gparallelizer.remote;
 
-import org.gparallelizer.actors.Actor;
+import org.gparallelizer.actor.Actor;
 import org.gparallelizer.serial.SerialContext;
 
 import java.util.UUID;

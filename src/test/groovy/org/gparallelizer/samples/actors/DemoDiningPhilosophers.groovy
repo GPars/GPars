@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actor.impl.AbstractPooledActor
+import org.gparallelizer.actor.Actors
 
 /**
  * Shows actor solution to The Dining Philosophers problem

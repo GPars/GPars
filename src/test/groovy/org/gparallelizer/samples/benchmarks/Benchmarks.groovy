@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.benchmarks
 
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actor.Actors
 
 Actors.defaultPooledActorGroup.resize 10
 

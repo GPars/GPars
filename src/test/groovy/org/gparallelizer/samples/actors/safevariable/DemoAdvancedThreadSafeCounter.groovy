@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.Safe
+import org.gparallelizer.actor.Safe
 
 class Conference extends Safe {
     def Conference() { super(0L) }

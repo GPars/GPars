@@ -1,6 +1,6 @@
 package org.gparallelizer.samples
 
-import org.gparallelizer.actors.impl.AbstractPooledActor
+import org.gparallelizer.actor.impl.AbstractPooledActor
 
 def shaveTime   = 100
 def random      = new Random()

@@ -17,10 +17,10 @@
 package org.gparallelizer.samples.actors
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.Actors
-import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.impl.AbstractPooledActor
+import org.gparallelizer.actor.Actors
+import static org.gparallelizer.actor.Actors.actor
 
 /**
  * Demonstrates various ways to structure pooled actor's code with its continuation-style message handling.

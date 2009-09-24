@@ -17,11 +17,11 @@
 package org.gparallelizer.remote;
 
 import groovy.lang.Closure;
-import org.gparallelizer.actors.Actor;
-import org.gparallelizer.actors.ActorGroup;
+import org.gparallelizer.actor.Actor;
+import org.gparallelizer.actor.ActorGroup;
 import org.gparallelizer.scheduler.DefaultPool;
 import org.gparallelizer.scheduler.Pool;
-import org.gparallelizer.actors.PooledActorGroup;
+import org.gparallelizer.actor.PooledActorGroup;
 import org.gparallelizer.serial.SerialHandles;
 
 import java.util.Collections;

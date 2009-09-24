@@ -16,9 +16,9 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.Actors
-import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.Actors
+import static org.gparallelizer.actor.Actors.actor
 
 /**
  * Demonstrates a way to do continuation-style loops with Actors.

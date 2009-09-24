@@ -16,9 +16,9 @@
 
 package org.gparallelizer.dataflow.operator
 
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.PooledActorGroup
-import org.gparallelizer.actors.ActorGroup
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.PooledActorGroup
+import org.gparallelizer.actor.ActorGroup
 
 /**
  * @author Vaclav Pech

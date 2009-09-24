@@ -1,6 +1,6 @@
 package org.gparallelizer.samples.actors
 
-import static org.gparallelizer.actors.Actors.actor
+import static org.gparallelizer.actor.Actors.actor
 
 def getYearEndClosing(String symbol, int year) {
     try {

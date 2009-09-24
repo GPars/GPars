@@ -16,10 +16,10 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActorGroup
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.impl.AbstractPooledActor
+import org.gparallelizer.actor.PooledActorGroup
+import org.gparallelizer.actor.Actors
 
 /**
  * Three pooled actors are created, two of them in a newly created pooled actor group, one in the fefault pooled actor

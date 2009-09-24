@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors
 
-import static org.gparallelizer.actors.Actors.actor
+import static org.gparallelizer.actor.Actors.actor
 
 /**
  * Performs merge sort using pooled actors.

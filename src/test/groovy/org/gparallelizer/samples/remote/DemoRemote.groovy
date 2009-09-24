@@ -1,6 +1,6 @@
 import org.gparallelizer.remote.LocalNode
 import org.gparallelizer.remote.netty.NettyTransportProvider
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actor.Actors
 
 println """Welcome to chat!
 Every line you will type will be printed on all JVM, which runs this script.

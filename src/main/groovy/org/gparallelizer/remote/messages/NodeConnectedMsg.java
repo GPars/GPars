@@ -16,7 +16,7 @@
 
 package org.gparallelizer.remote.messages;
 
-import org.gparallelizer.actors.Actor;
+import org.gparallelizer.actor.Actor;
 import org.gparallelizer.remote.LocalNode;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.serial.SerialMsg;

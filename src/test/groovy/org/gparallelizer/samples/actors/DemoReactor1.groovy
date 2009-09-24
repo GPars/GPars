@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.PooledActorGroup
+import org.gparallelizer.actor.PooledActorGroup
 
 /**
  * Demonstrates use of reactor - a specialized actor responding to incomming messages with result of running its body

@@ -16,7 +16,7 @@
 
 package org.gparallelizer.dataflow;
 
-import org.gparallelizer.actors.ActorGroup;
+import org.gparallelizer.actor.ActorGroup;
 import org.gparallelizer.scheduler.ResizablePool;
 
 /**

@@ -17,8 +17,8 @@
 package org.gparallelizer.samples.actors
 
 import java.util.concurrent.CyclicBarrier
-import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actor.impl.AbstractPooledActor
+import org.gparallelizer.actor.Actors
 
 /**
  * Shows possibilities to handle message delivery errors.

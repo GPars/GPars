@@ -16,7 +16,7 @@
 
 package org.gparallelizer.dataflow.operator
 
-import org.gparallelizer.actors.PooledActorGroup
+import org.gparallelizer.actor.PooledActorGroup
 import org.gparallelizer.dataflow.DataFlow
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable

@@ -16,7 +16,7 @@
 
 package org.gparallelizer.dataflow
 
-import org.gparallelizer.actors.impl.AbstractPooledActor
+import org.gparallelizer.actor.impl.AbstractPooledActor
 
 /**
  * Contains factory methods to create dataflow actors and starting them.

@@ -1,6 +1,6 @@
 package org.gparallelizer.remote
 
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actor.Actors
 import org.gparallelizer.remote.netty.NettyTransportProvider
 
 public class SyncTest extends GroovyTestCase {

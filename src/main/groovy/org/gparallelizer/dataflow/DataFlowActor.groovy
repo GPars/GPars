@@ -16,7 +16,7 @@
 
 package org.gparallelizer.dataflow
 
-import org.gparallelizer.actors.impl.AbstractPooledActor
+import org.gparallelizer.actor.impl.AbstractPooledActor
 
 /**
  * A parent actor for all actors used in Dataflow Concurrency implementation

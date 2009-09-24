@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.Actors
-import org.gparallelizer.actors.PooledActorGroup
+import org.gparallelizer.actor.Actors
+import org.gparallelizer.actor.PooledActorGroup
 import org.gparallelizer.scheduler.ResizablePool
 
 /**

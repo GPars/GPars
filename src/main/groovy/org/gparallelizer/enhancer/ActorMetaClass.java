@@ -18,7 +18,7 @@ package org.gparallelizer.enhancer;
 
 import groovy.lang.DelegatingMetaClass;
 import org.codehaus.groovy.runtime.InvokerHelper;
-import org.gparallelizer.actors.Actor;
+import org.gparallelizer.actor.Actor;
 
 /**
  * A meta class that intercepts all method calls to the instances, which it is attached to,

@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.Actors
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.Actors
 
 /**
  * Demonstrates use of reactor - a specialized actor responding to incomming messages with result of running its body

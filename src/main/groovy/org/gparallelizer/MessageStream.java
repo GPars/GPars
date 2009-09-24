@@ -17,8 +17,8 @@ package org.gparallelizer;
 
 import groovy.lang.Closure;
 import groovy.time.Duration;
-import org.gparallelizer.actors.Actor;
-import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actor.Actor;
+import org.gparallelizer.actor.ActorMessage;
 import org.gparallelizer.dataflow.DataCallback;
 import org.gparallelizer.remote.RemoteConnection;
 import org.gparallelizer.remote.RemoteHost;

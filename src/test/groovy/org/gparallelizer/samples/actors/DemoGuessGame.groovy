@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.impl.AbstractPooledActor
+import org.gparallelizer.actor.impl.AbstractPooledActor
 
 /**
  * A guess game. A player actor guesses a number and the master replies with either'too large', 'too small' or 'guessed'.
