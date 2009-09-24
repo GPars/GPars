@@ -12,18 +12,17 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
-//  limitations under the License. 
+//  limitations under the License.
 
 package org.gparallelizer.actor
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import org.gparallelizer.actor.impl.AbstractPooledActor
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 /**
- *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Dierk Koenig
  * Date: Jan 7, 2009
  */
 public class DefaultActorTest extends GroovyTestCase {
@@ -31,15 +30,15 @@ public class DefaultActorTest extends GroovyTestCase {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
         actor.send "Message"
-        actor.latch.await(30, TimeUnit.SECONDS)
-        assert actor.flag.get()
+        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
+        assert actor.receiveWasCalled.get()
     }
 
     public void testThreadName() {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
         actor << ''
-        actor.latch.await(30, TimeUnit.SECONDS)
+        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
 
         assert actor.threadName.startsWith("Actor Thread ")
         actor.stop()
@@ -48,8 +47,8 @@ public class DefaultActorTest extends GroovyTestCase {
 
 class DefaultTestActor extends AbstractPooledActor {
 
-    final AtomicBoolean flag = new AtomicBoolean(false)
-    final CountDownLatch latch = new CountDownLatch(1)
+    final AtomicBoolean receiveWasCalled = new AtomicBoolean(false)
+    final CountDownLatch receiveCallsOutstanding = new CountDownLatch(1)
 
     volatile def threadName = ''
 
@@ -57,8 +56,8 @@ class DefaultTestActor extends AbstractPooledActor {
         threadName = Thread.currentThread().name
         println threadName
         receive {
-            flag.set true
-            latch.countDown()
+            receiveWasCalled.set true
+            receiveCallsOutstanding.countDown()
 
             stop()
         }
