@@ -18,8 +18,8 @@ package org.gparallelizer.actors.impl
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
-import static org.gparallelizer.actors.PooledActors.actor
-import org.gparallelizer.actors.PooledActors
+import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actors.Actors
 
 public class SharedMemoryTest extends GroovyTestCase {
 
@@ -28,7 +28,7 @@ public class SharedMemoryTest extends GroovyTestCase {
     public void testSharedAccess() {
         long counter = 0
 
-        PooledActors.defaultPooledActorGroup.resize 2
+        Actors.defaultPooledActorGroup.resize 2
         def latch = new CountDownLatch(1)
 
         Actor actor1 = actor {
@@ -59,7 +59,7 @@ public class SharedMemoryTest extends GroovyTestCase {
 
 
         latch.await()
-        PooledActors.defaultPooledActorGroup.resize(5)
+        Actors.defaultPooledActorGroup.resize(5)
         assertEquals MAX_COUNTER, counter
     }
 }

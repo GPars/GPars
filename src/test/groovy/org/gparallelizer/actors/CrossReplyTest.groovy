@@ -24,14 +24,14 @@ public class CrossReplyTest extends GroovyTestCase {
         volatile int result = 0
         CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor incrementor = PooledActors.actor {
+        Actor incrementor = Actors.actor {
             react {
                 reply it + 1
             }
         }
         incrementor.start()
 
-        Actor actor = PooledActors.actor {
+        Actor actor = Actors.actor {
             incrementor.send 2
             receive {
                 result = it
@@ -49,14 +49,14 @@ public class CrossReplyTest extends GroovyTestCase {
         volatile int result = 0
         CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor incrementor = PooledActors.actor {
+        Actor incrementor = Actors.actor {
             react {
                 it.reply it + 1
             }
         }
         incrementor.start()
 
-        Actor actor = PooledActors.actor {
+        Actor actor = Actors.actor {
             incrementor.send 2
             receive {
                 result = it
@@ -73,14 +73,14 @@ public class CrossReplyTest extends GroovyTestCase {
         volatile int result = 0
         CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor incrementor = PooledActors.actor {
+        Actor incrementor = Actors.actor {
             receive {
                 reply it + 1
             }
         }
         incrementor.start()
 
-        Actor actor = PooledActors.actor {
+        Actor actor = Actors.actor {
             incrementor.send 2
             react {
                 result = it
@@ -98,14 +98,14 @@ public class CrossReplyTest extends GroovyTestCase {
         volatile int result = 0
         CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor incrementor = PooledActors.actor {
+        Actor incrementor = Actors.actor {
             receive {
                 it.reply it + 1
             }
         }
         incrementor.start()
 
-        Actor actor = PooledActors.actor {
+        Actor actor = Actors.actor {
             incrementor.send 2
             react {
                 result = it

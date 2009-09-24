@@ -26,7 +26,7 @@ public class FastSendTest extends GroovyTestCase {
     final CountDownLatch latch = new CountDownLatch(1)
     final CountDownLatch replyLatch = new CountDownLatch(1)
 
-    final Actor actor = PooledActors.actor {
+    final Actor actor = Actors.actor {
       disableSendingReplies()
       receive {
         try {
@@ -65,7 +65,7 @@ public class FastSendTest extends GroovyTestCase {
     final CountDownLatch latch = new CountDownLatch(1)
     final CountDownLatch replyLatch = new CountDownLatch(1)
 
-    final Actor actor = PooledActors.actor {
+    final Actor actor = Actors.actor {
       disableSendingReplies()
       receive {
         try {
@@ -87,7 +87,7 @@ public class FastSendTest extends GroovyTestCase {
       }
     }.start()
 
-    PooledActors.actor {
+    Actors.actor {
       actor << 'Message51'
       replyLatch.await()
       actor << 'Enabled message'

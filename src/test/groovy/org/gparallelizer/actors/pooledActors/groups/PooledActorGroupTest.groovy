@@ -19,7 +19,7 @@ package org.gparallelizer.actors.impl.groups
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.impl.*
 import org.gparallelizer.actors.ActorGroup
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.NonDaemonActorGroup
 import org.gparallelizer.actors.PooledActorGroup
 
@@ -29,12 +29,12 @@ public class PooledActorGroupTest extends GroovyTestCase {
     volatile boolean daemon = false;
     final CountDownLatch latch = new CountDownLatch(1)
 
-    def actor = PooledActors.actor {
+    def actor = Actors.actor {
       daemon = Thread.currentThread().isDaemon()
       latch.countDown()
     }.start()
 
-    assertEquals PooledActors.defaultPooledActorGroup, actor.actorGroup
+    assertEquals Actors.defaultPooledActorGroup, actor.actorGroup
     latch.await()
     assert daemon
   }
@@ -134,7 +134,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
     final PooledActorGroup daemonGroup2 = new PooledActorGroup()
     final NonDaemonActorGroup nonDaemonGroup1 = new NonDaemonActorGroup()
     final NonDaemonActorGroup nonDaemonGroup2 = new NonDaemonActorGroup()
-    final PooledActorGroup defaultGroup = PooledActors.defaultPooledActorGroup
+    final PooledActorGroup defaultGroup = Actors.defaultPooledActorGroup
 
     assert daemonGroup1.threadPool != daemonGroup2.threadPool
     assert daemonGroup1.threadPool != nonDaemonGroup1.threadPool

@@ -18,7 +18,7 @@ package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class PooledActorBenchmarkWithoutReply implements Benchmark {
 
@@ -27,7 +27,7 @@ public class PooledActorBenchmarkWithoutReply implements Benchmark {
 
         AbstractPooledActor initiator
 
-        final AbstractPooledActor bouncer = PooledActors.actor {
+        final AbstractPooledActor bouncer = Actors.actor {
             disableSendingReplies()
             loop {
                 react {
@@ -36,7 +36,7 @@ public class PooledActorBenchmarkWithoutReply implements Benchmark {
             }
         }.start()
 
-        initiator = PooledActors.actor {
+        initiator = Actors.actor {
             int iteration = 0
             disableSendingReplies()
             loop {

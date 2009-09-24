@@ -30,7 +30,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def result=''
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             result = receive(3.seconds)
             latch.countDown()
         }
@@ -44,7 +44,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def result=''
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive(2.seconds) {
                 result = it
             }

@@ -20,11 +20,11 @@ import org.gparallelizer.actors.impl.AbstractPooledActor
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
- * Use static import to be able to call PooledActors methods without the need to prepend them with the PooledActors identifier.
+ * Use static import to be able to call Actors methods without the need to prepend them with the Actors identifier.
  * <pre>
- * import static org.gparallelizer.actors.PooledActors.*
+ * import static org.gparallelizer.actors.Actors.*
  *
- * PooledActors.defaultPooledActorGroup.resize 1
+ * Actors.defaultPooledActorGroup.resize 1
  *
  * def actor = actor {
  *     react {message ->
@@ -36,17 +36,17 @@ import org.gparallelizer.actors.impl.AbstractPooledActor
  * actor.send 'Hi!'
  * </pre>
  *
- * All actors created through the PooledActors class will belong to the same default actor group and run
+ * All actors created through the Actors class will belong to the same default actor group and run
  * on daemon threads.
  * The PooledActorGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
  * threads are to be used.
  * @author Vaclav Pech
  * Date: Feb 18, 2009
  */
-public abstract class PooledActors {
+public abstract class Actors {
 
     /**
-     * The default actor group to share by all actors created through the PooledActors class.
+     * The default actor group to share by all actors created through the Actors class.
      */
     public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup()
 

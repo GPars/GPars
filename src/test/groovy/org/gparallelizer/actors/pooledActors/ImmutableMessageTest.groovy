@@ -17,7 +17,7 @@
 package org.gparallelizer.actors.impl
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class ImmutableMessageTest extends GroovyTestCase {
 
@@ -25,13 +25,13 @@ public class ImmutableMessageTest extends GroovyTestCase {
         volatile String result
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor bouncer = PooledActors.actor {
+        final AbstractPooledActor bouncer = Actors.actor {
             react {
                 it.reply new TestMessage(it.value)
             }
         }.start()
 
-        PooledActors.actor {
+        Actors.actor {
             bouncer << new TestMessage('Value')
             react {
                 result = it.value

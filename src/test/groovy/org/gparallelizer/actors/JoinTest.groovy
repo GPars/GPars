@@ -18,28 +18,28 @@ package org.gparallelizer.actors
 
 public class JoinTest extends GroovyTestCase {
     public void testActorJoin() {
-        final def actor = PooledActors.actor { Thread.sleep 500; stop() }.start()
+        final def actor = Actors.actor { Thread.sleep 500; stop() }.start()
         actor.join()
         assertFalse actor.isActive()
     }
 
     public void testMultipleActorJoin() {
-        final def actor1 = PooledActors.actor { Thread.sleep 500; stop() }.start()
-        final def actor2 = PooledActors.actor { Thread.sleep 500; stop() }.start()
+        final def actor1 = Actors.actor { Thread.sleep 500; stop() }.start()
+        final def actor2 = Actors.actor { Thread.sleep 500; stop() }.start()
         [actor1, actor2]*.join()
         assertFalse actor1.isActive()
         assertFalse actor2.isActive()
     }
 
     public void testactorJoin() {
-        final def actor = PooledActors.actor { Thread.sleep 500 }.start()
+        final def actor = Actors.actor { Thread.sleep 500 }.start()
         actor.join()
         assertFalse actor.isActive()
     }
 
     public void testCooperatingActorJoin() {
-        final def actor1 = PooledActors.actor { receive() }.start()
-        final def actor2 = PooledActors.actor {actor1.join()}.start()
+        final def actor1 = Actors.actor { receive() }.start()
+        final def actor2 = Actors.actor {actor1.join()}.start()
         actor1 << 'Message'
         [actor1, actor2]*.join()
         assertFalse actor1.isActive()
@@ -47,7 +47,7 @@ public class JoinTest extends GroovyTestCase {
     }
 
     public void testStoppedActorJoin() {
-        final def actor = PooledActors.actor { }.start()
+        final def actor = Actors.actor { }.start()
         actor.join()
         assertFalse actor.isActive()
         actor.join()

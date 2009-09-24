@@ -17,7 +17,7 @@
 package org.gparallelizer.samples.dataflow
 
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 import org.gparallelizer.dataflow.DataFlowVariable
 import static org.gparallelizer.dataflow.DataFlow.start
 
@@ -28,7 +28,7 @@ import static org.gparallelizer.dataflow.DataFlow.start
 
 final DataFlowVariable a = new DataFlowVariable()
 
-final AbstractPooledActor doubler = PooledActors.actor {
+final AbstractPooledActor doubler = Actors.actor {
     react {
         a << 2 * it
     }

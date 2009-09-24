@@ -17,10 +17,10 @@
 package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
- * Demonstrates a way to do continuation-style loops with PooledActors.
+ * Demonstrates a way to do continuation-style loops with Actors.
  * @author Vaclav Pech
  */
 class MyLoopActor extends AbstractPooledActor {
@@ -77,5 +77,5 @@ Thread.sleep 3000
 actor.send 4
 Thread.sleep 3000
 
-PooledActors.defaultPooledActorGroup.shutdown()
+Actors.defaultPooledActorGroup.shutdown()
 

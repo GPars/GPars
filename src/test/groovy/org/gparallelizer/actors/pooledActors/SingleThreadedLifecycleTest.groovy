@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors.impl
 
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
  *
@@ -27,12 +27,12 @@ public class SingleThreadedLifecycleTest extends LifecycleTest {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.defaultPooledActorGroup.resize(1)
+        Actors.defaultPooledActorGroup.resize(1)
     }
 
 
     protected void tearDown() {
         super.tearDown();
-        PooledActors.defaultPooledActorGroup.resize(5)
+        Actors.defaultPooledActorGroup.resize(5)
     }
 }

@@ -1,6 +1,6 @@
 package org.gparallelizer.remote
 
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 import org.gparallelizer.remote.netty.NettyTransportProvider
 
 public class SyncTest extends GroovyTestCase {
@@ -37,7 +37,7 @@ public class SyncTest extends GroovyTestCase {
   }
 
   void testSendAndContinue() {
-    def a1 = PooledActors.actor {
+    def a1 = Actors.actor {
       loop {
         react {msg ->
           if (msg == "test") {
@@ -47,7 +47,7 @@ public class SyncTest extends GroovyTestCase {
       }
     }.start()
 
-    def a2 = PooledActors.actor {
+    def a2 = Actors.actor {
       loop {
         react {msg ->
           if (msg == "test") {

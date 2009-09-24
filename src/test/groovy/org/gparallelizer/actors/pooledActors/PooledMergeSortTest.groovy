@@ -18,8 +18,8 @@ package org.gparallelizer.actors.impl
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import org.gparallelizer.actors.PooledActors
-import static org.gparallelizer.actors.PooledActors.actor
+import org.gparallelizer.actors.Actors
+import static org.gparallelizer.actors.Actors.actor
 
 /**
  *
@@ -30,7 +30,7 @@ public class PooledMergeSortTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.defaultPooledActorGroup.resize(10)
+        Actors.defaultPooledActorGroup.resize(10)
     }
 
     protected def split(List<Integer> list) {
@@ -86,7 +86,7 @@ public class PooledMergeSortTest extends GroovyTestCase {
     }
 
     public void testDefaultMergeSortWithOneThreadPool() {
-        PooledActors.defaultPooledActorGroup.resize(1)
+        Actors.defaultPooledActorGroup.resize(1)
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -101,12 +101,12 @@ public class PooledMergeSortTest extends GroovyTestCase {
         sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(30, TimeUnit.SECONDS)
-        PooledActors.defaultPooledActorGroup.resize(5)
+        Actors.defaultPooledActorGroup.resize(5)
         assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
     }
 
     public void testDefaultMergeSort() {
-        PooledActors.defaultPooledActorGroup.resize(10)
+        Actors.defaultPooledActorGroup.resize(10)
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 

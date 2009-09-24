@@ -25,7 +25,7 @@ public class ActorThreadTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor
-        actor = PooledActors.actor {
+        actor = Actors.actor {
             receive()
             flag1=isActorThread()
             latch.countDown()

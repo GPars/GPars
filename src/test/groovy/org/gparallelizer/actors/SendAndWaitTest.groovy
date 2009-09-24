@@ -25,7 +25,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testSuccessfulMessages() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive() {
                 reply 2
             }
@@ -46,7 +46,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testMessagesToStoppedActor() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive()
             reply 2
         }
@@ -70,7 +70,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive()
             reply 2
             barrier.await()
@@ -97,7 +97,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive()
             reply 2
             barrier.await()
@@ -128,7 +128,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             barrier.await()
             Thread.sleep 1000
             receive() {
@@ -157,7 +157,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             barrier.await()
             receive()
             barrier.await()
@@ -181,7 +181,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             barrier.await()
             receive()
         }

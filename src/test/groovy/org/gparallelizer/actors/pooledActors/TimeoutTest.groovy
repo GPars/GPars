@@ -19,8 +19,8 @@ package org.gparallelizer.actors.impl
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import static org.gparallelizer.actors.PooledActors.actor
-import org.gparallelizer.actors.PooledActors
+import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actors.Actors
 
 /**
  *
@@ -31,7 +31,7 @@ public class TimeoutTest extends GroovyTestCase {
 
   protected void setUp() {
     super.setUp();
-    PooledActors.defaultPooledActorGroup.resize(5)
+    Actors.defaultPooledActorGroup.resize(5)
   }
 
   public void testTimeout() {

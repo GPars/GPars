@@ -19,8 +19,8 @@ package org.gparallelizer.actors.impl
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 
-import org.gparallelizer.actors.PooledActors
-import static org.gparallelizer.actors.PooledActors.actor
+import org.gparallelizer.actors.Actors
+import static org.gparallelizer.actors.Actors.actor
 
 /**
  *
@@ -30,7 +30,7 @@ import static org.gparallelizer.actors.PooledActors.actor
 public class MessagingTest extends GroovyTestCase {
     protected void setUp() {
         super.setUp();
-        PooledActors.defaultPooledActorGroup.resize(10)
+        Actors.defaultPooledActorGroup.resize(10)
     }
 
     public void testReact() {

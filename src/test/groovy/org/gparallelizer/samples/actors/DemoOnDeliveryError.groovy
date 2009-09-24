@@ -18,7 +18,7 @@ package org.gparallelizer.samples.actors
 
 import java.util.concurrent.CyclicBarrier
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
  * Shows possibilities to handle message delivery errors.
@@ -26,10 +26,10 @@ import org.gparallelizer.actors.PooledActors
  * The onDeliveryError() method can, for example, send a notification back to the original sender of the message.
  */
 
-PooledActors.defaultPooledActorGroup.resize 10
+Actors.defaultPooledActorGroup.resize 10
 final CyclicBarrier barrier = new CyclicBarrier(2)
 
-final AbstractPooledActor actor = PooledActors.actor {
+final AbstractPooledActor actor = Actors.actor {
     barrier.await()
     react {
         stop()
@@ -37,7 +37,7 @@ final AbstractPooledActor actor = PooledActors.actor {
 }.start()
 
 final AbstractPooledActor me
-me = PooledActors.actor {
+me = Actors.actor {
     def message1 = 1
     def message2 = 2
     def message3 = 3

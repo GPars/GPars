@@ -1,6 +1,6 @@
 package org.gparallelizer.samples.actors
 
-import static org.gparallelizer.actors.PooledActors.actor
+import static org.gparallelizer.actors.Actors.actor
 
 def getYearEndClosing(String symbol, int year) {
     def url = "http://ichart.finance.yahoo.com/table.csv?s=$symbol&amp;a=11&amp;b=01&amp;c=$year&amp;d=11&amp;e=31&amp;f=$year&amp;g=m;ignore=.csv"

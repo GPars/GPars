@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.Safe
 
 final Closure cl = {
@@ -54,7 +54,7 @@ name.valAsync {println "Async: $it"}
 name << 'James'
 println name.val
 
-PooledActors.actor {
+Actors.actor {
     name << {it.toUpperCase()}
     react {
         println it

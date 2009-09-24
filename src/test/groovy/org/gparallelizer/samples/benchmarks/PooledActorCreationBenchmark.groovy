@@ -18,14 +18,14 @@ package org.gparallelizer.samples.benchmarks
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class PooledActorCreationBenchmark implements Benchmark {
 
     public long perform(final int numberOfIterations) {
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor initiator = PooledActors.actor {
+        final AbstractPooledActor initiator = Actors.actor {
             int iteration = 0
             loop {
                 if (iteration == numberOfIterations) {

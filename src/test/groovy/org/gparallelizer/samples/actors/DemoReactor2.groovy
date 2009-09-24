@@ -17,18 +17,18 @@
 package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
  * Demonstrates use of reactor - a specialized actor responding to incomming messages with result of running its body
  * on the message.
  */
 
-final def doubler = PooledActors.reactor {
+final def doubler = Actors.reactor {
     2 * it
 }.start()
 
-Actor actor = PooledActors.actor {
+Actor actor = Actors.actor {
     (1..10).each {doubler << it}
     int i = 0
     loop {

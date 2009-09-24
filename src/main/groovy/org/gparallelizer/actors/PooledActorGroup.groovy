@@ -41,7 +41,7 @@ import org.gparallelizer.scheduler.DefaultPool
  * </pre>
  *
  * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.actorGroup property,
- * which defaults to the PooledActors.defaultPooledActorGroup, can be set before the actor is started.
+ * which defaults to the Actors.defaultPooledActorGroup, can be set before the actor is started.
  *
  * <pre>
  * def group = new PooledActorGroup()

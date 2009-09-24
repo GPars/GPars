@@ -16,24 +16,24 @@
 
 package org.gparallelizer.samples.benchmarks
 
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
-PooledActors.defaultPooledActorGroup.resize 10
+Actors.defaultPooledActorGroup.resize 10
 
 final int iterations = 10000
 final int warmupIterations = 3000
 
 new PooledActorBenchmark().perform(warmupIterations)
-println 'PooledActors with send and reply: ' + new PooledActorBenchmark().perform(iterations)
+println 'Actors with send and reply: ' + new PooledActorBenchmark().perform(iterations)
 
 new PooledActorBenchmarkWithoutReply().perform(warmupIterations)
-println 'PooledActors with no replies: ' + new PooledActorBenchmarkWithoutReply().perform(iterations)
+println 'Actors with no replies: ' + new PooledActorBenchmarkWithoutReply().perform(iterations)
 
 new PooledActorCreationBenchmark().perform(warmupIterations)
-println 'PooledActors creation: ' + new PooledActorCreationBenchmark().perform(iterations)
+println 'Actors creation: ' + new PooledActorCreationBenchmark().perform(iterations)
 
 new PooledActorNetworkingBenchmark().perform(warmupIterations)
-println 'PooledActors networking: ' + new PooledActorNetworkingBenchmark().perform(iterations)
+println 'Actors networking: ' + new PooledActorNetworkingBenchmark().perform(iterations)
 
 new SequentialWordSortBenchmark().perform(warmupIterations)
 println 'Sequential Word Sort: ' + new SequentialWordSortBenchmark().perform(0)

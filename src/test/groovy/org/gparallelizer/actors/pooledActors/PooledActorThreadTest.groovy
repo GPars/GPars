@@ -18,7 +18,7 @@ package org.gparallelizer.actors.impl
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class PooledActorThreadTest extends GroovyTestCase {
     public void testActorThread() {
@@ -27,7 +27,7 @@ public class PooledActorThreadTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor
-        actor = PooledActors.actor {
+        actor = Actors.actor {
             flag1=isActorThread()
             react {
                 flag2=isActorThread()

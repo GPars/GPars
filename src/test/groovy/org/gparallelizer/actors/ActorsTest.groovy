@@ -31,7 +31,7 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             loop {
                 final int value = counter.incrementAndGet()
                 if (value == 3) {
@@ -50,7 +50,7 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             flag.set(true)
             receive(10, TimeUnit.MILLISECONDS)
         }
@@ -68,7 +68,7 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             throw new RuntimeException('test')
         }
         actor.metaClass.onException = {}

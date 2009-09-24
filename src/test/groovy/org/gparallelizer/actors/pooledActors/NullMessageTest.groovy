@@ -18,8 +18,8 @@ package org.gparallelizer.actors.impl
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.dataflow.DataFlowVariable
-import static org.gparallelizer.actors.PooledActors.actor
-import org.gparallelizer.actors.PooledActors
+import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actors.Actors
 
 public class NullMessageTest extends GroovyTestCase {
     public void testNullMesage() {
@@ -45,7 +45,7 @@ public class NullMessageTest extends GroovyTestCase {
                 latch.countDown()
             }
         }.start()
-        PooledActors.actor {
+        Actors.actor {
             actor << null
             latch.await()
         }.start()
@@ -60,7 +60,7 @@ public class NullMessageTest extends GroovyTestCase {
                 reply 10
             }
         }.start()
-        PooledActors.actor {
+        Actors.actor {
             actor << null
             react {
                 result << it

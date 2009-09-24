@@ -1,6 +1,6 @@
 import org.gparallelizer.remote.LocalNode
 import org.gparallelizer.remote.netty.NettyTransportProvider
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 println """Welcome to chat!
 Every line you will type will be printed on all JVM, which runs this script.
@@ -52,7 +52,7 @@ def mainNode = new LocalNode(transport, {
   // Parser for input stream
   // This is inner actor responsible for converting console input in to commands,
   // which our main actor understands
-  PooledActors.actor {
+  Actors.actor {
 
     // as console input doesn't fit well to actor model we create
     // demon thread to read standard input and feed parser

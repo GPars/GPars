@@ -21,7 +21,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.PooledActorGroup
 
 public class MultiMessageTest extends GroovyTestCase {
@@ -29,7 +29,7 @@ public class MultiMessageTest extends GroovyTestCase {
     CountDownLatch latch = new CountDownLatch(1)
     volatile int result = 0
 
-    def actor = PooledActors.actor {
+    def actor = Actors.actor {
       react {a, b, c ->
         result = a + b + c
         latch.countDown()
@@ -48,7 +48,7 @@ public class MultiMessageTest extends GroovyTestCase {
     CountDownLatch latch = new CountDownLatch(1)
     volatile int result = 0
 
-    def actor = PooledActors.actor {
+    def actor = Actors.actor {
       react {->
         result = 1
         latch.countDown()
@@ -65,7 +65,7 @@ public class MultiMessageTest extends GroovyTestCase {
     CountDownLatch latch = new CountDownLatch(1)
     volatile int result = 0
 
-    def actor = PooledActors.actor {
+    def actor = Actors.actor {
       react {
         result = 1
         latch.countDown()
@@ -82,7 +82,7 @@ public class MultiMessageTest extends GroovyTestCase {
     CountDownLatch latch = new CountDownLatch(1)
     volatile int result = 0
 
-    def actor = PooledActors.actor {
+    def actor = Actors.actor {
       react {a, b, c ->
         result = a[2] + b + c
         latch.countDown()

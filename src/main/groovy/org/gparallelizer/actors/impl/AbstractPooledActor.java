@@ -24,7 +24,7 @@ import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
 import org.gparallelizer.actors.ActorGroup;
-import org.gparallelizer.actors.PooledActors;
+import org.gparallelizer.actors.Actors;
 import static org.gparallelizer.actors.impl.ActorException.*;
 
 import java.util.*;
@@ -185,7 +185,7 @@ abstract public class AbstractPooledActor extends Actor {
     private static final Timer timer = new Timer(true);
 
     public AbstractPooledActor() {
-        setActorGroup(PooledActors.defaultPooledActorGroup);
+        setActorGroup(Actors.defaultPooledActorGroup);
     }
 
     /**

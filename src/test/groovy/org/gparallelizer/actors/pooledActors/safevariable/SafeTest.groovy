@@ -17,7 +17,7 @@
 package org.gparallelizer.actors.impl.safevariable
 
 import java.util.concurrent.atomic.AtomicBoolean
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.Safe
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
@@ -90,7 +90,7 @@ public class SafeTest extends GroovyTestCase {
         final Safe counter = new Safe(0L)
 
         def result = new DataFlowStream()
-        PooledActors.actor {
+        Actors.actor {
             counter << {reply 'Explicit reply'; 10}
             react {a, b ->
                 result << a
@@ -138,7 +138,7 @@ public class SafeTest extends GroovyTestCase {
         final Safe counter = new Safe(0L)
 
         def result = new DataFlowVariable()
-        PooledActors.actor {
+        Actors.actor {
             counter << {it}
             react {
                 result << it
@@ -147,7 +147,7 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 0, result.val
 
         result = new DataFlowVariable()
-        PooledActors.actor {
+        Actors.actor {
             counter << {null}
             react {
                 result << it
@@ -156,7 +156,7 @@ public class SafeTest extends GroovyTestCase {
         assertNull result.val
 
         result = new DataFlowVariable()
-        PooledActors.actor {
+        Actors.actor {
             counter << {}
             react {
                 result << it

@@ -17,7 +17,7 @@
 package org.gparallelizer.actors.impl
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class RepeatLoopTest extends GroovyTestCase {
 
@@ -25,7 +25,7 @@ public class RepeatLoopTest extends GroovyTestCase {
         volatile int count = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        PooledActors.actor {
+        Actors.actor {
             loop {
                 if (count == 10) {
                     stop()

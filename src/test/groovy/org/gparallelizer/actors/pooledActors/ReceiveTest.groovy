@@ -2,7 +2,7 @@ package org.gparallelizer.actors.impl
 
 import org.gparallelizer.dataflow.DataFlows
 import java.util.concurrent.CyclicBarrier
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
  * @author Vaclav Pech
@@ -13,7 +13,7 @@ public class ReceiveTest extends GroovyTestCase {
     public void testReceive() {
         final DataFlows df = new DataFlows()
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             df.result1 = receive()
             receive {
                 df.result2 = it
@@ -34,7 +34,7 @@ public class ReceiveTest extends GroovyTestCase {
     public void testNestedReceive() {
         final DataFlows df = new DataFlows()
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             loop {
                 react {
                     react {
@@ -73,7 +73,7 @@ public class ReceiveTest extends GroovyTestCase {
         final DataFlows df = new DataFlows()
         final def barrier = new CyclicBarrier(2)
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             loop {
                 if (df.contains('result1')) {
                     stop()

@@ -19,9 +19,9 @@ package org.gparallelizer.samples.actors
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
-PooledActors.defaultPooledActorGroup.resize 23
+Actors.defaultPooledActorGroup.resize 23
 
 //Messages
 private final class FileToSort {

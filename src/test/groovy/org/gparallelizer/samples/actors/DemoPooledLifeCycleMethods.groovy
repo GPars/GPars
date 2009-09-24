@@ -18,7 +18,7 @@ package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
  * Two actors are created to show possible ways to handle all lifecycle events of event-driven actors.
@@ -29,7 +29,7 @@ private class ExceptionFlag {
     static final boolean THROW_EXCEPTIION = true  //change the flag to test either exception or timeout
 }
 
-final Actor actor1 = PooledActors.actor {
+final Actor actor1 = Actors.actor {
     println("Running actor1")
     if (ExceptionFlag.THROW_EXCEPTIION) throw new RuntimeException('test')
     else {

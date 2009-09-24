@@ -23,7 +23,7 @@ public class NullMessageTest extends GroovyTestCase{
     public void testNullMesage() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive {
                 result = it
                 latch.countDown()
@@ -35,16 +35,16 @@ public class NullMessageTest extends GroovyTestCase{
     }
 
     public void testNullMesageFromActor() {
-        PooledActors.defaultPooledActorGroup.resize(100)
+        Actors.defaultPooledActorGroup.resize(100)
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive {
                 result = it
                 latch.countDown()
             }
         }.start()
-        PooledActors.actor {
+        Actors.actor {
             actor << null
             latch.await()
         }.start()
@@ -54,12 +54,12 @@ public class NullMessageTest extends GroovyTestCase{
 
     public void testNullMesageFromActorWithReply() {
         final def result = new DataFlowVariable()
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive {
                 reply 10
             }
         }.start()
-        PooledActors.actor {
+        Actors.actor {
             actor << null
             receive {
                 result << it

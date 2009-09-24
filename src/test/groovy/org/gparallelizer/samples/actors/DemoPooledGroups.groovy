@@ -19,22 +19,22 @@ package org.gparallelizer.samples.actors
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.impl.AbstractPooledActor
 import org.gparallelizer.actors.PooledActorGroup
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
  * Three pooled actors are created, two of them in a newly created pooled actor group, one in the fefault pooled actor
- * group using the factory method of the PooledActors class.
+ * group using the factory method of the Actors class.
  * @author Vaclav Pech
  */
 
 final PooledActorGroup sampleGroup = new PooledActorGroup()
 
 println "Sample Group $sampleGroup"
-println "Default group ${PooledActors.defaultPooledActorGroup}"
+println "Default group ${Actors.defaultPooledActorGroup}"
 println ""
 
 sampleGroup.actor {
-    println ((actorGroup==PooledActors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
+    println ((actorGroup==Actors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
 }.start()
 
 Thread.sleep 1000
@@ -42,7 +42,7 @@ Thread.sleep 1000
 class GroupSamplePooledActor extends AbstractPooledActor {
 
     protected void act() {
-        println ((actorGroup==PooledActors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
+        println ((actorGroup==Actors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
     }
 }
 

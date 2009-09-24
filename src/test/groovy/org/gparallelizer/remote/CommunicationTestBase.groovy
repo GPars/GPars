@@ -17,7 +17,7 @@
 package org.gparallelizer.remote
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public abstract class CommunicationTestBase extends GroovyTestCase {
 
@@ -25,7 +25,7 @@ public abstract class CommunicationTestBase extends GroovyTestCase {
 
   void testRemote() {
     def node1 = new LocalNode(transportProvider, {
-      def printer = PooledActors.actor {
+      def printer = Actors.actor {
         loop {
           react {msg ->
             println "node1: $msg"

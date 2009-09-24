@@ -19,20 +19,20 @@ package org.gparallelizer.actors.impl
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class DeliveryErrorTest  extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.defaultPooledActorGroup.resize 5
+        Actors.defaultPooledActorGroup.resize 5
     }
 
     public void testSuccessfulMessages() {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             react {}
         }
 
@@ -58,7 +58,7 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             react {
                 barrier.await()
             }
@@ -94,7 +94,7 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             react {
                 barrier.await()
                 if (true) throw new RuntimeException('test')
@@ -130,7 +130,7 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             latch.await()
         }
         actor.start()
@@ -149,7 +149,7 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         volatile boolean flag = true
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             latch.await()
             stop()
         }

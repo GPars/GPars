@@ -304,7 +304,10 @@
         <inspection_tool class="PublicInnerClass" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreEnums" value="false" />
         </inspection_tool>
-        <inspection_tool class="RedundantImplements" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="RedundantImplements" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreSerializable" value="false" />
+          <option name="ignoreCloneable" value="false" />
+        </inspection_tool>
         <inspection_tool class="RedundantMethodOverride" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="RefusedBequest" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreEmptySuperMethods" value="false" />
@@ -373,11 +376,12 @@
         <inspection_tool class="WaitWithoutCorrespondingNotify" enabled="true" level="WARNING" enabled_by_default="true" />
       </profile>
     </profiles>
-    <list size="4">
-      <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
-      <item index="1" class="java.lang.String" itemvalue="INFO" />
-      <item index="2" class="java.lang.String" itemvalue="WARNING" />
-      <item index="3" class="java.lang.String" itemvalue="ERROR" />
+    <list size="5">
+      <item index="0" class="java.lang.String" itemvalue="TYPO" />
+      <item index="1" class="java.lang.String" itemvalue="SERVER PROBLEM" />
+      <item index="2" class="java.lang.String" itemvalue="INFO" />
+      <item index="3" class="java.lang.String" itemvalue="WARNING" />
+      <item index="4" class="java.lang.String" itemvalue="ERROR" />
     </list>
   </component>
   <component name="JavacSettings">
@@ -538,6 +542,7 @@
   </component>
   <component name="ProjectDictionaryState">
     <dictionary name="dierkkonig" />
+    <dictionary name="vaclav" />
   </component>
   <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">

@@ -17,13 +17,13 @@
 package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 /**
  * Shows actor solution to The Dining Philosophers problem
  */
 
-PooledActors.defaultPooledActorGroup.resize 5
+Actors.defaultPooledActorGroup.resize 5
 
 final class Philosopher extends AbstractPooledActor {
     private Random random = new Random()

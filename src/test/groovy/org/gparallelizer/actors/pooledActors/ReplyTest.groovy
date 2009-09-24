@@ -20,8 +20,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.Actor
-import static org.gparallelizer.actors.PooledActors.actor
-import org.gparallelizer.actors.PooledActors
+import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actors.Actors
 
 /**
  *
@@ -32,7 +32,7 @@ public class ReplyTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.defaultPooledActorGroup.resize(5)
+        Actors.defaultPooledActorGroup.resize(5)
     }
 
     public void testMultipleClients() {
@@ -269,7 +269,7 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor actor = PooledActors.actor {
+        final AbstractPooledActor actor = Actors.actor {
             react {
                 reply 'Message2'
                 it.reply 'Message3'
@@ -280,7 +280,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }.start()
 
-        PooledActors.actor {
+        Actors.actor {
             actor.send 'Message1'
             react {
                 it.reply 'Message4'
@@ -310,7 +310,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }.start()
 
-        PooledActors.actor {
+        Actors.actor {
             actor.send 'Message1'
             react {
                 result = it

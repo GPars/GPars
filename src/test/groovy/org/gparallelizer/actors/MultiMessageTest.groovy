@@ -26,7 +26,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             receive {a, b, c ->
                 result = a + b + c
                 latch.countDown()
@@ -45,7 +45,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             receive {->
                 result = 1
                 latch.countDown()
@@ -62,7 +62,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             receive {
                 result = 1
                 latch.countDown()
@@ -79,7 +79,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             receive {a, b, c ->
                 result = a[2] + b + c
                 latch.countDown()

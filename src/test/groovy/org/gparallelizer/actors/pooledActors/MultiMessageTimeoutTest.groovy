@@ -19,14 +19,14 @@ package org.gparallelizer.actors.impl
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class MultiMessageTimeoutTest extends GroovyTestCase {
     public void testReact() {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             react(10, TimeUnit.SECONDS) {a, b, c ->
                 result = a + b + c
                 latch.countDown()
@@ -46,7 +46,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CyclicBarrier barrier = new CyclicBarrier(2)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             barrier.await()
             react(0, TimeUnit.SECONDS) {a, b, c ->
                 result = a + b + c
@@ -69,7 +69,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         volatile List result = []
         volatile boolean flag = false
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             barrier.await()
             react(0, TimeUnit.SECONDS) {a, b, c ->
                 result << a
@@ -96,7 +96,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         volatile List result = []
         volatile boolean flag = false
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             barrier.await()
             react(1, TimeUnit.SECONDS) {a, b, c ->
                 result << a
@@ -121,7 +121,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CyclicBarrier barrier = new CyclicBarrier(2)
         volatile List result = []
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             barrier.await()
             react(2, TimeUnit.SECONDS) {a, b, c ->
                 result << a
@@ -143,7 +143,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             react(10, TimeUnit.SECONDS) {->
                 result = 1
                 latch.countDown()
@@ -161,7 +161,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             barrier.await()
             react(0, TimeUnit.SECONDS) {->
                 result = 1
@@ -181,7 +181,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         volatile int result = 0
         volatile boolean flag = false
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             react(0, TimeUnit.SECONDS) {->
                 result = 2
                 latch.countDown()
@@ -203,7 +203,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             react(10, TimeUnit.SECONDS) {
                 result = 1
                 latch.countDown()
@@ -220,7 +220,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = PooledActors.actor {
+        def actor = Actors.actor {
             react(10, TimeUnit.SECONDS) {a, b, c ->
                 result = a[2] + b + c
                 latch.countDown()

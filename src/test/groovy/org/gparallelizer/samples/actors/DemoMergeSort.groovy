@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 import org.gparallelizer.actors.PooledActorGroup
 import org.gparallelizer.scheduler.ResizablePool
 
@@ -79,11 +79,11 @@ Closure createMessageHandler(def parentActor) {
 
 }
 
-def resultActor = PooledActors.actor {
+def resultActor = Actors.actor {
     println "Sorted array:\t${receive()}"
 }.start()
 
-def sorter = PooledActors.actor(createMessageHandler(resultActor))
+def sorter = Actors.actor(createMessageHandler(resultActor))
 sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3,
         4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3])
 

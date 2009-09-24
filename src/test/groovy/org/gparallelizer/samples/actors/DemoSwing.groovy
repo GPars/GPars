@@ -20,13 +20,13 @@ import groovy.swing.SwingBuilder
 import javax.swing.JFrame
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.PooledActorGroup
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
   vbox() {
     button('Click', actionPerformed: {
       bar()
-      PooledActors.actor {
+      Actors.actor {
         react {
           doLater {
             println 'Invoked later'

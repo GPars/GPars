@@ -19,8 +19,8 @@ package org.gparallelizer.samples.actors
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
-import static org.gparallelizer.actors.PooledActors.actor
+import org.gparallelizer.actors.Actors
+import static org.gparallelizer.actors.Actors.actor
 
 /**
  * Demonstrates various ways to structure pooled actor's code with its continuation-style message handling.
@@ -95,7 +95,7 @@ testActor(actor3)
 
 
 LifeCycleHelper.latch.await()
-PooledActors.defaultPooledActorGroup.shutdown()
+Actors.defaultPooledActorGroup.shutdown()
 
 
 class LifeCycleHelper {

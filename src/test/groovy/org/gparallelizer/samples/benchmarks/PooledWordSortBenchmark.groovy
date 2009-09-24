@@ -19,12 +19,12 @@ package org.gparallelizer.samples.benchmarks
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.impl.AbstractPooledActor
-import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Actors
 
 public class PooledWordSortBenchmark implements Benchmark {
 
   public long perform(final int numberOfIterations) {
-    PooledActors.defaultPooledActorGroup.resize 23
+    Actors.defaultPooledActorGroup.resize 23
 
     final long t1 = System.currentTimeMillis()
     final SortMaster master = new SortMaster(numActors: 10, docRoot: 'C:/dev/TeamCity/logs/')
@@ -32,7 +32,7 @@ public class PooledWordSortBenchmark implements Benchmark {
     master.waitUntilDone()
     final long t2 = System.currentTimeMillis()
     master.stopAll()
-    PooledActors.defaultPooledActorGroup.resetDefaultSize()
+    Actors.defaultPooledActorGroup.resetDefaultSize()
 
     return (t2 - t1)
   }

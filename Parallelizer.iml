@@ -12,7 +12,7 @@
   </component>
   <component name="FacetManager">
     <facet type="Groovy" name="Groovy">
-      <configuration />
+      <configuration compile="true" />
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">

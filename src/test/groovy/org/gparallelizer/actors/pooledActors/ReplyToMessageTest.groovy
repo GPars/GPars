@@ -19,14 +19,14 @@ package org.gparallelizer.actors.impl
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
-import static org.gparallelizer.actors.PooledActors.actor
-import org.gparallelizer.actors.PooledActors
+import static org.gparallelizer.actors.Actors.actor
+import org.gparallelizer.actors.Actors
 
 public class ReplyToMessageTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        PooledActors.defaultPooledActorGroup.resize(5)
+        Actors.defaultPooledActorGroup.resize(5)
     }
 
     public void testMultipleClients() {

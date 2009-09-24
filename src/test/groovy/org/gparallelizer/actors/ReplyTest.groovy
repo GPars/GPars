@@ -21,7 +21,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import org.gparallelizer.actors.impl.ActorReplyException
 
-import static org.gparallelizer.actors.PooledActors.actor
+import static org.gparallelizer.actors.Actors.actor
 
 /**
  *
@@ -40,7 +40,7 @@ public class ReplyTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def bouncer = PooledActors.actor {
+        final def bouncer = Actors.actor {
             loop {
                 receive {
                     reply it
@@ -160,7 +160,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             loop {
                 receive {
                     reply it
@@ -266,7 +266,7 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive {
                 reply 'Message2'
                 it.reply 'Message3'
@@ -277,7 +277,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }.start()
 
-        PooledActors.actor {
+        Actors.actor {
             actor.send 'Message1'
             receive {
                 it.reply 'Message4'
@@ -301,13 +301,13 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = PooledActors.actor {
+        final Actor actor = Actors.actor {
             receive {->
                 reply 'Message2'
             }
         }.start()
 
-        PooledActors.actor {
+        Actors.actor {
             actor.send 'Message1'
             receive {
                 result = it
