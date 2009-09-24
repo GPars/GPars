@@ -1,6 +1,6 @@
 //  GParallelizer
 //
-//  Copyright © 2008-9  The original author or authors
+//  Copyright ï¿½ 2008-9  The original author or authors
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.gparallelizer.dataflow.operator
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.PooledActorGroup
 import org.gparallelizer.dataflow.DataFlow
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable

@@ -14,7 +14,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors
+
+import org.gparallelizer.actors.pooledActors.Pool
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+import org.gparallelizer.actors.pooledActors.RunnableBackedPooledActor
 
 /**
  * Provides a common super class fo pooled actor's groups.

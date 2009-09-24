@@ -14,13 +14,15 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors
+
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
  * Use static import to be able to call PooledActors methods without the need to prepend them with the PooledActors identifier.
  * <pre>
- * import static org.gparallelizer.actors.pooledActors.PooledActors.*
+ * import static org.gparallelizer.actors.PooledActors.*
  *
  * PooledActors.defaultPooledActorGroup.resize 1
  *

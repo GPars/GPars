@@ -17,6 +17,7 @@
 package org.gparallelizer.actors.pooledActors
 
 import java.util.concurrent.atomic.AtomicInteger
+import org.gparallelizer.actors.PooledActorGroup
 
 public class ReactorTest extends GroovyTestCase{
 

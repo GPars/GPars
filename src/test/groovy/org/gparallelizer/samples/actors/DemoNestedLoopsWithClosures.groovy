@@ -17,8 +17,8 @@
 package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.PooledActors
-import static org.gparallelizer.actors.pooledActors.PooledActors.actor
+import org.gparallelizer.actors.PooledActors
+import static org.gparallelizer.actors.PooledActors.actor
 
 /**
  * Demonstrates a way to do continuation-style loops with PooledActors.

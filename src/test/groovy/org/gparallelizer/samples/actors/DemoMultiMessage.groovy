@@ -17,7 +17,7 @@
 package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.PooledActorGroup
 import static java.util.concurrent.TimeUnit.SECONDS
 
 /**

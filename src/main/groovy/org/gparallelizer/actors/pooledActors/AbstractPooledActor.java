@@ -23,6 +23,8 @@ import org.codehaus.groovy.runtime.*;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actors.Actor;
 import org.gparallelizer.actors.ActorMessage;
+import org.gparallelizer.actors.ActorGroup;
+import org.gparallelizer.actors.PooledActors;
 import static org.gparallelizer.actors.pooledActors.ActorException.*;
 
 import java.util.*;

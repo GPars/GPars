@@ -18,7 +18,6 @@ package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.dataflow.DataFlowVariable
-import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class NullMessageTest extends GroovyTestCase{
     public void testNullMesage() {

@@ -16,6 +16,8 @@
 
 package org.gparallelizer.actors.pooledActors
 
+import org.gparallelizer.actors.PooledActors
+
 /**
  *
  * @author Vaclav Pech

@@ -2,6 +2,7 @@ package org.gparallelizer.actors.pooledActors
 
 import org.gparallelizer.dataflow.DataFlows
 import java.util.concurrent.CyclicBarrier
+import org.gparallelizer.actors.PooledActors
 
 /**
  * @author Vaclav Pech

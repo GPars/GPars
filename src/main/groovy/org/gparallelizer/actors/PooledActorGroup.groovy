@@ -14,7 +14,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors
+
+import org.gparallelizer.actors.ActorGroup
+import org.gparallelizer.actors.pooledActors.Pool
+import org.gparallelizer.actors.pooledActors.DefaultPool
 
 /**
  * Provides logical grouping for pooled actors. Each group has an underlying thread pool, which will perform actions

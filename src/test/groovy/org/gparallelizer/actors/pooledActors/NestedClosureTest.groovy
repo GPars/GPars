@@ -17,6 +17,7 @@
 package org.gparallelizer.actors.pooledActors
 
 import org.gparallelizer.dataflow.DataFlowVariable
+import org.gparallelizer.actors.PooledActorGroup
 
 public class NestedClosureTest extends GroovyTestCase {
   public void testNestedClosures() {

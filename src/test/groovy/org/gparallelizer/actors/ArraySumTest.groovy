@@ -20,9 +20,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.ActorGroup
-import org.gparallelizer.actors.pooledActors.PooledActors
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
 
 /**
  *

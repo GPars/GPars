@@ -18,9 +18,9 @@ package org.gparallelizer.actors.pooledActors
 
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActors
-import static org.gparallelizer.actors.pooledActors.PooledActors.actor
+
+import org.gparallelizer.actors.PooledActors
+import static org.gparallelizer.actors.PooledActors.actor
 
 /**
  *

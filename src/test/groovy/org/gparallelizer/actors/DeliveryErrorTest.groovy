@@ -18,7 +18,6 @@ package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
-import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class DeliveryErrorTest extends GroovyTestCase {
     public void testSuccessfulMessages() {

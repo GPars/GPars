@@ -21,7 +21,7 @@ import jsr166y.forkjoin.ForkJoinWorkerThread
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.DefaultPool
 import org.gparallelizer.actors.pooledActors.FJPool
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.PooledActorGroup
 
 public class FJGroupTest extends GroovyTestCase {
     public void testFJGroup() {

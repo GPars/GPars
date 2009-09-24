@@ -1,6 +1,6 @@
 package org.gparallelizer.samples.actors
 
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import static org.gparallelizer.actors.PooledActors.*
 import org.gparallelizer.dataflow.DataFlowStream
 
 def getYearEndClosing(String symbol, int year ) {

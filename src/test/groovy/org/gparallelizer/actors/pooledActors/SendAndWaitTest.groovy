@@ -20,6 +20,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.PooledActorGroup
 
 public class SendAndWaitTest extends GroovyTestCase {
 

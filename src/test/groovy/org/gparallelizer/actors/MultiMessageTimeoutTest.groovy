@@ -19,7 +19,6 @@ package org.gparallelizer.actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
-import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class MultiMessageTimeoutTest extends GroovyTestCase {
   public void testReceive() {

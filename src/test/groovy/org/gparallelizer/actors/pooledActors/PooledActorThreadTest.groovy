@@ -18,6 +18,7 @@ package org.gparallelizer.actors.pooledActors
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.PooledActors
 
 public class PooledActorThreadTest extends GroovyTestCase {
     public void testActorThread() {

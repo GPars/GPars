@@ -14,12 +14,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors
+
+import org.gparallelizer.actors.pooledActors.DefaultPool
 
 /**
  * Represents a group of pooled-bound actors, which share a pool of non-daemon threads. Since Fork/Join doesn't support
  * non-daemon threads, the pool for NonDaemonActorGroup will always use JDK ExecutorService pools.
- * @see org.gparallelizer.actors.pooledActors.PooledActorGroup for more details on groups of pooled actors.
+ * @see org.gparallelizer.actors.PooledActorGroup for more details on groups of pooled actors.
  *
  * @author Vaclav Pech
  * Date: Jun 17, 2009

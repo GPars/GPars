@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors.safevariable
 
-import org.gparallelizer.actors.pooledActors.Safe
+import org.gparallelizer.actors.Safe
 
 final Safe counter = new Safe<Long>(0L)
 

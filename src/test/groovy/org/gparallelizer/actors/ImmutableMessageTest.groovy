@@ -17,7 +17,6 @@
 package org.gparallelizer.actors
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class ImmutableMessageTest extends GroovyTestCase {
     public void testSend() {

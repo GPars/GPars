@@ -18,7 +18,7 @@ package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.PooledActors
 
 /**
  * Two actors are created to show possible ways to handle all lifecycle events of event-driven actors.

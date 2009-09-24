@@ -19,8 +19,8 @@ package org.gparallelizer.samples.actors
 import groovy.swing.SwingBuilder
 import javax.swing.JFrame
 import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.PooledActorGroup
+import org.gparallelizer.actors.PooledActors
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
   vbox() {

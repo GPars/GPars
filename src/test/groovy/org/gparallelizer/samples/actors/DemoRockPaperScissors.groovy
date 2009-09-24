@@ -16,7 +16,7 @@
 
 package org.gparallelizer.samples.actors
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actors.PooledActorGroup
 
 /**
  * A popular gae implemented with actors.

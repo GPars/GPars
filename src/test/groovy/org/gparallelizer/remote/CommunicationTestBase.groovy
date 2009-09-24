@@ -17,7 +17,7 @@
 package org.gparallelizer.remote
 
 import java.util.concurrent.CountDownLatch
-import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.PooledActors
 
 public abstract class CommunicationTestBase extends GroovyTestCase {
 

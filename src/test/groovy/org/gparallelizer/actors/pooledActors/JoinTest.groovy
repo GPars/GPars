@@ -16,6 +16,8 @@
 
 package org.gparallelizer.actors.pooledActors
 
+import org.gparallelizer.actors.PooledActors
+
 public class JoinTest extends GroovyTestCase {
     public void testActorJoin() {
         final def actor = PooledActors.actor { Thread.sleep 500; stop() }.start()

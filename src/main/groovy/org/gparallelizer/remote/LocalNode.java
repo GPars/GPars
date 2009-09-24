@@ -18,10 +18,10 @@ package org.gparallelizer.remote;
 
 import groovy.lang.Closure;
 import org.gparallelizer.actors.Actor;
-import org.gparallelizer.actors.pooledActors.ActorGroup;
+import org.gparallelizer.actors.ActorGroup;
 import org.gparallelizer.actors.pooledActors.DefaultPool;
 import org.gparallelizer.actors.pooledActors.Pool;
-import org.gparallelizer.actors.pooledActors.PooledActorGroup;
+import org.gparallelizer.actors.PooledActorGroup;
 import org.gparallelizer.serial.SerialHandles;
 
 import java.util.Collections;

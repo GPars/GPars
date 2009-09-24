@@ -21,6 +21,8 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import org.gparallelizer.actors.Actor
+import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.PooledActorGroup
 
 public class MultiMessageTest extends GroovyTestCase {
   public void testReceive() {

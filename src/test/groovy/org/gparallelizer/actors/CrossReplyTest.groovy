@@ -17,7 +17,6 @@
 package org.gparallelizer.actors
 
 import java.util.concurrent.CyclicBarrier
-import org.gparallelizer.actors.pooledActors.PooledActors
 
 public class CrossReplyTest extends GroovyTestCase {
 

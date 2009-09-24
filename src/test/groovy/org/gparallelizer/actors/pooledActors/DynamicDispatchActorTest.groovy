@@ -16,6 +16,8 @@
 
 package org.gparallelizer.actors.pooledActors
 
+import org.gparallelizer.actors.DynamicDispatchActor
+
 public class DynamicDispatchActorTest extends GroovyTestCase {
     public void testDispatch() {
         final TestDynamicDispatchActor actor = new TestDynamicDispatchActor().start()

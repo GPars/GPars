@@ -14,7 +14,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actors.pooledActors
+package org.gparallelizer.actors
+
+import org.gparallelizer.actors.pooledActors.RunnableBackedPooledActor
 
 /**
  * An actor representing a reactor. When it receives a message, the supplied block of code is run with the message

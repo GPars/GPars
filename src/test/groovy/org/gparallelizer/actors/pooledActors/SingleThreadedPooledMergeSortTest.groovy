@@ -16,7 +16,7 @@
 
 package org.gparallelizer.actors.pooledActors
 
-import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.PooledActors
 
 /**
  *

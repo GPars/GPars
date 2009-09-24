@@ -17,6 +17,7 @@
 package org.gparallelizer.actors.pooledActors
 
 import java.util.concurrent.CountDownLatch
+import org.gparallelizer.actors.PooledActors
 
 public class RepeatLoopTest extends GroovyTestCase {
 

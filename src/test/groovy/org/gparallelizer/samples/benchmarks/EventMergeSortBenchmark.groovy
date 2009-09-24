@@ -16,8 +16,8 @@
 
 package org.gparallelizer.samples
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import static org.gparallelizer.actors.pooledActors.PooledActors.actor
+import org.gparallelizer.actors.PooledActorGroup
+import static org.gparallelizer.actors.PooledActors.actor
 
 /**
  * Performs merge sort using pooled actors.

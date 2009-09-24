@@ -18,8 +18,8 @@ package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actors.Actor
 import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.actors.pooledActors.PooledActors
+import org.gparallelizer.actors.PooledActorGroup
+import org.gparallelizer.actors.PooledActors
 
 /**
  * Three pooled actors are created, two of them in a newly created pooled actor group, one in the fefault pooled actor

@@ -19,7 +19,8 @@ package org.gparallelizer.actors.pooledActors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
-import static org.gparallelizer.actors.pooledActors.PooledActors.actor
+import static org.gparallelizer.actors.PooledActors.actor
+import org.gparallelizer.actors.PooledActors
 
 public class ReplyToMessageTest extends GroovyTestCase {
 

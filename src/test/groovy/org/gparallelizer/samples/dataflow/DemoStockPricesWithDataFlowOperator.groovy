@@ -1,7 +1,7 @@
 package org.gparallelizer.samples.dataflow
 
-import org.gparallelizer.actors.pooledActors.ActorGroup
-import org.gparallelizer.actors.pooledActors.NonDaemonActorGroup
+import org.gparallelizer.actors.ActorGroup
+import org.gparallelizer.actors.NonDaemonActorGroup
 import org.gparallelizer.dataflow.DataFlowStream
 import static org.gparallelizer.dataflow.operator.DataFlowOperator.operator
 

@@ -17,11 +17,10 @@
 package org.gparallelizer.actors.pooledActors.safevariable
 
 import java.util.concurrent.atomic.AtomicBoolean
-import org.gparallelizer.actors.pooledActors.PooledActors
-import org.gparallelizer.actors.pooledActors.Safe
+import org.gparallelizer.actors.PooledActors
+import org.gparallelizer.actors.Safe
 import org.gparallelizer.dataflow.DataFlowStream
 import org.gparallelizer.dataflow.DataFlowVariable
-import java.util.concurrent.CyclicBarrier
 
 public class SafeTest extends GroovyTestCase {
     public void testList() {
