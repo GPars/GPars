@@ -85,7 +85,7 @@ public class AbstractActorTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         final AtomicReference result = new AtomicReference()
 
-        Actor actor=PooledActors.actor {
+        Actor actor = Actors.actor {
             receive(1, TimeUnit.SECONDS) {
                 receiveFlag.set(true)
                 result.set it
