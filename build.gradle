@@ -86,7 +86,6 @@ def packageTitle = group
 //todo consider removing javadoc
 javadoc {
     dependsOn('compile')
-    options.subPackages(packageTitle)
     options.overview('overview.html')
     options.showAll()
     options.encoding('UTF-8')
