@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="GParallelizer Build" default="compile">
+<project name="gpars Build" default="compile">
   
   <property name="groovyJarPath" value="lib/groovy-all-1.7-beta-2-SNAPSHOT.jar"/>
   
@@ -17,7 +17,7 @@
   
   <path id="testClasspathId">
     <pathelement path="${destDir}"/>
-    <path refid="compileClasspath"/>
+    <path refid="compileClasspathId"/>
     <pathelement path="lib/junit-4.7.jar"/>
   </path>
   
