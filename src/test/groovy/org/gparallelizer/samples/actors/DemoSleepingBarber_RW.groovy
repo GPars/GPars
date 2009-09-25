@@ -24,7 +24,7 @@
 //  an arbitrary length list, the barbersShop object has to control how many customers are allowed into the
 //  queue.
 
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import org.gparallelizer.actor.PooledActorGroup
 
 @Grapes ( [
            @Grab ( group = 'org.gparallelizer' ,  module = 'gparallelizer' , version = '[0.8.4,)' ) ,

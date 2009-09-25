@@ -15,6 +15,8 @@
     todo tune maven repository upload - from CI?
     todo tag sources at releases
 
+    todo remove disableSendingReplies
+     
     todo enable @Immutable in code with latest Maia
 
     todo build with Groovy 1.6.5
