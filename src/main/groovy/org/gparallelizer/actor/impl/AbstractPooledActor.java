@@ -22,8 +22,8 @@ import groovy.time.Duration;
 import org.codehaus.groovy.runtime.*;
 import org.gparallelizer.MessageStream;
 import org.gparallelizer.actor.Actor;
-import org.gparallelizer.actor.ActorMessage;
 import org.gparallelizer.actor.ActorGroup;
+import org.gparallelizer.actor.ActorMessage;
 import org.gparallelizer.actor.Actors;
 import static org.gparallelizer.actor.impl.ActorException.*;
 
@@ -31,8 +31,9 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
  * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
@@ -128,7 +129,6 @@ abstract public class AbstractPooledActor extends Actor {
     /**
      * The actor group to which the actor belongs
      */
-    //todo ensure proper serialization
     private volatile ActorGroup actorGroup;
 
     /**
@@ -144,18 +144,25 @@ abstract public class AbstractPooledActor extends Actor {
     /**
      * Code for the next action
      */
-    private final AtomicReference<Reaction> reaction = new AtomicReference<Reaction>();
+    private volatile Reaction reaction;
 
-    //todo should be private, but wouldn't work
+    private static final AtomicReferenceFieldUpdater<AbstractPooledActor, Reaction> reactionUpdater = AtomicReferenceFieldUpdater.newUpdater(AbstractPooledActor.class, Reaction.class, "reaction");
+
     /**
      * A copy of buffer in case of timeout.
      */
     private List<ActorMessage> savedBufferedMessages;
 
+
+    private static final int S_STOPPED = 0;
+    private static final int S_RUNNING = 1;
+
     /**
      * Indicates whether the actor should terminate
      */
-    private final AtomicBoolean stopFlag = new AtomicBoolean(true);
+    private volatile int stopFlag = S_STOPPED;
+
+    private static final AtomicIntegerFieldUpdater<AbstractPooledActor> stopFlagUpdater = AtomicIntegerFieldUpdater.newUpdater(AbstractPooledActor.class, "stopFlag");
 
     /**
      * Code for the loop, if any
@@ -172,7 +179,7 @@ abstract public class AbstractPooledActor extends Actor {
      * The current timeout task, which will send a TIMEOUT message to the actor if not cancelled by someone
      * calling the send() method within the timeout specified for the currently blocked react() method.
      */
-    private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>();
+    private volatile TimerTask timerTask;
 
     /**
      * Internal lock to synchronize access of external threads calling send() or stop() with the current active actor action
@@ -222,11 +229,12 @@ abstract public class AbstractPooledActor extends Actor {
 
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
+     *
      * @return this (the actor itself) to allow method chaining
      */
     public final AbstractPooledActor start() {
         disableGroupMembershipChange();
-        if (!stopFlag.getAndSet(false))
+        if (stopFlagUpdater.getAndSet(this, S_RUNNING) != S_STOPPED)
             throw new IllegalStateException("Actor has already been started.");
         getActorGroup().getThreadPool().execute(new ActorAction(new Runnable() {
             public void run() {
@@ -250,7 +258,7 @@ abstract public class AbstractPooledActor extends Actor {
      */
     final boolean indicateStop() {
         cancelCurrentTimeoutTimer("");
-        return stopFlag.getAndSet(true);
+        return stopFlagUpdater.getAndSet(this, S_STOPPED) != S_RUNNING;
     }
 
     /**
@@ -263,7 +271,7 @@ abstract public class AbstractPooledActor extends Actor {
     public final Actor stop() {
         synchronized (lock) {
             if (!indicateStop()) {
-                if (reaction.getAndSet(null) != null)
+                if (reactionUpdater.getAndSet(this, null) != null)
                     getActorGroup().getThreadPool().execute(new ActorAction(new Runnable() {
                         public void run() {
                             throw TERMINATE;
@@ -284,7 +292,7 @@ abstract public class AbstractPooledActor extends Actor {
      */
     @Override
     public final boolean isActive() {
-        return !stopFlag.get();
+        return stopFlag == S_RUNNING;
     }
 
     /**
@@ -363,10 +371,10 @@ abstract public class AbstractPooledActor extends Actor {
         code.setDelegate(this);
 
         synchronized (lock) {
-            if (stopFlag.get())
+            if (stopFlag == S_STOPPED)
                 throw TERMINATE;
 
-            if (reaction.get() != null)
+            if (reaction != null)
                 throw new IllegalStateException("Cannot have more react called at the same time.");
 
             final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
@@ -378,14 +386,14 @@ abstract public class AbstractPooledActor extends Actor {
             if (reactCode.isReady()) {
                 getActorGroup().getThreadPool().execute(new ActorAction(reactCode));
             } else {
-                reaction.set(reactCode);
+                reaction = reactCode;
                 if (timeout >= 0) {
-                    timerTask.set(new TimerTask() {
+                    timerTask = new TimerTask() {
                         public void run() {
                             send(TIMEOUT);
                         }
-                    });
-                    timer.schedule(timerTask.get(), timeout);
+                    };
+                    timer.schedule(timerTask, timeout);
                 }
             }
         }
@@ -410,7 +418,6 @@ abstract public class AbstractPooledActor extends Actor {
                 if (message != null)
                     obj2Sender.put(message.getPayLoad(), message.getSender());
             }
-//            enhanceWithReplyMethodsToMessages(messages); // todo (dk) why is this commented?
         }
     }
 
@@ -422,7 +429,7 @@ abstract public class AbstractPooledActor extends Actor {
      */
     @Override
     protected final Object receiveImpl() throws InterruptedException {
-        if (stopFlag.get())
+        if (stopFlag == S_STOPPED)
             throw new IllegalStateException("The actor hasn't been started.");
         ActorMessage message = messageQueue.take();
         enhanceReplies(Arrays.asList(message));
@@ -440,7 +447,7 @@ abstract public class AbstractPooledActor extends Actor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
-        if (stopFlag.get())
+        if (stopFlag == S_STOPPED)
             throw new IllegalStateException("The actor hasn't been started.");
         ActorMessage message = messageQueue.poll(timeout, timeUnit);
         enhanceReplies(Arrays.asList(message));
@@ -465,7 +472,7 @@ abstract public class AbstractPooledActor extends Actor {
         int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
 
         for (int i = 0; i != toReceive; ++i) {
-            if (stopFlag.get())
+            if (stopFlag == S_STOPPED)
                 throw new IllegalStateException("The actor hasn't been started.");
 
             messages.add(messageQueue.take());
@@ -513,7 +520,7 @@ abstract public class AbstractPooledActor extends Actor {
             if (nullAppeared)
                 messages.add(null);
             else {
-                if (stopFlag.get())
+                if (stopFlag == S_STOPPED)
                     throw new IllegalStateException("The actor hasn't been started.");
                 ActorMessage message =
                         messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
@@ -565,12 +572,14 @@ abstract public class AbstractPooledActor extends Actor {
     /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
+     *
      * @param message may be null to simply trigger the actors receive/react
      * @return this (the actor itself) to allow method chaining
      */
     public final Actor send(Object message) {
         synchronized (lock) {
-            if (stopFlag.get()) throw new IllegalStateException("The actor hasn't been started.");
+            if (stopFlag == S_STOPPED)
+                throw new IllegalStateException("The actor hasn't been started.");
             cancelCurrentTimeoutTimer(message);
 
             ActorMessage actorMessage;
@@ -579,12 +588,12 @@ abstract public class AbstractPooledActor extends Actor {
             else
                 actorMessage = ActorMessage.build(message);
 
-            final Reaction reactCode = reaction.get();
+            final Reaction reactCode = reaction;
             if (reactCode != null) {
                 assert !reactCode.isReady();
                 reactCode.addMessage(actorMessage);
                 if (reactCode.isReady()) {
-                    reaction.set(null);
+                    reaction = null;
                     getActorGroup().getThreadPool().execute(new ActorAction(reactCode));
                 }
             } else {
@@ -658,7 +667,7 @@ abstract public class AbstractPooledActor extends Actor {
     }
 
     private void doLoopCall(Runnable code) {
-        if (stopFlag.get())
+        if (stopFlag == S_STOPPED)
             throw TERMINATE;
         getActorGroup().getThreadPool().execute(new ActorAction(code));
         throw CONTINUE;
@@ -666,7 +675,7 @@ abstract public class AbstractPooledActor extends Actor {
 
     private void cancelCurrentTimeoutTimer(Object message) {
         if (TIMEOUT != message) {
-            final TimerTask task = timerTask.get();
+            final TimerTask task = timerTask;
             if (task != null)
                 task.cancel();
         }
