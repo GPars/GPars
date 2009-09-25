@@ -832,7 +832,7 @@ abstract public class AbstractPooledActor extends Actor {
 
         private void handleException(final Throwable exception) {
             if (!callDynamic("onException", new Object[]{exception})) {
-                System.err.println("An exception occurred in the Actor thread ${Thread.currentThread().name}");
+                System.err.println("An exception occurred in the Actor thread " + Thread.currentThread().getName());
                 exception.printStackTrace(System.err);
             }
             handleTermination();
@@ -841,8 +841,10 @@ abstract public class AbstractPooledActor extends Actor {
         private void handleInterrupt(final InterruptedException exception) {
             Thread.interrupted();
             if (!callDynamic("onInterrupt", new Object[]{exception})) {
-                System.err.println("The actor processing thread has been interrupted ${Thread.currentThread().name}");
-                exception.printStackTrace(System.err);
+                if (!cancelled) {
+                    System.err.println("The actor processing thread has been interrupted " + Thread.currentThread().getName());
+                    exception.printStackTrace(System.err);
+                }
             }
             handleTermination();
         }
