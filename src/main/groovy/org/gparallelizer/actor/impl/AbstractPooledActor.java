@@ -563,13 +563,6 @@ abstract public class AbstractPooledActor extends Actor {
     }
 
     /**
-     * Releases the latch with all threads that have called join on the actor
-     */
-    final void releaseJoinedThreads() {
-        getJoinLatch().bind(null);
-    }
-
-    /**
      * Adds a message to the Actor's queue. Can only be called on a started Actor.
      * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
      *
@@ -646,6 +639,7 @@ abstract public class AbstractPooledActor extends Actor {
         final Runnable enhancedCode = new Runnable() {
             public void run() {
                 if (code instanceof Closure)
+                    //noinspection deprecation
                     GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) code);
                 else
                     code.run();
@@ -688,10 +682,10 @@ abstract public class AbstractPooledActor extends Actor {
     void runReaction(List<ActorMessage> messages, int maxNumberOfParameters, Closure code) {
         for (ActorMessage message : messages) {
             if (message.getPayLoad() == TIMEOUT) {
-                final ArrayList saved = new ArrayList();
+                final ArrayList<ActorMessage> saved = new ArrayList<ActorMessage>();
                 for (ActorMessage m : messages) {
                     if (m != null && m.getPayLoad() != TIMEOUT)
-                        saved.add(m.getPayLoad());
+                        saved.add(m);
                 }
                 savedBufferedMessages = saved;
                 throw TIMEOUT;
@@ -715,6 +709,7 @@ abstract public class AbstractPooledActor extends Actor {
             }
             code = new CurriedClosure(code, args);
         }
+        //noinspection deprecation
         GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), code);
         repeatLoop();
     }
@@ -815,8 +810,12 @@ abstract public class AbstractPooledActor extends Actor {
         }
 
         private void handleTimeout() {
-            callDynamic("onTimeout", new Object[0]);
-            handleTermination();
+            try {
+                callDynamic("onTimeout", new Object[0]);
+            }
+            finally {
+                handleTermination();
+            }
         }
 
         @SuppressWarnings({"FeatureEnvy"})
@@ -826,27 +825,36 @@ abstract public class AbstractPooledActor extends Actor {
             try {
                 callDynamic("afterStop", new Object[]{sweepQueue()});
             } finally {
-                releaseJoinedThreads();
+                //noinspection unchecked
+                getJoinLatch().bind(null);
             }
         }
 
         private void handleException(final Throwable exception) {
-            if (!callDynamic("onException", new Object[]{exception})) {
-                System.err.println("An exception occurred in the Actor thread " + Thread.currentThread().getName());
-                exception.printStackTrace(System.err);
+            try {
+                if (!callDynamic("onException", new Object[]{exception})) {
+                    System.err.println("An exception occurred in the Actor thread " + Thread.currentThread().getName());
+                    exception.printStackTrace(System.err);
+                }
             }
-            handleTermination();
+            finally {
+                handleTermination();
+            }
         }
 
         private void handleInterrupt(final InterruptedException exception) {
             Thread.interrupted();
-            if (!callDynamic("onInterrupt", new Object[]{exception})) {
-                if (!cancelled) {
-                    System.err.println("The actor processing thread has been interrupted " + Thread.currentThread().getName());
-                    exception.printStackTrace(System.err);
+            try {
+                if (!callDynamic("onInterrupt", new Object[]{exception})) {
+                    if (!cancelled) {
+                        System.err.println("The actor processing thread has been interrupted " + Thread.currentThread().getName());
+                        exception.printStackTrace(System.err);
+                    }
                 }
             }
-            handleTermination();
+            finally {
+                handleTermination();
+            }
         }
 
         private boolean callDynamic(final String method, final Object[] args) {
@@ -881,9 +889,9 @@ abstract public class AbstractPooledActor extends Actor {
         /**
          * Creates a new instance.
          *
-         * @param actor
+         * @param actor                    actor
          * @param numberOfExpectedMessages The number of messages expected by the next continuation
-         * @param code
+         * @param code                     code to execute
          */
         Reaction(AbstractPooledActor actor, final int numberOfExpectedMessages, Closure code) {
             this.actor = actor;
@@ -892,6 +900,7 @@ abstract public class AbstractPooledActor extends Actor {
             messages = new ActorMessage[numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages];
         }
 
+        @SuppressWarnings({"UnusedDeclaration"})
         Reaction(AbstractPooledActor actor, final int numberOfExpectedMessages) {
             this(actor, numberOfExpectedMessages, null);
         }
@@ -951,6 +960,7 @@ abstract public class AbstractPooledActor extends Actor {
          *
          * @return The messages stored so far.
          */
+        @SuppressWarnings({"UnusedDeclaration"})
         List<ActorMessage> dumpMessages() {
             return Collections.unmodifiableList(Arrays.asList(messages));
         }
