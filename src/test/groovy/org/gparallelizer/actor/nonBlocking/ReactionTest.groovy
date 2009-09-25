@@ -44,10 +44,6 @@ public class ReactionTest extends GroovyTestCase {
     assertEquals 5, holder.currentSize
     assert holder.ready
 
-    shouldFail(IllegalStateException) {
-      holder.addMessage createMessage('Message 6')
-    }
-
     List<ActorMessage> messages = holder.messages
     assertEquals 5, messages.size()
     assertEquals(['Message 1', 'Message 2', 'Message 3', 'Message 4', 'Message 5'], messages*.payLoad)

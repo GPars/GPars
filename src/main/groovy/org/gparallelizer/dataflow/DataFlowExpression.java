@@ -517,6 +517,13 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         return getClass().getSimpleName() + "(value=" + value + ')';
     }
 
+    /**
+     * Never use this method.
+     */
+    public void rebind() {
+        state = S_NOT_INITIALIZED;
+    }
+
     private static class TransformOne<V> extends DataFlowExpression<V> {
         Object arg;
         private final Closure closure;
