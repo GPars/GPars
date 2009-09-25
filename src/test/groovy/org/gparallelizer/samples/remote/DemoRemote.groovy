@@ -54,8 +54,8 @@ def mainNode = new LocalNode(transport, {
   // which our main actor understands
   Actors.actor {
 
-    // as console input doesn't fit well to actor model we create
-    // demon thread to read standard input and feed parser
+    // as console input doesn't fit well to actor model we create a
+    // daemon thread to read standard input and feed parser
     Thread.startDaemon {
       def reader = new LineNumberReader(new InputStreamReader(System.in))
       while(!Thread.currentThread().isInterrupted()) {
