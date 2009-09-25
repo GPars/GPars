@@ -17,7 +17,7 @@
   
   <path id="testClasspathId">
     <pathelement path="${destDir}"/>
-    <path refid="compileClasspathId"/>
+    <path refid="compileClasspathId"/>cls
     <pathelement path="lib/junit-4.7.jar"/>
   </path>
   
