@@ -24,6 +24,9 @@
 //  an arbitrary length list, the barbersShop object has to control how many customers are allowed into the
 //  queue.
 
+//  Author: Russel Winder <russel.winder@concertant.com>
+//  Date: 2009-09-26T08:09+01:00
+
 import org.gparallelizer.actor.PooledActorGroup
 
 class Customer {
