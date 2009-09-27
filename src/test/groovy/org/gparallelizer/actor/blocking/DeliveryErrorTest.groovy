@@ -14,10 +14,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor
+package org.gparallelizer.actor.blocking
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.Actors
 
 public class DeliveryErrorTest extends GroovyTestCase {
     public void testSuccessfulMessages() {

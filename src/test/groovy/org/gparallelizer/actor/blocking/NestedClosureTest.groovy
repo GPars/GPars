@@ -14,8 +14,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor
+package org.gparallelizer.actor.blocking
 
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.PooledActorGroup
 import org.gparallelizer.dataflow.DataFlowVariable
 
 public class NestedClosureTest extends GroovyTestCase {

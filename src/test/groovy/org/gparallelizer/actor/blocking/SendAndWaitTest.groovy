@@ -14,11 +14,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor
+package org.gparallelizer.actor.blocking
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
+import org.gparallelizer.actor.Actor
+import org.gparallelizer.actor.Actors
+import org.gparallelizer.actor.PooledActorGroup
 
 public class SendAndWaitTest extends GroovyTestCase {
 
