@@ -17,6 +17,7 @@
 package org.gparallelizer.enhancer;
 
 import groovy.lang.DelegatingMetaClass;
+import groovy.lang.MetaClass;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.gparallelizer.actor.Actor;
 
@@ -27,13 +28,14 @@ import org.gparallelizer.actor.Actor;
  * either thread-bound or event-driven (pooled).
  *
  * @author Jan Kotek, Vaclav Pech
- * Date: Apr 28, 2009
+ *         Date: Apr 28, 2009
  */
 public class ActorMetaClass extends DelegatingMetaClass {
 
     public static void enhanceClass(final Class clazz) {
         InvokerHelper.metaRegistry.setMetaClass(clazz, new ActorMetaClass(clazz));
     }
+
     /**
      * The background actor for processing all incoming method calls
      */
@@ -41,10 +43,11 @@ public class ActorMetaClass extends DelegatingMetaClass {
 
     /**
      * Creates a new instance with an actor associated
+     *
      * @param clazz The class to intercept
      */
     public ActorMetaClass(final Class clazz) {
-        super(clazz);
+        super(getDelegateMetaClass(clazz));
         actor = new EnhancerPooledActor();
         actor.start();
         //todo DataFlowVariable should re-throw exceptions from the val property
@@ -59,8 +62,14 @@ public class ActorMetaClass extends DelegatingMetaClass {
         //todo enable actor groups - a dedicated group
     }
 
+    static MetaClass getDelegateMetaClass(Class clazz) {
+        final MetaClass metaClass = InvokerHelper.getMetaClass(clazz);
+        return metaClass instanceof ActorMetaClass ? ((ActorMetaClass) metaClass).delegate : metaClass;
+    }
+
     /**
      * Enhances the supplied class with the ActorMetaClass
+     *
      * @param clazz The class to intercept
      */
     public static void intercept(final Class clazz) {
@@ -69,7 +78,8 @@ public class ActorMetaClass extends DelegatingMetaClass {
 
     /**
      * Enhances the supplied class with the ActorMetaClass
-     * @param clazz The class to intercept
+     *
+     * @param clazz       The class to intercept
      * @param pooledActor True if an event-driven (pooled) actor should be used, false for a thread-bound actor
      */
     public static void intercept(final Class clazz, final boolean pooledActor) {
@@ -78,6 +88,7 @@ public class ActorMetaClass extends DelegatingMetaClass {
 
     /**
      * Intercepts constructor calls
+     *
      * @param arguments The original arguments
      * @return The original return value
      */
@@ -92,9 +103,10 @@ public class ActorMetaClass extends DelegatingMetaClass {
 
     /**
      * Intercepts method calls
-     * @param object The object the method is being invoked on
+     *
+     * @param object     The object the method is being invoked on
      * @param methodName The name of intercepted method
-     * @param argument The original argument
+     * @param argument   The original argument
      * @return The original return value returned from the intercepted method
      */
     @Override
@@ -108,9 +120,10 @@ public class ActorMetaClass extends DelegatingMetaClass {
 
     /**
      * Intercepts method calls
-     * @param object The object the method is being invoked on
+     *
+     * @param object     The object the method is being invoked on
      * @param methodName The name of intercepted method
-     * @param arguments The original arguments
+     * @param arguments  The original arguments
      * @return The original return value returned from the intercepted method
      */
     @Override
@@ -124,6 +137,7 @@ public class ActorMetaClass extends DelegatingMetaClass {
 
     /**
      * Sends the message to the associated actor, waits for the reply and processes it
+     *
      * @param msg The message to pass to the actor
      * @return The original return value returned from the intercepted method
      */

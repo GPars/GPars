@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.samples
+package org.gparallelizer.samples.benchmarks
 
 import org.gparallelizer.actor.PooledActorGroup
 import static org.gparallelizer.actor.Actors.actor
@@ -48,7 +48,6 @@ protected List<Integer> merge(List<Integer> a, List<Integer> b) {
 
 Closure createMessageHandler(def parentActor) {
     return {
-        disableSendingReplies()
         react {List<Integer> message ->
             assert message != null
             switch (message.size()) {
@@ -88,7 +87,6 @@ for(i in 1..100) {
 }
 
 def resultActor = threadGroup.actor {
-    disableSendingReplies()
     final long t1 = System.currentTimeMillis()
     for(i in 1..10) {
         def sorter = pooledGroup.actor(createMessageHandler(delegate))

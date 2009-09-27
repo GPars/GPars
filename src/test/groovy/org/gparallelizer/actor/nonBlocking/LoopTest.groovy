@@ -14,14 +14,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor.impl
+package org.gparallelizer.actor.nonBlocking
 
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
-
-import static org.gparallelizer.actor.Actors.actor
 import org.gparallelizer.actor.Actors
+import org.gparallelizer.actor.impl.AbstractPooledActor
+import static org.gparallelizer.actor.Actors.actor
 
 /**
  *
@@ -130,7 +130,6 @@ public class LoopTest extends GroovyTestCase {
     }
 
     public void testBeforeLoopStop() {
-        final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
         final AbstractPooledActor actor = actor {

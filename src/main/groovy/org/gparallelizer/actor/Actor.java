@@ -204,7 +204,7 @@ public abstract class Actor extends ReceivingMessageStream {
         }
 
         public boolean isActorThread() {
-            throw new UnsupportedOperationException();
+            return false;
         }
 
         public MessageStream send(Object message) {

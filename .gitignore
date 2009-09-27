@@ -1,2 +1,6 @@
 build
 local.build.properties
+out
+Gpars.iml
+Gpars.ipr
+Gpars.iws

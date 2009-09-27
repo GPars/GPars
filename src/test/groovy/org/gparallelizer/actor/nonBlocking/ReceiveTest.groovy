@@ -1,4 +1,4 @@
-package org.gparallelizer.actor.impl
+package org.gparallelizer.actor.nonBlocking
 
 import org.gparallelizer.dataflow.DataFlows
 import java.util.concurrent.CyclicBarrier

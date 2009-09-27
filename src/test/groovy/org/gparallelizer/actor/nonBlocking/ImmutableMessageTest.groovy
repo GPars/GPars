@@ -14,10 +14,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor.impl
+package org.gparallelizer.actor.nonBlocking
 
 import java.util.concurrent.CountDownLatch
 import org.gparallelizer.actor.Actors
+import org.gparallelizer.actor.impl.AbstractPooledActor
 
 public class ImmutableMessageTest extends GroovyTestCase {
 

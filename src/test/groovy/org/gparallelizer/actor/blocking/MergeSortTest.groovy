@@ -14,11 +14,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor
+package org.gparallelizer.actor.blocking
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-
+import org.gparallelizer.actor.Actors
+import org.gparallelizer.actor.PooledActorGroup
 import org.gparallelizer.scheduler.ResizablePool
 
 /**
@@ -64,6 +65,7 @@ public class MergeSortTest extends GroovyTestCase {
                     case 2:
                         if (message[0] <= message[1]) parentActor.send(message)
                         else parentActor.send(message[-1..0])
+
                         break
                     default:
                         def splitList = split(message)

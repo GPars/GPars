@@ -19,9 +19,9 @@ package org.gparallelizer.remote;
 import groovy.lang.Closure;
 import org.gparallelizer.actor.Actor;
 import org.gparallelizer.actor.ActorGroup;
+import org.gparallelizer.actor.PooledActorGroup;
 import org.gparallelizer.scheduler.DefaultPool;
 import org.gparallelizer.scheduler.Pool;
-import org.gparallelizer.actor.PooledActorGroup;
 import org.gparallelizer.serial.SerialHandles;
 
 import java.util.Collections;
@@ -133,17 +133,7 @@ public class LocalNode {
     }
 
     public void addDiscoveryListener(final Closure l) {
-        listeners.add(new RemoteNodeDiscoveryListener() {
-            @Override
-            public void onConnect(RemoteNode node) {
-                l.call(new Object[]{node, "connected"});
-            }
-
-            @Override
-            public void onDisconnect(RemoteNode node) {
-                l.call(new Object[]{node, "disconnected"});
-            }
-        });
+        listeners.add(new RemoteNodeDiscoveryListener.RemoteNodeDiscoveryListenerClosure(l));
     }
 
     public void removeDiscoveryListener(RemoteNodeDiscoveryListener l) {

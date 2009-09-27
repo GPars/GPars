@@ -302,9 +302,9 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     private void notifyRemote(final UUID hostId) {
-        DataFlowActor.DATA_FLOW_GROUP.getThreadPool().execute(new Runnable() {
-            public void run() {
-                if (serialHandle != null) {
+        if (serialHandle != null)
+            DataFlowActor.DATA_FLOW_GROUP.getThreadPool().execute(new Runnable() {
+                public void run() {
                     Object sub = serialHandle.getSubscribers();
                     if (sub instanceof SerialContext) {
                         RemoteHost host = (RemoteHost) sub;
@@ -325,8 +325,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                         }
                     }
                 }
-            }
-        });
+            });
     }
 
     /**
@@ -515,6 +514,13 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(value=" + value + ')';
+    }
+
+    /**
+     * Never use this method.
+     */
+    public void rebind() {
+        state = S_NOT_INITIALIZED;
     }
 
     private static class TransformOne<V> extends DataFlowExpression<V> {

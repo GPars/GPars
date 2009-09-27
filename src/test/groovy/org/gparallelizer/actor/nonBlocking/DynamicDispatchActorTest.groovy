@@ -14,13 +14,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor.impl
+package org.gparallelizer.actor.nonBlocking
 
 import org.gparallelizer.actor.DynamicDispatchActor
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
     public void testDispatch() {
-        final TestDynamicDispatchActor actor = new TestDynamicDispatchActor().start()
+        final TestDynamicDispatchActor actor = new TestDynamicDispatchActor()
+        actor.start()
 
         actor.sendAndWait 1
         assertFalse actor.stringFlag

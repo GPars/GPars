@@ -14,7 +14,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package org.gparallelizer.actor
+package org.gparallelizer.actor.blocking
+
+import org.gparallelizer.actor.Actors
 
 public class JoinTest extends GroovyTestCase {
     public void testActorJoin() {

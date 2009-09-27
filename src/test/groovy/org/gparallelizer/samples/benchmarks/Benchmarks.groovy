@@ -26,9 +26,6 @@ final int warmupIterations = 3000
 new PooledActorBenchmark().perform(warmupIterations)
 println 'Actors with send and reply: ' + new PooledActorBenchmark().perform(iterations)
 
-new PooledActorBenchmarkWithoutReply().perform(warmupIterations)
-println 'Actors with no replies: ' + new PooledActorBenchmarkWithoutReply().perform(iterations)
-
 new PooledActorCreationBenchmark().perform(warmupIterations)
 println 'Actors creation: ' + new PooledActorCreationBenchmark().perform(iterations)
 
