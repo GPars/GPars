@@ -45,33 +45,6 @@ public abstract class ReceivingMessageStream extends MessageStream {
     }
 
     /**
-     * Indicates whether the actor should enhance messages to enable sending replies to their senders
-     */
-    private volatile boolean sendRepliesFlag = true;
-
-    protected final boolean getSendRepliesFlag() {
-        return sendRepliesFlag;
-    }
-
-    /**
-     * Enabled the actor and received messages to have the reply()/replyIfExists() methods called on them.
-     * Sending replies is enabled by default.
-     */
-    protected final void enableSendingReplies() {
-        sendRepliesFlag = true;
-    }
-
-    /**
-     * Disables the actor and received messages to have the reply()/replyIfExists() methods called on them.
-     * Calling reply()/replyIfExist() on the actor will result in IllegalStateException being thrown.
-     * Calling reply()/replyIfExist() on a received message will result in MissingMethodException being thrown.
-     * Sending replies is enabled by default.
-     */
-    protected final void disableSendingReplies() {
-        sendRepliesFlag = false;
-    }
-
-    /**
      * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
      * have not been sent by an actor. For such cases use replyIfExists().
      * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
@@ -84,9 +57,6 @@ public abstract class ReceivingMessageStream extends MessageStream {
      */
     protected final void reply(final Object message) {
         assert senders != null;
-        if (!sendRepliesFlag)
-            throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.");
-
         if (senders.isEmpty()) {
             throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
         } else {
@@ -120,8 +90,6 @@ public abstract class ReceivingMessageStream extends MessageStream {
      */
     protected final void replyIfExists(final Object message) {
         assert senders != null;
-        if (!sendRepliesFlag)
-            throw new IllegalStateException("Cannot send a reply $message. Replies have been disabled.");
         for (final MessageStream sender : senders) {
             try {
                 if (sender != null)

@@ -392,12 +392,10 @@ abstract public class AbstractPooledActor extends Actor {
     private void enhanceReplies(final List<ActorMessage> messages) {
         final List<MessageStream> senders = getSenders();
         senders.clear();
-        if (getSendRepliesFlag()) {
-            for (final ActorMessage message : messages) {
-                senders.add(message == null ? null : message.getSender());
-                if (message != null)
-                    obj2Sender.put(message.getPayLoad(), message.getSender());
-            }
+        for (final ActorMessage message : messages) {
+            senders.add(message == null ? null : message.getSender());
+            if (message != null)
+                obj2Sender.put(message.getPayLoad(), message.getSender());
         }
     }
 
@@ -644,12 +642,10 @@ abstract public class AbstractPooledActor extends Actor {
             }
         }
 
-        if (getSendRepliesFlag()) {
-            for (ActorMessage message : messages) {
-                if (message != null) {
-                    getSenders().add(message.getSender());
-                    obj2Sender.put(message.getPayLoad(), message.getSender());
-                }
+        for (ActorMessage message : messages) {
+            if (message != null) {
+                getSenders().add(message.getSender());
+                obj2Sender.put(message.getPayLoad(), message.getSender());
             }
         }
 
