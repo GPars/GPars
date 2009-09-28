@@ -376,7 +376,10 @@ abstract public class AbstractPooledActor extends Actor {
         if (timeout >= 0) {
             reactCode.setTimeout(timeout);
         }
+
         reaction = reactCode;
+        reactCode.checkQueue(); // it could happen that some messages arrived
+
         throw CONTINUE;
     }
 
@@ -607,6 +610,9 @@ abstract public class AbstractPooledActor extends Actor {
         }
         final Runnable enhancedCode = new Runnable() {
             public void run() {
+                getSenders().clear();
+                obj2Sender.clear();
+
                 if (code instanceof Closure)
                     //noinspection deprecation
                     GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) code);
