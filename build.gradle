@@ -57,7 +57,7 @@ dependencies {
 }
 
 //  To get the details of the "unchecked" issues.
-compile.compilerArgs = ['-Xlint']
+compileGroovy.options.compilerArgs = ['-Xlint']
 
 gradle.taskGraph.whenReady {taskGraph ->
     if (!taskGraph.hasTask(':release')) {
@@ -148,12 +148,12 @@ task zipDoc(type: Zip, dependsOn: documentation) {
 
 task zipSrc(type: Zip) {
     appendix = 'src'
-    fileSet(dir: source.main.groovy.srcDirs.iterator().next())
+    fileSet(dir: compileGroovy.source.iterator().next())
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
-    fileSet(dir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
+    fileSet(dir: compileGroovy.source.iterator().next(), includes: ['org/gparallelizer/samples/**'])
 }
 
 task wrapper(type: Wrapper) {
