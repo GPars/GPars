@@ -40,8 +40,8 @@ manifest.mainAttributes(
 repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
-    mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
     flatDir name: 'localRepository', dirs: 'lib'
+    mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
 }
 
 configurations {
