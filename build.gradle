@@ -85,7 +85,7 @@ def packageTitle = group
 
 //todo consider removing javadoc
 javadoc {
-    dependsOn('compile')
+    dependsOn('compileGroovy')
     options.overview('overview.html')
     options.showAll()
     options.encoding('UTF-8')
@@ -102,7 +102,7 @@ javadoc.doFirst {
 }
 
 groovydoc {
-  dependsOn('compile')
+  dependsOn('compileGroovy')
   //options.subPackages('org.gparallelizer')
   //options.overview('overview.html')
   //options.showAll()
@@ -115,7 +115,7 @@ groovydoc {
   //options.footer(copyrightString)
 }
 
-task myGroovyDoc ( dependsOn : 'compile' , description : 'Create the GroovyDoc API documentation.' ) << {
+task myGroovyDoc ( dependsOn : 'compileGroovy' , description : 'Create the GroovyDoc API documentation.' ) << {
   def groovydocDirPath = groovydoc.destinationDir
   def packageIncludeSpec = 'org.gparallelizer.*'
   ant.delete ( dir : groovydocDirPath , quiet : 'true' )
