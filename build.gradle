@@ -119,10 +119,9 @@ task myGroovyDoc ( dependsOn : 'classes' , description : 'Create the GroovyDoc A
   def packageIncludeSpec = 'org.gparallelizer.*'
   ant.delete ( dir : groovydocDirPath , quiet : 'true' )
   ant.mkdir ( dir : groovydocDirPath )
-  def sourceDirectory = source.main.groovy.srcDirs.toArray ( )[0]
   ant.taskdef ( name : 'groovydoc' , classname : 'org.codehaus.groovy.ant.Groovydoc' )
   ant.groovydoc (
-                 sourcePath : sourceDirectory ,
+                 sourcePath : sourceSets.main.groovy.srcDirs.iterator().next() ,
                  destDir : groovydocDirPath ,
                  packageNames : packageIncludeSpec ,
                  overview : 'overview.html' ,
@@ -147,12 +146,12 @@ task zipDoc(type: Zip, dependsOn: documentation) {
 
 task zipSrc(type: Zip) {
     appendix = 'src'
-    fileSet(dir: compileGroovy.source.iterator().next())
+    fileSet(dir: sourceSets.main.groovy.srcDirs.iterator().next())
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
-    fileSet(dir: compileGroovy.source.iterator().next(), includes: ['org/gparallelizer/samples/**'])
+    fileSet(dir: sourceSets.main.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
 }
 
 task wrapper(type: Wrapper) {
