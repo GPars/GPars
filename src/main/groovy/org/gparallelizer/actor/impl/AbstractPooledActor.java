@@ -96,8 +96,6 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  *     a.reply 'private message'  //sent to the sender of a only
  * }
  * </pre>
- * To speed up actor message processing enhancing messages and actors with reply methods can be disabled by calling
- * the disableSendingReplies() method. Calling enableSendingReplies() will initiate enhancements for reply again.
  * <p/>
  * The react() method accepts timeout specified using the TimeCategory DSL.
  * <pre>
