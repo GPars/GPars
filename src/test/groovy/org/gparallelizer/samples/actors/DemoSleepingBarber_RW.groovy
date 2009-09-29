@@ -25,80 +25,81 @@
 //  queue.
 
 //  Author: Russel Winder <russel.winder@concertant.com>
-//  Date: 2009-09-26T08:09+01:00
+//  Date: 2009-09-29T07:05+01:00
+
+package org.gparallelizer.samples.actors
 
 import org.gparallelizer.actor.PooledActorGroup
 
-class Customer {
-  final Integer id
+//  Have to call this something other than Customer because of the Customer class in DemoSleepingBarber.
 
-  public Customer(final int i) { id = i }
+class Customer_RW {
+  final Integer id
+  public Customer_RW ( final int i ) { id = i }
 }
 
-class BarberCustomer {}
+class BarberCustomer { }
 
 class PendingCustomer extends BarberCustomer {
-  final Customer customer
-
-  public PendingCustomer(final Customer c) { customer = c }
+  final Customer_RW customer
+  public PendingCustomer ( final Customer_RW c ) { customer = c }
 }
 
 class SuccessfulCustomer extends BarberCustomer {
-  final Customer customer
-
-  public SuccessfulCustomer(final Customer c) { customer = c }
+  final Customer_RW customer
+  public SuccessfulCustomer ( final Customer_RW c ) { customer = c }
 }
 
-def group = new PooledActorGroup()
+def group = new PooledActorGroup ( )
 def barbersShop
-def barber = group.reactor {message ->
-  if (message instanceof PendingCustomer) {
-    println('Barber : Starting with Customer ' + message.customer.id)
-    Thread.sleep((Math.random() * 600 + 100) as int)
-    println('Barber : Finished with Customer ' + message.customer.id)
-    new SuccessfulCustomer(message.customer)
+def barber = group.reactor { message ->
+  if ( message instanceof PendingCustomer ) {
+    println ( 'Barber : Starting with Customer ' + message.customer.id )
+    Thread.sleep ( ( Math.random ( ) * 600 + 100 ) as int )
+    println ( 'Barber : Finished with Customer ' + message.customer.id )
+    new SuccessfulCustomer ( message.customer )
   }
   else {
-    throw new RuntimeException('barber got a message of unexpected type ' + message.class)
+    throw new RuntimeException ( 'barber got a message of unexpected type ' + message.class )
   }
-}.start()
+}.start ( )
 barbersShop = group.actor {
   def seatsTaken = 0
   def isOpen = true
   def customersRejected = 0
   def customersProcessed = 0
   loop {
-    react {message ->
-      switch (message) {
-        case Customer:
-          if (seatsTaken < 4) {
-            println('Shop : Customer ' + message.id + ' takes a seat.')
-            barber.send(new PendingCustomer(message))
+    react { message ->
+      switch ( message ) {
+        case Customer_RW :
+          if ( seatsTaken < 4 ) {
+            println ( 'Shop : Customer ' + message.id + ' takes a seat.' )
+            barber.send ( new PendingCustomer ( message ) )
             ++seatsTaken
           }
           else {
-            println('Shop : Customer ' + message.id + ' turned away.')
+            println ( 'Shop : Customer ' + message.id + ' turned away.' )
             ++customersRejected
           }
           break
-        case SuccessfulCustomer:
+        case SuccessfulCustomer :
           --seatsTaken
           ++customersProcessed
-          println('Shop : Customer ' + message.customer.id + ' leaving trimmed.')
-          if (!isOpen && (seatsTaken == 0)) {
-            println('Processed ' + customersProcessed + ' customers and rejected ' + customersRejected + ' today.')
-            stop()
+          println ( 'Shop : Customer ' + message.customer.id + ' leaving trimmed.' )
+          if ( ! isOpen && ( seatsTaken == 0 ) ) {
+            println ( 'Processed ' + customersProcessed + ' customers and rejected ' + customersRejected + ' today.' )
+            stop ( )
           }
           break
-        case '': isOpen = false; break
-        default: throw new RuntimeException('barbersShop got a message of unexpected type ' + message.class)
+        case '' : isOpen = false ; break
+        default : throw new RuntimeException ( 'barbersShop got a message of unexpected type ' + message.class )
       }
     }
   }
-}.start()
-(0..<20).each {number ->
-  Thread.sleep((Math.random() * 200 + 100) as int)
-  barbersShop.send(new Customer(number))
+}.start ( )
+( 0 ..< 20 ).each { number ->
+  Thread.sleep ( ( Math.random ( ) * 200 + 100 ) as int )
+  barbersShop.send ( new Customer_RW ( number ) )
 }
-barbersShop.send('')
-barbersShop.join()
+barbersShop.send ( '' )
+barbersShop.join ( )

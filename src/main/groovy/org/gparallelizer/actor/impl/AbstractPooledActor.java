@@ -96,8 +96,6 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  *     a.reply 'private message'  //sent to the sender of a only
  * }
  * </pre>
- * To speed up actor message processing enhancing messages and actors with reply methods can be disabled by calling
- * the disableSendingReplies() method. Calling enableSendingReplies() will initiate enhancements for reply again.
  * <p/>
  * The react() method accepts timeout specified using the TimeCategory DSL.
  * <pre>
@@ -376,7 +374,10 @@ abstract public class AbstractPooledActor extends Actor {
         if (timeout >= 0) {
             reactCode.setTimeout(timeout);
         }
+
         reaction = reactCode;
+        reactCode.checkQueue(); // it could happen that some messages arrived
+
         throw CONTINUE;
     }
 
@@ -607,6 +608,9 @@ abstract public class AbstractPooledActor extends Actor {
         }
         final Runnable enhancedCode = new Runnable() {
             public void run() {
+                getSenders().clear();
+                obj2Sender.clear();
+
                 if (code instanceof Closure)
                     //noinspection deprecation
                     GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) code);

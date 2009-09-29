@@ -29,7 +29,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gparallelizer'
 group = 'org.gparallelizer'
-version = '0.8.5'
+version = '0.9-beta-1'
 
 manifest.mainAttributes(
         'Implementation-Title': 'gparallelizer',
@@ -57,7 +57,7 @@ dependencies {
 }
 
 //  To get the details of the "unchecked" issues.
-compile.compilerArgs = ['-Xlint']
+compileGroovy.options.compilerArgs = ['-Xlint']
 
 gradle.taskGraph.whenReady {taskGraph ->
     if (!taskGraph.hasTask(':release')) {
@@ -85,7 +85,6 @@ def packageTitle = group
 
 //todo consider removing javadoc
 javadoc {
-    dependsOn('compile')
     options.overview('overview.html')
     options.showAll()
     options.encoding('UTF-8')
@@ -102,7 +101,7 @@ javadoc.doFirst {
 }
 
 groovydoc {
-  dependsOn('compile')
+  dependsOn ( 'classes' )
   //options.subPackages('org.gparallelizer')
   //options.overview('overview.html')
   //options.showAll()
@@ -115,15 +114,14 @@ groovydoc {
   //options.footer(copyrightString)
 }
 
-task myGroovyDoc ( dependsOn : 'compile' , description : 'Create the GroovyDoc API documentation.' ) << {
+task myGroovyDoc ( dependsOn : 'classes' , description : 'Create the GroovyDoc API documentation.' ) << {
   def groovydocDirPath = groovydoc.destinationDir
   def packageIncludeSpec = 'org.gparallelizer.*'
   ant.delete ( dir : groovydocDirPath , quiet : 'true' )
   ant.mkdir ( dir : groovydocDirPath )
-  def sourceDirectory = source.main.groovy.srcDirs.toArray ( )[0]
   ant.taskdef ( name : 'groovydoc' , classname : 'org.codehaus.groovy.ant.Groovydoc' )
   ant.groovydoc (
-                 sourcePath : sourceDirectory ,
+                 sourcePath : sourceSets.main.groovy.srcDirs.iterator().next() ,
                  destDir : groovydocDirPath ,
                  packageNames : packageIncludeSpec ,
                  overview : 'overview.html' ,
@@ -148,12 +146,12 @@ task zipDoc(type: Zip, dependsOn: documentation) {
 
 task zipSrc(type: Zip) {
     appendix = 'src'
-    fileSet(dir: source.main.groovy.srcDirs.iterator().next())
+    fileSet(dir: sourceSets.main.groovy.srcDirs.iterator().next())
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
-    fileSet(dir: source.test.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
+    fileSet(dir: sourceSets.main.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
 }
 
 task wrapper(type: Wrapper) {

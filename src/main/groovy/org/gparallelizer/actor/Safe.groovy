@@ -44,13 +44,13 @@ import org.gparallelizer.util.EnhancedRWLock
  * @author Vaclav Pech
  * Date: Jul 2, 2009
  */
-public class Safe extends DynamicDispatchActor {
+public class Safe<T> extends DynamicDispatchActor {
 
   private EnhancedRWLock lock = new EnhancedRWLock()
   /**
    * Holds the internal mutable state
    */
-  protected Object data
+  protected T data
   final Closure copy = {it}
 
   /**
@@ -64,7 +64,7 @@ public class Safe extends DynamicDispatchActor {
    * Creates a new Safe around the supplied modifiable object
    * @param data The object to use for storing the variable's internal state     *
    */
-  def Safe(final Object data) {
+  def Safe(final T data) {
     this.data = data
     start()
   }
@@ -74,7 +74,7 @@ public class Safe extends DynamicDispatchActor {
    * @param data The object to use for storing the variable's internal state
    * @param copy A closure to use to create a copy of the internal state when sending the internal state out
    */
-  def Safe(final Object data, final Closure copy) {
+  def Safe(final T data, final Closure copy) {
     this.data = data
     this.copy = copy
     start()
@@ -93,7 +93,7 @@ public class Safe extends DynamicDispatchActor {
   /**
    * Other messages than closures are accepted as new values for the internal state
    */
-  final void onMessage(Object message) {
+  final void onMessage(T message) {
     lock.withWriteLock {
       updateValue message
     }
@@ -102,14 +102,14 @@ public class Safe extends DynamicDispatchActor {
   /**
    * Allows closures to set the new internal state as a whole
    */
-  final void updateValue(Object newValue) { data = newValue }
+  final void updateValue(T newValue) { data = newValue }
 
   /**
    * A shorthand method for safe message-based retrieval of the internal state.
    * Retrieves the internal state immediately by-passing the queue of tasks waiting to be processed.
    */
-  final public Object getInstantVal() {
-    Object result = null
+  final public T getInstantVal() {
+    T result = null
     lock.withReadLock { result = copy(data) }
     return result
   }
@@ -119,7 +119,7 @@ public class Safe extends DynamicDispatchActor {
    * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
    */
   @SuppressWarnings ("GroovyAssignabilityCheck")
-  final public Object getVal() {
+  final public T getVal() {
     this.sendAndWait { getInstantVal() }
   }
 
