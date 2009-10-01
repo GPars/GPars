@@ -220,7 +220,7 @@ abstract public class AbstractPooledActor extends Actor {
         return actorGroup;
     }
 
-    private void schedule(final ActorAction action) {
+    private synchronized void schedule(final ActorAction action) {
         final ActorAction ca = currentAction;
         if (ca != null)
             ca.schedule(action);
@@ -921,7 +921,7 @@ abstract public class AbstractPooledActor extends Actor {
          *
          * @param message The message to add.
          */
-        public void addMessage(final ActorMessage message) {
+        private void addMessage(final ActorMessage message) {
             offer(message);
         }
 
