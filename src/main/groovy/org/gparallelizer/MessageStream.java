@@ -32,7 +32,7 @@ import java.util.concurrent.locks.LockSupport;
 /**
  * Stream of abstract messages
  *
- * @author Alex Tkachman
+ * @author Alex Tkachman, Vaclav Pech
  */
 public abstract class MessageStream extends WithSerialId {
     /**
@@ -51,7 +51,7 @@ public abstract class MessageStream extends WithSerialId {
      * @param <T>     type of message accepted by the stream
      * @return always return message stream itself
      */
-    public final <T> MessageStream send(T message, MessageStream replyTo) {
+    public final <T> MessageStream send(final T message, final MessageStream replyTo) {
         return send(new ActorMessage<T>(message, replyTo));
     }
 
@@ -61,7 +61,7 @@ public abstract class MessageStream extends WithSerialId {
      * @param message to send
      * @return original stream
      */
-    public final <T> MessageStream leftShift(T message) {
+    public final <T> MessageStream leftShift(final T message) {
         return send(message);
     }
 
@@ -73,8 +73,8 @@ public abstract class MessageStream extends WithSerialId {
      * @return The message that came in reply to the original send.
      * @throws InterruptedException if interrupted while waiting
      */
-    public final <T, V> V sendAndWait(T message) throws InterruptedException {
-        ResultWaiter<V> to = new ResultWaiter<V>();
+    public final <T, V> V sendAndWait(final T message) throws InterruptedException {
+        final ResultWaiter<V> to = new ResultWaiter<V>();
         send(new ActorMessage<T>(message, to));
         return to.getResult();
     }
@@ -128,7 +128,15 @@ public abstract class MessageStream extends WithSerialId {
         return RemoteMessageStream.class;
     }
 
+    /**
+     * Represents a pending request for a reply from an actor.
+     * @param <V> The type of expected reply message
+     */
     private static class ResultWaiter<V> extends MessageStream {
+
+        /**
+         * Holds a reference to the calling thread, while waiting, and the received reply message, once it has arrived.
+         */
         private volatile Object value;
 
         private volatile boolean isSet;
@@ -137,6 +145,11 @@ public abstract class MessageStream extends WithSerialId {
             value = Thread.currentThread();
         }
 
+        /**
+         * Accepts the message as a reply and wakes up the sleeping thread.
+         * @param message message to send
+         * @return this
+         */
         @Override
         public MessageStream send(final Object message) {
             final Thread thread = (Thread) this.value;
@@ -149,6 +162,11 @@ public abstract class MessageStream extends WithSerialId {
             return this;
         }
 
+        /**
+         * Retrieves the response blocking until a message arrives
+         * @return The received message
+         * @throws InterruptedException If the thread gets interrupted
+         */
         public V getResult() throws InterruptedException {
             while (!isSet) {
                 LockSupport.park();
@@ -160,6 +178,28 @@ public abstract class MessageStream extends WithSerialId {
             return (V) value;
         }
 
+        /**
+         * Retrieves the response blocking until a message arrives
+         * @param timeout How long to wait
+         * @param units Unit for the timeout
+         * @return The received message
+         * @throws InterruptedException If the thread gets interrupted
+         */
+        public Object getResult(final long timeout, final TimeUnit units) throws InterruptedException {
+            final long endNano = System.nanoTime() + units.toNanos(timeout);
+            while (!isSet) {
+                final long toWait = endNano - System.nanoTime();
+                if (toWait <= 0L) {
+                    return null;
+                }
+                LockSupport.parkNanos(toWait);
+                if (Thread.currentThread().isInterrupted())
+                    throw new InterruptedException();
+            }
+            rethrowException();
+            return value;
+        }
+
         private void rethrowException() {
             if (value instanceof Throwable) {
                 if (value instanceof RuntimeException)
@@ -169,22 +209,9 @@ public abstract class MessageStream extends WithSerialId {
             }
         }
 
-        public Object getResult(long timeout, TimeUnit units) throws InterruptedException {
-            long endNano = System.nanoTime() + units.toNanos(timeout);
-            Thread thread = Thread.currentThread();
-            while (!isSet) {
-                long toWait = endNano - System.nanoTime();
-                if (toWait <= 0) {
-                    return null;
-                }
-                LockSupport.parkNanos(toWait);
-                if (thread.isInterrupted())
-                    throw new InterruptedException();
-            }
-            rethrowException();
-            return value;
-        }
-
+        /**
+         * Handle cases when the message sent to the actor doesn't get deliverred
+         */
         public void onDeliveryError() {
             send(new IllegalStateException("Delivery error. Maybe target actor is not active"));
         }
