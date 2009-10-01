@@ -4,11 +4,7 @@ import java.util.concurrent.TimeUnit
 import org.gparallelizer.MessageStream.ResultWaiter
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
- * Date: Oct 1, 2009
- * Time: 9:40:15 PM
- * To change this template use File | Settings | File Templates.
+ * @author Vaclav Pech
  */
 class MessageStreamTest extends GroovyTestCase {
     public void testResultWaiterWithTimeoutAndException() {
