@@ -122,6 +122,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  * @author Vaclav Pech, Alex Tkachman, Dierk Koenig
  *         Date: Feb 7, 2009
  */
+@SuppressWarnings({"ThrowCaughtLocally"})
 abstract public class AbstractPooledActor extends Actor {
     /**
      * The actor group to which the actor belongs
@@ -132,6 +133,11 @@ abstract public class AbstractPooledActor extends Actor {
      * Indicates whether the actor's group can be changed. It is typically not changeable after actor starts.
      */
     private volatile boolean groupMembershipChangeable = true;
+
+    /**
+     * Ensures atomicity of reaction reference manipulation and message retrieval fro mthe messageQueue
+     */
+    private final Object reactionLock = new Object();
 
     /**
      * Queue for the messages
@@ -214,7 +220,7 @@ abstract public class AbstractPooledActor extends Actor {
         return actorGroup;
     }
 
-    private void schedule(ActorAction action) {
+    private void schedule(final ActorAction action) {
         final ActorAction ca = currentAction;
         if (ca != null)
             ca.schedule(action);
@@ -227,6 +233,7 @@ abstract public class AbstractPooledActor extends Actor {
      *
      * @return this (the actor itself) to allow method chaining
      */
+    @Override
     public final AbstractPooledActor start() {
         disableGroupMembershipChange();
         if (!stopFlagUpdater.compareAndSet(this, S_STOPPED, S_RUNNING))
@@ -375,8 +382,11 @@ abstract public class AbstractPooledActor extends Actor {
             reactCode.setTimeout(timeout);
         }
 
-        reaction = reactCode;
-        reactCode.checkQueue(); // it could happen that some messages arrived
+
+        synchronized (reactionLock) {
+            reaction = reactCode;
+            reactCode.checkQueue(); // it could happen that some messages arrived
+        }
 
         throw CONTINUE;
     }
@@ -548,7 +558,7 @@ abstract public class AbstractPooledActor extends Actor {
      * @param message may be null to simply trigger the actors receive/react
      * @return this (the actor itself) to allow method chaining
      */
-    public final Actor send(Object message) {
+    @Override public final Actor send(final Object message) {
         if (stopFlag == S_STOPPED)
             throw new IllegalStateException("The actor hasn't been started.");
 
@@ -559,9 +569,11 @@ abstract public class AbstractPooledActor extends Actor {
             actorMessage = ActorMessage.build(message);
 
         messageQueue.offer(actorMessage);
-        final Reaction reactCode = reaction;
-        if (reactCode != null) {
-            reactCode.checkQueue();
+        synchronized (reactionLock) {
+            final Reaction reactCode = reaction;
+            if (reactCode != null) {
+                reactCode.checkQueue();
+            }
         }
         return this;
     }
@@ -572,7 +584,7 @@ abstract public class AbstractPooledActor extends Actor {
      * @return The messages stored in the queue
      */
     final List sweepQueue() {
-        ArrayList<ActorMessage> messages = new ArrayList<ActorMessage>();
+        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
         if (savedBufferedMessages != null && !savedBufferedMessages.isEmpty())
             messages.addAll(savedBufferedMessages);
         ActorMessage message = messageQueue.poll();
@@ -606,7 +618,7 @@ abstract public class AbstractPooledActor extends Actor {
             ((Closure) code).setResolveStrategy(Closure.DELEGATE_FIRST);
             ((Closure) code).setDelegate(this);
         }
-        final Runnable enhancedCode = new Runnable() {
+        loopCode = new Runnable() {
             public void run() {
                 getSenders().clear();
                 obj2Sender.clear();
@@ -619,14 +631,12 @@ abstract public class AbstractPooledActor extends Actor {
                 doLoopCall();
             }
         };
-        loopCode = enhancedCode;
         doLoopCall();
     }
 
     private void doLoopCall() {
-        if (stopFlag != S_RUNNING)
-            throw TERMINATE;
-        Runnable code = loopCode;
+        if (stopFlag != S_RUNNING) throw TERMINATE;
+        final Runnable code = loopCode;
         if (code != null) {
             schedule(new ActorAction(this, code));
             throw CONTINUE;
@@ -705,7 +715,7 @@ abstract public class AbstractPooledActor extends Actor {
          * @param actor
          * @param code  The code to perform on behalf of the actor
          */
-        ActorAction(AbstractPooledActor actor, final Runnable code) {
+        ActorAction(final AbstractPooledActor actor, final Runnable code) {
             super();
             this.actor = actor;
             if (code instanceof Closure)
@@ -829,7 +839,7 @@ abstract public class AbstractPooledActor extends Actor {
             return false;
         }
 
-        public void schedule(ActorAction action) {
+        public void schedule(final ActorAction action) {
             if (actor.currentAction == this) {
                 nextAction = action;
             } else {
@@ -855,10 +865,10 @@ abstract public class AbstractPooledActor extends Actor {
         private final AbstractPooledActor actor;
 
         private volatile int currentIndex;
-        private final static AtomicIntegerFieldUpdater<Reaction> currentSizeUpdater = AtomicIntegerFieldUpdater.newUpdater(Reaction.class, "currentSize");
+        private static final AtomicIntegerFieldUpdater<Reaction> currentSizeUpdater = AtomicIntegerFieldUpdater.newUpdater(Reaction.class, "currentSize");
 
         private volatile int currentSize;
-        private final static AtomicIntegerFieldUpdater<Reaction> currentIndexUpdater = AtomicIntegerFieldUpdater.newUpdater(Reaction.class, "currentIndex");
+        private static final AtomicIntegerFieldUpdater<Reaction> currentIndexUpdater = AtomicIntegerFieldUpdater.newUpdater(Reaction.class, "currentIndex");
 
         /**
          * Creates a new instance.
@@ -867,7 +877,7 @@ abstract public class AbstractPooledActor extends Actor {
          * @param numberOfExpectedMessages The number of messages expected by the next continuation
          * @param code                     code to execute
          */
-        Reaction(AbstractPooledActor actor, final int numberOfExpectedMessages, Closure code) {
+        Reaction(final AbstractPooledActor actor, final int numberOfExpectedMessages, final Closure code) {
             this.actor = actor;
             this.code = code;
             this.numberOfExpectedMessages = numberOfExpectedMessages;
@@ -875,7 +885,7 @@ abstract public class AbstractPooledActor extends Actor {
         }
 
         @SuppressWarnings({"UnusedDeclaration"})
-        Reaction(AbstractPooledActor actor, final int numberOfExpectedMessages) {
+        Reaction(final AbstractPooledActor actor, final int numberOfExpectedMessages) {
             this(actor, numberOfExpectedMessages, null);
         }
 
@@ -940,7 +950,7 @@ abstract public class AbstractPooledActor extends Actor {
             actor.runReaction(Arrays.asList(messages), numberOfExpectedMessages, code);
         }
 
-        public void offer(ActorMessage actorMessage) {
+        public void offer(final ActorMessage actorMessage) {
             final int allocated = currentIndexUpdater.getAndIncrement(this);
             if (!timeout && allocated < (numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages)) {
                 messages[allocated] = actorMessage;
@@ -964,9 +974,9 @@ abstract public class AbstractPooledActor extends Actor {
             }
         }
 
-        public void setTimeout(long timeout) {
+        public void setTimeout(final long timeout) {
             timer.schedule(new TimerTask() {
-                public void run() {
+                @Override public void run() {
                     if (!isReady()) {
                         actor.send(new ActorMessage(TIMEOUT, null));
                     }
