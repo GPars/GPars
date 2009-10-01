@@ -156,13 +156,17 @@ public abstract class MessageStream extends WithSerialId {
                 if (thread.isInterrupted())
                     throw new InterruptedException();
             }
+            rethrowException();
+            return (V) value;
+        }
+
+        private void rethrowException() {
             if (value instanceof Throwable) {
                 if (value instanceof RuntimeException)
                     throw (RuntimeException) value;
                 else
                     throw new RuntimeException((Throwable) value);
             }
-            return (V) value;
         }
 
         public Object getResult(long timeout, TimeUnit units) throws InterruptedException {
@@ -177,6 +181,7 @@ public abstract class MessageStream extends WithSerialId {
                 if (thread.isInterrupted())
                     throw new InterruptedException();
             }
+            rethrowException();
             return value;
         }
 
