@@ -220,7 +220,7 @@ abstract public class AbstractPooledActor extends Actor {
         return actorGroup;
     }
 
-    private synchronized void schedule(final ActorAction action) {
+    private void schedule(final ActorAction action) {
         final ActorAction ca = currentAction;
         if (ca != null)
             ca.schedule(action);
@@ -737,6 +737,7 @@ abstract public class AbstractPooledActor extends Actor {
                     throw TERMINATE;
 
                 assert actor.currentAction == null;
+                if (actor.currentAction != null) throw new RuntimeException("Multiple threads running an actor");
                 actor.currentAction = this;
 
                 registerCurrentActorWithThread(actor);
