@@ -138,6 +138,7 @@ abstract public class AbstractPooledActor extends Actor {
      * Ensures atomicity of reaction reference manipulation and message retrieval fro mthe messageQueue
      */
     private final Object reactionLock = new Object();
+    private final Object scheduleLock = new Object();
 
     /**
      * Queue for the messages
@@ -221,11 +222,13 @@ abstract public class AbstractPooledActor extends Actor {
     }
 
     private void schedule(final ActorAction action) {
-        final ActorAction ca = currentAction;
-        if (ca != null)
-            ca.schedule(action);
-        else
-            getActorGroup().getThreadPool().execute(action);
+        synchronized (scheduleLock) {
+            final ActorAction ca = currentAction;
+            if (ca != null)
+                ca.schedule(action);
+            else
+                getActorGroup().getThreadPool().execute(action);
+        }
     }
 
     /**
@@ -737,7 +740,6 @@ abstract public class AbstractPooledActor extends Actor {
                     throw TERMINATE;
 
                 assert actor.currentAction == null;
-                if (actor.currentAction != null) throw new RuntimeException("Multiple threads running an actor");
                 actor.currentAction = this;
 
                 registerCurrentActorWithThread(actor);
@@ -767,9 +769,11 @@ abstract public class AbstractPooledActor extends Actor {
                 Thread.interrupted();
                 deregisterCurrentActorWithThread();
 
-                actor.currentAction = null;
-                if (nextAction != null && !cancelled && stopFlagUpdater.get(actor) == S_RUNNING)
-                    actor.getActorGroup().getThreadPool().execute(nextAction);
+                synchronized (actor.scheduleLock) {
+                    actor.currentAction = null;
+                    if (nextAction != null && !cancelled && stopFlagUpdater.get(actor) == S_RUNNING)
+                        actor.getActorGroup().getThreadPool().execute(nextAction);
+                }
             }
         }
 
@@ -841,10 +845,12 @@ abstract public class AbstractPooledActor extends Actor {
         }
 
         public void schedule(final ActorAction action) {
-            if (actor.currentAction == this) {
-                nextAction = action;
-            } else {
-                actor.getActorGroup().getThreadPool().execute(action);
+            synchronized (actor.scheduleLock) {
+                if (actor.currentAction == this) {
+                    nextAction = action;
+                } else {
+                    actor.getActorGroup().getThreadPool().execute(action);
+                }
             }
         }
     }
