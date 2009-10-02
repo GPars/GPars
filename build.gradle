@@ -54,7 +54,14 @@ dependencies {
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: ant.project.properties.jsr166yVersion
     compile group: 'org.jboss.netty', name: 'netty', version: ant.project.properties.nettyVersion
     deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: ant.project.properties.wagonSvnVersion
+//    compile files('lib/groovy-all.jar')
 }
+
+//todo remove myGroovyDoc
+//todo alter properties
+//todo disable distributed tests when no network is available
+//todo sort out repositories
+//todo enable samples zip generation
 
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
