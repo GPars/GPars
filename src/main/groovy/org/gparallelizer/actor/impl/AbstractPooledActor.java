@@ -123,7 +123,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  *         Date: Feb 7, 2009
  */
 @SuppressWarnings({"ThrowCaughtLocally"})
-abstract public class AbstractPooledActor extends Actor {
+public abstract class AbstractPooledActor extends Actor {
     /**
      * The actor group to which the actor belongs
      */
@@ -242,21 +242,23 @@ abstract public class AbstractPooledActor extends Actor {
     @Override
     public final AbstractPooledActor start() {
         disableGroupMembershipChange();
-        if (!stopFlagUpdater.compareAndSet(this, S_STOPPED, S_RUNNING)) {
-            throw new IllegalStateException("Actor has already been started.");
-        }
-
-        currentAction = null;
-        reaction = null;
-        loopCode = null;
-        getJoinLatch().rebind();
-
-        schedule(new ActorAction(this, new Runnable() {
-            public void run() {
-                onStart();
-                act();
+        synchronized (reactionLock) {
+            if (!stopFlagUpdater.compareAndSet(this, S_STOPPED, S_RUNNING)) {
+                throw new IllegalStateException("Actor has already been started.");
             }
-        }));
+
+            currentAction = null;
+            reaction = null;
+            loopCode = null;
+            getJoinLatch().rebind();
+
+            schedule(new ActorAction(this, new Runnable() {
+                public void run() {
+                    onStart();
+                    act();
+                }
+            }));
+        }
         return this;
     }
 
