@@ -101,7 +101,7 @@ public abstract class Actor extends ReceivingMessageStream {
      * @param listener listener to notify
      * @throws InterruptedException if interrupted while waiting
      */
-    public final void join(MessageStream listener) throws InterruptedException {
+    public final void join(final MessageStream listener) throws InterruptedException {
         joinLatch.getValAsync(listener);
     }
 
@@ -112,7 +112,7 @@ public abstract class Actor extends ReceivingMessageStream {
      * @param unit    units of timeout
      * @throws InterruptedException if interrupted while waiting
      */
-    public final void join(final long timeout, TimeUnit unit) throws InterruptedException {
+    public final void join(final long timeout, final TimeUnit unit) throws InterruptedException {
         if (timeout > 0)
             joinLatch.getVal(timeout, unit);
         else
@@ -125,7 +125,7 @@ public abstract class Actor extends ReceivingMessageStream {
      * @param duration timeout to wait
      * @throws InterruptedException if interrupted while waiting
      */
-    public final void join(Duration duration) throws InterruptedException {
+    public final void join(final Duration duration) throws InterruptedException {
         join(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 

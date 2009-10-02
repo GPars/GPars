@@ -30,6 +30,7 @@ import java.io.Serializable;
 public class ActorMessage<T> implements Serializable {
     private T payLoad;
     private MessageStream sender;
+    //todo what are the values after deserialization?
 
     /**
      * Creates a new instance

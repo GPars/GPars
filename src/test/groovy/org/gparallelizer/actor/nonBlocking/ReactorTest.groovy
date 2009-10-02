@@ -22,7 +22,7 @@ import org.gparallelizer.actor.PooledActorGroup
 public class ReactorTest extends GroovyTestCase{
 
     public void testMessageProcessing() {
-        final def group = new PooledActorGroup()
+        final def group = new PooledActorGroup(4)
         final def result1 = new AtomicInteger(0)
         final def result2 = new AtomicInteger(0)
         final def result3 = new AtomicInteger(0)

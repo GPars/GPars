@@ -17,7 +17,7 @@
 package org.gparallelizer;
 
 import groovy.lang.Closure;
-import groovy.time.Duration;
+import groovy.time.BaseDuration;
 import org.gparallelizer.actor.Actor;
 import org.gparallelizer.actor.ActorMessage;
 import org.gparallelizer.actor.impl.AbstractPooledActor;
@@ -158,7 +158,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receive(final Duration duration) throws InterruptedException {
+    protected final Object receive(final BaseDuration duration) throws InterruptedException {
         return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
@@ -198,13 +198,11 @@ public abstract class ReceivingMessageStream extends MessageStream {
 
             final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
             if (actor != null) {
-                MessageStream sender = actor.obj2Sender.get(original);
+                final MessageStream sender = actor.obj2Sender.get(original);
                 if (sender != null)
                     try {
                         sender.send(reply);
-                    }
-                    catch (IllegalStateException e) {//
-                    }
+                    } catch (IllegalStateException ignored) { }
             }
         }
     }

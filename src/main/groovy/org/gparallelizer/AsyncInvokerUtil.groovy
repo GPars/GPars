@@ -23,6 +23,7 @@ import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.ConcurrentHashMap
+import org.codehaus.groovy.runtime.InvokerInvocationException
 
 /**
  * This class forms the core of the DSL initialized by <i>Asynchronizer</i>. The static methods of <i>AsyncInvokerUtil</i>
@@ -47,7 +48,7 @@ public class AsyncInvokerUtil {
      * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
      */
     public static Future callAsync(final Closure cl, final Object ... args) {
-        callAsync {->cl(*args)}
+        callAsync {-> cl(* args)}
     }
 
     /**
@@ -64,7 +65,7 @@ public class AsyncInvokerUtil {
      * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
      */
     public static Closure async(Closure cl) {
-        return {Object ... args -> callAsync(cl, *args)}
+        return {Object ... args -> callAsync(cl, * args)}
     }
 
     /**
@@ -106,6 +107,7 @@ public class AsyncInvokerUtil {
      * Starts multiple closures in separate threads, using a new thread for the startup.
      * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported to the supplied instance of UncaughtExceptionHandler.
      * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     * Unwraps potential InvokerInvocationException before control is passed to the UncaughtExceptionHandler instance.
      * @return The thread that submits the closures to the thread executor service so that the caller can take ownership of it and e.g. call <i>join()</i> on it to wait for all the closures to finish processing.
      */
     public static Thread startInParallel(java.lang.Thread.UncaughtExceptionHandler uncaughtExceptionHandler, Closure ... closures) {
@@ -113,7 +115,12 @@ public class AsyncInvokerUtil {
             doInParallel(closures)
         } as Runnable)
         thread.daemon = false
-        thread.uncaughtExceptionHandler = uncaughtExceptionHandler
+        thread.uncaughtExceptionHandler = {Thread t, Throwable throwable ->
+            if (throwable instanceof InvokerInvocationException)
+                uncaughtExceptionHandler.uncaughtException(t, throwable.cause)
+            else
+                uncaughtExceptionHandler.uncaughtException(t, throwable)
+        } as UncaughtExceptionHandler
         thread.start()
         return thread
     }
@@ -141,7 +148,7 @@ public class AsyncInvokerUtil {
         final Semaphore semaphore = new Semaphore(0)
         Closure code = async({Object ... args ->
             try {
-                cl(*args)
+                cl(* args)
             } catch (Throwable e) {
                 exceptions.add(e)
             } finally {
@@ -149,7 +156,7 @@ public class AsyncInvokerUtil {
             }
         })
         int count = 0
-        for(element in collection) {
+        for (element in collection) {
             count += 1
             code.call(element)
         }
@@ -167,15 +174,13 @@ public class AsyncInvokerUtil {
      * Example:
      *      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *          def result = Collections.synchronizedSet(new HashSet())
-     *          service.eachWithIndexAsync([1, 2, 3, 4, 5]) {Number number -> result.add(number * 10)}
-     *          assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *          service.eachWithIndexAsync([1, 2, 3, 4, 5]) {Number number -> result.add(number * 10)}*          assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
      * have a new <i>eachAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      *    Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *         def result = Collections.synchronizedSet(new HashSet())
-     *        [1, 2, 3, 4, 5].eachWithIndexAsync { Number number, int index -> result.add(number * 10) }
-     *         assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *        [1, 2, 3, 4, 5].eachWithIndexAsync { Number number, int index -> result.add(number * 10) }*         assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static def eachWithIndexAsync(Object collection, Closure cl) {
@@ -191,7 +196,7 @@ public class AsyncInvokerUtil {
             }
         })
         int count = 0
-        for(element in collection) {
+        for (element in collection) {
             code.call(element, count)
             count += 1
         }
@@ -328,7 +333,7 @@ public class AsyncInvokerUtil {
             def result = cl(it)
             final def myList = [it].asSynchronized()
             def list = map.putIfAbsent(result, myList)
-            if (list!=null) list.add(it)
+            if (list != null) list.add(it)
         })
         return map.values().asList()
     }
