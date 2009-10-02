@@ -41,7 +41,7 @@ repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
     mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
-    flatDir name: 'localRepository', dirs: 'lib'
+//    flatDir name: 'localRepository', dirs: 'lib'
 }
 
 configurations {
@@ -49,19 +49,18 @@ configurations {
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: ant.project.properties.groovyVersion
+//    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: ant.project.properties.groovyVersion
+    groovy files('lib/groovy-all-1.6.5-SNAPSHOT.jar')
+//    testCompile group: 'junit', name: 'junit', version: hasProperty('groovyVersion') ? groovyVersion : '4.7'
     testCompile group: 'junit', name: 'junit', version: ant.project.properties.junitVersion
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: ant.project.properties.jsr166yVersion
     compile group: 'org.jboss.netty', name: 'netty', version: ant.project.properties.nettyVersion
     deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: ant.project.properties.wagonSvnVersion
-//    compile files('lib/groovy-all.jar')
 }
 
-//todo remove myGroovyDoc
 //todo alter properties
 //todo disable distributed tests when no network is available
 //todo sort out repositories
-//todo enable samples zip generation
 
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
@@ -90,7 +89,6 @@ def titleForDocumentation = archivesBaseName + ' ' + version
 def copyrightString = 'Copyright &#169; 2008&#8211;2009  V&#225;clav Pech.  All Rights Reserved.'
 def packageTitle = group
 
-//todo consider removing javadoc
 javadoc {
     options.overview('overview.html')
     options.showAll()
@@ -108,43 +106,19 @@ javadoc.doFirst {
 }
 
 groovydoc {
-  dependsOn ( 'classes' )
-  //options.subPackages('org.gparallelizer')
-  //options.overview('overview.html')
-  //options.showAll()
-  //options.encoding('UTF-8')
-  //options.setUse(true)
-  ////options.author(true)
-  ////options.version(true)
-  //options.windowTitle(packageTitle)
-  //options.docTitle(packageTitle)
-  //options.footer(copyrightString)
+    dependsOn(classes)
+    includePrivate = true
+    use = true
+    windowTitle = packageTitle
+    docTitle = packageTitle
+    header = packageTitle
+    footer = copyrightString
+    packageNames = ['org.gparallelizer.*']
+//    description = 'Create the GroovyDoc API documentation.'
+    overview = 'overview.html'
 }
 
-task myGroovyDoc ( dependsOn : 'classes' , description : 'Create the GroovyDoc API documentation.' ) << {
-  def groovydocDirPath = groovydoc.destinationDir
-  def packageIncludeSpec = 'org.gparallelizer.*'
-  ant.delete ( dir : groovydocDirPath , quiet : 'true' )
-  ant.mkdir ( dir : groovydocDirPath )
-  ant.taskdef ( name : 'groovydoc' , classname : 'org.codehaus.groovy.ant.Groovydoc' )
-  ant.groovydoc (
-                 sourcePath : sourceSets.main.groovy.srcDirs.iterator().next() ,
-                 destDir : groovydocDirPath ,
-                 packageNames : packageIncludeSpec ,
-                 overview : 'overview.html' ,
-                 'private' : 'true' ,
-                 use : 'true' ,
-                 //author : 'true' ,
-                 //version : 'true' ,
-                 windowTitle : packageTitle ,
-                 docTitle : packageTitle ,
-                 header : packageTitle ,
-                 footer : copyrightString,
-                 //source : sourceCompatibility
-                 )
-}
-
-task documentation(dependsOn: ['javadoc', 'myGroovyDoc'], description: 'Create the API documentation.')
+task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
 
 task zipDoc(type: Zip, dependsOn: documentation) {
     appendix = 'docs'
@@ -153,12 +127,14 @@ task zipDoc(type: Zip, dependsOn: documentation) {
 
 task zipSrc(type: Zip) {
     appendix = 'src'
-    fileSet(dir: sourceSets.main.groovy.srcDirs.iterator().next())
+    from sourceSets.main.allSource
 }
 
 task zipSamples(type: Zip) {
     appendix = 'samples'
-    fileSet(dir: sourceSets.main.groovy.srcDirs.iterator().next(), includes: ['org/gparallelizer/samples/**'])
+    from sourceSets.test.allSource.matching{
+        include 'org/gparallelizer/samples/**'
+    }
 }
 
 task wrapper(type: Wrapper) {
