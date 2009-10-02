@@ -203,11 +203,13 @@ abstract public class AbstractPooledActor extends Actor {
      * @param group new group
      */
     public final void setActorGroup(final ActorGroup group) {
-        if (!groupMembershipChangeable)
+        if (!groupMembershipChangeable) {
             throw new IllegalStateException("Cannot set actor's group on a started actor.");
+        }
 
-        if (group == null)
+        if (group == null) {
             throw new IllegalArgumentException("Cannot set actor's group to null.");
+        }
 
         actorGroup = group;
     }
@@ -224,10 +226,11 @@ abstract public class AbstractPooledActor extends Actor {
     private void schedule(final ActorAction action) {
         synchronized (scheduleLock) {
             final ActorAction ca = currentAction;
-            if (ca != null)
+            if (ca != null) {
                 ca.schedule(action);
-            else
+            } else {
                 getActorGroup().getThreadPool().execute(action);
+            }
         }
     }
 
@@ -239,8 +242,9 @@ abstract public class AbstractPooledActor extends Actor {
     @Override
     public final AbstractPooledActor start() {
         disableGroupMembershipChange();
-        if (!stopFlagUpdater.compareAndSet(this, S_STOPPED, S_RUNNING))
+        if (!stopFlagUpdater.compareAndSet(this, S_STOPPED, S_RUNNING)) {
             throw new IllegalStateException("Actor has already been started.");
+        }
 
         currentAction = null;
         reaction = null;
@@ -258,8 +262,9 @@ abstract public class AbstractPooledActor extends Actor {
 
     protected void onStart() {
         final Object list = InvokerHelper.invokeMethod(this, "respondsTo", new Object[]{"afterStart"});
-        if (list != null && !((List) list).isEmpty())
+        if (list != null && !((List) list).isEmpty()) {
             InvokerHelper.invokeMethod(this, "afterStart", new Object[]{});
+        }
     }
 
     /**
@@ -269,17 +274,20 @@ abstract public class AbstractPooledActor extends Actor {
      *
      * @return this (the actor itself) to allow method chaining
      */
-    public final Actor stop() {
+    @Override public final Actor stop() {
         if (stopFlagUpdater.compareAndSet(this, S_RUNNING, S_STOPPING)) {
-            final ActorAction action = currentAction;
-            if (action != null)
-                action.cancel();
-            else {
-                getActorGroup().getThreadPool().execute(new ActorAction(this, new Runnable() {
-                    public void run() {
-                        throw TERMINATE;
-                    }
-                }));
+
+            synchronized (scheduleLock) {
+                final ActorAction action = currentAction;
+                if (action != null) {
+                    action.cancel();
+                } else {
+                    getActorGroup().getThreadPool().execute(new ActorAction(this, new Runnable() {
+                        public void run() {
+                            throw TERMINATE;
+                        }
+                    }));
+                }
             }
         }
         return this;
@@ -332,7 +340,7 @@ abstract public class AbstractPooledActor extends Actor {
      *             the closure to send a reply back to the actor, which sent the original message.
      */
     protected final void react(final Closure code) {
-        react(-1, code);
+        react(-1L, code);
     }
 
     /**
@@ -344,7 +352,7 @@ abstract public class AbstractPooledActor extends Actor {
      * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
      *                 the closure to send a reply back to the actor, which sent the original message.
      */
-    protected final void react(final long timeout, TimeUnit timeUnit, final Closure code) {
+    protected final void react(final long timeout, final TimeUnit timeUnit, final Closure code) {
         react(timeUnit.toMillis(timeout), code);
     }
 
@@ -362,31 +370,32 @@ abstract public class AbstractPooledActor extends Actor {
      */
     protected final void react(final long timeout, final Closure code) {
 
-        if (!isActorThread())
+        if (!isActorThread()) {
             throw new IllegalStateException("Cannot call react from thread which is not owned by the actor");
-
-        if (stopFlag != S_RUNNING)
-            throw TERMINATE;
-
-        getSenders().clear();
-        final int maxNumberOfParameters = code.getMaximumNumberOfParameters();
-
-        code.setResolveStrategy(Closure.DELEGATE_FIRST);
-        code.setDelegate(this);
-
-        assert reaction == null;
-
-        final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
-        reactCode.checkQueue();
-
-        assert !reactCode.isReady();
-
-        if (timeout >= 0) {
-            reactCode.setTimeout(timeout);
         }
 
-
         synchronized (reactionLock) {
+            if (stopFlag != S_RUNNING) {
+                throw TERMINATE;
+            }
+
+            getSenders().clear();
+            final int maxNumberOfParameters = code.getMaximumNumberOfParameters();
+
+            code.setResolveStrategy(Closure.DELEGATE_FIRST);
+            code.setDelegate(this);
+
+            assert reaction == null;
+
+            final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
+            reactCode.checkQueue();
+
+            assert !reactCode.isReady();
+
+            if (timeout >= 0) {
+                reactCode.setTimeout(timeout);
+            }
+
             reaction = reactCode;
             reactCode.checkQueue(); // it could happen that some messages arrived
         }
@@ -408,8 +417,9 @@ abstract public class AbstractPooledActor extends Actor {
         senders.clear();
         for (final ActorMessage message : messages) {
             senders.add(message == null ? null : message.getSender());
-            if (message != null)
+            if (message != null) {
                 obj2Sender.put(message.getPayLoad(), message.getSender());
+            }
         }
     }
 
@@ -421,12 +431,14 @@ abstract public class AbstractPooledActor extends Actor {
      */
     @Override
     protected final Object receiveImpl() throws InterruptedException {
-        if (stopFlag != S_RUNNING)
+        if (stopFlag != S_RUNNING) {
             throw new IllegalStateException("The actor hasn't been started.");
+        }
         ActorMessage message = messageQueue.take();
         enhanceReplies(Arrays.asList(message));
-        if (message == null)
+        if (message == null) {
             return null;
+        }
         return message.getPayLoad();
     }
 
@@ -439,12 +451,14 @@ abstract public class AbstractPooledActor extends Actor {
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
     protected final Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
-        if (stopFlag != S_RUNNING)
+        if (stopFlag != S_RUNNING) {
             throw new IllegalStateException("The actor hasn't been started.");
+        }
         ActorMessage message = messageQueue.poll(timeout, timeUnit);
         enhanceReplies(Arrays.asList(message));
-        if (message == null)
+        if (message == null) {
             return null;
+        }
         return message.getPayLoad();
     }
 
@@ -464,17 +478,18 @@ abstract public class AbstractPooledActor extends Actor {
         int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
 
         for (int i = 0; i != toReceive; ++i) {
-            if (stopFlag != S_RUNNING)
+            if (stopFlag != S_RUNNING) {
                 throw TERMINATE;
+            }
 
             messages.add(messageQueue.take());
         }
         enhanceReplies(messages);
 
         try {
-            if (maxNumberOfParameters == 0)
+            if (maxNumberOfParameters == 0) {
                 handler.call();
-            else {
+            } else {
                 Object args[] = new Object[messages.size()];
                 for (int i = 0; i < args.length; i++) {
                     args[i] = messages.get(i).getPayLoad();
@@ -509,11 +524,12 @@ abstract public class AbstractPooledActor extends Actor {
         boolean nullAppeared = false;  //Ignore further potential messages once a null is retrieved (due to a timeout)
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
         for (int i = 0; i != toReceive; ++i) {
-            if (nullAppeared)
+            if (nullAppeared) {
                 messages.add(null);
-            else {
-                if (stopFlag != S_RUNNING)
+            } else {
+                if (stopFlag != S_RUNNING) {
                     throw new IllegalStateException("The actor hasn't been started.");
+                }
                 ActorMessage message =
                         messageQueue.poll(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
                 nullAppeared = (message == null);
@@ -562,17 +578,19 @@ abstract public class AbstractPooledActor extends Actor {
      * @return this (the actor itself) to allow method chaining
      */
     @Override public final Actor send(final Object message) {
-        if (stopFlag == S_STOPPED)
-            throw new IllegalStateException("The actor hasn't been started.");
 
         ActorMessage actorMessage;
-        if (message instanceof ActorMessage)
+        if (message instanceof ActorMessage) {
             actorMessage = (ActorMessage) message;
-        else
+        } else {
             actorMessage = ActorMessage.build(message);
+        }
 
-        messageQueue.offer(actorMessage);
         synchronized (reactionLock) {
+            if (stopFlag == S_STOPPED) {
+                throw new IllegalStateException("The actor hasn't been started.");
+            }
+            messageQueue.offer(actorMessage);
             final Reaction reactCode = reaction;
             if (reactCode != null) {
                 reactCode.checkQueue();
@@ -588,17 +606,19 @@ abstract public class AbstractPooledActor extends Actor {
      */
     final List sweepQueue() {
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
-        if (savedBufferedMessages != null && !savedBufferedMessages.isEmpty())
+        if (savedBufferedMessages != null && !savedBufferedMessages.isEmpty()) {
             messages.addAll(savedBufferedMessages);
+        }
         ActorMessage message = messageQueue.poll();
         while (message != null) {
             Object list = InvokerHelper.invokeMethod(message.getPayLoad(), "respondsTo", new Object[]{"onDeliveryError"});
-            if (list != null && !((List) list).isEmpty())
+            if (list != null && !((List) list).isEmpty()) {
                 InvokerHelper.invokeMethod(message.getPayLoad(), "onDeliveryError", new Object[0]);
-            else {
+            } else {
                 list = InvokerHelper.invokeMethod(message.getSender(), "respondsTo", new Object[]{"onDeliveryError"});
-                if (list != null && !((List) list).isEmpty())
+                if (list != null && !((List) list).isEmpty()) {
                     InvokerHelper.invokeMethod(message.getSender(), "onDeliveryError", new Object[0]);
+                }
             }
 
             messages.add(message);
@@ -614,8 +634,9 @@ abstract public class AbstractPooledActor extends Actor {
      * @param code The closure to invoke repeatedly
      */
     protected final void loop(final Runnable code) {
-        if (loopCode != null)
+        if (loopCode != null) {
             throw new IllegalStateException("The loop method must be only called once");
+        }
 
         if (code instanceof Closure) {
             ((Closure) code).setResolveStrategy(Closure.DELEGATE_FIRST);
@@ -627,10 +648,12 @@ abstract public class AbstractPooledActor extends Actor {
                 obj2Sender.clear();
 
                 if (code instanceof Closure)
-                    //noinspection deprecation
+                //noinspection deprecation
+                {
                     GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) code);
-                else
+                } else {
                     code.run();
+                }
                 doLoopCall();
             }
         };
@@ -649,10 +672,11 @@ abstract public class AbstractPooledActor extends Actor {
     void runReaction(List<ActorMessage> messages, int maxNumberOfParameters, Closure code) {
         for (ActorMessage message : messages) {
             if (message.getPayLoad() == TIMEOUT) {
-                final ArrayList<ActorMessage> saved = new ArrayList<ActorMessage>();
+                final List<ActorMessage> saved = new ArrayList<ActorMessage>();
                 for (ActorMessage m : messages) {
-                    if (m != null && m.getPayLoad() != TIMEOUT)
+                    if (m != null && m.getPayLoad() != TIMEOUT) {
                         saved.add(m);
+                    }
                 }
                 savedBufferedMessages = saved;
                 throw TIMEOUT;
@@ -721,8 +745,9 @@ abstract public class AbstractPooledActor extends Actor {
         ActorAction(final AbstractPooledActor actor, final Runnable code) {
             super();
             this.actor = actor;
-            if (code instanceof Closure)
+            if (code instanceof Closure) {
                 ((Closure) code).setDelegate(actor);
+            }
             this.code = code;
         }
 
@@ -736,8 +761,9 @@ abstract public class AbstractPooledActor extends Actor {
          */
         public void run() {
             try {
-                if (cancelled || stopFlagUpdater.get(actor) != S_RUNNING)
+                if (cancelled || stopFlagUpdater.get(actor) != S_RUNNING) {
                     throw TERMINATE;
+                }
 
                 assert actor.currentAction == null;
                 actor.currentAction = this;
@@ -771,8 +797,9 @@ abstract public class AbstractPooledActor extends Actor {
 
                 synchronized (actor.scheduleLock) {
                     actor.currentAction = null;
-                    if (nextAction != null && !cancelled && stopFlagUpdater.get(actor) == S_RUNNING)
+                    if (nextAction != null && !cancelled && stopFlagUpdater.get(actor) == S_RUNNING) {
                         actor.getActorGroup().getThreadPool().execute(nextAction);
+                    }
                 }
             }
         }
@@ -782,8 +809,9 @@ abstract public class AbstractPooledActor extends Actor {
          */
         void cancel() {
             cancelled = true;
-            if (actionThread != null && actionThread != Thread.currentThread())
+            if (actionThread != null && actionThread != Thread.currentThread()) {
                 actionThread.interrupt();
+            }
         }
 
         private void handleTimeout() {
@@ -844,13 +872,11 @@ abstract public class AbstractPooledActor extends Actor {
             return false;
         }
 
-        public void schedule(final ActorAction action) {
-            synchronized (actor.scheduleLock) {
-                if (actor.currentAction == this) {
-                    nextAction = action;
-                } else {
-                    actor.getActorGroup().getThreadPool().execute(action);
-                }
+        private void schedule(final ActorAction action) {
+            if (actor.currentAction == this) {
+                nextAction = action;
+            } else {
+                actor.getActorGroup().getThreadPool().execute(action);
             }
         }
     }
@@ -891,8 +917,7 @@ abstract public class AbstractPooledActor extends Actor {
             messages = new ActorMessage[numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages];
         }
 
-        @SuppressWarnings({"UnusedDeclaration"})
-        Reaction(final AbstractPooledActor actor, final int numberOfExpectedMessages) {
+        @SuppressWarnings({"UnusedDeclaration"}) Reaction(final AbstractPooledActor actor, final int numberOfExpectedMessages) {
             this(actor, numberOfExpectedMessages, null);
         }
 
@@ -948,8 +973,7 @@ abstract public class AbstractPooledActor extends Actor {
          *
          * @return The messages stored so far.
          */
-        @SuppressWarnings({"UnusedDeclaration"})
-        List<ActorMessage> dumpMessages() {
+        @SuppressWarnings({"UnusedDeclaration"}) List<ActorMessage> dumpMessages() {
             return Collections.unmodifiableList(Arrays.asList(messages));
         }
 
@@ -970,8 +994,9 @@ abstract public class AbstractPooledActor extends Actor {
                     if (actor != null) {
                         actor.reaction = null;
                         actor.schedule(new ActorAction(actor, this));
-                        if (actor.isActorThread())
+                        if (actor.isActorThread()) {
                             throw CONTINUE;
+                        }
                     }
                 }
             } else {
