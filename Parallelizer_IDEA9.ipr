@@ -2,14 +2,6 @@
 <project relativePaths="false" version="4">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
-    <buildFile url="file://$PROJECT_DIR$/build.xml">
-      <additionalClassPath />
-      <antReference projectDefault="true" />
-      <customJdkName value="" />
-      <maximumHeapSize value="128" />
-      <maximumStackSize value="2" />
-      <properties />
-    </buildFile>
   </component>
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />
@@ -93,16 +85,16 @@
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/dataflow/operator/DataFlowOperator.groovy" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/RemoteConnection.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/RemoteHost.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/messages" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/messages/HostIdMsg.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/messages/NodeConnectedMsg.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/messages/NodeDisconnectedMsg.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/remote/netty" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/scheduler" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/org/gparallelizer/transformations" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/dataflow/operator/DataFlowOperator.groovy" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/RemoteConnection.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/RemoteHost.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/messages" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/messages/HostIdMsg.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/messages/NodeConnectedMsg.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/messages/NodeDisconnectedMsg.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/netty" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/scheduler" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/transformations" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/META-INF" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/test" charset="UTF-8" />
   </component>
@@ -716,9 +708,6 @@
           <option name="m_limit" value="5" />
         </inspection_tool>
         <inspection_tool class="NonBlockStatementBodyJS" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="NonBooleanMethodNameMayNotStartWithQuestion" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="questionString" value="is,can,has,should,could,will,shall,check,contains,equals,startsWith,endsWith" />
-        </inspection_tool>
         <inspection_tool class="NonCommentSourceStatements" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="30" />
         </inspection_tool>
@@ -800,11 +789,6 @@
           <option name="m_ignoreSingleCharacterNames" value="false" />
           <option name="m_ignoreOverridesOfLibraryMethods" value="false" />
         </inspection_tool>
-        <inspection_tool class="ParameterNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_regex" value="[a-z][A-Za-z\d]*" />
-          <option name="m_minLength" value="1" />
-          <option name="m_maxLength" value="20" />
-        </inspection_tool>
         <inspection_tool class="ParameterNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[a-z][A-Za-z]*" />
           <option name="m_minLength" value="1" />
@@ -821,7 +805,6 @@
         </inspection_tool>
         <inspection_tool class="PlatformDetectionJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="PointlessIndexOfComparison" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="PrivateMemberAccessBetweenOuterAndInnerClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ProtectedField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ProtectedInnerClass" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreEnums" value="false" />
@@ -930,7 +913,6 @@
           <option name="m_ignoreWeakCollections" value="false" />
         </inspection_tool>
         <inspection_tool class="StaticFieldReferenceOnSubclass" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="StaticImport" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StaticInheritance" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StaticMethodNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[a-z][A-Za-z\d]*" />
@@ -1596,7 +1578,7 @@
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="Git" />
+    <mapping directory="" vcs="svn" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
   <component name="copyright">
@@ -1605,4 +1587,3 @@
     </Base>
   </component>
 </project>
-

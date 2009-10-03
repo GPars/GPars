@@ -1,4 +1,4 @@
-*GParallelizer* allows Groovy code to easily handle tasks concurrently, leveraging either the JSR-166y _Parallel Arrays_ or Java's executor services.
+*GPars* (formerly *GParallelizer*) allows Groovy code to easily handle tasks concurrently, leveraging either the JSR-166y _Parallel Arrays_ or Java's executor services.
 
 The framework offers developers straightforward Groovy-based Domain Specific Languages (DSLs) to declare, which parts of the code should be performed in parallel. Objects are enhanced with asynchronous methods like _eachAsync()_, _collectAsync()_ and others, to perform these collection-based operations in parallel. Closures can be turned into asynchronous variants, which when invoked schedule the original closure for processing in an executor service. The library also provides helper methods for running a bunch of closures concurrently.
 
@@ -36,7 +36,7 @@ Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
 The _Parallelizer.withParallelizer()_ method takes optional parameters for number of threads in the created pool and unhandled exception handler. The _Parallelizer.withExistingParallelizer()_ takes an already existing thread pool to reuse.
 The DSL is valid only within the associated block of code and only for the thread that has called the _withParallelizer()_ or _withExistingParallelizer()_ method. The _withParallelizer()_ method returns only after all the worker threads have finished their tasks and the pool has been destroyed, returning back the return value of the associated block of code. The _withExistingParallelizer()_ method doesn't wait for the pool threads to finish.
 
-Alternatively, the _Parallelizer_ class can be statically imported _import static org.gparallelizer.Parallelizer.`*`_, which will allow omitting the _Parallelizer_ class name.
+Alternatively, the _Parallelizer_ class can be statically imported _import static org.gpars.Parallelizer.`*`_, which will allow omitting the _Parallelizer_ class name.
 {{{
 withParallelizer {
   assert [1, 2, 3, 4, 5].allAsync {it > 0}
@@ -81,7 +81,7 @@ Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
 }}}
 The _Asynchronizer.withAsynchronizer()_ method takes optional parameters for number of threads in the created pool and a thread factory. The _Asynchronizer.withExistingAsynchronizer()_ takes an already existing executor service to reuse. The DSL is valid only within the associated block of code and only for the thread that has called the _withAsynchronizer()_ or _withExistingAsynchronizer()_ method. The _withAsynchronizer()_ method returns only after all the worker threads have finished their tasks and the executor service has been destroyed, returning back the return value of the associated block of code. The _withExistingAsynchronizer()_ method doesn't wait for the executor service threads to finish.
 
-Alternatively, the _Asynchronizer_ class can be statically imported _import static org.gparallelizer.Asynchronizer.`*`_, which will allow omitting the _Asynchronizer_ class name.
+Alternatively, the _Asynchronizer_ class can be statically imported _import static org.gpars.Asynchronizer.`*`_, which will allow omitting the _Asynchronizer_ class name.
 {{{
 withAsynchronizer {
   def result = [1, 2, 3, 4, 5].findAsync{Number number -> number > 2}
