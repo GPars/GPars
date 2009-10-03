@@ -19,7 +19,7 @@ package groovyx.gpars.enhancer
 import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
- * The thread-bound actor used in ActorMetaClass
+ * The actor used in ActorMetaClass
  *
  * @author Vaclav Pech
  * Date: Apr 28, 2009
@@ -31,6 +31,6 @@ public class EnhancerActor extends AbstractPooledActor {
     }
 
     protected void act() {
-        receive {AsyncMessage message -> EnhancerHelper.instance.processMessage(message)}
+        receive { AsyncMessage message -> EnhancerHelper.instance.processMessage(message) }
     }
 }

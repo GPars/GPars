@@ -24,8 +24,7 @@ import groovyx.gpars.actor.Actor;
 /**
  * A meta class that intercepts all method calls to the instances, which it is attached to,
  * suspends the calling thread and processes the called method in the associated actor.
- * Each ActorMetaClass instance has an actor associated. Based on the constructor used tha actor can be
- * either thread-bound or event-driven (pooled).
+ * Each ActorMetaClass instance has an actor associated.
  *
  * @author Jan Kotek, Vaclav Pech
  *         Date: Apr 28, 2009
@@ -73,7 +72,7 @@ public class ActorMetaClass extends DelegatingMetaClass {
      * @param clazz The class to intercept
      */
     public static void intercept(final Class clazz) {
-        ActorMetaClass.intercept(clazz, false);
+        InvokerHelper.metaRegistry.setMetaClass(clazz, new ActorMetaClass(clazz));
     }
 
     /**
@@ -81,9 +80,11 @@ public class ActorMetaClass extends DelegatingMetaClass {
      *
      * @param clazz       The class to intercept
      * @param pooledActor True if an event-driven (pooled) actor should be used, false for a thread-bound actor
+     * @deprecated thread-bound Actors are no longer available. Use intercept(clazz) instead.
      */
+    @Deprecated
     public static void intercept(final Class clazz, final boolean pooledActor) {
-        InvokerHelper.metaRegistry.setMetaClass(clazz, new ActorMetaClass(clazz));
+        intercept(clazz);
     }
 
     /**
