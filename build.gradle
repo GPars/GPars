@@ -41,7 +41,6 @@ repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
     mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
-//    flatDir name: 'localRepository', dirs: 'lib'
 }
 
 configurations {
@@ -49,13 +48,13 @@ configurations {
 }
 
 dependencies {
-//    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: ant.project.properties.groovyVersion
-    groovy files('lib/groovy-all-1.6.5.jar')
-//    testCompile group: 'junit', name: 'junit', version: hasProperty('groovyVersion') ? groovyVersion : '4.7'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: ant.project.properties.groovyVersion
+//    groovy files('lib/groovy-all-1.6.5.jar')
     testCompile group: 'junit', name: 'junit', version: ant.project.properties.junitVersion
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: ant.project.properties.jsr166yVersion
     compile group: 'org.jboss.netty', name: 'netty', version: ant.project.properties.nettyVersion
     deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: ant.project.properties.wagonSvnVersion
+
 }
 
 //todo alter properties
