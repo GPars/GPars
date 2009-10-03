@@ -1,6 +1,6 @@
 #! /usr/bin/env groovy
 
-//  GParallelizer
+//  GPars (formerly GParallelizer)
 //
 //  Copyright © 2009  The original author or authors
 //

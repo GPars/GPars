@@ -1,4 +1,4 @@
-//  GParallelizer
+//  GPars (formerly GParallelizer)
 //
 //  Copyright © 2008-9  The original author or authors
 //
