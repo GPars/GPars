@@ -41,6 +41,7 @@ repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
     mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
+    flatDir name: 'localRepository', dirs: 'lib'
 }
 
 configurations {
@@ -49,12 +50,10 @@ configurations {
 
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: ant.project.properties.groovyVersion
-//    groovy files('lib/groovy-all-1.6.5.jar')
     testCompile group: 'junit', name: 'junit', version: ant.project.properties.junitVersion
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: ant.project.properties.jsr166yVersion
     compile group: 'org.jboss.netty', name: 'netty', version: ant.project.properties.nettyVersion
     deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: ant.project.properties.wagonSvnVersion
-
 }
 
 //todo alter properties
@@ -67,7 +66,9 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 gradle.taskGraph.whenReady {taskGraph ->
     if (!taskGraph.hasTask(':release')) {
         final Date date = new Date()
-        version += '-SNAPSHOT' + new SimpleDateFormat('yyMMddHHmmssZ').format(date)
+        //  TODO: Should only put the date in the artefact name when uploading to the Maven repository, otherwise
+        //  should just append SNAPSHOT.
+        version += '-SNAPSHOT' + new SimpleDateFormat('-yyyyMMddHHmmssZ').format(date)
     }
 }
 
@@ -113,7 +114,6 @@ groovydoc {
     header = packageTitle
     footer = copyrightString
     packageNames = ['groovyx.gpars.*']
-//    description = 'Create the GroovyDoc API documentation.'
     overview = 'overview.html'
 }
 
