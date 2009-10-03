@@ -32,7 +32,7 @@ group = 'groovyx.gpars'
 version = '0.9-beta-1'
 
 manifest.mainAttributes(
-        'Implementation-Title': 'gpars',
+        'Implementation-Title': archivesBaseName,
         'Implementation-Version': version,
         'provider': 'Vaclav Pech'
 )
