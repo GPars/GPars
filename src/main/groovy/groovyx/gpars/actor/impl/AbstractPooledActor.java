@@ -135,9 +135,8 @@ public abstract class AbstractPooledActor extends Actor {
     private volatile boolean groupMembershipChangeable = true;
 
     /**
-     * Ensures atomicity of reaction reference manipulation and message retrieval fro mthe messageQueue
+     * Ensures atomicity of scheduling, reaction reference manipulation and message retrieval from the messageQueue
      */
-    private final Object reactionLock = new Object();
     private final Object scheduleLock = new Object();
 
     /**
@@ -242,7 +241,7 @@ public abstract class AbstractPooledActor extends Actor {
     @Override
     public final AbstractPooledActor start() {
         disableGroupMembershipChange();
-        synchronized (reactionLock) {
+        synchronized (scheduleLock) {
             if (!stopFlagUpdater.compareAndSet(this, S_STOPPED, S_RUNNING)) {
                 throw new IllegalStateException("Actor has already been started.");
             }
@@ -376,7 +375,7 @@ public abstract class AbstractPooledActor extends Actor {
             throw new IllegalStateException("Cannot call react from thread which is not owned by the actor");
         }
 
-        synchronized (reactionLock) {
+        synchronized (scheduleLock) {
             if (stopFlag != S_RUNNING) {
                 throw TERMINATE;
             }
@@ -588,7 +587,7 @@ public abstract class AbstractPooledActor extends Actor {
             actorMessage = ActorMessage.build(message);
         }
 
-        synchronized (reactionLock) {
+        synchronized (scheduleLock) {
             if (stopFlag == S_STOPPED) {
                 throw new IllegalStateException("The actor hasn't been started.");
             }
