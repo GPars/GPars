@@ -27,12 +27,12 @@ usePlugin 'maven'
 
 defaultTasks 'test'
 
-archivesBaseName = 'gparallelizer'
-group = 'org.gparallelizer'
+archivesBaseName = 'gpars'
+group = 'groovyx.gpars'
 version = '0.9-beta-1'
 
 manifest.mainAttributes(
-        'Implementation-Title': 'gparallelizer',
+        'Implementation-Title': 'gpars',
         'Implementation-Version': version,
         'provider': 'Vaclav Pech'
 )
@@ -113,7 +113,7 @@ groovydoc {
     docTitle = packageTitle
     header = packageTitle
     footer = copyrightString
-    packageNames = ['org.gparallelizer.*']
+    packageNames = ['groovyx.gpars.*']
 //    description = 'Create the GroovyDoc API documentation.'
     overview = 'overview.html'
 }
@@ -133,7 +133,7 @@ task zipSrc(type: Zip) {
 task zipSamples(type: Zip) {
     appendix = 'samples'
     from sourceSets.test.allSource.matching{
-        include 'org/gparallelizer/samples/**'
+        include 'groovyx/gpars/samples/**'
     }
 }
 

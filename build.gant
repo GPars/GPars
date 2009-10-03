@@ -1,8 +1,8 @@
 property ( file : 'build.properties' )
 
 includeTargets ** gant.targets.Maven * [
-                                        groupId : 'org.gparallelizer' ,
-                                        artifactId : 'gparallelizer' ,
+                                        groupId : 'groovyx.gpars' ,
+                                        artifactId : 'gpars' ,
                                         version : '0.8.5' ,
                                         javaCompileProperties : [ source : '1.5' , target : '1.5' , debug : 'true' ] ,
                                         nestedJavaCompilerArgs : [ '-Xlint' ] ,

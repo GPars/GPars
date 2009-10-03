@@ -1,5 +1,5 @@
 /***
- * GParallelizer: a groovy concurrency library.
+ * GPars (formerly GParallelizer): a groovy concurrency library.
  * It provides support for configuring parallel system using Groovy:
  */
 
