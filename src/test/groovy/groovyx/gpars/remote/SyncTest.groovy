@@ -36,8 +36,7 @@ public class SyncTest extends GroovyTestCase {
     node2.localHost.disconnect()
   }
 
-    //todo enable
-  void _testSendAndContinue() {
+  void testSendAndContinue() {
     def a1 = Actors.actor {
       loop {
         react {msg ->
