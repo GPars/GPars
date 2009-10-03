@@ -708,9 +708,6 @@
           <option name="m_limit" value="5" />
         </inspection_tool>
         <inspection_tool class="NonBlockStatementBodyJS" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="NonBooleanMethodNameMayNotStartWithQuestion" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="questionString" value="is,can,has,should,could,will,shall,check,contains,equals,startsWith,endsWith" />
-        </inspection_tool>
         <inspection_tool class="NonCommentSourceStatements" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="30" />
         </inspection_tool>
@@ -792,11 +789,6 @@
           <option name="m_ignoreSingleCharacterNames" value="false" />
           <option name="m_ignoreOverridesOfLibraryMethods" value="false" />
         </inspection_tool>
-        <inspection_tool class="ParameterNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_regex" value="[a-z][A-Za-z\d]*" />
-          <option name="m_minLength" value="1" />
-          <option name="m_maxLength" value="20" />
-        </inspection_tool>
         <inspection_tool class="ParameterNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[a-z][A-Za-z]*" />
           <option name="m_minLength" value="1" />
@@ -813,7 +805,6 @@
         </inspection_tool>
         <inspection_tool class="PlatformDetectionJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="PointlessIndexOfComparison" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="PrivateMemberAccessBetweenOuterAndInnerClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ProtectedField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ProtectedInnerClass" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreEnums" value="false" />
