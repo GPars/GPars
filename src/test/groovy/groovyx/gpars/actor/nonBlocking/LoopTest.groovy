@@ -16,11 +16,12 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -30,9 +31,14 @@ import static groovyx.gpars.actor.Actors.actor
  */
 public class LoopTest extends GroovyTestCase {
 
+    ActorGroup group
+
     protected void setUp() {
-        super.setUp();
-        Actors.defaultPooledActorGroup.resize(10)
+        group = new PooledActorGroup(10)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
     }
 
     public void testLoop() {

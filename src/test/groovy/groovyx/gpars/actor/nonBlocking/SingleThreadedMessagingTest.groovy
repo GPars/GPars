@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.PooledActorGroup
 
 /**
  *
@@ -26,12 +26,6 @@ import groovyx.gpars.actor.Actors
 public class SingleThreadedMessagingTest extends MessagingTest {
 
     protected void setUp() {
-        super.setUp();
-        Actors.defaultPooledActorGroup.resize(1)
-    }
-
-    protected void tearDown() {
-        super.tearDown();
-        Actors.defaultPooledActorGroup.resize(5)
+        group = new PooledActorGroup(1)
     }
 }

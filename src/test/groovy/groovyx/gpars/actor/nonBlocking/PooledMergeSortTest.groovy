@@ -16,10 +16,11 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.PooledActorGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import groovyx.gpars.actor.Actors
-import static groovyx.gpars.actor.Actors.actor
 
 /**
  *
@@ -28,9 +29,14 @@ import static groovyx.gpars.actor.Actors.actor
  */
 public class PooledMergeSortTest extends GroovyTestCase {
 
+    ActorGroup group
+
     protected void setUp() {
-        super.setUp();
-        Actors.defaultPooledActorGroup.resize(10)
+        group = new PooledActorGroup(10)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
     }
 
     protected def split(List<Integer> list) {
@@ -71,8 +77,8 @@ public class PooledMergeSortTest extends GroovyTestCase {
                     default:
                         def splitList = split(message)
 
-                        def child1 = actor(createMessageHandler(delegate))
-                        def child2 = actor(createMessageHandler(delegate))
+                        def child1 = group.actor(createMessageHandler(delegate))
+                        def child2 = group.actor(createMessageHandler(delegate))
                         child1.start().send(splitList[0])
                         child2.start().send(splitList[1])
 
@@ -86,38 +92,38 @@ public class PooledMergeSortTest extends GroovyTestCase {
     }
 
     public void testDefaultMergeSortWithOneThreadPool() {
-        Actors.defaultPooledActorGroup.resize(1)
+        group.resize(1)
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
-        def resultActor = actor {
+        def resultActor = group.actor {
             react {
                 result = it
                 latch.countDown()
             }
         }.start()
 
-        def sorter = actor(createMessageHandler(resultActor))
+        def sorter = group.actor(createMessageHandler(resultActor))
         sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(30, TimeUnit.SECONDS)
-        Actors.defaultPooledActorGroup.resize(5)
+        group.resize(5)
         assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
     }
 
     public void testDefaultMergeSort() {
-        Actors.defaultPooledActorGroup.resize(10)
+        group.resize(10)
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
-        def resultActor = actor {
+        def resultActor = group.actor {
             react {
                 result = it
                 latch.countDown()
             }
         }.start()
 
-        def sorter = actor(createMessageHandler(resultActor))
+        def sorter = group.actor(createMessageHandler(resultActor))
         sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(30, TimeUnit.SECONDS)
