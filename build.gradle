@@ -147,20 +147,8 @@ task demo(dependsOn: 'compileGroovy') << {
             'DemoDiningPhilosophers.groovy',        // runs endlessly
             'DemoLoadBalancer.groovy',              // runs endlessly
             'DemoRockPaperScissors.groovy',         // runs endlessly
-            'DemoEventMergeSort.groovy',            // use System.exit()
-            'DataFlowDemo2.groovy',
-            'DataFlowDemo3.groovy',
-            'DataFlowDemo4.groovy',
-            'DataFlowDemo5.groovy',
-            'DataFlowDemo6.groovy',
-            'DemoDataFlowStreamIteration.groovy',
-            'DemoMixDataFlowWithActors.groovy',
-            'DemoProducerConsumer1.groovy',
-            'DemoProducerConsumer2.groovy',
-            'DemoMashupWithMethods.groovy',
-            'DemoPhysicalCalculations.groovy',
-            'DemoSwing.groovy',
-            'DemoSwingMashup.groovy',
+            // 'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
+            // 'DemoSwingMashup.groovy',  // but they can be run locally
     ]
     RootLoader rl = new RootLoader(this.class.classLoader)
     rl.addURL(new File('build/classes/main').toURL())
@@ -168,6 +156,8 @@ task demo(dependsOn: 'compileGroovy') << {
     rl.addURL(new File('lib/jsr166y-070108.jar').toURL())
     rl.addURL(new File('lib/netty-3.1.3.GA.jar').toURL())
     def shell = new GroovyShell(rl)
+    System.metaClass.static.exit = { int retval -> println ">>> System.exit($retval) suppressed." }
+    System.in.metaClass.read     = { -> println ">>> System.in.read() suppressed" }
     def failed = []
     def ok = 0
     new File('src/test/groovy/').eachFileRecurse { File file ->
