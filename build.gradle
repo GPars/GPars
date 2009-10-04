@@ -125,7 +125,8 @@ task zipSrc(type: Zip) {
     from sourceSets.main.allSource
 }
 
-task zipSamples(dependsOn: 'demo', type: Zip) {
+//task zipSamples(dependsOn: 'demo', type: Zip) {
+task zipSamples(type: Zip) {
     appendix = 'samples'
     from sourceSets.test.allSource.matching{
         include 'groovyx/gpars/samples/**'
