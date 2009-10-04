@@ -125,7 +125,7 @@ task zipSrc(type: Zip) {
     from sourceSets.main.allSource
 }
 
-task zipSamples(type: Zip) {
+task zipSamples(dependsOn: 'demo', type: Zip) {
     appendix = 'samples'
     from sourceSets.test.allSource.matching{
         include 'groovyx/gpars/samples/**'
@@ -138,7 +138,7 @@ task wrapper(type: Wrapper) {
 }
 
 // todo (dk) needs more work:
-task demo << {
+task demo(dependsOn: 'compileGroovy') << {
     def excludes = [
             'DemoPotentialDeadlock.groovy',         // may deadlock (on purpose)
             'DemoNonDeterministicDeadlockWithDataFlows.groovy', // may deadlock (on purpose)
@@ -157,6 +157,9 @@ task demo << {
             'DemoProducerConsumer1.groovy',
             'DemoProducerConsumer2.groovy',
             'DemoMashupWithMethods.groovy',
+            'DemoPhysicalCalculations.groovy',
+            'DemoSwing.groovy',
+            'DemoSwingMashup.groovy',
     ]
     RootLoader rl = new RootLoader(this.class.classLoader)
     rl.addURL(new File('build/classes/main').toURL())
