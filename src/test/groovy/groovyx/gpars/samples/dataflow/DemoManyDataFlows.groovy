@@ -34,7 +34,6 @@ scheduler.execute { df.result = many.collect{ df[it] }.sum() }
 many.each { num ->
     scheduler.execute {
       df[num] = 1
-      println num
     }
 }
 

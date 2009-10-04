@@ -1,3 +1,5 @@
+package groovyx.gpars.samples.remote
+
 import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import groovyx.gpars.actor.Actors
