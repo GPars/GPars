@@ -21,9 +21,6 @@
 import java.text.SimpleDateFormat
 import org.codehaus.groovy.tools.RootLoader
 
-ant.property(file: 'local.build.properties')
-ant.property(file: 'build.properties')
-
 usePlugin 'groovy'
 usePlugin 'maven'
 
@@ -42,7 +39,6 @@ manifest.mainAttributes(
 repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
-    mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
 }
 
 configurations {
