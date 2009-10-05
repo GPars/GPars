@@ -448,8 +448,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * Returns either standard property of expression or
      * creates expression, which will request given property when receiver became available
      *
-     * @param propertyName
-     * @return
+     * @param propertyName The name of the property to retrieve
+     * @return The property value, instance of DataFlowGetPropertyExpression 
      */
     public Object getProperty(String propertyName) {
         MetaProperty metaProperty = getMetaClass().hasProperty(this, propertyName);
