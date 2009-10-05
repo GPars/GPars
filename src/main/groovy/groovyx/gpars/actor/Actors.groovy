@@ -17,6 +17,7 @@
 package groovyx.gpars.actor
 
 import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.scheduler.ResizablePool
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
@@ -48,7 +49,7 @@ public abstract class Actors {
     /**
      * The default actor group to share by all actors created through the Actors class.
      */
-    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup()
+    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(new ResizablePool(true))
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
