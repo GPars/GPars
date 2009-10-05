@@ -81,7 +81,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     /**
      * Serial id of the object
      *
-     * @return
+     * @return The serial id
      */
     public UUID getSerialId() {
         return serialId;
@@ -96,7 +96,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     /**
      * Getter for subscribers
      *
-     * @return
+     * @return The current subscribers
      */
     public Object getSubscribers() {
         return subscribers;
@@ -107,7 +107,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
      *
      * @param context
      */
-    public void subscribe(SerialContext context) {
+    public void subscribe(final SerialContext context) {
         synchronized (this) {
             if (subscribers == null) {
                 subscribers = context;

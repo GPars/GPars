@@ -85,7 +85,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
          *
          * @param thread     The physical thread of the request, which will be suspended
          * @param previous   The previous request in the chain of requests
-         * @param attachment
+         * @param attachment An arbitrary object closely identifying the request for the caller
          * @param callback   An actor or operator to send a message to once a value is bound
          */
         private WaitingThread(final Thread thread, final WaitingThread<V> previous, final Object attachment, final MessageStream callback) {
@@ -200,8 +200,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
-    public T getVal(long timeout, TimeUnit units) throws InterruptedException {
-        long endNano = System.nanoTime() + units.toNanos(timeout);
+    public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
+        final long endNano = System.nanoTime() + units.toNanos(timeout);
         WaitingThread<T> newWaiting = null;
         while (state != S_INITIALIZED) {
             if (newWaiting == null) {
@@ -218,7 +218,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
             if (waitingUpdater.compareAndSet(this, previous, newWaiting)) {
                 // ok, we are in the queue, so writer is responsible to process us
                 while (state != S_INITIALIZED) {
-                    long toWait = endNano - System.nanoTime();
+                    final long toWait = endNano - System.nanoTime();
                     if (toWait <= 0) {
                         newWaiting.set(true); // don't unpark please
                         return null;
@@ -273,7 +273,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         notifyRemote(null);
     }
 
-    private void doBindImpl(T value) {
+    private void doBindImpl(final T value) {
         this.value = value;
         state = S_INITIALIZED;
 
@@ -281,22 +281,22 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         final WaitingThread<T> waitingQueue = waitingUpdater.getAndSet(this, dummyWaitingThread);
 
         // no more new waiting threads since that point
-        for (WaitingThread<T> waiting = waitingQueue; waiting != null; waiting = waiting.previous) {
-            // maybe waiting thread canceled or was interrupted
-            if (waiting.compareAndSet(false, true)) {
-                if (waiting.thread != null) {
+        for (WaitingThread<T> currentWaiting = waitingQueue; currentWaiting != null; currentWaiting = currentWaiting.previous) {
+            // maybe currentWaiting thread canceled or was interrupted
+            if (currentWaiting.compareAndSet(false, true)) {
+                if (currentWaiting.thread != null) {
                     // can be potentially called on a non-parked thread,
                     // which is OK as in this case next park () will be ignored
-                    LockSupport.unpark(waiting.thread);
+                    LockSupport.unpark(currentWaiting.thread);
                 } else {
-                    if (waiting.callback != null)
-                        scheduleCallback(waiting.attachment, waiting.callback);
+                    if (currentWaiting.callback != null)
+                        scheduleCallback(currentWaiting.attachment, currentWaiting.callback);
                 }
             }
         }
     }
 
-    public void doBindRemote(BindDataFlow msg) {
+    public void doBindRemote(final BindDataFlow msg) {
         doBindImpl(value);
         notifyRemote(msg.hostId);
     }
