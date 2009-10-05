@@ -1,6 +1,6 @@
 package groovyx.gpars.remote;
 
-import groovyx.gpars.remote.messages.HostIdMsg;
+import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.serial.SerialMsg;
 
 /**

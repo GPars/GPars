@@ -14,24 +14,37 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package groovyx.gpars.remote.messages;
+package groovyx.gpars.remote.message;
 
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.remote.LocalNode;
+import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 
 import java.util.UUID;
 
 /**
- * Message sent by NetTransportProvider immediately after connection to another host set up set up
+ * Message sent when local node connected to remote host
  *
  * @author Alex Tkachman
  */
-public class HostIdMsg extends SerialMsg {
+public class NodeConnectedMsg extends SerialMsg {
 
     /**
-     * Construct message representing current state of the transport provider
+     * Id of node connected
      */
-    public HostIdMsg(UUID id) {
+    public final UUID nodeId;
+
+    public final Actor mainActor;
+
+    public NodeConnectedMsg(LocalNode node) {
         super();
-        hostId = id;
+        nodeId = node.getId();
+        mainActor = node.getMainActor();
+    }
+
+    @Override
+    public void execute(RemoteConnection conn) {
+        conn.getHost().getLocalHost().connectRemoteNode(nodeId, conn.getHost(), mainActor);
     }
 }
