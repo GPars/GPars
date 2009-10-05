@@ -27,12 +27,15 @@
     </p>
     <ol>
       <li>
-        Actors provide a Groovy implementation of Scala-like actors, both thread-bound actors
-        (only in pre-0.9 versions) and thread pool-bound (event-driven) ones.
+        Actors provide a Groovy implementation of Scala-like actors, remote actors, Clojure-like agents
+        and a couple of specialized actors like DynamicDispatchActor or Reactor.
       </li>
       <li>
         Dataflow Concurrency (since version 0.8) allows for very natural shared-memory concurrency model,
         based on single-assignment variables.
+      </li>
+      <li>
+        And CSP implementation is likely to appear soon as well.
       </li>
       <li>
         Asynchronizer uses the Java 1.5 built-in support for executor services to enable multi-threaded
