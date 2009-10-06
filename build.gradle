@@ -46,11 +46,11 @@ configurations {
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: groovyVersion ?: '1.6.5'
-    testCompile group: 'junit', name: 'junit', version: junitVersion ?: '4.7'
-    compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: jsr166yVersion ?: '070108'
-    compile group: 'org.jboss.netty', name: 'netty', version: nettyVersion ?: '3.1.3.GA'
-    deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: wagonSvnVersion ?: '1.9'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.6.5'
+    testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
+    compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
+    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.3.GA'
+    deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: hasProperty('wagonSvnVersion') ? wagonSvnVersion : '1.9'
 }
 
 //  To get the details of the "unchecked" issues.
