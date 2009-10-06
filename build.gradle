@@ -144,6 +144,7 @@ task demo(dependsOn: 'compileGroovy') << {
             'DemoDiningPhilosophers.groovy',        // runs endlessly
             'DemoLoadBalancer.groovy',              // runs endlessly
             'DemoRockPaperScissors.groovy',         // runs endlessly
+            'DemoWordSort.groovy',         // throws OOM
             // 'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
             // 'DemoSwingMashup.groovy',  // but they can be run locally
     ]

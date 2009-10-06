@@ -95,7 +95,6 @@ testActor(actor3)
 
 
 LifeCycleHelper.latch.await()
-Actors.defaultPooledActorGroup.shutdown()
 
 
 class LifeCycleHelper {

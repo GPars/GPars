@@ -73,9 +73,8 @@ actor.send 0
 
 
 
-Thread.sleep 3000
+Thread.sleep 2000
 actor.send 4
-Thread.sleep 3000
-
-Actors.defaultPooledActorGroup.shutdown()
+Thread.sleep 1000
+actor.stop()
 
