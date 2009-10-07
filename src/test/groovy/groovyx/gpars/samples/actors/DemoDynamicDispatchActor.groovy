@@ -39,8 +39,7 @@ final class MyActor extends DynamicDispatchActor {
         println 'Received object'
     }
 
-    //todo must be List
-    void onMessage(ArrayList message) {
+    void onMessage(List message) {
         println 'Received list'
         stop()
     }
