@@ -17,6 +17,8 @@
 package groovyx.gpars.actor
 
 import groovyx.gpars.actor.impl.AbstractPooledActor
+import org.codehaus.groovy.runtime.NullObject
+import org.codehaus.groovy.runtime.DefaultGroovyMethods
 
 /**
  * A pooled actor allowing for an alternative structure of the message handling code.
@@ -41,8 +43,6 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
 
 public class DynamicDispatchActor extends AbstractPooledActor {
 
-  def handlers = [:] as LinkedHashMap
-
     /**
      * Creates a new instance without any when handlers registered
      */
@@ -55,19 +55,6 @@ public class DynamicDispatchActor extends AbstractPooledActor {
      * @param closure A closure to run against te actor, typically to register handlers
      */
   DynamicDispatchActor(Closure closure) {
-
-    respondsTo("onMessage").each {MetaMethod method ->
-      if (method.parameterTypes.length == 1) {
-        handlers[method.parameterTypes[0].theClass] = method
-      }
-    }
-
-    respondsTo("onNullMessage").each {MetaMethod method ->
-      if (method.parameterTypes.length == 0) {
-        handlers[null] = method
-      }
-    }
-
     if (closure) {
       Closure cloned = (Closure) closure.clone()
       cloned.resolveStrategy = Closure.DELEGATE_FIRST
@@ -82,44 +69,14 @@ public class DynamicDispatchActor extends AbstractPooledActor {
   final void act() {
     loop {
       react { msg ->
-        def msgClass = msg?.class
-
-        def handler = null
-
-        if (!handler)
-          handler = handlers[msgClass]
-
-        if (!handler) {
-          def handlerClass = handlers.keySet().find {Class handlerMsgClass -> handlerMsgClass.isAssignableFrom(msgClass)}
-          handler = handlers[handlerClass]
-        }
-
-        if (!handler)
-          throw new IllegalStateException("Unable to handle message $it");
-
-        if (handler instanceof Closure) {
-          msg ? handler.call(msg) : handler.call ()
-        }
-        else {
-          ((MetaMethod) handler).invoke(delegate, (msg != null ? [msg] : []) as Object[])
-        }
+        if (msg == null)
+           msg = NullObject.nullObject
+        onMessage msg
       }
     }
   }
 
   void when(Closure closure) {
-    Closure cloned = (Closure) closure.clone()
-    cloned.resolveStrategy = Closure.DELEGATE_FIRST
-    cloned.delegate = this
-
-    if (closure.maximumNumberOfParameters == 0) {
-      handlers[null] = cloned
-    }
-    else {
-      if (closure.maximumNumberOfParameters != 1)
-        throw new IllegalStateException("'when' closure should have zero or one parameter");
-
-      handlers[cloned.parameterTypes[0]] = cloned
-    }
+    DefaultGroovyMethods.getMetaClass(this).onMessage closure
   }
 }

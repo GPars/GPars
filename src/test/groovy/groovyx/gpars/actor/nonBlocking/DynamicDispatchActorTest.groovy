@@ -46,7 +46,8 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         actor.sendAndWait new ArrayList()
         assertFalse actor.stringFlag
         assertFalse actor.integerFlag
-        assert actor.objectFlag
+        assertFalse actor.objectFlag
+        assert actor.listFlag
         actor.clearFlags();
     }
 

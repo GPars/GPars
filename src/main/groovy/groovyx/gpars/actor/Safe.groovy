@@ -17,6 +17,7 @@
 package groovyx.gpars.actor
 
 import groovyx.gpars.util.EnhancedRWLock
+import org.codehaus.groovy.runtime.NullObject
 
 /**
  * A special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
@@ -80,7 +81,7 @@ public class Safe<T> extends DynamicDispatchActor {
     start()
   }
 
-  final void onNullMessage () {
+  final void onMessage (NullObject obj) {
     lock.withWriteLock {
       updateValue null
     }
