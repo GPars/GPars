@@ -199,6 +199,19 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     dda.sendAndWait(null)
     assert nullFlag
   }
+
+  public void testClosureMessage() {
+    volatile boolean flag = false
+
+    def dda = new DynamicDispatchActor()
+    dda.when { Closure cl ->
+        reply cl()
+     }
+    dda.start()
+
+    dda.sendAndWait { flag = true }
+    assert flag
+  }
 }
 
 final class TestDynamicDispatchActor extends DynamicDispatchActor {
