@@ -155,7 +155,7 @@ task demo(dependsOn: 'compileGroovy') << {
     rl.addURL(new File('lib/netty-3.1.3.GA.jar').toURL())
     def shell = new GroovyShell(rl)
     System.metaClass.static.exit = { int retval -> println ">>> System.exit($retval) suppressed." }
-    System.in.metaClass.read     = { -> println ">>> System.in.read() suppressed" }
+    System.in.metaClass.read     = { -> println ">>> System.in.read() suppressed";'Automated build' }
     def failed = []
     def ok = 0
     new File('src/test/groovy/').eachFileRecurse { File file ->
