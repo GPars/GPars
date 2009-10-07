@@ -25,19 +25,24 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
  * In general DynamicDispatchActor repeatedly scans for messages and dispatches arrived messages to one
  * of the onMessage(message) methods defined on the actor.
  * <pre>
- * final class MyActor extends DynamicDispatchActor {*
- *     void onMessage(String message) {*         println 'Received string'
- *}*
- *     void onMessage(Integer message) {*         println 'Received integer'
- *}*
- *     void onMessage(Object message) {*         println 'Received object'
- *}*
- *     void onNullMessage() {*         println 'Received null'
- *}*}* </pre>
+ * final class MyActor extends DynamicDispatchActor {
+ *      void onMessage(String message) {
+ *          println 'Received string'
+ *      }
+ *      void onMessage(Integer message) {
+ *          println 'Received integer'
+ *      }
+ *      void onMessage(Object message) {
+ *          println 'Received object'
+ *      }
+ *      void onMessage(NullObject nullMessage) {
+ *          println 'Received null'
+ *      }
+ * } </pre>
  *
- * Method when {...} provide alternative way to define message handlers
+ * Method when {...} provides an alternative way to define message handlers
  *
- * @author Vaclav Pech, Alex Tkachman
+ * @author Vaclav Pech, Alex Tkachman, Dierk Koenig
  * Date: Jun 26, 2009
  */
 
