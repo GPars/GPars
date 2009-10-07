@@ -160,6 +160,30 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     assert integerFlag
     assert objectFlag
   }
+
+  public void testWhenAttachedAfterCtor() {
+    volatile boolean stringFlag = false
+    volatile boolean integerFlag = false
+
+    def dda = new DynamicDispatchActor()
+    dda.when { String message ->
+        stringFlag = true
+        reply false
+     }
+    dda.start()
+
+    dda.sendAndWait ''
+    assert stringFlag
+    assertFalse integerFlag
+
+    dda.when { int message ->
+        integerFlag = true
+        reply false
+     }
+
+    dda.sendAndWait 1
+    assert stringFlag
+  }
 }
 
 final class TestDynamicDispatchActor extends DynamicDispatchActor {
@@ -176,7 +200,7 @@ final class TestDynamicDispatchActor extends DynamicDispatchActor {
     }
 
     TestDynamicDispatchActor() {
-        when {String message ->
+        when { String message ->
             stringFlag = true
             reply false
         }
