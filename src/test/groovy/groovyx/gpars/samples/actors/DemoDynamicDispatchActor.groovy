@@ -24,6 +24,9 @@ import groovyx.gpars.actor.DynamicDispatchActor
  */
 
 final class MyActor extends DynamicDispatchActor {
+
+    def MyActor(final closure) { super(closure); }
+
     void onMessage(String message) {
         println 'Received string'
     }
@@ -42,11 +45,13 @@ final class MyActor extends DynamicDispatchActor {
     }
 }
 
-final def actor = new MyActor().start()
+final def actor = new MyActor({
+    when{BigDecimal num -> println 'Received BigDecimal'}
+}).start()
 
 actor  << 1
 actor  << ''
 actor  << 1.0
-actor  << new ArrayList()
+actor  << [1, 2, 3, 4, 5]
 
 actor.join()

@@ -145,12 +145,8 @@ task demo(dependsOn: 'compileGroovy') << {
             'DemoPotentialDeadlock.groovy',         // may deadlock (on purpose)
             'DemoNonDeterministicDeadlockWithDataFlows.groovy', // may deadlock (on purpose)
             'DemoDeadLock.groovy',                  // deadlock (on purpose)
-            'DemoDiningPhilosophers.groovy',        // runs endlessly
-            'DemoLoadBalancer.groovy',              // runs endlessly
-            'DemoRockPaperScissors.groovy',         // runs endlessly
-            'DemoWordSort.groovy',         // throws OOM
-            // 'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
-            // 'DemoSwingMashup.groovy',  // but they can be run locally
+             'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
+             'DemoSwingMashup.groovy',  // but they can be run locally
     ]
     RootLoader rl = new RootLoader(this.class.classLoader)
     rl.addURL(new File('build/classes/main').toURL())

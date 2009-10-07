@@ -16,105 +16,110 @@
 
 package groovyx.gpars.samples.actors
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.impl.AbstractPooledActor
-import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
 
-Actors.defaultPooledActorGroup.resize 23
+final def docRoot = ''  //set a folder to scan with absolute path
+
+final def group = new PooledActorGroup(23)
 
 //Messages
 private final class FileToSort {
-  String fileName
+    String fileName
 }
 private final class SortResult {
-  String fileName;
-  List<String> words
+    String fileName;
+    List<String> words
 }
 
 //Worker actor
 final class WordSortActor extends AbstractPooledActor {
 
-  private List<String> sortedWords(String fileName) {
-    parseFile(fileName).sort {it.toLowerCase()}
-  }
+    def WordSortActor(group) { this.actorGroup = group }
 
-  private List<String> parseFile(String fileName) {
-    List<String> words = []
-    new File(fileName).splitEachLine(' ') {words.addAll(it)}
-    return words
-  }
-
-  void act() {
-    loop {
-      react {message ->
-        switch (message) {
-          case FileToSort:
-//                        println "Sorting file=${message.fileName} on thread ${Thread.currentThread().name}"
-            reply new SortResult(fileName: message.fileName, words: sortedWords(message.fileName))
-        }
-      }
+    private List<String> sortedWords(String fileName) {
+        parseFile(fileName).sort {it.toLowerCase()}
     }
-  }
+
+    private List<String> parseFile(String fileName) {
+        List<String> words = []
+        new File(fileName).splitEachLine(' ') {words.addAll(it)}
+        return words
+    }
+
+    void act() {
+        loop {
+            react {message ->
+                switch (message) {
+                    case FileToSort:
+//                        println "Sorting file=${message.fileName} on thread ${Thread.currentThread().name}"
+                        reply new SortResult(fileName: message.fileName, words: sortedWords(message.fileName))
+                }
+            }
+        }
+    }
 }
 
 //Master actor
 final class SortMaster extends AbstractPooledActor {
 
-  String docRoot = '/'
-  int numActors = 1
+    String docRoot = '/'
+    int numActors = 1
 
-  List<List<String>> sorted = []
-  private CountDownLatch startupLatch = new CountDownLatch(1)
-  private CountDownLatch doneLatch
+    List<List<String>> sorted = []
+    private CountDownLatch startupLatch = new CountDownLatch(1)
+    private CountDownLatch doneLatch
 
-  private void beginSorting() {
-    int cnt = sendTasksToWorkers()
-    doneLatch = new CountDownLatch(cnt)
-  }
-
-  private List createWorkers() {
-    return (1..numActors).collect {new WordSortActor().start()}
-  }
-
-  private int sendTasksToWorkers() {
-    List<Actor> workers = createWorkers()
-    int cnt = 0
-    new File(docRoot).eachFile {
-      workers[cnt % numActors] << new FileToSort(fileName: it)
-      cnt += 1
+    private void beginSorting() {
+        int cnt = sendTasksToWorkers()
+        doneLatch = new CountDownLatch(cnt)
     }
-    return cnt
-  }
 
-  public void waitUntilDone() {
-    startupLatch.await()
-    doneLatch.await()
-  }
+    private List createWorkers() {
+        return (1..numActors).collect {new WordSortActor(this.actorGroup).start()}
+    }
 
-  void act() {
-    beginSorting()
-    startupLatch.countDown()
-    loop {
-      react {
-        switch (it) {
-          case SortResult:
-            sorted << it.words
-            doneLatch.countDown()
-//                        println "Received results for file=${it.fileName}"
+    private int sendTasksToWorkers() {
+        List<Actor> workers = createWorkers()
+        int cnt = 0
+        new File(this.docRoot).eachFile {
+            workers[cnt % numActors] << new FileToSort(fileName: it)
+            cnt += 1
         }
-      }
+        return cnt
     }
-  }
+
+    public void waitUntilDone() {
+        startupLatch.await()
+        doneLatch.await()
+    }
+
+    void act() {
+        beginSorting()
+        startupLatch.countDown()
+        loop {
+            react {
+                switch (it) {
+                    case SortResult:
+                        sorted << it.words
+                        doneLatch.countDown()
+//                        println "Received results for file=${it.fileName}"
+                }
+            }
+        }
+    }
 }
 
+if (docRoot) {
 //start the actors to sort words
-//todo change the folder name
-def master = new SortMaster(docRoot: 'C:/dev/TeamCity/logs/', numActors: 21).start()
-master.waitUntilDone()
-final long t1 = System.currentTimeMillis()
-master = new SortMaster(docRoot: 'C:/dev/TeamCity/logs/', numActors: 21).start()
-master.waitUntilDone()
-final long t2 = System.currentTimeMillis()
-println 'Done ' + (t2 - t1)
+    def master = new SortMaster(actorGroup:group, docRoot: docRoot, numActors: 21).start()
+    master.waitUntilDone()
+    final long t1 = System.currentTimeMillis()
+    master = new SortMaster(actorGroup:group, docRoot: docRoot, numActors: 21).start()
+    master.waitUntilDone()
+    final long t2 = System.currentTimeMillis()
+    println 'Done ' + (t2 - t1)
 //println master.sorted
+}

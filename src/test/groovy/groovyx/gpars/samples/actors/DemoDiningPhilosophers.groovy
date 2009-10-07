@@ -111,4 +111,4 @@ def philosophers = [
 forks*.start()
 philosophers*.start()
 
-System.in.read()
+Thread.sleep 10000

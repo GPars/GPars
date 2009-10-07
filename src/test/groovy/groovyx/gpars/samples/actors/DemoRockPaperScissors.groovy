@@ -16,7 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.actor.NonDaemonActorGroup
 
 /**
  * A popular gae implemented with actors.
@@ -47,7 +48,7 @@ def announce(p1, m1, p2, m2) {
     println "winner = ${winner}"
 }
 
-PooledActorGroup group = new PooledActorGroup()
+ActorGroup group = new NonDaemonActorGroup()
 group.with {
     final def player1 = actor {
         loop {
@@ -66,23 +67,27 @@ group.with {
     }.start()
 
     def coordinator = actor {
+        int count = 0
         loop {
-            react {
-                player1.send("play")
-                player2.send("play")
+            count++
+            if (count == 120) {
+                [player1, player2, delegate]*.stop()
+                Thread.start { group.shutdown() }
+            } else
+                react {
+                    player1.send("play")
+                    player2.send("play")
 
-                react {msg1 ->
-                    react {msg2 ->
-                        announce(msg1[0], msg1[1], msg2[0], msg2[1])
-                        send("start")
+                    react {msg1 ->
+                        react {msg2 ->
+                            announce(msg1[0], msg1[1], msg2[0], msg2[1])
+                            send("start")
+                        }
                     }
                 }
-            }
         }
     }.start()
 
     coordinator.send("start")
 }
 
-System.in.read()
-group.shutdown()

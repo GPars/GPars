@@ -107,7 +107,7 @@ Thread.start {
     }
 }
 
-System.in.read()
+Thread.sleep 35000
 balancer << new WorkToDo()
 balancer << new WorkToDo()
-System.in.read()
+Thread.sleep 10000
