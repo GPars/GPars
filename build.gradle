@@ -145,6 +145,8 @@ task demo(dependsOn: 'compileGroovy') << {
             'DemoPotentialDeadlock.groovy',         // may deadlock (on purpose)
             'DemoNonDeterministicDeadlockWithDataFlows.groovy', // may deadlock (on purpose)
             'DemoDeadLock.groovy',                  // deadlock (on purpose)
+            'DemoPhysicalCalculations.groovy',                  // needs non-daemon threads
+            'DemoRemote.groovy',                  // doesn't work in an automated environment
              'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
              'DemoSwingMashup.groovy',  // but they can be run locally
     ]
