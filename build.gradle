@@ -61,7 +61,7 @@ gradle.taskGraph.whenReady {taskGraph ->
         final Date date = new Date()
         //  TODO: Should only put the date in the artefact name when uploading to the Maven repository, otherwise
         //  should just append SNAPSHOT.
-        version += '-SNAPSHOT' + new SimpleDateFormat('-yyyyMMddHHmmssZ').format(date)
+        version += '-SNAPSHOT' // + new SimpleDateFormat('-yyyyMMddHHmmssZ').format(date)
     }
 }
 
