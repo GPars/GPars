@@ -43,10 +43,17 @@ public class DynamicDispatchActor extends AbstractPooledActor {
 
   def handlers = [:] as LinkedHashMap
 
+    /**
+     * Creates a new instance without any when handlers registered
+     */
   DynamicDispatchActor() {
     this(null)
   }
 
+    /**
+     * Creates an instance, processing all when{} calls in the supplied closure
+     * @param closure A closure to run against te actor, typically to register handlers
+     */
   DynamicDispatchActor(Closure closure) {
 
     respondsTo("onMessage").each {MetaMethod method ->
