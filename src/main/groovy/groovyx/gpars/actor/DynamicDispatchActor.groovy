@@ -39,7 +39,7 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  * Date: Jun 26, 2009
  */
 
-public abstract class DynamicDispatchActor extends AbstractPooledActor {
+public class DynamicDispatchActor extends AbstractPooledActor {
 
   def handlers = [:] as LinkedHashMap
 
@@ -94,7 +94,7 @@ public abstract class DynamicDispatchActor extends AbstractPooledActor {
           msg ? handler.call(msg) : handler.call ()
         }
         else {
-          ((MetaMethod) handler).invoke(delegate, (msg ? [msg] : []) as Object[])
+          ((MetaMethod) handler).invoke(delegate, (msg != null ? [msg] : []) as Object[])
         }
       }
     }

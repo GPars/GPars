@@ -41,7 +41,7 @@ import groovyx.gpars.scheduler.ResizablePool
  * on daemon threads.
  * The PooledActorGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
  * threads are to be used.
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  * Date: Feb 18, 2009
  */
 public abstract class Actors {
@@ -71,5 +71,11 @@ public abstract class Actors {
      */
     public static AbstractPooledActor reactor(final Closure code) {
         return defaultPooledActorGroup.reactor(code)
+    }
+
+    /**
+     */
+    public static AbstractPooledActor messageHandler(final Closure code) {
+        return defaultPooledActorGroup.messageHandler (code)
     }
 }

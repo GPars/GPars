@@ -17,6 +17,7 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.actor.Actors
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
   public void testDispatch() {
@@ -42,6 +43,51 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     assert actor.stringFlag
     assert actor.integerFlag
     assert actor.objectFlag
+  }
+
+  public void testDispatcher() {
+    volatile boolean stringFlag = false
+    volatile boolean integerFlag = false
+    volatile boolean objectFlag = false
+
+    def actor = Actors.messageHandler {
+      when {String message ->
+        stringFlag = true
+        reply false
+      }
+
+      when { Integer message ->
+        integerFlag = true
+        reply false
+      }
+
+       when { Object message ->
+        objectFlag = true
+        reply false
+      }
+    }
+
+    actor.start()
+
+    actor.sendAndWait 1
+    assertFalse stringFlag
+    assert integerFlag
+    assertFalse objectFlag
+
+    actor.sendAndWait ''
+    assert stringFlag
+    assert integerFlag
+    assertFalse objectFlag
+
+    actor.sendAndWait 1.0
+    assert stringFlag
+    assert integerFlag
+    assert objectFlag
+
+    actor.sendAndWait new ArrayList()
+    assert stringFlag
+    assert integerFlag
+    assert objectFlag
   }
 }
 

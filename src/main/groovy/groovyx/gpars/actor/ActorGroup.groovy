@@ -23,7 +23,7 @@ import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 /**
  * Provides a common super class fo pooled actor's groups.
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  * Date: May 8, 2009
  */
 public abstract class ActorGroup {
@@ -63,5 +63,11 @@ public abstract class ActorGroup {
      */
     public final AbstractPooledActor reactor(final Closure code) {
         new ReactiveActor(code)
+    }
+
+    /**
+     */
+    public final AbstractPooledActor messageHandler(final Closure code) {
+        new DynamicDispatchActor(code)
     }
 }
