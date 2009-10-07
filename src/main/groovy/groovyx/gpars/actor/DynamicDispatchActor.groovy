@@ -29,10 +29,13 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  *     void onMessage(Integer message) {*         println 'Received integer'
  *}*
  *     void onMessage(Object message) {*         println 'Received object'
+ *}*
+ *     void onNullMessage() {*         println 'Received null'
  *}*}* </pre>
- * The dispatch leverages Groovy dynamic method dispatch.
  *
- * @author Vaclav Pech
+ * Method when {...} provide alternative way to define message handlers
+ *
+ * @author Vaclav Pech, Alex Tkachman
  * Date: Jun 26, 2009
  */
 
@@ -52,6 +55,12 @@ public abstract class DynamicDispatchActor extends AbstractPooledActor {
       }
     }
 
+    respondsTo("onNullMessage").each {MetaMethod method ->
+      if (method.parameterTypes.length == 0) {
+        handlers[null] = method
+      }
+    }
+
     if (closure) {
       Closure cloned = (Closure) closure.clone()
       cloned.resolveStrategy = Closure.DELEGATE_FIRST
@@ -65,9 +74,14 @@ public abstract class DynamicDispatchActor extends AbstractPooledActor {
    */
   final void act() {
     loop {
-      react {
-        def msgClass = it.class
-        def handler = handlers[msgClass]
+      react { msg ->
+        def msgClass = msg?.class
+
+        def handler = null
+
+        if (!handler)
+          handler = handlers[msgClass]
+
         if (!handler) {
           def handlerClass = handlers.keySet().find {Class handlerMsgClass -> handlerMsgClass.isAssignableFrom(msgClass)}
           handler = handlers[handlerClass]
@@ -77,23 +91,28 @@ public abstract class DynamicDispatchActor extends AbstractPooledActor {
           throw new IllegalStateException("Unable to handle message $it");
 
         if (handler instanceof Closure) {
-          handler.call it
+          msg ? handler.call(msg) : handler.call ()
         }
         else {
-          ((MetaMethod) handler).invoke(delegate, [it] as Object[])
+          ((MetaMethod) handler).invoke(delegate, (msg ? [msg] : []) as Object[])
         }
       }
     }
   }
 
   void when(Closure closure) {
-    if (closure.maximumNumberOfParameters != 1)
-      throw new IllegalStateException("'when' closure should have exactly one argument");
-
     Closure cloned = (Closure) closure.clone()
     cloned.resolveStrategy = Closure.DELEGATE_FIRST
     cloned.delegate = this
 
-    handlers[cloned.parameterTypes[0]] = cloned
+    if (closure.maximumNumberOfParameters == 0) {
+      handlers[null] = cloned
+    }
+    else {
+      if (closure.maximumNumberOfParameters != 1)
+        throw new IllegalStateException("'when' closure should have zero or one parameter");
+
+      handlers[cloned.parameterTypes[0]] = cloned
+    }
   }
 }

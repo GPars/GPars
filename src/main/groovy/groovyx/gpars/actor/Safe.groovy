@@ -16,8 +16,6 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.util.EnhancedRWLock
-
 /**
  * A special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
  * Agents safe-guard mutable values by allowing only a single agent-managed thread to make modifications to them.
@@ -78,6 +76,12 @@ public class Safe<T> extends DynamicDispatchActor {
     this.data = data
     this.copy = copy
     start()
+  }
+
+  final void onNullMessage () {
+    lock.withWriteLock {
+      updateValue null
+    }
   }
 
   /**
