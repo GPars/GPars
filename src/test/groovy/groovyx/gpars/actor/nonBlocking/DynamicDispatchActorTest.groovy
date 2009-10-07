@@ -19,6 +19,7 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.Actors
+import org.codehaus.groovy.runtime.NullObject
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
     public void testDispatch() {
@@ -183,6 +184,20 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
     dda.sendAndWait 1
     assert stringFlag
+  }
+
+  public void testNullHandlerForSendWithNull() {
+    volatile boolean nullFlag = false
+
+    def dda = new DynamicDispatchActor()
+    dda.when { NullObject message ->
+        nullFlag = true
+        reply false
+     }
+    dda.start()
+
+    dda.sendAndWait(null)
+    assert nullFlag
   }
 }
 
