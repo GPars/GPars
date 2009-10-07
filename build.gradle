@@ -175,7 +175,7 @@ task demo(dependsOn: 'compileGroovy') << {
         println "*** done"
     }
     println "=== demos: $ok ok, ${failed.size()} failed"
-    failed.each{ println "${it.file}\n    ${it.exception}" }
+    failed.each{ println "${it.file}\n    ${it.exception}";it.exception.printStackTrace() }
 }
 
 //todo test fork frequency in gradle 0.9

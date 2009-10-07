@@ -36,7 +36,7 @@ iterator.eachAsync {
     println it
 }
 
-final String text = 'want to be big'
+final String text = 'want to be very big'
 AsyncEnhancer.enhanceInstance text
 println((text.collectAsync {it.toUpperCase()}).join())
 
