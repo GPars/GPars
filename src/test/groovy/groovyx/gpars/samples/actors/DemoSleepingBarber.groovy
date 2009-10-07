@@ -104,6 +104,7 @@ class Customer extends AbstractPooledActor {
                         break
                     case Done:
                         println "Customer: $name: I have been served."
+                        stop()
                         break
 
                 }
@@ -121,10 +122,15 @@ class Next {}
 class Start {}
 class Done {}
 
-new Customer(name: 'Joe', localBarbers: waitingRoom).start()
-new Customer(name: 'Dave', localBarbers: waitingRoom).start()
-new Customer(name: 'Alice', localBarbers: waitingRoom).start()
+def customers = []
+customers << new Customer(name: 'Joe', localBarbers: waitingRoom).start()
+customers << new Customer(name: 'Dave', localBarbers: waitingRoom).start()
+customers << new Customer(name: 'Alice', localBarbers: waitingRoom).start()
 
 System.in.read()
-new Customer(name: 'James', localBarbers: waitingRoom).start()
+customers << new Customer(name: 'James', localBarbers: waitingRoom).start()
 System.in.read()
+customers*.join()
+barber.stop()
+waitingRoom.stop()
+
