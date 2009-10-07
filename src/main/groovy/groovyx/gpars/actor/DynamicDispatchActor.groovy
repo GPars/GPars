@@ -23,21 +23,13 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  * In general DynamicDispatchActor repeatedly scans for messages and dispatches arrived messages to one
  * of the onMessage(message) methods defined on the actor.
  * <pre>
- * final class MyActor extends DynamicDispatchActor {
- *
- *     void onMessage(String message) {
- *         println 'Received string'
- *     }
- *
- *     void onMessage(Integer message) {
- *         println 'Received integer'
- *     }
- *
- *     void onMessage(Object message) {
- *         println 'Received object'
- *     }
- * }
- * </pre>
+ * final class MyActor extends DynamicDispatchActor {*
+ *     void onMessage(String message) {*         println 'Received string'
+ *}*
+ *     void onMessage(Integer message) {*         println 'Received integer'
+ *}*
+ *     void onMessage(Object message) {*         println 'Received object'
+ *}*}* </pre>
  * The dispatch leverages Groovy dynamic method dispatch.
  *
  * @author Vaclav Pech
@@ -46,14 +38,62 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
 
 public abstract class DynamicDispatchActor extends AbstractPooledActor {
 
-    /**
-     * Loops reading messages using the react() method and dispatches to the corresponding onMessage() method.
-     */
-    final void act() {
-        loop {
-            react {
-                onMessage it
-            }
-        }
+  def handlers = [:] as LinkedHashMap
+
+  DynamicDispatchActor() {
+    this(null)
+  }
+
+  DynamicDispatchActor(Closure closure) {
+
+    respondsTo("onMessage").each {MetaMethod method ->
+      if (method.parameterTypes.length == 1) {
+        handlers[method.parameterTypes[0].theClass] = method
+      }
     }
+
+    if (closure) {
+      Closure cloned = (Closure) closure.clone()
+      cloned.resolveStrategy = Closure.DELEGATE_FIRST
+      cloned.delegate = this
+      cloned.call()
+    }
+  }
+
+  /**
+   * Loops reading messages using the react() method and dispatches to the corresponding onMessage() method.
+   */
+  final void act() {
+    loop {
+      react {
+        def msgClass = it.class
+        def handler = handlers[msgClass]
+        if (!handler) {
+          def handlerClass = handlers.keySet().find {Class handlerMsgClass -> handlerMsgClass.isAssignableFrom(msgClass)}
+          handler = handlers[handlerClass]
+        }
+
+        if (!handler)
+          throw new IllegalStateException("Unable to handle message $it");
+
+        if (handler instanceof Closure) {
+          handler.call it
+        }
+        else {
+          ((MetaMethod) handler).invoke(delegate, [it] as Object[])
+        }
+      }
+    }
+  }
+
+  void when(Closure closure) {
+    if (closure.maximumNumberOfParameters != 1)
+      throw new IllegalStateException("'when' closure should have exactly one argument");
+
+    Closure cloned = (Closure) closure.clone()
+    cloned.resolveStrategy = Closure.DELEGATE_FIRST
+    cloned.delegate = this
+
+    handlers[cloned.parameterTypes[0]] = cloned
+  }
 }
