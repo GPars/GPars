@@ -65,7 +65,9 @@ public abstract class ActorGroup {
         new ReactiveActor(code)
     }
 
+    //todo javadoc
     /**
+     *
      */
     public final AbstractPooledActor messageHandler(final Closure code) {
         new DynamicDispatchActor(code)

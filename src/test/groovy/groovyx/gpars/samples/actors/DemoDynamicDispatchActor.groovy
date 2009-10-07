@@ -39,7 +39,7 @@ final class MyActor extends DynamicDispatchActor {
         println 'Received object'
     }
 
-    void onMessage(List message) {
+    void onMessage(ArrayList message) {
         println 'Received list'
         stop()
     }

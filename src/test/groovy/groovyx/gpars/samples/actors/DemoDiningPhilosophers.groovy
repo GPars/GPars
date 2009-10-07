@@ -112,3 +112,8 @@ forks*.start()
 philosophers*.start()
 
 Thread.sleep 10000
+
+forks*.stop()
+forks*.join()
+philosophers*.stop()
+philosophers*.join()
