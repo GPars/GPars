@@ -58,6 +58,13 @@ public class ParallelizerTest extends GroovyTestCase {
     }
   }
 
+  public void testCollectAsyncWithThreadPoolOnRange() {
+    Parallelizer.doParallel(5) {
+      def result = (1..5).collectAsync {Number number -> number * 10}
+      assertEquals([10, 20, 30, 40, 50], result)
+    }
+  }
+
   public void testFindAllAsyncWithThreadPool() {
     Parallelizer.doParallel(5) {
       def result = [1, 2, 3, 4, 5].findAllAsync {Number number -> number > 3}

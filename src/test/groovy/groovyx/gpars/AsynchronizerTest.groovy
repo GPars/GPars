@@ -60,7 +60,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
   }
 
-  public void testEachAsyncOnsingleElementCollections() {
+  public void testEachAsyncOnSingleElementCollections() {
     Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
       [1].eachAsync {}
       [1].eachAsync {}
@@ -115,6 +115,13 @@ public class AsynchronizerTest extends GroovyTestCase {
   public void testCollectAsync() {
     Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
       def result = [1, 2, 3, 4, 5].collectAsync {Number number -> number * 10}
+      assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result))
+    }
+  }
+
+  public void testCollectAsyncOnRange() {
+    Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+      def result = (1..5).collectAsync {Number number -> number * 10}
       assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result))
     }
   }
