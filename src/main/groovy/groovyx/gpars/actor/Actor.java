@@ -208,7 +208,8 @@ public abstract class Actor extends ReceivingMessageStream {
       return false;
     }
 
-    @Override public MessageStream send(Object message) {
+    @SuppressWarnings({"AssignmentToMethodParameter"}) @Override
+    public MessageStream send(Object message) {
       if (!(message instanceof ActorMessage)) {
         message = new ActorMessage<Object>(message, threadBoundActor());
       }

@@ -45,6 +45,7 @@ public abstract class MessageStream extends WithSerialId {
 
   /**
    * Convenience method for send(new Object()).
+   * @return always return message stream itself
    */
   public MessageStream send() {
     return send(new Object());
@@ -94,7 +95,8 @@ public abstract class MessageStream extends WithSerialId {
    * @return The message that came in reply to the original send.
    * @throws InterruptedException if interrupted while waiting
    */
-  public final <T> MessageStream sendAndContinue(T message, Closure closure) throws InterruptedException {
+  @SuppressWarnings({"AssignmentToMethodParameter"})
+  public final <T> MessageStream sendAndContinue(final T message, Closure closure) throws InterruptedException {
     closure = (Closure) closure.clone();
     closure.setDelegate(this);
     closure.setResolveStrategy(Closure.DELEGATE_FIRST);
@@ -111,8 +113,8 @@ public abstract class MessageStream extends WithSerialId {
    * @return The message that came in reply to the original send.
    * @throws InterruptedException if interrupted while waiting
    */
-  public final <T> Object sendAndWait(long timeout, TimeUnit units, T message) throws InterruptedException {
-    ResultWaiter to = new ResultWaiter();
+  public final <T> Object sendAndWait(final long timeout, final TimeUnit units, final T message) throws InterruptedException {
+    final ResultWaiter to = new ResultWaiter();
     send(new ActorMessage<T>(message, to));
     return to.getResult(timeout, units);
   }
@@ -126,7 +128,7 @@ public abstract class MessageStream extends WithSerialId {
    * @return The message that came in reply to the original send.
    * @throws InterruptedException if interrupted while waioting
    */
-  public final <T> Object sendAndWait(Duration duration, T message) throws InterruptedException {
+  public final <T> Object sendAndWait(final Duration duration, final T message) throws InterruptedException {
     return sendAndWait(duration.toMilliseconds(), TimeUnit.MILLISECONDS, message);
   }
 
@@ -235,10 +237,11 @@ public abstract class MessageStream extends WithSerialId {
   public static class RemoteMessageStream extends MessageStream implements RemoteSerialized {
     private RemoteHost remoteHost;
 
-    public RemoteMessageStream(RemoteHost host) {
+    public RemoteMessageStream(final RemoteHost host) {
       remoteHost = host;
     }
 
+    @SuppressWarnings({"AssignmentToMethodParameter"}) @Override
     public MessageStream send(Object message) {
       if (!(message instanceof ActorMessage)) {
         message = new ActorMessage<Object>(message, Actor.threadBoundActor());
@@ -252,7 +255,7 @@ public abstract class MessageStream extends WithSerialId {
     private final MessageStream to;
     private final ActorMessage<T> message;
 
-    public SendTo(MessageStream to, ActorMessage<T> message) {
+    public SendTo(final MessageStream to, final ActorMessage<T> message) {
       super();
       this.to = to;
       this.message = message;
@@ -267,7 +270,7 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     @Override
-    public void execute(RemoteConnection conn) {
+    public void execute(final RemoteConnection conn) {
       to.send(message);
     }
   }
