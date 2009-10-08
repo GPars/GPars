@@ -25,39 +25,38 @@ import static groovyx.gpars.dataflow.DataFlow.start
  * on to the final consumer, which prints them out.
  * Since both consumers read elements using the 'val' property, they will keep reading until stopped explicitely.
  */
-
 void ints(int n, int max, DataFlowStream<Integer> stream) {
-    if (n != max) {
-        println "Generating int: $n"
-        stream << n
-        ints(n+1, max, stream)
-    }
+  if (n != max) {
+    println "Generating int: $n"
+    stream << n
+    ints(n + 1, max, stream)
+  }
 }
 
 void sum(int s, DataFlowStream<Integer> inStream, DataFlowStream<Integer> outStream) {
-    println "Calculating $s"
-    outStream << s
-    sum(inStream.val + s, inStream, outStream)
+  println "Calculating $s"
+  outStream << s
+  sum(inStream.val + s, inStream, outStream)
 }
 
 void printSum(DataFlowStream stream) {
-    println "Result ${stream.val}"
-    printSum stream
+  println "Result ${stream.val}"
+  printSum stream
 }
 
 final def producer = new DataFlowStream<Integer>()
 final def consumer = new DataFlowStream<Integer>()
 
 start {
-    ints(0, 1000, producer)
+  ints(0, 1000, producer)
 }
 
 start {
-    sum(0, producer, consumer)
+  sum(0, producer, consumer)
 }
 
 start {
-    printSum (consumer)
+  printSum(consumer)
 }
 
 System.in.read()

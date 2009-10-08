@@ -28,22 +28,22 @@ cleanMemory()
 final long memory1 = Runtime.runtime.freeMemory()
 println 'Threads at start: ' + Thread.threads.length
 for (i in 0..10000) {
-    final CountDownLatch latch = new CountDownLatch(1)
-    final ActorGroup group = new PooledActorGroup(Math.max(1, random.nextInt(20)))
-    final Actor actor = group.actor {
-        receive {
-            reply it
-        }
-    }.start()
+  final CountDownLatch latch = new CountDownLatch(1)
+  final ActorGroup group = new PooledActorGroup(Math.max(1, random.nextInt(20)))
+  final Actor actor = group.actor {
+    receive {
+      reply it
+    }
+  }.start()
 
-    group.actor {
-        actor << 'Message'
-        receive {
-            latch.countDown()
-        }
-    }.start()
-    latch.await()
-    group.shutdown()
+  group.actor {
+    actor << 'Message'
+    receive {
+      latch.countDown()
+    }
+  }.start()
+  latch.await()
+  group.shutdown()
 }
 cleanMemory()
 println 'Threads at finish: ' + Thread.threads.length
@@ -52,11 +52,11 @@ println memory2 - memory1
 assert memory2 - memory1 < 1000000
 
 private def cleanMemory() {
-    println 'Cleaning memory'
-    for (i in 0..5000) {
-        final def int[] ints = new int[50000]
-        if (ints[0] > 10) ints[10] = ints[20]
-    }
-    System.gc()
-    Thread.sleep(3000)
+  println 'Cleaning memory'
+  for (i in 0..5000) {
+    final def int[] ints = new int[50000]
+    if (ints[0] > 10) ints[10] = ints[20]
+  }
+  System.gc()
+  Thread.sleep(3000)
 }

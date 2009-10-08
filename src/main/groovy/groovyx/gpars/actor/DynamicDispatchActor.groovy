@@ -25,20 +25,11 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
  * In general DynamicDispatchActor repeatedly scans for messages and dispatches arrived messages to one
  * of the onMessage(message) methods defined on the actor.
  * <pre>
- * final class MyActor extends DynamicDispatchActor {
- *      void onMessage(String message) {
- *          println 'Received string'
- *      }
- *      void onMessage(Integer message) {
- *          println 'Received integer'
- *      }
- *      void onMessage(Object message) {
- *          println 'Received object'
- *      }
- *      void onMessage(NullObject nullMessage) {
- *          println 'Received null'
- *      }
- * } </pre>
+ * final class MyActor extends DynamicDispatchActor {*      void onMessage(String message) {*          println 'Received string'
+ *}*      void onMessage(Integer message) {*          println 'Received integer'
+ *}*      void onMessage(Object message) {*          println 'Received object'
+ *}*      void onMessage(NullObject nullMessage) {*          println 'Received null'
+ *}*} </pre>
  *
  * Method when {...} provides an alternative way to define message handlers
  *
@@ -48,17 +39,17 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
 
 public class DynamicDispatchActor extends AbstractPooledActor {
 
-    /**
-     * Creates a new instance without any when handlers registered
-     */
+  /**
+   * Creates a new instance without any when handlers registered
+   */
   DynamicDispatchActor() {
     this(null)
   }
 
-    /**
-     * Creates an instance, processing all when{} calls in the supplied closure
-     * @param closure A closure to run against te actor, typically to register handlers
-     */
+  /**
+   * Creates an instance, processing all when{} calls in the supplied closure
+   * @param closure A closure to run against te actor, typically to register handlers
+   */
   DynamicDispatchActor(Closure closure) {
     if (closure) {
       Closure cloned = (Closure) closure.clone()
@@ -73,9 +64,9 @@ public class DynamicDispatchActor extends AbstractPooledActor {
    */
   final void act() {
     loop {
-      react { msg ->
+      react {msg ->
         if (msg == null)
-           msg = NullObject.nullObject
+          msg = NullObject.nullObject
         onMessage msg
       }
     }

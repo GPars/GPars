@@ -24,65 +24,65 @@ import groovyx.gpars.scheduler.FJPool
 import groovyx.gpars.actor.PooledActorGroup
 
 public class FJGroupTest extends GroovyTestCase {
-    public void testFJGroup() {
-        final PooledActorGroup group = new PooledActorGroup(new FJPool())
+  public void testFJGroup() {
+    final PooledActorGroup group = new PooledActorGroup(new FJPool())
 
-        final CountDownLatch latch = new CountDownLatch(1)
-        boolean result = false
+    final CountDownLatch latch = new CountDownLatch(1)
+    boolean result = false
 
-        group.actor {
-            result = Thread.currentThread() instanceof ForkJoinWorkerThread
-            latch.countDown()
-        }.start()
+    group.actor {
+      result = Thread.currentThread() instanceof ForkJoinWorkerThread
+      latch.countDown()
+    }.start()
 
-        latch.await()
-        assert result
+    latch.await()
+    assert result
+  }
+
+  public void testNonFJGroup() {
+    final PooledActorGroup group = new PooledActorGroup(new DefaultPool())
+
+    final CountDownLatch latch = new CountDownLatch(1)
+    boolean result = false
+
+    group.actor {
+      result = Thread.currentThread() instanceof ForkJoinWorkerThread
+      latch.countDown()
+    }.start()
+
+    latch.await()
+    assertFalse result
+  }
+
+  public void testFJNonFJGroupCommunication() {
+    final PooledActorGroup group1 = new PooledActorGroup(new DefaultPool())
+    final PooledActorGroup group2 = new PooledActorGroup(new FJPool())
+
+    final CountDownLatch latch = new CountDownLatch(1)
+    int result = 0
+
+    final Actor actor1 = group1.actor {
+      react {
+        reply it + 5
+      }
     }
+    actor1.start()
 
-    public void testNonFJGroup() {
-        final PooledActorGroup group = new PooledActorGroup(new DefaultPool())
-
-        final CountDownLatch latch = new CountDownLatch(1)
-        boolean result = false
-
-        group.actor {
-            result = Thread.currentThread() instanceof ForkJoinWorkerThread
-            latch.countDown()
-        }.start()
-
-        latch.await()
-        assertFalse result
-    }
-
-    public void testFJNonFJGroupCommunication() {
-        final PooledActorGroup group1 = new PooledActorGroup(new DefaultPool())
-        final PooledActorGroup group2 = new PooledActorGroup(new FJPool())
-
-        final CountDownLatch latch = new CountDownLatch(1)
-        int result = 0
-
-        final Actor actor1 = group1.actor {
-            react {
-                reply it + 5
-            }
+    final Actor actor2 = group2.actor {
+      react {
+        actor1 << it + 10
+        react {message ->
+          result = message
+          latch.countDown()
         }
-        actor1.start()
-
-        final Actor actor2 = group2.actor {
-            react {
-                actor1 << it + 10
-                react {message ->
-                    result = message
-                    latch.countDown()
-                }
-            }
-        }
-        actor2.start()
-
-        actor2 << 10
-        latch.await()
-        assertEquals 25, result
-        group1.shutdown()
-        group2.shutdown()
+      }
     }
+    actor2.start()
+
+    actor2 << 10
+    latch.await()
+    assertEquals 25, result
+    group1.shutdown()
+    group2.shutdown()
+  }
 }

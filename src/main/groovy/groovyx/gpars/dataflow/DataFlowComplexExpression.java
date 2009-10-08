@@ -19,26 +19,28 @@ package groovyx.gpars.dataflow;
 /**
  * @author Alex Tkachman
  */
-public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T>  {
-    protected Object[] args;
+public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T> {
+  protected Object[] args;
 
-    protected DataFlowComplexExpression(final Object... elements) {
-        this.args = elements;
+  protected DataFlowComplexExpression(final Object... elements) {
+    this.args = elements;
+  }
+
+  @Override
+  protected void subscribe(final DataFlowExpressionsCollector listener) {
+    for (int i = 0; i != args.length; ++i) {
+      args[i] = listener.subscribe(args[i]);
+    }
+  }
+
+  @Override
+  protected T evaluate() {
+    for (int i = 0; i != args.length; ++i) {
+      if (args[i] instanceof DataFlowExpression) {
+        args[i] = ((DataFlowExpression) args[i]).value;
+      }
     }
 
-    @Override
-    protected void subscribe(final DataFlowExpressionsCollector listener) {
-        for (int i = 0; i != args.length; ++i) {
-            args [i] = listener.subscribe(args[i]);
-        }
-    }
-
-    @Override
-    protected T evaluate() {
-        for (int i = 0; i != args.length; ++i)
-            if (args[i] instanceof DataFlowExpression)
-                args[i] = ((DataFlowExpression) args[i]).value;
-        
-        return null;
-    }
+    return null;
+  }
 }

@@ -29,65 +29,65 @@ import static groovyx.gpars.actor.Actors.actor
 
 class MyPooledActor extends AbstractPooledActor {
 
-    protected void act() {
-        handleA()
-    }
+  protected void act() {
+    handleA()
+  }
 
-    private void handleA() {
-        react {a ->
-            replyIfExists "Done"
-            handleB(a)
-        }
+  private void handleA() {
+    react {a ->
+      replyIfExists "Done"
+      handleB(a)
     }
+  }
 
-    private void handleB(int a) {
-        react {b ->
-            println a + b
-            LifeCycleHelper.latch.countDown()
-        }
+  private void handleB(int a) {
+    react {b ->
+      println a + b
+      LifeCycleHelper.latch.countDown()
     }
+  }
 }
 testActor(new MyPooledActor())
 
 
 Actor actor2 = actor {
-    handleA()
+  handleA()
 }
 
 actor2.metaClass {
-    handleA = {->
-        react {a ->
-            replyIfExists "Done"
-            handleB(a)
-        }
+  handleA = {->
+    react {a ->
+      replyIfExists "Done"
+      handleB(a)
     }
+  }
 
-    handleB = {a ->
-        react {b ->
-            println a + b
-            LifeCycleHelper.latch.countDown()
-        }
+  handleB = {a ->
+    react {b ->
+      println a + b
+      LifeCycleHelper.latch.countDown()
     }
+  }
 }
 testActor(actor2)
 
 
 Closure handleB = {a ->
-    react {b ->
-        println a + b
-        LifeCycleHelper.latch.countDown()
-    }
+  react {b ->
+    println a + b
+    LifeCycleHelper.latch.countDown()
+  }
 }
 
 Closure handleA = {->
-    react {a ->
-        replyIfExists "Done"
-        handleB(a)
-    }
+  react {a ->
+    replyIfExists "Done"
+    handleB(a)
+  }
 }
 
 Actor actor3 = actor {
-    handleA()
+  handleA()
 }
 handleA.delegate = actor3
 handleB.delegate = actor3
@@ -98,11 +98,11 @@ LifeCycleHelper.latch.await()
 
 
 class LifeCycleHelper {
-    static CountDownLatch latch = new CountDownLatch(3)
+  static CountDownLatch latch = new CountDownLatch(3)
 }
 
 private def testActor(AbstractPooledActor actor) {
-    actor.start()
-    actor.send 2
-    actor.send 3
+  actor.start()
+  actor.send 2
+  actor.send 3
 }

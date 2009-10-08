@@ -18,17 +18,17 @@ package groovyx.gpars.issues
 
 class A {
 
-    int counter = 0
+  int counter = 0
 
-    protected def final foo() {
-        bar {
-            counter
-        }
+  protected def final foo() {
+    bar {
+      counter
     }
+  }
 
-    private final String bar(Closure code) {
-        return "Bar " + code()
-    }
+  private final String bar(Closure code) {
+    return "Bar " + code()
+  }
 }
 
 class B extends A {}
@@ -36,9 +36,9 @@ class B extends A {}
 class C {}
 
 C.metaClass {
-    mixin B
+  mixin B
 }
 
-def c= new C()
+def c = new C()
 c.foo()
 

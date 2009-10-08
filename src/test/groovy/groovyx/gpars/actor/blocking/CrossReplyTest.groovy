@@ -22,102 +22,102 @@ import groovyx.gpars.actor.Actors
 
 public class CrossReplyTest extends GroovyTestCase {
 
-    public void testReplyToThreadBound() {
-        volatile int result = 0
-        CyclicBarrier barrier = new CyclicBarrier(2)
+  public void testReplyToThreadBound() {
+    volatile int result = 0
+    CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor incrementor = Actors.actor {
-            react {
-                reply it + 1
-            }
-        }
-        incrementor.start()
-
-        Actor actor = Actors.actor {
-            incrementor.send 2
-            receive {
-                result = it
-                barrier.await()
-            }
-        }
-        actor.start()
-
-        barrier.await()
-        incrementor.stop()
-        assertEquals 3, result
+    Actor incrementor = Actors.actor {
+      react {
+        reply it + 1
+      }
     }
+    incrementor.start()
 
-    public void testMessageReplyToThreadBound() {
-        volatile int result = 0
-        CyclicBarrier barrier = new CyclicBarrier(2)
-
-        Actor incrementor = Actors.actor {
-            react {
-                it.reply it + 1
-            }
-        }
-        incrementor.start()
-
-        Actor actor = Actors.actor {
-            incrementor.send 2
-            receive {
-                result = it
-                barrier.await()
-            }
-        }
-        actor.start()
-
+    Actor actor = Actors.actor {
+      incrementor.send 2
+      receive {
+        result = it
         barrier.await()
-        assertEquals 3, result
+      }
     }
+    actor.start()
 
-    public void testReplyToEventDriven() {
-        volatile int result = 0
-        CyclicBarrier barrier = new CyclicBarrier(2)
+    barrier.await()
+    incrementor.stop()
+    assertEquals 3, result
+  }
 
-        Actor incrementor = Actors.actor {
-            receive {
-                reply it + 1
-            }
-        }
-        incrementor.start()
+  public void testMessageReplyToThreadBound() {
+    volatile int result = 0
+    CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor actor = Actors.actor {
-            incrementor.send 2
-            react {
-                result = it
-                barrier.await()
-            }
-        }
-        actor.start()
+    Actor incrementor = Actors.actor {
+      react {
+        it.reply it + 1
+      }
+    }
+    incrementor.start()
 
+    Actor actor = Actors.actor {
+      incrementor.send 2
+      receive {
+        result = it
         barrier.await()
-        incrementor.stop()
-        assertEquals 3, result
+      }
     }
+    actor.start()
 
-    public void testMessageReplyToEventDriven() {
-        volatile int result = 0
-        CyclicBarrier barrier = new CyclicBarrier(2)
+    barrier.await()
+    assertEquals 3, result
+  }
 
-        Actor incrementor = Actors.actor {
-            receive {
-                it.reply it + 1
-            }
-        }
-        incrementor.start()
+  public void testReplyToEventDriven() {
+    volatile int result = 0
+    CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actor actor = Actors.actor {
-            incrementor.send 2
-            react {
-                result = it
-                barrier.await()
-            }
-        }
-        actor.start()
+    Actor incrementor = Actors.actor {
+      receive {
+        reply it + 1
+      }
+    }
+    incrementor.start()
 
+    Actor actor = Actors.actor {
+      incrementor.send 2
+      react {
+        result = it
         barrier.await()
-        assertEquals 3, result
+      }
     }
+    actor.start()
+
+    barrier.await()
+    incrementor.stop()
+    assertEquals 3, result
+  }
+
+  public void testMessageReplyToEventDriven() {
+    volatile int result = 0
+    CyclicBarrier barrier = new CyclicBarrier(2)
+
+    Actor incrementor = Actors.actor {
+      receive {
+        it.reply it + 1
+      }
+    }
+    incrementor.start()
+
+    Actor actor = Actors.actor {
+      incrementor.send 2
+      react {
+        result = it
+        barrier.await()
+      }
+    }
+    actor.start()
+
+    barrier.await()
+    assertEquals 3, result
+  }
 
 }

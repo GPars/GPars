@@ -25,286 +25,286 @@ import static groovyx.gpars.actor.Actors.actor
 
 public class ReplyToMessageTest extends GroovyTestCase {
 
-    protected void setUp() {
-        super.setUp();
-        Actors.defaultPooledActorGroup.resize 10
-    }
+  protected void setUp() {
+    super.setUp();
+    Actors.defaultPooledActorGroup.resize 10
+  }
 
-    protected void tearDown() {
-        super.tearDown();
-        Actors.defaultPooledActorGroup.resetDefaultSize()
-    }
+  protected void tearDown() {
+    super.tearDown();
+    Actors.defaultPooledActorGroup.resetDefaultSize()
+  }
 
-    public void testMultipleClients() {
-        final CyclicBarrier barrier = new CyclicBarrier(3)
-        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
-        def replies1 = []
-        def replies2 = []
+  public void testMultipleClients() {
+    final CyclicBarrier barrier = new CyclicBarrier(3)
+    final CyclicBarrier completedBarrier = new CyclicBarrier(3)
+    def replies1 = []
+    def replies2 = []
 
-        final def bouncer = Actors.actor {
-            loop {
-                receive {
-                    it.reply it
-                    barrier.await()
-                }
-            }
-        }.start()
-
-        Thread.sleep 1000
-
-        actor {
-            bouncer.send 1
-            barrier.await()
-            bouncer.send 2
-            barrier.await()
-            barrier.await()
-            barrier.await()
-            receive {
-                replies1 << it
-                receive {
-                    replies1 << it
-                    completedBarrier.await()
-                }
-            }
-        }.start()
-
-        actor {
-            bouncer.send 10
-            barrier.await()
-            bouncer.send 20
-            barrier.await()
-            barrier.await()
-            barrier.await()
-            receive {
-                replies2 << it
-                receive {
-                    replies2 << it
-                    completedBarrier.await()
-                }
-            }
-        }.start()
-
-        completedBarrier.await()
-        bouncer.stop()
-
-        assertEquals([1, 2], replies1)
-        assertEquals([10, 20], replies2)
-    }
-
-    public void testMultipleActors() {
-        final CyclicBarrier barrier = new CyclicBarrier(2)
-        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
-        def replies1 = []
-        def replies2 = []
-
-        final def incrementor = Actors.actor {
-            loop { receive { it.reply it + 1 }}
-        }.start()
-
-        final def decrementor = Actors.actor {
-            loop { receive { it.reply it - 1 }}
-        }.start()
-
-        actor {
-            barrier.await()
-            incrementor.send 2
-            decrementor.send 6
-            incrementor.send 3
-            decrementor.send 9
-            receive {
-                replies1 << it
-                receive {
-                    replies1 << it
-                    receive {
-                        replies1 << it
-                        receive {
-                            replies1 << it
-                            completedBarrier.await()
-                        }
-                    }
-                }
-            }
-        }.start()
-
-        actor {
-            barrier.await()
-            incrementor.send 20
-            decrementor.send 60
-            incrementor.send 30
-            decrementor.send 40
-            receive {
-                replies2 << it
-                receive {
-                    replies2 << it
-                    receive {
-                        replies2 << it
-                        receive {
-                            replies2 << it
-                            completedBarrier.await()
-                        }
-                    }
-                }
-            }
-        }.start()
-
-        completedBarrier.await()
-        incrementor.stop()
-        decrementor.stop()
-        assertEquals 4, replies1.size()
-        assert replies1.containsAll([3, 5, 4, 8])
-        assertEquals 4, replies2.size()
-        assert replies2.containsAll([21, 59, 31, 39])
-    }
-
-    public void testReplyWithoutSender() {
-        final AtomicBoolean flag = new AtomicBoolean(false)
-        final CyclicBarrier barrier = new CyclicBarrier(2)
-
-        final Actor actor = Actors.actor {
-            loop {
-                receive {
-                    it.reply it
-                }
-            }
+    final def bouncer = Actors.actor {
+      loop {
+        receive {
+          it.reply it
+          barrier.await()
         }
+      }
+    }.start()
 
-        actor.metaClass {
-            onException = {
-                flag.set(true)
-                barrier.await()
-            }
+    Thread.sleep 1000
+
+    actor {
+      bouncer.send 1
+      barrier.await()
+      bouncer.send 2
+      barrier.await()
+      barrier.await()
+      barrier.await()
+      receive {
+        replies1 << it
+        receive {
+          replies1 << it
+          completedBarrier.await()
         }
+      }
+    }.start()
 
-        actor.start()
+    actor {
+      bouncer.send 10
+      barrier.await()
+      bouncer.send 20
+      barrier.await()
+      barrier.await()
+      barrier.await()
+      receive {
+        replies2 << it
+        receive {
+          replies2 << it
+          completedBarrier.await()
+        }
+      }
+    }.start()
 
-        actor.send 'messsage'
+    completedBarrier.await()
+    bouncer.stop()
+
+    assertEquals([1, 2], replies1)
+    assertEquals([10, 20], replies2)
+  }
+
+  public void testMultipleActors() {
+    final CyclicBarrier barrier = new CyclicBarrier(2)
+    final CyclicBarrier completedBarrier = new CyclicBarrier(3)
+    def replies1 = []
+    def replies2 = []
+
+    final def incrementor = Actors.actor {
+      loop { receive { it.reply it + 1 }}
+    }.start()
+
+    final def decrementor = Actors.actor {
+      loop { receive { it.reply it - 1 }}
+    }.start()
+
+    actor {
+      barrier.await()
+      incrementor.send 2
+      decrementor.send 6
+      incrementor.send 3
+      decrementor.send 9
+      receive {
+        replies1 << it
+        receive {
+          replies1 << it
+          receive {
+            replies1 << it
+            receive {
+              replies1 << it
+              completedBarrier.await()
+            }
+          }
+        }
+      }
+    }.start()
+
+    actor {
+      barrier.await()
+      incrementor.send 20
+      decrementor.send 60
+      incrementor.send 30
+      decrementor.send 40
+      receive {
+        replies2 << it
+        receive {
+          replies2 << it
+          receive {
+            replies2 << it
+            receive {
+              replies2 << it
+              completedBarrier.await()
+            }
+          }
+        }
+      }
+    }.start()
+
+    completedBarrier.await()
+    incrementor.stop()
+    decrementor.stop()
+    assertEquals 4, replies1.size()
+    assert replies1.containsAll([3, 5, 4, 8])
+    assertEquals 4, replies2.size()
+    assert replies2.containsAll([21, 59, 31, 39])
+  }
+
+  public void testReplyWithoutSender() {
+    final AtomicBoolean flag = new AtomicBoolean(false)
+    final CyclicBarrier barrier = new CyclicBarrier(2)
+
+    final Actor actor = Actors.actor {
+      loop {
+        receive {
+          it.reply it
+        }
+      }
+    }
+
+    actor.metaClass {
+      onException = {
+        flag.set(true)
         barrier.await()
-        actor.stop()
-
-        assert flag.get()
+      }
     }
 
-    public void testReplyIfExists() {
-        final AtomicBoolean flag = new AtomicBoolean(false)
-        final CyclicBarrier barrier = new CyclicBarrier(2)
+    actor.start()
 
-        final Actor receiver = actor {
-            receive {
-                it.replyIfExists it
-            }
-        }
+    actor.send 'messsage'
+    barrier.await()
+    actor.stop()
 
-        receiver.start()
+    assert flag.get()
+  }
 
-        actor {
-            receiver.send 'messsage'
-            receive {
-                flag.set(true)
-                barrier.await()
-            }
-        }.start()
+  public void testReplyIfExists() {
+    final AtomicBoolean flag = new AtomicBoolean(false)
+    final CyclicBarrier barrier = new CyclicBarrier(2)
 
+    final Actor receiver = actor {
+      receive {
+        it.replyIfExists it
+      }
+    }
+
+    receiver.start()
+
+    actor {
+      receiver.send 'messsage'
+      receive {
+        flag.set(true)
         barrier.await()
+      }
+    }.start()
 
-        assert flag.get()
-    }
+    barrier.await()
 
-    public void testReplyIfExistsWithoutSender() {
-        final AtomicBoolean flag = new AtomicBoolean(false)
-        final CyclicBarrier barrier = new CyclicBarrier(2)
+    assert flag.get()
+  }
 
-        final Actor actor = actor {
-            receive {
-                it.replyIfExists it
-                flag.set(true)
-                barrier.await()
-            }
-        }
+  public void testReplyIfExistsWithoutSender() {
+    final AtomicBoolean flag = new AtomicBoolean(false)
+    final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        actor.start()
-
-        actor.send 'messsage'
+    final Actor actor = actor {
+      receive {
+        it.replyIfExists it
+        flag.set(true)
         barrier.await()
-
-        assert flag.get()
+      }
     }
 
-    public void testReplyIfExistsWithStoppedSender() {
-        final AtomicBoolean flag = new AtomicBoolean(false)
-        final CyclicBarrier barrier = new CyclicBarrier(2)
-        final CountDownLatch latch = new CountDownLatch(1)
+    actor.start()
 
-        final Actor replier = actor {
-            receive {
-                latch.await()
-                it.replyIfExists it
-                flag.set(true)
-                barrier.await()
-            }
-        }
+    actor.send 'messsage'
+    barrier.await()
 
-        replier.start()
+    assert flag.get()
+  }
 
-        final Actor sender = actor {
-            replier.send 'messsage'
-        }
+  public void testReplyIfExistsWithStoppedSender() {
+    final AtomicBoolean flag = new AtomicBoolean(false)
+    final CyclicBarrier barrier = new CyclicBarrier(2)
+    final CountDownLatch latch = new CountDownLatch(1)
 
-        sender.metaClass {
-            afterStop = {
-                latch.countDown()
-            }
-        }
-
-        sender.start()
-
+    final Actor replier = actor {
+      receive {
         latch.await()
+        it.replyIfExists it
+        flag.set(true)
         barrier.await()
-
-        assert flag.get()
+      }
     }
 
-    public void testNestedReplies() {
-        final CyclicBarrier barrier = new CyclicBarrier(3)
-        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
-        def replies1 = []
-        def replies2 = []
+    replier.start()
 
-        final def maxFinder = actor {
-            barrier.await()
-            receive {message1 ->
-                receive {message2 ->
-                    def max = Math.max(message1, message2)
-                    message1.reply max
-                    message2.reply max
-                }
-            }
-        }.start()
+    final Actor sender = actor {
+      replier.send 'messsage'
+    }
+
+    sender.metaClass {
+      afterStop = {
+        latch.countDown()
+      }
+    }
+
+    sender.start()
+
+    latch.await()
+    barrier.await()
+
+    assert flag.get()
+  }
+
+  public void testNestedReplies() {
+    final CyclicBarrier barrier = new CyclicBarrier(3)
+    final CyclicBarrier completedBarrier = new CyclicBarrier(3)
+    def replies1 = []
+    def replies2 = []
+
+    final def maxFinder = actor {
+      barrier.await()
+      receive {message1 ->
+        receive {message2 ->
+          def max = Math.max(message1, message2)
+          message1.reply max
+          message2.reply max
+        }
+      }
+    }.start()
 
 
-        actor {
-            barrier.await()
-            maxFinder.send 2
-            receive {
-                replies1 << it
-                completedBarrier.await()
-            }
-        }.start()
-
-        actor {
-            barrier.await()
-            maxFinder.send 3
-            receive {
-                replies2 << it
-                completedBarrier.await()
-            }
-        }.start()
-
+    actor {
+      barrier.await()
+      maxFinder.send 2
+      receive {
+        replies1 << it
         completedBarrier.await()
-        assertEquals 1, replies1.size()
-        assertEquals 1, replies2.size()
+      }
+    }.start()
 
-        assert replies1.contains(3)
-        assert replies2.contains(3)
-    }
+    actor {
+      barrier.await()
+      maxFinder.send 3
+      receive {
+        replies2 << it
+        completedBarrier.await()
+      }
+    }.start()
+
+    completedBarrier.await()
+    assertEquals 1, replies1.size()
+    assertEquals 1, replies2.size()
+
+    assert replies1.contains(3)
+    assert replies2.contains(3)
+  }
 
 }

@@ -28,22 +28,22 @@ import static groovyx.gpars.actor.Actors.actor
 Closure innerLoop
 
 Closure outerLoop = {->
-    react {a ->
-        println 'Outer: ' + a
-        innerLoop()
-    }
+  react {a ->
+    println 'Outer: ' + a
+    innerLoop()
+  }
 }
 
 innerLoop = {->
-    react {b ->
-        println 'Inner ' + b
-        if (b==0) outerLoop()
-        else innerLoop()
-    }
+  react {b ->
+    println 'Inner ' + b
+    if (b == 0) outerLoop()
+    else innerLoop()
+  }
 }
 
 Actor actor = actor {
-    outerLoop()
+  outerLoop()
 }
 outerLoop.delegate = actor
 innerLoop.delegate = actor

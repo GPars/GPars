@@ -28,33 +28,33 @@ import groovyx.gpars.actor.Actors
  */
 
 public class TimeCategoryActorsTest extends GroovyTestCase {
-    public void testReceive() {
-        volatile def result=''
-        final CountDownLatch latch = new CountDownLatch(1)
+  public void testReceive() {
+    volatile def result = ''
+    final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
-            result = receive(3.seconds)
-            latch.countDown()
-        }
-        actor.start()
-
-        latch.await(30, TimeUnit.SECONDS)
-        assertNull(result)
+    final Actor actor = Actors.actor {
+      result = receive(3.seconds)
+      latch.countDown()
     }
+    actor.start()
 
-    public void testReceiveWithHandler() {
-        volatile def result=''
-        final CountDownLatch latch = new CountDownLatch(1)
+    latch.await(30, TimeUnit.SECONDS)
+    assertNull(result)
+  }
 
-        final Actor actor = Actors.actor {
-            receive(2.seconds) {
-                result = it
-            }
-            latch.countDown()
-        }
-        actor.start()
+  public void testReceiveWithHandler() {
+    volatile def result = ''
+    final CountDownLatch latch = new CountDownLatch(1)
 
-        latch.await(30, TimeUnit.SECONDS)
-        assertNull(result)
+    final Actor actor = Actors.actor {
+      receive(2.seconds) {
+        result = it
+      }
+      latch.countDown()
     }
+    actor.start()
+
+    latch.await(30, TimeUnit.SECONDS)
+    assertNull(result)
+  }
 }

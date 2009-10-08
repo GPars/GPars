@@ -28,23 +28,23 @@ import groovyx.gpars.scheduler.DefaultPool
  */
 public final class NonDaemonActorGroup extends ActorGroup {
 
-    /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
-     */
-    def NonDaemonActorGroup() {
-        super(new DefaultPool(false))
-    }
+  /**
+   * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
+   */
+  def NonDaemonActorGroup() {
+    super(new DefaultPool(false))
+  }
 
-    /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
-     * @param poolSize The initial size of the underlying thread pool
-     */
-    def NonDaemonActorGroup(final int poolSize) {
-        super(new DefaultPool(false, poolSize))
-    }
+  /**
+   * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
+   * @param poolSize The initial size of the underlying thread pool
+   */
+  def NonDaemonActorGroup(final int poolSize) {
+    super(new DefaultPool(false, poolSize))
+  }
 
-    /**
-     * Fork/Join not used by this group
-     */
-    boolean getUsedForkJoin() { false }
+  /**
+   * Fork/Join not used by this group
+   */
+  boolean getUsedForkJoin() { false }
 }

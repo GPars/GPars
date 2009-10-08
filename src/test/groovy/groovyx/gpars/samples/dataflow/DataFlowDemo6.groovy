@@ -28,15 +28,15 @@ final def y = new DataFlowVariable()
 final def z = new DataFlowVariable()
 
 start {
-    z << x.val + y.val
-    println "Result: ${z.val}"
-    System.exit 0
+  z << x.val + y.val
+  println "Result: ${z.val}"
+  System.exit 0
 }
 
 start {
-    x << 10
+  x << 10
 }
 
 start {
-    y << 5
+  y << 5
 }

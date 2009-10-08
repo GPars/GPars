@@ -21,29 +21,29 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 
 public class ImmutableMessageTest extends GroovyTestCase {
-    public void testSend() {
-        volatile String result
-        final CountDownLatch latch = new CountDownLatch(1)
+  public void testSend() {
+    volatile String result
+    final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor bouncer = Actors.actor {
-            receive {
-                it.reply new TestMessage(it.value)
-            }
-        }.start()
+    final Actor bouncer = Actors.actor {
+      receive {
+        it.reply new TestMessage(it.value)
+      }
+    }.start()
 
-        Actors.actor {
-            bouncer << new TestMessage('Value')
-            receive {
-                result = it.value
-                latch.countDown()
-            }
-        }.start()
+    Actors.actor {
+      bouncer << new TestMessage('Value')
+      receive {
+        result = it.value
+        latch.countDown()
+      }
+    }.start()
 
-        latch.await()
-        assertEquals 'Value', result
-    }
+    latch.await()
+    assertEquals 'Value', result
+  }
 }
 
 @Immutable final class TestMessage {
-    String value
+  String value
 }

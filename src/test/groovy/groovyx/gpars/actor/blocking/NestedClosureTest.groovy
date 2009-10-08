@@ -21,41 +21,41 @@ import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.dataflow.DataFlowVariable
 
 public class NestedClosureTest extends GroovyTestCase {
-    public void testNestedClosures() {
-        final def result = new DataFlowVariable<Integer>()
+  public void testNestedClosures() {
+    final def result = new DataFlowVariable<Integer>()
 
-        final def group = new PooledActorGroup(20)
+    final def group = new PooledActorGroup(20)
 
-        final Actor actor = group.actor {
-            final def nestedActor = group.actor {
-                receive {
-                    reply 20
-                    stop()
-                }
-            }.start()
-            result << nestedActor.sendAndWait(10)
-            stop()
+    final Actor actor = group.actor {
+      final def nestedActor = group.actor {
+        receive {
+          reply 20
+          stop()
         }
-        actor.start()
-        assertEquals 20, result.val
+      }.start()
+      result << nestedActor.sendAndWait(10)
+      stop()
     }
+    actor.start()
+    assertEquals 20, result.val
+  }
 
-    public void testNestedClosuresForactors() {
-        final def result = new DataFlowVariable<Integer>()
+  public void testNestedClosuresForactors() {
+    final def result = new DataFlowVariable<Integer>()
 
-        final def group = new PooledActorGroup(20)
+    final def group = new PooledActorGroup(20)
 
-        final Actor actor = group.actor {
-            final def nestedActor = group.actor {
-                receive {
-                    reply 20
-                }
-            }.start()
-            result << nestedActor.sendAndWait(10)
+    final Actor actor = group.actor {
+      final def nestedActor = group.actor {
+        receive {
+          reply 20
         }
-        actor.start()
-        assertEquals 20, result.val
+      }.start()
+      result << nestedActor.sendAndWait(10)
     }
+    actor.start()
+    assertEquals 20, result.val
+  }
 
 
 }

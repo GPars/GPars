@@ -60,7 +60,7 @@ def mainNode = new LocalNode(transport, {
     // daemon thread to read standard input and feed parser
     Thread.startDaemon {
       def reader = new LineNumberReader(new InputStreamReader(System.in))
-      while(!Thread.currentThread().isInterrupted()) {
+      while (!Thread.currentThread().isInterrupted()) {
         def line = reader.readLine()
 
         // magic Groovy way to access outer actor
@@ -77,10 +77,10 @@ def mainNode = new LocalNode(transport, {
     // nothing really interesting inside the loop
     // transform input to commands sent to mainActor
     loop {
-      react { line ->
+      react {line ->
         if (line == '@bye') {
-          mainActor.stop ()
-          stop ()
+          mainActor.stop()
+          stop()
           return
         }
 
@@ -105,7 +105,7 @@ def mainNode = new LocalNode(transport, {
         mainActor << [command: "broadcast", line: line, id: id]
       }
     }
-  }.start ()
+  }.start()
 
   // main loop of main actor starts here
   // the only interesting thing to notice is (and this is main point)
@@ -145,6 +145,6 @@ def mainNode = new LocalNode(transport, {
 })
 
 // let us wait before our application finished
-mainNode.mainActor.join ()
+mainNode.mainActor.join()
 // now we can shutdown communication
-transport.disconnect ()
+transport.disconnect()

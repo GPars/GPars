@@ -24,11 +24,11 @@ package groovyx.gpars.dataflow
  */
 final class SingleRunActor extends DataFlowActor {
 
-    Closure body
+  Closure body
 
-    void act() {
-        body.delegate = this
-        body()
-    }
+  void act() {
+    body.delegate = this
+    body()
+  }
 }
 

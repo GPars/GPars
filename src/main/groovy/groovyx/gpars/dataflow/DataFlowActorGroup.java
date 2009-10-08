@@ -31,14 +31,15 @@ import groovyx.gpars.scheduler.ResizablePool;
  * </pre>
  *
  * @author Vaclav Pech, Alex Tkachman
- * Date: Jun 21, 2009
+ *         Date: Jun 21, 2009
  */
 public final class DataFlowActorGroup extends ActorGroup {
-    /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
-     * @param poolSize The initial size of the underlying thread pool
-     */
-    public DataFlowActorGroup(final int poolSize) {
-        super(new ResizablePool(true, poolSize));
-    }
+  /**
+   * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
+   *
+   * @param poolSize The initial size of the underlying thread pool
+   */
+  public DataFlowActorGroup(final int poolSize) {
+    super(new ResizablePool(true, poolSize));
+  }
 }

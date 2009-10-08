@@ -22,68 +22,70 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public abstract class SerialContext {
-    private static final ThreadLocal<SerialContext> threadContext = new ThreadLocal<SerialContext>();
+  private static final ThreadLocal<SerialContext> threadContext = new ThreadLocal<SerialContext>();
 
-    protected final SerialHandles localHost;
+  protected final SerialHandles localHost;
 
-    protected final UUID hostId;
+  protected final UUID hostId;
 
-    public SerialContext(SerialHandles localHost, UUID hostId) {
-        this.localHost = localHost;
-        this.hostId = hostId;
+  public SerialContext(SerialHandles localHost, UUID hostId) {
+    this.localHost = localHost;
+    this.hostId = hostId;
+  }
+
+  public static SerialContext get() {
+    return threadContext.get();
+  }
+
+  public UUID getHostId() {
+    return hostId;
+  }
+
+  /**
+   * Enter to the context
+   */
+  public final void enter() {
+    if (threadContext.get() != null) {
+      throw new IllegalStateException("Serialization context already defined");
     }
 
-    public static SerialContext get() {
-        return threadContext.get();
+    threadContext.set(this);
+  }
+
+  /**
+   * Leave this context
+   */
+  public final void leave() {
+    if (threadContext.get() != this) {
+      throw new IllegalStateException("Wrong serialization context");
     }
 
-    public UUID getHostId() {
-        return hostId;
-    }
+    threadContext.set(null);
+  }
 
-    /**
-     * Enter to the context
-     */
-    public final void enter() {
-        if (threadContext.get() != null)
-            throw new IllegalStateException("Serialization context already defined");
+  public UUID getLocalHostId() {
+    return localHost.getId();
+  }
 
-        threadContext.set(this);
-    }
+  public void add(SerialHandle serialHandle) {
+    localHost.add(serialHandle);
+  }
 
-    /**
-     * Leave this context
-     */
-    public final void leave() {
-        if (threadContext.get() != this)
-            throw new IllegalStateException("Wrong serialization context");
+  public void remove(SerialHandle serialHandle) {
+    localHost.remove(serialHandle);
+  }
 
-        threadContext.set(null);
-    }
+  public SerialHandle get(UUID id) {
+    return localHost.get(id);
+  }
 
-    public UUID getLocalHostId() {
-        return localHost.getId();
-    }
+  public void finalizeHandle(SerialHandle handle) {
+    localHost.finalizeHandle(handle);
+  }
 
-    public void add(SerialHandle serialHandle) {
-        localHost.add(serialHandle);
-    }
+  public SerialContext getSerialHost(UUID hostId, Object attachment) {
+    return localHost.getSerialHost(hostId, attachment);
+  }
 
-    public void remove(SerialHandle serialHandle) {
-        localHost.remove(serialHandle);
-    }
-
-    public SerialHandle get(UUID id) {
-        return localHost.get(id);
-    }
-
-    public void finalizeHandle(SerialHandle handle) {
-        localHost.finalizeHandle(handle);
-    }
-
-    public SerialContext getSerialHost(UUID hostId, Object attachment) {
-        return localHost.getSerialHost(hostId, attachment);
-    }
-
-    public abstract void write(SerialMsg msg);
+  public abstract void write(SerialMsg msg);
 }

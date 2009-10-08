@@ -23,40 +23,40 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public abstract class SerialHandles {
-    /**
-     * Unique id of the provider
-     */
-    protected final UUID id = UUID.randomUUID();
+  /**
+   * Unique id of the provider
+   */
+  protected final UUID id = UUID.randomUUID();
 
-    /**
-     * Table of local objects serialized out to remote nodes
-     */
-    private final HashMap<UUID, SerialHandle> localHandles = new HashMap<UUID, SerialHandle>();
+  /**
+   * Table of local objects serialized out to remote nodes
+   */
+  private final HashMap<UUID, SerialHandle> localHandles = new HashMap<UUID, SerialHandle>();
 
-    /**
-     * Getter for provider id
-     *
-     * @return unique id
-     */
-    public UUID getId() {
-        return id;
-    }
+  /**
+   * Getter for provider id
+   *
+   * @return unique id
+   */
+  public UUID getId() {
+    return id;
+  }
 
-    public void add(SerialHandle handle) {
-        localHandles.put(handle.getSerialId(), handle);
-    }
+  public void add(SerialHandle handle) {
+    localHandles.put(handle.getSerialId(), handle);
+  }
 
-    public void remove(SerialHandle handle) {
-        localHandles.remove(handle.getSerialId());
-    }
+  public void remove(SerialHandle handle) {
+    localHandles.remove(handle.getSerialId());
+  }
 
-    public SerialHandle get(UUID id) {
-        return localHandles.get(id);
-    }
+  public SerialHandle get(UUID id) {
+    return localHandles.get(id);
+  }
 
-    public void finalizeHandle(SerialHandle handle) {
-        localHandles.remove(handle.getSerialId());
-    }
+  public void finalizeHandle(SerialHandle handle) {
+    localHandles.remove(handle.getSerialId());
+  }
 
-    public abstract SerialContext getSerialHost(UUID hostId, Object attachment);
+  public abstract SerialContext getSerialHost(UUID hostId, Object attachment);
 }

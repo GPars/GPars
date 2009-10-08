@@ -26,7 +26,7 @@ import groovyx.gpars.scheduler.FJPool
 import groovyx.gpars.scheduler.ResizablePool
 
 List items = []
-for (i in 1..1000) {items << {i+it}}
+for (i in 1..1000) {items << {i + it}}
 
 final def numOfIterations = 1..100
 final def numOfWarmupIterations = 1..100
@@ -57,35 +57,35 @@ time = meassurePool(numOfIterations, items, new Scheduler(3))
 println "Custom Scheduler $time"
 
 long meassureSequential(iterations, List tasks) {
-    final long t1 = System.currentTimeMillis()
-    for (i in iterations) {
-        for(task in tasks) {
-            int result = task.call(10)
-            if (result < 0) println result
-        }
+  final long t1 = System.currentTimeMillis()
+  for (i in iterations) {
+    for (task in tasks) {
+      int result = task.call(10)
+      if (result < 0) println result
     }
-    final long t2 = System.currentTimeMillis()
-    return t2 - t1
+  }
+  final long t2 = System.currentTimeMillis()
+  return t2 - t1
 }
 
 long meassurePool(iterations, List tasks, Pool pool) {
-    final long t1 = System.currentTimeMillis()
-    for (i in iterations) {
-        for(task in tasks) {
-            pool.execute {
-                int result = task.call(10)
-                if (result < 0) println result
-            }
-        }
-        pause(pool)
+  final long t1 = System.currentTimeMillis()
+  for (i in iterations) {
+    for (task in tasks) {
+      pool.execute {
+        int result = task.call(10)
+        if (result < 0) println result
+      }
     }
-    pool.shutdown()
-    final long t2 = System.currentTimeMillis()
-    return t2 - t1
+    pause(pool)
+  }
+  pool.shutdown()
+  final long t2 = System.currentTimeMillis()
+  return t2 - t1
 }
 
 private def pause(Pool pool) {
-    final CyclicBarrier barrier = new CyclicBarrier(2)
-    pool.execute { barrier.await() }
-    barrier.await()
+  final CyclicBarrier barrier = new CyclicBarrier(2)
+  pool.execute { barrier.await() }
+  barrier.await()
 }

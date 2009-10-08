@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.Safe
 
 final Closure cl = {
-    it ? new LinkedList(it) : null
+  it ? new LinkedList(it) : null
 }
 
 final Safe<List> agent = new Safe<List>([1], cl)
@@ -28,8 +28,8 @@ final Safe<List> agent = new Safe<List>([1], cl)
 agent << {it << 2}
 agent << {println it}
 
-println (agent.sendAndWait {it})
-println (agent.sendAndWait {it.size()})
+println(agent.sendAndWait {it})
+println(agent.sendAndWait {it.size()})
 println agent.val
 
 agent << [1, 2, 3, 4, 5]
@@ -45,7 +45,7 @@ def name = new Safe<String>()
 name << {updateValue 'Joe' }
 name << {updateValue(it + ' and Dave')}
 println name.val
-println (name.sendAndWait({it.size()}))
+println(name.sendAndWait({it.size()}))
 
 name << 'Alice'
 println name.val
@@ -55,10 +55,10 @@ name << 'James'
 println name.val
 
 Actors.actor {
-    name << {it.toUpperCase()}
-    react {
-        println it
-    }
+  name << {it.toUpperCase()}
+  react {
+    println it
+  }
 }.start().join()
 
 name.stop()

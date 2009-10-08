@@ -27,11 +27,11 @@ import java.util.UUID;
  */
 public class HostIdMsg extends SerialMsg {
 
-    /**
-     * Construct message representing current state of the transport provider
-     */
-    public HostIdMsg(UUID id) {
-        super();
-        hostId = id;
-    }
+  /**
+   * Construct message representing current state of the transport provider
+   */
+  public HostIdMsg(UUID id) {
+    super();
+    hostId = id;
+  }
 }

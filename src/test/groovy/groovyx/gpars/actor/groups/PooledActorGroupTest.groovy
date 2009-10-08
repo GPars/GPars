@@ -128,7 +128,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
     nonDaemonGroup.shutdown()
   }
 
-  @SuppressWarnings ("GroovyMethodWithMoreThanThreeNegations")
+  @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
   public void testDifferentPools() {
     final PooledActorGroup daemonGroup1 = new PooledActorGroup()
     final PooledActorGroup daemonGroup2 = new PooledActorGroup()

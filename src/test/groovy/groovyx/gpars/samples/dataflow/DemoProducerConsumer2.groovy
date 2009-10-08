@@ -34,19 +34,19 @@ final def urls = [
 ]
 
 start {
-    for(url in urls) {
-        final def site = new DataFlowVariable()
-        buffer << site
-        site << url.toURL().text
-    }
+  for (url in urls) {
+    final def site = new DataFlowVariable()
+    buffer << site
+    site << url.toURL().text
+  }
 }
 
 start {
-    int count = 0
-    0.upto(urls.size()-1) {
-        def content = buffer.val
-        if (content.contains('groovy')) count++
-    }
-    println "Number of Groovy sites today: $count"
-    System.exit 0
+  int count = 0
+  0.upto(urls.size() - 1) {
+    def content = buffer.val
+    if (content.contains('groovy')) count++
+  }
+  println "Number of Groovy sites today: $count"
+  System.exit 0
 }

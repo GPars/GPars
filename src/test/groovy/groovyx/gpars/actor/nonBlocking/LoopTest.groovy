@@ -31,126 +31,126 @@ import static groovyx.gpars.actor.Actors.actor
  */
 public class LoopTest extends GroovyTestCase {
 
-    ActorGroup group
+  ActorGroup group
 
-    protected void setUp() {
-        group = new PooledActorGroup(10)
-    }
+  protected void setUp() {
+    group = new PooledActorGroup(10)
+  }
 
-    protected void tearDown() {
-        group.shutdown()
-    }
+  protected void tearDown() {
+    group.shutdown()
+  }
 
-    public void testLoop() {
-        final def barrier = new CyclicBarrier(2)
-        final AtomicInteger counter = new AtomicInteger(0)
+  public void testLoop() {
+    final def barrier = new CyclicBarrier(2)
+    final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
-            loop {
-                react {
-                    counter.incrementAndGet()
-                    barrier.await()
-                    react {message ->
-                        counter.incrementAndGet()
-                        barrier.await()
-
-                    }
-                }
-            }
-        }.start()
-
-        Thread.sleep 1000
-        assertEquals 0, counter.intValue()
-
-        1.upto(7) {
-            actor.send 'message'
+    final AbstractPooledActor actor = actor {
+      loop {
+        react {
+          counter.incrementAndGet()
+          barrier.await()
+          react {message ->
+            counter.incrementAndGet()
             barrier.await()
-            assertEquals it, counter.intValue()
+
+          }
         }
-        actor.stop()
+      }
+    }.start()
+
+    Thread.sleep 1000
+    assertEquals 0, counter.intValue()
+
+    1.upto(7) {
+      actor.send 'message'
+      barrier.await()
+      assertEquals it, counter.intValue()
     }
+    actor.stop()
+  }
 
-    public void testLoopStop() {
-        final def barrier = new CyclicBarrier(2)
-        final def afterStopBarrier = new CyclicBarrier(2)
-        final AtomicInteger counter = new AtomicInteger(0)
+  public void testLoopStop() {
+    final def barrier = new CyclicBarrier(2)
+    final def afterStopBarrier = new CyclicBarrier(2)
+    final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
-            loop {
-                barrier.await()
-                Thread.sleep 10000
-                react {
-                    counter.incrementAndGet()
-                }
-            }
-        }.start()
-
-        actor.metaClass {
-            afterStop = {List messages ->
-                afterStopBarrier.await()
-            }
-            onInterrupt = {}
-        }
-
+    final AbstractPooledActor actor = actor {
+      loop {
         barrier.await()
-        actor.send 'message'
-        actor.stop()
+        Thread.sleep 10000
+        react {
+          counter.incrementAndGet()
+        }
+      }
+    }.start()
+
+    actor.metaClass {
+      afterStop = {List messages ->
         afterStopBarrier.await()
-        assertEquals 0, counter.intValue()
+      }
+      onInterrupt = {}
     }
 
-    public void testSubsequentLoopStop() {
-        final def barrier = new CyclicBarrier(2)
-        final def afterBarrier = new CyclicBarrier(2)
-        final AtomicInteger counter = new AtomicInteger(0)
-        AtomicReference<List> messagesReference = new AtomicReference<List>(null)
+    barrier.await()
+    actor.send 'message'
+    actor.stop()
+    afterStopBarrier.await()
+    assertEquals 0, counter.intValue()
+  }
 
-        final AbstractPooledActor actor = actor {
-            loop {
-                barrier.await()
-                react {
-                    counter.incrementAndGet()
-                    barrier.await()
-                    Thread.sleep 10000
-                }
-            }
-        }.start()
+  public void testSubsequentLoopStop() {
+    final def barrier = new CyclicBarrier(2)
+    final def afterBarrier = new CyclicBarrier(2)
+    final AtomicInteger counter = new AtomicInteger(0)
+    AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        actor.metaClass {
-            afterStop = {List messages ->
-                messagesReference.set(messages)
-                afterBarrier.await()
-            }
-            onInterrupt = {}
+    final AbstractPooledActor actor = actor {
+      loop {
+        barrier.await()
+        react {
+          counter.incrementAndGet()
+          barrier.await()
+          Thread.sleep 10000
         }
+      }
+    }.start()
 
-        actor.send 'message'
-        barrier.await()
-        actor.send 'message'
-        barrier.await()
-        actor.stop()
-
+    actor.metaClass {
+      afterStop = {List messages ->
+        messagesReference.set(messages)
         afterBarrier.await()
-        assertEquals 1, counter.intValue()
-        assertEquals 1, messagesReference.get().size()
+      }
+      onInterrupt = {}
     }
 
-    public void testBeforeLoopStop() {
-        final AtomicInteger counter = new AtomicInteger(0)
+    actor.send 'message'
+    barrier.await()
+    actor.send 'message'
+    barrier.await()
+    actor.stop()
 
-        final AbstractPooledActor actor = actor {
-            Thread.sleep 10000
-            loop {
-                counter.incrementAndGet()
-            }
-        }.start()
+    afterBarrier.await()
+    assertEquals 1, counter.intValue()
+    assertEquals 1, messagesReference.get().size()
+  }
 
-        actor.metaClass { onInterrupt ={} }
+  public void testBeforeLoopStop() {
+    final AtomicInteger counter = new AtomicInteger(0)
 
-        actor.send 'message'
-        actor.stop()
+    final AbstractPooledActor actor = actor {
+      Thread.sleep 10000
+      loop {
+        counter.incrementAndGet()
+      }
+    }.start()
 
-        Thread.sleep 1000
-        assertEquals 0, counter.intValue()
-    }
+    actor.metaClass { onInterrupt = {} }
+
+    actor.send 'message'
+    actor.stop()
+
+    Thread.sleep 1000
+    assertEquals 0, counter.intValue()
+  }
 }

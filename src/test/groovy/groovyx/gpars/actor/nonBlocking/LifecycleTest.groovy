@@ -34,316 +34,316 @@ import java.util.concurrent.atomic.AtomicReference
  */
 public class LifecycleTest extends GroovyTestCase {
 
-    ActorGroup group
+  ActorGroup group
 
-    protected void setUp() {
-        group = new PooledActorGroup(5)
+  protected void setUp() {
+    group = new PooledActorGroup(5)
+  }
+
+  protected void tearDown() {
+    group.shutdown()
+  }
+
+
+  public void testDefaultStop() {
+    final def barrier = new CyclicBarrier(2)
+    final AtomicInteger counter = new AtomicInteger(0)
+
+    final AbstractPooledActor actor = group.actor {
+      barrier.await()
+      counter.incrementAndGet()
+      barrier.await()
+    }.start()
+
+    barrier.await()
+    assert actor.isActive()
+    barrier.await()
+    assertEquals 1, counter.intValue()
+    Thread.sleep 500
+    assertFalse actor.isActive()
+  }
+
+  public void testDefaultStopAfterReact() {
+    final def barrier = new CyclicBarrier(2)
+    final AtomicInteger counter = new AtomicInteger(0)
+    AtomicReference messagesReference = new AtomicReference(null)
+
+    final AbstractPooledActor actor = group.actor {
+      react {
+        barrier.await()
+        counter.incrementAndGet()
+        barrier.await()
+      }
+    }.start()
+
+    actor.metaClass {
+      afterStop = {List messages ->
+        messagesReference.set(messages)
+        barrier.await()
+      }
     }
 
-    protected void tearDown() {
-        group.shutdown()
+    actor.send 'message'
+    barrier.await()
+    assert actor.isActive()
+    barrier.await()
+    assertEquals 1, counter.intValue()
+    barrier.await()
+    assertFalse actor.isActive()
+    assertNotNull messagesReference.get()
+  }
+
+  public void testStop() {
+    final AtomicInteger counter = new AtomicInteger(0)
+
+    final AbstractPooledActor actor = group.actor {
+      Thread.sleep 10000
+      react {
+        counter.incrementAndGet()
+      }
+    }.start()
+
+    actor.metaClass {
+      onInterrupt = {}
     }
 
+    actor.send('message')
+    actor.stop()
 
-    public void testDefaultStop() {
-        final def barrier = new CyclicBarrier(2)
-        final AtomicInteger counter = new AtomicInteger(0)
+    Thread.sleep 1000
+    assertEquals 0, counter.intValue()
 
-        final AbstractPooledActor actor = group.actor {
-            barrier.await()
-            counter.incrementAndGet()
-            barrier.await()
-        }.start()
+    shouldFail(IllegalStateException) {
+      actor.send 'message'
+    }
+  }
 
-        barrier.await()
-        assert actor.isActive()
-        barrier.await()
-        assertEquals 1, counter.intValue()
-        Thread.sleep 500
-        assertFalse actor.isActive()
+  public void testReentrantStop() {
+    final def barrier = new CyclicBarrier(2)
+    final def latch = new CountDownLatch(1)
+    final AtomicInteger counter = new AtomicInteger(0)
+
+    final AbstractPooledActor actor = group.actor {
+      barrier.await()
+      react {
+      }
+    }.start()
+
+    actor.metaClass {
+      afterStop = {List messages ->
+        counter.incrementAndGet()
+        latch.countDown()
+      }
+      onInterrupt = {}
     }
 
-    public void testDefaultStopAfterReact() {
-        final def barrier = new CyclicBarrier(2)
-        final AtomicInteger counter = new AtomicInteger(0)
-        AtomicReference messagesReference = new AtomicReference(null)
+    actor.send 'message'
+    actor.stop()
+    actor.stop()
+    actor.stop()
+    latch.await()
+    assertEquals 1, counter.intValue()
+    assertFalse actor.isActive()
+  }
 
-        final AbstractPooledActor actor = group.actor {
-            react {
-                barrier.await()
-                counter.incrementAndGet()
-                barrier.await()
-            }
-        }.start()
+  public void testStopWithoutMessageSent() {
+    final def barrier = new CyclicBarrier(2)
+    final def latch = new CountDownLatch(1)
+    final AtomicInteger counter = new AtomicInteger(0)
+    AtomicReference messagesReference = new AtomicReference(null)
 
-        actor.metaClass {
-            afterStop = {List messages ->
-                messagesReference.set(messages)
-                barrier.await()
-            }
-        }
+    final AbstractPooledActor actor = group.actor {
+      counter.incrementAndGet()
+      barrier.await()
 
-        actor.send 'message'
-        barrier.await()
-        assert actor.isActive()
-        barrier.await()
-        assertEquals 1, counter.intValue()
-        barrier.await()
-        assertFalse actor.isActive()
-        assertNotNull messagesReference.get()
+      react {
+        counter.incrementAndGet()
+      }
+    }.start()
+
+    actor.metaClass {
+      afterStop = {List messages ->
+        messagesReference.set(messages)
+        latch.countDown()
+      }
     }
 
-    public void testStop() {
-        final AtomicInteger counter = new AtomicInteger(0)
+    barrier.await()
+    assert actor.isActive()
+    assertEquals 1, counter.intValue()
+    Thread.sleep 500
 
-        final AbstractPooledActor actor = group.actor {
-            Thread.sleep 10000
-            react {
-                counter.incrementAndGet()
-            }
-        }.start()
+    actor.stop()
 
-        actor.metaClass {
-            onInterrupt = {}
-        }
+    latch.await(30, TimeUnit.SECONDS)
+    assertFalse actor.isActive()
+    assertEquals 1, counter.intValue()
+    assertNotNull messagesReference.get()
+  }
 
-        actor.send('message')
-        actor.stop()
+  public void testStopWithInterruption() {
+    final def barrier = new CyclicBarrier(2)
+    final def latch = new CountDownLatch(1)
+    final AtomicInteger counter = new AtomicInteger(0)
+    AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        Thread.sleep 1000
-        assertEquals 0, counter.intValue()
+    final AbstractPooledActor actor = group.actor {
+      react {
+        barrier.await()
+        Thread.sleep(10000)
+        counter.incrementAndGet()  //never reached
+      }
+    }.start()
 
-        shouldFail(IllegalStateException) {
-            actor.send 'message'
-        }
+    actor.metaClass {
+      afterStop = {List messages ->
+        messagesReference.set(messages)
+        latch.countDown()
+      }
+      onInterrupt = {}
     }
 
-    public void testReentrantStop() {
-        final def barrier = new CyclicBarrier(2)
-        final def latch = new CountDownLatch(1)
-        final AtomicInteger counter = new AtomicInteger(0)
+    actor.send 'message1'
+    actor.send 'message2'
+    actor.send 'message3'
+    barrier.await()
+    assert actor.isActive()
+    Thread.sleep 500
+    actor.stop()
 
-        final AbstractPooledActor actor = group.actor {
-            barrier.await()
-            react {
-            }
-        }.start()
+    latch.await(30, TimeUnit.SECONDS)
+    assertEquals 0, counter.intValue()
+    assertFalse actor.isActive()
+    assertNotNull messagesReference.get()
+    assertEquals 2, messagesReference.get().size()
+  }
 
-        actor.metaClass {
-            afterStop = {List messages ->
-                counter.incrementAndGet()
-                latch.countDown()
-            }
-            onInterrupt = {}
-        }
+  public void testAfterStart() {
+    final def afterStartBarrier = new CyclicBarrier(2)
+    final AtomicBoolean afterStartFlag = new AtomicBoolean(false)
 
-        actor.send 'message'
-        actor.stop()
-        actor.stop()
-        actor.stop()
-        latch.await()
-        assertEquals 1, counter.intValue()
-        assertFalse actor.isActive()
+    final AbstractPooledActor actor = group.actor { }
+
+    actor.metaClass {
+      afterStart = { afterStartFlag.set true; afterStartBarrier.await() }
     }
 
-    public void testStopWithoutMessageSent() {
-        final def barrier = new CyclicBarrier(2)
-        final def latch = new CountDownLatch(1)
-        final AtomicInteger counter = new AtomicInteger(0)
-        AtomicReference messagesReference = new AtomicReference(null)
+    actor.start()
 
-        final AbstractPooledActor actor = group.actor {
-            counter.incrementAndGet()
-            barrier.await()
+    afterStartBarrier.await(30, TimeUnit.SECONDS)
+    assert afterStartFlag.get()
+  }
 
-            react {
-                counter.incrementAndGet()
-            }
-        }.start()
+  public void testOnInterrupt() {
+    final def barrier = new CyclicBarrier(2)
+    final def afterStopBarrier = new CyclicBarrier(2)
+    final AtomicBoolean onInterruptFlag = new AtomicBoolean(false)
+    AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        actor.metaClass {
-            afterStop = {List messages ->
-                messagesReference.set(messages)
-                latch.countDown()
-            }
-        }
-
+    final AbstractPooledActor actor = group.actor {
+      react {
         barrier.await()
-        assert actor.isActive()
-        assertEquals 1, counter.intValue()
-        Thread.sleep 500
+        Thread.sleep(10000)
+      }
+    }.start()
 
-        actor.stop()
-
-        latch.await(30, TimeUnit.SECONDS)
-        assertFalse actor.isActive()
-        assertEquals 1, counter.intValue()
-        assertNotNull messagesReference.get()
+    actor.metaClass {
+      afterStop = {List messages ->
+        messagesReference.set(messages)
+        afterStopBarrier.await()
+      }
+      onInterrupt = { onInterruptFlag.set true }
     }
 
-    public void testStopWithInterruption() {
-        final def barrier = new CyclicBarrier(2)
-        final def latch = new CountDownLatch(1)
-        final AtomicInteger counter = new AtomicInteger(0)
-        AtomicReference<List> messagesReference = new AtomicReference<List>(null)
+    actor.send 'message1'
+    actor.send 'message2'
+    actor.send 'message3'
+    barrier.await()
+    actor.stop()
 
-        final AbstractPooledActor actor = group.actor {
-            react {
-                barrier.await()
-                Thread.sleep(10000)
-                counter.incrementAndGet()  //never reached
-            }
-        }.start()
+    afterStopBarrier.await(30, TimeUnit.SECONDS)
+    assert onInterruptFlag.get()
+    assertFalse actor.isActive()
+    assertNotNull messagesReference.get()
+    assertEquals 2, messagesReference.get().size()
+  }
 
-        actor.metaClass {
-            afterStop = {List messages ->
-                messagesReference.set(messages)
-                latch.countDown()
-            }
-            onInterrupt = {}            
-        }
+  public void testOnException() {
+    final def barrier = new CyclicBarrier(2)
+    final def afterStopBarrier = new CyclicBarrier(2)
+    final AtomicBoolean onExceptionFlag = new AtomicBoolean(false)
+    AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        actor.send 'message1'
-        actor.send 'message2'
-        actor.send 'message3'
+    final AbstractPooledActor actor = group.actor {
+      react {
         barrier.await()
-        assert actor.isActive()
-        Thread.sleep 500
-        actor.stop()
+        throw new RuntimeException('test')
+      }
+    }.start()
 
-        latch.await(30, TimeUnit.SECONDS)
-        assertEquals 0, counter.intValue()
-        assertFalse actor.isActive()
-        assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+    actor.metaClass {
+      afterStop = {List messages ->
+        messagesReference.set(messages)
+        afterStopBarrier.await()
+      }
+      onException = { onExceptionFlag.set true }
     }
 
-    public void testAfterStart() {
-        final def afterStartBarrier = new CyclicBarrier(2)
-        final AtomicBoolean afterStartFlag = new AtomicBoolean(false)
+    actor.send 'message1'
+    actor.send 'message2'
+    actor.send 'message3'
+    barrier.await()
 
-        final AbstractPooledActor actor = group.actor { }
+    afterStopBarrier.await(30, TimeUnit.SECONDS)
+    assert onExceptionFlag.get()
+    assertFalse actor.isActive()
+    assertNotNull messagesReference.get()
+    assertEquals 2, messagesReference.get().size()
+  }
 
-        actor.metaClass {
-            afterStart = { afterStartFlag.set true; afterStartBarrier.await() }
-        }
+  public void testRestart() {
+    final def barrier = new CyclicBarrier(2)
+    final AtomicInteger counter = new AtomicInteger(0)
 
-        actor.start()
-        
-        afterStartBarrier.await(30, TimeUnit.SECONDS)
-        assert afterStartFlag.get()
+    final AbstractPooledActor actor = group.actor {
+      barrier.await()
+      counter.incrementAndGet()
+      barrier.await()
+    }.start()
+
+    barrier.await()
+    assert actor.isActive()
+    barrier.await()
+    assertEquals 1, counter.intValue()
+    Thread.sleep 500
+    assertFalse actor.isActive()
+
+    actor.start()
+
+    barrier.await()
+    assert actor.isActive()
+    barrier.await()
+    assertEquals 2, counter.intValue()
+    Thread.sleep 500
+    assertFalse actor.isActive()
+  }
+
+  public void testDoubleStart() {
+    final def barrier = new CyclicBarrier(2)
+    final AtomicInteger counter = new AtomicInteger(0)
+
+    final AbstractPooledActor actor = group.actor {
+      barrier.await()
+    }.start()
+
+    shouldFail(IllegalStateException) {
+      actor.start()
     }
 
-    public void testOnInterrupt() {
-        final def barrier = new CyclicBarrier(2)
-        final def afterStopBarrier = new CyclicBarrier(2)
-        final AtomicBoolean onInterruptFlag = new AtomicBoolean(false)
-        AtomicReference<List> messagesReference = new AtomicReference<List>(null)
-
-        final AbstractPooledActor actor = group.actor {
-            react {
-                barrier.await()
-                Thread.sleep(10000)
-            }
-        }.start()
-
-        actor.metaClass {
-            afterStop = {List messages ->
-                messagesReference.set(messages)
-                afterStopBarrier.await()
-            }
-            onInterrupt = { onInterruptFlag.set true }
-        }
-
-        actor.send 'message1'
-        actor.send 'message2'
-        actor.send 'message3'
-        barrier.await()
-        actor.stop()
-
-        afterStopBarrier.await(30, TimeUnit.SECONDS)
-        assert onInterruptFlag.get()
-        assertFalse actor.isActive()
-        assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
-    }
-
-    public void testOnException() {
-        final def barrier = new CyclicBarrier(2)
-        final def afterStopBarrier = new CyclicBarrier(2)
-        final AtomicBoolean onExceptionFlag = new AtomicBoolean(false)
-        AtomicReference<List> messagesReference = new AtomicReference<List>(null)
-
-        final AbstractPooledActor actor = group.actor {
-            react {
-                barrier.await()
-                throw new RuntimeException('test')
-            }
-        }.start()
-
-        actor.metaClass {
-            afterStop = {List messages ->
-                messagesReference.set(messages)
-                afterStopBarrier.await()
-            }
-            onException = { onExceptionFlag.set true }
-        }
-
-        actor.send 'message1'
-        actor.send 'message2'
-        actor.send 'message3'
-        barrier.await()
-
-        afterStopBarrier.await(30, TimeUnit.SECONDS)
-        assert onExceptionFlag.get()
-        assertFalse actor.isActive()
-        assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
-    }
-
-    public void testRestart() {
-        final def barrier = new CyclicBarrier(2)
-        final AtomicInteger counter = new AtomicInteger(0)
-
-        final AbstractPooledActor actor = group.actor {
-            barrier.await()
-            counter.incrementAndGet()
-            barrier.await()
-        }.start()
-
-        barrier.await()
-        assert actor.isActive()
-        barrier.await()
-        assertEquals 1, counter.intValue()
-        Thread.sleep 500
-        assertFalse actor.isActive()
-
-        actor.start()
-
-        barrier.await()
-        assert actor.isActive()
-        barrier.await()
-        assertEquals 2, counter.intValue()
-        Thread.sleep 500
-        assertFalse actor.isActive()
-    }
-
-    public void testDoubleStart() {
-        final def barrier = new CyclicBarrier(2)
-        final AtomicInteger counter = new AtomicInteger(0)
-
-        final AbstractPooledActor actor = group.actor {
-            barrier.await()
-        }.start()
-
-        shouldFail(IllegalStateException) {
-            actor.start()
-        }
-
-        assert actor.isActive()
-        barrier.await()
-        Thread.sleep 500
-        assertFalse actor.isActive()
-    }
+    assert actor.isActive()
+    barrier.await()
+    Thread.sleep 500
+    assertFalse actor.isActive()
+  }
 
 }

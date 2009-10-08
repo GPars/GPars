@@ -25,7 +25,7 @@ import groovyx.gpars.actor.PooledActorGroup
  */
 public class SingleThreadLoopTest extends LoopTest {
 
-    protected void setUp() {
-        group = new PooledActorGroup(1)
-    }
+  protected void setUp() {
+    group = new PooledActorGroup(1)
+  }
 }

@@ -21,9 +21,10 @@ package groovyx.gpars.actor.impl;
  * Implementing singleton pattern, ActorException holds the unique reference.
  *
  * @author Vaclav Pech
- * Date: Feb 17, 2009
+ *         Date: Feb 17, 2009
  */
 final class ActorTimeoutException extends ActorException {
 
-    ActorTimeoutException() { }
+  ActorTimeoutException() {
+  }
 }

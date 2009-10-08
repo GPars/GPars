@@ -26,30 +26,32 @@ import groovyx.gpars.remote.RemoteHost;
 
 @ChannelPipelineCoverage("one")
 public class RemoteObjectEncoder extends ObjectEncoder {
-    private RemoteConnection connection;
+  private RemoteConnection connection;
 
-    /**
-     * Creates a new encoder.
-     *
-     * @param connection
-     */
-    public RemoteObjectEncoder(RemoteConnection connection) {
-        super();
-        this.connection = connection;
+  /**
+   * Creates a new encoder.
+   *
+   * @param connection
+   */
+  public RemoteObjectEncoder(RemoteConnection connection) {
+    super();
+    this.connection = connection;
+  }
+
+  @Override
+  protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
+    RemoteHost remoteHost = connection.getHost();
+
+    if (remoteHost != null) {
+      remoteHost.enter();
     }
-
-    @Override
-    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
-        RemoteHost remoteHost = connection.getHost();
-
-        if (remoteHost != null)
-           remoteHost.enter();
-        try {
-            return super.encode(ctx, channel, msg);
-        }
-        finally {
-            if (remoteHost != null)
-               remoteHost.leave();
-        }
+    try {
+      return super.encode(ctx, channel, msg);
     }
+    finally {
+      if (remoteHost != null) {
+        remoteHost.leave();
+      }
+    }
+  }
 }

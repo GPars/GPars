@@ -28,82 +28,82 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  */
 public class MixinTest extends GroovyTestCase {
 
-    public void testSomething(){
-        //todo enables mixin tests or remove
-    }
-    
-    public void _testClassMixin() {
-        volatile def result=null
-        final CountDownLatch latch = new CountDownLatch(1)
-        final CountDownLatch stopLatch = new CountDownLatch(1)
-        final AtomicBoolean stopFlag = new AtomicBoolean(false)
+  public void testSomething() {
+    //todo enables mixin tests or remove
+  }
 
-        Company.metaClass {
-            mixin AbstractPooledActor
+  public void _testClassMixin() {
+    volatile def result = null
+    final CountDownLatch latch = new CountDownLatch(1)
+    final CountDownLatch stopLatch = new CountDownLatch(1)
+    final AtomicBoolean stopFlag = new AtomicBoolean(false)
 
-            act = {->
-                receive {
-                    result = it
-                    latch.countDown()
-                }
-            }
+    Company.metaClass {
+      mixin AbstractPooledActor
 
-            afterStop = {
-                stopFlag.set(true)
-                stopLatch.countDown()
-            }
+      act = {->
+        receive {
+          result = it
+          latch.countDown()
         }
+      }
 
-        final Company company = new Company(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
-
-        company.start()
-        company.send("Message")
-        latch.await(30, TimeUnit.SECONDS)
-        company.stop()
-        assertEquals('Message', result)
-        stopLatch.await(30, TimeUnit.SECONDS)
-        assert stopFlag.get()
+      afterStop = {
+        stopFlag.set(true)
+        stopLatch.countDown()
+      }
     }
 
-    public void _testInstanceMixin() {
-        volatile def result=null
-        final CountDownLatch latch = new CountDownLatch(1)
-        final CountDownLatch stopLatch = new CountDownLatch(1)
-        final AtomicBoolean stopFlag = new AtomicBoolean(false)
+    final Company company = new Company(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
 
-        final Corporation corp   = new Corporation(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
-        corp.metaClass {
-            mixin AbstractPooledActor
+    company.start()
+    company.send("Message")
+    latch.await(30, TimeUnit.SECONDS)
+    company.stop()
+    assertEquals('Message', result)
+    stopLatch.await(30, TimeUnit.SECONDS)
+    assert stopFlag.get()
+  }
 
-            act = {->
-                receive {
-                    result = it
-                    latch.countDown()
-                }
-            }
+  public void _testInstanceMixin() {
+    volatile def result = null
+    final CountDownLatch latch = new CountDownLatch(1)
+    final CountDownLatch stopLatch = new CountDownLatch(1)
+    final AtomicBoolean stopFlag = new AtomicBoolean(false)
 
-            afterStop = {
-                stopFlag.set(true)
-                stopLatch.countDown()
-            }
+    final Corporation corp = new Corporation(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
+    corp.metaClass {
+      mixin AbstractPooledActor
+
+      act = {->
+        receive {
+          result = it
+          latch.countDown()
         }
+      }
 
-        corp.start()
-        corp.send("Message")
-        latch.await(30, TimeUnit.SECONDS)
-        corp.stop()
-        assertEquals('Message', result)
-        stopLatch.await(30, TimeUnit.SECONDS)
-        assert stopFlag.get()
+      afterStop = {
+        stopFlag.set(true)
+        stopLatch.countDown()
+      }
     }
+
+    corp.start()
+    corp.send("Message")
+    latch.await(30, TimeUnit.SECONDS)
+    corp.stop()
+    assertEquals('Message', result)
+    stopLatch.await(30, TimeUnit.SECONDS)
+    assert stopFlag.get()
+  }
 }
 
 class Company {
-    String name
-    List<String> employees
+  String name
+  List<String> employees
 }
 
 class Corporation {
-    String name
-    List<String> employees
+  String name
+  List<String> employees
 }

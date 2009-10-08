@@ -23,101 +23,101 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.operator.DataFlowOperator.operator
 
 /**
-* @author Vaclav Pech
+ * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
 
 public class DataFlowOperatorTest extends GroovyTestCase {
 
-    public void testOperator() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowStream c = new DataFlowStream()
-        final DataFlowVariable d = new DataFlowVariable()
-        final DataFlowStream e = new DataFlowStream()
+  public void testOperator() {
+    final DataFlowVariable a = new DataFlowVariable()
+    final DataFlowVariable b = new DataFlowVariable()
+    final DataFlowStream c = new DataFlowStream()
+    final DataFlowVariable d = new DataFlowVariable()
+    final DataFlowStream e = new DataFlowStream()
 
-        def op = operator(inputs : [a, b, c], outputs : [d, e]) {x, y, z ->
-            bindOutput 0, x + y + z
-            bindOutput 1, x * y * z
-        }
-
-        DataFlow.start { a << 5 }
-        DataFlow.start { b << 20 }
-        DataFlow.start { c << 40 }
-
-        assertEquals 65, d.val
-        assertEquals 4000, e.val
-
-        op.stop()
+    def op = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
+      bindOutput 0, x + y + z
+      bindOutput 1, x * y * z
     }
 
-    public void testOperatorWithDoubleWaitOnChannel() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
+    DataFlow.start { a << 5 }
+    DataFlow.start { b << 20 }
+    DataFlow.start { c << 40 }
 
-        def op = operator(inputs : [a, a], outputs : [b]) {x, y ->
-            bindOutput 0, x + y
-        }
+    assertEquals 65, d.val
+    assertEquals 4000, e.val
 
-        a << 1
-        a << 2
-        a << 3
-        a << 4
+    op.stop()
+  }
 
-        assertEquals 3, b.val
-        assertEquals 7, b.val
+  public void testOperatorWithDoubleWaitOnChannel() {
+    final DataFlowStream a = new DataFlowStream()
+    final DataFlowStream b = new DataFlowStream()
 
-        op.stop()
+    def op = operator(inputs: [a, a], outputs: [b]) {x, y ->
+      bindOutput 0, x + y
     }
 
-    public void testNonCommutativeOperator() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
+    a << 1
+    a << 2
+    a << 3
+    a << 4
 
-        def op = operator(inputs : [a, b], outputs : [c]) {x, y ->
-            bindOutput 0, 2*x + y
-        }
+    assertEquals 3, b.val
+    assertEquals 7, b.val
 
-        DataFlow.start { a << 5 }
-        DataFlow.start { b << 20 }
+    op.stop()
+  }
 
-        assertEquals 30, c.val
+  public void testNonCommutativeOperator() {
+    final DataFlowStream a = new DataFlowStream()
+    final DataFlowStream b = new DataFlowStream()
+    final DataFlowStream c = new DataFlowStream()
 
-        op.stop()
+    def op = operator(inputs: [a, b], outputs: [c]) {x, y ->
+      bindOutput 0, 2 * x + y
     }
 
-    public void testCombinedOperators() {
-        final PooledActorGroup group = new PooledActorGroup(1)
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-        a << 1
-        a << 2
-        a << 3
-        b << 4
-        b << 5
-        b << 6
-        b << 7
+    DataFlow.start { a << 5 }
+    DataFlow.start { b << 20 }
 
-        final DataFlowStream x = new DataFlowStream()
-        def op1 = operator(inputs : [a], outputs : [x], group) {v ->
-            bindOutput 0, v * v
-        }
+    assertEquals 30, c.val
 
-        final DataFlowStream y = new DataFlowStream()
-        def op2 = operator(inputs : [b], outputs : [y], group) {v ->
-            bindOutput 0, v * v
-        }
+    op.stop()
+  }
 
-        def op3 = operator(inputs : [x, y], outputs : [c], group) {v1, v2 ->
-            bindOutput 0, v1 + v2
-        }
+  public void testCombinedOperators() {
+    final PooledActorGroup group = new PooledActorGroup(1)
+    final DataFlowStream a = new DataFlowStream()
+    final DataFlowStream b = new DataFlowStream()
+    final DataFlowStream c = new DataFlowStream()
+    a << 1
+    a << 2
+    a << 3
+    b << 4
+    b << 5
+    b << 6
+    b << 7
 
-        assertEquals 17, c.val
-        assertEquals 29, c.val
-        assertEquals 45, c.val
-        [op1, op2, op3]*.stop()
+    final DataFlowStream x = new DataFlowStream()
+    def op1 = operator(inputs: [a], outputs: [x], group) {v ->
+      bindOutput 0, v * v
     }
+
+    final DataFlowStream y = new DataFlowStream()
+    def op2 = operator(inputs: [b], outputs: [y], group) {v ->
+      bindOutput 0, v * v
+    }
+
+    def op3 = operator(inputs: [x, y], outputs: [c], group) {v1, v2 ->
+      bindOutput 0, v1 + v2
+    }
+
+    assertEquals 17, c.val
+    assertEquals 29, c.val
+    assertEquals 45, c.val
+    [op1, op2, op3]*.stop()
+  }
 
 }

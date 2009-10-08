@@ -27,20 +27,20 @@ import static groovyx.gpars.actor.Actors.actor
  */
 
 def decryptor = actor {
-    loop {
-        react {message ->
-            if (message instanceof String) reply message.reverse()
-            else stop()
-        }
+  loop {
+    react {message ->
+      if (message instanceof String) reply message.reverse()
+      else stop()
     }
+  }
 }.start()
 
 def console = actor {
-    decryptor.send 'suonorhcnysa si yvoorG'
-    react {
-        println 'Decrypted message: ' + it
-        decryptor.send false
-    }
+  decryptor.send 'suonorhcnysa si yvoorG'
+  react {
+    println 'Decrypted message: ' + it
+    decryptor.send false
+  }
 }.start()
 
 [decryptor, console]*.join()

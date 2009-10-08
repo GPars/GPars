@@ -27,31 +27,31 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public final class RemoteNode<T extends LocalHost> {
-    private final UUID id;
+  private final UUID id;
 
-    private final SerialContext remoteHost;
-    private final Actor mainActor;
+  private final SerialContext remoteHost;
+  private final Actor mainActor;
 
-    public RemoteNode(UUID id, SerialContext remoteHost, Actor mainActor) {
-        this.id = id;
-        this.remoteHost = remoteHost;
-        this.mainActor = mainActor;
-    }
+  public RemoteNode(UUID id, SerialContext remoteHost, Actor mainActor) {
+    this.id = id;
+    this.remoteHost = remoteHost;
+    this.mainActor = mainActor;
+  }
 
-    public final UUID getId() {
-        return id;
-    }
+  public final UUID getId() {
+    return id;
+  }
 
-    @Override
-    public String toString() {
-        return getId().toString();
-    }
+  @Override
+  public String toString() {
+    return getId().toString();
+  }
 
-    public final Actor getMainActor() {
-        return mainActor;
-    }
+  public final Actor getMainActor() {
+    return mainActor;
+  }
 
-    public SerialContext getRemoteHost() {
-        return remoteHost;
-    }
+  public SerialContext getRemoteHost() {
+    return remoteHost;
+  }
 }

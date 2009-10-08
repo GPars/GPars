@@ -29,11 +29,11 @@ final CyclicBarrier barrier = new CyclicBarrier(2)
 
 final DataFlowStream stream = new DataFlowStream()
 DataFlow.start {
-    (0..10).each {stream << it}
-    barrier.await()
-    react {
-        stream << 11
-    }
+  (0..10).each {stream << it}
+  barrier.await()
+  react {
+    stream << 11
+  }
 }
 
 barrier.await()

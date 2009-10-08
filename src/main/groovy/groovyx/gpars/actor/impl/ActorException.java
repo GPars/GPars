@@ -24,13 +24,14 @@ package groovyx.gpars.actor.impl;
  * to avoid need for exception object creation each time.
  *
  * @author Vaclav Pech
- * Date: Feb 17, 2009
+ *         Date: Feb 17, 2009
  */
 public abstract class ActorException extends RuntimeException {
 
-    public static final ActorException CONTINUE = new ActorContinuationException();
-    public static final ActorException TERMINATE = new ActorTerminationException();
-    public static final ActorException TIMEOUT = new ActorTimeoutException();
+  public static final ActorException CONTINUE = new ActorContinuationException();
+  public static final ActorException TERMINATE = new ActorTerminationException();
+  public static final ActorException TIMEOUT = new ActorTimeoutException();
 
-    ActorException() { }
+  ActorException() {
+  }
 }

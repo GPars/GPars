@@ -81,7 +81,7 @@ public class Safe<T> extends DynamicDispatchActor {
     start()
   }
 
-  final void onMessage (NullObject obj) {
+  final void onMessage(NullObject obj) {
     lock.withWriteLock {
       updateValue null
     }
@@ -125,7 +125,7 @@ public class Safe<T> extends DynamicDispatchActor {
    * A shorthand method for safe message-based retrieval of the internal state.
    * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
    */
-  @SuppressWarnings ("GroovyAssignabilityCheck")
+  @SuppressWarnings("GroovyAssignabilityCheck")
   final public T getVal() {
     this.sendAndWait { getInstantVal() }
   }

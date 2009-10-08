@@ -26,30 +26,30 @@ import java.util.Set;
  * @author Alex Tkachman
  */
 public class LocalHostRegistry {
-    public static final Set<LocalHost> localHosts
-            = Collections.synchronizedSet(new HashSet<LocalHost>());
+  public static final Set<LocalHost> localHosts
+          = Collections.synchronizedSet(new HashSet<LocalHost>());
 
-    public synchronized static void connect(final LocalNode node) {
-        for (final LocalHost transportProvider : localHosts) {
-            node.connect(transportProvider);
+  public synchronized static void connect(final LocalNode node) {
+    for (final LocalHost transportProvider : localHosts) {
+      node.connect(transportProvider);
+    }
+  }
+
+  public synchronized static void disconnect(final LocalNode node) {
+    for (final LocalHost transportProvider : localHosts) {
+      node.getScheduler().execute(new Runnable() {
+        public void run() {
+          transportProvider.disconnect(node);
         }
+      });
     }
+  }
 
-    public synchronized static void disconnect(final LocalNode node) {
-        for (final LocalHost transportProvider : localHosts) {
-            node.getScheduler().execute(new Runnable() {
-                public void run() {
-                    transportProvider.disconnect(node);
-                }
-            });
-        }
-    }
+  public static synchronized void removeLocalHost(LocalHost localHost) {
+    localHosts.remove(localHost);
+  }
 
-    public static synchronized void removeLocalHost(LocalHost localHost) {
-        localHosts.remove(localHost);
-    }
-
-    public static synchronized void addLocalHost(LocalHost localHost) {
-        localHosts.add(localHost);
-    }
+  public static synchronized void addLocalHost(LocalHost localHost) {
+    localHosts.add(localHost);
+  }
 }

@@ -28,48 +28,48 @@ import java.io.Serializable;
  *         Date: Feb 27, 2009
  */
 public class ActorMessage<T> implements Serializable {
-    private T payLoad;
-    private MessageStream sender;
-    //todo what are the values after deserialization?
+  private T payLoad;
+  private MessageStream sender;
+  //todo what are the values after deserialization?
 
-    /**
-     * Creates a new instance
-     *
-     * @param payLoad The original message
-     * @param sender  The sending actor, null, if the message was not sent by an actor
-     */
-    public ActorMessage(final T payLoad, final MessageStream sender) {
-        this.payLoad = payLoad;
-        this.sender = sender;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param payLoad The original message
+   * @param sender  The sending actor, null, if the message was not sent by an actor
+   */
+  public ActorMessage(final T payLoad, final MessageStream sender) {
+    this.payLoad = payLoad;
+    this.sender = sender;
+  }
 
-    /**
-     * Constructor for serialization
-     */
-    protected ActorMessage() { //
-    }
+  /**
+   * Constructor for serialization
+   */
+  protected ActorMessage() { //
+  }
 
-    public T getPayLoad() {
-        return payLoad;
-    }
+  public T getPayLoad() {
+    return payLoad;
+  }
 
-    public MessageStream getSender() {
-        return sender;
-    }
+  public MessageStream getSender() {
+    return sender;
+  }
 
-    /**
-     * Factory method to create instances of ActorMessage with given payload.
-     * The sender of the ActorMessage is retrieved from the ReplyRegistry.
-     *
-     * @param payLoad The original message
-     * @return The newly created message
-     */
-    public static <T> ActorMessage build(final T payLoad) {
-        return new ActorMessage<T>(payLoad, Actor.threadBoundActor());
-    }
+  /**
+   * Factory method to create instances of ActorMessage with given payload.
+   * The sender of the ActorMessage is retrieved from the ReplyRegistry.
+   *
+   * @param payLoad The original message
+   * @return The newly created message
+   */
+  public static <T> ActorMessage build(final T payLoad) {
+    return new ActorMessage<T>(payLoad, Actor.threadBoundActor());
+  }
 
-    @Override
-    public String toString() {
-        return "Message from " + sender + ": " + payLoad;
-    }
+  @Override
+  public String toString() {
+    return "Message from " + sender + ": " + payLoad;
+  }
 }

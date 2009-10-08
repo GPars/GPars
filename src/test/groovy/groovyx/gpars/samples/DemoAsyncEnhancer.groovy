@@ -33,7 +33,7 @@ final Iterator iterator = list.iterator()
 AsyncEnhancer.enhanceInstance iterator
 
 iterator.eachAsync {
-    println it
+  println it
 }
 
 final String text = 'want to be very big'
@@ -42,5 +42,5 @@ println((text.collectAsync {it.toUpperCase()}).join())
 
 def animals = ['dog', 'ant', 'cat', 'whale']
 AsyncEnhancer.enhanceInstance animals
-println (animals.anyAsync {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-println (animals.allAsync {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+println(animals.anyAsync {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+println(animals.allAsync {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')

@@ -21,17 +21,17 @@ import groovyx.gpars.dataflow.DataFlowVariable
 
 final many = 1..(limit)
 
-List dfs = many.collect{ new DataFlowVariable() }
+List dfs = many.collect { new DataFlowVariable() }
 def result = new DataFlowVariable()
 
-def scheduler = Executors.newFixedThreadPool (20)
+def scheduler = Executors.newFixedThreadPool(20)
 
 scheduler.execute { result << dfs.sum { it.val } }
 
-dfs.each { df ->
-    scheduler.execute { df << 1 }
+dfs.each {df ->
+  scheduler.execute { df << 1 }
 }
 
 assert many.size() == result.val
 
-scheduler.shutdown ()
+scheduler.shutdown()

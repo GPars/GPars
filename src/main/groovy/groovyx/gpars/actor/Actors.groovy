@@ -27,12 +27,10 @@ import groovyx.gpars.scheduler.ResizablePool
  *
  * Actors.defaultPooledActorGroup.resize 1
  *
- * def actor = actor {
- *     react {message ->
+ * def actor = actor {*     react {message ->
  *         println message
- *     }
- *     //this line will never be reached
- * }.start()
+ *}*     //this line will never be reached
+ *}.start()
  *
  * actor.send 'Hi!'
  * </pre>
@@ -46,37 +44,37 @@ import groovyx.gpars.scheduler.ResizablePool
  */
 public abstract class Actors {
 
-    /**
-     * The default actor group to share by all actors created through the Actors class.
-     */
-    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(new ResizablePool(true))
+  /**
+   * The default actor group to share by all actors created through the Actors class.
+   */
+  public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(new ResizablePool(true))
 
-    /**
-     * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
-     * The created actor will be part of the default actor group.
-     * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
-     */
-    public static AbstractPooledActor actor(Closure handler) {
-        return defaultPooledActorGroup.actor(handler)
-    }
+  /**
+   * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
+   * The created actor will be part of the default actor group.
+   * @param handler The body of the newly created actor's act method.
+   * @return A newly created instance of the AbstractPooledActor class
+   */
+  public static AbstractPooledActor actor(Closure handler) {
+    return defaultPooledActorGroup.actor(handler)
+  }
 
-    /**
-     * Creates a reactor around the supplied code.
-     * When a reactor receives a message, the supplied block of code is run with the message
-     * as a parameter and the result of the code is send in reply.
-     * The created actor will be part of the default actor group.
-     * @param The code to invoke for each received message
-     * @return A new instance of ReactiveEventBasedThread
-     */
-    public static AbstractPooledActor reactor(final Closure code) {
-        return defaultPooledActorGroup.reactor(code)
-    }
+  /**
+   * Creates a reactor around the supplied code.
+   * When a reactor receives a message, the supplied block of code is run with the message
+   * as a parameter and the result of the code is send in reply.
+   * The created actor will be part of the default actor group.
+   * @param The code to invoke for each received message
+   * @return A new instance of ReactiveEventBasedThread
+   */
+  public static AbstractPooledActor reactor(final Closure code) {
+    return defaultPooledActorGroup.reactor(code)
+  }
 
-    //todo javadoc
-    /**
-     */
-    public static AbstractPooledActor messageHandler(final Closure code) {
-        return defaultPooledActorGroup.messageHandler (code)
-    }
+  //todo javadoc
+  /**
+   */
+  public static AbstractPooledActor messageHandler(final Closure code) {
+    return defaultPooledActorGroup.messageHandler(code)
+  }
 }

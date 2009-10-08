@@ -29,58 +29,58 @@ import groovyx.gpars.actor.Actors
  * Date: Jan 9, 2009
  */
 public class ActorsTest extends GroovyTestCase {
-    public void testDefaultActor() {
-        final AtomicInteger counter = new AtomicInteger(0)
-        final CountDownLatch latch = new CountDownLatch(1)
+  public void testDefaultActor() {
+    final AtomicInteger counter = new AtomicInteger(0)
+    final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
-            loop {
-                final int value = counter.incrementAndGet()
-                if (value == 3) {
-                    stop()
-                    latch.countDown()
-                }
-            }
+    final Actor actor = Actors.actor {
+      loop {
+        final int value = counter.incrementAndGet()
+        if (value == 3) {
+          stop()
+          latch.countDown()
         }
-        actor.start()
+      }
+    }
+    actor.start()
 
-        latch.await(30, TimeUnit.SECONDS)
-        assertEquals 3, counter.intValue()
+    latch.await(30, TimeUnit.SECONDS)
+    assertEquals 3, counter.intValue()
+  }
+
+  public void testDefaultactor() {
+    final AtomicBoolean flag = new AtomicBoolean(false)
+    final CountDownLatch latch = new CountDownLatch(1)
+
+    final Actor actor = Actors.actor {
+      flag.set(true)
+      receive(10, TimeUnit.MILLISECONDS)
+    }
+    actor.metaClass.afterStop = {
+      latch.countDown()
     }
 
-    public void testDefaultactor() {
-        final AtomicBoolean flag = new AtomicBoolean(false)
-        final CountDownLatch latch = new CountDownLatch(1)
+    actor.start()
 
-        final Actor actor = Actors.actor {
-            flag.set(true)
-            receive(10, TimeUnit.MILLISECONDS)
-        }
-        actor.metaClass.afterStop = {
-            latch.countDown()
-        }
+    latch.await(30, TimeUnit.SECONDS)
+    assert flag.get()
+  }
 
-        actor.start()
+  public void testDefaultactorWithException() {
+    final AtomicBoolean flag = new AtomicBoolean(false)
+    final CountDownLatch latch = new CountDownLatch(1)
 
-        latch.await(30, TimeUnit.SECONDS)
-        assert flag.get()
+    final Actor actor = Actors.actor {
+      throw new RuntimeException('test')
     }
-
-    public void testDefaultactorWithException() {
-        final AtomicBoolean flag = new AtomicBoolean(false)
-        final CountDownLatch latch = new CountDownLatch(1)
-
-        final Actor actor = Actors.actor {
-            throw new RuntimeException('test')
-        }
-        actor.metaClass.onException = {}
-        actor.metaClass.afterStop = {
-            flag.set(true)
-            latch.countDown()
-        }
-        actor.start()
-
-        latch.await(30, TimeUnit.SECONDS)
-        assert flag.get()
+    actor.metaClass.onException = {}
+    actor.metaClass.afterStop = {
+      flag.set(true)
+      latch.countDown()
     }
+    actor.start()
+
+    latch.await(30, TimeUnit.SECONDS)
+    assert flag.get()
+  }
 }

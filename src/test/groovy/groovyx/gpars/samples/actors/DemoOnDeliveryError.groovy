@@ -30,39 +30,39 @@ Actors.defaultPooledActorGroup.resize 10
 final CyclicBarrier barrier = new CyclicBarrier(2)
 
 final AbstractPooledActor actor = Actors.actor {
-    barrier.await()
-    react {
-        stop()
-    }
+  barrier.await()
+  react {
+    stop()
+  }
 }.start()
 
 final AbstractPooledActor me
 me = Actors.actor {
-    def message1 = 1
-    def message2 = 2
-    def message3 = 3
+  def message1 = 1
+  def message2 = 2
+  def message3 = 3
 
-    message2.metaClass.onDeliveryError = {->
-        me << "Could not deliver $delegate"
+  message2.metaClass.onDeliveryError = {->
+    me << "Could not deliver $delegate"
+  }
+
+  message3.metaClass.onDeliveryError = {->
+    me << "Could not deliver $delegate"
+  }
+
+  actor << message1
+  actor << message2
+  actor << message3
+  Thread.sleep 1000
+  barrier.await()
+
+  react {a ->
+    println a
+    react {b ->
+      println b
+      System.exit 0
     }
-
-    message3.metaClass.onDeliveryError = {->
-        me << "Could not deliver $delegate"
-    }
-
-    actor << message1
-    actor << message2
-    actor << message3
-    Thread.sleep 1000 
-    barrier.await()
-
-    react {a->
-        println a
-        react {b ->
-            println b
-            System.exit 0 
-        }
-    }
+  }
 
 }.start()
 

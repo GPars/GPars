@@ -33,177 +33,182 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 public abstract class ReceivingMessageStream extends MessageStream {
-    /**
-     * A list of senders for the currently procesed messages
-     */
-    private final List<MessageStream> senders = new ArrayList<MessageStream>();
+  /**
+   * A list of senders for the currently procesed messages
+   */
+  private final List<MessageStream> senders = new ArrayList<MessageStream>();
 
-    protected final WeakHashMap<Object, MessageStream> obj2Sender = new WeakHashMap<Object, MessageStream>();
+  protected final WeakHashMap<Object, MessageStream> obj2Sender = new WeakHashMap<Object, MessageStream>();
 
-    protected final List<MessageStream> getSenders() {
-        return senders;
-    }
+  protected final List<MessageStream> getSenders() {
+    return senders;
+  }
 
-    /**
-     * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
-     * have not been sent by an actor. For such cases use replyIfExists().
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
-     *
-     * @param message reply message
-     * @throws groovyx.gpars.actor.impl.ActorReplyException
-     *          If some of the replies failed to be sent.
-     */
-    protected final void reply(final Object message) {
-        assert senders != null;
-        if (senders.isEmpty()) {
-            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
+  /**
+   * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
+   * have not been sent by an actor. For such cases use replyIfExists().
+   * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
+   * will result in IllegalStateException being thrown.
+   * Sending replies is enabled by default.
+   *
+   * @param message reply message
+   * @throws groovyx.gpars.actor.impl.ActorReplyException
+   *          If some of the replies failed to be sent.
+   */
+  protected final void reply(final Object message) {
+    assert senders != null;
+    if (senders.isEmpty()) {
+      throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
+    } else {
+      final List<Exception> exceptions = new ArrayList<Exception>();
+      for (final MessageStream sender : senders) {
+        if (sender != null) {
+          try {
+            sender.send(message);
+          }
+          catch (IllegalStateException e) {
+            exceptions.add(e);
+          }
         } else {
-            final List<Exception> exceptions = new ArrayList<Exception>();
-            for (final MessageStream sender : senders) {
-                if (sender != null) {
-                    try {
-                        sender.send(message);
-                    }
-                    catch (IllegalStateException e) {
-                        exceptions.add(e);
-                    }
-                } else {
-                    exceptions.add(new IllegalArgumentException("Cannot send a reply message " + message + " to a null recipient."));
-                }
-            }
-            if (!exceptions.isEmpty()) {
-                throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
-            }
+          exceptions.add(new IllegalArgumentException("Cannot send a reply message " + message + " to a null recipient."));
         }
+      }
+      if (!exceptions.isEmpty()) {
+        throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
+      }
     }
+  }
 
-    /**
-     * Sends a reply to all currently processed messages, which have been sent by an actor.
-     * Ignores potential errors when sending the replies, like no sender or sender already stopped.
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
-     *
-     * @param message reply message
-     */
-    protected final void replyIfExists(final Object message) {
-        assert senders != null;
-        for (final MessageStream sender : senders) {
-            try {
-                if (sender != null)
-                    sender.send(message);
-            } catch (IllegalStateException ignore) {
-            }
+  /**
+   * Sends a reply to all currently processed messages, which have been sent by an actor.
+   * Ignores potential errors when sending the replies, like no sender or sender already stopped.
+   * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
+   * will result in IllegalStateException being thrown.
+   * Sending replies is enabled by default.
+   *
+   * @param message reply message
+   */
+  protected final void replyIfExists(final Object message) {
+    assert senders != null;
+    for (final MessageStream sender : senders) {
+      try {
+        if (sender != null) {
+          sender.send(message);
         }
+      } catch (IllegalStateException ignore) {
+      }
+    }
+  }
+
+  /**
+   * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+   *
+   * @return The message retrieved from the queue, or null, if the timeout expires.
+   * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+   */
+  protected abstract Object receiveImpl() throws InterruptedException;
+
+  /**
+   * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+   *
+   * @param timeout how long to wait before giving up, in units of unit
+   * @param units   a TimeUnit determining how to interpret the timeout parameter
+   * @return The message retrieved from the queue, or null, if the timeout expires.
+   * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+   */
+  protected abstract Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException;
+
+  /**
+   * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+   *
+   * @return The message retrieved from the queue, or null, if the timeout expires.
+   * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+   */
+  protected final Object receive() throws InterruptedException {
+    final Object msg = receiveImpl();
+    if (msg instanceof ActorMessage) {
+      final ActorMessage messageAndReply = (ActorMessage) msg;
+      return messageAndReply.getPayLoad();
+    } else {
+      return msg;
+    }
+  }
+
+  /**
+   * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+   *
+   * @param timeout how long to wait before giving up, in units of unit
+   * @param units   a TimeUnit determining how to interpret the timeout parameter
+   * @return The message retrieved from the queue, or null, if the timeout expires.
+   * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+   */
+  protected final Object receive(final long timeout, final TimeUnit units) throws InterruptedException {
+    final Object msg = receiveImpl(timeout, units);
+    if (msg instanceof ActorMessage) {
+      final ActorMessage messageAndReply = (ActorMessage) msg;
+      return messageAndReply.getPayLoad();
+    } else {
+      return msg;
+    }
+  }
+
+  /**
+   * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+   *
+   * @param duration how long to wait before giving up, in units of unit
+   * @return The message retrieved from the queue, or null, if the timeout expires.
+   * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+   */
+  protected final Object receive(final BaseDuration duration) throws InterruptedException {
+    return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
+  }
+
+  public static final class ReplyCategory {
+    public static void reply(Object original, Object reply) {
+      if (original instanceof ReceivingMessageStream) {
+        ((ReceivingMessageStream) original).reply(reply);
+        return;
+      }
+
+      if (original instanceof Closure) {
+        ((ReceivingMessageStream) ((Closure) original).getDelegate()).reply(reply);
+        return;
+      }
+
+      final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
+      if (actor == null) {
+        throw new IllegalStateException("reply from non-actor");
+      }
+
+      MessageStream sender = actor.obj2Sender.get(original);
+      if (sender == null) {
+        throw new IllegalStateException("Cannot send a reply message " + original.toString() + " to a null recipient.");
+      }
+
+      sender.send(reply);
     }
 
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected abstract Object receiveImpl() throws InterruptedException;
+    public static void replyIfExists(Object original, Object reply) {
+      if (original instanceof ReceivingMessageStream) {
+        ((ReceivingMessageStream) original).replyIfExists(reply);
+        return;
+      }
 
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param timeout how long to wait before giving up, in units of unit
-     * @param units   a TimeUnit determining how to interpret the timeout parameter
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected abstract Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException;
+      if (original instanceof Closure) {
+        ((ReceivingMessageStream) ((Closure) original).getDelegate()).replyIfExists(reply);
+        return;
+      }
 
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive() throws InterruptedException {
-        final Object msg = receiveImpl();
-        if (msg instanceof ActorMessage) {
-            final ActorMessage messageAndReply = (ActorMessage) msg;
-            return messageAndReply.getPayLoad();
-        } else {
-            return msg;
-        }
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param timeout how long to wait before giving up, in units of unit
-     * @param units   a TimeUnit determining how to interpret the timeout parameter
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive(final long timeout, final TimeUnit units) throws InterruptedException {
-        final Object msg = receiveImpl(timeout, units);
-        if (msg instanceof ActorMessage) {
-            final ActorMessage messageAndReply = (ActorMessage) msg;
-            return messageAndReply.getPayLoad();
-        } else {
-            return msg;
-        }
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param duration how long to wait before giving up, in units of unit
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive(final BaseDuration duration) throws InterruptedException {
-        return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
-    }
-
-    public static final class ReplyCategory {
-        public static void reply(Object original, Object reply) {
-            if (original instanceof ReceivingMessageStream) {
-                ((ReceivingMessageStream) original).reply(reply);
-                return;
-            }
-
-            if (original instanceof Closure) {
-                ((ReceivingMessageStream) ((Closure) original).getDelegate()).reply(reply);
-                return;
-            }
-
-            final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
-            if (actor == null)
-                throw new IllegalStateException("reply from non-actor");
-
-            MessageStream sender = actor.obj2Sender.get(original);
-            if (sender == null)
-                throw new IllegalStateException("Cannot send a reply message " + original.toString() + " to a null recipient.");
-
+      final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
+      if (actor != null) {
+        final MessageStream sender = actor.obj2Sender.get(original);
+        if (sender != null) {
+          try {
             sender.send(reply);
+          } catch (IllegalStateException ignored) {
+          }
         }
-
-        public static void replyIfExists(Object original, Object reply) {
-            if (original instanceof ReceivingMessageStream) {
-                ((ReceivingMessageStream) original).replyIfExists(reply);
-                return;
-            }
-
-            if (original instanceof Closure) {
-                ((ReceivingMessageStream) ((Closure) original).getDelegate()).replyIfExists(reply);
-                return;
-            }
-
-            final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
-            if (actor != null) {
-                final MessageStream sender = actor.obj2Sender.get(original);
-                if (sender != null)
-                    try {
-                        sender.send(reply);
-                    } catch (IllegalStateException ignored) { }
-            }
-        }
+      }
     }
+  }
 }

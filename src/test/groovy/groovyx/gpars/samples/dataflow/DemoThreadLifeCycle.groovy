@@ -26,32 +26,32 @@ import static groovyx.gpars.dataflow.DataFlow.start
 def throwException = true
 
 start {
-    enhance(delegate)
-    println("Running thread")
-    if (throwException) throw new RuntimeException('test')
-    else {
-        react(10.milliseconds) {}  //will timeout
-    }
+  enhance(delegate)
+  println("Running thread")
+  if (throwException) throw new RuntimeException('test')
+  else {
+    react(10.milliseconds) {}  //will timeout
+  }
 }
 
 private void enhance(AbstractPooledActor thread) {
-    thread.metaClass {
-        afterStop = {List undeliveredMessages ->
-            println "thread has stopped"
-        }
-
-        onInterrupt = {InterruptedException e ->
-            println "thread has been interrupted"
-        }
-
-        onTimeout = {->
-            println "thread has timed out"
-        }
-
-        onException = {Exception e ->
-            println "thread threw an exception"
-        }
+  thread.metaClass {
+    afterStop = {List undeliveredMessages ->
+      println "thread has stopped"
     }
+
+    onInterrupt = {InterruptedException e ->
+      println "thread has been interrupted"
+    }
+
+    onTimeout = {->
+      println "thread has timed out"
+    }
+
+    onException = {Exception e ->
+      println "thread threw an exception"
+    }
+  }
 }
 
 System.in.read()

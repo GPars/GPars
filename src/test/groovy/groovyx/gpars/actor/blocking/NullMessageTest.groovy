@@ -21,52 +21,52 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
 
-public class NullMessageTest extends GroovyTestCase{
-    public void testNullMesage() {
-        volatile def result = ''
-        final def latch = new CountDownLatch(1)
-        final Actor actor = Actors.actor {
-            receive {
-                result = it
-                latch.countDown()
-            }
-        }.start()
-        actor << null
-        latch.await()
-        assertNull result
-    }
+public class NullMessageTest extends GroovyTestCase {
+  public void testNullMesage() {
+    volatile def result = ''
+    final def latch = new CountDownLatch(1)
+    final Actor actor = Actors.actor {
+      receive {
+        result = it
+        latch.countDown()
+      }
+    }.start()
+    actor << null
+    latch.await()
+    assertNull result
+  }
 
-    public void testNullMesageFromActor() {
-        Actors.defaultPooledActorGroup.resize(100)
-        volatile def result = ''
-        final def latch = new CountDownLatch(1)
-        final Actor actor = Actors.actor {
-            receive {
-                result = it
-                latch.countDown()
-            }
-        }.start()
-        Actors.actor {
-            actor << null
-            latch.await()
-        }.start()
-        latch.await()
-        assertNull result
-    }
+  public void testNullMesageFromActor() {
+    Actors.defaultPooledActorGroup.resize(100)
+    volatile def result = ''
+    final def latch = new CountDownLatch(1)
+    final Actor actor = Actors.actor {
+      receive {
+        result = it
+        latch.countDown()
+      }
+    }.start()
+    Actors.actor {
+      actor << null
+      latch.await()
+    }.start()
+    latch.await()
+    assertNull result
+  }
 
-    public void testNullMesageFromActorWithReply() {
-        final def result = new DataFlowVariable()
-        final Actor actor = Actors.actor {
-            receive {
-                reply 10
-            }
-        }.start()
-        Actors.actor {
-            actor << null
-            receive {
-                result << it
-            }
-        }.start()
-        assertEquals 10, result.val
-    }
+  public void testNullMesageFromActorWithReply() {
+    final def result = new DataFlowVariable()
+    final Actor actor = Actors.actor {
+      receive {
+        reply 10
+      }
+    }.start()
+    Actors.actor {
+      actor << null
+      receive {
+        result << it
+      }
+    }.start()
+    assertEquals 10, result.val
+  }
 }
