@@ -58,7 +58,7 @@ public abstract class Actor extends ReceivingMessageStream {
   }
 
   /**
-   * Starts the Actor. No messages can be send or received before an Actor is started.
+   * Starts the Actor. No messages can be sent or received before an Actor is started.
    *
    * @return same actor
    */
@@ -80,9 +80,9 @@ public abstract class Actor extends ReceivingMessageStream {
   public abstract boolean isActive();
 
   /**
-   * Checks whether the current thread is the actor's current thread.
+   * Checks whether the current thread is the actor's worker thread.
    *
-   * @return whether the current thread is the actor's current thread
+   * @return whether the current thread is the actor's worker thread
    */
   public abstract boolean isActorThread();
 

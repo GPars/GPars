@@ -32,7 +32,7 @@ import java.util.concurrent.locks.LockSupport;
 /**
  * Stream of abstract messages
  *
- * @author Alex Tkachman, Vaclav Pech
+ * @author Alex Tkachman, Vaclav Pech, Dierk Koenig
  */
 public abstract class MessageStream extends WithSerialId {
   /**
@@ -42,6 +42,13 @@ public abstract class MessageStream extends WithSerialId {
    * @return always return message stream itself
    */
   public abstract MessageStream send(Object message);
+
+  /**
+   * Convenience method for send(new Object()).
+   */
+  public MessageStream send() {
+    return send(new Object());
+  }
 
   /**
    * Send message to stream and return immediately
