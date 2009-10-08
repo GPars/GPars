@@ -37,49 +37,49 @@ manifest.mainAttributes(
 )
 
 repositories {
-    mavenCentral()
-    mavenRepo urls: ['http://repository.jboss.org/maven2/']
+  mavenCentral()
+  mavenRepo urls: ['http://repository.jboss.org/maven2/']
 }
 
 configurations {
-    deployerJars
+  deployerJars
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.6.5'
-    testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
-    compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
-    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.3.GA'
-    deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: hasProperty('wagonSvnVersion') ? wagonSvnVersion : '1.9'
+  groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.6.5'
+  testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
+  compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
+  compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.3.GA'
+  deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: hasProperty('wagonSvnVersion') ? wagonSvnVersion : '1.9'
 }
 
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
 
- /*
+/*
 gradle.taskGraph.whenReady {taskGraph ->
-    if (!taskGraph.hasTask(':release')) {
-        final Date date = new Date()
-        //  TODO: Should only put the date in the artefact name when uploading to the Maven repository, otherwise
-        //  should just append SNAPSHOT.
-        version += '-SNAPSHOT' // + new SimpleDateFormat('-yyyyMMddHHmmssZ').format(date)
-    }
+   if (!taskGraph.hasTask(':release')) {
+       final Date date = new Date()
+       //  TODO: Should only put the date in the artefact name when uploading to the Maven repository, otherwise
+       //  should just append SNAPSHOT.
+       version += '-SNAPSHOT' // + new SimpleDateFormat('-yyyyMMddHHmmssZ').format(date)
+   }
 }
- */
+*/
 
 task release(dependsOn: ['build']) << {
-    println 'We release now'
+  println 'We release now'
 }
 
 uploadArchives {
-    repositories.mavenDeployer {
-        uniqueVersion = false
-        configuration = configurations.deployerJars
-        //repository(url: 'java-net:/maven2-repository/trunk/repository/') {
-        //}
-        repository(url: 'https://dav.codehaus.org/repository/gpars')
-        snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars')
-    }
+  repositories.mavenDeployer {
+    uniqueVersion = false
+    configuration = configurations.deployerJars
+    //repository(url: 'java-net:/maven2-repository/trunk/repository/') {
+    //}
+    repository(url: 'https://dav.codehaus.org/repository/gpars')
+    snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars')
+  }
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
@@ -87,115 +87,115 @@ def copyrightString = 'Copyright &#169; 2008&#8211;2009  V&#225;clav Pech.  All 
 def packageTitle = group
 
 javadoc {
-    options.overview('overview.html')
-    options.showAll()
-    options.encoding('UTF-8')
-    options.setUse(true)
-    options.author(true)
-    options.version(true)
-    options.windowTitle(titleForDocumentation)
-    options.docTitle(titleForDocumentation)
-    options.footer(copyrightString)
+  options.overview('overview.html')
+  options.showAll()
+  options.encoding('UTF-8')
+  options.setUse(true)
+  options.author(true)
+  options.version(true)
+  options.windowTitle(titleForDocumentation)
+  options.docTitle(titleForDocumentation)
+  options.footer(copyrightString)
 }
 javadoc.doFirst {
-    javadoc.title = titleForDocumentation
-    javadoc.options.docTitle = javadoc.title
+  javadoc.title = titleForDocumentation
+  javadoc.options.docTitle = javadoc.title
 }
 
 groovydoc {
-    dependsOn(classes)
-    includePrivate = true
-    use = true
-    windowTitle = packageTitle
-    docTitle = packageTitle
-    header = packageTitle
-    footer = copyrightString
-    packageNames = ['groovyx.gpars.*']
-    overview = 'overview.html'
+  dependsOn(classes)
+  includePrivate = true
+  use = true
+  windowTitle = packageTitle
+  docTitle = packageTitle
+  header = packageTitle
+  footer = copyrightString
+  packageNames = ['groovyx.gpars.*']
+  overview = 'overview.html'
 }
 
 task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
 
 task zipDoc(type: Zip, dependsOn: documentation) {
-    appendix = 'docs'
-    fileSet(dir: docsDir)
+  appendix = 'docs'
+  fileSet(dir: docsDir)
 }
 
 task zipSrc(type: Zip) {
-    appendix = 'src'
-    from sourceSets.main.allSource
+  appendix = 'src'
+  from sourceSets.main.allSource
 }
 
 //task zipSamples(dependsOn: 'demo', type: Zip) {
 task zipSamples(type: Zip) {
-    appendix = 'samples'
-    from sourceSets.test.allSource.matching{
-        include 'groovyx/gpars/samples/**'
-    }
+  appendix = 'samples'
+  from sourceSets.test.allSource.matching {
+    include 'groovyx/gpars/samples/**'
+  }
 }
 
 task wrapper(type: Wrapper) {
-    jarPath = 'wrapper'
-    gradleVersion = '0.8'
+  jarPath = 'wrapper'
+  gradleVersion = '0.8'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
-   excludedDemos = [
-           'DemoPotentialDeadlock.groovy',         // may deadlock (on purpose)
-           'DemoNonDeterministicDeadlockWithDataFlows.groovy', // may deadlock (on purpose)
-           'DemoDeadLock.groovy',                  // deadlock (on purpose)
-           'DemoPhysicalCalculations.groovy',                  // needs non-daemon threads
-           'DemoRemote.groovy',                  // doesn't work in an automated environment
-           'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
-           'DemoSwingMashup.groovy',  // but they can be run locally
-   ]
+  excludedDemos = [
+          'DemoPotentialDeadlock.groovy',         // may deadlock (on purpose)
+          'DemoNonDeterministicDeadlockWithDataFlows.groovy', // may deadlock (on purpose)
+          'DemoDeadLock.groovy',                  // deadlock (on purpose)
+          'DemoPhysicalCalculations.groovy',                  // needs non-daemon threads
+          'DemoRemote.groovy',                  // doesn't work in an automated environment
+          'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
+          'DemoSwingMashup.groovy',  // but they can be run locally
+  ]
 
-   classpath = sourceSets.main.runtimeClasspath
+  classpath = sourceSets.main.runtimeClasspath
 
-   demoFiles = sourceSets.test.allGroovy.matching {
-       include '**/*Demo*.groovy'
-       exclude excludedDemos.collect { name -> "**/$name"}
-   }
+  demoFiles = sourceSets.test.allGroovy.matching {
+    include '**/*Demo*.groovy'
+    exclude excludedDemos.collect {name -> "**/$name"}
+  }
 }
 
 class DemoTask extends DefaultTask {
-   @org.gradle.api.tasks.InputFiles
-   FileCollection classpath
+  @org.gradle.api.tasks.InputFiles
+  FileCollection classpath
 
-   @org.gradle.api.tasks.InputFiles
-   FileCollection demoFiles
+  @org.gradle.api.tasks.InputFiles
+  FileCollection demoFiles
 
-   List excludedDemos
+  List excludedDemos
 
-   @org.gradle.api.tasks.TaskAction
-   def runDemos() {
-       def shell = createShell()
-       def failed = []
-       def ok = 0
-       demoFiles.files.each {File file ->
-           println "*** starting demo $file.name"
-           try {
-               shell.evaluate(file)
-               ok += 1
-           } catch (Exception ex) {
-               failed << [file: file, exception: ex]
-           }
-           println "*** done"
-       }
-       println "=== demos: $ok ok, ${failed.size()} failed"
-       failed.each { println "${it.file}\n    ${it.exception}" }
-   }
+  @org.gradle.api.tasks.TaskAction
+  def runDemos() {
+    def shell = createShell()
+    def failed = []
+    def ok = 0
+    demoFiles.files.each {File file ->
+      println "*** starting demo $file.name"
+      try {
+        shell.evaluate(file)
+        ok += 1
+      } catch (Exception ex) {
+        failed << [file: file, exception: ex]
+      }
+      println "*** done"
+    }
+    println "=== demos: $ok ok, ${failed.size()} failed"
+    failed.each { println "${it.file}\n    ${it.exception}" }
+  }
 
-    private GroovyShell createShell() {
-           URLClassLoader classloader = new URLClassLoader(
-               classpath.files.collect {File classpathElement -> classpathElement.toURL()} as URL[],
-               Thread.currentThread().contextClassLoader
+  private GroovyShell createShell() {
+    URLClassLoader classloader = new URLClassLoader(
+            classpath.files.collect {File classpathElement -> classpathElement.toURL()} as URL[],
+            Thread.currentThread().contextClassLoader
 
-           )
-           System.metaClass.static.exit = {int retval -> println ">>> System.exit($retval) suppressed." }
-           System.in.metaClass.read = {-> println ">>> System.in.read() suppressed";'Automated build' }
-           new GroovyShell(classloader)
-       }
+    )
+    System.metaClass.static.exit = {int retval -> println ">>> System.exit($retval) suppressed." }
+    System.in.metaClass.read = {-> println ">>> System.in.read() suppressed"; 'Automated build' }
+    new GroovyShell(classloader)
+  }
 }
 
 //todo test fork frequency in gradle 0.9
