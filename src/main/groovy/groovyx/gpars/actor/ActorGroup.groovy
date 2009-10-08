@@ -21,7 +21,7 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 
 /**
- * Provides a common super class fo pooled actor's groups.
+ * Provides a common super class of pooled actor groups.
  *
  * @author Vaclav Pech, Alex Tkachman
  * Date: May 8, 2009
@@ -29,7 +29,7 @@ import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 public abstract class ActorGroup {
 
   /**
-   * Stored the group actors' thread pool
+   * Stores the group actors' thread pool
    */
   private @Delegate Pool threadPool
 
