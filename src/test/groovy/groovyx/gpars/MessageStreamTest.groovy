@@ -4,7 +4,7 @@ import groovyx.gpars.MessageStream.ResultWaiter
 import java.util.concurrent.TimeUnit
 
 /**
- * @author Vaclav Pech
+ * @author Vaclav Pech, Dierk Koenig
  */
 class MessageStreamTest extends GroovyTestCase {
 
