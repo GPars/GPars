@@ -20,8 +20,9 @@ import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.NonDaemonActorGroup
 
 /**
- * A popular gae implemented with actors.
+ * A popular game implemented with actors.
  * Notice the use of a PooledActorGroup to hold the actors participating in the game.
+ * Author: Vaclav Pech, Dierk Koenig
  */
 
 enum Move {
@@ -44,7 +45,7 @@ def announce(p1, m1, p2, m2) {
       if (m1 != m2) winner = p2
   }
 
-  [[p1, m1], [p2, m2]].sort {it[0]}.each { print "${it[0]}\t(${it[1]}),\t\t" }
+  [[p1, m1], [p2, m2]].sort {it[0]}.each { print "${it[0]} ${it[1].toString().padRight(9)}, " }
   println "winner = ${winner}"
 }
 
@@ -73,21 +74,22 @@ group.with {
       if (count == 120) {
         [player1, player2, delegate]*.stop()
         Thread.start { group.shutdown() }
+        return
       } else
         react {
-          player1.send("play")
-          player2.send("play")
+          player1.send()
+          player2.send()
 
           react {msg1 ->
             react {msg2 ->
               announce(msg1[0], msg1[1], msg2[0], msg2[1])
-              send("start")
+              send()
             }
           }
         }
     }
   }.start()
 
-  coordinator.send("start")
+  coordinator.send()
 }
 
