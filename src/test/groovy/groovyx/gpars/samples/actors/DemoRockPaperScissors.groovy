@@ -25,71 +25,48 @@ import groovyx.gpars.actor.NonDaemonActorGroup
  * Author: Vaclav Pech, Dierk Koenig
  */
 
-enum Move {
-  ROCK, PAPER, SCISSORS
-}
+enum Move { ROCK, PAPER, SCISSORS }
+
+final static BEATS = [[Move.ROCK, Move.SCISSORS], [Move.PAPER, Move.ROCK], [Move.SCISSORS, Move.PAPER]].asImmutable()
+
+@Immutable class Stroke { String player; Move move }
 
 random = new Random()
-
 def randomMove() {
+  sleep random.nextInt(100) // mimic some longer interministic processing time
   return Move.values()[random.nextInt(Move.values().length)]
 }
 
-def announce(p1, m1, p2, m2) {
+def announce = { Stroke first, Stroke second ->
   String winner = "tie"
-  switch ([m1, m2]) {
-    case [[Move.ROCK, Move.SCISSORS], [Move.PAPER, Move.ROCK], [Move.SCISSORS, Move.PAPER]]:
-      winner = p1
-      break
-    default:
-      if (m1 != m2) winner = p2
-  }
+  if ([first, second]*.move in BEATS) winner = first.player
+  if ([second, first]*.move in BEATS) winner = second.player
 
-  [[p1, m1], [p2, m2]].sort {it[0]}.each { print "${it[0]} ${it[1].toString().padRight(9)}, " }
+  [first, second].each { print "${it.player} ${it.move.toString().padRight(9)}, " }
   println "winner = ${winner}"
 }
 
-ActorGroup group = new NonDaemonActorGroup()
-group.with {
-  final def player1 = actor {
-    loop {
-      react {
-        reply(["Player 1", randomMove()])
-      }
-    }
-  }.start()
+ActorGroup pooled = new NonDaemonActorGroup() // uses default pool size
 
-  final def player2 = actor {
-    loop {
-      react {
-        reply(["Player 2", randomMove()])
-      }
-    }
-  }.start()
+final player1 = pooled.reactor { new Stroke("Player 1", randomMove()) }.start()
+final player2 = pooled.reactor { new Stroke("Player 2", randomMove()) }.start()
 
-  def coordinator = actor {
-    int count = 0
-    loop {
-      count++
-      if (count == 120) {
-        [player1, player2, delegate]*.stop()
-        Thread.start { group.shutdown() }
-        return
-      } else
-        react {
-          player1.send()
-          player2.send()
+def coordinator = pooled.actor {
+  int count = 0
+  loop {
+    count++
+    if (count >= 120) {
+      [player1, player2, delegate]*.stop()
+      Thread.start { pooled.shutdown() }
+      return
+    } 
+    react {
+      player1.send()
+      player2.send()
+      react { Stroke first -> react { Stroke second ->
+        announce first, second
+        send()
+  } } } }
+}.start()
 
-          react {msg1 ->
-            react {msg2 ->
-              announce(msg1[0], msg1[1], msg2[0], msg2[1])
-              send()
-            }
-          }
-        }
-    }
-  }.start()
-
-  coordinator.send()
-}
-
+coordinator.send()
