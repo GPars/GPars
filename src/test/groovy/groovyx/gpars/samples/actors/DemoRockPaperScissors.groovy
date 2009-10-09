@@ -27,13 +27,17 @@ import groovyx.gpars.actor.NonDaemonActorGroup
 
 enum Move { ROCK, PAPER, SCISSORS }
 
-final static BEATS = [[Move.ROCK, Move.SCISSORS], [Move.PAPER, Move.ROCK], [Move.SCISSORS, Move.PAPER]].asImmutable()
+final static BEATS = [
+        [Move.ROCK,     Move.SCISSORS],
+        [Move.PAPER,    Move.ROCK],
+        [Move.SCISSORS, Move.PAPER]
+].asImmutable()
 
 @Immutable class Stroke { String player; Move move }
 
 random = new Random()
 def randomMove() {
-  sleep random.nextInt(100) // mimic some longer interministic processing time
+  sleep random.nextInt(10) // mimic some longer interministic processing time
   return Move.values()[random.nextInt(Move.values().length)]
 }
 
@@ -42,8 +46,9 @@ def announce = { Stroke first, Stroke second ->
   if ([first, second]*.move in BEATS) winner = first.player
   if ([second, first]*.move in BEATS) winner = second.player
 
-  [first, second].each { print "${it.player} ${it.move.toString().padRight(9)}, " }
-  println "winner = ${winner}"
+  def out = new StringBuilder()
+  [first, second].each { out << "${it.player} ${it.move.toString().padRight(8)}, " }
+  out << "winner = ${winner}"
 }
 
 ActorGroup pooled = new NonDaemonActorGroup() // uses default pool size
@@ -64,7 +69,7 @@ def coordinator = pooled.actor {
       player1.send()
       player2.send()
       react { Stroke first -> react { Stroke second ->
-        announce first, second
+        println announce(first, second)
         send()
   } } } }
 }.start()
