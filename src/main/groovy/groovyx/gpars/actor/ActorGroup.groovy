@@ -62,7 +62,9 @@ public abstract class ActorGroup {
    * @return A new instance of ReactiveEventBasedThread
    */
   public final AbstractPooledActor reactor(final Closure code) {
-    new ReactiveActor(code)
+    final def actor = new ReactiveActor(code)
+    actor.actorGroup = this
+    actor
   }
 
   //todo javadoc
@@ -70,6 +72,8 @@ public abstract class ActorGroup {
    *
    */
   public final AbstractPooledActor messageHandler(final Closure code) {
-    new DynamicDispatchActor(code)
+    final def actor = new DynamicDispatchActor(code)
+    actor.actorGroup = this
+    actor
   }
 }
