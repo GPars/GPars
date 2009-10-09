@@ -35,22 +35,24 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
- * AbstractPooledActor provides the default PooledActor implementation. It represents a standalone active object (actor),
+ * AbstractPooledActor provides the default Actor implementation. It represents a standalone active object (actor),
  * which reacts asynchronously to messages sent to it from outside through the send() method.
- * Each PooledActor has its own message queue and a thread pool shared with other PooledActors by means of an instance
- * of the PooledActorGroup, which they have in common.
- * The PooledActorGroup instance is responsible for the pool creation, management and shutdown.
- * All work performed by a PooledActor is divided into chunks, which are sequentially submitted as independent tasks
+ * Each Actor has its own message queue and a thread pool shared with other Actors by means of an instance
+ * of the ActorGroup, which they have in common.
+ * The ActorGroup instance is responsible for the pool creation, management and shutdown.
+ * All work performed by an Actor is divided into chunks, which are sequentially submitted as independent tasks
  * to the thread pool for processing.
- * Whenever a PooledActor looks for a new message through the react() method, the actor gets detached
+ * Whenever an Actor looks for a new message through the react() method, the actor gets detached
  * from the thread, making the thread available for other actors. Thanks to the ability to dynamically attach and detach
- * threads to actors, PooledActors can scale far beyond the limits of the underlying platform on number of concurrently
+ * threads to actors, Actors can scale far beyond the limits of the underlying platform on number of concurrently
  * available threads.
+ * The receive() method can be used to read a message from the queue without giving up the thread. If no message is available,
+ * the call to receive() blocks until a message arrives or the supplied timeout expires.
  * The loop() method allows to repeatedly invoke a closure and yet perform each of the iterations sequentially
  * in different thread from the thread pool.
  * To support continuations correctly the react() and loop() methods never return.
  * <pre>
- * import static org.gparallelizer.actors.pooledActors.PooledActors.*
+ * import static groovyx.gpars.actors.Actors.*
  * <p/>
  * def actor = actor {
  *     loop {
@@ -105,7 +107,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  * </pre>
  * If no message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
  * and the actor terminates.
- * Each PooledActor has at any point in time at most one active instance of ActorAction associated, which abstracts
+ * Each Actor has at any point in time at most one active instance of ActorAction associated, which abstracts
  * the current chunk of actor's work to perform. Once a thread is assigned to the ActorAction, it moves the actor forward
  * till loop() or react() is called. These methods schedule another ActorAction for processing and throw dedicated exception
  * to terminate the current ActorAction.
