@@ -17,8 +17,9 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.actor.PooledActorGroup
 import org.codehaus.groovy.runtime.NullObject
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
@@ -211,6 +212,12 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
     dda.sendAndWait { flag = true }
     assert flag
+  }
+
+  public void testGroup() {
+    final PooledActorGroup group = new PooledActorGroup()
+    final DynamicDispatchActor handler = group.messageHandler {}
+    assertSame group, handler.actorGroup
   }
 }
 

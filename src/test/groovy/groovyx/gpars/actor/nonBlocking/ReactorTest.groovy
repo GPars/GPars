@@ -18,6 +18,7 @@ package groovyx.gpars.actor.nonBlocking
 
 import java.util.concurrent.atomic.AtomicInteger
 import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.ReactiveActor
 
 public class ReactorTest extends GroovyTestCase {
 
@@ -53,5 +54,11 @@ public class ReactorTest extends GroovyTestCase {
 
     processor.stop()
     processor.join()
+  }
+
+  public void testGroup() {
+    final PooledActorGroup group = new PooledActorGroup()
+    final ReactiveActor reactor = group.reactor {}
+    assertSame group, reactor.actorGroup
   }
 }
