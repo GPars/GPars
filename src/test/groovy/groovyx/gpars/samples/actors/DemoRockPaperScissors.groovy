@@ -27,7 +27,7 @@ import groovyx.gpars.actor.NonDaemonActorGroup
 
 enum Move { ROCK, PAPER, SCISSORS }
 
-final static BEATS = [
+final /*static*/ BEATS = [
         [Move.ROCK,     Move.SCISSORS],
         [Move.PAPER,    Move.ROCK],
         [Move.SCISSORS, Move.PAPER]
