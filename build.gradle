@@ -150,7 +150,7 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
     'DemoRemote',                                 // doesn't work in an automated environment
     'DemoSwing',                                  // maybe we don't want these to run on the CI ..
     'DemoSwingMashup',                            // but they can be run locally
-    'DemoReactor1',    // todo (dk) this should not be necessary
+    'DemoLoadBalancer',  // todo: should be runnable
   ]
 
   classpath = sourceSets.main.runtimeClasspath

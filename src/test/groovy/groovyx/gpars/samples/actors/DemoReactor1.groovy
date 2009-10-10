@@ -23,7 +23,7 @@ import groovyx.gpars.actor.PooledActorGroup
  * on the message.
  */
 
-final def group = new PooledActorGroup()
+final def group = new PooledActorGroup(4)
 
 final def doubler = group.reactor {
   2 * it
