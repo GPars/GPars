@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.MessageStream
+import groovyx.gpars.actor.Actors
 
 //todo update doc
 /**
@@ -53,7 +54,7 @@ final class DataCallback extends MessageStream {
    */
   @Override
   public MessageStream send(Object message) {
-    DataFlowActor.DATA_FLOW_GROUP.threadPool.execute {
+    Actors.defaultPooledActorGroup.threadPool.execute {
       code.call message
     };
     return this;

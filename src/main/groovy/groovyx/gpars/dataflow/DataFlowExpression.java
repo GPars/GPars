@@ -20,13 +20,14 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaProperty;
-import org.codehaus.groovy.runtime.InvokerHelper;
 import groovyx.gpars.MessageStream;
+import groovyx.gpars.actor.Actors;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialMsg;
 import groovyx.gpars.serial.WithSerialId;
+import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -305,7 +306,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
   private void notifyRemote(final UUID hostId) {
     if (serialHandle != null) {
-      DataFlowActor.DATA_FLOW_GROUP.getThreadPool().execute(new Runnable() {
+      Actors.defaultPooledActorGroup.getThreadPool().execute(new Runnable() {
         public void run() {
           Object sub = serialHandle.getSubscribers();
           if (sub instanceof SerialContext) {
