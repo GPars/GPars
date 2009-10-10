@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  * in different thread from the thread pool.
  * To support continuations correctly the react() and loop() methods never return.
  * <pre>
- * import static groovyx.gpars.actors.Actors.*
+ * import static groovyx.gpars.actor.Actors.actor
  * <p/>
  * def actor = actor {
  *     loop {
