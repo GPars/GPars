@@ -113,7 +113,7 @@ public abstract class MessageStream extends WithSerialId {
    * @return The message that came in reply to the original send.
    * @throws InterruptedException if interrupted while waiting
    */
-  public final <T> Object sendAndWait(final long timeout, final TimeUnit units, final T message) throws InterruptedException {
+  public final <T> Object sendAndWait(final T message, final long timeout, final TimeUnit units) throws InterruptedException {
     final ResultWaiter to = new ResultWaiter();
     send(new ActorMessage<T>(message, to));
     return to.getResult(timeout, units);
@@ -123,13 +123,13 @@ public abstract class MessageStream extends WithSerialId {
    * Sends a message and waits for a reply. Timeouts after the specified timeout. In case of timeout returns null.
    * Returns the reply or throws an IllegalStateException, if the target actor cannot reply.
    *
-   * @param duration timeout
    * @param message  message to send
+   * @param duration timeout
    * @return The message that came in reply to the original send.
    * @throws InterruptedException if interrupted while waioting
    */
-  public final <T> Object sendAndWait(final Duration duration, final T message) throws InterruptedException {
-    return sendAndWait(duration.toMilliseconds(), TimeUnit.MILLISECONDS, message);
+  public final <T> Object sendAndWait(final T message, final Duration duration) throws InterruptedException {
+    return sendAndWait(message, duration.toMilliseconds(), TimeUnit.MILLISECONDS);
   }
 
   @Override
