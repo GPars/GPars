@@ -16,10 +16,12 @@
 
 //  Author: Václav Pech
 //  Author: Russel Winder
-//  Author: Dierk König (demo task)
+//  Author: Dierk König
+//  Author: Hans Dockter
 
 import java.text.SimpleDateFormat
-import org.codehaus.groovy.tools.RootLoader
+import org.gradle.api.DefaultTask           // gradle imports these by default, but IDEA doesn't know
+import org.gradle.api.file.FileCollection
 
 usePlugin 'groovy'
 usePlugin 'maven'
@@ -141,20 +143,21 @@ task wrapper(type: Wrapper) {
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
   excludedDemos = [
-          'DemoPotentialDeadlock.groovy',         // may deadlock (on purpose)
-          'DemoNonDeterministicDeadlockWithDataFlows.groovy', // may deadlock (on purpose)
-          'DemoDeadLock.groovy',                  // deadlock (on purpose)
-          'DemoPhysicalCalculations.groovy',                  // needs non-daemon threads
-          'DemoRemote.groovy',                  // doesn't work in an automated environment
-          'DemoSwing.groovy',        // maybe we don't want these to run on the CI ..
-          'DemoSwingMashup.groovy',  // but they can be run locally
+    'DemoPotentialDeadlock',                      // may deadlock (on purpose)
+    'DemoNonDeterministicDeadlockWithDataFlows',  // may deadlock (on purpose)
+    'DemoDeadLock',                               // deadlock (on purpose)
+    'DemoPhysicalCalculations',                   // needs non-daemon threads
+    'DemoRemote',                                 // doesn't work in an automated environment
+    'DemoSwing',                                  // maybe we don't want these to run on the CI ..
+    'DemoSwingMashup',                            // but they can be run locally
+    'DemoReactor1',    // todo (dk) this should not be necessary
   ]
 
   classpath = sourceSets.main.runtimeClasspath
 
   demoFiles = sourceSets.test.allGroovy.matching {
     include '**/*Demo*.groovy'
-    exclude excludedDemos.collect {name -> "**/$name"}
+    exclude excludedDemos.collect { name -> "**/${name}.groovy" }
   }
 }
 
