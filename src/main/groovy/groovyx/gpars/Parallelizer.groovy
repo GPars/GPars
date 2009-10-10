@@ -24,12 +24,21 @@ import jsr166y.forkjoin.ForkJoinPool
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
  * shows to be much faster (10 - 20 times) compared to the executor service implementation in Asynchronizer.
  * E.g.
- * Parallelizer.withParallelizer(5) {*     final AtomicInteger result = new AtomicInteger(0)
- *     [1, 2, 3, 4, 5].eachAsync {result.addAndGet(it)}*     assertEquals 15, result
- *}*
- * Parallelizer.withParallelizer(5) {*     final List result = [1, 2, 3, 4, 5].collectAsync {it * 2}*     assert ([2, 4, 6, 8, 10].equals(result))
- *}*
- * Parallelizer.withParallelizer(5) {*     assert [1, 2, 3, 4, 5].allAsync {it > 0}*     assert ![1, 2, 3, 4, 5].allAsync {it > 1}*}*
+ * <pre>
+ * Parallelizer.withParallelizer(5) {
+ *   final AtomicInteger result = new AtomicInteger(0)
+ *   [1, 2, 3, 4, 5].eachAsync {result.addAndGet(it)}
+ *   assertEquals 15, result
+ *}
+ * Parallelizer.withParallelizer(5) {
+ *   final List result = [1, 2, 3, 4, 5].collectAsync {it * 2}
+ *   assert ([2, 4, 6, 8, 10].equals(result))
+ *}
+ * Parallelizer.withParallelizer(5) {
+ *   assert [1, 2, 3, 4, 5].allAsync {it > 0}
+ *  assert ![1, 2, 3, 4, 5].allAsync {it > 1}
+ *}
+ * </pre>
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
@@ -76,8 +85,10 @@ public class Parallelizer {
    * <pre>
    * Parallelizer.doParallel {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-   *}* </pre>
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   *}
+   * </pre>
    * @param cl The block of code to invoke with the DSL enabled
    */
   public static doParallel(Closure cl) {
@@ -97,8 +108,10 @@ public class Parallelizer {
    * <pre>
    * Parallelizer.doParallel(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-   *}* </pre>
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   *}
+   * </pre>
    * @param numberOfThreads Number of threads in the newly created thread pool
    * @param cl The block of code to invoke with the DSL enabled
    */
@@ -117,10 +130,13 @@ public class Parallelizer {
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
+   * // todo: fix copy-paste error in example
    * Parallelizer.doParallel(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-   *}* </pre>
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   *}
+   * </pre>
    * @param numberOfThreads Number of threads in the newly created thread pool
    * @param handler Handler for uncaught exceptions raised in code performed by the pooled threads
    * @param cl The block of code to invoke with the DSL enabled
@@ -141,8 +157,10 @@ public class Parallelizer {
    * <pre>
    * Parallelizer.withParallelizer {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-   *}* </pre>
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   *}
+   *  </pre>
    * @param cl The block of code to invoke with the DSL enabled
    */
   public static withParallelizer(Closure cl) {
@@ -161,8 +179,10 @@ public class Parallelizer {
    * <pre>
    * Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-   *}* </pre>
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   *}
+   *  </pre>
    * @param numberOfThreads Number of threads in the newly created thread pool
    * @param cl The block of code to invoke with the DSL enabled
    */
@@ -180,10 +200,13 @@ public class Parallelizer {
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
+   * //todo: fix copy-paste error in example
    * Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-   *}* </pre>
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   *}
+   *  </pre>
    * @param numberOfThreads Number of threads in the newly created thread pool
    * @param handler Handler for uncaught exceptions raised in code performed by the pooled threads
    * @param cl The block of code to invoke with the DSL enabled
@@ -210,8 +233,10 @@ public class Parallelizer {
    * <pre>
    * Parallelizer.withExistingParallelizer(anotherPool) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-   *}* </pre>
+   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+   *}
+   *  </pre>
    * @param pool The thread pool to use, the pool will not be shutdown after this method returns
    */
   public static withExistingParallelizer(ForkJoinPool pool, Closure cl) {
