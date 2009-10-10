@@ -1,0 +1,69 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.1.3 Models and Views</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Returning the Model</h4><p class="paragraph"/>A model is essentially a map that the view uses when rendering. The keys within that map translate to variable names accessible by the view. There are a couple of ways to return a model, the first way is to explicitly return a map instance:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+ 	&#91; book : Book.get( params.id ) &#93;
+&#125;</pre></div><p class="paragraph"/>If no explicit model is returned the controller's properties will be used as the model thus allowing you to write code like this:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    List books
+    List authors
+    def list = &#123;
+           books = Book.list()
+           authors = Author.list()
+    &#125;
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+This is possible due to the fact that controllers are prototype scoped. In other words a new controller is created for each request. Otherwise code such as the above would not be thread safe.
+</blockquote><p class="paragraph"/>In the above example the <code>books</code> and <code>authors</code> properties will be available in the view.<p class="paragraph"/>A more advanced approach is to return an instance of the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/servlet/ModelAndView.html" class="api">ModelAndView</a> class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.springframework.web.servlet.ModelAndView<p class="paragraph"/>def index = &#123;
+    def favoriteBooks = &#8230; // get some books just <span class="java&#45;keyword">for</span> the index page, perhaps your favorites<p class="paragraph"/>    // forward to the list view to show them
+    <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">new</span> ModelAndView(<span class="java&#45;quote">"/book/list"</span>, &#91; bookList : favoriteBooks &#93;)
+&#125;</pre></div><p class="paragraph"/>
+<h4>Selecting the View</h4><p class="paragraph"/>In both of the previous two examples there was no code that specified which <a href="../guide/single.html#6.2 Groovy Server Pages" class="guide">view</a> to render. So how does Grails know which view to pick? The answer lies in the conventions. For the action:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+	def show = &#123;
+	 	&#91; book : Book.get( params.id ) &#93;
+	&#125;	
+&#125;</pre></div><p class="paragraph"/>Grails will automatically look for a view at the location <code>grails-app/views/book/show.gsp</code> (actually Grails will try to look for a JSP first, as Grails can equally be used with JSP).<p class="paragraph"/>If you wish to render another view, then the <a href="../ref/Controllers/render.html" class="controllers">render</a> method there to help:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+  	def map = &#91; book : Book.get( params.id ) &#93;
+    render(view:<span class="java&#45;quote">"display"</span>, model:map)
+&#125;</pre></div><p class="paragraph"/>In this case Grails will attempt to render a view at the location <code>grails-app/views/book/display.gsp</code>. Notice that Grails automatically qualifies the view location with the <code>book</code> folder of the <code>grails-app/views</code> directory. This is convenient, but if you have some shared views you need to access instead use:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+  	def map = &#91; book : Book.get( params.id ) &#93;
+    render(view:<span class="java&#45;quote">"/shared/display"</span>, model:map)
+&#125;</pre></div><p class="paragraph"/>In this case Grails will attempt to render a view at the location <code>grails-app/views/shared/display.gsp</code>.<p class="paragraph"/>
+<h4>Rendering a Response</h4><p class="paragraph"/>Sometimes its easier (typically with Ajax applications) to render snippets of text or code to the response directly from the controller. For this, the highly flexible <code>render</code> method can be used:<p class="paragraph"/><div class="code"><pre>render <span class="java&#45;quote">"Hello World!"</span></pre></div><p class="paragraph"/>
+The above code writes the text "Hello World!" to the response, other examples include:<p class="paragraph"/><div class="code"><pre>// write some markup
+render &#123;
+   <span class="java&#45;keyword">for</span>(b in books) &#123;
+      div(id:b.id, b.title)
+   &#125;
+&#125;
+// render a specific view
+render(view:'show')
+// render a template <span class="java&#45;keyword">for</span> each item in a collection
+render(template:'book_template', collection:Book.list())
+// render some text with encoding and content type
+render(text:<span class="java&#45;quote">"&#60;xml&#62;some xml&#60;/xml&#62;"</span>,contentType:<span class="java&#45;quote">"text/xml"</span>,encoding:<span class="java&#45;quote">"UTF&#45;8"</span>)</pre></div><p class="paragraph"/>If you plan on using Groovy's MarkupBuilder to generate html for use with the render method becareful of naming clashes between html elements and Grails tags. e.g.<p class="paragraph"/><div class="code"><pre>def login = &#123;
+        StringWriter w = <span class="java&#45;keyword">new</span> StringWriter()
+        def builder = <span class="java&#45;keyword">new</span> groovy.xml.MarkupBuilder(w)
+        builder.html&#123;
+            head&#123;
+                title 'Log in'
+            &#125;
+            body&#123;
+                h1 'Hello'
+                form&#123;<p class="paragraph"/>                &#125;
+            &#125;
+        &#125;<p class="paragraph"/>        def html = w.toString()
+        render html
+    &#125;</pre></div><p class="paragraph"/>Will actually <a href="../guide/single.html#6.2.2.6 Tags as Method Calls" class="guide">call the form tag</a> (which will return some text that will be ignored by the MarkupBuilder). To correctly output a &#60;form&#62; elemement, use the following:<p class="paragraph"/> <div class="code"><pre>def login = &#123;
+        // &#8230;
+        body&#123;
+            h1 'Hello'
+            builder.form&#123;<p class="paragraph"/>            &#125;
+        &#125;
+        // &#8230;
+   &#125;</pre></div>
+
+	</body>
+</html>

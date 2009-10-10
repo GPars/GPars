@@ -1,0 +1,34 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>12.9 Participating in Auto Reload Events</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Monitoring Resources for Changes</h4><p class="paragraph"/>Often it is valuable to monitor resources for changes and then reload those changes when they occur. This is how Grails implements advanced reloading of application state at runtime. For example, consider the below simplified snippet from the <code>ServicesPlugin</code> that Grails comes with:<p class="paragraph"/><div class="code"><pre>class ServicesGrailsPlugin &#123;
+    &#8230;
+    def watchedResources = <span class="java&#45;quote">"file:./grails&#45;app/services/&#42;Service.groovy"</span><p class="paragraph"/>    &#8230;
+  def onChange = &#123; event &#45;&#62;
+    <span class="java&#45;keyword">if</span>(event.source) &#123;
+      def serviceClass = application.addServiceClass(event.source)
+      def serviceName = <span class="java&#45;quote">"$&#123;serviceClass.propertyName&#125;"</span>
+      def beans = beans &#123;
+           <span class="java&#45;quote">"$serviceName"</span>(serviceClass.getClazz()) &#123; bean &#45;&#62;
+               bean.autowire =  <span class="java&#45;keyword">true</span>
+      &#125;
+            &#125;
+      <span class="java&#45;keyword">if</span>(event.ctx) &#123;
+        event.ctx.registerBeanDefinition(serviceName,
+                                       beans.getBeanDefinition(serviceName))
+      &#125;
+    &#125;
+  &#125;
+&#125;</pre></div><p class="paragraph"/>Firstly it defines a set of <code>watchedResources</code> as either a String or a List of strings that contain either the references or patterns of the resources to watch. If the watched resources is a Groovy file, when it is changed it will automatically be reloaded and passed into the <code>onChange</code> closure inside the <code>event</code> object.<p class="paragraph"/>The <code>event</code> object defines a number of useful properties:
+<ul class="star">
+<li><code>event.source</code> - The source of the event which is either the reloaded class or a Spring Resource</li>
+<li><code>event.ctx</code> - The Spring <code>ApplicationContext</code> instance</li>
+<li><code>event.plugin</code> - The plugin object that manages the resource (Usually this)</li>
+<li><code>event.application</code> - The <code>GrailsApplication</code> instance</li>
+</ul><p class="paragraph"/>From these objects you can evaluate the conventions and then apply the appropriate changes to the <code>ApplicationContext</code> and so forth based on the conventions, etc.  In the "Services" example above, a new services bean is re-registered with the <code>ApplicationContext</code> when one of the service classes changes.<p class="paragraph"/><h4>Influencing Other Plugins</h4><p class="paragraph"/>As well as being able to react to changes that occur when a plugin changes, sometimes one plugin needs to "influence" another plugin.<p class="paragraph"/>Take for example the Services &#38; Controllers plugins. When a service is reloaded, unless you reload the controllers too, problems will occur when you try to auto-wire the reloaded service into an older controller Class.<p class="paragraph"/>To get round this, you can specify which plugins another plugin "influences". What this means is that when one plugin detects a change, it will reload itself and then reload all influenced plugins. See this snippet from the <code>ServicesGrailsPlugin</code>:<p class="paragraph"/><div class="code"><pre>def influences = &#91;'controllers'&#93;</pre></div><p class="paragraph"/><h4>Observing other plugins</h4><p class="paragraph"/>If there is a particular plugin that you would like to observe for changes but not necessary watch the resources that it monitors you can use the "observe" property:<p class="paragraph"/><div class="code"><pre>def observe = &#91;<span class="java&#45;quote">"hibernate"</span>&#93;</pre></div><p class="paragraph"/>In this case when a Hibernate domain class is changed you will also receive the event chained from the hibernate plugin. It is also possible for a plugin to observe all loaded plugins by using a wildcard:<p class="paragraph"/><div class="code"><pre>def observe = &#91;<span class="java&#45;quote">"&#42;"</span>&#93;</pre></div><p class="paragraph"/>The Logging plugin does exactly this so that it can add the <code>log</code> property back to <em class="italic">any</em> artefact that changes while the application is running.
+	</body>
+</html>

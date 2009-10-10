@@ -1,0 +1,15 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>response </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>response</code> object is an instance of the Servlet API's <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletResponse.html" class="api">HttpServletResponse</a> class<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class BookController &#123;
+	def downloadFile = &#123;
+		<span class="java&#45;object">byte</span>&#91;&#93; bytes = // read bytes
+		response.outputStream &#60;&#60; bytes
+	&#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The Servlet API's <code>HttpServletResponse</code> class can be used within Grails to perform all typical activities such as writing out binary data, writing directly to the response and sending error response codes to name but a few. Refer to the documentation on the <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletResponse.html" class="api">HttpServletResponse</a> class in the Servlet API for more information.<p class="paragraph"/>Grails also overrides the left shift operator on the <code>response</code> object making it easier to write to the response writer:<p class="paragraph"/><div class="code"><pre>response &#60;&#60; <span class="java&#45;quote">"Hello World"</span></pre></div>
+	</body>
+</html>

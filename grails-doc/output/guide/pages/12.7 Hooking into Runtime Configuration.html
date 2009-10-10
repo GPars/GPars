@@ -1,0 +1,36 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>12.7 Hooking into Runtime Configuration</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails provides a number of hooks to leverage the different parts of the system and perform runtime configuration by convention.<p class="paragraph"/><h4>Hooking into the Grails Spring configuration</h4><p class="paragraph"/>First, you can hook in Grails runtime configuration by providing a property called <code>doWithSpring</code> which is assigned a block of code. For example the following snippet is from one of the core Grails plugins that provides <a href="../guide/single.html#10. Internationalization" class="guide">i18n</a> support:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.springframework.web.servlet.i18n.CookieLocaleResolver;
+<span class="java&#45;keyword">import</span> org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+<span class="java&#45;keyword">import</span> org.springframework.context.support.ReloadableResourceBundleMessageSource;<p class="paragraph"/>class I18nGrailsPlugin &#123;<p class="paragraph"/>	def version = 0.1<p class="paragraph"/>	def doWithSpring = &#123;
+		messageSource(ReloadableResourceBundleMessageSource) &#123;
+			basename = <span class="java&#45;quote">"WEB&#45;INF/grails&#45;app/i18n/messages"</span>
+		&#125;
+		localeChangeInterceptor(LocaleChangeInterceptor) &#123;
+			paramName = <span class="java&#45;quote">"lang"</span>
+		&#125;
+		localeResolver(CookieLocaleResolver)
+	&#125;
+&#125;</pre></div><p class="paragraph"/>This plugin sets up the Grails <code>messageSource</code> bean and a couple of other beans to manage Locale resolution and switching. It using the <a href="../guide/single.html#14. Grails and Spring" class="guide">Spring Bean Builder</a> syntax to do so.<p class="paragraph"/><h4>Participating in web.xml Generation</h4><p class="paragraph"/>Grails generates the <code>WEB-INF/web.xml</code> file at load time, and although plugins cannot change this file directly, they can participate in the generation of the file. Essentially a plugin can provide a <code>doWithWebDescriptor</code> property that is assigned a block of code that gets passed the <code>web.xml</code> as a <code>XmlSlurper</code> <code>GPathResult</code>.<p class="paragraph"/>Consider the below example from the <code>ControllersPlugin</code>:<p class="paragraph"/><div class="code"><pre>def doWithWebDescriptor = &#123; webXml &#45;&#62;
+	def mappingElement = webXml.'servlet&#45;mapping'
+	mappingElement + &#123;
+		'servlet&#45;mapping' &#123;
+			'servlet&#45;name'(<span class="java&#45;quote">"grails"</span>)
+			'url&#45;pattern'(<span class="java&#45;quote">"&#42;.dispatch"</span>)
+		&#125;
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Here the plugin goes through gets a reference to the last <code>&#60;servlet-mapping&#62;</code> element and appends Grails' servlet to the end of it using XmlSlurper's ability to programmatically modify XML using closures and blocks.<p class="paragraph"/>
+<h4>Doing Post Initialisation Configuration</h4><p class="paragraph"/>Sometimes it is useful to be able do some runtime configuration after the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/ApplicationContext.html" class="api">ApplicationContext</a> has been built. In this case you can define a <code>doWithApplicationContext</code> closure property.<p class="paragraph"/><div class="code"><pre>class SimplePlugin &#123;
+     def name=<span class="java&#45;quote">"simple"</span>
+     def version = 1.1<p class="paragraph"/>	 def doWithApplicationContext = &#123; appCtx &#45;&#62;
+          SessionFactory sf = appCtx.getBean(<span class="java&#45;quote">"sessionFactory"</span>)
+          // <span class="java&#45;keyword">do</span> something here with session factory
+	 &#125;
+&#125;</pre></div><p class="paragraph"/>
+	</body>
+</html>

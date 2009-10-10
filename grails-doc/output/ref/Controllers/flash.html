@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>flash </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>A temporary storage map that stores objects within the session for the next request and the next request only, automatically clearing our the objects held there after the next request completes.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><pre class="bq"><code>
+class BookController {
+	def index = {
+		flash.message = "Welcome!"
+		redirect(action:home)
+	}
+	def home = {}
+}</code></pre><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The flash object is essentially a map (a hash) which you can use to store key value pairs. These values are transparently stored inside the session and then cleared at the end of the next request.<p class="paragraph"/>This pattern allows you to use HTTP redirects (which is useful for <a href="http://www.theserverside.com/tt/articles/article.tss?l=RedirectAfterPost)" target="blank">redirect after post</a> and retain values that can retrieved from the flash object.
+	</body>
+</html>

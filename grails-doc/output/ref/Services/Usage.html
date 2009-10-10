@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>Service Usage</h1><p class="paragraph"/>A service contains business logic that can be re-used across a Grails application. In Grails a service is a class that ends in the convention "Service" and lives in the <code>grails-app/services</code> directory. A service can be created with the <a href="../../ref/Command Line/create-service.html" class="commandLine">create-service</a> command:<p class="paragraph"/><div class="code"><pre>grails create&#45;service Book</pre></div><p class="paragraph"/>Or via your favourite IDE or text editor.<p class="paragraph"/><div class="code"><pre>class BookService &#123;	
+	Book&#91;&#93; getBooks() &#123;
+		Book.list() as Book&#91;&#93;
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Refer to the user guide topic on <a href="../../guide/single.html#8. The Service Layer" class="guide">Services</a> for more information.
+	</body>
+</html>

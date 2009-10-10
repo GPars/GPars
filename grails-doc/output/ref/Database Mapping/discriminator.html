@@ -1,0 +1,38 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>discriminator</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Customizes the discriminator value used in table-per-subclass inheritance mapping.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class Content &#123;
+	&#8230;
+&#125;
+class PodCast <span class="java&#45;keyword">extends</span> Content&#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		discriminator <span class="java&#45;quote">"audio"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Usage: <code>discriminator(string/map)</code><p class="paragraph"/>Arguments:
+<ul class="star">
+<li><code>column</code> (optional) - The column name to store the discriminator</li>
+<li><code>value</code> - The value to use for the discriminator</li>
+</ul><p class="paragraph"/>By default when mapping inheritance Grails uses a single-table model so that all subclasses share the same table. A discriminator column is then used to help Grails tell what type a particular row is. By default the class name is stored as the value of this column. You can use the <code>discriminator</code> method to customize the value stored:<p class="paragraph"/><div class="code"><pre>class Content &#123;
+	&#8230;
+&#125;
+class PodCast <span class="java&#45;keyword">extends</span> Content&#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		discriminator <span class="java&#45;quote">"audio"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>You can also customize the discriminator column name:<p class="paragraph"/><div class="code"><pre>class Content &#123;
+	&#8230;
+&#125;
+class PodCast <span class="java&#45;keyword">extends</span> Content&#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		discriminator column:<span class="java&#45;quote">"content_type"</span>,  value: <span class="java&#45;quote">"audio"</span>
+	&#125;
+&#125;</pre></div>
+	</body>
+</html>

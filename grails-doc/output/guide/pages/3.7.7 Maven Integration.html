@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.7.7 Maven Integration</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		When using the Grails Maven plugin, Grails' dependency resolution mechanics are disabled as it is assumed that you will manage dependencies via Maven's <code>pom.xml</code> file.<p class="paragraph"/>However, if you would like to continue using Grails regular commands like run-app, test-app and so on then you can tell Grails' command line to load dependencies from the Maven <code>pom.xml</code> file instead.<p class="paragraph"/>To do so simply add the following line to your <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.project.dependency.resolution = &#123;
+ 	pom <span class="java&#45;keyword">true</span>
+	..
+&#125;</pre></div><p class="paragraph"/>The line <code>pom true</code> tells Grails to parse Maven's <code>pom.xml</code> and load dependencies from there.
+
+	</body>
+</html>

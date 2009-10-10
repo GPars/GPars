@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>Constraints Usage</h1><p class="paragraph"/>Constraints provide Grails with a declarative DSL for defining validation rules, schema generation and CRUD generation meta data. An example of a set of constraints applied to a domain class are as follows:<p class="paragraph"/><div class="code"><pre>class User &#123;
+    ...<p class="paragraph"/>    <span class="java&#45;keyword">static</span> constraints = &#123;
+        login(size:5..15, blank:<span class="java&#45;keyword">false</span>, unique:<span class="java&#45;keyword">true</span>)
+        password(size:5..15, blank:<span class="java&#45;keyword">false</span>)
+        email(email:<span class="java&#45;keyword">true</span>, blank:<span class="java&#45;keyword">false</span>)
+        age(min:18, nullable:<span class="java&#45;keyword">false</span>)
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Refer to the user guide topic on <a href="../../guide/single.html#7.1 Declaring Constraints" class="guide">Constraints</a> for more information.
+	</body>
+</html>

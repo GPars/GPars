@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>resource</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Creates a link that can be used where necessary (for example in an href, javascript, ajax call etc.)<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>Example controller for an application called "shop":<p class="paragraph"/>Example usages for the "shop" app:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:resource dir=<span class="xml&#45;quote">"css"</span> file=<span class="xml&#45;quote">"main.css"</span> /&#62;</span> == /shop/css/main.css
+<span class="xml&#45;tag">&#60;g:resource dir=<span class="xml&#45;quote">"css"</span> file=<span class="xml&#45;quote">"main.css"</span> absolute=<span class="xml&#45;quote">"true"</span>/&#62;</span> == http://portal.mygreatsite.com/css/main.css
+<span class="xml&#45;tag">&#60;g:resource dir=<span class="xml&#45;quote">"css"</span> file=<span class="xml&#45;quote">"main.css"</span> base=<span class="xml&#45;quote">"http://admin.mygreatsite.com"</span>/&#62;</span> == http://admin.mygreatsite.com/css/main.css</pre></div><p class="paragraph"/>Example as a method call in GSP only:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;link type=<span class="xml&#45;quote">"text/css"</span> href=<span class="xml&#45;quote">"$&#123;resource(dir:'css',file:'main.css')&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>Results in:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;link type=<span class="xml&#45;quote">"text/css"</span> href=<span class="xml&#45;quote">"/shop/css/main.css"</span> /&#62;</span></pre></div><p class="paragraph"/><p class="paragraph"/><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Attributes
+<ul class="star">
+<li><code>dir</code> (optional) - the name of the directory within the grails app to link to</li>
+<li><code>file</code> (optional) - the name of the file within the grails app to link to</li>
+<li><code>absolute</code> (optional) - If set to "true" will prefix the link target address with the value of the grails.serverURL property from Config, or http://localhost:&#60;port&#62; if no value in Config and not running in production.</li>
+<li><code>base</code> (optional) - Sets the prefix to be added to the link target address, typically an absolute server URL. This overrides the behaviour of the <code>absolute</code> property, if both are specified.</li>
+</ul><p class="paragraph"/><h2>Source</h2><p class="paragraph"/><div class="error">source: ../grails/src/java/org/codehaus/groovy/grails/plugins/web/taglib/ApplicationTagLib.groovy (No such file or directory)</div><p class="paragraph"/>
+
+	</body>
+</html>

@@ -1,0 +1,21 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.4.3 Hibernate Query Language (HQL)</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		GORM classes also support Hibernate's query language HQL, a very complete reference for which can be found <a href="http://www.hibernate.org/hib_docs/reference/en/html/queryhql.html" target="blank">Chapter 14. HQL: The Hibernate Query Language</a> of the Hibernate documentation.<p class="paragraph"/>GORM provides a number of methods that work with HQL including <a href="../ref/Domain Classes/find.html" class="domainClasses">find</a>, <a href="../ref/Domain Classes/findAll.html" class="domainClasses">findAll</a> and <a href="../ref/Domain Classes/executeQuery.html" class="domainClasses">executeQuery</a>. An example of a query can be seen below:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like 'Lord of the%'"</span>)</pre></div><p class="paragraph"/><h4>Positional and Named Parameters</h4><p class="paragraph"/>In this case the value passed to the query is hard coded, however you can equally use positional parameters:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like ?"</span>, &#91;<span class="java&#45;quote">"The Shi%"</span>&#93;)</pre></div><p class="paragraph"/>Or even named parameters:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like :search or b.author like :search"</span>, &#91;search:<span class="java&#45;quote">"The Shi%"</span>&#93;)</pre></div><p class="paragraph"/><h4>Multiline Queries</h4><p class="paragraph"/>If you need to separate the query across multiple lines you can use a line continuation character:<p class="paragraph"/><div class="code"><pre>def results = Book.findAll(<span class="java&#45;quote">"&#92;
+from Book as b, &#92;
+     Author as a &#92;
+where b.author = a and a.surname = ?"</span>, &#91;'Smith'&#93;)</pre></div><p class="paragraph"/><blockquote class="note">
+Groovy multiline strings will NOT work with HQL queries
+</blockquote><p class="paragraph"/><h4>Pagination and Sorting</h4><p class="paragraph"/>You can also perform pagination and sorting whilst using HQL queries. To do so simply specify the pagination options as a map at the end of the method call and include an "ORDER BY" clause in the HQL:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like 'Lord of the%' order by b.title asc"</span>,
+                   &#91;max:10, offset:20&#93;)</pre></div>
+
+	</body>
+</html>

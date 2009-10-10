@@ -1,0 +1,15 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>core </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The core plug-in that adds methods and beans that other plug-ins rely upon<p class="paragraph"/><h2>Description</h2><p class="paragraph"/>This plug-in deals with setting up Grails to use Spring MVC at its core to deal with web requests. The plug-in sets up the <code>GrailsDispatcherServlet</code> and necessary Spring beans (see below) for controllers, tag libraries and Groovy Server Pages (GSP)<p class="paragraph"/>Configured Spring Beans:
+<ul class="star">
+<li><code>classLoader</code> - A bean that refers to the GroovyClassLoader used to load this GrailsApplication</li>
+<li><code>classEditor</code> - A PropertyEditor that allows conversion of String's to classes using the <code>classLoader</code> bean</li>
+<li><code>customEditors</code> - An instance of <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/config/CustomEditorConfigurer.html" class="api">org.springframework.beans.factory.config.CustomEditorConfigurer</a>, that uses allows the <code>classEditor</code> bean to be used as a PropertyEditor</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

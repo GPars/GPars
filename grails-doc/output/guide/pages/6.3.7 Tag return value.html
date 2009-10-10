@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.3.7 Tag return value</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Since Grails 1.2, a tag library call returns an instance of <code>org.codehaus.groovy.grails.web.util.StreamCharBuffer</code> class by default.
+This change improves performance by reducing object creation and optimizing buffering during request processing. 
+In earlier Grails versions, a <code>java.lang.String</code> instance was returned.<p class="paragraph"/>Tag libraries can also return direct object values to the caller since Grails 1.2.. 
+Object returning tag names are listed in a static <code>returnObjectForTags</code> property in the tag library class.<p class="paragraph"/>Example:
+<div class="code"><pre>class ObjectReturningTagLib &#123;
+	<span class="java&#45;keyword">static</span> namespace = <span class="java&#45;quote">"cms"</span>
+	<span class="java&#45;keyword">static</span> returnObjectForTags = &#91;'content'&#93;<p class="paragraph"/>	def content = &#123; attrs, body &#45;&#62;
+		CmsContent.findByCode(attrs.code)?.content	
+    &#125;
+&#125;</pre></div>
+	</body>
+</html>

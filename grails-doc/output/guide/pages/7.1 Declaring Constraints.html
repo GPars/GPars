@@ -1,0 +1,27 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>7.1 Declaring Constraints</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Within a domain class a <a href="../ref/Domain Classes/constraints.html" class="domainClasses">constraints</a> are defined with the constraints property that is assigned a code block:<p class="paragraph"/><div class="code"><pre>class User &#123;
+    <span class="java&#45;object">String</span> login
+    <span class="java&#45;object">String</span> password
+    <span class="java&#45;object">String</span> email
+    <span class="java&#45;object">Integer</span> age<p class="paragraph"/>    <span class="java&#45;keyword">static</span> constraints = &#123;
+	  &#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>You then use method calls that match the property name for which the constraint applies in combination with named parameters to specify constraints:<p class="paragraph"/>
+<div class="code"><pre>class User &#123;
+    ...<p class="paragraph"/>    <span class="java&#45;keyword">static</span> constraints = &#123;
+        login(size:5..15, blank:<span class="java&#45;keyword">false</span>, unique:<span class="java&#45;keyword">true</span>)
+        password(size:5..15, blank:<span class="java&#45;keyword">false</span>)
+        email(email:<span class="java&#45;keyword">true</span>, blank:<span class="java&#45;keyword">false</span>)
+        age(min:18, nullable:<span class="java&#45;keyword">false</span>)
+    &#125;
+&#125;</pre></div><p class="paragraph"/>In this example we've declared that the <code>login</code> property must be between 5 and 15 characters long, it cannot be blank and must be unique. We've all applied other constraints to the <code>password</code>, <code>email</code> and <code>age</code> properties.<p class="paragraph"/><blockquote class="note">
+  A complete reference for the available constraints can be found on the reference guide
+</blockquote>
+	</body>
+</html>

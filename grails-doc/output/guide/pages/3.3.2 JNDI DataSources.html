@@ -1,0 +1,12 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.3.2 JNDI DataSources</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Since many Java EE containers typically supply <code>DataSource</code> instances via the <a href="http://java.sun.com/products/jndi/" target="blank">Java Naming and Directory Interface</a> (JNDI). Sometimes you are required to look-up a <code>DataSource</code> via JNDI.<p class="paragraph"/>Grails supports the definition of JNDI data sources as follows:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+    jndiName = <span class="java&#45;quote">"java:comp/env/myDataSource"</span>
+&#125;</pre></div><p class="paragraph"/>The format on the JNDI name may vary from container to container, but the way you define the <code>DataSource</code> remains the same.
+	</body>
+</html>

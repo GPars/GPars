@@ -1,0 +1,42 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>12.8 Adding Dynamic Methods at Runtime</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>The Basics</h4><p class="paragraph"/>Grails plugins allow you to register dynamic methods with any Grails managed or other class at runtime. New methods can only be added within a <code>doWithDynamicMethods</code> closure of a plugin.<p class="paragraph"/>For Grails managed classes like controllers, tag libraries and so forth you can add methods, constructors etc. using the <a href="http://groovy.codehaus.org/ExpandoMetaClass" target="blank">ExpandoMetaClass</a> mechanism by accessing each controller's <a href="api:http://groovy.codehaus.org/api/groovy/lang/MetaObjectProtocol.html" target="blank">MetaClass</a>:<p class="paragraph"/><div class="code"><pre>class ExamplePlugin &#123;
+  def doWithDynamicMethods = &#123; applicationContext &#45;&#62;
+        application.controllerClasses.each &#123; controllerClass &#45;&#62;
+             controllerClass.metaClass.myNewMethod = &#123;&#45;&#62; println <span class="java&#45;quote">"hello world"</span> &#125;
+        &#125;
+  &#125;
+&#125;</pre></div><p class="paragraph"/>In this case we use the implicit application object to get a reference to all of the controller classes' MetaClass instances and then add a new method called <code>myNewMethod</code> to each controller.
+Alternatively, if you know before hand the class you wish the add a method to you can simple reference that classes <code>metaClass</code> property:<p class="paragraph"/><div class="code"><pre>class ExamplePlugin &#123;<p class="paragraph"/>  def doWithDynamicMethods = &#123; applicationContext &#45;&#62;
+      <span class="java&#45;object">String</span>.metaClass.swapCase = &#123;&#45;&#62;
+           def sb = <span class="java&#45;keyword">new</span> <span class="java&#45;object">StringBuffer</span>()
+           delegate.each &#123;
+               sb &#60;&#60; (<span class="java&#45;object">Character</span>.isUpperCase(it as <span class="java&#45;object">char</span>) ? 
+                      <span class="java&#45;object">Character</span>.toLowerCase(it as <span class="java&#45;object">char</span>) : 
+                      <span class="java&#45;object">Character</span>.toUpperCase(it as <span class="java&#45;object">char</span>))
+           &#125;
+           sb.toString()
+      &#125;<p class="paragraph"/>      assert <span class="java&#45;quote">"UpAndDown"</span> == <span class="java&#45;quote">"uPaNDdOWN"</span>.swapCase()       
+  &#125;
+&#125;</pre></div><p class="paragraph"/>In this example we add a new method <code>swapCase</code> to <code>java.lang.String</code> directly by accessing its <code>metaClass</code>.<p class="paragraph"/><h4>Interacting with the ApplicationContext</h4><p class="paragraph"/>The <code>doWithDynamicMethods</code> closure gets passed the Spring <code>ApplicationContext</code> instance. This is useful as it allows you to interact with objects within it. For example if you where implementing a method to interact with Hibernate you could use the <code>SessionFactory</code> instance in combination with a <code>HibernateTemplate</code>:<p class="paragraph"/>
+<div class="code"><pre><span class="java&#45;keyword">import</span> org.springframework.orm.hibernate3.HibernateTemplate<p class="paragraph"/>class ExampleHibernatePlugin &#123;<p class="paragraph"/>   def doWithDynamicMethods = &#123; applicationContext &#45;&#62;<p class="paragraph"/>       application.domainClasses.each &#123; domainClass &#45;&#62;<p class="paragraph"/>           domainClass.metaClass.<span class="java&#45;keyword">static</span>.load = &#123; <span class="java&#45;object">Long</span> id&#45;&#62; 
+                def sf = applicationContext.sessionFactory
+                def template = <span class="java&#45;keyword">new</span> HibernateTemplate(sf)
+				template.load(delegate, id)
+           &#125;
+       &#125;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Also because of the autowiring and dependency injection capability of the Spring container you can implement more powerful dynamic constructors that use the application context to wire dependencies into your object at runtime:<p class="paragraph"/><div class="code"><pre>class MyConstructorPlugin &#123;<p class="paragraph"/>    def doWithDynamicMethods = &#123; applicationContext &#45;&#62;
+         application.domainClasses.each &#123; domainClass &#45;&#62;
+              domainClass.metaClass.constructor = &#123;&#45;&#62;
+                  <span class="java&#45;keyword">return</span> applicationContext.getBean(domainClass.name)
+              &#125;
+         &#125;<p class="paragraph"/>    &#125;
+&#125;</pre></div><p class="paragraph"/>Here we actually replace the default constructor with one that looks up prototyped Spring beans instead!<p class="paragraph"/>
+	</body>
+</html>

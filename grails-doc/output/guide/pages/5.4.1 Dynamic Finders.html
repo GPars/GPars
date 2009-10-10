@@ -1,0 +1,40 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.4.1 Dynamic Finders</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		GORM supports the concept of <strong class="bold">dynamic finders</strong>. A dynamic finder looks like a static method invocation, but the methods themselves don't actually exist in any form at the code level.<p class="paragraph"/>Instead, a method is auto-magically generated using code synthesis at runtime, based on the properties of a given class. Take for example the <code>Book</code> class:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+	Date releaseDate
+	Author author
+&#125;                
+class Author &#123;
+	<span class="java&#45;object">String</span> name
+&#125;</pre></div><p class="paragraph"/>The <code>Book</code> class has properties such as <code>title</code>, <code>releaseDate</code> and <code>author</code>. These can be used by the <a href="../ref/Domain Classes/findBy.html" class="domainClasses">findBy</a> and <a href="../ref/Domain Classes/findAllBy.html" class="domainClasses">findAllBy</a> methods in the form of "method expressions":<p class="paragraph"/><div class="code"><pre>def book = Book.findByTitle(<span class="java&#45;quote">"The Stand"</span>)<p class="paragraph"/>book = Book.findByTitleLike(<span class="java&#45;quote">"Harry Pot%"</span>)<p class="paragraph"/>book = Book.findByReleaseDateBetween( firstDate, secondDate )<p class="paragraph"/>book = Book.findByReleaseDateGreaterThan( someDate )<p class="paragraph"/>book = Book.findByTitleLikeOrReleaseDateLessThan( <span class="java&#45;quote">"%Something%"</span>, someDate )</pre></div><p class="paragraph"/><h4>Method Expressions</h4><p class="paragraph"/>A method expression in GORM is made up of the prefix such as <a href="../ref/Domain Classes/findBy.html" class="domainClasses">findBy</a> followed by an expression that combines one or more properties. The basic form is:<p class="paragraph"/><div class="code"><pre>Book.findBy(&#91;Property&#93;&#91;Comparator&#93;&#91;<span class="java&#45;object">Boolean</span> Operator&#93;)?&#91;Property&#93;&#91;Comparator&#93;</pre></div><p class="paragraph"/>The tokens marked with a '?' are optional. Each comparator changes the nature of the query. For example:<p class="paragraph"/><div class="code"><pre>def book = Book.findByTitle(<span class="java&#45;quote">"The Stand"</span>)<p class="paragraph"/>book =  Book.findByTitleLike(<span class="java&#45;quote">"Harry Pot%"</span>)</pre></div><p class="paragraph"/>In the above example the first query is equivalent to equality whilst the latter, due to the <code>Like</code> comparator, is equivalent to a SQL <code>like</code> expression.<p class="paragraph"/>The possible comparators include:
+<ul class="star">
+<li><code>InList</code> - In the list of given values</li>
+<li><code>LessThan</code> - less than the given value</li>
+<li><code>LessThanEquals</code> - less than or equal a give value</li>
+<li><code>GreaterThan</code> - greater than a given value</li>
+<li><code>GreaterThanEquals</code> - greater than or equal a given value</li>
+<li><code>Like</code> - Equivalent to a SQL like expression</li>
+<li><code>Ilike</code> - Similar to a <code>Like</code>, except case insensitive</li>
+<li><code>NotEqual</code> - Negates equality</li>
+<li><code>Between</code> - Between two values (requires two arguments)</li>
+<li><code>IsNotNull</code> - Not a null value (doesn't require an argument)</li>
+<li><code>IsNull</code> - Is a null value (doesn't require an argument)</li>
+</ul><p class="paragraph"/>Notice that the last 3 require different numbers of method arguments compared to the rest, as demonstrated in the following example:<p class="paragraph"/><div class="code"><pre>def now = <span class="java&#45;keyword">new</span> Date()
+def lastWeek = now &#45; 7
+def book = Book.findByReleaseDateBetween( lastWeek, now )<p class="paragraph"/>books = Book.findAllByReleaseDateIsNull()
+books = Book.findAllByReleaseDateIsNotNull()</pre></div><p class="paragraph"/><h4>Boolean logic (AND/OR) </h4><p class="paragraph"/>Method expressions can also use a boolean operator to combine two criteria:<p class="paragraph"/><div class="code"><pre>def books = 
+    Book.findAllByTitleLikeAndReleaseDateGreaterThan(<span class="java&#45;quote">"%Java%"</span>, <span class="java&#45;keyword">new</span> Date()&#45;30)</pre></div><p class="paragraph"/>In this case we're using <code>And</code> in the middle of the query to make sure both conditions are satisfied, but you could equally use <code>Or</code>:<p class="paragraph"/><div class="code"><pre>def books = 
+    Book.findAllByTitleLikeOrReleaseDateGreaterThan(<span class="java&#45;quote">"%Java%"</span>, <span class="java&#45;keyword">new</span> Date()&#45;30)</pre></div><p class="paragraph"/>At the moment, you can only use dynamic finders with a maximum of two criteria, i.e. the method name can only have one boolean operator. If you need to use more, you should consider using either <a href="../guide/single.html#5.4.2 Criteria" class="guide">Criteria</a> or the <a href="../guide/single.html#5.4.3 Hibernate Query Language (HQL)" class="guide">HQL</a>.<p class="paragraph"/><h4>Querying Associations</h4><p class="paragraph"/>Associations can also be used within queries:<p class="paragraph"/><div class="code"><pre>def author = Author.findByName(<span class="java&#45;quote">"Stephen King"</span>)<p class="paragraph"/>def books = author ? Book.findAllByAuthor(author) : &#91;&#93;</pre></div><p class="paragraph"/>In this case if the <code>Author</code> instance is not null we use it in a query to obtain all the <code>Book</code> instances for the given <code>Author</code>.<p class="paragraph"/><h4>Pagination &#38; Sorting</h4><p class="paragraph"/>The same pagination and sorting parameters available on the <a href="../ref/Domain Classes/list.html" class="domainClasses">list</a> method can also be used with dynamic finders by supplying a map as the final parameter:<p class="paragraph"/><div class="code"><pre>def books = 
+  Book.findAllByTitleLike(<span class="java&#45;quote">"Harry Pot%"</span>, &#91;max:3, 
+                                         offset:2, 
+                                         sort:<span class="java&#45;quote">"title"</span>,
+                                         order:<span class="java&#45;quote">"desc"</span>&#93;)</pre></div>
+
+	</body>
+</html>

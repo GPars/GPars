@@ -1,0 +1,51 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.3 The DataSource</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Since Grails is built on Java technology to set-up a data source requires some knowledge of JDBC (the technology that doesn't stand for Java Database Connectivity).<p class="paragraph"/>Essentially, if you are using another database other than HSQLDB you need to have a JDBC driver. For example for MySQL you would need <a href="http://www.mysql.com/products/connector/j/" target="blank">Connector/J</a><p class="paragraph"/>Drivers typically come in the form of a JAR archive. Drop the JAR into your projects <code>lib</code> directory.<p class="paragraph"/>Once you have the JAR in place you need to get familiar Grails' DataSource descriptor file located at <code>grails-app/conf/DataSource.groovy</code>. This file contains the dataSource definition which includes the following settings:
+<ul class="star">
+<li><code>driverClassName</code> - The class name of the JDBC driver</li>
+<li><code>username</code> - The username used to establish a JDBC connection</li>
+<li><code>password</code> - The password used to establish a JDBC connection</li>
+<li><code>url</code> - The JDBC URL of the database</li>
+<li><code>dbCreate</code> - Whether to auto-generate the database from the domain model or not</li>
+<li><code>pooled</code> - Whether to use a pool of connections (defaults to true)</li>
+<li><code>logSql</code> - Enable SQL logging</li>
+<li><code>dialect</code> - A String or Class that represents the Hibernate dialect used to communicate with the database. See the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/dialect/package-summary.html" target="blank">org.hibernate.dialect</a> package for available dialects.</li>
+<li><code>properties</code> - Extra properties to set on the DataSource bean. See the <a href="http://commons.apache.org/dbcp/api-1.2.2/org/apache/commons/dbcp/BasicDataSource.html" target="blank">Commons DBCP BasicDataSource</a> documentation.</li>
+</ul><p class="paragraph"/>A typical configuration for MySQL may be something like:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+	pooled = <span class="java&#45;keyword">true</span>
+	dbCreate = <span class="java&#45;quote">"update"</span>
+	url = <span class="java&#45;quote">"jdbc:mysql://localhost/yourDB"</span>
+	driverClassName = <span class="java&#45;quote">"com.mysql.jdbc.Driver"</span>
+	username = <span class="java&#45;quote">"yourUser"</span>
+	password = <span class="java&#45;quote">"yourPassword"</span>	
+&#125;</pre></div><p class="paragraph"/><blockquote class="warning">
+When configuring the DataSource do not include the type or the def keyword before any of the configuration settings as Groovy will treat these as local variable definitions and they will not be processed. For example the following is invalid:
+</blockquote><p class="paragraph"/><div class="code"><pre>dataSource &#123;
+	<span class="java&#45;object">boolean</span> pooled = <span class="java&#45;keyword">true</span> // type declaration results in local variable
+	&#8230;
+&#125;</pre></div><p class="paragraph"/>
+Example of advanced configuration using extra properties:
+<div class="code"><pre>dataSource &#123;
+	pooled = <span class="java&#45;keyword">true</span>
+	dbCreate = <span class="java&#45;quote">"update"</span>
+	url = <span class="java&#45;quote">"jdbc:mysql://localhost/yourDB"</span>
+	driverClassName = <span class="java&#45;quote">"com.mysql.jdbc.Driver"</span>
+	username = <span class="java&#45;quote">"yourUser"</span>
+	password = <span class="java&#45;quote">"yourPassword"</span>
+	properties &#123;
+		maxActive = 50
+		maxIdle = 25
+		minIdle = 5
+		initialSize = 5
+		minEvictableIdleTimeMillis = 60000
+		timeBetweenEvictionRunsMillis = 60000
+		maxWait = 10000		
+	&#125;	
+&#125;</pre></div><p class="paragraph"/> 
+	</body>
+</html>

@@ -1,0 +1,20 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.5.2.6 Database Indices</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		To get the best performance out of your queries it is often necessary to tailor the table index definitions. How you tailor them is domain specific and a matter of monitoring usage patterns of your queries. With GORM's DSL you can specify which columns need to live in which indexes:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;object">String</span> address
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      version <span class="java&#45;keyword">false</span>
+      id column:'person_id'
+      firstName column:'First_Name', index:'Name_Idx'
+      address column:'Address', index:'Name_Idx, Address_Index'
+  &#125;
+&#125;</pre></div><p class="paragraph"/><p class="paragraph"/>
+	</body>
+</html>

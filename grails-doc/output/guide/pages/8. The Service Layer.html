@@ -1,0 +1,11 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>8. The Service Layer</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		As well as the <a href="../guide/single.html#6. The Web Layer" class="guide">Web layer</a>, Grails defines the notion of a service layer. The Grails team discourages the embedding of core application logic inside controllers, as it does not promote re-use and a clean separation of concerns.<p class="paragraph"/>Services in Grails are seen as the place to put the majority of the logic in your application, leaving controllers responsible for handling request flow via redirects and so on.<p class="paragraph"/><h4>Creating a Service</h4><p class="paragraph"/>You can create a Grails service by running the <a href="../ref/Command Line/create-service.html" class="commandLine">create-service</a> command from the root of your project in a terminal window:<p class="paragraph"/><div class="code"><pre>grails create&#45;service simple</pre></div><p class="paragraph"/>The above example will create a service at the location <code>grails-app/services/SimpleService.groovy</code>. A service's name ends with the convention <code>Service</code>, other than that a service is a plain Groovy class:<p class="paragraph"/><div class="code"><pre>class SimpleService &#123;	
+&#125;</pre></div>
+	</body>
+</html>

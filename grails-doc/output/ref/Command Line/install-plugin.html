@@ -1,0 +1,21 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>install-plugin </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Installs a plug-in from a file, URL or the Grails central SVN repository<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>grails install&#45;plugin http://foo.com/grails&#45;bar&#45;1.0.zip
+grails install&#45;plugin ../grails&#45;bar&#45;1.0.zip
+grails install&#45;plugin jsecurity
+grails install&#45;plugin jsecurity 0.1</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Usage: 
+<div class="code"><pre>grails install&#45;plugin &#91;URL/File&#93;
+grails install&#45;plugin &#91;name&#93; &#91;version&#93;&#42;</pre></div><p class="paragraph"/>Fired Events: 
+<ul class="star">
+<li><code>StatusUpdate</code> - Fired at various points during the plug-in installation</li>
+<li><code>StatusError</code> - When an error occurs during plug-in installation</li>
+<li><code>StatusFinal</code> - When the plug-in is installed successfully</li>
+<li><code>PluginInstalled</code> - When the plug-in is installed successfully</li>
+</ul><p class="paragraph"/>The <code>install-plugin</code> command is a versatile command that allows the installation of plug-ins from a remote URL, a local file or from the Grails central SVN repository at http://plugins.grails.org<p class="paragraph"/>To install from a URL, simply specify the absolute URL to the plug-in package:<p class="paragraph"/><div class="code"><pre>grails install&#45;plugin http://foo.com/grails&#45;bar&#45;1.0.zip</pre></div><p class="paragraph"/>To install from a local file, specify the absolute or relative path to the file:<p class="paragraph"/><div class="code"><pre>grails install&#45;plugin ../grails&#45;bar&#45;1.0.zip</pre></div><p class="paragraph"/>You can also install plug-ins provided via the remote central repository. To find out what plug-ins are available use <a href="../../ref/Command Line/list-plugins.html" class="commandLine">list-plugins</a><p class="paragraph"/>If you want to install a plug-in, say the "jsecurity" plug-in, you can use the install-plugin command followed by the plugin name:<p class="paragraph"/><div class="code"><pre>grails install&#45;plugin jsecurity</pre></div><p class="paragraph"/>This will install the latest version of the plug-in. If you need to install a specific version you can use:<p class="paragraph"/><div class="code"><pre>grails install&#45;plugin jsecurity 0.1</pre></div><p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.2.2.5 Forms and Fields</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Form Basics</h4><p class="paragraph"/>GSP supports many different tags for aiding in dealing with HTML forms and fields, the most basic of which is the <a href="../ref/Tags/form.html" class="tags">form</a> tag. The <code>form</code> tag is a controller/action aware version of the regular HTML form tag. The <code>url</code> attribute allows you to specify which controller and action to map to:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:form name=<span class="xml&#45;quote">"myForm"</span> url=<span class="xml&#45;quote">"&#91;controller:'book',action:'list'&#93;"</span>&#62;</span>...<span class="xml&#45;tag">&#60;/g:form&#62;</span></pre></div><p class="paragraph"/>In this case we create a form called <code>myForm</code> that submits to the <code>BookController</code>'s <code>list</code> action. Beyond that all of the usual HTML attributes apply.<p class="paragraph"/><h4>Form Fields</h4><p class="paragraph"/>As well as easy construction of forms GSP supports custom tags for dealing with different types of fields including:
+<ul class="star">
+<li><a href="../ref/Tags/textField.html" class="tags">textField</a> - For input fields of type 'text'</li>
+<li><a href="../ref/Tags/checkBox.html" class="tags">checkBox</a> - For input fields of type 'checkbox'</li>
+<li><a href="../ref/Tags/radio.html" class="tags">radio</a> - For input fields of type 'radio'</li>
+<li><a href="../ref/Tags/hiddenField.html" class="tags">hiddenField</a> - For input fields of type 'hidden'</li>
+<li><a href="../ref/Tags/select.html" class="tags">select</a> - For dealing with HTML select boxes</li>
+</ul><p class="paragraph"/>Each of these allow GSP expressions as the value:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"myField"</span> value=<span class="xml&#45;quote">"$&#123;myValue&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>GSP also contains extended helper versions of the above tags such as <a href="../ref/Tags/radioGroup.html" class="tags">radioGroup</a> (for creating groups of <a href="../ref/Tags/radio.html" class="tags">radio</a> tags), <a href="../ref/Tags/localeSelect.html" class="tags">localeSelect</a>, <a href="../ref/Tags/currencySelect.html" class="tags">currencySelect</a> and <a href="../ref/Tags/timeZoneSelect.html" class="tags">timeZoneSelect</a> (for selecting locale's, currencies and time zone's respectively).<p class="paragraph"/><h4>Multiple Submit Buttons</h4><p class="paragraph"/>The age old problem of dealing with multiple submit buttons is also handled elegantly with Grails via the <a href="../ref/Tags/actionSubmit.html" class="tags">actionSubmit</a> tag. It is just like a regular submit, but allows you to specify an alternative action to submit to:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:actionSubmit value=<span class="xml&#45;quote">"Some update label"</span> action=<span class="xml&#45;quote">"update"</span> /&#62;</span></pre></div><p class="paragraph"/>
+	</body>
+</html>

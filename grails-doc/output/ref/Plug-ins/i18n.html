@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>i18n </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>i18n</code> plug-in sets up Grails' support for <a href="../../guide/single.html#10. Internationalization" class="guide">Internationalization</a>.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>An example <code>messages.properties</code> within the <code>grails-app/i18n</code> directory:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">default</span>.doesnt.match.message=Property &#91;&#123;0&#125;&#93; of class &#91;&#123;1&#125;&#93; with value &#91;&#123;2&#125;&#93; does not match the required pattern &#91;&#123;3&#125;&#93;
+<span class="java&#45;keyword">default</span>.invalid.url.message=Property &#91;&#123;0&#125;&#93; of class &#91;&#123;1&#125;&#93; with value &#91;&#123;2&#125;&#93; is not a valid URL
+<span class="java&#45;keyword">default</span>.invalid.creditCard.message=Property &#91;&#123;0&#125;&#93; of class &#91;&#123;1&#125;&#93; with value &#91;&#123;2&#125;&#93; is not a valid credit card number</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Refer to the section on <a href="../../guide/single.html#10. Internationalization" class="guide">Internationalization</a> in the Grails user guide which details how Grails' i18n support works.<p class="paragraph"/>Configured Spring Beans:
+<ul class="star">
+<li><code>messageSource</code> - An instance the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/support/ReloadableResourceBundleMessageSource.html" class="api">org.springframework.context.support.ReloadableResourceBundleMessageSource</a> class which is used to resolve messages.</li>
+<li><code>localeChangeInterceptor</code> - An instance of the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/servlet/i18n/LocaleChangeInterceptor.html" class="api">org.springframework.web.servlet.i18n.LocaleChangeInterceptor</a> class which is used to switch locales using a <code>lang</code> request parameter.</li>
+<li><code>localeResolver</code> - An instance of the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/servlet/i18n/CookieLocaleResolver.html" class="api">org.springframework.web.servlet.i18n.CookieLocaleResolver</a> class that is used to store the user locale in a cookie.</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

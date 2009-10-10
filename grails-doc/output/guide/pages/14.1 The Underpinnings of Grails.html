@@ -1,0 +1,20 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>14.1 The Underpinnings of Grails</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails is actually a <a href="http://www.springframework.org/docs/MVC-step-by-step/Spring-MVC-step-by-step.html" target="blank">Spring MVC</a> application in disguise. Spring MVC is the Spring framework's built-in MVC web application framework. Although Spring MVC suffers from the same difficulties as frameworks like Struts in terms of its ease of use, it is superbly designed and architected and was, for Grails, the perfect framework to build another framework on top of.<p class="paragraph"/>Grails leverages Spring MVC in the following areas:
+<ul class="star">
+<li>Basic controller logic - Grails subclasses Spring's <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/servlet/DispatcherServlet.html" class="api">DispatcherServlet</a> and uses it to delegate onto Grails <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a></li>
+<li>Data Binding and Validation - Grails' <a href="../guide/single.html#7. Validation" class="guide">validation</a> and <a href="../guide/single.html#6.1.6 Data Binding" class="guide">data binding</a> capabilities are built on those provided by Spring</li>
+<li>Runtime configuration - Grails' entire runtime convention based system is wired together by a Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/ApplicationContext.html" class="api">ApplicationContext</a></li>
+<li>Transactions - Grails uses Spring's transaction management in <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">GORM</a></li>
+</ul><p class="paragraph"/>In other words Grails has Spring embedded running all the way through it.<p class="paragraph"/><h4>The Grails ApplicationContext</h4><p class="paragraph"/>Spring developers are often keen to understand how the Grails <code>ApplicationContext</code> instance is constructed. The basics of it are as follows.
+<ul class="star">
+<li>Grails constructs a parent <code>ApplicationContext</code> from the <code>web-app/WEB-INF/applicationContext.xml</code>. This <code>ApplicationContext</code> sets up the api:org.codehaus.groovy.grails.commons.GrailsApplication instance and the api:org.codehaus.groovy.grails.plugins.GrailsPluginManager.</li>
+<li>Using this <code>ApplicationContext</code> as a parent Grails' analyses the conventions with the <code>GrailsApplication</code> instance and constructs a child <code>ApplicationContext</code> that is used as the root <code>ApplicationContext</code> of the web application</li>
+</ul><p class="paragraph"/><h4>Configured Spring Beans</h4><p class="paragraph"/>Most of Grails' configuration happens at runtime. Each <a href="../guide/single.html#12. Plug-ins" class="guide">plug-in</a> may configure Spring beans that are registered with the <code>ApplicationContext</code>. For a reference as to which beans are configured refer to the reference guide which describes each of the Grails plug-ins and which beans they configure.
+	</body>
+</html>

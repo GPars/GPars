@@ -1,0 +1,13 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>unique</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Constraints a property as unique at the database level<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>login(unique:<span class="java&#45;keyword">true</span>)</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Set to true if the property must be unique (this is a persistent call and will query the database)<p class="paragraph"/><blockquote class="warning">
+Be aware that it's possible (though uncommon in practice) for a uniqueness constraint validation to pass but a subsequent save of the data to fail due to a uniqueness constraint enforced at the database level. The only way to prevent this would be to use the <code>SERIALIZABLE</code> transaction isolation level (bad for performance) or just be prepared to get an exception to this effect at some point.
+</blockquote><p class="paragraph"/>Scope of <code>unique</code> constraint can be specified by specifying the name of another property of the same class, or list of such names. The semantics in these cases is: pair of constrained property value and scope property value must be unique (or combination of constrained property value and all scope property values must be unique).<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>group(unique:'department')</pre></div><p class="paragraph"/>In the above example <code>group</code> name must be unique in one <code>department</code> but there might be groups with same name in different departments.<p class="paragraph"/>Another example:<p class="paragraph"/><div class="code"><pre>login(unique:&#91;'group','department'&#93;)</pre></div><p class="paragraph"/>In this example <code>login</code> must be unique in <code>group</code> and <code>department</code>. There might be same logins in different groups or different departments.<p class="paragraph"/>This constraint influences <a href="../../guide/single.html#5.7 GORM and Constraints" class="guide">schema generation</a>.<p class="paragraph"/>Error Code: <code>className.propertyName.unique</code><p class="paragraph"/>
+
+	</body>
+</html>

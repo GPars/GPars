@@ -1,0 +1,25 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.2.1 GSP Basics</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		In the next view sections we'll go through the basics of GSP and what is available to you. First off let's cover some basic syntax that users of JSP and ASP should be familiar with.<p class="paragraph"/>GSP supports the usage of <code>&#60;% %&#62;</code> blocks to embed Groovy code (again this is discouraged):<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+     <span class="xml&#45;tag">&#60;% out &#60;&#60; <span class="xml&#45;quote">"Hello GSP!"</span> %&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>As well as this syntax you can also use the <code>&#60;%= %&#62;</code> syntax to output values:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+     <span class="xml&#45;tag">&#60;%=<span class="xml&#45;quote">"Hello GSP!"</span> %&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>
+GSP also supports JSP-style server-side comments as the following example demonstrates:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+	 <span class="xml&#45;tag">&#60;%&#45;&#45; This is my comment &#45;&#45;%&#62;</span>
+     <span class="xml&#45;tag">&#60;%=<span class="xml&#45;quote">"Hello GSP!"</span> %&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div>
+
+	</body>
+</html>

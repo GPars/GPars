@@ -1,0 +1,32 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>4.1 Creating Gant Scripts</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		You can create your own Gant scripts by running the <a href="../ref/Command Line/create-script.html" class="commandLine">create-script</a> command from the root of your project. For example the following command:<p class="paragraph"/><div class="code"><pre>grails create&#45;script compile&#45;sources</pre></div><p class="paragraph"/>Will create a script called <code>scripts/CompileSources.groovy</code>. A Gant script itself is similar to a regular Groovy script except that it supports the concept of "targets" and dependencies between them:<p class="paragraph"/><div class="code"><pre>target(<span class="java&#45;keyword">default</span>:<span class="java&#45;quote">"The <span class="java&#45;keyword">default</span> target is the one that gets executed by Grails"</span>) &#123;
+	depends(clean, compile)
+&#125;
+target(clean:<span class="java&#45;quote">"Clean out things"</span>) &#123;
+	ant.delete(dir:<span class="java&#45;quote">"output"</span>)
+&#125;
+target(compile:<span class="java&#45;quote">"Compile some sources"</span>) &#123;
+	ant.mkdir(dir:<span class="java&#45;quote">"mkdir"</span>)
+	ant.javac(srcdir:<span class="java&#45;quote">"src/java"</span>, destdir:<span class="java&#45;quote">"output"</span>)
+&#125;</pre></div><p class="paragraph"/>As demonstrated in the script above, there is an implicit <code>ant</code> variable that allows access to the <a href="http://ant.apache.org/manual/index.html" target="blank">Apache Ant API</a>.
+<blockquote class="note">
+In previous versions of Grails (1.0.3 and below), the variable was <code>Ant</code>, i.e. with a capital first letter.
+</blockquote><p class="paragraph"/>You can also "depend" on other targets using the <code>depends</code> method demonstrated in the <code>default</code> target above.<p class="paragraph"/><h3>The default target</h3><p class="paragraph"/>In the example above, we specified a target with the explicit name "default". This is one way of defining the default target for a script. An alternative approach is to use the <code>setDefaultTarget()</code> method:<p class="paragraph"/><div class="code"><pre>target(<span class="java&#45;quote">"clean&#45;compile"</span>: <span class="java&#45;quote">"Performs a clean compilation on the app's source files."</span>) &#123;
+	depends(clean, compile)
+&#125;
+target(clean:<span class="java&#45;quote">"Clean out things"</span>) &#123;
+	ant.delete(dir:<span class="java&#45;quote">"output"</span>)
+&#125;
+target(compile:<span class="java&#45;quote">"Compile some sources"</span>) &#123;
+	ant.mkdir(dir:<span class="java&#45;quote">"mkdir"</span>)
+	ant.javac(srcdir:<span class="java&#45;quote">"src/java"</span>, destdir:<span class="java&#45;quote">"output"</span>)
+&#125;<p class="paragraph"/>setDefaultTarget(<span class="java&#45;quote">"clean&#45;compile"</span>)</pre></div><p class="paragraph"/>This allows you to call the default target directly from other scripts if you wish. Also, although we have put the call to <code>setDefaultTarget()</code> at the end of the script in this example, it can go anywhere as long as it comes <em class="italic">after</em> the target it refers to ("clean-compile" in this case).<p class="paragraph"/>Which approach is better? To be honest, you can use whichever you prefer - there don't seem to be any major advantages in either case. One thing we would say is that if you want to allow other scripts to call your "default" target, you should move it into a shared script that doesn't have a default target at all. We'll talk some more about this in the next section.
+
+	</body>
+</html>

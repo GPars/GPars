@@ -1,0 +1,22 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>dataSource </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>dataSource</code> plug-in sets up the Grails JDBC <code>DataSource</code> instance.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>A <code>DataSource</code> configured with explicit settings in <code>grails-app/conf/DataSource.groovy</code>:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+	pooled = <span class="java&#45;keyword">true</span>
+	dbCreate = <span class="java&#45;quote">"update"</span>
+	url = <span class="java&#45;quote">"jdbc:mysql://localhost/yourDB"</span>
+	driverClassName = <span class="java&#45;quote">"com.mysql.jdbc.Driver"</span>
+	username = <span class="java&#45;quote">"yourUser"</span>
+	password = <span class="java&#45;quote">"yourPassword"</span>	
+&#125;</pre></div><p class="paragraph"/>A <code>DataSource</code> configured to look-up via JNDI:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+    jndiName = <span class="java&#45;quote">"java:comp/env/myDataSource"</span>
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Refer to the section on <a href="../../guide/single.html#3.3 The DataSource" class="guide">Data Sources</a> in the Grails user guide.<p class="paragraph"/>Configured Spring Beans:
+<ul class="star">
+<li><code>dataSource</code> - An instance of the Apache DBCP libraries <code>org.apache.commons.dbcp.BasicDataSource</code> class or a <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/jndi/JndiObjectFactoryBean.html" class="api">org.springframework.jndi.JndiObjectFactoryBean</a> in the case of a JNDI <code>DataSource</code></li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

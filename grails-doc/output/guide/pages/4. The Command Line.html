@@ -1,0 +1,37 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>4. The Command Line</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails' command line system is built on <a href="http://groovy.codehaus.org/Gant" target="blank">Gant</a> - a simple Groovy wrapper around <a href="http://ant.apache.org" target="blank">Apache Ant</a>.<p class="paragraph"/>However, Grails takes it a bit further through the use of convention and the <code>grails</code> command. When you type:
+<div class="code"><pre>grails &#91;command name&#93;</pre></div>              
+Grails does a search in the following directories for Gant scripts to execute:                          
+<ul class="star">
+<li><code>USER_HOME/.grails/scripts</code></li>
+<li><code>PROJECT_HOME/scripts</code></li>
+<li><code>PROJECT_HOME/plugins/*/scripts</code></li>
+<li><code>GRAILS_HOME/scripts</code></li>
+</ul><p class="paragraph"/>Grails will also convert command names that are in lower case form such as run-app into camel case. So typing<p class="paragraph"/><div class="code"><pre>grails run&#45;app</pre></div><p class="paragraph"/>Results in a search for the following files:
+<ul class="star">
+<li><code>USER_HOME/.grails/scripts/RunApp.groovy</code></li>
+<li><code>PROJECT_HOME/scripts/RunApp.groovy</code></li>
+<li><code>PLUGINS_HOME/*/scripts/RunApp.groovy</code></li>
+<li><code>GLOBAL_PLUGINS_HOME/*/scripts/RunApp.groovy</code></li>
+<li><code>GRAILS_HOME/scripts/RunApp.groovy</code></li>
+</ul><p class="paragraph"/>If multiple matches are found Grails will give you a choice of which one to execute. When Grails executes a Gant script, it invokes the "default" target defined in that script. If there is no default, Grails will quit with an error.<p class="paragraph"/>To get a list and some help about the available commands type:<p class="paragraph"/><div class="code"><pre>grails help</pre></div><p class="paragraph"/>Which outputs usage instructions and the list of commands Grails is aware of:
+<div class="code"><pre>Usage (optionals marked with &#42;): 
+grails &#91;environment&#93;&#42; &#91;target&#93; &#91;arguments&#93;&#42;<p class="paragraph"/>Examples: 
+grails dev run&#45;app	
+grails create&#45;app books<p class="paragraph"/>Available Targets (type grails help 'target&#45;name' <span class="java&#45;keyword">for</span> more info):
+grails bootstrap
+grails bug&#45;report
+grails clean
+grails compile
+...</pre></div><p class="paragraph"/><blockquote class="note">
+Refer to the Command Line reference in left menu of the reference guide for more information about individual commands
+</blockquote>
+
+	</body>
+</html>

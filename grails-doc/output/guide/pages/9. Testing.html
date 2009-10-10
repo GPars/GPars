@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>9. Testing</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Automated testing is seen as a key part of Grails, implemented using <a href="http://groovy.codehaus.org/Testing+Guide" target="blank">Groovy Tests</a>. Hence, Grails provides many ways to making testing easier from low level unit testing to high level functional tests. This section details the different capabilities that Grails offers in terms of testing.<p class="paragraph"/>The first thing to be aware of is that all of the <code>create-*</code> commands actually end up creating <code>integration</code> tests automatically for you. For example say you run the commandLine command as follows:<p class="paragraph"/><div class="code"><pre>grails create&#45;controller simple</pre></div><p class="paragraph"/>Not only will Grails create a controller at <code>grails-app/controllers/SimpleController.groovy</code>, but also an integration test at <code>test/integration/SimpleControllerTests.groovy</code>. What Grails won't do however is populate the logic inside the test! That is left up to you.<p class="paragraph"/>Once you have done this, you can then execute all the tests with the commandLine command:<p class="paragraph"/><div class="code"><pre>grails test&#45;app</pre></div><p class="paragraph"/>The above command will produce output such as:<p class="paragraph"/><div class="code"><pre>&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+Running Unit Tests&#8230;
+Running test FooTests...FAILURE
+Unit Tests Completed in 464ms &#8230;
+&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;<p class="paragraph"/>Tests failed: 0 errors, 1 failures</pre></div><p class="paragraph"/>Whilst reports will have been written out the <code>test/reports</code> directory. You can also run an individual test by specifying the name of the test (without the <code>Tests</code> suffix) to run:<p class="paragraph"/><div class="code"><pre>grails test&#45;app SimpleController</pre></div><p class="paragraph"/>In addition, you can run a number of tests by specifying each ones name separated by a space:<p class="paragraph"/><div class="code"><pre>grails test&#45;app SimpleController BookController</pre></div><p class="paragraph"/>
+	</body>
+</html>

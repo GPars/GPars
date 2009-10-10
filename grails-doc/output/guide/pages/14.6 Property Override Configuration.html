@@ -1,0 +1,12 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>14.6 Property Override Configuration</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails supports the notion of property override configuration through an extended version of Spring's <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/config/PropertyOverrideConfigurer.html" class="api">PropertyOverrideConfigurer</a>, which is often useful when used in combination with <a href="../guide/single.html#3.4 Externalized Configuration" class="guide">externalized configuration</a>.<p class="paragraph"/>Essentially you can supply <a href="http://groovy.codehaus.org/ConfigSlurper" target="blank">ConfigSlurper</a> scripts that define a <code>beans</code> block that can override settings on a bean:<p class="paragraph"/><div class="code"><pre>beans &#123;
+   bookService.webServiceURL = <span class="java&#45;quote">"http://www.amazon.com"</span>
+&#125;</pre></div><p class="paragraph"/>The overrides are applied before the Spring <code>ApplicationContext</code> is constructed. The format is:<p class="paragraph"/><div class="code"><pre>&#91;bean name&#93;.&#91;property name&#93; = &#91;value&#93;</pre></div><p class="paragraph"/>You can also provide a regular Java properties file with each entry prefixed with <code>beans</code>:<p class="paragraph"/><div class="code"><pre>beans.bookService.webServiceURL=http://www.amazon.com</pre></div>
+	</body>
+</html>

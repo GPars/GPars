@@ -1,0 +1,30 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>afterInterceptor </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Allows interception of actions after they have executed, but before the view has rendered at the controller level.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>Using a block:
+<div class="code"><pre>class BookController &#123;
+	def afterInterceptor = &#123; model &#45;&#62;
+		model.foo = <span class="java&#45;quote">"bar"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In the above example the first argument to block is model (a map of key value pairs passed to the view)<p class="paragraph"/>Using a map with a method reference:
+<div class="code"><pre>class BookController &#123;
+	def afterInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;invokeMe, only:&#91;'list'&#93;&#93;	
+	def invokeMe(model) &#123;
+		model.foo = <span class="java&#45;quote">"bar"</span>
+	&#125;	
+	def list = &#123;
+		&#91;bookList:Book.list()&#93;
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this example we use the map syntax to constraint the {{afterInterceptor}} to execute <strong class="bold">only</strong> for the {{list}} action.<p class="paragraph"/><h2>Description</h2><p class="paragraph"/>To define an interceptor that is executed after an action use the <code>afterInterceptor</code> property:<p class="paragraph"/><div class="code"><pre>def afterInterceptor = &#123; model &#45;&#62;
+       println <span class="java&#45;quote">"Tracing action $&#123;actionUri&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>The after interceptor takes the resulting model as an argument and can hence perform post manipulation of the model or response.<p class="paragraph"/>An <code>afterInterceptor</code> may also modify the Spring MVC ModelAndView object prior to rendering. In this case, the above example becomes:<p class="paragraph"/><div class="code"><pre>def afterInterceptor = &#123; model, modelAndView &#45;&#62;
+       println <span class="java&#45;quote">"Current view is $&#123;modelAndView.viewName&#125;"</span>
+       <span class="java&#45;keyword">if</span>(model.someVar) modelAndView.viewName = <span class="java&#45;quote">"/mycontroller/someotherview"</span>
+       println <span class="java&#45;quote">"View is now $&#123;modelAndView.viewName&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>This allows the view to be changed based on the model returned by the current action. Note that the <code>modelAndView</code> may be null if the action being intercepted called redirect or render.
+	</body>
+</html>

@@ -1,0 +1,41 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.2.1.2 One-to-many</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		A one-to-many relationship is when one class, example <code>Author</code>, has many instances of a another class, example <code>Book</code>. With Grails you define such a relationship with the <code>hasMany</code> setting:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+    <span class="java&#45;keyword">static</span> hasMany = &#91; books : Book &#93;<p class="paragraph"/>    <span class="java&#45;object">String</span> name
+&#125;
+class Book &#123;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>In this case we have a unidirectional one-to-many. Grails will, by default, map this kind of relationship with a join table.<p class="paragraph"/><blockquote class="note">
+The <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a> allows mapping unidirectional relationships using a foreign key association instead
+</blockquote><p class="paragraph"/>Grails will automatically inject a property of type <code>java.util.Set</code> into the domain class based on the <code>hasMany</code> setting. This can be used to iterate over the collection:<p class="paragraph"/><div class="code"><pre>def a = Author.get(1)<p class="paragraph"/>a.books.each &#123;
+	println it.title
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+The default fetch strategy used by Grails is "lazy", which means that the collection will be lazily initialized. This can lead to the <a href="http://www.javalobby.org/java/forums/t20533.html" target="blank">n+1 problem</a> if you are not careful.<p class="paragraph"/>If you need "eager" fetching you can use the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a> or specify eager fetching as part of a <a href="../guide/single.html#5.4 Querying with GORM" class="guide">query</a>
+</blockquote><p class="paragraph"/>The default cascading behaviour is to cascade saves and updates, but not deletes unless a <code>belongsTo</code> is also specified:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+    <span class="java&#45;keyword">static</span> hasMany = &#91; books : Book &#93;<p class="paragraph"/>    <span class="java&#45;object">String</span> name
+&#125;
+class Book &#123;
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;author:Author&#93;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>If you have two properties of the same type on the many side of a one-to-many you have to use <code>mappedBy</code> to specify which the collection is mapped:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+	<span class="java&#45;keyword">static</span> mappedBy = &#91;flights:<span class="java&#45;quote">"departureAirport"</span>&#93;
+&#125;
+class Flight &#123;
+	Airport departureAirport
+	Airport destinationAirport
+&#125;</pre></div><p class="paragraph"/>This is also true if you have multiple collections that map to different properties on the many side:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;keyword">static</span> hasMany = &#91;outboundFlights:Flight, inboundFlights:Flight&#93;
+	<span class="java&#45;keyword">static</span> mappedBy = &#91;outboundFlights:<span class="java&#45;quote">"departureAirport"</span>, inboundFlights:<span class="java&#45;quote">"destinationAirport"</span>&#93;
+&#125;
+class Flight &#123;
+	Airport departureAirport
+	Airport destinationAirport
+&#125;</pre></div><p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,22 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.7.1 Configurations and Dependencies</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails features 5 dependency resolution configurations (or 'scopes') which you can take advantage of:
+<ul class="star">
+<li> <code>build</code>: Dependencies for the build system only</li>
+<li> <code>compile</code>: Dependencies for the compile step</li>
+<li> <code>runtime</code>: Dependencies needed at runtime but not for compilation (see above)</li>
+<li> <code>test</code>: Dependencies needed for testing but not at runtime (see above)</li>
+<li> <code>provided</code>: Dependencies needed at development time, but not during WAR deployment</li>
+</ul><p class="paragraph"/>Within the <code>dependencies</code> block you can specify a dependency that falls into one of these configurations by calling the equivalent method. For example if your application requires the MySQL driver to function at <code>runtime</code> you can specify as such:<p class="paragraph"/><div class="code"><pre>runtime 'com.mysql:mysql&#45;connector&#45;java:5.1.5'</pre></div><p class="paragraph"/>The above uses the string syntax which is <code>group:name:version</code>. You can also use a map-based syntax:<p class="paragraph"/><div class="code"><pre>runtime group:'com.mysql', name:'mysql&#45;connector&#45;java', version:'5.1.5'</pre></div><p class="paragraph"/>Multiple dependencies can be specified by passing multiple arguments:<p class="paragraph"/><div class="code"><pre>runtime 'com.mysql:mysql&#45;connector&#45;java:5.1.5',
+		'net.sf.ehcache:ehcache:1.6.1'<p class="paragraph"/>// Or<p class="paragraph"/>runtime(
+ 	&#91;group:'com.mysql', name:'mysql&#45;connector&#45;java', version:'5.1.5'&#93;,
+	&#91;group:'net.sf.ehcache', name:'ehcache', version:'1.6.1'&#93;
+)</pre></div><p class="paragraph"/>
+
+	</body>
+</html>

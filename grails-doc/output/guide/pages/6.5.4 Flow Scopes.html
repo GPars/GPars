@@ -1,0 +1,46 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.5.4 Flow Scopes</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Scope Basics</h4><p class="paragraph"/>You'll notice from previous examples that we used a special object called <code>flow</code> to store objects within "flow scope". Grails flows have 5 different scopes you can utilize:
+<ul class="star">
+<li><code>request</code> - Stores an object for the scope of the current request</li>
+<li><code>flash</code> - Stores the object for the current and next request only</li>
+<li><code>flow</code> - Stores objects for the scope of the flow, removing them when the flow reaches an end state</li>
+<li><code>conversation</code> - Stores objects for the scope of the conversation including the root flow and nested subflows</li>
+<li><code>session</code> - Stores objects inside the users session</li>
+</ul><p class="paragraph"/><blockquote class="note">
+Grails service classes can be automatically scoped to a web flow scope. See the documentation on <a href="../guide/single.html#8. The Service Layer" class="guide">Services</a> for more information.
+</blockquote><p class="paragraph"/>Also returning a model map from an action will automatically result in the model being placed in flow scope. For example, using a transition action, you can place objects within <code>flow</code> scope as follows:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>) &#123;
+         &#91;person:<span class="java&#45;keyword">new</span> Person(params)&#93;
+   &#125;.to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>Be aware that a new request is always created for each state, so an object placed in request scope in an action state (for example) will not be available in a subsequent view state. Use one of the other scopes to pass objects from one state to another. Also note that Web Flow: 
+<ol>
+<li>Moves objects from flash scope to request scope upon transition between states;</li>
+<li>Merges objects from the flow and conversation scopes into the view model before rendering (so you shouldn't include a scope prefix when referencing these objects within a view, e.g. GSP pages).</li>
+</ol><p class="paragraph"/><p class="paragraph"/><h4>Flow Scopes and Serialization</h4><p class="paragraph"/>When placing objects in <code>flash</code>, <code>flow</code> or <code>conversation</code> scope they must implement <code>java.io.Serializable</code> otherwise you will get an error. This has an impact on <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a> in that domain classes are typically placed within a scope so that they can be rendered in a view. For example consider the following domain class:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>In order to place an instance of the <code>Book</code> class in a flow scope you will need to modify it as follows:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>This also impacts associations and closures you declare within a domain class. For example consider this:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+	Author author
+&#125;</pre></div><p class="paragraph"/>Here if the <code>Author</code> association is not <code>Serializable</code> you will also get an error. This also impacts closures used in <a href="../guide/single.html#5.5.1 Events and Auto Timestamping" class="guide">GORM events</a> such as <code>onLoad</code>, <code>onSave</code> and so on. The following domain class will cause an error if an instance is placed in a flow scope:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+	def onLoad = &#123;
+		println <span class="java&#45;quote">"I'm loading"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>The reason is that the assigned block on the <code>onLoad</code> event cannot be serialized. To get around this you should declare all events as <code>transient</code>:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+	<span class="java&#45;keyword">transient</span> onLoad = &#123;
+		println <span class="java&#45;quote">"I'm loading"</span>
+	&#125;
+&#125;</pre></div>
+
+	</body>
+</html>

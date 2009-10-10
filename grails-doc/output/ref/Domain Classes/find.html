@@ -1,0 +1,26 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>find</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Finds and returns the first result for the given query or <code>null</code> if no instance was found<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>// Dan brown's first book
+Book.find(<span class="java&#45;quote">"from Book as b where b.author='Dan Brown'"</span>)
+// with a positional parameter
+Book.find(<span class="java&#45;quote">"from Book as b where b.author=?"</span>,&#91;'Dan Brown'&#93;)
+// with a named parameter (since 0.5)
+Book.find(<span class="java&#45;quote">"from Book as b where b.author=:author"</span>,&#91;author:'Dan Brown'&#93;)<p class="paragraph"/>// query by example
+def b = <span class="java&#45;keyword">new</span> Book(author:<span class="java&#45;quote">"Dan Brown"</span>)
+Book.find(b)</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>find</code> method allows querying with Hibernate's query language <a href="../../guide/single.html#5.4.3 Hibernate Query Language (HQL)" class="guide">HQL</a> and querying by example. The basic syntax is:<p class="paragraph"/><div class="code"><pre>Book.find( <span class="java&#45;object">String</span> query )
+Book.find( <span class="java&#45;object">String</span> query, Collection positionalParams )
+Book.find( <span class="java&#45;object">String</span> query, Map namedParams )
+Book.find( Book example )</pre></div><p class="paragraph"/>Parameters:
+<ul class="star">
+<li><code>query</code> - An HQL query</li>
+<li><code>positionalParams</code> - A List of parameters for a positional parametrized HQL query</li>
+<li><code>namedParams</code> - A Map of named parameters a HQL query</li>
+<li><code>example</code> - An instance of the domain class for query by example</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

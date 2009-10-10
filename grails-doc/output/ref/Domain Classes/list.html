@@ -1,0 +1,26 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>list</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Lists all of the instances of the domain class.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>// list everything
+def results = Book.list()
+// list 10 results
+def results = Book.list(max:10)
+// list 10 results, offset by 100
+def results = Book.list(max:10, offset:100)
+// list 10 results, offset by 100, orderd by title in descending order
+def results = Book.list(max:10, offset:100, sort:<span class="java&#45;quote">"title"</span>, order:<span class="java&#45;quote">"desc"</span>)<p class="paragraph"/>// list all books, eagerly fetching the authors association
+def results = Book.list(fetch:&#91;authors:<span class="java&#45;quote">"eager"</span>&#93;)</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Parameters:
+<ul class="star">
+<li><code>max</code> - The maximum number to list</li>
+<li><code>offset</code> - The offset from the first result to list from</li>
+<li><code>order</code> - The order to list by, either <code>"desc"</code> or <code>"asc"</code></li>
+<li><code>sort</code> - The property name to sort by</li>
+<li><code>ignoreCase</code> - Whether to ignore the case when sorting. Default is <code>true</code>.</li>
+<li><code>fetch</code> - The fetch policy for the object's associations as a Map</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

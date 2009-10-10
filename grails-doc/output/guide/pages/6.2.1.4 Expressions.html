@@ -1,0 +1,15 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.2.1.4 Expressions</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		In GSP the <code>&#60;%= %&#62;</code> syntax introduced earlier is rarely used due to the support for GSP expressions. It is present mainly to allow ASP and JSP developers to feel at home using GSP. A GSP expression is similar to a JSP EL expression or a Groovy GString and takes the form <code>${expr}</code>:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+  <span class="xml&#45;tag">&#60;body&#62;</span>
+    Hello $&#123;params.name&#125;
+  <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>However, unlike JSP EL you can have any Groovy expression within the <code>${..}</code> parenthesis. Variables within the <code>${..}</code> are <strong class="bold">not</strong> escaped by default, so any HTML in the variable's string is output directly to the page. To reduce the risk of Cross-site-scripting (XSS) attacks, you can enable automatic HTML escaping via the <code>grails.views.default.codec</code> setting in <code>grails-app/conf/Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.views.<span class="java&#45;keyword">default</span>.codec='html'</pre></div><p class="paragraph"/>Other possible values are 'none' (for no default encoding) and 'base64'.
+
+	</body>
+</html>

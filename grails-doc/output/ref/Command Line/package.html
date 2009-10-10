@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>package</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Runs the packaging phase of Grails' runtime. This is mainly useful when used by other scripts.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>As an include:<p class="paragraph"/><div class="code"><pre>includeTargets &#60;&#60; <span class="java&#45;keyword">new</span> File ( <span class="java&#45;quote">"$&#123;grailsHome&#125;/scripts/Package.groovy"</span> )</pre></div><p class="paragraph"/>As a command:<p class="paragraph"/><div class="code"><pre>grails <span class="java&#45;keyword">package</span></pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Usage: 
+<div class="code"><pre>grails <span class="java&#45;keyword">package</span></pre></div><p class="paragraph"/>When used as an include you need to supply the following at the top of your Gant script:<p class="paragraph"/><div class="code"><pre>includeTargets &#60;&#60; <span class="java&#45;keyword">new</span> File ( <span class="java&#45;quote">"$&#123;grailsHome&#125;/scripts/Package.groovy"</span> )</pre></div><p class="paragraph"/>Once this is in place there are a number of useful commands that can be re-used:
+<ul class="star">
+<li><code>loadPlugins</code> - Loads all of the Grails plug-ins and creates the GrailsPluginManager instance</li>
+<li><code>generateWebXml</code> - Generates the Grails web.xml deployment descriptor</li>
+<li><code>generateLog4j</code> - Generates the Grails log4j properties file</li>
+<li><code>packageApp</code> - Calls all of the above 3 targets in the appropriate order</li>
+</ul><p class="paragraph"/>Typically <code>packageApp</code> is the most useful as it performs all the necessary packaging steps<p class="paragraph"/>
+	</body>
+</html>

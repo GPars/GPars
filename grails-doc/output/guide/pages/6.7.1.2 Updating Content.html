@@ -1,0 +1,18 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.7.1.2 Updating Content</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		This is great, but usually you would want to provide some kind of feedback to the user as to what has happened:<p class="paragraph"/><div class="code"><pre>def delete = &#123;
+      def b = Book.get( params.id )
+      b.delete()
+      render <span class="java&#45;quote">"Book $&#123;b.id&#125; was deleted"</span>
+&#125;</pre></div><p class="paragraph"/>GSP code:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"message"</span>&#62;</span><span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"delete"</span> id=<span class="xml&#45;quote">"1"</span> update=<span class="xml&#45;quote">"message"</span>&#62;</span>Delete Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span></pre></div><p class="paragraph"/>The above example will call the action and set the contents of the <code>message</code> <code>div</code> to the response in this case <code>"Book 1 was deleted"</code>. This is done by the <code>update</code> attribute on the tag, which can also take a map to indicate what should be updated on failure:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"message"</span>&#62;</span><span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"error"</span>&#62;</span><span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"delete"</span> id=<span class="xml&#45;quote">"1"</span>
+              update=<span class="xml&#45;quote">"&#91;success:'message',failure:'error'&#93;"</span>&#62;</span>Delete Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span></pre></div><p class="paragraph"/>Here the <code>error</code> div will be updated if the request failed.
+	</body>
+</html>

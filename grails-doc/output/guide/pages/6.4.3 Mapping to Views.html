@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.4.3 Mapping to Views</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		If you want to resolve a URL to a view, without a controller or action involved, you can do so too. For example if you wanted to map the root URL <code>/</code> to a GSP at the location <code>grails-app/views/index.gsp</code> you could use:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+      <span class="java&#45;quote">"/"</span>(view:<span class="java&#45;quote">"/index"</span>)  // map the root URL
+&#125;</pre></div><p class="paragraph"/>Alternatively if you need a view that is specific to a given controller you could use:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/help"</span>(controller:<span class="java&#45;quote">"site"</span>,view:<span class="java&#45;quote">"help"</span>) // to a view <span class="java&#45;keyword">for</span> a controller
+&#125;</pre></div>
+	</body>
+</html>

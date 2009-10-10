@@ -1,0 +1,62 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>13. Web Services</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1><a name="13. Web Services">13. Web Services</a></h1>Web services are all about providing a web API onto your web application and are typically implemented in either <a href="http://en.wikipedia.org/wiki/SOAP" target="blank">SOAP</a> or <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer" target="blank">REST</a>. 
+<h2><a name="13.1 REST">13.1 REST</a></h2>REST is not really a technology in itself, but more an architectural pattern. REST is extremely simple and just involves using plain XML or JSON as a communication medium, combined with URL patterns that are "representational" of the underlying system and HTTP methods such as GET, PUT, POST and DELETE.<p class="paragraph"/>Each HTTP method maps to an action. For example GET for retrieving data, PUT for creating data, POST for updating and so on. In this sense REST fits quite well with <a href="../guide/single.html#16. Scaffolding" class="guide">CRUD</a>.<p class="paragraph"/><h4>URL patterns</h4><p class="paragraph"/>The first step to implementing REST with Grails is to provide RESTful <a href="../guide/single.html#6.4 URL Mappings" class="guide">URL mappings</a>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/product/$id?"</span>(resource:<span class="java&#45;quote">"product"</span>)
+&#125;</pre></div><p class="paragraph"/>What this does is map the URI <code>/product</code> onto a <code>ProductController</code>. Each HTTP method such as GET, PUT, POST and DELETE map to unique actions within the controller as outlined by the table below:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th>Method</th><th>Action</th></tr><tr class="table-odd"><td><code>GET</code></td><td><code>show</code></td></tr><tr class="table-even"><td><code>PUT</code></td><td><code>update</code></td></tr><tr class="table-odd"><td><code>POST</code></td><td><code>save</code></td></tr><tr class="table-even"><td><code>DELETE</code></td><td><code>delete</code></td></tr></table><p class="paragraph"/>You can alter how HTTP methods by using the capability of URL Mappings to <a href="../guide/single.html#6.4.5 Mapping to HTTP methods" class="guide">map to HTTP methods</a>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/product/$id"</span>(controller:<span class="java&#45;quote">"product"</span>)&#123;
+    action = &#91;GET:<span class="java&#45;quote">"show"</span>, PUT:<span class="java&#45;quote">"update"</span>, DELETE:<span class="java&#45;quote">"delete"</span>, POST:<span class="java&#45;quote">"save"</span>&#93;
+&#125;</pre></div><p class="paragraph"/>However, unlike the <code>resource</code> argument used previously, in this case Grails will not provide automatic XML or JSON marshaling for you unless you specify the <code>parseRequest</code> argument in the URL mapping:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/product/$id"</span>(controller:<span class="java&#45;quote">"product"</span>, parseRequest:<span class="java&#45;keyword">true</span>)&#123;
+    action = &#91;GET:<span class="java&#45;quote">"show"</span>, PUT:<span class="java&#45;quote">"update"</span>, DELETE:<span class="java&#45;quote">"delete"</span>, POST:<span class="java&#45;quote">"save"</span>&#93;
+&#125;</pre></div><p class="paragraph"/><h4>XML Marshaling - Reading</h4><p class="paragraph"/>The controller implementation itself can use Grails' <a href="../guide/single.html#6.1.7 XML and JSON Responses" class="guide">XML marshaling</a> support to implement the GET method:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;
+class ProductController &#123;
+	def show = &#123;
+		<span class="java&#45;keyword">if</span>(params.id &#38;&#38; Product.exists(params.id)) &#123;
+			def p = Product.findByName(params.id)
+			render p as XML
+		&#125;
+		<span class="java&#45;keyword">else</span> &#123;
+			def all = Product.list()
+			render all as XML
+		&#125;
+	&#125;
+	..
+&#125;</pre></div><p class="paragraph"/>Here what we do is if there is an <code>id</code> we search for the <code>Product</code> by name and return it otherwise we return all Products. This way if we go to <code>/products</code> we get all products, otherwise if we go to <code>/product/MacBook</code> we only get a MacBook.<p class="paragraph"/><h4>XML Marshalling - Updating</h4><p class="paragraph"/>To support updates such as <code>PUT</code> and <code>POST</code> you can use the <a href="../ref/Controllers/params.html" class="controllers">params</a> object which Grails enhances with the ability to read an incoming XML packet. Given an incoming XML packet of:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;?xml version=<span class="xml&#45;quote">"1.0"</span> encoding=<span class="xml&#45;quote">"ISO&#45;8859&#45;1"</span>?&#62;</span>
+<span class="xml&#45;tag">&#60;product&#62;</span>
+	<span class="xml&#45;tag">&#60;name&#62;</span>MacBook<span class="xml&#45;tag">&#60;/name&#62;</span>
+	<span class="xml&#45;tag">&#60;vendor id=<span class="xml&#45;quote">"12"</span>&#62;</span>
+		<span class="xml&#45;tag">&#60;name&#62;</span>Apple<span class="xml&#45;tag">&#60;/name&#62;</span>
+     <span class="xml&#45;tag">&#60;/vender&#62;</span>
+<span class="xml&#45;tag">&#60;/product&#62;</span></pre></div><p class="paragraph"/>You can read this XML packet using the same techniques described in the <a href="../guide/single.html#6.1.6 Data Binding" class="guide">Data Binding</a> section via the <a href="../ref/Controllers/params.html" class="controllers">params</a> object:<p class="paragraph"/><div class="code"><pre>def save = &#123;
+	def p = <span class="java&#45;keyword">new</span> Product(params&#91;'product'&#93;)<p class="paragraph"/>	<span class="java&#45;keyword">if</span>(p.save()) &#123;
+		render p as XML
+	&#125;
+	<span class="java&#45;keyword">else</span> &#123;
+		render p.errors
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this example by indexing into the <code>params</code> object using the key <code>'product'</code> we can automatically create and bind the XML using the constructor of the <code>Product</code> class. An interesting aspect of the line:
+<div class="code"><pre>def p = <span class="java&#45;keyword">new</span> Product(params&#91;'product'&#93;)</pre></div>
+Is that it requires no code changes to deal with a form submission that submits form data than it does to deal with an XML request. The exact same technique can be used with a JSON request too.<p class="paragraph"/><blockquote class="note">
+If you require different responses to different clients (REST, HTML etc.) you can use <a href="../guide/single.html#6.8 Content Negotiation" class="guide">content negotation</a>
+</blockquote><p class="paragraph"/>The <code>Product</code> object is then saved and rendered as XML, otherwise an error message is produced using Grails' <a href="../guide/single.html#7. Validation" class="guide">validation</a> capabilities in the form:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;error&#62;</span>
+   <span class="xml&#45;tag">&#60;message&#62;</span>The property 'title' of class 'Person' must be specified<span class="xml&#45;tag">&#60;/message&#62;</span>
+<span class="xml&#45;tag">&#60;/error&#62;</span></pre></div> <h2><a name="13.2 SOAP">13.2 SOAP</a></h2>Grails supports SOAP through the <a href="http://xfire.codehaus.org/" target="blank">XFire</a> plug-in which uses the popular XFire SOAP stack to integrate SOAP support into Grails. The XFire plug-in allows you to expose Grails <a href="../guide/single.html#8. The Service Layer" class="guide">services</a> as SOAP services using a special <code>expose</code> property:<p class="paragraph"/><div class="code"><pre>class BookService &#123;<p class="paragraph"/>  <span class="java&#45;keyword">static</span> expose=&#91;'xfire'&#93;<p class="paragraph"/>  Book&#91;&#93; getBooks()&#123;
+    Book.list() as Book&#91;&#93;
+  &#125;
+&#125;</pre></div><p class="paragraph"/>The WSDL can then be accessed at the location: <code>http://127.0.0.1:8080/your_grails_app/services/book?wsdl</code><p class="paragraph"/>For more information on the XFire plug-in refer <a href="http://grails.org/XFire+plugin" target="blank">the documentation</a> on the wiki.<h2><a name="13.3 RSS and Atom">13.3 RSS and Atom</a></h2>No direct support is provided for RSS or Atom within Grails. You could construct RSS or ATOM feeds with the <a href="../ref/Controllers/render.html" class="controllers">render</a> method's XML capability. There is however a <a href="http://docs.codehaus.org/display/GRAILS/Feeds+Plugin" target="blank">Feeds plug-in</a> available for Grails that provides a RSS and Atom builder using the popular <a href="https://rome.dev.java.net/">ROME</a> library. An example of its usage can be seen below:<p class="paragraph"/><div class="code"><pre>def feed = &#123;
+    render(feedType:<span class="java&#45;quote">"rss"</span>, feedVersion:<span class="java&#45;quote">"2.0"</span>) &#123;
+        title = <span class="java&#45;quote">"My test feed"</span>
+        link = <span class="java&#45;quote">"http://your.test.server/yourController/feed"</span><p class="paragraph"/>        Article.list().each() &#123;
+            entry(it.title) &#123;
+                link = <span class="java&#45;quote">"http://your.test.server/article/$&#123;it.id&#125;"</span>
+                it.content // <span class="java&#45;keyword">return</span> the content
+            &#125;
+        &#125;
+    &#125;
+&#125;</pre></div>
+	</body>
+</html>

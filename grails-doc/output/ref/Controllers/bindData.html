@@ -1,0 +1,23 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>bindData </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Allows fine grained control of binding request parameters from strings onto objects and the necessary types (data binding).<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><pre class="bq"><code>
+// binds request parameters to a target object
+bindData(target, params) 
+// exclude firstName and lastName (since 0.4)
+bindData(target, params, 'firstName', 'lastName') 
+// only use parameters starting with "author." e.g. author.email (since 0.5.5)
+bindData(target, this.params, "author") 
+bindData(target, this.params, 'firstName', 'lastName', "author")</code></pre><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Usage: <code>bindData(target, params, excludes<strong class="bold">, prefix</strong>)</code><p class="paragraph"/>Arguments:
+<ul class="star">
+<li><code>target</code> - The target object to bind to</li>
+<li><code>params</code> - The source parameters, can be either a map or the <a href="../../ref/Controllers/params.html" class="controllers">params</a> object</li>
+<li><code>excludes</code> - The parameters to exclude</li>
+<li><code>prefix</code> - A string representing a prefix to use to filter parameters. A prefix separator of "." is assumed</li>
+</ul><p class="paragraph"/>The underlying implementation uses Spring's Data Binding framework. If the target is a domain class type conversion errors are stored in the <code>errors</code> property of the domain class.<p class="paragraph"/>Refer to the section on <a href="../../guide/single.html#6.1.6 Data Binding" class="guide">Data Binding</a> in the user guide for more information.<p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,80 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.4.2 Criteria</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Criteria is a type safe, advanced way to query that uses a Groovy builder to construct potentially complex queries. It is a much better alternative to using StringBuffer.<p class="paragraph"/>Criteria can be used either via the <a href="../ref/Domain Classes/createCriteria.html" class="domainClasses">createCriteria</a> or <a href="../ref/Domain Classes/withCriteria.html" class="domainClasses">withCriteria</a> methods. The builder uses Hibernate's Criteria API, the nodes on this builder map the static methods found in the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/criterion/Restrictions.html" class="api">Restrictions</a> class of the Hibernate Criteria API. Example Usage:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()
+def results = c &#123;
+	like(<span class="java&#45;quote">"holderFirstName"</span>, <span class="java&#45;quote">"Fred%"</span>)
+	and &#123;
+		between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+		eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+	&#125;
+	maxResults(10)
+	order(<span class="java&#45;quote">"holderLastName"</span>, <span class="java&#45;quote">"desc"</span>)
+&#125;</pre></div><p class="paragraph"/><h4>Conjunctions and Disjunctions</h4><p class="paragraph"/>As demonstrated in the previous example you can group criteria in a logical AND using a <code>and { }</code> block:<p class="paragraph"/><div class="code"><pre>and &#123;
+	between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+	eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+&#125;</pre></div><p class="paragraph"/>This also works with logical OR:<p class="paragraph"/><div class="code"><pre>or &#123;
+	between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+	eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+&#125;</pre></div><p class="paragraph"/>And you can also negate using logical NOT:<p class="paragraph"/><div class="code"><pre>not &#123;
+	between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+	eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+&#125;</pre></div><p class="paragraph"/><h4>Querying Associations</h4><p class="paragraph"/>Associations can be queried by having a node that matches the property name. For example say the <code>Account</code> class had many <code>Transaction</code> objects:<p class="paragraph"/><div class="code"><pre>class Account &#123;
+    &#8230;
+    def hasMany = &#91;transactions:Transaction&#93;
+    Set transactions
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>
+We can query this association by using the property name <code>transaction</code> as a builder node:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()
+def now = <span class="java&#45;keyword">new</span> Date()
+def results = c.list &#123;
+       transactions &#123;
+            between('date',now&#45;10, now)
+       &#125;
+&#125;</pre></div><p class="paragraph"/>
+The above code will find all the <code>Account</code> instances that have performed <code>transactions</code> within the last 10 days.
+You can also nest such association queries within logical blocks:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()
+def now = <span class="java&#45;keyword">new</span> Date()
+def results = c.list &#123;
+     or &#123;
+        between('created',now&#45;10,now)
+        transactions &#123;
+             between('date',now&#45;10, now)
+        &#125;
+     &#125;
+&#125;</pre></div><p class="paragraph"/>
+Here we find all accounts that have either performed transactions in the last 10 days OR have been recently created in the last 10 days.<p class="paragraph"/>
+<h4>Querying with Projections</h4><p class="paragraph"/>Projections may be used to customise the results. To use projections you need to define a "projections" node within the criteria builder tree. There are equivalent methods within the projections node to the methods found in the Hibernate <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/criterion/Projections.html" class="api">Projections</a> class:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()<p class="paragraph"/>def numberOfBranches = c.get &#123;
+	projections &#123;
+		countDistinct('branch')
+	&#125;
+&#125;</pre></div><p class="paragraph"/><h4>Using Scrollable Results</h4><p class="paragraph"/>You can use Hibernate's <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/ScrollableResults.html" class="api">ScrollableResults</a> feature by calling the scroll method:<p class="paragraph"/><div class="code"><pre>def results = crit.scroll &#123;
+      maxResults(10)
+&#125;
+def f = results.first()
+def l = results.last()
+def n = results.next()
+def p = results.previous()<p class="paragraph"/>def <span class="java&#45;keyword">future</span> = results.scroll(10)
+def accountNumber = results.getLong('number')</pre></div><p class="paragraph"/>
+To quote the documentation of Hibernate ScrollableResults:<p class="paragraph"/><blockquote class="quote">
+A result iterator that allows moving around within the results by arbitrary increments. The Query / ScrollableResults pattern is very similar to the JDBC PreparedStatement/ ResultSet pattern and the semantics of methods of this interface are similar to the similarly named methods on ResultSet.
+</blockquote><p class="paragraph"/>Contrary to JDBC, columns of results are numbered from zero.<p class="paragraph"/><h4>Setting properties in the Criteria instance</h4><p class="paragraph"/>If a node within the builder tree doesn't match a particular criterion it will attempt to set a property on the Criteria object itself. Thus allowing full access to all the properties in this class. The below example calls <code>setMaxResults</code> and <code>setFirstResult</code> on the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Criteria.html" class="api">Criteria</a> instance:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.hibernate.FetchMode as FM
+	&#8230;
+	def results = c.list &#123;
+		maxResults(10)
+		firstResult(50)
+		fetchMode(<span class="java&#45;quote">"aRelationship"</span>, FM.EAGER)
+	&#125;</pre></div><p class="paragraph"/><h4>Querying with Eager Fetching</h4><p class="paragraph"/>In the section on <a href="../guide/single.html#5.3.4 Eager and Lazy Fetching" class="guide">Eager and Lazy Fetching</a> we discussed how to declaratively specify fetching to avoid the N+1 SELECT problem. However, this can also be achieved using a criteria query:<p class="paragraph"/><div class="code"><pre>def criteria = Task.createCriteria()
+def tasks = criteria.list&#123;
+     eq <span class="java&#45;quote">"assignee.id"</span>, task.assignee.id
+     join 'assignee'
+     join 'project'
+     order 'priority', 'asc'
+&#125;</pre></div><p class="paragraph"/>Notice the usage of the <code>join</code> method. This method indicates the criteria API that a <code>JOIN</code> query should be used to obtain the results.<p class="paragraph"/><h4>Method Reference</h4><p class="paragraph"/>If you invoke the builder with no method name such as:<p class="paragraph"/><div class="code"><pre>c &#123; &#8230; &#125;</pre></div><p class="paragraph"/>The build defaults to listing all the results and hence the above is equivalent to:<p class="paragraph"/><div class="code"><pre>c.list &#123; &#8230; &#125;</pre></div><p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th>Method</th><th>Description</th></tr><tr class="table-odd"></tr><tr class="table-even"><td><strong class="bold">list</strong></td><td>This is the default method. It returns all matching rows.</td></tr><tr class="table-odd"><td><strong class="bold">get</strong></td><td>Returns a unique result set, i.e. just one row. The criteria has to be formed that way, that it only queries one row. This method is not to be confused with a limit to just the first row.</td></tr><tr class="table-even"><td><strong class="bold">scroll</strong></td><td>Returns a scrollable result set</td></tr><tr class="table-odd"><td><strong class="bold">listDistinct</strong></td><td>If subqueries or associations are used, one may end up with the same row multiple times in the result set, this allows listing only distinct entities and is equivalent to <code>DISTINCT_ROOT_ENTITY</code> of the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/criterion/CriteriaSpecification.html" class="api">CriteriaSpecification</a> class</td></tr></table><p class="paragraph"/><p class="paragraph"/><p class="paragraph"/><p class="paragraph"/>
+
+	</body>
+</html>

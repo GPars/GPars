@@ -1,0 +1,33 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.2.1.1 One-to-one</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		A one-to-one relationship is the simplest kind, and is defined trivially using a property of the type of another domain class. Consider this example:<p class="paragraph"/><h5>Example A</h5><p class="paragraph"/><div class="code"><pre>class Face &#123;
+    Nose nose
+&#125;
+class Nose &#123;	
+&#125;</pre></div><p class="paragraph"/>In this case we have unidirectional many-to-one relationship from <code>Face</code> to <code>Nose</code>. To make it a true one-to-one you should make <code>nose</code> unique:<p class="paragraph"/><div class="code"><pre>class Face &#123;
+    Nose nose
+	<span class="java&#45;keyword">static</span> constraints = &#123;
+		nose unique:<span class="java&#45;keyword">true</span>
+	&#125;
+&#125;
+class Nose &#123;	
+&#125;</pre></div><p class="paragraph"/>To make this relationship bidirectional define the other side as follows:<p class="paragraph"/><h5>Example B</h5><p class="paragraph"/><div class="code"><pre>class Face &#123;
+    Nose nose
+&#125;
+class Nose &#123;	
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;face:Face&#93;
+&#125;</pre></div><p class="paragraph"/>In this case we use the <code>belongsTo</code> setting to say that <code>Nose</code> "belongs to" Face. The result of this is that we can create a Face and save it and the database updates/inserts will be <em class="italic">cascaded</em> down to <code>Nose</code>:<p class="paragraph"/>
+<div class="code"><pre><span class="java&#45;keyword">new</span> Face(nose:<span class="java&#45;keyword">new</span> Nose()).save()</pre></div><p class="paragraph"/>The example above will save both face and nose. Note that the inverse <em class="italic">is not</em> true and will result in an error due to a transient <code>Face</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">new</span> Nose(face:<span class="java&#45;keyword">new</span> Face()).save() // will cause an error</pre></div><p class="paragraph"/>Another important implication of <code>belongsTo</code> is that if you delete a <code>Face</code> instance the <code>Nose</code> will be deleted too:<p class="paragraph"/><div class="code"><pre>def f = Face.get(1)
+f.delete() // both Face and Nose deleted</pre></div><p class="paragraph"/>In the previous example the foreign key associated the <code>Face</code> with the <code>Nose</code> is stored in the parent as column called <code>nose_id</code>. If you want the foreign key to be stored in the child you need a <code>hasOne</code> association:<p class="paragraph"/><h5>Example C</h5><p class="paragraph"/><div class="code"><pre>class Face &#123;
+    <span class="java&#45;keyword">static</span> hasOne = &#91;nose:Nose&#93;
+&#125;
+class Nose &#123;	
+	Face face
+&#125;</pre></div><p class="paragraph"/>In this example you get a bidirectional one-to-one where the foreign key column is stored in the <code>nose</code> table inside a column called <code>face_id</code>.
+	</body>
+</html>

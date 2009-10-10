@@ -1,0 +1,27 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.7 Dependency Resolution</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		In order to control how JAR dependencies are resolved Grails features (since version 1.2) a dependency resolution DSL that allows you to control how dependencies for applications and plugins are resolved.<p class="paragraph"/>Inside the <code>grails-app/conf/BuildConfig.groovy</code> file you can specify a <code>grails.project.dependency.resolution</code> property that configures how dependencies are resolved:<p class="paragraph"/><div class="code"><pre>grails.project.dependency.resolution = &#123;
+   // config here
+&#125;</pre></div><p class="paragraph"/>The default configuration looks like the following:<p class="paragraph"/><div class="code"><pre>grails.project.dependency.resolution = &#123;
+    inherits <span class="java&#45;quote">"global"</span> // inherit Grails' <span class="java&#45;keyword">default</span> dependencies
+    log <span class="java&#45;quote">"warn"</span> // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    repositories &#123;
+        grailsHome()<p class="paragraph"/>        // uncomment the below to enable remote dependency resolution
+        // from <span class="java&#45;keyword">public</span> Maven repositories
+        //mavenCentral()
+        //mavenRepo <span class="java&#45;quote">"http://snapshots.repository.codehaus.org"</span>
+        //mavenRepo <span class="java&#45;quote">"http://repository.codehaus.org"</span>
+        //mavenRepo <span class="java&#45;quote">"http://download.java.net/maven/2/"</span>
+        //mavenRepo "http://repository.jboss.com/maven2/
+    &#125;
+    dependencies &#123;
+        // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
+        // runtime 'com.mysql:mysql&#45;connector&#45;java:5.1.5'
+    &#125;<p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>The details of the above will be explained in the next few sections.<p class="paragraph"/>
+	</body>
+</html>

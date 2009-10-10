@@ -1,0 +1,29 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>request </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>request</code> object is an instance of the Servlet API's <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletRequest.html" class="api">HttpServletRequest</a> class<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class BookController &#123;
+	def list = &#123;
+		log.info <span class="java&#45;quote">"User agent: "</span> + request.getHeader(<span class="java&#45;quote">"User&#45;Agent"</span>)<p class="paragraph"/>		render(view:actionName)
+	&#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletRequest.html" class="api">HttpServletRequest</a> class is useful for, amongst other things, obtaining request headers, storing request scoped attributes and establishing information about the client. Refer to the Servlet API's javadocs for further information.<p class="paragraph"/>Grails enhances the <code>HttpServletRequest</code> instance by adding the following new properties and methods:
+<ul class="star">
+<li><code>XML</code> - An instance of <code>XmlSlurper</code>'s <a href="http://groovy.codehaus.org/api/groovy/util/slurpersupport/GPathResult.html" target="blank">GPathResult</a> class that allows parsing of an incoming XML request (useful for REST).</li>
+<li><code>JSON</code> - An instance of Grails' api:org.codehaus.groovy.grails.web.json.JSONObject class that allows parsing of an incoming JSON request (useful for JSON based REST).</li>
+<li><code>forwardURI</code> - Useful for obtaining the current request URI since the <code>request</code> objects <code>requestURI</code> property returns the original URI, not the matched one.</li>
+<li><code>get</code> - Returns true if the current request is an HTTP <code>GET</code> request.</li>
+<li><code>post</code> - Returns true if the current request is an HTTP <code>POST</code> request.</li>
+<li><code>each</code> - Implementation of Groovy's <code>each</code> method for iterating over request attributes.</li>
+<li><code>find</code> - Implementation of Groovy's default <code>find</code> method for searching request attributes.</li>
+<li><code>findAll</code> - Implementation of Groovy's default <code>findAll</code> method for searching request attributes.</li>
+<li><code>format</code> - The request format, used for <a href="../../guide/single.html#6.8 Content Negotiation" class="guide">content negotiation</a>.</li>
+</ul><p class="paragraph"/>The <code>XML</code> and <code>JSON</code> properties are useful for XML APIs and can be used to parse incoming XML or JSON packages. For example given a request body of:
+<div class="code"><pre><span class="xml&#45;tag">&#60;book&#62;</span>
+   <span class="xml&#45;tag">&#60;title&#62;</span>The Stand<span class="xml&#45;tag">&#60;/title&#62;</span>
+<span class="xml&#45;tag">&#60;/book&#62;</span></pre></div><p class="paragraph"/>This can be parsed trivially:<p class="paragraph"/><div class="code"><pre>def title = request.XML?.book?.title
+render <span class="java&#45;quote">"The Title is $title"</span></pre></div><p class="paragraph"/>Request attributes which are normally accessible via the <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/ServletRequest.html#getAttribute(java.lang.String)" class="api">getAttribute</a> can also be indexed into using the array index operator or de-reference operator:<p class="paragraph"/><div class="code"><pre>def user = request&#91;'user'&#93;<p class="paragraph"/>request&#91;'user'&#93; = 'John'<p class="paragraph"/>asset 'John' == request.user</pre></div>
+	</body>
+</html>

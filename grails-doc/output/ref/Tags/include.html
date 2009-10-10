@@ -1,0 +1,29 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>include </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Includes the response of another controller/action or view in the current response<p class="paragraph"/>
+<h2>Examples</h2><p class="paragraph"/>Example controller for an application called "shop":<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+     def list = &#123; &#91; books: Book.list( params ) &#93; &#125;
+     def show = &#123; &#91; book : Book.get( params&#91;'id'&#93; ) &#93; &#125;
+&#125;</pre></div><p class="paragraph"/>Example usages for above controller:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:include action=<span class="xml&#45;quote">"show"</span> id=<span class="xml&#45;quote">"1"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:include action=<span class="xml&#45;quote">"show"</span> id=<span class="xml&#45;quote">"$&#123;currentBook.id&#125;"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:include controller=<span class="xml&#45;quote">"book"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:include controller=<span class="xml&#45;quote">"book"</span> action=<span class="xml&#45;quote">"list"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:include action=<span class="xml&#45;quote">"list"</span> params=<span class="xml&#45;quote">"&#91;sort:'title',order:'asc',author:currentBook.author&#93;"</span> /&#62;</span></pre></div><p class="paragraph"/>
+Example as a method call in controllers, tag libraries or GSP:<p class="paragraph"/><div class="code"><pre>def content = g.include(action:'list',controller:'book')</pre></div><p class="paragraph"/>
+<h2>Description</h2><p class="paragraph"/>Attributes
+<ul class="star">
+<li><code>action</code> (optional) - the name of the action to use in the include</li>
+<li><code>controller</code> (optional) - the name of the controller to use in the include</li>
+<li><code>id</code> (optional) - the id to use in the include</li>
+<li><code>view</code> (optional) - The name of the view to use in the include</li>
+<li><code>params</code> (optional) - a map containing request parameters</li>
+<li><code>model</code> (optional) - Any request attributes (the model) to pass to the view to be included</li>
+</ul><p class="paragraph"/><h2>Source</h2><p class="paragraph"/><div class="error">source: ../grails/src/java/org/codehaus/groovy/grails/plugins/web/taglib/RenderTagLib.groovy (No such file or directory)</div><p class="paragraph"/>
+
+	</body>
+</html>

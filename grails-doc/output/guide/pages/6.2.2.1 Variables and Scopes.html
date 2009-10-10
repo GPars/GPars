@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.2.2.1 Variables and Scopes</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Variables can be defined within a GSP using the <a href="../ref/Tags/set.html" class="tags">set</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"now"</span> value=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>Here we assign a variable called <code>now</code> to the result of a GSP expression (which simply constructs a new <code>java.util.Date</code> instance). You can also use the body of the <code>&#60;g:set&#62;</code> tag to define a variable:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"myHTML"</span>&#62;</span>
+   Some re&#45;usable code on: $&#123;new Date()&#125;
+<span class="xml&#45;tag">&#60;/g:set&#62;</span></pre></div><p class="paragraph"/>Variables can also be placed in one of the following scopes:
+<ul class="star">
+<li><code>page</code> - Scoped to the current page (default)</li>
+<li><code>request</code> - Scoped to the current request</li>
+<li><code>flash</code> - Placed within <a href="../ref/Controllers/flash.html" class="controllers">flash</a> scope and hence available for the next request</li>
+<li><code>session</code> - Scoped for the user session</li>
+<li><code>application</code> - Application-wide scope.</li>
+</ul><p class="paragraph"/>To select which scope a variable is placed into use the <code>scope</code> attribute:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"now"</span> value=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span> scope=<span class="xml&#45;quote">"request"</span> /&#62;</span></pre></div>
+	</body>
+</html>

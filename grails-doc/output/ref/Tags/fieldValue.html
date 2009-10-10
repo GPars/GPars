@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>fieldValue </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>This tag will inspect a bean which has been the subject of <a href="../../guide/single.html#6.1.6 Data Binding" class="guide">data binding</a> and obtain the value of the field either from the originally submitted value contained within the bean's errors object populating during data binding or from the value of a bean's property. Once the value is obtained it will be automatically HTML encoded.<p class="paragraph"/>
+<h2>Examples</h2><p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:fieldValue bean=<span class="xml&#45;quote">"$&#123;book&#125;"</span> field=<span class="xml&#45;quote">"title"</span> /&#62;</span><p class="paragraph"/>// or as a method
+<span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"text"</span> value=<span class="xml&#45;quote">"$&#123;fieldValue(bean:book,field:'title')&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Attributes
+<ul class="star">
+<li><code>bean</code> (required) - The bean instance to inspect</li>
+<li><code>field</code> (required) - The name of the field to obtain the value of</li>
+</ul><p class="paragraph"/><h2>Source</h2><p class="paragraph"/><div class="error">source: ../grails/src/java/org/codehaus/groovy/grails/plugins/web/taglib/ValidationTagLib.groovy (No such file or directory)</div><p class="paragraph"/>
+
+	</body>
+</html>

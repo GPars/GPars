@@ -1,0 +1,22 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>scope </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Changes the scope of a service<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class BookService &#123;
+	<span class="java&#45;keyword">static</span> scope = <span class="java&#45;quote">"session"</span>
+	&#8230;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>By default services are "singleton" scoped which means that clients of a service only ever use a single instance (a singleton) of the service. This behaviour can be changed by specifying a <code>scope</code> attribute with on the following values:
+<ul class="star">
+<li><code>prototype</code> - A new service is created every time it is injected into another class</li>
+<li><code>request</code> - A new service will be created per request</li>
+<li><code>flash</code> - A new service will be created for the current and next request only</li>
+<li><code>flow</code> - In web flows the service will exist for the scope of the flow</li>
+<li><code>conversation</code> - In web flows the service will exist for the scope of the conversation. ie a root flow and its sub flows</li>
+<li><code>session</code> - A service is created for the scope of a user session</li>
+<li><code>singleton</code> (default) - Only one instance of the service ever exists</li>
+</ul><p class="paragraph"/>See <a href="../../guide/single.html#8.2 Scoped Services" class="guide">Scoped Services</a> in the user guide for more information.
+	</body>
+</html>

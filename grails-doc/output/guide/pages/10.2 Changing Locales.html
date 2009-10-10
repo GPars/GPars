@@ -1,0 +1,10 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>10.2 Changing Locales</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		By default the user locale is detected from the incoming <code>Accept-Language</code> header. However, you can provide users the capability to switch locales by simply passing a parameter called <code>lang</code> to Grails as a request parameter:<p class="paragraph"/><div class="code"><pre>/book/list?lang=es</pre></div><p class="paragraph"/>Grails will automatically switch the user locale and store it in a cookie so subsequent requests will have the new header.
+	</body>
+</html>

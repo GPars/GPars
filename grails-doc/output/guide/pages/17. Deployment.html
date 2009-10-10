@@ -1,0 +1,42 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>17. Deployment</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails applications can be deployed in a number of ways, each of which has its pros and cons.<p class="paragraph"/><h3>"grails run-app"</h3><p class="paragraph"/>You should be very familiar with this approach by now, since it is the most common method of running an application during the development phase. An embedded Tomcat server is launched that loads the web application from the development sources, thus allowing it to pick up an changes to application files.<p class="paragraph"/>This approach is not recommended at all for production deployment because the performance is poor. Checking for and loading changes places a sizable overhead on the server. Having said that, <code>grails prod run-app</code> removes the per-request overhead and allows you to fine tune how frequently the regular check takes place.<p class="paragraph"/>Setting the system property "disable.auto.recompile" to <code>true</code> disables this regular check completely, while the property "recompile.frequency" controls the frequency. This latter property should be set to the number of seconds you want between each check. The default is currently 3.<p class="paragraph"/><h3>"grails run-war"</h3><p class="paragraph"/>This is very similar to the previous option, but Tomcat runs against the packaged WAR file rather than the development sources. Hot-reloading is disabled, so you get good performance without the hassle of having to deploy the WAR file elsewhere.<p class="paragraph"/><h3>WAR file</h3><p class="paragraph"/>When it comes down to it, current java infrastructures almost mandate that web applications are deployed as WAR files, so this is by far the most common approach to Grails application deployment in production. Creating a WAR file is as simple as executing the <a href="../ref/Command Line/war.html" class="commandLine">war</a> command:<p class="paragraph"/><div class="code"><pre>grails war</pre></div><p class="paragraph"/>There are also many ways in which you can customise the WAR file that is created. For example, you can specify a path (either absolute or relative) to the command that instructs it where to place the file and what name to give it:<p class="paragraph"/><div class="code"><pre>grails war /opt/java/tomcat&#45;5.5.24/foobar.war</pre></div><p class="paragraph"/>Alternatively, you can add a line to <code>grails-app/conf/BuildConfig.groovy</code> that changes the default location and filename:<p class="paragraph"/><div class="code"><pre>grails.war.destFile = <span class="java&#45;quote">"foobar&#45;prod.war"</span></pre></div><p class="paragraph"/>Of course, any command line argument that you provide overrides this setting.<p class="paragraph"/>It is also possible to control what libraries are included in the WAR file, in case you need to avoid conflicts with libraries in a shared folder for example. The default behavior is to include in the WAR file all libraries required by Grails, plus any libraries contained in plugin "lib" directories, plus any libraries contained in the application's "lib" directory. As an alternative to the default behavior you can explicitly specify the complete list of libraries to include in the WAR file by setting the properties <code>grails.war.dependencies</code> and <code>grails.war.java5.dependencies</code> in Config.groovy to either lists of Ant include patterns or closures containing AntBuilder syntax. Closures are invoked from within an Ant "copy" step, so only elements like "fileset" can be included, whereas each item in a pattern list is included. Any closure or pattern assigned to the latter property will be included in addition to <code>grails.war.dependencies</code> only if you are running JDK 1.5 or above.<p class="paragraph"/>Be careful with these properties: if any of the libraries Grails depends on are missing, the application will almost certainly fail. Here is an example that includes a small subset of the standard Grails dependencies:<p class="paragraph"/><div class="code"><pre>def deps = &#91;
+    <span class="java&#45;quote">"hibernate3.jar"</span>,
+    <span class="java&#45;quote">"groovy&#45;all&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"standard&#45;$&#123;servletVersion&#125;.jar"</span>,
+    <span class="java&#45;quote">"jstl&#45;$&#123;servletVersion&#125;.jar"</span>,
+    <span class="java&#45;quote">"oscache&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"commons&#45;logging&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"sitemesh&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"spring&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"log4j&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"ognl&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"commons&#45;&#42;.jar"</span>,
+    <span class="java&#45;quote">"xstream&#45;1.2.1.jar"</span>,
+    <span class="java&#45;quote">"xpp3_min&#45;1.1.3.4.O.jar"</span> &#93;<p class="paragraph"/>grails.war.dependencies = &#123;
+    fileset(dir: <span class="java&#45;quote">"libs"</span>) &#123;
+        deps.each &#123; pattern &#45;&#62;
+            include(name: pattern)
+        &#125;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>This example only exists to demonstrate the syntax for the properties. If you attempt to use it as is in your own application, the application will probably not work. You can find a list of dependencies required by Grails in the "dependencies.txt" file that resides in the root directory of the unpacked distribution. You can also find a list of the default dependencies included in WAR generation in the "War.groovy" script - see the "DEFAULT_DEPS" and "DEFAULT_J5_DEPS" variables.<p class="paragraph"/>The remaining two configuration options available to you are <code>grails.war.copyToWebApp</code> and <code>grails.war.resources</code>. The first of these allows you to customise what files are included in the WAR file from the "web-app" directory. The second allows you to do any extra processing you want before the WAR file is finally created.<p class="paragraph"/><div class="code"><pre>// This closure is passed the command line arguments used to start the
+// war process.
+grails.war.copyToWebApp = &#123; args &#45;&#62;
+    fileset(dir:<span class="java&#45;quote">"web&#45;app"</span>) &#123;
+        include(name: <span class="java&#45;quote">"js/&#42;&#42;"</span>)
+        include(name: <span class="java&#45;quote">"css/&#42;&#42;"</span>)
+        include(name: <span class="java&#45;quote">"WEB&#45;INF/&#42;&#42;"</span>)
+    &#125;
+&#125;<p class="paragraph"/>// This closure is passed the location of the staging directory that
+// is zipped up to make the WAR file, and the command line arguments.
+// Here we override the standard web.xml with our own.
+grails.war.resources = &#123; stagingDir, args &#45;&#62;
+    copy(file: <span class="java&#45;quote">"grails&#45;app/conf/custom&#45;web.xml"</span>, tofile: <span class="java&#45;quote">"$&#123;stagingDir&#125;/WEB&#45;INF/web.xml"</span>)
+&#125;</pre></div><p class="paragraph"/><h2>Application servers</h2><p class="paragraph"/>Ideally you should be able to simply drop a WAR file created by Grails into any application server and it should work straight away. However, things are rarely ever this simple. The <a href="http://grails.org/Deployment" target="blank">Grails website</a> contains an up-to-date list of application servers that Grails has been tested with, along with any additional steps required to get a Grails WAR file working.<p class="paragraph"/>
+	</body>
+</html>

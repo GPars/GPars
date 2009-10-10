@@ -1,0 +1,18 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.2 Domain Modelling in GORM</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		When building Grails applications you have to consider the problem domain you are trying to solve. For example if you were building an <a href="http://www.amazon.com/" target="blank">Amazon</a> bookstore you would be thinking about books, authors, customers and publishers to name a few.<p class="paragraph"/>These are modeled in GORM as Groovy classes so a <code>Book</code> class may have a title, a release date, an ISBN number and so on. The next few sections show how to model the domain in GORM.<p class="paragraph"/>To create a domain class you can run the <a href="../ref/Command Line/create-domain-class.html" class="commandLine">create-domain-class</a> target as follows:<p class="paragraph"/><div class="code"><pre>grails create&#45;domain&#45;class Book</pre></div><p class="paragraph"/>The result will be a class at <code>grails-app/domain/Book.groovy</code>:<p class="paragraph"/><div class="code"><pre>class Book &#123;	
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+If you wish to use packages you can move the Book.groovy class into a sub directory under the domain directory and add the appropriate <code>package</code> declaration as per Groovy (and Java's) packaging rules.
+</blockquote><p class="paragraph"/>The above class will map automatically to a table in the database called <code>book</code> (the same name as the class). This behaviour is customizable through the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM Domain Specific Language</a><p class="paragraph"/>Now that you have a domain class you can define its properties as Java types. For example:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+	Date releaseDate
+	<span class="java&#45;object">String</span> ISBN
+&#125;</pre></div><p class="paragraph"/>Each property is mapped to a column in the database, where the convention for column names is all lower case separated by underscores. For example <code>releaseDate</code> maps onto a column <code>release_date</code>. The SQL types are auto-detected from the Java types, but can be customized via <a href="../guide/single.html#7.1 Declaring Constraints" class="guide">Constraints</a> or the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a>.
+
+	</body>
+</html>

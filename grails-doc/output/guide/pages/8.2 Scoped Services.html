@@ -1,0 +1,21 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>8.2 Scoped Services</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		By default, access to service methods is not synchronised, so nothing prevents concurrent execution of those functions. In fact, because the service is a singleton and may be used concurrently, you should be very careful about storing state in a service. Or take the easy (and better) road and never store state in a service.<p class="paragraph"/>You can change this behaviour by placing a service in a particular scope. The supported scopes are:
+<ul class="star">
+<li><code>prototype</code> - A new service is created every time it is injected into another class</li>
+<li><code>request</code> - A new service will be created per request</li>
+<li><code>flash</code> - A new service will be created for the current and next request only</li>
+<li><code>flow</code> - In web flows the service will exist for the scope of the flow</li>
+<li><code>conversation</code> - In web flows the service will exist for the scope of the conversation. ie a root flow and its sub flows</li>
+<li><code>session</code> - A service is created for the scope of a user session</li>
+<li><code>singleton</code> (default) - Only one instance of the service ever exists</li>
+</ul><p class="paragraph"/><blockquote class="note">
+If your service is <code>flash</code>, <code>flow</code> or <code>conversation</code> scoped it will need to implement <code>java.io.Serializable</code> and can only be used in the context of a <a href="../guide/single.html#6.5 Web Flow" class="guide">Web Flow</a>
+</blockquote><p class="paragraph"/>To enable one of the scopes, add a static scope property to your class whose value is one of the above:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> scope = <span class="java&#45;quote">"flow"</span></pre></div><p class="paragraph"/>
+	</body>
+</html>

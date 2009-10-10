@@ -1,0 +1,35 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>link </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Creates an html anchor tag with the <code>href</code> set based on the parameters specified.<p class="paragraph"/>
+<h2>Examples</h2><p class="paragraph"/>Example controller for an application called "shop":<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+     def list = &#123; &#91; books: Book.list( params ) &#93; &#125;
+     def show = &#123; &#91; book : Book.get( params&#91;'id'&#93; ) &#93; &#125;
+&#125;</pre></div><p class="paragraph"/>Example usages for above controller:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"show"</span> id=<span class="xml&#45;quote">"1"</span>&#62;</span>Book 1<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"show"</span> id=<span class="xml&#45;quote">"$&#123;currentBook.id&#125;"</span>&#62;</span>$&#123;currentBook.name&#125;<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"book"</span>&#62;</span>Book Home<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"book"</span> action=<span class="xml&#45;quote">"list"</span>&#62;</span>Book List<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link url=<span class="xml&#45;quote">"&#91;action:'list',controller:'book'&#93;"</span>&#62;</span>Book List<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"list"</span> params=<span class="xml&#45;quote">"&#91;sort:'title',order:'asc',author:currentBook.author&#93;"</span>&#62;</span>
+     Book List
+<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"book"</span> absolute=<span class="xml&#45;quote">"true"</span>&#62;</span>Book Home<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"book"</span> base=<span class="xml&#45;quote">"http://admin.mygreatsite.com"</span>&#62;</span>Book Home<span class="xml&#45;tag">&#60;/g:link&#62;</span></pre></div><p class="paragraph"/>
+Example as a method call in GSP only:<p class="paragraph"/><div class="code"><pre>&#60;%= link(action:'list',controller:'book') &#123; 'Book List' &#125;%&#62;</pre></div><p class="paragraph"/>
+Results in:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;a href=<span class="xml&#45;quote">"/shop/book/list"</span>&#62;</span>Book List<span class="xml&#45;tag">&#60;/a&#62;</span></pre></div><p class="paragraph"/><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Attributes
+<ul class="star">
+<li><code>action</code> (optional) - the name of the action to use in the link, if not specified the default action will be linked</li>
+<li><code>controller</code> (optional) - the name of the controller to use in the link, if not specified the current controller will be linked</li>
+<li><code>id</code> (optional) - the id to use in the link</li>
+<li><code>params</code> (optional) - a map containing request parameters</li>
+<li><code>url</code> (optional) - a map containing the action, controller, id etc.</li>
+<li><code>absolute</code> (optional) - If set to "true" will prefix the link target address with the value of the grails.serverURL property from Config, or http://localhost:&#60;port&#62; if no value in Config and not running in production.</li>
+<li><code>base</code> (optional) - Sets the prefix to be added to the link target address, typically an absolute server URL. This overrides the behaviour of the <code>absolute</code> property, if both are specified.</li>
+</ul><p class="paragraph"/><h2>Source</h2><p class="paragraph"/><div class="error">source: ../grails/src/java/org/codehaus/groovy/grails/plugins/web/taglib/ApplicationTagLib.groovy (No such file or directory)</div><p class="paragraph"/>
+
+	</body>
+</html>

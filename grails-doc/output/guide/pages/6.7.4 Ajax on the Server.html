@@ -1,0 +1,50 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.7.4 Ajax on the Server</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Although Ajax features the X for XML there are a number of different ways to implement Ajax which are typically broken down into:
+<ul class="star">
+<li>Content Centric Ajax - Where you merely use the HTML result of a remote call to update the page</li>
+<li>Data Centric Ajax - Where you actually send an XML or JSON response from the server and programmatically update the page</li>
+<li>Script Centric Ajax - Where the server sends down a stream of Javascript to be evaluated on the fly</li>
+</ul><p class="paragraph"/>Most of the examples in the <a href="../guide/single.html#6.7 Ajax" class="guide">Ajax</a> section cover Content Centric Ajax where you are updating the page, but you may also want to use Data Centric or Script Centric. This guide covers the different styles of Ajax.<p class="paragraph"/><h4>Content Centric Ajax</h4><p class="paragraph"/>Just to re-cap, content centric Ajax involves sending some HTML back from the server and is typically done by rendering a template with the <a href="../ref/Controllers/render.html" class="controllers">render</a> method:<p class="paragraph"/><div class="code"><pre>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>	render(template:<span class="java&#45;quote">"bookTemplate"</span>, model:&#91;book:b&#93;)
+&#125;</pre></div><p class="paragraph"/>Calling this on the client involves using the <a href="../ref/Tags/remoteLink.html" class="tags">remoteLink</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"showBook"</span> id=<span class="xml&#45;quote">"$&#123;book.id&#125;"</span> update=<span class="xml&#45;quote">"book$&#123;book.id&#125;"</span>&#62;</span>Update Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"book$&#123;book.id&#125;"</span>&#62;</span>
+   <span class="xml&#45;comment">&#60;!&#45;&#45;existing book mark&#45;up &#45;&#45;&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/><h4>Data Centric Ajax with JSON</h4><p class="paragraph"/>Data Centric Ajax typically involves evaluating the response on the client and updating programmatically. For a JSON response with Grails you would typically use Grails' <a href="../guide/single.html#6.1.7 XML and JSON Responses" class="guide">JSON marshaling</a> capability:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;<p class="paragraph"/>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>    render b as JSON	
+&#125;</pre></div><p class="paragraph"/>And then on the client parse the incoming JSON request using an Ajax event handler:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+function updateBook(e) &#123;
+	var book = eval(<span class="xml&#45;quote">"("</span>+e.responseText+<span class="xml&#45;quote">")"</span>) // evaluate the JSON
+	$(<span class="xml&#45;quote">"book"</span>+book.id+<span class="xml&#45;quote">"_title"</span>).innerHTML = book.title
+&#125;
+<span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"test"</span> update=<span class="xml&#45;quote">"foo"</span> onSuccess=<span class="xml&#45;quote">"updateBook(e)"</span>&#62;</span>Update Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span>
+<span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"bookId"</span>&#62;</span>book$&#123;book.id&#125;<span class="xml&#45;tag">&#60;/g:set&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;"</span>&#62;</span>
+	<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;_title"</span>&#62;</span>The Stand<span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/><h4>Data Centric Ajax with XML</h4><p class="paragraph"/>On the server side using XML is equally trivial:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;<p class="paragraph"/>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>    render b as XML	
+&#125;</pre></div><p class="paragraph"/>However, since DOM is involved the client gets more complicated:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+function updateBook(e) &#123;
+	var xml = e.responseXML
+	var id = xml.getElementsByTagName(<span class="xml&#45;quote">"book"</span>).getAttribute(<span class="xml&#45;quote">"id"</span>)
+	$(<span class="xml&#45;quote">"book"</span>+id+<span class="xml&#45;quote">"_title"</span>)=xml.getElementsByTagName(<span class="xml&#45;quote">"title"</span>)&#91;0&#93;.textContent
+&#125;
+<span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"test"</span> update=<span class="xml&#45;quote">"foo"</span> onSuccess=<span class="xml&#45;quote">"updateBook(e)"</span>&#62;</span>Update Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span>
+<span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"bookId"</span>&#62;</span>book$&#123;book.id&#125;<span class="xml&#45;tag">&#60;/g:set&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;"</span>&#62;</span>
+	<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;_title"</span>&#62;</span>The Stand<span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/><h4>Script Centric Ajax with JavaScript</h4><p class="paragraph"/>Script centric Ajax involves actually sending Javascript back that gets evaluated on the client. An example of this can be seen below:<p class="paragraph"/><div class="code"><pre>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>    response.contentType = <span class="java&#45;quote">"text/javascript"</span>
+    <span class="java&#45;object">String</span> title = b.title.encodeAsJavascript()
+    render <span class="java&#45;quote">"&#36;('book$&#123;b.id&#125;_title')='$&#123;title&#125;'"</span>
+&#125;</pre></div><p class="paragraph"/>The important thing to remember is to set the <code>contentType</code> to <code>text/javascript</code>. If you are using Prototype on the client the returned Javascript will automatically be evaluated due to this <code>contentType</code> setting.<p class="paragraph"/>Obviously in this case it is critical that you have an agreed client-side API as you don't want changes on the client breaking the server. This is one of the reasons Rails has something like RJS. Although Grails does not currently have a feature such as RJS there is a <a href="http://grails.org/Dynamic+Javascript+Plugin" target="blank">Dynamic JavaScript Plug-in</a> that offers similar capabilities.
+
+	</body>
+</html>

@@ -1,0 +1,42 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>formRemote </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Creates a form tag that uses a remote uri to execute an ajax call serializing the form elements falling back to a normal form submit if javascript is not supported.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>Example controller for an application called "shop":<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+     def list = &#123; &#91; books: Book.list( params ) &#93; &#125;
+     def show = &#123; &#91; book : Book.get( params&#91;'id'&#93; ) &#93; &#125;
+&#125;</pre></div><p class="paragraph"/>Example usages for above controller:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:formRemote name=<span class="xml&#45;quote">"myForm"</span> on404=<span class="xml&#45;quote">"alert('not found!')"</span> update=<span class="xml&#45;quote">"updateMe"</span> url=<span class="xml&#45;quote">"&#91;action:'show'&#93;"</span>&#62;</span>
+    Login: <span class="xml&#45;tag">&#60;input name=<span class="xml&#45;quote">"login"</span> type=<span class="xml&#45;quote">"text"</span>&#62;</span><span class="xml&#45;tag">&#60;/input&#62;</span>
+<span class="xml&#45;tag">&#60;/g:formRemote&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"updateMe"</span>&#62;</span>this div is updated by the form<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:formRemote name=<span class="xml&#45;quote">"myForm"</span> update=<span class="xml&#45;quote">"updateMe"</span>
+              url=<span class="xml&#45;quote">"&#91; controller: 'book', action: 'list', params: &#91; sort: 'title', order: 'desc' &#93;&#93;"</span>&#62;</span>
+    Login: <span class="xml&#45;tag">&#60;input name=<span class="xml&#45;quote">"login"</span> type=<span class="xml&#45;quote">"text"</span>&#62;</span><span class="xml&#45;tag">&#60;/input&#62;</span>
+<span class="xml&#45;tag">&#60;/g:formRemote&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"updateMe"</span>&#62;</span>this div is updated by the form<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/>You can override both the form method and action to use when javascript is unavailable by providing <code>method</code> and <code>action</code> attributes. This example will submit the form to <code>/&#60;context&#62;/book/oldList</code> using a GET if javascript is unavailable:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:formRemote name=<span class="xml&#45;quote">"myForm"</span> method=<span class="xml&#45;quote">"GET"</span> action=<span class="xml&#45;quote">"$&#123;createLink(controller: 'book', action: 'oldList')&#125;"</span>
+              url=<span class="xml&#45;quote">"&#91; controller: 'book', action: 'list', params: &#91; sort: 'title', order: 'desc' &#93;&#93;"</span>&#62;</span>
+    Login: <span class="xml&#45;tag">&#60;input name=<span class="xml&#45;quote">"login"</span> type=<span class="xml&#45;quote">"text"</span>&#62;</span><span class="xml&#45;tag">&#60;/input&#62;</span>
+<span class="xml&#45;tag">&#60;/g:formRemote&#62;</span></pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Attributes
+<ul class="star">
+<li><code>url</code> - The url to submit to as either a map (containing values for the controller, action, id, and params) or a URL string</li>
+<li><code>action</code> (optional) - The action to execute as a fallback, defaults to the url if non specified</li>
+<li><code>update</code> (optional) - Either a map containing the elements to update for 'success' or 'failure' states, or a string with the element to update in which cause failure events would be ignored</li>
+<li><code>before</code> (optional) - The javascript function to call before the remote function call</li>
+<li><code>after</code> (optional) - The javascript function to call after the remote function call</li>
+<li><code>asynchronous</code> (optional) - Whether to do the call asynchronously or not (defaults to true)</li>
+<li><code>method</code> (optional) - The method to use the execute the call (defaults to "post")</li>
+</ul><p class="paragraph"/>Events
+<ul class="star">
+<li><code>onSuccess</code> (optional) - The javascript function to call if successful</li>
+<li><code>onFailure</code> (optional) - The javascript function to call if the call failed</li>
+<li><code>on_ERROR_CODE</code> (optional) - The javascript function to call to handle specified error codes (eg on404="alert('not found!')")</li>
+<li><code>onUninitialized</code> (optional) - The javascript function to call the a ajax engine failed to initialise</li>
+<li><code>onLoading</code> (optional) - The javascript function to call when the remote function is loading the response</li>
+<li><code>onLoaded</code> (optional) - The javascript function to call when the remote function is completed loading the response</li>
+<li><code>onComplete</code> (optional) - The javascript function to call when the remote function is complete, including any updates</li>
+</ul><p class="paragraph"/><h2>Source</h2><p class="paragraph"/><div class="error">source: ../grails/src/java/org/codehaus/groovy/grails/plugins/web/taglib/JavascriptTagLib.groovy (No such file or directory)</div><p class="paragraph"/>
+
+	</body>
+</html>

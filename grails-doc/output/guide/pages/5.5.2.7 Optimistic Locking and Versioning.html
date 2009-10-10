@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.5.2.7 Optimistic Locking and Versioning</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		As discussed in the section on <a href="../guide/single.html#5.3.5 Pessimistic and Optimistic Locking" class="guide">Optimistic and Pessimistic Locking</a>, by default GORM uses optimistic locking and automatically injects a <code>version</code> property into every class which is in turn mapped to a <code>version</code> column at the database level.<p class="paragraph"/>If you're mapping to a legacy schema this can be problematic, so you can disable this feature by doing the following:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      version <span class="java&#45;keyword">false</span>
+  &#125;
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+If you disable optimistic locking you are essentially on your own with regards to concurrent updates and are open to the risk of users losing (due to data overriding) data unless you use <a href="../guide/single.html#5.3.5 Pessimistic and Optimistic Locking" class="guide">pessimistic locking</a>
+</blockquote>
+
+	</body>
+</html>

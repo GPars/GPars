@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>actionName </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Returns the name of the currently executing action<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class BookController &#123;
+	def list = &#123;
+		log.info <span class="java&#45;quote">"Executing action $actionName"</span><p class="paragraph"/>		render(view:actionName)
+	&#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Returns the name of the currently executing action which is dictated by the URL mappings
+	</body>
+</html>

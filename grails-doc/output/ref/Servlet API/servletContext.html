@@ -1,0 +1,21 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>servletContext </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The servletContext object is an instance of the Servlet API's <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/ServletContext.html" class="api">ServletContext</a> class.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class BookController &#123;
+	def doSomething = &#123;
+	    def input
+	    <span class="java&#45;keyword">try</span> &#123;
+		  input = servletContext.getResourceAsStream(<span class="java&#45;quote">"/WEB&#45;INF/myscript.groovy"</span>)
+		  def result = <span class="java&#45;keyword">new</span> GroovyShell().evaluate(input.text)
+		  render result
+	    &#125;
+	    <span class="java&#45;keyword">finally</span> &#123;
+		   input.close()
+	    &#125;<p class="paragraph"/>	&#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The Servlet API's <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/ServletContext.html" class="api">ServletContext</a> is useful for, amongst other things, storing global application attributes, reading local server resources and establishing information about the servlet container.<p class="paragraph"/>Application attributes which are normally accessible via the <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/ServletContext.html#getAttribute(java.lang.String)" class="api">getAttribute</a> can also be indexed into using the array index operator or de-reference operator:<p class="paragraph"/><div class="code"><pre>def mySetting = servletContext&#91;<span class="java&#45;quote">"mySetting"</span>&#93;<p class="paragraph"/>servletContext&#91;<span class="java&#45;quote">"mySetting"</span>&#93; = <span class="java&#45;quote">"foo"</span><p class="paragraph"/>asset <span class="java&#45;quote">"foo"</span> == servletContext.mySetting</pre></div><p class="paragraph"/>
+	</body>
+</html>

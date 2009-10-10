@@ -1,0 +1,25 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.3.3 Understanding Cascading Updates and Deletes</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		It is critical that you understand how cascading updates and deletes work when using GORM. The key part to remember is the <code>belongsTo</code> setting which controls which class "owns" a relationship.<p class="paragraph"/>Whether it is a one-to-one, one-to-many or many-to-many if you define <code>belongsTo</code> updates and deletes will cascade from the owning class to its possessions (the other side of the relationship).<p class="paragraph"/>If you <em class="italic">do not</em> define <code>belongsTo</code> then no cascades will happen and you will have to manually save each object.<p class="paragraph"/>Here is an example:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;object">String</span> name
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+&#125;
+class Flight &#123;
+	<span class="java&#45;object">String</span> number
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;airport:Airport&#93;
+&#125;</pre></div><p class="paragraph"/>If I now create an <code>Airport</code> and add some <code>Flight</code>s to it I can save the <code>Airport</code> and have the updates cascaded down to each flight, hence saving the whole object graph:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">new</span> Airport(name:<span class="java&#45;quote">"Gatwick"</span>)
+	 .addToFlights(<span class="java&#45;keyword">new</span> Flight(number:<span class="java&#45;quote">"BA3430"</span>))
+	 .addToFlights(<span class="java&#45;keyword">new</span> Flight(number:<span class="java&#45;quote">"EZ0938"</span>))
+	 .save()</pre></div><p class="paragraph"/>Conversely if I later delete the <code>Airport</code> all <code>Flight</code>s associated with it will also be deleted:<p class="paragraph"/><div class="code"><pre>def airport = Airport.findByName(<span class="java&#45;quote">"Gatwick"</span>)
+airport.delete()</pre></div><p class="paragraph"/>However, if I were to remove <code>belongsTo</code> then the above cascading deletion code <strong class="bold">would not work</strong>. To understand this better take a look at the summaries below that describe the default behaviour of GORM with regards to specific associations.<p class="paragraph"/><h5>Bidirectional one-to-many with belongsTo</h5><p class="paragraph"/><div class="code"><pre>class A &#123; <span class="java&#45;keyword">static</span> hasMany = &#91;bees:B&#93; &#125;
+class B &#123; <span class="java&#45;keyword">static</span> belongsTo = &#91;a:A&#93; &#125;</pre></div><p class="paragraph"/>In the case of a bidirectional one-to-many where the many side defines a <code>belongsTo</code> then the cascade strategy is set to "ALL" for the one side and "NONE" for the many side.<p class="paragraph"/><h5>Unidirectional one-to-many</h5><p class="paragraph"/><div class="code"><pre>class A &#123; <span class="java&#45;keyword">static</span> hasMany = &#91;bees:B&#93; &#125;
+class B &#123;  &#125;</pre></div><p class="paragraph"/>In the case of a unidirectional one-to-many where the many side defines no belongsTo then the cascade strategy is set to "SAVE-UPDATE".<p class="paragraph"/><h5>Bidirectional one-to-many no belongsTo</h5><p class="paragraph"/><div class="code"><pre>class A &#123; <span class="java&#45;keyword">static</span> hasMany = &#91;bees:B&#93; &#125;
+class B &#123; A a &#125;</pre></div><p class="paragraph"/>In the case of a bidirectional one-to-many where the many side does not define a <code>belongsTo</code> then the cascade strategy is set to "SAVE-UPDATE" for the one side and "NONE" for the many side.<p class="paragraph"/><h5>Unidirectional One-to-one with belongsTo</h5><p class="paragraph"/><div class="code"><pre>class A &#123;  &#125;
+class B &#123; <span class="java&#45;keyword">static</span> belongsTo = &#91;a:A&#93; &#125;</pre></div><p class="paragraph"/>In the case of a unidirectional one-to-one association that defines a <code>belongsTo</code> then the cascade strategy is set to "ALL" for the owning side of the relationship (A-&#62;B) and "NONE" from the side that defines the <code>belongsTo</code> (B-&#62;A)<p class="paragraph"/>Note that if you need further control over cascading behaviour, you can use the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a>.
+	</body>
+</html>

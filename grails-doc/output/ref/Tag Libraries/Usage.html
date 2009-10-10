@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>Tag Library Usage</h1><p class="paragraph"/>A tag library fulfills role of "view helper" in the Model View Controller (MVC) pattern and is responsible aiding GSP rendering. In Grails a tag library is a class that ends in the convention "TagLib" and lives in the <code>grails-app/taglib</code> directory. A controller can be created with the <a href="../../ref/Command Line/create-tag-lib.html" class="commandLine">create-tag-lib</a> command:<p class="paragraph"/><div class="code"><pre>grails create&#45;tag&#45;lib format</pre></div><p class="paragraph"/>Or via your favourite IDE or text editor.<p class="paragraph"/><div class="code"><pre>class FormatTagLib &#123;
+	def dateFormat = &#123; attrs, body &#45;&#62;
+		out &#60;&#60; <span class="java&#45;keyword">new</span> java.text.SimpleDateFormat(attrs.format).format(attrs.value)
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Each property in a tag library that takes two arguments is considered a tag. The first argument <code>attrs</code> is the attributes of the tag whilst the second <code>body</code> argument is another block or closure that can be invoked.<p class="paragraph"/>Refer to the user guide topic on <a href="../../guide/single.html#6.3 Tag Libraries" class="guide">Tag Libraries</a> for more information.
+	</body>
+</html>

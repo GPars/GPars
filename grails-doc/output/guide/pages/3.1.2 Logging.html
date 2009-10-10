@@ -1,0 +1,82 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.1.2 Logging</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Logging Basics</h4><p class="paragraph"/>Grails uses its common configuration mechanism to configure the underlying <a href="http://logging.apache.org/log4j/1.2/index.html" target="blank">Log4j</a> log system. To configure logging you must modify the file <code>Config.groovy</code> located in the <code>grails-app/conf</code> directory.<p class="paragraph"/>This single <code>Config.groovy</code> file allows you to specify separate logging configurations for <code>development</code>, <code>test</code>, and <code>production</code> <a href="../guide/single.html#3.2 Environments" class="guide">environments</a>. Grails processes the <code>Config.groovy</code> and configures Log4j appropriately.<p class="paragraph"/>Since 1.1 Grails provides a Log4j DSL, that you can use to configure Log4j an example of which can be seen below:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+    error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
+	       'org.codehaus.groovy.grails.web.pages' //  GSP<p class="paragraph"/>    warn   'org.mortbay.log'
+&#125;</pre></div><p class="paragraph"/>Essentially, each method translates into a log level and you can pass the names of the packages you want to log at that level as arguments to the method.<p class="paragraph"/>Some useful loggers include:
+<ul class="star">
+<li><code>org.codehaus.groovy.grails.commons</code> - Core artefact information such as class loading etc.</li>
+<li><code>org.codehaus.groovy.grails.web</code> - Grails web request processing</li>
+<li><code>org.codehaus.groovy.grails.web.mapping</code> - URL mapping debugging</li>
+<li><code>org.codehaus.groovy.grails.plugins</code> - Log plugin activity</li>
+<li><code>org.springframework</code> - See what Spring is doing</li>
+<li><code>org.hibernate</code> - See what Hibernate is doing</li>
+</ul><p class="paragraph"/><h4>The Root Logger</h4><p class="paragraph"/>The Root logger is the logger that all other loggers inherit from. You can configure the Root logger using the root method:<p class="paragraph"/><div class="code"><pre>root &#123;
+    error()
+    additivity = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>The above example configures the root logger to log messages at the error level and above to the default standard out appender. You can also configure the root logger to log to one or more named appenders:<p class="paragraph"/><div class="code"><pre>appenders &#123;
+	file name:'file', file:'/<span class="java&#45;keyword">var</span>/logs/mylog.log'
+&#125;
+root &#123;
+    debug 'stdout', 'file'
+    additivity = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>Here the root logger will log to two appenders - the default 'stdout' appender and a 'file' appender.<p class="paragraph"/>You can also configure the root logger from the argument passed into the Log4J closure:
+<div class="code"><pre>log4j = &#123; root &#45;&#62;
+    root.level = org.apache.log4j.Level.DEBUG
+    &#8230;
+&#125;</pre></div>
+The closure argument "root" is an instance of  <code>org.apache.log4j.Logger</code> , so refer to the API documentation for Log4J to find out what properties and methods are available to you.<p class="paragraph"/><h4>Custom Appenders</h4><p class="paragraph"/>Using the Log4j you can define custom appenders. The following appenders are available by default:
+<ul class="star">
+<li><code>jdbc</code> - An appender that logs to a JDBC connection</li>
+<li><code>console</code> - An appender that logs to standard out</li>
+<li><code>file</code> - An appender that logs to a file</li>
+<li><code>rollingFile</code> - An appender that logs to rolling set of files</li>
+</ul><p class="paragraph"/>For example to configure a rolling file appender you can do:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+	appenders &#123;
+		rollingFile name:<span class="java&#45;quote">"myAppender"</span>, maxFileSize:1024, file:<span class="java&#45;quote">"/tmp/logs/myApp.log"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Each argument passed to the appender maps to a property of underlying <a href="http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Appender.html" target="blank">Appender</a> class. The example above sets the <code>name</code>, <code>maxFileSize</code> and <code>file</code> properties of the <a href="http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/RollingFileAppender.html" target="blank">RollingFileAppender</a> class.<p class="paragraph"/>If you prefer to simply create the appender programmatically yourself, or you have your own appender implementation then you can simply call the <code>appender</code> method and appender instance:<p class="paragraph"/>
+<div class="code"><pre><span class="java&#45;keyword">import</span> org.apache.log4j.&#42;<p class="paragraph"/>log4j = &#123;
+	appenders &#123;
+		appender <span class="java&#45;keyword">new</span> RollingFileAppender(name:<span class="java&#45;quote">"myAppender"</span>, maxFileSize:1024, file:<span class="java&#45;quote">"/tmp/logs/myApp.log"</span>)
+	&#125;
+&#125;</pre></div><p class="paragraph"/>You can then log to a particular appender by passing the name as a key to one of the log level methods from the previous section:<p class="paragraph"/><div class="code"><pre>error myAppender:<span class="java&#45;quote">"org.codehaus.groovy.grails.commons"</span></pre></div><p class="paragraph"/><p class="paragraph"/><h4>Custom Layouts</h4><p class="paragraph"/>By default the Log4j DSL assumes that you want to use a <a href="http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html" target="blank">PatternLayout</a>. However, there are other layouts available including:
+<ul class="star">
+<li><code>xml</code> - Create an XML log file</li>
+<li><code>html</code> - Creates an HTML log file</li>
+<li><code>simple</code> - A simple textual log</li>
+<li><code>pattern</code> - A Pattern layout</li>
+</ul><p class="paragraph"/>You can specify custom patterns to an appender using the <code>layout</code> setting:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+	appenders &#123;
+        console name:'customAppender', layout:pattern(conversionPattern: '%c&#123;2&#125; %m%n')
+    &#125;
+&#125;</pre></div><p class="paragraph"/>This also works for the built-in appender "stdout", which logs to the console:
+<div class="code"><pre>log4j = &#123;
+    appenders &#123;
+        console name:'stdout', layout:pattern(conversionPattern: '%c&#123;2&#125; %m%n')
+    &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Full stacktraces</h4><p class="paragraph"/>When exceptions occur, there can be an awful lot of noise in the stacktrace from Java and Groovy internals. Grails filters these typically irrelevant details and restricts traces to non-core Grails/Groovy class packages.<p class="paragraph"/>When this happens, the full trace is always written to the <code>StackTrace</code> logger. This logs to a file called <code>stacktrace.log</code> - but you can change this in your <code>Config.groovy</code> to do anything you like. For example if you prefer full stack traces to go to standard out you can add this line:<p class="paragraph"/><div class="code"><pre>error stdout:<span class="java&#45;quote">"StackTrace"</span></pre></div><p class="paragraph"/>You can completely disable stacktrace filtering by setting the <code>grails.full.stacktrace</code> VM property to <code>true</code>:<p class="paragraph"/><div class="code"><pre>grails &#45;Dgrails.full.stacktrace=<span class="java&#45;keyword">true</span> run&#45;app</pre></div><p class="paragraph"/><h4>Logging by Convention</h4><p class="paragraph"/>All application artefacts have a dynamically added <code>log</code> property. This includes <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a>, <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a>, tag libraries and so on. Below is an example of its usage:<p class="paragraph"/><div class="code"><pre>def foo = <span class="java&#45;quote">"bar"</span>
+log.debug <span class="java&#45;quote">"The value of foo is $foo"</span></pre></div><p class="paragraph"/>Logs are named using the convention <code>grails.app.&#60;artefactType&#62;.ClassName</code>. Below is an example of how to configure logs for different Grails artefacts:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+	// Set level <span class="java&#45;keyword">for</span> all application artefacts
+	info <span class="java&#45;quote">"grails.app"</span>
+	// Set <span class="java&#45;keyword">for</span> a specific controller
+	debug <span class="java&#45;quote">"grails.app.controller.YourController"</span>
+	// Set <span class="java&#45;keyword">for</span> a specific domain class
+	debug <span class="java&#45;quote">"grails.app.domain.Book"</span>
+	// Set <span class="java&#45;keyword">for</span> all taglibs
+	info <span class="java&#45;quote">"grails.app.tagLib"</span><p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>The artefacts names are dictated by convention, some of the common ones are listed below:
+<ul class="star">
+<li><code>bootstrap</code> - For bootstrap classes</li>
+<li><code>dataSource</code> - For data sources</li>
+<li><code>tagLib</code> - For tag libraries</li>
+<li><code>service</code> - For service classes</li>
+<li><code>controller</code> - For controllers</li>
+<li><code>domain</code> - For domain entities</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

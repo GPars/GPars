@@ -1,0 +1,24 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>addTo*</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Adds a domain class relationship for one-to-many or many-to-many relationship, where the relationship is indicated by the property used as the suffix to the method.<p class="paragraph"/>
+<h2>Examples</h2><p class="paragraph"/><div class="code"><pre>def fictBook = <span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"IT"</span>)
+def nonFictBook = <span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"On Writing: A Memoir of the Craft"</span>)
+def a = <span class="java&#45;keyword">new</span> Author(name:<span class="java&#45;quote">"Stephen King"</span>)
+             .addToFiction(fictBook)       // 'fiction' is name of relationship property
+             .addToNonFiction(nonFictBook) // 'nonFiction' is name of relationship property
+             .save()</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>addTo*</code> method is a dynamic method that uses an association to automatically add instances to the association. It also automatically configures bi-directional relationship so that both sides o the relationship have been set.<p class="paragraph"/>The method expects an instance of the associated class:<p class="paragraph"/><div class="code"><pre>def fictBook = <span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"IT"</span>)
+def nonFictBook = <span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"On Writing: A Memoir of the Craft"</span>)
+def a = <span class="java&#45;keyword">new</span> Author(name:<span class="java&#45;quote">"Stephen King"</span>)
+             .addToFiction(fictBook)       // 'fiction' is name of relationship property
+             .addToNonFiction(nonFictBook) // 'nonFiction' is name of relationship property
+             .save()</pre></div><p class="paragraph"/>Or a map, in which case it auto-instantiates an instance of the associated class:<p class="paragraph"/><div class="code"><pre>def a = <span class="java&#45;keyword">new</span> Author(name:<span class="java&#45;quote">"Stephen King"</span>)
+             .addToFiction(title:<span class="java&#45;quote">"IT"</span>)       
+             .addToNonFiction(title:<span class="java&#45;quote">"On Writing: A Memoir of the Craft"</span>)
+             .save()</pre></div><p class="paragraph"/>
+	</body>
+</html>

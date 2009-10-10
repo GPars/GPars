@@ -1,0 +1,18 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.3.2 Deleting Objects</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		An example of the <a href="../ref/Domain Classes/delete.html" class="domainClasses">delete</a> method can be seen below:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.delete()</pre></div><p class="paragraph"/>By default Grails will use transactional write behind to perform the delete, if you want to perform the delete in place then you can use the <code>flush</code> argument:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.delete(flush:<span class="java&#45;keyword">true</span>)</pre></div><p class="paragraph"/>Using the <code>flush</code> argument will also allow you to catch any errors that may potentially occur during a delete. A common error that may occur is if you violate a database constraint, although this is normally down to a programming or schema error. The following example shows how to catch a <code>DataIntegrityViolationException</code> that is thrown when you violate the database constraints:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)<p class="paragraph"/><span class="java&#45;keyword">try</span> &#123;
+	p.delete(flush:<span class="java&#45;keyword">true</span>)
+&#125;
+<span class="java&#45;keyword">catch</span>(org.springframework.dao.DataIntegrityViolationException e) &#123;
+	flash.message = <span class="java&#45;quote">"Could not delete person $&#123;p.name&#125;"</span>
+	redirect(action:<span class="java&#45;quote">"show"</span>, id:p.id)
+&#125;</pre></div><p class="paragraph"/>Note that Grails does not supply a <code>deleteAll</code> method as deleting data is discouraged and can often be avoided through boolean flags/logic.<p class="paragraph"/>If you really need to batch delete data you can use the <a href="../ref/Domain Classes/executeUpdate.html" class="domainClasses">executeUpdate</a> method to do batch DML statements:<p class="paragraph"/><div class="code"><pre>Customer.executeUpdate(<span class="java&#45;quote">"delete Customer c where c.name = :oldName"</span>, &#91;oldName:<span class="java&#45;quote">"Fred"</span>&#93;)</pre></div><p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,33 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>withFormat </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Used to execute different responses based on the incoming request <code>Accept</code> header, format parameter or URI extension. See <a href="../../guide/single.html#6.8 Content Negotiation" class="guide">content negotiation</a> for more information.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;<p class="paragraph"/>class BookController &#123;
+	def books
+	def list = &#123;
+		<span class="java&#45;keyword">this</span>.books = Book.list()
+		withFormat &#123;
+			html bookList:books
+			js &#123; render <span class="java&#45;quote">"alert('hello')"</span> &#125; 
+			xml &#123; render books as XML &#125;
+		&#125;
+	&#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>withFormat</code> method takes a block within the scope of which you can execute different methods whose names match the content type you want to respond to. For example:<p class="paragraph"/><div class="code"><pre>withFormat &#123;
+	html bookList:books
+	js &#123; render <span class="java&#45;quote">"alert('hello')"</span> &#125; 
+	xml &#123; render books as XML &#125;
+&#125;</pre></div><p class="paragraph"/>Here we invoke three methods called <code>html</code>, <code>js</code> and <code>xml</code> that use mime type names configured in <code>grails-app/conf/Config.groovy</code> (See <a href="../../guide/single.html#6.8 Content Negotiation" class="guide">content negotiation</a> for more information). The call to <code>html</code> accepts a model (a map) which is passed on to the view. Grails will first search for a view called <code>grails-app/views/book/list.html.gsp</code> and if that is not found fallback to <code>grails-app/views/book/list.gsp</code>.<p class="paragraph"/>Note that the order of the types is significant if either the request format is "all" or more than one content type has the same "q" rating in the accept header. In the former case, the first type handler in the block is executed ("html" in the short example above). The latter case is more confusing because it only holds if there is more than one content type with the highest "q" rating for which you have a type handler <strong class="bold">and</strong> you have more than one type handler matching that "q" rating. For example, say the request has "text/html" and "application/xml" with a "q" rating of 1.0, then this code:
+<div class="code"><pre>withFormat &#123;
+    xml &#123; &#8230; &#125;
+    html &#123; &#8230; &#125;
+&#125;</pre></div>
+will use the "xml" type handler for the request.<p class="paragraph"/>If you require the model to be lazily executed you can pass a closure or block instead of a map:<p class="paragraph"/><div class="code"><pre>withFormat &#123;
+	html &#123; &#91;bookList:Book.list()&#93; &#125;
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>The block will only get executed if the <code>html</code> format is matched. 
+
+	</body>
+</html>

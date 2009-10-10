@@ -1,0 +1,37 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.1.9 Command Objects</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails controllers support the concept of command objects. A command object is similar to a form bean in something like Struts and they are useful in circumstances when you want to populate a subset of the properties needed to update a domain class. Or where there is no domain class required for the interaction, but you need features such as <a href="../guide/single.html#6.1.6 Data Binding" class="guide">data binding</a> and <a href="../guide/single.html#7. Validation" class="guide">validation</a>.<p class="paragraph"/><h4>Declaring Command Objects</h4><p class="paragraph"/>Command objects are typically declared in the same source file as a controller directly below the controller class definition. For example:<p class="paragraph"/><div class="code"><pre>class UserController &#123;
+	&#8230;
+&#125;
+class LoginCommand &#123;
+   <span class="java&#45;object">String</span> username
+   <span class="java&#45;object">String</span> password
+   <span class="java&#45;keyword">static</span> constraints = &#123;
+           username(blank:<span class="java&#45;keyword">false</span>, minSize:6)
+           password(blank:<span class="java&#45;keyword">false</span>, minSize:6)
+   &#125;
+&#125;</pre></div><p class="paragraph"/>As the previous example demonstrates you can supply <a href="../guide/single.html#7.1 Declaring Constraints" class="guide">constraints</a> to command objects just as you can with <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a>.<p class="paragraph"/><h4>Using Command Objects</h4><p class="paragraph"/>To use command objects, controller actions may optionally specify any number of command object parameters. The parameter types must be supplied so that Grails knows what objects to create, populate and validate.<p class="paragraph"/>Before the controller action is executed Grails will automatically create an instance of the command object class, populate the properties of the command object with request parameters having corresponding names and the command object will be validated. For Example:<p class="paragraph"/><div class="code"><pre>class LoginController &#123;
+  def login = &#123; LoginCommand cmd &#45;&#62;
+         <span class="java&#45;keyword">if</span>(cmd.hasErrors()) &#123;
+                redirect(action:'loginForm')
+         &#125;
+         <span class="java&#45;keyword">else</span> &#123;
+            // <span class="java&#45;keyword">do</span> something <span class="java&#45;keyword">else</span>
+        &#125;
+  &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Command Objects and Dependency Injection</h4><p class="paragraph"/>Command objects can participate in dependency injection. This is useful if your command object has some custom validation logic which may need to interact with Grails <a href="../guide/single.html#8. The Service Layer" class="guide">services</a>:<p class="paragraph"/><div class="code"><pre>class LoginCommand &#123;
+    def loginService<p class="paragraph"/>	<span class="java&#45;object">String</span> username
+	<span class="java&#45;object">String</span> password<p class="paragraph"/>	<span class="java&#45;keyword">static</span> constraints = &#123;
+		username(validator: &#123; val, obj &#45;&#62;
+			obj.loginService.canLogin(obj.username, obj.password)
+		&#125;)
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this example the command object interacts with a bean injected by name from the Spring <code>ApplicationContext</code>.<p class="paragraph"/>
+
+	</body>
+</html>

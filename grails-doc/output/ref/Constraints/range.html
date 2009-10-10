@@ -1,0 +1,11 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>range</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Uses a Groovy range to ensure that a property's value occurs within a specified range<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>age(range:18..65)</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Set to a Groovy range which can contain numbers in the form of an <code>IntRange</code>, dates or any object that implements <code>Comparable</code> and provides <code>next</code> and <code>previous</code> methods for navigation. This constraint influences <a href="../../guide/single.html#5.7 GORM and Constraints" class="guide">schema generation</a>.<p class="paragraph"/>
+Error Code: <code>className.propertyName.range.toosmall</code> or <code>className.propertyName.range.toobig</code><p class="paragraph"/>
+	</body>
+</html>

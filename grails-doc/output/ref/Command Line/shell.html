@@ -1,0 +1,21 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>shell</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Starts an instance of the Groovy terminal shell with an initialized Grails runtime.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>grails shell</pre></div><p class="paragraph"/><h2>Description   </h2><p class="paragraph"/>Usage: 
+<div class="code"><pre>grails &#91;environment&#93;&#42; shell</pre></div><p class="paragraph"/>Starts the Grails shell, which is an extended version of the regular Groovy shell. Within the binding of the shell there are a couple of useful variables:
+<ul class="star">
+<li><code>ctx</code> - The Spring ApplicationContext instance</li>
+<li><code>grailsApplication</code> - The GrailsApplication instance</li>
+</ul><p class="paragraph"/>These are useful as they allow access to the conventions within Grails and interesting beans in the context.<p class="paragraph"/>Fired Events:
+<ul class="star">
+<li><code>StatusFinal</code> - When the shell is loaded</li>
+</ul><p class="paragraph"/>Example Shell:<p class="paragraph"/><div class="code"><pre>Groovy Shell (1.1&#45;rc&#45;1, JVM: 1.5.0_07&#45;87)
+Type 'go' to execute statements; Type 'help' <span class="java&#45;keyword">for</span> more information.
+groovy&#62; Book.list()
+groovy&#62; go</pre></div>
+	</body>
+</html>

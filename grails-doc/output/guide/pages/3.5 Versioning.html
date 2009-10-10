@@ -1,0 +1,11 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.5 Versioning</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Versioning Basics</h4><p class="paragraph"/>Grails has built in support for application versioning. When you first create an application with the <a href="../ref/Command Line/create-app.html" class="commandLine">create-app</a> command the version of the application is set to <code>0.1</code>. The version is stored in the application meta data file called <code>application.properties</code> in the root of the project.<p class="paragraph"/>To change the version of your application you can run the <a href="../ref/Command Line/set-version.html" class="commandLine">set-version</a> command:<p class="paragraph"/><div class="code"><pre>grails set&#45;version 0.2</pre></div><p class="paragraph"/>The version is used in various commands including the <a href="../ref/Command Line/war.html" class="commandLine">war</a> command which will append the application version to the end of the created WAR file.<p class="paragraph"/><h4>Detecting Versions at Runtime</h4><p class="paragraph"/>You can detect the application version using Grails' support for application metadata using the api:org.codehaus.groovy.grails.commons.GrailsApplication class. For example within <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a> there is an implicit <a href="../ref/Controllers/grailsApplication.html" class="controllers">grailsApplication</a> variable that can be used:<p class="paragraph"/><div class="code"><pre>def version = grailsApplication.metadata&#91;'app.version'&#93;</pre></div><p class="paragraph"/>If it is the version of Grails you need you can use:<p class="paragraph"/><div class="code"><pre>def grailsVersion = grailsApplication.metadata&#91;'app.grails.version'&#93;</pre></div><p class="paragraph"/>or the <code>GrailsUtil</code> class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.util.&#42;
+def grailsVersion = GrailsUtil.grailsVersion</pre></div><p class="paragraph"/><p class="paragraph"/>
+	</body>
+</html>

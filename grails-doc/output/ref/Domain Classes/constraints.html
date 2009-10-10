@@ -1,0 +1,21 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>constraints </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Allows the definition of declarative validation constraints. See <a href="../../guide/single.html#7. Validation" class="guide">Validation</a> in the user guide.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class Book &#123;
+   <span class="java&#45;object">String</span> title
+   Author author
+   <span class="java&#45;keyword">static</span> constraints = &#123;
+        title(blank:<span class="java&#45;keyword">false</span>, nullable:<span class="java&#45;keyword">false</span>, size:5..150)	
+        author(nullable:<span class="java&#45;keyword">false</span>)
+   &#125;	
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Constraints are defined using the declarative constraints DSL as described in the <a href="../../guide/single.html#7. Validation" class="guide">Validation</a> section of the user guide. Once evaluated validation can be applied through the use of the <a href="../../ref/Domain Classes/validate.html" class="domainClasses">validate</a> method:<p class="paragraph"/><div class="code"><pre>def b = <span class="java&#45;keyword">new</span> Book()
+assert !b.validate()</pre></div><p class="paragraph"/>A list of api:org.codehaus.groovy.grails.validation.ConstrainedProperty instances applied against the domain class by the <code>constraints</code> property is available at runtime:<p class="paragraph"/><div class="code"><pre>b.constraints.each &#123;
+      println it.name
+      println it.maxSize
+&#125;</pre></div>
+	</body>
+</html>

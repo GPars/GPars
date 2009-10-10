@@ -1,0 +1,21 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>domainClass </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>domainClass</code> plug-in sets up Grails domain classes as prototyped beans in the Spring <code>ApplicationContext</code><p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>An example domain class:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+	Date releaseDate
+	Author author
+&#125;</pre></div><p class="paragraph"/>
+<h2>Description</h2><p class="paragraph"/>Refer to the section on <a href="../../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">GORM</a> in the Grails user guide which details how to create Grails domain classes.<p class="paragraph"/>Configured Spring Beans given a domain class of <code>Book</code>:
+<ul class="star">
+<li><code>BookValidator</code> - A api:org.codehaus.groovy.grails.validation.GrailsDomainClassValidator that validates a domain class' defined <a href="../../guide/single.html#7.1 Declaring Constraints" class="guide">constraints</a>.</li>
+<li><code>BookPersistentClass</code> - The java.lang.Class for the domain class <code>Book</code></li>
+<li><code>BookDomainClass</code> - The api:org.codehaus.groovy.grails.commons.GrailsDomainClass instance which understands the conventions defined within a domain class and is used by <a href="../../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">GORM</a> to perform ORM mapping.</li>
+<li><code>Book</code> - A prototyped bean that will create a new instance of <code>Book</code> every time requested. This bean is used to perform auto-wiring of domain classes when constructed with the <code>new</code> operator.</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

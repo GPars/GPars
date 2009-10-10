@@ -1,0 +1,51 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.1.4 Redirects and Chaining</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Redirects</h4><p class="paragraph"/>                 Actions can be redirected using the <a href="../ref/Controllers/redirect.html" class="controllers">redirect</a> method present in all controllers:<p class="paragraph"/>                 <div class="code"><pre>class OverviewController &#123;
+                     def login = &#123;&#125;<p class="paragraph"/>                     def find = &#123;
+                         <span class="java&#45;keyword">if</span>(!session.user)
+                            redirect(action:login)
+                         &#8230;
+                     &#125;
+                 &#125;</pre></div><p class="paragraph"/>                 Internally the <a href="../ref/Controllers/redirect.html" class="controllers">redirect</a> method uses the <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletResponse.html" class="api">HttpServletResonse</a> object's <code>sendRedirect</code> method.<p class="paragraph"/>                 The <code>redirect</code> method expects either:
+<ul class="star">
+<li>Another closure within the same controller class:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Call the login action within the same class
+                 redirect(action:login)</pre></div>
+<ul class="star">
+<li>The name of a controller and action:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Also redirects to the index action in the home controller
+                 redirect(controller:'home',action:'index')</pre></div>
+<ul class="star">
+<li> A URI for a resource relative the application context path:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Redirect to an explicit URI
+                 redirect(uri:<span class="java&#45;quote">"/login.html"</span>)</pre></div>
+<ul class="star">
+<li>Or a full URL:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Redirect to a URL
+                 redirect(url:<span class="java&#45;quote">"http://grails.org"</span>)</pre></div><p class="paragraph"/>                 Parameters can be optionally passed from one action to the next using the <code>params</code> argument of the method:<p class="paragraph"/>                 <div class="code"><pre>redirect(action:myaction, params:&#91;myparam:<span class="java&#45;quote">"myvalue"</span>&#93;)</pre></div><p class="paragraph"/>
+                 These parameters are made available through the <a href="../ref/Controllers/params.html" class="controllers">params</a> dynamic property that also accesses request parameters. If a parameter is specified with the same name as a request parameter the request parameter is overridden and the controller parameter used.<p class="paragraph"/>                 Since the <code>params</code> object is also a map, you can use it to pass the current request parameters from one action to the next:<p class="paragraph"/>                 <div class="code"><pre>redirect(action:<span class="java&#45;quote">"next"</span>, params:params)</pre></div><p class="paragraph"/>                 Finally, you can also include a fragment in the target URI:<p class="paragraph"/>                 <div class="code"><pre>redirect(controller: <span class="java&#45;quote">"test"</span>, action: <span class="java&#45;quote">"show"</span>, fragment: <span class="java&#45;quote">"profile"</span>)</pre></div><p class="paragraph"/>                 will (depending on the URL mappings) redirect to something like "/myapp/test/show#profile".<p class="paragraph"/>                 h4. Chaining<p class="paragraph"/>                 Actions can also be chained. Chaining allows the model to be retained from one action to the next. For example calling the <code>first</code> action in the below action:<p class="paragraph"/>                 <div class="code"><pre>class ExampleChainController &#123;
+                     def first = &#123;
+                         chain(action:second,model:&#91;one:1&#93;)
+                     &#125;
+                     def second  = &#123;
+                         chain(action:third,model:&#91;two:2&#93;)
+                     &#125;
+                     def third = &#123;
+                          &#91;three:3&#93;)
+                     &#125;
+                 &#125;</pre></div><p class="paragraph"/>
+                 Results in the model:<p class="paragraph"/>                 <div class="code"><pre>&#91;one:1, two:2, three:3&#93;</pre></div><p class="paragraph"/>
+                 The model can be accessed in subsequent controller actions in the chain via the <code>chainModel</code> map. This dynamic property only exists in actions following the call to the <code>chain</code> method:<p class="paragraph"/>                 <div class="code"><pre>class ChainController &#123;<p class="paragraph"/>                     def nextInChain = &#123;
+                         def model = chainModel.myModel
+                         &#8230;
+                     &#125;
+                 &#125;</pre></div><p class="paragraph"/>
+                 Like the <code>redirect</code> method you can also pass parameters to the <code>chain</code> method:<p class="paragraph"/>                 <div class="code"><pre>chain(action:<span class="java&#45;quote">"action1"</span>, model:&#91;one:1&#93;, params:&#91;myparam:<span class="java&#45;quote">"param1"</span>&#93;)</pre></div><p class="paragraph"/>
+
+	</body>
+</html>

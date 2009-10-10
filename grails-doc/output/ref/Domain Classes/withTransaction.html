@@ -1,0 +1,23 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>withTransaction </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Allows programmatic transactions using Spring's Transaction Abstraction and a block.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>Account.withTransaction &#123; status &#45;&#62;
+	def source = Account.get(params.from)
+	def dest = Account.get(params.to)<p class="paragraph"/>	def amount = params.amount.toInteger()
+	<span class="java&#45;keyword">if</span>(source.active) &#123;
+		source.balance &#45;= amount
+		<span class="java&#45;keyword">if</span>(dest.active) &#123;
+			dest.amount += amount
+		&#125;
+		<span class="java&#45;keyword">else</span> &#123;
+			status.setRollbackOnly()
+		&#125;
+	&#125;	
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>withTransaction</code> method uses a block or closure that gets passed Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/transaction/TransactionStatus.html" class="api">TransactionStatus</a> object. The <code>TransactionStatus</code> object can be used to programmatically control rollback of the transaction.<p class="paragraph"/>Refer to the user guide section of <a href="../../guide/single.html#5.6 Programmatic Transactions" class="guide">Programmatic Transactions</a> for more information.
+
+	</body>
+</html>

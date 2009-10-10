@@ -1,0 +1,33 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.5.3 Flow Execution Events</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		In order to <em class="italic">transition</em> execution of a flow from one state to the next you need some way of trigger an <em class="italic">event</em> that indicates what the flow should do next. Events can be triggered from either view states or action states.<p class="paragraph"/><h4>Triggering Events from a View State</h4><p class="paragraph"/>As discussed previously the start state of the flow in a previous code listing deals with two possible events. A <code>checkout</code> event and a <code>continueShopping</code> event:<p class="paragraph"/><div class="code"><pre>def shoppingCartFlow = &#123;
+    showCart &#123;
+        on(<span class="java&#45;quote">"checkout"</span>).to <span class="java&#45;quote">"enterPersonalDetails"</span>           
+        on(<span class="java&#45;quote">"continueShopping"</span>).to <span class="java&#45;quote">"displayCatalogue"</span>
+    &#125;
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>Since the <code>showCart</code> event is a view state it will render the view <code>grails-app/book/shoppingCart/showCart.gsp</code>. Within this view you need to have components that trigger flow execution. On a form this can be done use the <a href="../ref/Tags/submitButton.html" class="tags">submitButton</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:form action=<span class="xml&#45;quote">"shoppingCart"</span>&#62;</span>
+    <span class="xml&#45;tag">&#60;g:submitButton name=<span class="xml&#45;quote">"continueShopping"</span> value=<span class="xml&#45;quote">"Continue Shopping"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:submitButton&#62;</span>
+    <span class="xml&#45;tag">&#60;g:submitButton name=<span class="xml&#45;quote">"checkout"</span> value=<span class="xml&#45;quote">"Checkout"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:submitButton&#62;</span>
+<span class="xml&#45;tag">&#60;/g:form&#62;</span></pre></div><p class="paragraph"/>The form must submit back to the <code>shoppingCart</code> flow. The name attribute of each <a href="../ref/Tags/submitButton.html" class="tags">submitButton</a> tag signals which event will be triggered. If you don't have a form you can also trigger an event with the <a href="../ref/Tags/link.html" class="tags">link</a> tag as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"shoppingCart"</span> event=<span class="xml&#45;quote">"checkout"</span> /&#62;</span></pre></div><p class="paragraph"/><h4>Triggering Events from an Action</h4><p class="paragraph"/>To trigger an event from an <code>action</code> you need to invoke a method. For example there is the built in <code>error()</code> and <code>success()</code> methods. The example below triggers the <code>error()</code> event on validation failure in a transition action:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>) &#123;
+         def p = <span class="java&#45;keyword">new</span> Person(params)
+         flow.person = p
+         <span class="java&#45;keyword">if</span>(!p.validate())<span class="java&#45;keyword">return</span> error()
+   &#125;.to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>In this case because of the error the transition action will make the flow go back to the <code>enterPersonalDetails</code> state.<p class="paragraph"/>With an action state you can also trigger events to redirect flow:<p class="paragraph"/><div class="code"><pre>shippingNeeded &#123;
+   action &#123;
+       <span class="java&#45;keyword">if</span>(params.shippingRequired) yes()
+       <span class="java&#45;keyword">else</span> no()
+   &#125;
+   on(<span class="java&#45;quote">"yes"</span>).to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"no"</span>).to <span class="java&#45;quote">"enterPayment"</span>
+&#125;</pre></div><p class="paragraph"/>
+	</body>
+</html>

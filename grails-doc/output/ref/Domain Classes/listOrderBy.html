@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>listOrderBy*</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Lists all of the instances of the domain class ordered by the property in the method expression<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>def results = Book.listOrderByAuthor() // everything
+def results = Book.listOrderByTitle(max:10) // 10 results
+def results = Book.listOrderByTitle(max:10, offset:100, order:<span class="java&#45;quote">"desc"</span>) // 10 results, offset from 100</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Parameters:
+<ul class="star">
+<li><code>max</code> - The maximum number to list</li>
+<li><code>offset</code> - The offset from the first result to list from</li>
+<li><code>order</code> - The order to list by, either <code>"desc"</code> or <code>"asc"</code></li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

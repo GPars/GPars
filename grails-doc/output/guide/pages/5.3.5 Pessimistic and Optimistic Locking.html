@@ -1,0 +1,26 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.3.5 Pessimistic and Optimistic Locking</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Optimistic Locking</h4><p class="paragraph"/>By default GORM classes are configured for optimistic locking. Optimistic locking essentially is a feature of Hibernate which involves storing a version number in a special <code>version</code> column in the database.<p class="paragraph"/>The <code>version</code> column gets read into a <code>version</code> property that contains the current versioned state of persistent instance which you can access:<p class="paragraph"/><div class="code"><pre>def airport = Airport.get(10)<p class="paragraph"/>println airport.version</pre></div><p class="paragraph"/>When you perform updates Hibernate will automatically check the version property against the  version column in the database and if they differ will throw a <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/StaleObjectStateException.html" class="api">StaleObjectException</a> and the transaction will be rolled back.<p class="paragraph"/>This is useful as it allows a certain level of atomicity without resorting to pessimistic locking that has an inherit performance penalty. The downside is that you have to deal with this exception if you have highly concurrent writes. This requires flushing the session:<p class="paragraph"/><div class="code"><pre>def airport = Airport.get(10)<p class="paragraph"/><span class="java&#45;keyword">try</span> &#123;
+	airport.name = <span class="java&#45;quote">"Heathrow"</span>
+	airport.save(flush:<span class="java&#45;keyword">true</span>)
+&#125;
+<span class="java&#45;keyword">catch</span>(org.springframework.dao.OptimisticLockingFailureException e) &#123;
+	// deal with exception
+&#125;</pre></div><p class="paragraph"/>The way you deal with the exception depends on the application. You could attempt a programmatic merge of the data or go back to the user and ask them to resolve the conflict.<p class="paragraph"/>Alternatively, if it becomes a problem you can resort to pessimistic locking.<p class="paragraph"/><h4>Pessimistic Locking</h4><p class="paragraph"/>Pessimistic locking is equivalent to doing a SQL "SELECT * FOR UPDATE" statement and locking a row in the database. This has the implication that other read operations will be blocking until the lock is released.<p class="paragraph"/>In Grails pessimistic locking is performed on an existing instance via the <a href="../ref/Domain Classes/lock.html" class="domainClasses">lock</a> method:<p class="paragraph"/><div class="code"><pre>def airport = Airport.get(10)
+airport.lock() // lock <span class="java&#45;keyword">for</span> update
+airport.name = <span class="java&#45;quote">"Heathrow"</span>
+airport.save()</pre></div><p class="paragraph"/>Grails will automatically deal with releasing the lock for you once the transaction has been committed. However, in the above case what we are doing is "upgrading" from a regular SELECT to a SELECT..FOR UPDATE and another thread could still have updated the record in between the call to get() and the call to lock().<p class="paragraph"/>To get around this problem you can use the static <a href="../ref/Domain Classes/lock.html" class="domainClasses">lock</a> method that takes an id just like <a href="../ref/Domain Classes/get.html" class="domainClasses">get</a>:<p class="paragraph"/><div class="code"><pre>def airport = Airport.lock(10) // lock <span class="java&#45;keyword">for</span> update
+airport.name = <span class="java&#45;quote">"Heathrow"</span>
+airport.save()</pre></div><p class="paragraph"/>In this case only SELECT..FOR UPDATE is issued.<p class="paragraph"/><blockquote class="warning">
+Though Grails, through Hibernate, supports pessimistic locking, the embedded HSQLDB shipped with Grails which is used as the default in-memory database <strong class="bold">does not</strong>. If you need to test pessimistic locking you will need to do so against a database that does have support such as MySQL.
+</blockquote><p class="paragraph"/>As well as the <a href="../ref/Domain Classes/lock.html" class="domainClasses">lock</a> method you can also obtain a pessimistic locking using queries. For example using a dynamic finder:<p class="paragraph"/><div class="code"><pre>def airport = Airport.findByName(<span class="java&#45;quote">"Heathrow"</span>, &#91;lock:<span class="java&#45;keyword">true</span>&#93;)</pre></div><p class="paragraph"/>Or using criteria:<p class="paragraph"/><div class="code"><pre>def airport = Airport.createCriteria().get &#123;
+	eq('name', 'Heathrow')
+	lock <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>
+	</body>
+</html>

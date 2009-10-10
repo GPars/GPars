@@ -1,0 +1,13 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>belongsTo </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Defines a "belongs to" relationship where the class specified by <code>belongsTo</code> assumes ownership of the relationship. This has the effect of controlling how deletes cascade. In other words the owning side will cascade deletes when <code>belongsTo</code> is specified on the inverse side.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class Book &#123;
+   <span class="java&#45;object">String</span> title
+   <span class="java&#45;keyword">static</span> belongsTo = &#91;author:Author&#93;
+&#125;</pre></div><p class="paragraph"/>In this example the <code>Book</code> class specifies that it belongs to the <code>Author</code> class, hence when an <code>Author</code> instance is deleted so are all the <code>Book</code> instances associated with the <code>Author</code><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Note that <code>belongsTo</code> servers to abstract the nature of the cascading behaviour in Hibernate. However, if you prefer to have full control of cascading deletes you can take advantage of the <a href="../../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a>, which allows fine grained control of cascading deletes. 
+	</body>
+</html>

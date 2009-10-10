@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.7.6 Plugin JAR Dependencies</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		The way in which you specify dependencies for a <a href="../guide/single.html#12. Plug-ins" class="guide">plugin</a> is identical to how you specify dependencies in an application. When a plugin is installed into an application the application automatically inherits the dependencies of the plugin.<p class="paragraph"/>If a plugin is using a JAR which conflicts with another plugin, or an application dependency then you can override how a plugin resolves its dependencies inside an application using the <code>plugin</code> method:<p class="paragraph"/><div class="code"><pre>plugin(<span class="java&#45;quote">"hibernate"</span>) &#123;
+    compile( 'org.hibernate:hibernate&#45;core:3.3.1.GA') &#123;
+		excludes 'ehcache', 'xml&#45;apis', 'commons&#45;logging'
+	&#125;
+    compile 'org.hibernate:hibernate&#45;annotations:3.4.0.GA',
+			'org.hibernate:hibernate&#45;commons&#45;annotations:3.3.0.ga'<p class="paragraph"/>	runtime 'javassist:javassist:3.4.GA'	
+&#125;</pre></div><p class="paragraph"/>In this case the application is controlling how the <code>hibernate</code> plugin resolves dependencies and not the <code>hibernate</code> plugin. If you wish to simply exclude a single dependency resolved by a plugin then you can do so:<p class="paragraph"/><div class="code"><pre>plugin(<span class="java&#45;quote">"hibernate"</span>) &#123;
+    runtime <span class="java&#45;quote">"cglib:cglib&#45;nodep:2.1_3"</span>
+	excludes 'javassist:javassist:3.4.GA'	
+&#125;</pre></div>
+	</body>
+</html>

@@ -1,0 +1,48 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.6 Project Documentation</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Since Grails 1.2, the documentation engine that powers the creation of this documentation is available to your Grails projects.<p class="paragraph"/>The documentation engine uses a variation on the Textile syntax to automatically create project documentation with smart linking, formatting etc.<p class="paragraph"/><h4>Creating project documentation</h4><p class="paragraph"/>To use the engine you need to follow a few conventions. Firstly you need to create a <code>src/docs/guide</code> directory and then have numbered text files using the <code>gdoc</code> format. For example:<p class="paragraph"/><div class="code"><pre>+ src/docs/guide/1. Introduction.gdoc
++ src/docs/guide/2. Getting Started.gdoc</pre></div><p class="paragraph"/>The title of each chapter is taken from the file name. The order is dictated by the numerical value at the beginning of the file name.<p class="paragraph"/><h4>Creating reference items</h4><p class="paragraph"/>Reference items appear in the left menu on the documentation and are useful for quick reference documentation. Each reference item belongs to a category and a category is a directory located in the <code>src/docs/ref</code> directory. For example say you defined a new method called <code>renderPDF</code>, that belongs to a category called <code>Controllers</code> this can be done by creating a gdoc text file at the following location:<p class="paragraph"/><div class="code"><pre>+ src/ref/Controllers/renderPDF.gdoc</pre></div><p class="paragraph"/><h4>Configuring Output Properties</h4><p class="paragraph"/>There are various properties you can set within your <code>grails-app/conf/Config.groovy</code> file that customize the output of the documentation such as:
+<ul class="star">
+<li><strong class="bold">grails.doc.authors</strong> - The authors of the documentation</li>
+<li><strong class="bold">grails.doc.license</strong> - The license of the software</li>
+<li><strong class="bold">grails.doc.copyright</strong> - The copyright message to display</li>
+<li><strong class="bold">grails.doc.footer</strong> - The footer to use</li>
+</ul><p class="paragraph"/>Other properties such as the name of the documentation and the version are pulled from your project itself.<p class="paragraph"/><h4>Generating Documentation</h4><p class="paragraph"/>Once you have created some documentation (refer to the syntax guide in the next chapter) you can generate an HTML version of the documentation using the command:<p class="paragraph"/><div class="code"><pre>grails docs</pre></div><p class="paragraph"/>This command will output an <code>docs/manual/index.html</code> which can be opened to view your documentation.<p class="paragraph"/>
+<h4>Documentation Syntax</h4><p class="paragraph"/>As mentioned the syntax is largely similar to Textile or Confluence style wiki markup. The following sections walk you through the syntax basics.<p class="paragraph"/><h5>Basic Formatting</h5><p class="paragraph"/>Monospace: <code>monospace</code> 
+<div class="code"><pre>&#64;monospace&#64;</pre></div><p class="paragraph"/>Italic: <em class="italic">italic</em> <div class="code"><pre>&#95;italic&#95;</pre></div><p class="paragraph"/>Bold: <strong class="bold">bold</strong>
+<div class="code"><pre>&#42;bold&#42;</pre></div><p class="paragraph"/>Image: 
+<img border="0" class="center" src="http://grails.org/images/new/grailslogo_topNav.png"></img><p class="paragraph"/><div class="code"><pre>&#33;http://grails.org/images/new/grailslogo_topNav.png&#33;</pre></div><p class="paragraph"/><h5>Linking</h5><p class="paragraph"/>There are several ways to create links with the documentation generator. A basic external link can either be defined using confluence or textile style markup:<p class="paragraph"/><div class="code"><pre>&#91;SpringSource|http://www.springsource.com/&#93; or <span class="java&#45;quote">"SpringSource"</span>:http://www.springsource.com/</pre></div><p class="paragraph"/>For links to other sections inside the user guide you can use the <code>guide:</code> prefix:<p class="paragraph"/><div class="code"><pre>&#91;Intro|guide:1. Introduction&#93;</pre></div><p class="paragraph"/>The documentation engine will warn you if any links to sections in your guide break. Sometimes though it is preferable not to hard code the actual names of guide sections since you may move them around. To get around this you can create an alias inside <code>grails-app/conf/Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.doc.alias.intro=<span class="java&#45;quote">"1. Introduction"</span></pre></div><p class="paragraph"/>And then the link becomes:<p class="paragraph"/><div class="code"><pre>&#91;Intro|guide:intro&#93;</pre></div><p class="paragraph"/>This is useful since if you linked the to "1. Introduction" chapter many times you would have to change all of those links.<p class="paragraph"/>To link to reference items you can use a special syntax:<p class="paragraph"/><div class="code"><pre>&#91;controllers|renderPDF&#93;</pre></div><p class="paragraph"/>In this case the category of the reference item is on the left hand side of the | and the name of the reference item on the right.<p class="paragraph"/>Finally, to link to external APIs you can use the <code>api:</code> prefix. For example:<p class="paragraph"/><div class="code"><pre>&#91;<span class="java&#45;object">String</span>|api:java.lang.<span class="java&#45;object">String</span>&#93;</pre></div><p class="paragraph"/>The documentation engine will automatically create the appropriate javadoc link in this case. If you want to add additional APIs to the engine you can configure them in <code>grails-app/conf/Config.groovy</code>. For example:<p class="paragraph"/><div class="code"><pre>grails.doc.api.org.hibernate=<span class="java&#45;quote">"http://www.hibernate.org/hib_docs/v3/api"</span></pre></div><p class="paragraph"/>The above example configures classes within the <code>org.hibernate</code> package to link to the Hibernate website's API docs.<p class="paragraph"/><h5>Lists and Headings</h5><p class="paragraph"/>Headings can be created by specifying the letter 'h' followed by a number and then a dot:<p class="paragraph"/><div class="code"><pre>h3.&#60;space&#62;Heading3
+h4.&#60;space&#62;Heading4</pre></div><p class="paragraph"/>Unordered lists are defined with the use of the * character:<p class="paragraph"/><div class="code"><pre>&#42; item 1
+&#42;&#42; subitem 1
+&#42;&#42; subitem 2
+&#42; item 2</pre></div><p class="paragraph"/>Numbered lists can be defined with the # character:<p class="paragraph"/><div class="code"><pre>&#35; item 1</pre></div><p class="paragraph"/>Tables can be created using the <code>table</code> macro:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Name</strong></th><th><strong class="bold">Number</strong></th></tr><tr class="table-odd"><td>Albert</td><td>46</td></tr><tr class="table-even"><td>Wilma</td><td>1348</td></tr><tr class="table-odd"><td>James</td><td>12</td></tr></table><p class="paragraph"/><div class="code"><pre>&#123;table&#125;
+ &#42;Name&#42; | &#42;<span class="java&#45;object">Number</span>&#42; 
+ Albert | 46
+ Wilma | 1348
+ James | 12
+&#123;table&#125;</pre></div><p class="paragraph"/><h5>Code and Notes</h5><p class="paragraph"/>You can define code blocks with the <code>code</code> macro:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+    <span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/><div class="code"><pre>&#123;code&#125;
+class Book &#123;
+    <span class="java&#45;object">String</span> title
+&#125;
+&#123;code&#125;</pre></div><p class="paragraph"/>The example above provides syntax highlighting for Java and Groovy code, but you can also highlight XML markup:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;hello&#62;</span>world<span class="xml&#45;tag">&#60;/hello&#62;</span></pre></div><p class="paragraph"/><div class="code"><pre>&#123;code:xml&#125;
+&#60;hello&#62;world&#60;/hello&#62;
+&#123;code&#125;</pre></div><p class="paragraph"/>There are also a couple of macros for displaying notes and warnings:<p class="paragraph"/>Note:
+<blockquote class="note">
+This is a note!
+</blockquote><p class="paragraph"/><div class="code"><pre>&#123;note&#125;
+This is a note!
+&#123;note&#125;</pre></div><p class="paragraph"/>Warning:<p class="paragraph"/><blockquote class="warning">
+This is a warning!
+</blockquote><p class="paragraph"/><div class="code"><pre>&#123;warning&#125;
+This is a warning!
+&#123;warning&#125;</pre></div><p class="paragraph"/>
+
+	</body>
+</html>

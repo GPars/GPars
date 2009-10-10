@@ -1,0 +1,305 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3. Configuration</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1><a name="3. Configuration">3. Configuration</a></h1>It may seem odd that in a framework that embraces "convention-over-configuration" that we tackle this topic now, but since what configuration there is typically a one off, it is best to get it out the way.<p class="paragraph"/>With Grails' default settings you can actually develop and application without doing any configuration whatsoever. Grails ships with an embedded container and in-memory HSQLDB meaning there isn't even a database to set-up.<p class="paragraph"/>However, typically you want to set-up a real database at some point and the way you do that is described in the following section.<h2><a name="3.1 Basic Configuration">3.1 Basic Configuration</a></h2>For general configuration Grails provides a file called <code>grails-app/conf/Config.groovy</code>. This file uses Groovy's <a href="http://groovy.codehaus.org/ConfigSlurper" target="blank">ConfigSlurper</a> which is very similar to Java properties files except it is pure Groovy hence you can re-use variables and use proper Java types!<p class="paragraph"/>You can add your own configuration in here, for example:<p class="paragraph"/><div class="code"><pre>foo.bar.hello = <span class="java&#45;quote">"world"</span></pre></div><p class="paragraph"/>Then later in your application you can access these settings in one of two ways. The most common is via the api:org.codehaus.groovy.grails.commons.GrailsApplication object, which is available as a variable in controllers and tag libraries:<p class="paragraph"/><div class="code"><pre>assert <span class="java&#45;quote">"world"</span> == grailsApplication.config.foo.bar.hello</pre></div><p class="paragraph"/>The other way involves getting a reference to the api:org.codehaus.groovy.grails.commons.ConfigurationHolder class that holds a reference to the configuration object:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.codehaus.groovy.grails.commons.&#42;
+&#8230;
+def config = ConfigurationHolder.config
+assert <span class="java&#45;quote">"world"</span> == config.foo.bar.hello</pre></div>
+<h2><a name="3.1.1 Built in options">3.1.1 Built in options</a></h2>Grails also provides the following configuration options:
+<ul class="star">
+<li><code>grails.config.locations</code>  - The location of properties files or addition Grails Config files that should be merged with main configuration</li>
+<li><code>grails.enable.native2ascii</code> - Set this to false if you do not require native2ascii conversion of Grails i18n properties files</li>
+<li><code>grails.views.default.codec</code> - Sets the default encoding regime for GSPs - can be one of 'none', 'html', or 'base64' (default: 'none'). To reduce risk of XSS attacks, set this to 'html'.</li>
+<li><code>grails.views.gsp.encoding</code> - The file encoding used for GSP source files (default is 'utf-8')</li>
+<li><code>grails.mime.file.extensions</code> - Whether to use the file extension to dictate the mime type in <a href="../guide/single.html#6.8 Content Negotiation" class="guide">Content Negotiation</a></li>
+<li><code>grails.mime.types</code> - A map of supported mime types used for <a href="../guide/single.html#6.8 Content Negotiation" class="guide">Content Negotiation</a></li>
+<li><code>grails.serverURL</code> - A string specifying the server URL portion of absolute links, including server name e.g. grails.serverURL="http://my.yourportal.com". See <a href="../ref/Tags/createLink.html" class="Tags">createLink</a>.</li>
+</ul><p class="paragraph"/><h3>War generation</h3>
+<ul class="star">
+<li><code>grails.war.destFile</code> - Sets the location where the <a href="../ref/Command Line/war.html" class="commandLine">war</a> command should place the generated WAR file</li>
+<li><code>grails.war.dependencies</code> - A closure containing Ant builder syntax or a list of JAR filenames. Allows you to customise what libaries are included in the WAR file.</li>
+<li><code>grails.war.java5.dependencies</code> - A list of the JARs that should be included in the WAR file for JDK 1.5 and above.</li>
+<li><code>grails.war.copyToWebApp</code> - A closure containing Ant builder syntax that is legal inside an Ant copy, for example "fileset()". Allows you to control what gets included in the WAR file from the "web-app" directory.</li>
+<li><code>grails.war.resources</code> - A closure containing Ant builder syntax. Allows the application to do any other pre-warring stuff it needs to.</li>
+</ul><p class="paragraph"/>For more information on using these options, see the section on <a href="../guide/single.html#17. Deployment" class="guide">deployment</a>
+<h2><a name="3.1.2 Logging">3.1.2 Logging</a></h2><h4>Logging Basics</h4><p class="paragraph"/>Grails uses its common configuration mechanism to configure the underlying <a href="http://logging.apache.org/log4j/1.2/index.html" target="blank">Log4j</a> log system. To configure logging you must modify the file <code>Config.groovy</code> located in the <code>grails-app/conf</code> directory.<p class="paragraph"/>This single <code>Config.groovy</code> file allows you to specify separate logging configurations for <code>development</code>, <code>test</code>, and <code>production</code> <a href="../guide/single.html#3.2 Environments" class="guide">environments</a>. Grails processes the <code>Config.groovy</code> and configures Log4j appropriately.<p class="paragraph"/>Since 1.1 Grails provides a Log4j DSL, that you can use to configure Log4j an example of which can be seen below:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+    error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
+	       'org.codehaus.groovy.grails.web.pages' //  GSP<p class="paragraph"/>    warn   'org.mortbay.log'
+&#125;</pre></div><p class="paragraph"/>Essentially, each method translates into a log level and you can pass the names of the packages you want to log at that level as arguments to the method.<p class="paragraph"/>Some useful loggers include:
+<ul class="star">
+<li><code>org.codehaus.groovy.grails.commons</code> - Core artefact information such as class loading etc.</li>
+<li><code>org.codehaus.groovy.grails.web</code> - Grails web request processing</li>
+<li><code>org.codehaus.groovy.grails.web.mapping</code> - URL mapping debugging</li>
+<li><code>org.codehaus.groovy.grails.plugins</code> - Log plugin activity</li>
+<li><code>org.springframework</code> - See what Spring is doing</li>
+<li><code>org.hibernate</code> - See what Hibernate is doing</li>
+</ul><p class="paragraph"/><h4>The Root Logger</h4><p class="paragraph"/>The Root logger is the logger that all other loggers inherit from. You can configure the Root logger using the root method:<p class="paragraph"/><div class="code"><pre>root &#123;
+    error()
+    additivity = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>The above example configures the root logger to log messages at the error level and above to the default standard out appender. You can also configure the root logger to log to one or more named appenders:<p class="paragraph"/><div class="code"><pre>appenders &#123;
+	file name:'file', file:'/<span class="java&#45;keyword">var</span>/logs/mylog.log'
+&#125;
+root &#123;
+    debug 'stdout', 'file'
+    additivity = <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/>Here the root logger will log to two appenders - the default 'stdout' appender and a 'file' appender.<p class="paragraph"/>You can also configure the root logger from the argument passed into the Log4J closure:
+<div class="code"><pre>log4j = &#123; root &#45;&#62;
+    root.level = org.apache.log4j.Level.DEBUG
+    &#8230;
+&#125;</pre></div>
+The closure argument "root" is an instance of  <code>org.apache.log4j.Logger</code> , so refer to the API documentation for Log4J to find out what properties and methods are available to you.<p class="paragraph"/><h4>Custom Appenders</h4><p class="paragraph"/>Using the Log4j you can define custom appenders. The following appenders are available by default:
+<ul class="star">
+<li><code>jdbc</code> - An appender that logs to a JDBC connection</li>
+<li><code>console</code> - An appender that logs to standard out</li>
+<li><code>file</code> - An appender that logs to a file</li>
+<li><code>rollingFile</code> - An appender that logs to rolling set of files</li>
+</ul><p class="paragraph"/>For example to configure a rolling file appender you can do:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+	appenders &#123;
+		rollingFile name:<span class="java&#45;quote">"myAppender"</span>, maxFileSize:1024, file:<span class="java&#45;quote">"/tmp/logs/myApp.log"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Each argument passed to the appender maps to a property of underlying <a href="http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Appender.html" target="blank">Appender</a> class. The example above sets the <code>name</code>, <code>maxFileSize</code> and <code>file</code> properties of the <a href="http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/RollingFileAppender.html" target="blank">RollingFileAppender</a> class.<p class="paragraph"/>If you prefer to simply create the appender programmatically yourself, or you have your own appender implementation then you can simply call the <code>appender</code> method and appender instance:<p class="paragraph"/>
+<div class="code"><pre><span class="java&#45;keyword">import</span> org.apache.log4j.&#42;<p class="paragraph"/>log4j = &#123;
+	appenders &#123;
+		appender <span class="java&#45;keyword">new</span> RollingFileAppender(name:<span class="java&#45;quote">"myAppender"</span>, maxFileSize:1024, file:<span class="java&#45;quote">"/tmp/logs/myApp.log"</span>)
+	&#125;
+&#125;</pre></div><p class="paragraph"/>You can then log to a particular appender by passing the name as a key to one of the log level methods from the previous section:<p class="paragraph"/><div class="code"><pre>error myAppender:<span class="java&#45;quote">"org.codehaus.groovy.grails.commons"</span></pre></div><p class="paragraph"/><p class="paragraph"/><h4>Custom Layouts</h4><p class="paragraph"/>By default the Log4j DSL assumes that you want to use a <a href="http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html" target="blank">PatternLayout</a>. However, there are other layouts available including:
+<ul class="star">
+<li><code>xml</code> - Create an XML log file</li>
+<li><code>html</code> - Creates an HTML log file</li>
+<li><code>simple</code> - A simple textual log</li>
+<li><code>pattern</code> - A Pattern layout</li>
+</ul><p class="paragraph"/>You can specify custom patterns to an appender using the <code>layout</code> setting:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+	appenders &#123;
+        console name:'customAppender', layout:pattern(conversionPattern: '%c&#123;2&#125; %m%n')
+    &#125;
+&#125;</pre></div><p class="paragraph"/>This also works for the built-in appender "stdout", which logs to the console:
+<div class="code"><pre>log4j = &#123;
+    appenders &#123;
+        console name:'stdout', layout:pattern(conversionPattern: '%c&#123;2&#125; %m%n')
+    &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Full stacktraces</h4><p class="paragraph"/>When exceptions occur, there can be an awful lot of noise in the stacktrace from Java and Groovy internals. Grails filters these typically irrelevant details and restricts traces to non-core Grails/Groovy class packages.<p class="paragraph"/>When this happens, the full trace is always written to the <code>StackTrace</code> logger. This logs to a file called <code>stacktrace.log</code> - but you can change this in your <code>Config.groovy</code> to do anything you like. For example if you prefer full stack traces to go to standard out you can add this line:<p class="paragraph"/><div class="code"><pre>error stdout:<span class="java&#45;quote">"StackTrace"</span></pre></div><p class="paragraph"/>You can completely disable stacktrace filtering by setting the <code>grails.full.stacktrace</code> VM property to <code>true</code>:<p class="paragraph"/><div class="code"><pre>grails &#45;Dgrails.full.stacktrace=<span class="java&#45;keyword">true</span> run&#45;app</pre></div><p class="paragraph"/><h4>Logging by Convention</h4><p class="paragraph"/>All application artefacts have a dynamically added <code>log</code> property. This includes <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a>, <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a>, tag libraries and so on. Below is an example of its usage:<p class="paragraph"/><div class="code"><pre>def foo = <span class="java&#45;quote">"bar"</span>
+log.debug <span class="java&#45;quote">"The value of foo is $foo"</span></pre></div><p class="paragraph"/>Logs are named using the convention <code>grails.app.&#60;artefactType&#62;.ClassName</code>. Below is an example of how to configure logs for different Grails artefacts:<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+	// Set level <span class="java&#45;keyword">for</span> all application artefacts
+	info <span class="java&#45;quote">"grails.app"</span>
+	// Set <span class="java&#45;keyword">for</span> a specific controller
+	debug <span class="java&#45;quote">"grails.app.controller.YourController"</span>
+	// Set <span class="java&#45;keyword">for</span> a specific domain class
+	debug <span class="java&#45;quote">"grails.app.domain.Book"</span>
+	// Set <span class="java&#45;keyword">for</span> all taglibs
+	info <span class="java&#45;quote">"grails.app.tagLib"</span><p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>The artefacts names are dictated by convention, some of the common ones are listed below:
+<ul class="star">
+<li><code>bootstrap</code> - For bootstrap classes</li>
+<li><code>dataSource</code> - For data sources</li>
+<li><code>tagLib</code> - For tag libraries</li>
+<li><code>service</code> - For service classes</li>
+<li><code>controller</code> - For controllers</li>
+<li><code>domain</code> - For domain entities</li>
+</ul><p class="paragraph"/><h2><a name="3.1.3 GORM">3.1.3 GORM</a></h2>Grails provides the following GORM configuration options:
+<ul class="star">
+<li><code>grails.gorm.failOnError</code>  - If set to <code>true</code>, causes the save() method on domain classes to throw a <code>grails.validation.ValidationException</code> if <a href="../guide/single.html#7. Validation" class="guide">validation</a> fails during a save.  This option may also be assigned a list of Strings representing package names.  If the value is a list of Strings then the failOnError behavior will only be applied to domain classes in those packages (including sub-packages).  See the <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> method docs for more information.</li>
+</ul><p class="paragraph"/>Enable failOnError for all domain classes&#8230;
+<div class="code"><pre>grails.gorm.failOnError=<span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>Enable failOnError for domain classes by package&#8230;
+<div class="code"><pre>grails.gorm.failOnError = &#91;'com.companyname.somepackage', 'com.companyname.someotherpackage'&#93;</pre></div>
+<ul class="star">
+<li><code>grails.gorm.autoFlush</code> = If set to <code>true</code>, causes the <a href="../ref/Domain Classes/merge.html" class="domainClasses">merge</a>, <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> and <a href="../ref/Domain Classes/delete.html" class="domainClasses">delete</a> methods to flush the session, replacing the need to do something like <code>save(flush: true)</code>.</li>
+</ul><p class="paragraph"/><h2><a name="3.2 Environments">3.2 Environments</a></h2><h4>Per Environment Configuration</h4><p class="paragraph"/>Grails supports the concept of per environment configuration. Both the <code>Config.groovy</code> file and the <code>DataSource.groovy</code> file within the <code>grails-app/conf</code> directory can take advantage of per environment configuration using the syntax provided by <a href="http://groovy.codehaus.org/ConfigSlurper." target="blank">ConfigSlurper</a> As an example consider the following default <code>DataSource</code> definition provided by Grails:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+    pooled = <span class="java&#45;keyword">false</span>                          
+    driverClassName = <span class="java&#45;quote">"org.hsqldb.jdbcDriver"</span>	
+    username = <span class="java&#45;quote">"sa"</span>
+    password = <span class="java&#45;quote">""</span>				
+&#125;
+environments &#123;
+    development &#123;
+        dataSource &#123;
+            dbCreate = <span class="java&#45;quote">"create&#45;drop"</span> // one of 'create', 'createeate&#45;drop','update'
+            url = <span class="java&#45;quote">"jdbc:hsqldb:mem:devDB"</span>
+        &#125;
+    &#125;   
+    test &#123;
+        dataSource &#123;
+            dbCreate = <span class="java&#45;quote">"update"</span>
+            url = <span class="java&#45;quote">"jdbc:hsqldb:mem:testDb"</span>
+        &#125;
+    &#125;   
+    production &#123;
+        dataSource &#123;
+            dbCreate = <span class="java&#45;quote">"update"</span>
+            url = <span class="java&#45;quote">"jdbc:hsqldb:file:prodDb;shutdown=<span class="java&#45;keyword">true</span>"</span>
+        &#125;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Notice how the common configuration is provided at the top level and then an <code>environments</code> block specifies per environment settings for the <code>dbCreate</code> and <code>url</code> properties of the <code>DataSource</code>. This syntax can also be used within <code>Config.groovy</code>.<p class="paragraph"/><h4>Packaging and Running for Different Environments</h4><p class="paragraph"/>Grails' <a href="../guide/single.html#4. The Command Line" class="guide">command line</a> has built in capabilities to execute any command within the context of a specific environment. The format is:<p class="paragraph"/><div class="code"><pre>grails &#91;environment&#93; &#91;command name&#93;</pre></div><p class="paragraph"/>In addition, there are 3 preset environments known to Grails: <code>dev</code>, <code>prod</code>, and <code>test</code> for <code>development</code>, <code>production</code> and <code>test</code>. For example to create a WAR for the <code>test</code> environment you could do:<p class="paragraph"/><div class="code"><pre>grails test war</pre></div><p class="paragraph"/>If you have other environments that you need to target you can pass a <code>grails.env</code> variable to any command:<p class="paragraph"/><div class="code"><pre>grails &#45;Dgrails.env=UAT run&#45;app</pre></div><p class="paragraph"/><h4>Programmatic Environment Detection</h4><p class="paragraph"/>Within your code, such as in a Gant script or a bootstrap class you can detect the environment using the api:grails.util.Environment class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.util.Environment<p class="paragraph"/>...<p class="paragraph"/><span class="java&#45;keyword">switch</span>(Environment.current) &#123;
+	<span class="java&#45;keyword">case</span> Environment.DEVELOPMENT:
+	   configureForDevelopment()
+	<span class="java&#45;keyword">break</span>
+	<span class="java&#45;keyword">case</span> Environment.PRODUCTION:
+	   configureForProduction()
+	<span class="java&#45;keyword">break</span> 
+&#125;</pre></div><h2><a name="3.3 The DataSource">3.3 The DataSource</a></h2>Since Grails is built on Java technology to set-up a data source requires some knowledge of JDBC (the technology that doesn't stand for Java Database Connectivity).<p class="paragraph"/>Essentially, if you are using another database other than HSQLDB you need to have a JDBC driver. For example for MySQL you would need <a href="http://www.mysql.com/products/connector/j/" target="blank">Connector/J</a><p class="paragraph"/>Drivers typically come in the form of a JAR archive. Drop the JAR into your projects <code>lib</code> directory.<p class="paragraph"/>Once you have the JAR in place you need to get familiar Grails' DataSource descriptor file located at <code>grails-app/conf/DataSource.groovy</code>. This file contains the dataSource definition which includes the following settings:
+<ul class="star">
+<li><code>driverClassName</code> - The class name of the JDBC driver</li>
+<li><code>username</code> - The username used to establish a JDBC connection</li>
+<li><code>password</code> - The password used to establish a JDBC connection</li>
+<li><code>url</code> - The JDBC URL of the database</li>
+<li><code>dbCreate</code> - Whether to auto-generate the database from the domain model or not</li>
+<li><code>pooled</code> - Whether to use a pool of connections (defaults to true)</li>
+<li><code>logSql</code> - Enable SQL logging</li>
+<li><code>dialect</code> - A String or Class that represents the Hibernate dialect used to communicate with the database. See the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/dialect/package-summary.html" target="blank">org.hibernate.dialect</a> package for available dialects.</li>
+<li><code>properties</code> - Extra properties to set on the DataSource bean. See the <a href="http://commons.apache.org/dbcp/api-1.2.2/org/apache/commons/dbcp/BasicDataSource.html" target="blank">Commons DBCP BasicDataSource</a> documentation.</li>
+</ul><p class="paragraph"/>A typical configuration for MySQL may be something like:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+	pooled = <span class="java&#45;keyword">true</span>
+	dbCreate = <span class="java&#45;quote">"update"</span>
+	url = <span class="java&#45;quote">"jdbc:mysql://localhost/yourDB"</span>
+	driverClassName = <span class="java&#45;quote">"com.mysql.jdbc.Driver"</span>
+	username = <span class="java&#45;quote">"yourUser"</span>
+	password = <span class="java&#45;quote">"yourPassword"</span>	
+&#125;</pre></div><p class="paragraph"/><blockquote class="warning">
+When configuring the DataSource do not include the type or the def keyword before any of the configuration settings as Groovy will treat these as local variable definitions and they will not be processed. For example the following is invalid:
+</blockquote><p class="paragraph"/><div class="code"><pre>dataSource &#123;
+	<span class="java&#45;object">boolean</span> pooled = <span class="java&#45;keyword">true</span> // type declaration results in local variable
+	&#8230;
+&#125;</pre></div><p class="paragraph"/>
+Example of advanced configuration using extra properties:
+<div class="code"><pre>dataSource &#123;
+	pooled = <span class="java&#45;keyword">true</span>
+	dbCreate = <span class="java&#45;quote">"update"</span>
+	url = <span class="java&#45;quote">"jdbc:mysql://localhost/yourDB"</span>
+	driverClassName = <span class="java&#45;quote">"com.mysql.jdbc.Driver"</span>
+	username = <span class="java&#45;quote">"yourUser"</span>
+	password = <span class="java&#45;quote">"yourPassword"</span>
+	properties &#123;
+		maxActive = 50
+		maxIdle = 25
+		minIdle = 5
+		initialSize = 5
+		minEvictableIdleTimeMillis = 60000
+		timeBetweenEvictionRunsMillis = 60000
+		maxWait = 10000		
+	&#125;	
+&#125;</pre></div><p class="paragraph"/> <h2><a name="3.3.1 DataSources and Environments">3.3.1 DataSources and Environments</a></h2>The previous example configuration assumes you want the same config for all environments: production, test, development etc.<p class="paragraph"/>Grails' DataSource definition is "environment aware", however, so you can do:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+	// common settings here
+&#125;                     
+environments &#123;
+  production &#123;
+     dataSource &#123;
+          url = <span class="java&#45;quote">"jdbc:mysql://liveip.com/liveDb"</span>					
+     &#125;			
+  &#125;
+&#125;</pre></div>
+<h2><a name="3.3.2 JNDI DataSources">3.3.2 JNDI DataSources</a></h2>Since many Java EE containers typically supply <code>DataSource</code> instances via the <a href="http://java.sun.com/products/jndi/" target="blank">Java Naming and Directory Interface</a> (JNDI). Sometimes you are required to look-up a <code>DataSource</code> via JNDI.<p class="paragraph"/>Grails supports the definition of JNDI data sources as follows:<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+    jndiName = <span class="java&#45;quote">"java:comp/env/myDataSource"</span>
+&#125;</pre></div><p class="paragraph"/>The format on the JNDI name may vary from container to container, but the way you define the <code>DataSource</code> remains the same.<h2><a name="3.3.3 Automatic Database Migration">3.3.3 Automatic Database Migration</a></h2>The <code>dbCreate</code> property of the <code>DataSource</code> definition is important as it dictates what Grails should do at runtime with regards to automatically generating the database tables from <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">GORM</a> classes. The options are:
+<ul class="star">
+<li><code>create-drop</code> - Drop and re-create the database when Grails is run</li>
+<li><code>create</code> - Create the database if it doesn't exist, but don't modify it if it does. Deletes existing data.</li>
+<li><code>update</code> - Create the database if it doesn't exist, and modify it if it does exist</li>
+</ul><p class="paragraph"/><blockquote class="warning">
+Both <code>create-drop</code> and <code>create</code> will destroy all existing data hence use with caution!
+</blockquote><p class="paragraph"/>In <a href="../guide/single.html#3.2 Environments" class="guide">development</a> mode <code>dbCreate</code> is by default set to "create-drop":<p class="paragraph"/><div class="code"><pre>dataSource &#123;
+	dbCreate = <span class="java&#45;quote">"create&#45;drop"</span> // one of 'create', 'create&#45;drop','update'
+&#125;</pre></div><p class="paragraph"/>What this does is automatically drop and re-create the database tables on each restart of the application. Obviously this may not be what you want in production.<p class="paragraph"/><blockquote class="note">
+Although Grails does not currently support Rails-style Migrations out of the box, there are currently three plugins that provide similar capabilities to Grails: Autobase (http://wiki.github.com/RobertFischer/autobase), The <a href="http://www.liquibase.org/manual/latest/grails.html" target="blank">LiquiBase</a> plugin and the <a href="http://code.google.com/p/dbmigrate/wiki/Grails" target="blank">DbMigrate</a> plugin both of which are available via the <code>grails list-plugins</code> command
+</blockquote><p class="paragraph"/><p class="paragraph"/><h2><a name="3.4 Externalized Configuration">3.4 Externalized Configuration</a></h2>The default configuration file <code>Config.groovy</code> in <code>grails-app/conf</code> is fine in the majority of cases, but there may be circumstances where you want to maintain the configuration in a file <em class="italic">outside</em> the main application structure. For example if you are deploying to a WAR some administrators prefer the configuration of the application to be externalized to avoid having to re-package the WAR due to a change of configuration.<p class="paragraph"/>In order to support deployment scenarios such as these the configuration can be externalized. To do so you need to point Grails at the locations of the configuration files Grails should be using by adding a <code>grails.config.locations</code> setting in <code>Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.config.locations = &#91; <span class="java&#45;quote">"classpath:$&#123;appName&#125;&#45;config.properties"</span>,
+                            <span class="java&#45;quote">"classpath:$&#123;appName&#125;&#45;config.groovy"</span>,
+                            <span class="java&#45;quote">"file:$&#123;userHome&#125;/.grails/$&#123;appName&#125;&#45;config.properties"</span>,
+                            <span class="java&#45;quote">"file:$&#123;userHome&#125;/.grails/$&#123;appName&#125;&#45;config.groovy"</span>&#93;</pre></div><p class="paragraph"/>In the above example we're loading configuration files (both Java properties files and <a href="http://groovy.codehaus.org/ConfigSlurper" target="blank">ConfigSlurper</a> configurations) from different places on the classpath and files located in <code>USER_HOME</code>.<p class="paragraph"/>Ultimately all configuration files get merged into the <code>config</code> property of the api:org.codehaus.groovy.grails.commons.GrailsApplication object and are hence obtainable from there.<p class="paragraph"/><blockquote class="note">
+Grails also supports the concept of property place holders and property override configurers as defined in <a href="http://www.springframework.org." target="blank">Spring</a> For more information on these see the section on <a href="../guide/single.html#14. Grails and Spring" class="guide">Grails and Spring</a>
+</blockquote><h2><a name="3.5 Versioning">3.5 Versioning</a></h2><h4>Versioning Basics</h4><p class="paragraph"/>Grails has built in support for application versioning. When you first create an application with the <a href="../ref/Command Line/create-app.html" class="commandLine">create-app</a> command the version of the application is set to <code>0.1</code>. The version is stored in the application meta data file called <code>application.properties</code> in the root of the project.<p class="paragraph"/>To change the version of your application you can run the <a href="../ref/Command Line/set-version.html" class="commandLine">set-version</a> command:<p class="paragraph"/><div class="code"><pre>grails set&#45;version 0.2</pre></div><p class="paragraph"/>The version is used in various commands including the <a href="../ref/Command Line/war.html" class="commandLine">war</a> command which will append the application version to the end of the created WAR file.<p class="paragraph"/><h4>Detecting Versions at Runtime</h4><p class="paragraph"/>You can detect the application version using Grails' support for application metadata using the api:org.codehaus.groovy.grails.commons.GrailsApplication class. For example within <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a> there is an implicit <a href="../ref/Controllers/grailsApplication.html" class="controllers">grailsApplication</a> variable that can be used:<p class="paragraph"/><div class="code"><pre>def version = grailsApplication.metadata&#91;'app.version'&#93;</pre></div><p class="paragraph"/>If it is the version of Grails you need you can use:<p class="paragraph"/><div class="code"><pre>def grailsVersion = grailsApplication.metadata&#91;'app.grails.version'&#93;</pre></div><p class="paragraph"/>or the <code>GrailsUtil</code> class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.util.&#42;
+def grailsVersion = GrailsUtil.grailsVersion</pre></div><p class="paragraph"/><p class="paragraph"/><h2><a name="3.6 Project Documentation">3.6 Project Documentation</a></h2>Since Grails 1.2, the documentation engine that powers the creation of this documentation is available to your Grails projects.<p class="paragraph"/>The documentation engine uses a variation on the Textile syntax to automatically create project documentation with smart linking, formatting etc.<p class="paragraph"/><h4>Creating project documentation</h4><p class="paragraph"/>To use the engine you need to follow a few conventions. Firstly you need to create a <code>src/docs/guide</code> directory and then have numbered text files using the <code>gdoc</code> format. For example:<p class="paragraph"/><div class="code"><pre>+ src/docs/guide/1. Introduction.gdoc
++ src/docs/guide/2. Getting Started.gdoc</pre></div><p class="paragraph"/>The title of each chapter is taken from the file name. The order is dictated by the numerical value at the beginning of the file name.<p class="paragraph"/><h4>Creating reference items</h4><p class="paragraph"/>Reference items appear in the left menu on the documentation and are useful for quick reference documentation. Each reference item belongs to a category and a category is a directory located in the <code>src/docs/ref</code> directory. For example say you defined a new method called <code>renderPDF</code>, that belongs to a category called <code>Controllers</code> this can be done by creating a gdoc text file at the following location:<p class="paragraph"/><div class="code"><pre>+ src/ref/Controllers/renderPDF.gdoc</pre></div><p class="paragraph"/><h4>Configuring Output Properties</h4><p class="paragraph"/>There are various properties you can set within your <code>grails-app/conf/Config.groovy</code> file that customize the output of the documentation such as:
+<ul class="star">
+<li><strong class="bold">grails.doc.authors</strong> - The authors of the documentation</li>
+<li><strong class="bold">grails.doc.license</strong> - The license of the software</li>
+<li><strong class="bold">grails.doc.copyright</strong> - The copyright message to display</li>
+<li><strong class="bold">grails.doc.footer</strong> - The footer to use</li>
+</ul><p class="paragraph"/>Other properties such as the name of the documentation and the version are pulled from your project itself.<p class="paragraph"/><h4>Generating Documentation</h4><p class="paragraph"/>Once you have created some documentation (refer to the syntax guide in the next chapter) you can generate an HTML version of the documentation using the command:<p class="paragraph"/><div class="code"><pre>grails docs</pre></div><p class="paragraph"/>This command will output an <code>docs/manual/index.html</code> which can be opened to view your documentation.<p class="paragraph"/>
+<h4>Documentation Syntax</h4><p class="paragraph"/>As mentioned the syntax is largely similar to Textile or Confluence style wiki markup. The following sections walk you through the syntax basics.<p class="paragraph"/><h5>Basic Formatting</h5><p class="paragraph"/>Monospace: <code>monospace</code> 
+<div class="code"><pre>&#64;monospace&#64;</pre></div><p class="paragraph"/>Italic: <em class="italic">italic</em> <div class="code"><pre>&#95;italic&#95;</pre></div><p class="paragraph"/>Bold: <strong class="bold">bold</strong>
+<div class="code"><pre>&#42;bold&#42;</pre></div><p class="paragraph"/>Image: 
+<img border="0" class="center" src="http://grails.org/images/new/grailslogo_topNav.png"></img><p class="paragraph"/><div class="code"><pre>&#33;http://grails.org/images/new/grailslogo_topNav.png&#33;</pre></div><p class="paragraph"/><h5>Linking</h5><p class="paragraph"/>There are several ways to create links with the documentation generator. A basic external link can either be defined using confluence or textile style markup:<p class="paragraph"/><div class="code"><pre>&#91;SpringSource|http://www.springsource.com/&#93; or <span class="java&#45;quote">"SpringSource"</span>:http://www.springsource.com/</pre></div><p class="paragraph"/>For links to other sections inside the user guide you can use the <code>guide:</code> prefix:<p class="paragraph"/><div class="code"><pre>&#91;Intro|guide:1. Introduction&#93;</pre></div><p class="paragraph"/>The documentation engine will warn you if any links to sections in your guide break. Sometimes though it is preferable not to hard code the actual names of guide sections since you may move them around. To get around this you can create an alias inside <code>grails-app/conf/Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.doc.alias.intro=<span class="java&#45;quote">"1. Introduction"</span></pre></div><p class="paragraph"/>And then the link becomes:<p class="paragraph"/><div class="code"><pre>&#91;Intro|guide:intro&#93;</pre></div><p class="paragraph"/>This is useful since if you linked the to "1. Introduction" chapter many times you would have to change all of those links.<p class="paragraph"/>To link to reference items you can use a special syntax:<p class="paragraph"/><div class="code"><pre>&#91;controllers|renderPDF&#93;</pre></div><p class="paragraph"/>In this case the category of the reference item is on the left hand side of the | and the name of the reference item on the right.<p class="paragraph"/>Finally, to link to external APIs you can use the <code>api:</code> prefix. For example:<p class="paragraph"/><div class="code"><pre>&#91;<span class="java&#45;object">String</span>|api:java.lang.<span class="java&#45;object">String</span>&#93;</pre></div><p class="paragraph"/>The documentation engine will automatically create the appropriate javadoc link in this case. If you want to add additional APIs to the engine you can configure them in <code>grails-app/conf/Config.groovy</code>. For example:<p class="paragraph"/><div class="code"><pre>grails.doc.api.org.hibernate=<span class="java&#45;quote">"http://www.hibernate.org/hib_docs/v3/api"</span></pre></div><p class="paragraph"/>The above example configures classes within the <code>org.hibernate</code> package to link to the Hibernate website's API docs.<p class="paragraph"/><h5>Lists and Headings</h5><p class="paragraph"/>Headings can be created by specifying the letter 'h' followed by a number and then a dot:<p class="paragraph"/><div class="code"><pre>h3.&#60;space&#62;Heading3
+h4.&#60;space&#62;Heading4</pre></div><p class="paragraph"/>Unordered lists are defined with the use of the * character:<p class="paragraph"/><div class="code"><pre>&#42; item 1
+&#42;&#42; subitem 1
+&#42;&#42; subitem 2
+&#42; item 2</pre></div><p class="paragraph"/>Numbered lists can be defined with the # character:<p class="paragraph"/><div class="code"><pre>&#35; item 1</pre></div><p class="paragraph"/>Tables can be created using the <code>table</code> macro:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Name</strong></th><th><strong class="bold">Number</strong></th></tr><tr class="table-odd"><td>Albert</td><td>46</td></tr><tr class="table-even"><td>Wilma</td><td>1348</td></tr><tr class="table-odd"><td>James</td><td>12</td></tr></table><p class="paragraph"/><div class="code"><pre>&#123;table&#125;
+ &#42;Name&#42; | &#42;<span class="java&#45;object">Number</span>&#42; 
+ Albert | 46
+ Wilma | 1348
+ James | 12
+&#123;table&#125;</pre></div><p class="paragraph"/><h5>Code and Notes</h5><p class="paragraph"/>You can define code blocks with the <code>code</code> macro:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+    <span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/><div class="code"><pre>&#123;code&#125;
+class Book &#123;
+    <span class="java&#45;object">String</span> title
+&#125;
+&#123;code&#125;</pre></div><p class="paragraph"/>The example above provides syntax highlighting for Java and Groovy code, but you can also highlight XML markup:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;hello&#62;</span>world<span class="xml&#45;tag">&#60;/hello&#62;</span></pre></div><p class="paragraph"/><div class="code"><pre>&#123;code:xml&#125;
+&#60;hello&#62;world&#60;/hello&#62;
+&#123;code&#125;</pre></div><p class="paragraph"/>There are also a couple of macros for displaying notes and warnings:<p class="paragraph"/>Note:
+<blockquote class="note">
+This is a note!
+</blockquote><p class="paragraph"/><div class="code"><pre>&#123;note&#125;
+This is a note!
+&#123;note&#125;</pre></div><p class="paragraph"/>Warning:<p class="paragraph"/><blockquote class="warning">
+This is a warning!
+</blockquote><p class="paragraph"/><div class="code"><pre>&#123;warning&#125;
+This is a warning!
+&#123;warning&#125;</pre></div><p class="paragraph"/>
+<h2><a name="3.7 Dependency Resolution">3.7 Dependency Resolution</a></h2>In order to control how JAR dependencies are resolved Grails features (since version 1.2) a dependency resolution DSL that allows you to control how dependencies for applications and plugins are resolved.<p class="paragraph"/>Inside the <code>grails-app/conf/BuildConfig.groovy</code> file you can specify a <code>grails.project.dependency.resolution</code> property that configures how dependencies are resolved:<p class="paragraph"/><div class="code"><pre>grails.project.dependency.resolution = &#123;
+   // config here
+&#125;</pre></div><p class="paragraph"/>The default configuration looks like the following:<p class="paragraph"/><div class="code"><pre>grails.project.dependency.resolution = &#123;
+    inherits <span class="java&#45;quote">"global"</span> // inherit Grails' <span class="java&#45;keyword">default</span> dependencies
+    log <span class="java&#45;quote">"warn"</span> // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    repositories &#123;
+        grailsHome()<p class="paragraph"/>        // uncomment the below to enable remote dependency resolution
+        // from <span class="java&#45;keyword">public</span> Maven repositories
+        //mavenCentral()
+        //mavenRepo <span class="java&#45;quote">"http://snapshots.repository.codehaus.org"</span>
+        //mavenRepo <span class="java&#45;quote">"http://repository.codehaus.org"</span>
+        //mavenRepo <span class="java&#45;quote">"http://download.java.net/maven/2/"</span>
+        //mavenRepo "http://repository.jboss.com/maven2/
+    &#125;
+    dependencies &#123;
+        // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
+        // runtime 'com.mysql:mysql&#45;connector&#45;java:5.1.5'
+    &#125;<p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>The details of the above will be explained in the next few sections.<p class="paragraph"/><h2><a name="3.7.1 Configurations and Dependencies">3.7.1 Configurations and Dependencies</a></h2>Grails features 5 dependency resolution configurations (or 'scopes') which you can take advantage of:
+<ul class="star">
+<li> <code>build</code>: Dependencies for the build system only</li>
+<li> <code>compile</code>: Dependencies for the compile step</li>
+<li> <code>runtime</code>: Dependencies needed at runtime but not for compilation (see above)</li>
+<li> <code>test</code>: Dependencies needed for testing but not at runtime (see above)</li>
+<li> <code>provided</code>: Dependencies needed at development time, but not during WAR deployment</li>
+</ul><p class="paragraph"/>Within the <code>dependencies</code> block you can specify a dependency that falls into one of these configurations by calling the equivalent method. For example if your application requires the MySQL driver to function at <code>runtime</code> you can specify as such:<p class="paragraph"/><div class="code"><pre>runtime 'com.mysql:mysql&#45;connector&#45;java:5.1.5'</pre></div><p class="paragraph"/>The above uses the string syntax which is <code>group:name:version</code>. You can also use a map-based syntax:<p class="paragraph"/><div class="code"><pre>runtime group:'com.mysql', name:'mysql&#45;connector&#45;java', version:'5.1.5'</pre></div><p class="paragraph"/>Multiple dependencies can be specified by passing multiple arguments:<p class="paragraph"/><div class="code"><pre>runtime 'com.mysql:mysql&#45;connector&#45;java:5.1.5',
+		'net.sf.ehcache:ehcache:1.6.1'<p class="paragraph"/>// Or<p class="paragraph"/>runtime(
+ 	&#91;group:'com.mysql', name:'mysql&#45;connector&#45;java', version:'5.1.5'&#93;,
+	&#91;group:'net.sf.ehcache', name:'ehcache', version:'1.6.1'&#93;
+)</pre></div><p class="paragraph"/>
+<h2><a name="3.7.2 Dependency Repositories">3.7.2 Dependency Repositories</a></h2>Grails, when installed, does not use any remote public repositories. There is a default <code>grailsHome()</code> repository that will locate the JAR files Grails needs from your Grails installation. If you want to take advantage of a public repository you need to specify as such inside the <code>repositories</code> block:<p class="paragraph"/><div class="code"><pre>repositories &#123;
+    mavenCentral()
+&#125;</pre></div><p class="paragraph"/>In this case the default public Maven repository is specified. You can also specify a specific Maven repository to use by URL:<p class="paragraph"/><div class="code"><pre>repositories &#123;
+	mavenRepo <span class="java&#45;quote">"http://repository.codehaus.org"</span>
+&#125;</pre></div><p class="paragraph"/>If you do not wish to use a public Maven repository you can specify a flat file repository:<p class="paragraph"/><div class="code"><pre>repositories &#123;
+	flatDir name:'myRepo', dirs:'/path/to/repo'
+&#125;</pre></div><p class="paragraph"/>If all else fails since Grails builds on Apache Ivy you can specify an Ivy resolver:<p class="paragraph"/><div class="code"><pre>repositories &#123;
+	resolver <span class="java&#45;keyword">new</span> URLResolver(...)
+&#125;</pre></div><p class="paragraph"/><p class="paragraph"/><h2><a name="3.7.3 Debugging Resolution">3.7.3 Debugging Resolution</a></h2>If you are having trouble getting a dependency to resolve you can enable more verbose debugging from the underlying engine using the <code>log</code> method:<p class="paragraph"/><div class="code"><pre>// log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+log <span class="java&#45;quote">"warn"</span></pre></div><p class="paragraph"/><h2><a name="3.7.4 Inherited Dependencies">3.7.4 Inherited Dependencies</a></h2>By default every Grails application inherits a bunch of framework dependencies. This is done through the line:<p class="paragraph"/><div class="code"><pre>inherits <span class="java&#45;quote">"global"</span></pre></div><p class="paragraph"/>Inside the <code>BuildConfig.groovy</code> file. If you wish exclude certain inherited dependencies then you can do so using the <code>excludes</code> method:<p class="paragraph"/><div class="code"><pre>inherits(<span class="java&#45;quote">"global"</span>) &#123;
+	excludes <span class="java&#45;quote">"oscache"</span>, <span class="java&#45;quote">"ehcache"</span>
+&#125;</pre></div><p class="paragraph"/><p class="paragraph"/><h2><a name="3.7.5 Dependency Reports">3.7.5 Dependency Reports</a></h2>As mentioned in the previous section a Grails application consists of dependencies inherited from the framework, the plugins installed and the application dependencies itself.<p class="paragraph"/>To obtain a report of an application's dependencies you can run the <a href="../ref/Command Line/dependency-report.html" class="commandLine">dependency-report</a> command:<p class="paragraph"/><div class="code"><pre>grails dependency&#45;report</pre></div><p class="paragraph"/>This will output a report to the <code>target/dependency-report</code> directory by default. You can specify which configuration (scope) you want a report for by passing an argument containing the configuration name:<p class="paragraph"/><div class="code"><pre>grails dependency&#45;report runtime</pre></div>
+<h2><a name="3.7.6 Plugin JAR Dependencies">3.7.6 Plugin JAR Dependencies</a></h2>The way in which you specify dependencies for a <a href="../guide/single.html#12. Plug-ins" class="guide">plugin</a> is identical to how you specify dependencies in an application. When a plugin is installed into an application the application automatically inherits the dependencies of the plugin.<p class="paragraph"/>If a plugin is using a JAR which conflicts with another plugin, or an application dependency then you can override how a plugin resolves its dependencies inside an application using the <code>plugin</code> method:<p class="paragraph"/><div class="code"><pre>plugin(<span class="java&#45;quote">"hibernate"</span>) &#123;
+    compile( 'org.hibernate:hibernate&#45;core:3.3.1.GA') &#123;
+		excludes 'ehcache', 'xml&#45;apis', 'commons&#45;logging'
+	&#125;
+    compile 'org.hibernate:hibernate&#45;annotations:3.4.0.GA',
+			'org.hibernate:hibernate&#45;commons&#45;annotations:3.3.0.ga'<p class="paragraph"/>	runtime 'javassist:javassist:3.4.GA'	
+&#125;</pre></div><p class="paragraph"/>In this case the application is controlling how the <code>hibernate</code> plugin resolves dependencies and not the <code>hibernate</code> plugin. If you wish to simply exclude a single dependency resolved by a plugin then you can do so:<p class="paragraph"/><div class="code"><pre>plugin(<span class="java&#45;quote">"hibernate"</span>) &#123;
+    runtime <span class="java&#45;quote">"cglib:cglib&#45;nodep:2.1_3"</span>
+	excludes 'javassist:javassist:3.4.GA'	
+&#125;</pre></div><h2><a name="3.7.7 Maven Integration">3.7.7 Maven Integration</a></h2>When using the Grails Maven plugin, Grails' dependency resolution mechanics are disabled as it is assumed that you will manage dependencies via Maven's <code>pom.xml</code> file.<p class="paragraph"/>However, if you would like to continue using Grails regular commands like run-app, test-app and so on then you can tell Grails' command line to load dependencies from the Maven <code>pom.xml</code> file instead.<p class="paragraph"/>To do so simply add the following line to your <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.project.dependency.resolution = &#123;
+ 	pom <span class="java&#45;keyword">true</span>
+	..
+&#125;</pre></div><p class="paragraph"/>The line <code>pom true</code> tells Grails to parse Maven's <code>pom.xml</code> and load dependencies from there.
+
+	</body>
+</html>

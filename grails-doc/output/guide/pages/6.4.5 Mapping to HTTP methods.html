@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.4.5 Mapping to HTTP methods</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		URL mappings can also be configured to map based on the HTTP method (GET, POST, PUT or DELETE). This is extremely useful for RESTful APIs and for restricting mappings based on HTTP method.<p class="paragraph"/>As an example the following mappings provide a RESTful API URL mappings for the <code>ProductController</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/product/$id"</span>(controller:<span class="java&#45;quote">"product"</span>)&#123;
+       action = &#91;GET:<span class="java&#45;quote">"show"</span>, PUT:<span class="java&#45;quote">"update"</span>, DELETE:<span class="java&#45;quote">"delete"</span>, POST:<span class="java&#45;quote">"save"</span>&#93;
+   &#125;	
+&#125;</pre></div>
+	</body>
+</html>

@@ -1,0 +1,24 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>war </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>war</code> command will create a Web Application Archive (WAR) file which can be deployed on any Java EE compliant application server<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>grails war
+grails test war
+grails &#45;Dgrails.env=foo war</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Usage: 
+<div class="code"><pre>grails &#91;environment&#93;&#42; war &#91;arguments&#93;&#42;</pre></div><p class="paragraph"/>Arguments:
+<ul class="star">
+<li><code>nojars</code> - Packages the WAR with no jar files. Used for shared deployment</li>
+</ul><p class="paragraph"/>Fired Events: 
+<ul class="star">
+<li><code>StatusFinal</code> - When the WAR file has been created</li>
+</ul><p class="paragraph"/>The <code>war</code> command will create a web application archive (WAR) file using the application name and version number. By default a war file deployable to the production environment will be created, but the environment can be specified using Grails standard convention:<p class="paragraph"/><div class="code"><pre>grails test war
+grails dev war
+grails prod war
+grails war /foo/bar/mywar.war
+grails war &#45;&#45;nojars</pre></div><p class="paragraph"/>You can also specify a custom environment:<p class="paragraph"/><div class="code"><pre>grails &#45;Dgrails.env=UAT war</pre></div><p class="paragraph"/>Once the WAR has been created you should follow the instructions that relate to the container which you are using to complete deployment
+
+	</body>
+</html>

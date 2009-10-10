@@ -1,0 +1,11 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>lock</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>lock</code> method obtains a pessimistic lock using an SQL <code>select &#8230; for update</code>.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>def book = Book.get(1)
+book.lock()</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>lock</code> method will obtain a pessimistic lock on an instance, essentially locking a row in the database with <code>select &#8230; for update</code>. The <code>lock</code> method is equivalent to using Hibernate's <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/LockMode.html#UPGRADE" class="api">LockMode.UPGRADE</a> in combination with the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Session.html#lock(java.lang.Object, org.hibernate.LockMode)" class="api">lock</a> method.<p class="paragraph"/>The lock will automatically be released when the transaction is committed. In Grails this is typically after an action has finished executing.<p class="paragraph"/>Refer to the section on <a href="../../guide/single.html#5.3.5 Pessimistic and Optimistic Locking" class="guide">Optimistic and Pessimistic locking</a> in the user guide for info.<p class="paragraph"/>
+	</body>
+</html>

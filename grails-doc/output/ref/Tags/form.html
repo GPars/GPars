@@ -1,0 +1,29 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>form </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Creates a form that submits to a controller, action, and/or id. Beyond what is below all the usual HTML attributes apply.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>Example controller for an application called "shop":<p class="paragraph"/><div class="code"><pre>class Book &#123;
+     def list = &#123; &#91; books: Book.list( params ) &#93; &#125;
+     def show = &#123; &#91; book : Book.get( params&#91;'id'&#93; ) &#93; &#125;
+&#125;</pre></div><p class="paragraph"/>Example usages for above controller:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:form name=<span class="xml&#45;quote">"myForm"</span> action=<span class="xml&#45;quote">"myaction"</span> id=<span class="xml&#45;quote">"1"</span>&#62;</span>...<span class="xml&#45;tag">&#60;/g:form&#62;</span>
+results in:
+<span class="xml&#45;tag">&#60;form action=<span class="xml&#45;quote">"/shop/book/myaction/1"</span> method=<span class="xml&#45;quote">"post"</span> name=<span class="xml&#45;quote">"myForm"</span> id=<span class="xml&#45;quote">"myForm"</span> &#62;</span>...<span class="xml&#45;tag">&#60;/form&#62;</span><p class="paragraph"/><span class="xml&#45;tag">&#60;g:form name=<span class="xml&#45;quote">"myForm"</span> url=<span class="xml&#45;quote">"&#91;action:'list',controller:'book'&#93;"</span>&#62;</span>...<span class="xml&#45;tag">&#60;/g:form&#62;</span>
+results in:
+<span class="xml&#45;tag">&#60;form action=<span class="xml&#45;quote">"/shop/book/list"</span> method=<span class="xml&#45;quote">"post"</span> name=<span class="xml&#45;quote">"myForm"</span> id=<span class="xml&#45;quote">"myForm"</span> &#62;</span>...<span class="xml&#45;tag">&#60;/form&#62;</span><p class="paragraph"/><span class="xml&#45;tag">&#60;g:form action=<span class="xml&#45;quote">"show"</span>&#62;</span>...<span class="xml&#45;tag">&#60;/g:form&#62;</span>
+results in:
+<span class="xml&#45;tag">&#60;form action=<span class="xml&#45;quote">"/shop/book/show"</span> method=<span class="xml&#45;quote">"post"</span> &#62;</span>...<span class="xml&#45;tag">&#60;/form&#62;</span></pre></div><p class="paragraph"/>
+<h2>Description</h2><p class="paragraph"/>Attributes
+<ul class="star">
+<li><code>action</code> (optional) - the name of the action to use in the link, if not specified the default action will be linked</li>
+<li><code>controller</code> (optional) - the name of the controller to use in the link, if not specified the current controller will be linked</li>
+<li><code>id</code> (optional) - The id to use in the link</li>
+<li><code>url</code> (optional) - A map containing the action,controller,id etc.</li>
+<li><code>name</code> (optional) - A value to use for both the name and id attribute of the form tag</li>
+<li><code>useToken</code> (optional) - Set whether to send a token in the request to handle duplicate form submissions. See <a href="../../guide/single.html#6.1.10 Handling Duplicate Form Submissions" class="guide">Handling Duplicate Form Submissions</a></li>
+</ul><p class="paragraph"/><h2>Source</h2><p class="paragraph"/><div class="error">source: ../grails/src/java/org/codehaus/groovy/grails/plugins/web/taglib/FormTagLib.groovy (No such file or directory)</div><p class="paragraph"/>
+
+	</body>
+</html>

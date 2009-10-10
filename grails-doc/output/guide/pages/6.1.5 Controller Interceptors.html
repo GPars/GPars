@@ -1,0 +1,34 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.1.5 Controller Interceptors</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Often it is useful to intercept processing based on either request, session or application state. This can be achieved via action interceptors. There are currently 2 types of interceptors: before and after.<p class="paragraph"/><blockquote class="note">
+If your interceptor is likely to apply to more than one controller, you are almost certainly better off writing a <a href="../guide/single.html#6.6 Filters" class="guide">Filter</a>. Filters can be applied to multiple controllers or URIs, without the need to change the logic of each controller
+</blockquote><p class="paragraph"/><h4>Before Interception</h4><p class="paragraph"/>The <code>beforeInterceptor</code> intercepts processing before the action is executed. If it returns <code>false</code> then the intercepted action will not be executed. The interceptor can be defined for all actions in a controller as follows:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#123;
+       println <span class="java&#45;quote">"Tracing action $&#123;actionUri&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>
+The above is declared inside the body of the controller definition.  It will be executed before all actions and does not interfere with processing. A common use case is however for authentication:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,except:'login'&#93;
+// defined as a regular method so its <span class="java&#45;keyword">private</span>
+def auth() &#123;
+     <span class="java&#45;keyword">if</span>(!session.user) &#123;
+            redirect(action:'login')
+            <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">false</span>
+     &#125;
+&#125;
+def login = &#123;
+     // display login page
+&#125;</pre></div><p class="paragraph"/>
+The above code defines a method called <code>auth</code>. A method is used so that it is not exposed as an action to the outside world (i.e. it is private). The <code>beforeInterceptor</code> then defines an interceptor that is used on all actions 'except' the login action and is told to execute the 'auth' method. The 'auth' method is referenced using Groovy's method pointer syntax, within the method itself it detects whether there is a user in the session otherwise it redirects to the login action and returns false, instruction the intercepted action not to be processed.<p class="paragraph"/><h4>After Interception</h4><p class="paragraph"/>To define an interceptor that is executed after an action use the <code>afterInterceptor</code> property:<p class="paragraph"/><div class="code"><pre>def afterInterceptor = &#123; model &#45;&#62;
+       println <span class="java&#45;quote">"Tracing action $&#123;actionUri&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>The after interceptor takes the resulting model as an argument and can hence perform post manipulation of the model or response.<p class="paragraph"/>An after interceptor may also modify the Spring MVC <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/servlet/ModelAndView.html" class="api">ModelAndView</a> object prior to rendering. In this case, the above example becomes:<p class="paragraph"/><div class="code"><pre>def afterInterceptor = &#123; model, modelAndView &#45;&#62;
+       println <span class="java&#45;quote">"Current view is $&#123;modelAndView.viewName&#125;"</span>
+       <span class="java&#45;keyword">if</span>(model.someVar) modelAndView.viewName = <span class="java&#45;quote">"/mycontroller/someotherview"</span>
+       println <span class="java&#45;quote">"View is now $&#123;modelAndView.viewName&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>This allows the view to be changed based on the model returned by the current action. Note that the <code>modelAndView</code> may be <code>null</code> if the action being intercepted called redirect or render.<p class="paragraph"/>
+<h4>Interception Conditions</h4><p class="paragraph"/>Rails users will be familiar with the authentication example and how the 'except' condition was used when executing the interceptor (interceptors are called 'filters' in Rails, this terminology conflicts with the servlet filter terminology in Java land):<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,except:'login'&#93;</pre></div><p class="paragraph"/>This executes the interceptor for all actions except the specified action. A list of actions can also be defined as follows:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,except:&#91;'login','register'&#93;&#93;</pre></div><p class="paragraph"/>The other supported condition is 'only', this executes the interceptor for only the specified actions:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,only:&#91;'secure'&#93;&#93;</pre></div><p class="paragraph"/><p class="paragraph"/>
+
+	</body>
+</html>

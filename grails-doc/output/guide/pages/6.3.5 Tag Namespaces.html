@@ -1,0 +1,15 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.3.5 Tag Namespaces</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		By default, tags are added to the default Grails namespace and are used with the <code>g:</code> prefix in GSP pages. However, you can specify a different namespace by adding a static property to your <code>TagLib</code> class:<p class="paragraph"/><div class="code"><pre>class SimpleTagLib &#123;
+    <span class="java&#45;keyword">static</span> namespace = <span class="java&#45;quote">"my"</span><p class="paragraph"/>    def example = &#123; attrs &#45;&#62;
+        &#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Here we have specified a <code>namespace</code> of <code>my</code> and hence the tags in this tag lib must then be referenced from GSP pages like this:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;my:example name=<span class="xml&#45;quote">"..."</span> /&#62;</span></pre></div><p class="paragraph"/>Where the prefix is the same as the value of the static <code>namespace</code> property. Namespaces are particularly useful for plugins.<p class="paragraph"/>
+Tags within namespaces can be invoked as methods using the namespace as a prefix to the method call:<p class="paragraph"/><div class="code"><pre>out &#60;&#60; my.example(name:<span class="java&#45;quote">"foo"</span>)</pre></div><p class="paragraph"/>This works from GSP, controllers or tag libraries
+	</body>
+</html>

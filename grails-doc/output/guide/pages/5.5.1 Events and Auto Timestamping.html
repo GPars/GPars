@@ -1,0 +1,53 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.5.1 Events and Auto Timestamping</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		GORM supports the registration of events as methods that get fired when certain events occurs such as deletes, inserts and updates. The following is a list of supported events:
+<ul class="star">
+<li><code>beforeInsert</code> - Executed before an object is initially persisted to the databse</li>
+<li><code>beforeUpdate</code> - Executed before an object is updated</li>
+<li><code>beforeDelete</code> - Executed before an object is deleted</li>
+<li><code>afterInsert</code> - Executed after an object is persisted to the database</li>
+<li><code>afterUpdate</code> - Executed after an object has been updated</li>
+<li><code>afterDelete</code> - Executed after an object has been updated</li>
+<li><code>onLoad</code> - Executed when an object is loaded from the database</li>
+</ul><p class="paragraph"/>To add an event simply register the relevant closure with your domain class.<p class="paragraph"/><blockquote class="warning">
+Do not attempt to flush the session within an event (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.
+</blockquote><p class="paragraph"/><h3>Event types</h3><p class="paragraph"/><h4>The beforeInsert event</h4><p class="paragraph"/>Fired before an object is saved to the db<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   Date dateCreated<p class="paragraph"/>   def beforeInsert() &#123;
+       dateCreated = <span class="java&#45;keyword">new</span> Date()
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h4>The beforeUpdate event</h4><p class="paragraph"/>Fired before an existing object is updated<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   Date dateCreated
+   Date lastUpdated<p class="paragraph"/>   def beforeInsert() &#123;
+       dateCreated = <span class="java&#45;keyword">new</span> Date()
+   &#125;
+   def beforeUpdate() &#123;
+       lastUpdated = <span class="java&#45;keyword">new</span> Date()
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h4>The beforeDelete event</h4><p class="paragraph"/>Fired before an object is deleted.<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   <span class="java&#45;object">String</span> name
+   Date dateCreated
+   Date lastUpdated<p class="paragraph"/>   def beforeDelete() &#123;
+	  ActivityTrace.withNewSession &#123;
+	 	  <span class="java&#45;keyword">new</span> ActivityTrace(eventName:<span class="java&#45;quote">"Person Deleted"</span>,data:name).save()
+	  &#125;      
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Notice the usage of <code>withNewSession</code> method above. Since events are triggered whilst Hibernate is flushing using persistence methods like <code>save()</code> and <code>delete()</code> won't result in objects being saved unless you run your operations with a new <code>Session</code>.<p class="paragraph"/>Fortunately the <code>withNewSession</code> method allows you to share the same transactional JDBC connection even though you're using a different underlying <code>Session</code>.<p class="paragraph"/><h4>The onLoad event</h4><p class="paragraph"/>Fired when an object is loaded from the db:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   <span class="java&#45;object">String</span> name
+   Date dateCreated
+   Date lastUpdated<p class="paragraph"/>   def onLoad() &#123;
+      name = <span class="java&#45;quote">"I'm loaded"</span>
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Automatic timestamping</h4><p class="paragraph"/>The examples above demonstrated using events to update a <code>lastUpdated</code> and <code>dateCreated</code> property to keep track of updates to objects. However, this is actually not necessary. By merely defining a <code>lastUpdated</code> and <code>dateCreated</code> property these will be automatically updated for you by GORM.<p class="paragraph"/>If this is not the behaviour you want you can disable this feature with:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   Date dateCreated
+   Date lastUpdated
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+      autoTimestamp <span class="java&#45;keyword">false</span>
+   &#125;
+&#125;</pre></div><p class="paragraph"/>
+	</body>
+</html>

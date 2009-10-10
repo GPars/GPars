@@ -1,0 +1,20 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>install-templates</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Installs the templates used by Grails during code generation<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>grails install&#45;templates</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Usage:<p class="paragraph"/><div class="code"><pre>grails install&#45;templates</pre></div><p class="paragraph"/>Fired Events: 
+<ul class="star">
+<li><code>StatusUpdate</code> - When the templates are successfully installed</li>
+</ul><p class="paragraph"/>The <code>install-plugin</code> command will install the set of templates Grails uses for all code generation activities to the <code>src/templates</code> directory. The templates installed are as follows:<p class="paragraph"/><div class="code"><pre>src
+   templates
+       artifacts
+	   scaffolding
+	   war</pre></div><p class="paragraph"/>The <code>artifacts</code> directory contains the templates used by the <code>create-* </code> commands.
+The <code>scaffolding</code> directory contains templates used by the <code>generate-* </code> commands.
+The <code>war</code> directory contains the web.xml template used to generate the deployment descriptor.
+
+	</body>
+</html>

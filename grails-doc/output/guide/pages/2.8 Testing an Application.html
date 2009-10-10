@@ -1,0 +1,10 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>2.8 Testing an Application</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		The <code>create-*</code> commands in Grails automatically create integration tests for you within the <code>test/integration</code> directory. It is of course up to you to populate these tests with valid test logic, information on which can be found in the section on <a href="../guide/single.html#9. Testing" class="guide">Testing</a>. However, if you wish to execute tests you can run the <a href="../ref/Command Line/test-app.html" class="commandLine">test-app</a> command as follows:<p class="paragraph"/><div class="code"><pre>grails test&#45;app</pre></div><p class="paragraph"/>Grails also automatically generates an Ant <code>build.xml</code> which can also run the tests by delegating to Grails' <a href="../ref/Command Line/test-app.html" class="commandLine">test-app</a> command:<p class="paragraph"/><div class="code"><pre>ant test</pre></div><p class="paragraph"/>This is useful when you need to build Grails applications as part of a continuous integration platform such as CruiseControl.
+	</body>
+</html>

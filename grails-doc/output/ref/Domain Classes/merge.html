@@ -1,0 +1,18 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>merge</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Merges a domain class instance back into the current persistent context and returns a new merged instance.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>def b = <span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"The Shining"</span>)
+b = b.merge()</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>merge</code> method is similar in function to the <a href="../../ref/Domain Classes/save.html" class="domainClasses">save</a> method, but not in behaviour. The <code>merge</code> allows the merging of "detached" instances such as those stored in the HTTP <a href="../../ref/Controllers/session.html" class="controllers">session</a>. Essentially, each persistent instance is associated with a persistence context. A new persistence context is created for each <a href="../../ref/Controllers/request.html" class="controllers">request</a>. The result is objects stored in the session lose their persistent context on subsequent requests. In this case you can't simply call <a href="../../ref/Domain Classes/save.html" class="domainClasses">save</a> as the domain class is not associated with a current context.<p class="paragraph"/>The <code>merge</code> method on the other hand allows you to merge a detached objects state back into the current session. Unlike the <code>save</code> method this method returns a new instance of the class representing the re-attached object. In other words you <strong class="bold">must</strong> write code like the below:<p class="paragraph"/><div class="code"><pre>book = book.merge()</pre></div><p class="paragraph"/>If you don't use the return value of the <code>merge</code> method then you still have access to the original detached instance and you will get errors such as lazy initialization exceptions.<p class="paragraph"/>The <code>merge</code> method is defined in the Hibernate documentation as follows:<p class="paragraph"/><blockquote class="quote">
+Copy the state of the given object onto the persistent object with the same identifier. If there is no persistent instance currently associated with the session, it will be loaded. If the given instance is unsaved, save a copy of and return it as a newly persistent instance.
+</blockquote><p class="paragraph"/>The <code>merge</code> method is equivalent to the Hibernate <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Session.html#merge(java.lang.Object)" class="api">merge</a> method.<p class="paragraph"/>
+Parameters:
+<ul class="star">
+<li><code>validate</code> (optional) - Set to <code>false</code> if validation should be skipped</li>
+<li><code>flush</code> (optional) - When set to <code>true</code> flushes the persistent context, hence persisting the object immediately</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,15 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.2 Groovy Server Pages</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Groovy Servers Pages (or GSP for short) is Grails' view technology. It is designed to be familiar for users of technologies such as ASP and JSP, but to be far more flexible and intuitive.<p class="paragraph"/>In Grails GSPs live in the <code>grails-app/views</code> directory and are typically rendered automatically (by convention) or via the <a href="../ref/Controllers/render.html" class="controllers">render</a> method such as:<p class="paragraph"/><div class="code"><pre>render(view:<span class="java&#45;quote">"index"</span>)</pre></div><p class="paragraph"/>A GSP is typically a mix of mark-up and GSP tags which aid in view rendering.<p class="paragraph"/><blockquote class="note">
+	Although it is possible to have Groovy logic embedded in your GSP and doing this will be covered in this document the practice is strongly discouraged. Mixing mark-up and code is a <strong class="bold">bad</strong> thing and most GSP pages contain no code and needn't do so.
+</blockquote><p class="paragraph"/>A GSP typically has a "model" which is a set of variables that are used for view rendering. The model is passed to the GSP view from a controller. For example consider the following controller action:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+	&#91;book: Book.get(params.id)&#93;
+&#125;</pre></div><p class="paragraph"/>This action will look-up a <code>Book</code> instance and create a model that contains a key called <code>book</code>. This key can then be reference within the GSP view using the name <code>book</code>:<p class="paragraph"/><div class="code"><pre>&#60;%=book.title%&#62;</pre></div>
+
+	</body>
+</html>

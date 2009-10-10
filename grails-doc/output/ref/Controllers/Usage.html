@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>Controller Usage</h1><p class="paragraph"/>A controller fulfills the C in the Model View Controller (MVC) pattern and is responsible for handling web requests. In Grails a controller is a class that ends in the convention "Controller" and lives in the <code>grails-app/controllers</code> directory. A controller can be created with the <a href="../../ref/Command Line/create-controller.html" class="commandLine">create-controller</a> command:<p class="paragraph"/><div class="code"><pre>grails create&#45;controller hello</pre></div><p class="paragraph"/>Or via your favourite IDE or text editor.<p class="paragraph"/><div class="code"><pre>class HelloController &#123;
+	def world = &#123;
+		render <span class="java&#45;quote">"Hello World!"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Each action in the controller is a callable block (for example the <code>world</code> action above) that has access to a number of implicit variables and methods which are covered in this reference documentation.<p class="paragraph"/>Refer to the user guide topic on <a href="../../guide/single.html#6.1 Controllers" class="guide">Controllers</a> for more information.
+	</body>
+</html>

@@ -1,0 +1,718 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5. Object Relational Mapping (GORM)</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1><a name="5. Object Relational Mapping (GORM)">5. Object Relational Mapping (GORM)</a></h1>Domain classes are core to any business application. They hold state about business processes and hopefully also implement behavior. They are linked together through relationships, either one-to-one or one-to-many.<p class="paragraph"/>GORM is Grails' object relational mapping (ORM) implementation. Under the hood it uses Hibernate 3 (an extremely popular and flexible open source ORM solution) but because of the dynamic nature of Groovy, the fact that it supports both static and dynamic typing, and the convention of Grails there is less configuration involved in creating Grails domain classes.<p class="paragraph"/>You can also write Grails domain classes in Java. See the section on Hibernate Integration for how to write Grails domain classes in Java but still use dynamic persistent methods. Below is a preview of GORM in action:<p class="paragraph"/><div class="code"><pre>def book = Book.findByTitle(<span class="java&#45;quote">"Groovy in Action"</span>)<p class="paragraph"/>book
+  .addToAuthors(name:<span class="java&#45;quote">"Dierk Koenig"</span>)
+  .addToAuthors(name:<span class="java&#45;quote">"Guillaume LaForge"</span>)
+  .save()</pre></div><p class="paragraph"/><h2><a name="5.1 Quick Start Guide">5.1 Quick Start Guide</a></h2>A domain class can be created with the <a href="../ref/Command Line/create-domain-class.html" class="commandLine">create-domain-class</a> command:<p class="paragraph"/><div class="code"><pre>grails create&#45;domain&#45;class Person</pre></div><p class="paragraph"/>This will create a class at the location <code>grails-app/domain/Person.groovy</code> such as the one below:<p class="paragraph"/><div class="code"><pre>class Person &#123;	
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+If you have the <code>dbCreate</code> property set to "update", "create" or "create-drop" on your <a href="../guide/single.html#3.3 The DataSource" class="guide">DataSource</a>, Grails will automatically generated/modify the database tables for you.
+</blockquote><p class="paragraph"/>You can customize the class by adding properties:<p class="paragraph"/><div class="code"><pre>class Person &#123;	
+	<span class="java&#45;object">String</span> name
+	<span class="java&#45;object">Integer</span> age
+	Date lastVisit
+&#125;</pre></div><p class="paragraph"/>Once you have a domain class try and manipulate it via the <a href="../ref/Command Line/shell.html" class="commandLine">shell</a> or <a href="../ref/Command Line/console.html" class="commandLine">console</a> by typing:<p class="paragraph"/><div class="code"><pre>grails console</pre></div><p class="paragraph"/>This loads an interactive GUI where you can type Groovy commands. 
+<h2><a name="5.1.1 Basic CRUD">5.1.1 Basic CRUD</a></h2>Try performing some basic CRUD (Create/Read/Update/Delete) operations.<p class="paragraph"/><h4>Create</h4><p class="paragraph"/>To create a domain class use the Groovy new operator, set its properties and call <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a>:<p class="paragraph"/><div class="code"><pre>def p = <span class="java&#45;keyword">new</span> Person(name:<span class="java&#45;quote">"Fred"</span>, age:40, lastVisit:<span class="java&#45;keyword">new</span> Date())
+p.save()</pre></div><p class="paragraph"/>The <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> method will persist your class to the database using the underlying Hibernate ORM layer.<p class="paragraph"/><h4>Read</h4><p class="paragraph"/>Grails transparently adds an implicit <code>id</code> property to your domain class which you can use for retrieval:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+assert 1 == p.id</pre></div><p class="paragraph"/>This uses the <a href="../ref/Domain Classes/get.html" class="domainClasses">get</a> method that expects a database identifier to read the <code>Person</code> object back from the db. 
+You can also load an object in a read-only state by using the <a href="../ref/Domain Classes/read.html" class="domainClasses">read</a> method:<p class="paragraph"/><div class="code"><pre>def p = Person.read(1)</pre></div><p class="paragraph"/>In this case the underlying Hibernate engine will not do any dirty checking and the object will not be persisted. Note that
+if you explicitly call the <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> method then the object is placed back into a read-write state.<p class="paragraph"/><h4>Update</h4><p class="paragraph"/>To update an instance, set some properties and then simply call <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> again:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.name = <span class="java&#45;quote">"Bob"</span>
+p.save()</pre></div><p class="paragraph"/><h4>Delete</h4><p class="paragraph"/>To delete an instance use the <a href="../ref/Domain Classes/delete.html" class="domainClasses">delete</a> method:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.delete()</pre></div><p class="paragraph"/><h2><a name="5.2 Domain Modelling in GORM">5.2 Domain Modelling in GORM</a></h2>When building Grails applications you have to consider the problem domain you are trying to solve. For example if you were building an <a href="http://www.amazon.com/" target="blank">Amazon</a> bookstore you would be thinking about books, authors, customers and publishers to name a few.<p class="paragraph"/>These are modeled in GORM as Groovy classes so a <code>Book</code> class may have a title, a release date, an ISBN number and so on. The next few sections show how to model the domain in GORM.<p class="paragraph"/>To create a domain class you can run the <a href="../ref/Command Line/create-domain-class.html" class="commandLine">create-domain-class</a> target as follows:<p class="paragraph"/><div class="code"><pre>grails create&#45;domain&#45;class Book</pre></div><p class="paragraph"/>The result will be a class at <code>grails-app/domain/Book.groovy</code>:<p class="paragraph"/><div class="code"><pre>class Book &#123;	
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+If you wish to use packages you can move the Book.groovy class into a sub directory under the domain directory and add the appropriate <code>package</code> declaration as per Groovy (and Java's) packaging rules.
+</blockquote><p class="paragraph"/>The above class will map automatically to a table in the database called <code>book</code> (the same name as the class). This behaviour is customizable through the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM Domain Specific Language</a><p class="paragraph"/>Now that you have a domain class you can define its properties as Java types. For example:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+	Date releaseDate
+	<span class="java&#45;object">String</span> ISBN
+&#125;</pre></div><p class="paragraph"/>Each property is mapped to a column in the database, where the convention for column names is all lower case separated by underscores. For example <code>releaseDate</code> maps onto a column <code>release_date</code>. The SQL types are auto-detected from the Java types, but can be customized via <a href="../guide/single.html#7.1 Declaring Constraints" class="guide">Constraints</a> or the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a>.
+<h2><a name="5.2.1 Association in GORM">5.2.1 Association in GORM</a></h2>Relationships define how domain classes interact with each other. Unless specified explicitly at both ends, a relationship exists only in the direction it is defined.<p class="paragraph"/><h2><a name="5.2.1.1 One-to-one">5.2.1.1 One-to-one</a></h2>A one-to-one relationship is the simplest kind, and is defined trivially using a property of the type of another domain class. Consider this example:<p class="paragraph"/><h5>Example A</h5><p class="paragraph"/><div class="code"><pre>class Face &#123;
+    Nose nose
+&#125;
+class Nose &#123;	
+&#125;</pre></div><p class="paragraph"/>In this case we have unidirectional many-to-one relationship from <code>Face</code> to <code>Nose</code>. To make it a true one-to-one you should make <code>nose</code> unique:<p class="paragraph"/><div class="code"><pre>class Face &#123;
+    Nose nose
+	<span class="java&#45;keyword">static</span> constraints = &#123;
+		nose unique:<span class="java&#45;keyword">true</span>
+	&#125;
+&#125;
+class Nose &#123;	
+&#125;</pre></div><p class="paragraph"/>To make this relationship bidirectional define the other side as follows:<p class="paragraph"/><h5>Example B</h5><p class="paragraph"/><div class="code"><pre>class Face &#123;
+    Nose nose
+&#125;
+class Nose &#123;	
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;face:Face&#93;
+&#125;</pre></div><p class="paragraph"/>In this case we use the <code>belongsTo</code> setting to say that <code>Nose</code> "belongs to" Face. The result of this is that we can create a Face and save it and the database updates/inserts will be <em class="italic">cascaded</em> down to <code>Nose</code>:<p class="paragraph"/>
+<div class="code"><pre><span class="java&#45;keyword">new</span> Face(nose:<span class="java&#45;keyword">new</span> Nose()).save()</pre></div><p class="paragraph"/>The example above will save both face and nose. Note that the inverse <em class="italic">is not</em> true and will result in an error due to a transient <code>Face</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">new</span> Nose(face:<span class="java&#45;keyword">new</span> Face()).save() // will cause an error</pre></div><p class="paragraph"/>Another important implication of <code>belongsTo</code> is that if you delete a <code>Face</code> instance the <code>Nose</code> will be deleted too:<p class="paragraph"/><div class="code"><pre>def f = Face.get(1)
+f.delete() // both Face and Nose deleted</pre></div><p class="paragraph"/>In the previous example the foreign key associated the <code>Face</code> with the <code>Nose</code> is stored in the parent as column called <code>nose_id</code>. If you want the foreign key to be stored in the child you need a <code>hasOne</code> association:<p class="paragraph"/><h5>Example C</h5><p class="paragraph"/><div class="code"><pre>class Face &#123;
+    <span class="java&#45;keyword">static</span> hasOne = &#91;nose:Nose&#93;
+&#125;
+class Nose &#123;	
+	Face face
+&#125;</pre></div><p class="paragraph"/>In this example you get a bidirectional one-to-one where the foreign key column is stored in the <code>nose</code> table inside a column called <code>face_id</code>.<h2><a name="5.2.1.2 One-to-many">5.2.1.2 One-to-many</a></h2>A one-to-many relationship is when one class, example <code>Author</code>, has many instances of a another class, example <code>Book</code>. With Grails you define such a relationship with the <code>hasMany</code> setting:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+    <span class="java&#45;keyword">static</span> hasMany = &#91; books : Book &#93;<p class="paragraph"/>    <span class="java&#45;object">String</span> name
+&#125;
+class Book &#123;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>In this case we have a unidirectional one-to-many. Grails will, by default, map this kind of relationship with a join table.<p class="paragraph"/><blockquote class="note">
+The <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a> allows mapping unidirectional relationships using a foreign key association instead
+</blockquote><p class="paragraph"/>Grails will automatically inject a property of type <code>java.util.Set</code> into the domain class based on the <code>hasMany</code> setting. This can be used to iterate over the collection:<p class="paragraph"/><div class="code"><pre>def a = Author.get(1)<p class="paragraph"/>a.books.each &#123;
+	println it.title
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+The default fetch strategy used by Grails is "lazy", which means that the collection will be lazily initialized. This can lead to the <a href="http://www.javalobby.org/java/forums/t20533.html" target="blank">n+1 problem</a> if you are not careful.<p class="paragraph"/>If you need "eager" fetching you can use the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a> or specify eager fetching as part of a <a href="../guide/single.html#5.4 Querying with GORM" class="guide">query</a>
+</blockquote><p class="paragraph"/>The default cascading behaviour is to cascade saves and updates, but not deletes unless a <code>belongsTo</code> is also specified:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+    <span class="java&#45;keyword">static</span> hasMany = &#91; books : Book &#93;<p class="paragraph"/>    <span class="java&#45;object">String</span> name
+&#125;
+class Book &#123;
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;author:Author&#93;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>If you have two properties of the same type on the many side of a one-to-many you have to use <code>mappedBy</code> to specify which the collection is mapped:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+	<span class="java&#45;keyword">static</span> mappedBy = &#91;flights:<span class="java&#45;quote">"departureAirport"</span>&#93;
+&#125;
+class Flight &#123;
+	Airport departureAirport
+	Airport destinationAirport
+&#125;</pre></div><p class="paragraph"/>This is also true if you have multiple collections that map to different properties on the many side:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;keyword">static</span> hasMany = &#91;outboundFlights:Flight, inboundFlights:Flight&#93;
+	<span class="java&#45;keyword">static</span> mappedBy = &#91;outboundFlights:<span class="java&#45;quote">"departureAirport"</span>, inboundFlights:<span class="java&#45;quote">"destinationAirport"</span>&#93;
+&#125;
+class Flight &#123;
+	Airport departureAirport
+	Airport destinationAirport
+&#125;</pre></div><p class="paragraph"/><h2><a name="5.2.1.3 Many-to-many">5.2.1.3 Many-to-many</a></h2>Grails supports many-to-many relationships by defining a <code>hasMany</code> on both sides of the relationship and having a <code>belongsTo</code> on the side that owns the relationship:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+   <span class="java&#45;keyword">static</span> belongsTo = Author
+   <span class="java&#45;keyword">static</span> hasMany = &#91;authors:Author&#93;
+   <span class="java&#45;object">String</span> title
+&#125;
+class Author &#123;
+   <span class="java&#45;keyword">static</span> hasMany = &#91;books:Book&#93;
+   <span class="java&#45;object">String</span> name
+&#125;</pre></div><p class="paragraph"/>Grails maps a many-to-many using a join table at the database level. The owning side of the relationship, in this case <code>Author</code>, takes responsibility for persisting the relationship and is the only side that can cascade saves across.<p class="paragraph"/>For example this will work and cascade saves:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">new</span> Author(name:<span class="java&#45;quote">"Stephen King"</span>)
+		.addToBooks(<span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"The Stand"</span>))
+		.addToBooks(<span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"The Shining"</span>))		
+		.save()</pre></div><p class="paragraph"/>However the below will only save the <code>Book</code> and not the authors!<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">new</span> Book(name:<span class="java&#45;quote">"Groovy in Action"</span>)
+		.addToAuthors(<span class="java&#45;keyword">new</span> Author(name:<span class="java&#45;quote">"Dierk Koenig"</span>))
+		.addToAuthors(<span class="java&#45;keyword">new</span> Author(name:<span class="java&#45;quote">"Guillaume Laforge"</span>))		
+		.save()</pre></div><p class="paragraph"/>This is the expected behaviour as, just like Hibernate, only one side of a many-to-many can take responsibility for managing the relationship.<p class="paragraph"/><blockquote class="warning">
+Grails' <a href="../guide/single.html#16. Scaffolding" class="guide">Scaffolding</a> feature <strong class="bold">does not</strong> currently support many-to-many relationship and hence you must write the code to manage the relationship yourself
+</blockquote><h2><a name="5.2.1.4 Basic Collection Types">5.2.1.4 Basic Collection Types</a></h2>As well as associations between different domain classes, GORM also supports mapping of basic collection types. 
+For example, the following class creates a <code>nicknames</code> association that is a <code>Set</code> of <code>String</code> instances:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+    <span class="java&#45;keyword">static</span> hasMany = &#91;nicknames:<span class="java&#45;object">String</span>&#93;
+&#125;</pre></div><p class="paragraph"/>GORM will map an association like the above using a join table. You can alter various aspects of how the join table is mapped using the <code>joinTable</code> argument:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+    <span class="java&#45;keyword">static</span> hasMany = &#91;nicknames:<span class="java&#45;object">String</span>&#93;<p class="paragraph"/>    <span class="java&#45;keyword">static</span> mapping = &#123;
+       hasMany joinTable:&#91;name:'bunch_o_nicknames', key:'person_id', column:'nickname', type:<span class="java&#45;quote">"text"</span>&#93;       
+    &#125; 
+&#125;</pre></div><p class="paragraph"/>The example above will map to a table that looks like the following:<p class="paragraph"/><strong class="bold">bunch_o_nicknames Table</strong>
+<div class="code"><pre>&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+| person_id         |     nickname          |
+&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+|   1               |      Fred             |
+&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</pre></div><h2><a name="5.2.2 Composition in GORM">5.2.2 Composition in GORM</a></h2>As well as <a href="../guide/single.html#5.2.1 Association in GORM" class="guide">association</a>, Grails supports the notion of composition. In this case instead of mapping classes onto separate tables a class can be "embedded" within the current table. For example:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+	Address homeAddress
+	Address workAddress
+	<span class="java&#45;keyword">static</span> embedded = &#91;'homeAddress', 'workAddress'&#93;
+&#125;
+class Address &#123;
+	<span class="java&#45;object">String</span> number
+	<span class="java&#45;object">String</span> code
+&#125;</pre></div><p class="paragraph"/>The resulting mapping would looking like this:<p class="paragraph"/><img border="0" class="center" src="../img/5.2.2-composition.jpg"></img><p class="paragraph"/><blockquote class="note">
+If you define the <code>Address</code> class in a separate Groovy file in the <code>grails-app/domain</code> directory you will also get an <code>address</code> table. If you don't want this to happen use Groovy's ability to define multiple classes per file and include the <code>Address</code> class below the <code>Person</code> class in the <code>grails-app/domain/Person.groovy</code> file
+</blockquote><h2><a name="5.2.3 Inheritance in GORM">5.2.3 Inheritance in GORM</a></h2>GORM supports inheritance both from abstract base classes and concrete persistent GORM entities. For example:<p class="paragraph"/><div class="code"><pre>class Content &#123;
+     <span class="java&#45;object">String</span> author
+&#125;
+class BlogEntry <span class="java&#45;keyword">extends</span> Content &#123;
+    URL url
+&#125;
+class Book <span class="java&#45;keyword">extends</span> Content &#123;
+    <span class="java&#45;object">String</span> ISBN
+&#125;
+class PodCast <span class="java&#45;keyword">extends</span> Content &#123;
+    <span class="java&#45;object">byte</span>&#91;&#93; audioStream
+&#125;</pre></div><p class="paragraph"/>In the above example we have a parent <code>Content</code> class and then various child classes with more specific behaviour.<p class="paragraph"/><h4>Considerations</h4><p class="paragraph"/>At the database level Grails by default uses table-per-hierarchy mapping with a discriminator column called <code>class</code> so the parent class (<code>Content</code>) and its sub classes (<code>BlogEntry</code>, <code>Book</code> etc.), share the <strong class="bold">same</strong> table.<p class="paragraph"/>Table-per-hierarchy mapping has a down side in that you <strong class="bold">cannot</strong> have non-nullable properties with inheritance mapping. An alternative is to use table-per-subclass which can be enabled via the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a><p class="paragraph"/>However, excessive use of inheritance and table-per-subclass can result in poor query performance due to the excessive use of join queries. In general our advice is if you're going to use inheritance, don't abuse it and don't make your inheritance hierarchy too deep.<p class="paragraph"/><h4>Polymorphic Queries</h4><p class="paragraph"/>The upshot of inheritance is that you get the ability to polymorphically query. For example using the <a href="../ref/Domain Classes/list.html" class="domainClasses">list</a> method on the <code>Content</code> super class will return all sub classes of <code>Content</code>:<p class="paragraph"/><div class="code"><pre>def content = Content.list() // list all blog entries, books and pod casts
+content = Content.findAllByAuthor('Joe Bloggs') // find all by author<p class="paragraph"/>def podCasts = PodCast.list() // list only pod casts</pre></div><h2><a name="5.2.4 Sets, Lists and Maps">5.2.4 Sets, Lists and Maps</a></h2><h4>Sets of objects</h4><p class="paragraph"/>By default when you define a relationship with GORM it is a <code>java.util.Set</code> which is an unordered collection that cannot contain duplicates. In other words when you have:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+   <span class="java&#45;keyword">static</span> hasMany = &#91;books:Book&#93;
+&#125;</pre></div><p class="paragraph"/>The books property that GORM injects is a <code>java.util.Set</code>. The problem with this is there is no ordering when accessing the collection, which may not be what you want. To get custom ordering you can say that the set is a <code>SortedSet</code>:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+   SortedSet books
+   <span class="java&#45;keyword">static</span> hasMany = &#91;books:Book&#93;
+&#125;</pre></div><p class="paragraph"/>In this case a <code>java.util.SortedSet</code> implementation is used which means you have to implement <code>java.lang.Comparable</code> in your Book class:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Comparable &#123;
+   <span class="java&#45;object">String</span> title
+   Date releaseDate = <span class="java&#45;keyword">new</span> Date()<p class="paragraph"/>   <span class="java&#45;object">int</span> compareTo(obj) &#123;
+       releaseDate.compareTo(obj.releaseDate)
+   &#125;
+&#125;</pre></div><p class="paragraph"/>The result of the above class is that the Book instances in the books collections of the Author class will be ordered by their release date.<p class="paragraph"/><h4>Lists of objects</h4><p class="paragraph"/>If you simply want to be able to keep objects in the order which they were added and to be able to reference them by index like an array you can define your collection type as a <code>List</code>:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+   List books
+   <span class="java&#45;keyword">static</span> hasMany = &#91;books:Book&#93;
+&#125;</pre></div><p class="paragraph"/>In this case when you add new elements to the books collection the order is retained in a sequential list indexed from 0 so you can do:<p class="paragraph"/><div class="code"><pre>author.books&#91;0&#93; // get the first book</pre></div><p class="paragraph"/>The way this works at the database level is Hibernate creates a <code>books_idx</code> column where it saves the index of the elements in the collection in order to retain this order at the db level.<p class="paragraph"/>When using a <code>List</code>, elements must be added to the collection before being saved, otherwise Hibernate will throw an exception (<code>org.hibernate.HibernateException</code>: null index column for collection):<p class="paragraph"/><div class="code"><pre>// This won't work!
+def book = <span class="java&#45;keyword">new</span> Book(title: 'The Shining')
+book.save()
+author.addToBooks(book)<p class="paragraph"/>// Do it <span class="java&#45;keyword">this</span> way instead.
+def book = <span class="java&#45;keyword">new</span> Book(title: 'Misery')
+author.addToBooks(book)
+author.save()</pre></div><p class="paragraph"/><h4>Maps of Objects</h4><p class="paragraph"/>If you want a simple map of string/value pairs GORM can map this with the following:<p class="paragraph"/><div class="code"><pre>class Author &#123;
+   Map books // map of ISBN:book names
+&#125;<p class="paragraph"/>def a = <span class="java&#45;keyword">new</span> Author()
+a.books = &#91;<span class="java&#45;quote">"1590597583"</span>:<span class="java&#45;quote">"Grails Book"</span>&#93;
+a.save()</pre></div>
+In this case the key and value of the map MUST be strings.<p class="paragraph"/>If you want a Map of objects then you can do this:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+  Map authors
+  <span class="java&#45;keyword">static</span> hasMany = &#91;authors:Author&#93;
+&#125;<p class="paragraph"/>def a = <span class="java&#45;keyword">new</span> Author(name:<span class="java&#45;quote">"Stephen King"</span>)<p class="paragraph"/>def book = <span class="java&#45;keyword">new</span> Book()
+book.authors = &#91;stephen:a&#93;
+book.save()</pre></div><p class="paragraph"/>The static <code>hasMany</code> property defines the type of the elements within the Map. The keys for the map <strong class="bold">must</strong> be strings.<p class="paragraph"/><h4>A Note on Collection Types and Performance</h4><p class="paragraph"/>The Java <code>Set</code> type is a collection that doesn't allow duplicates. In order to ensure uniqueness when adding an entry to a <code>Set</code> association Hibernate has to load the entire associations from the database. If you have a large numbers of entries in the association this can be costly in terms of performance.<p class="paragraph"/>The same behavior is required for <code>List</code> types, since Hibernate needs to load the entire association in-order to maintain order. Therefore it is recommended that if you anticipate a large numbers of records in the association that you make the association bidirectional so that the link can be created on the inverse side. For example consider the following code:<p class="paragraph"/><div class="code"><pre>def book = <span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"New Grails Book"</span>)
+def author = Author.get(1)
+book.author = author
+book.save()</pre></div><p class="paragraph"/>In this example the association link is being created by the child (Book) and hence it is not necessary to manipulate the collection directly resulting in fewer queries and more efficient code. Given an <code>Author</code> with a large number of associated <code>Book</code> instances if you were to write code like the following you would see an impact on performance:<p class="paragraph"/><div class="code"><pre>def book = <span class="java&#45;keyword">new</span> Book(title:<span class="java&#45;quote">"New Grails Book"</span>)
+def author = Author.get(1)
+author.addToBooks(book)
+author.save()</pre></div><h2><a name="5.3 Persistence Basics">5.3 Persistence Basics</a></h2>A key thing to remember about Grails is that under the surface Grails is using <a href="http://www.hibernate.org/" target="blank">Hibernate</a> for persistence. If you are coming from a background of using <a href="http://wiki.rubyonrails.org/rails/pages/ActiveRecord" target="blank">ActiveRecord</a> or <a href="http://ibatis.apache.org/," target="blank">iBatis</a> Hibernate's "session" model may feel a little strange.<p class="paragraph"/>Essentially, Grails automatically binds a Hibernate session to the currently executing request. This allows you to use the <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> and <a href="../ref/Domain Classes/delete.html" class="domainClasses">delete</a> methods as well as other GORM methods transparently.<p class="paragraph"/><p class="paragraph"/><h2><a name="5.3.1 Saving and Updating">5.3.1 Saving and Updating</a></h2>An example of using the <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> method can be seen below:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.save()</pre></div><p class="paragraph"/>A major difference with Hibernate is when you call <a href="../ref/Domain Classes/save.html" class="domainClasses">save</a> it does not necessarily perform any SQL operations <strong class="bold">at that point</strong>. Hibernate typically batches up SQL statements and executes them at the end. This is typically done for you automatically by Grails, which manages your Hibernate session.<p class="paragraph"/>There are occasions, however, when you may want to control when those statements are executed or, in Hibernate terminology, when the session is "flushed". To do so you can use the flush argument to the save method:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.save(flush:<span class="java&#45;keyword">true</span>)</pre></div><p class="paragraph"/>Note that in this case all pending SQL statements including previous saves will be synchronized with the db. This also allows you to catch any exceptions thrown, which is typically useful in highly concurrent scenarios involving <a href="../guide/single.html#5.3.5 Pessimistic and Optimistic Locking" class="guide">optimistic locking</a>:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+<span class="java&#45;keyword">try</span> &#123;
+	p.save(flush:<span class="java&#45;keyword">true</span>)
+&#125;
+<span class="java&#45;keyword">catch</span>(Exception e) &#123;
+	// deal with exception
+&#125;</pre></div><h2><a name="5.3.2 Deleting Objects">5.3.2 Deleting Objects</a></h2>An example of the <a href="../ref/Domain Classes/delete.html" class="domainClasses">delete</a> method can be seen below:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.delete()</pre></div><p class="paragraph"/>By default Grails will use transactional write behind to perform the delete, if you want to perform the delete in place then you can use the <code>flush</code> argument:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)
+p.delete(flush:<span class="java&#45;keyword">true</span>)</pre></div><p class="paragraph"/>Using the <code>flush</code> argument will also allow you to catch any errors that may potentially occur during a delete. A common error that may occur is if you violate a database constraint, although this is normally down to a programming or schema error. The following example shows how to catch a <code>DataIntegrityViolationException</code> that is thrown when you violate the database constraints:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)<p class="paragraph"/><span class="java&#45;keyword">try</span> &#123;
+	p.delete(flush:<span class="java&#45;keyword">true</span>)
+&#125;
+<span class="java&#45;keyword">catch</span>(org.springframework.dao.DataIntegrityViolationException e) &#123;
+	flash.message = <span class="java&#45;quote">"Could not delete person $&#123;p.name&#125;"</span>
+	redirect(action:<span class="java&#45;quote">"show"</span>, id:p.id)
+&#125;</pre></div><p class="paragraph"/>Note that Grails does not supply a <code>deleteAll</code> method as deleting data is discouraged and can often be avoided through boolean flags/logic.<p class="paragraph"/>If you really need to batch delete data you can use the <a href="../ref/Domain Classes/executeUpdate.html" class="domainClasses">executeUpdate</a> method to do batch DML statements:<p class="paragraph"/><div class="code"><pre>Customer.executeUpdate(<span class="java&#45;quote">"delete Customer c where c.name = :oldName"</span>, &#91;oldName:<span class="java&#45;quote">"Fred"</span>&#93;)</pre></div><p class="paragraph"/><h2><a name="5.3.3 Understanding Cascading Updates and Deletes">5.3.3 Understanding Cascading Updates and Deletes</a></h2>It is critical that you understand how cascading updates and deletes work when using GORM. The key part to remember is the <code>belongsTo</code> setting which controls which class "owns" a relationship.<p class="paragraph"/>Whether it is a one-to-one, one-to-many or many-to-many if you define <code>belongsTo</code> updates and deletes will cascade from the owning class to its possessions (the other side of the relationship).<p class="paragraph"/>If you <em class="italic">do not</em> define <code>belongsTo</code> then no cascades will happen and you will have to manually save each object.<p class="paragraph"/>Here is an example:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;object">String</span> name
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+&#125;
+class Flight &#123;
+	<span class="java&#45;object">String</span> number
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;airport:Airport&#93;
+&#125;</pre></div><p class="paragraph"/>If I now create an <code>Airport</code> and add some <code>Flight</code>s to it I can save the <code>Airport</code> and have the updates cascaded down to each flight, hence saving the whole object graph:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">new</span> Airport(name:<span class="java&#45;quote">"Gatwick"</span>)
+	 .addToFlights(<span class="java&#45;keyword">new</span> Flight(number:<span class="java&#45;quote">"BA3430"</span>))
+	 .addToFlights(<span class="java&#45;keyword">new</span> Flight(number:<span class="java&#45;quote">"EZ0938"</span>))
+	 .save()</pre></div><p class="paragraph"/>Conversely if I later delete the <code>Airport</code> all <code>Flight</code>s associated with it will also be deleted:<p class="paragraph"/><div class="code"><pre>def airport = Airport.findByName(<span class="java&#45;quote">"Gatwick"</span>)
+airport.delete()</pre></div><p class="paragraph"/>However, if I were to remove <code>belongsTo</code> then the above cascading deletion code <strong class="bold">would not work</strong>. To understand this better take a look at the summaries below that describe the default behaviour of GORM with regards to specific associations.<p class="paragraph"/><h5>Bidirectional one-to-many with belongsTo</h5><p class="paragraph"/><div class="code"><pre>class A &#123; <span class="java&#45;keyword">static</span> hasMany = &#91;bees:B&#93; &#125;
+class B &#123; <span class="java&#45;keyword">static</span> belongsTo = &#91;a:A&#93; &#125;</pre></div><p class="paragraph"/>In the case of a bidirectional one-to-many where the many side defines a <code>belongsTo</code> then the cascade strategy is set to "ALL" for the one side and "NONE" for the many side.<p class="paragraph"/><h5>Unidirectional one-to-many</h5><p class="paragraph"/><div class="code"><pre>class A &#123; <span class="java&#45;keyword">static</span> hasMany = &#91;bees:B&#93; &#125;
+class B &#123;  &#125;</pre></div><p class="paragraph"/>In the case of a unidirectional one-to-many where the many side defines no belongsTo then the cascade strategy is set to "SAVE-UPDATE".<p class="paragraph"/><h5>Bidirectional one-to-many no belongsTo</h5><p class="paragraph"/><div class="code"><pre>class A &#123; <span class="java&#45;keyword">static</span> hasMany = &#91;bees:B&#93; &#125;
+class B &#123; A a &#125;</pre></div><p class="paragraph"/>In the case of a bidirectional one-to-many where the many side does not define a <code>belongsTo</code> then the cascade strategy is set to "SAVE-UPDATE" for the one side and "NONE" for the many side.<p class="paragraph"/><h5>Unidirectional One-to-one with belongsTo</h5><p class="paragraph"/><div class="code"><pre>class A &#123;  &#125;
+class B &#123; <span class="java&#45;keyword">static</span> belongsTo = &#91;a:A&#93; &#125;</pre></div><p class="paragraph"/>In the case of a unidirectional one-to-one association that defines a <code>belongsTo</code> then the cascade strategy is set to "ALL" for the owning side of the relationship (A-&#62;B) and "NONE" from the side that defines the <code>belongsTo</code> (B-&#62;A)<p class="paragraph"/>Note that if you need further control over cascading behaviour, you can use the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a>.<h2><a name="5.3.4 Eager and Lazy Fetching">5.3.4 Eager and Lazy Fetching</a></h2>Associations in GORM are by default lazy. This is best explained by example:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;object">String</span> name
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+&#125;
+class Flight &#123;
+	<span class="java&#45;object">String</span> number
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;airport:Airport&#93;
+&#125;</pre></div><p class="paragraph"/>Given the above domain classes and the following code:<p class="paragraph"/><div class="code"><pre>def airport = Airport.findByName(<span class="java&#45;quote">"Gatwick"</span>)
+airport.flights.each &#123;
+	println it.name
+&#125;</pre></div><p class="paragraph"/>GORM will execute a single SQL query to fetch the <code>Airport</code> instance and then 1 extra query <em class="italic">for each</em> iteration over the <code>flights</code> association. In other words you get N+1 queries.<p class="paragraph"/>This can sometimes be optimal depending on the frequency of use of the association as you may have logic that dictates the associations is only accessed on certain occasions.<p class="paragraph"/><h3>Configuring Eager Fetching</h3><p class="paragraph"/>An alternative is to use eager fetching which can specified as follows:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;object">String</span> name
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		flight fetch:<span class="java&#45;quote">"join"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In  this case the association will be <code>Airport</code> instance and the <code>flights</code> association will be loaded all at once (depending on the mapping). This has the benefit of requiring fewer queries, however should be used carefully as you could load your entire database into memory with too many eager associations.<p class="paragraph"/><blockquote class="note">
+Associations can also be declared non-lazy using the <a href="../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM DSL</a>
+</blockquote><p class="paragraph"/><h3>Using Batch Fetching</h3><p class="paragraph"/>Although eager fetching is appropriate for some cases, it is not always desirable. If you made everything eager you could quite possibly load your entire database into memory resulting in performance and memory problems. An alternative to eager fetching is to use batch fetching. Essentially, you can configure Hibernate to lazily fetch results in "batches". For example:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	<span class="java&#45;object">String</span> name
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		flight batchSize:10
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this case, due to the <code>batchSize</code> argument, when you iterate over the <code>flights</code> association, Hibernate will fetch results in batches of 10. For example if you had an <code>Airport</code> that had 30 flights, if you didn't configure batch fetching you would get 1 query to fetch the <code>Airport</code> and then <code>30</code> queries to fetch each flight. With batch fetching you get 1 query to fetch the <code>Airport</code> and 3 queries to fetch each <code>Flight</code> in batches of 10. In other words, batch fetching is an optimization of the lazy fetching strategy. Batch fetching can also be configured at the class level as follows:<p class="paragraph"/><div class="code"><pre>class Flight &#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		batchSize 10
+	&#125;
+&#125;</pre></div>
+<h2><a name="5.3.5 Pessimistic and Optimistic Locking">5.3.5 Pessimistic and Optimistic Locking</a></h2><h4>Optimistic Locking</h4><p class="paragraph"/>By default GORM classes are configured for optimistic locking. Optimistic locking essentially is a feature of Hibernate which involves storing a version number in a special <code>version</code> column in the database.<p class="paragraph"/>The <code>version</code> column gets read into a <code>version</code> property that contains the current versioned state of persistent instance which you can access:<p class="paragraph"/><div class="code"><pre>def airport = Airport.get(10)<p class="paragraph"/>println airport.version</pre></div><p class="paragraph"/>When you perform updates Hibernate will automatically check the version property against the  version column in the database and if they differ will throw a <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/StaleObjectStateException.html" class="api">StaleObjectException</a> and the transaction will be rolled back.<p class="paragraph"/>This is useful as it allows a certain level of atomicity without resorting to pessimistic locking that has an inherit performance penalty. The downside is that you have to deal with this exception if you have highly concurrent writes. This requires flushing the session:<p class="paragraph"/><div class="code"><pre>def airport = Airport.get(10)<p class="paragraph"/><span class="java&#45;keyword">try</span> &#123;
+	airport.name = <span class="java&#45;quote">"Heathrow"</span>
+	airport.save(flush:<span class="java&#45;keyword">true</span>)
+&#125;
+<span class="java&#45;keyword">catch</span>(org.springframework.dao.OptimisticLockingFailureException e) &#123;
+	// deal with exception
+&#125;</pre></div><p class="paragraph"/>The way you deal with the exception depends on the application. You could attempt a programmatic merge of the data or go back to the user and ask them to resolve the conflict.<p class="paragraph"/>Alternatively, if it becomes a problem you can resort to pessimistic locking.<p class="paragraph"/><h4>Pessimistic Locking</h4><p class="paragraph"/>Pessimistic locking is equivalent to doing a SQL "SELECT * FOR UPDATE" statement and locking a row in the database. This has the implication that other read operations will be blocking until the lock is released.<p class="paragraph"/>In Grails pessimistic locking is performed on an existing instance via the <a href="../ref/Domain Classes/lock.html" class="domainClasses">lock</a> method:<p class="paragraph"/><div class="code"><pre>def airport = Airport.get(10)
+airport.lock() // lock <span class="java&#45;keyword">for</span> update
+airport.name = <span class="java&#45;quote">"Heathrow"</span>
+airport.save()</pre></div><p class="paragraph"/>Grails will automatically deal with releasing the lock for you once the transaction has been committed. However, in the above case what we are doing is "upgrading" from a regular SELECT to a SELECT..FOR UPDATE and another thread could still have updated the record in between the call to get() and the call to lock().<p class="paragraph"/>To get around this problem you can use the static <a href="../ref/Domain Classes/lock.html" class="domainClasses">lock</a> method that takes an id just like <a href="../ref/Domain Classes/get.html" class="domainClasses">get</a>:<p class="paragraph"/><div class="code"><pre>def airport = Airport.lock(10) // lock <span class="java&#45;keyword">for</span> update
+airport.name = <span class="java&#45;quote">"Heathrow"</span>
+airport.save()</pre></div><p class="paragraph"/>In this case only SELECT..FOR UPDATE is issued.<p class="paragraph"/><blockquote class="warning">
+Though Grails, through Hibernate, supports pessimistic locking, the embedded HSQLDB shipped with Grails which is used as the default in-memory database <strong class="bold">does not</strong>. If you need to test pessimistic locking you will need to do so against a database that does have support such as MySQL.
+</blockquote><p class="paragraph"/>As well as the <a href="../ref/Domain Classes/lock.html" class="domainClasses">lock</a> method you can also obtain a pessimistic locking using queries. For example using a dynamic finder:<p class="paragraph"/><div class="code"><pre>def airport = Airport.findByName(<span class="java&#45;quote">"Heathrow"</span>, &#91;lock:<span class="java&#45;keyword">true</span>&#93;)</pre></div><p class="paragraph"/>Or using criteria:<p class="paragraph"/><div class="code"><pre>def airport = Airport.createCriteria().get &#123;
+	eq('name', 'Heathrow')
+	lock <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/><h2><a name="5.4 Querying with GORM">5.4 Querying with GORM</a></h2>GORM supports a number of powerful ways to query from dynamic finders, to criteria to Hibernate's object oriented query language HQL.<p class="paragraph"/>Groovy's ability to manipulate collections via <a href="http://groovy.codehaus.org/GPath" target="blank">GPath</a> and methods like sort, findAll and so on combined with GORM results in a powerful combination.<p class="paragraph"/>However, let's start with the basics.<p class="paragraph"/><h4>Listing instances</h4><p class="paragraph"/>If you simply need to obtain all the instances of a given class you can use the <a href="../ref/Domain Classes/list.html" class="domainClasses">list</a> method:<p class="paragraph"/><div class="code"><pre>def books = Book.list()</pre></div><p class="paragraph"/>The <a href="../ref/Domain Classes/list.html" class="domainClasses">list</a> method supports arguments to perform pagination:<p class="paragraph"/><div class="code"><pre>def books = Book.list(offset:10, max:20)</pre></div><p class="paragraph"/>as well as sorting:<p class="paragraph"/><div class="code"><pre>def books = Book.list(sort:<span class="java&#45;quote">"title"</span>, order:<span class="java&#45;quote">"asc"</span>)</pre></div><p class="paragraph"/>Here, the <code>sort</code> argument is the name of the domain class property that you wish to sort on, and the <code>order</code> argument is either <code>asc</code> for <strong class="bold">asc</strong>ending or <code>desc</code> for <strong class="bold">desc</strong>ending.<p class="paragraph"/><h4>Retrieval by Database  Identifier</h4><p class="paragraph"/>The second basic form of retrieval is by database identifier using the <a href="../ref/Domain Classes/get.html" class="domainClasses">get</a> method:<p class="paragraph"/><div class="code"><pre>def book = Book.get(23)</pre></div><p class="paragraph"/>You can also obtain a list of instances for a set of identifiers using <a href="../ref/Domain Classes/getAll.html" class="domainClasses">getAll</a>:<p class="paragraph"/><div class="code"><pre>def books = Book.getAll(23, 93, 81)</pre></div>
+<h2><a name="5.4.1 Dynamic Finders">5.4.1 Dynamic Finders</a></h2>GORM supports the concept of <strong class="bold">dynamic finders</strong>. A dynamic finder looks like a static method invocation, but the methods themselves don't actually exist in any form at the code level.<p class="paragraph"/>Instead, a method is auto-magically generated using code synthesis at runtime, based on the properties of a given class. Take for example the <code>Book</code> class:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+	Date releaseDate
+	Author author
+&#125;                
+class Author &#123;
+	<span class="java&#45;object">String</span> name
+&#125;</pre></div><p class="paragraph"/>The <code>Book</code> class has properties such as <code>title</code>, <code>releaseDate</code> and <code>author</code>. These can be used by the <a href="../ref/Domain Classes/findBy.html" class="domainClasses">findBy</a> and <a href="../ref/Domain Classes/findAllBy.html" class="domainClasses">findAllBy</a> methods in the form of "method expressions":<p class="paragraph"/><div class="code"><pre>def book = Book.findByTitle(<span class="java&#45;quote">"The Stand"</span>)<p class="paragraph"/>book = Book.findByTitleLike(<span class="java&#45;quote">"Harry Pot%"</span>)<p class="paragraph"/>book = Book.findByReleaseDateBetween( firstDate, secondDate )<p class="paragraph"/>book = Book.findByReleaseDateGreaterThan( someDate )<p class="paragraph"/>book = Book.findByTitleLikeOrReleaseDateLessThan( <span class="java&#45;quote">"%Something%"</span>, someDate )</pre></div><p class="paragraph"/><h4>Method Expressions</h4><p class="paragraph"/>A method expression in GORM is made up of the prefix such as <a href="../ref/Domain Classes/findBy.html" class="domainClasses">findBy</a> followed by an expression that combines one or more properties. The basic form is:<p class="paragraph"/><div class="code"><pre>Book.findBy(&#91;Property&#93;&#91;Comparator&#93;&#91;<span class="java&#45;object">Boolean</span> Operator&#93;)?&#91;Property&#93;&#91;Comparator&#93;</pre></div><p class="paragraph"/>The tokens marked with a '?' are optional. Each comparator changes the nature of the query. For example:<p class="paragraph"/><div class="code"><pre>def book = Book.findByTitle(<span class="java&#45;quote">"The Stand"</span>)<p class="paragraph"/>book =  Book.findByTitleLike(<span class="java&#45;quote">"Harry Pot%"</span>)</pre></div><p class="paragraph"/>In the above example the first query is equivalent to equality whilst the latter, due to the <code>Like</code> comparator, is equivalent to a SQL <code>like</code> expression.<p class="paragraph"/>The possible comparators include:
+<ul class="star">
+<li><code>InList</code> - In the list of given values</li>
+<li><code>LessThan</code> - less than the given value</li>
+<li><code>LessThanEquals</code> - less than or equal a give value</li>
+<li><code>GreaterThan</code> - greater than a given value</li>
+<li><code>GreaterThanEquals</code> - greater than or equal a given value</li>
+<li><code>Like</code> - Equivalent to a SQL like expression</li>
+<li><code>Ilike</code> - Similar to a <code>Like</code>, except case insensitive</li>
+<li><code>NotEqual</code> - Negates equality</li>
+<li><code>Between</code> - Between two values (requires two arguments)</li>
+<li><code>IsNotNull</code> - Not a null value (doesn't require an argument)</li>
+<li><code>IsNull</code> - Is a null value (doesn't require an argument)</li>
+</ul><p class="paragraph"/>Notice that the last 3 require different numbers of method arguments compared to the rest, as demonstrated in the following example:<p class="paragraph"/><div class="code"><pre>def now = <span class="java&#45;keyword">new</span> Date()
+def lastWeek = now &#45; 7
+def book = Book.findByReleaseDateBetween( lastWeek, now )<p class="paragraph"/>books = Book.findAllByReleaseDateIsNull()
+books = Book.findAllByReleaseDateIsNotNull()</pre></div><p class="paragraph"/><h4>Boolean logic (AND/OR) </h4><p class="paragraph"/>Method expressions can also use a boolean operator to combine two criteria:<p class="paragraph"/><div class="code"><pre>def books = 
+    Book.findAllByTitleLikeAndReleaseDateGreaterThan(<span class="java&#45;quote">"%Java%"</span>, <span class="java&#45;keyword">new</span> Date()&#45;30)</pre></div><p class="paragraph"/>In this case we're using <code>And</code> in the middle of the query to make sure both conditions are satisfied, but you could equally use <code>Or</code>:<p class="paragraph"/><div class="code"><pre>def books = 
+    Book.findAllByTitleLikeOrReleaseDateGreaterThan(<span class="java&#45;quote">"%Java%"</span>, <span class="java&#45;keyword">new</span> Date()&#45;30)</pre></div><p class="paragraph"/>At the moment, you can only use dynamic finders with a maximum of two criteria, i.e. the method name can only have one boolean operator. If you need to use more, you should consider using either <a href="../guide/single.html#5.4.2 Criteria" class="guide">Criteria</a> or the <a href="../guide/single.html#5.4.3 Hibernate Query Language (HQL)" class="guide">HQL</a>.<p class="paragraph"/><h4>Querying Associations</h4><p class="paragraph"/>Associations can also be used within queries:<p class="paragraph"/><div class="code"><pre>def author = Author.findByName(<span class="java&#45;quote">"Stephen King"</span>)<p class="paragraph"/>def books = author ? Book.findAllByAuthor(author) : &#91;&#93;</pre></div><p class="paragraph"/>In this case if the <code>Author</code> instance is not null we use it in a query to obtain all the <code>Book</code> instances for the given <code>Author</code>.<p class="paragraph"/><h4>Pagination &#38; Sorting</h4><p class="paragraph"/>The same pagination and sorting parameters available on the <a href="../ref/Domain Classes/list.html" class="domainClasses">list</a> method can also be used with dynamic finders by supplying a map as the final parameter:<p class="paragraph"/><div class="code"><pre>def books = 
+  Book.findAllByTitleLike(<span class="java&#45;quote">"Harry Pot%"</span>, &#91;max:3, 
+                                         offset:2, 
+                                         sort:<span class="java&#45;quote">"title"</span>,
+                                         order:<span class="java&#45;quote">"desc"</span>&#93;)</pre></div>
+<h2><a name="5.4.2 Criteria">5.4.2 Criteria</a></h2>Criteria is a type safe, advanced way to query that uses a Groovy builder to construct potentially complex queries. It is a much better alternative to using StringBuffer.<p class="paragraph"/>Criteria can be used either via the <a href="../ref/Domain Classes/createCriteria.html" class="domainClasses">createCriteria</a> or <a href="../ref/Domain Classes/withCriteria.html" class="domainClasses">withCriteria</a> methods. The builder uses Hibernate's Criteria API, the nodes on this builder map the static methods found in the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/criterion/Restrictions.html" class="api">Restrictions</a> class of the Hibernate Criteria API. Example Usage:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()
+def results = c &#123;
+	like(<span class="java&#45;quote">"holderFirstName"</span>, <span class="java&#45;quote">"Fred%"</span>)
+	and &#123;
+		between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+		eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+	&#125;
+	maxResults(10)
+	order(<span class="java&#45;quote">"holderLastName"</span>, <span class="java&#45;quote">"desc"</span>)
+&#125;</pre></div><p class="paragraph"/><h4>Conjunctions and Disjunctions</h4><p class="paragraph"/>As demonstrated in the previous example you can group criteria in a logical AND using a <code>and { }</code> block:<p class="paragraph"/><div class="code"><pre>and &#123;
+	between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+	eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+&#125;</pre></div><p class="paragraph"/>This also works with logical OR:<p class="paragraph"/><div class="code"><pre>or &#123;
+	between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+	eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+&#125;</pre></div><p class="paragraph"/>And you can also negate using logical NOT:<p class="paragraph"/><div class="code"><pre>not &#123;
+	between(<span class="java&#45;quote">"balance"</span>, 500, 1000)
+	eq(<span class="java&#45;quote">"branch"</span>, <span class="java&#45;quote">"London"</span>)
+&#125;</pre></div><p class="paragraph"/><h4>Querying Associations</h4><p class="paragraph"/>Associations can be queried by having a node that matches the property name. For example say the <code>Account</code> class had many <code>Transaction</code> objects:<p class="paragraph"/><div class="code"><pre>class Account &#123;
+    &#8230;
+    def hasMany = &#91;transactions:Transaction&#93;
+    Set transactions
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>
+We can query this association by using the property name <code>transaction</code> as a builder node:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()
+def now = <span class="java&#45;keyword">new</span> Date()
+def results = c.list &#123;
+       transactions &#123;
+            between('date',now&#45;10, now)
+       &#125;
+&#125;</pre></div><p class="paragraph"/>
+The above code will find all the <code>Account</code> instances that have performed <code>transactions</code> within the last 10 days.
+You can also nest such association queries within logical blocks:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()
+def now = <span class="java&#45;keyword">new</span> Date()
+def results = c.list &#123;
+     or &#123;
+        between('created',now&#45;10,now)
+        transactions &#123;
+             between('date',now&#45;10, now)
+        &#125;
+     &#125;
+&#125;</pre></div><p class="paragraph"/>
+Here we find all accounts that have either performed transactions in the last 10 days OR have been recently created in the last 10 days.<p class="paragraph"/>
+<h4>Querying with Projections</h4><p class="paragraph"/>Projections may be used to customise the results. To use projections you need to define a "projections" node within the criteria builder tree. There are equivalent methods within the projections node to the methods found in the Hibernate <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/criterion/Projections.html" class="api">Projections</a> class:<p class="paragraph"/><div class="code"><pre>def c = Account.createCriteria()<p class="paragraph"/>def numberOfBranches = c.get &#123;
+	projections &#123;
+		countDistinct('branch')
+	&#125;
+&#125;</pre></div><p class="paragraph"/><h4>Using Scrollable Results</h4><p class="paragraph"/>You can use Hibernate's <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/ScrollableResults.html" class="api">ScrollableResults</a> feature by calling the scroll method:<p class="paragraph"/><div class="code"><pre>def results = crit.scroll &#123;
+      maxResults(10)
+&#125;
+def f = results.first()
+def l = results.last()
+def n = results.next()
+def p = results.previous()<p class="paragraph"/>def <span class="java&#45;keyword">future</span> = results.scroll(10)
+def accountNumber = results.getLong('number')</pre></div><p class="paragraph"/>
+To quote the documentation of Hibernate ScrollableResults:<p class="paragraph"/><blockquote class="quote">
+A result iterator that allows moving around within the results by arbitrary increments. The Query / ScrollableResults pattern is very similar to the JDBC PreparedStatement/ ResultSet pattern and the semantics of methods of this interface are similar to the similarly named methods on ResultSet.
+</blockquote><p class="paragraph"/>Contrary to JDBC, columns of results are numbered from zero.<p class="paragraph"/><h4>Setting properties in the Criteria instance</h4><p class="paragraph"/>If a node within the builder tree doesn't match a particular criterion it will attempt to set a property on the Criteria object itself. Thus allowing full access to all the properties in this class. The below example calls <code>setMaxResults</code> and <code>setFirstResult</code> on the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Criteria.html" class="api">Criteria</a> instance:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.hibernate.FetchMode as FM
+	&#8230;
+	def results = c.list &#123;
+		maxResults(10)
+		firstResult(50)
+		fetchMode(<span class="java&#45;quote">"aRelationship"</span>, FM.EAGER)
+	&#125;</pre></div><p class="paragraph"/><h4>Querying with Eager Fetching</h4><p class="paragraph"/>In the section on <a href="../guide/single.html#5.3.4 Eager and Lazy Fetching" class="guide">Eager and Lazy Fetching</a> we discussed how to declaratively specify fetching to avoid the N+1 SELECT problem. However, this can also be achieved using a criteria query:<p class="paragraph"/><div class="code"><pre>def criteria = Task.createCriteria()
+def tasks = criteria.list&#123;
+     eq <span class="java&#45;quote">"assignee.id"</span>, task.assignee.id
+     join 'assignee'
+     join 'project'
+     order 'priority', 'asc'
+&#125;</pre></div><p class="paragraph"/>Notice the usage of the <code>join</code> method. This method indicates the criteria API that a <code>JOIN</code> query should be used to obtain the results.<p class="paragraph"/><h4>Method Reference</h4><p class="paragraph"/>If you invoke the builder with no method name such as:<p class="paragraph"/><div class="code"><pre>c &#123; &#8230; &#125;</pre></div><p class="paragraph"/>The build defaults to listing all the results and hence the above is equivalent to:<p class="paragraph"/><div class="code"><pre>c.list &#123; &#8230; &#125;</pre></div><p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th>Method</th><th>Description</th></tr><tr class="table-odd"></tr><tr class="table-even"><td><strong class="bold">list</strong></td><td>This is the default method. It returns all matching rows.</td></tr><tr class="table-odd"><td><strong class="bold">get</strong></td><td>Returns a unique result set, i.e. just one row. The criteria has to be formed that way, that it only queries one row. This method is not to be confused with a limit to just the first row.</td></tr><tr class="table-even"><td><strong class="bold">scroll</strong></td><td>Returns a scrollable result set</td></tr><tr class="table-odd"><td><strong class="bold">listDistinct</strong></td><td>If subqueries or associations are used, one may end up with the same row multiple times in the result set, this allows listing only distinct entities and is equivalent to <code>DISTINCT_ROOT_ENTITY</code> of the <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/criterion/CriteriaSpecification.html" class="api">CriteriaSpecification</a> class</td></tr></table><p class="paragraph"/><p class="paragraph"/><p class="paragraph"/><p class="paragraph"/>
+<h2><a name="5.4.3 Hibernate Query Language (HQL)">5.4.3 Hibernate Query Language (HQL)</a></h2>GORM classes also support Hibernate's query language HQL, a very complete reference for which can be found <a href="http://www.hibernate.org/hib_docs/reference/en/html/queryhql.html" target="blank">Chapter 14. HQL: The Hibernate Query Language</a> of the Hibernate documentation.<p class="paragraph"/>GORM provides a number of methods that work with HQL including <a href="../ref/Domain Classes/find.html" class="domainClasses">find</a>, <a href="../ref/Domain Classes/findAll.html" class="domainClasses">findAll</a> and <a href="../ref/Domain Classes/executeQuery.html" class="domainClasses">executeQuery</a>. An example of a query can be seen below:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like 'Lord of the%'"</span>)</pre></div><p class="paragraph"/><h4>Positional and Named Parameters</h4><p class="paragraph"/>In this case the value passed to the query is hard coded, however you can equally use positional parameters:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like ?"</span>, &#91;<span class="java&#45;quote">"The Shi%"</span>&#93;)</pre></div><p class="paragraph"/>Or even named parameters:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like :search or b.author like :search"</span>, &#91;search:<span class="java&#45;quote">"The Shi%"</span>&#93;)</pre></div><p class="paragraph"/><h4>Multiline Queries</h4><p class="paragraph"/>If you need to separate the query across multiple lines you can use a line continuation character:<p class="paragraph"/><div class="code"><pre>def results = Book.findAll(<span class="java&#45;quote">"&#92;
+from Book as b, &#92;
+     Author as a &#92;
+where b.author = a and a.surname = ?"</span>, &#91;'Smith'&#93;)</pre></div><p class="paragraph"/><blockquote class="note">
+Groovy multiline strings will NOT work with HQL queries
+</blockquote><p class="paragraph"/><h4>Pagination and Sorting</h4><p class="paragraph"/>You can also perform pagination and sorting whilst using HQL queries. To do so simply specify the pagination options as a map at the end of the method call and include an "ORDER BY" clause in the HQL:<p class="paragraph"/><div class="code"><pre>def results =
+      Book.findAll(<span class="java&#45;quote">"from Book as b where b.title like 'Lord of the%' order by b.title asc"</span>,
+                   &#91;max:10, offset:20&#93;)</pre></div>
+<h2><a name="5.5 Advanced GORM Features">5.5 Advanced GORM Features</a></h2>The following sections cover more advanced usages of GORM including caching, custom mapping and events.<h2><a name="5.5.1 Events and Auto Timestamping">5.5.1 Events and Auto Timestamping</a></h2>GORM supports the registration of events as methods that get fired when certain events occurs such as deletes, inserts and updates. The following is a list of supported events:
+<ul class="star">
+<li><code>beforeInsert</code> - Executed before an object is initially persisted to the databse</li>
+<li><code>beforeUpdate</code> - Executed before an object is updated</li>
+<li><code>beforeDelete</code> - Executed before an object is deleted</li>
+<li><code>afterInsert</code> - Executed after an object is persisted to the database</li>
+<li><code>afterUpdate</code> - Executed after an object has been updated</li>
+<li><code>afterDelete</code> - Executed after an object has been updated</li>
+<li><code>onLoad</code> - Executed when an object is loaded from the database</li>
+</ul><p class="paragraph"/>To add an event simply register the relevant closure with your domain class.<p class="paragraph"/><blockquote class="warning">
+Do not attempt to flush the session within an event (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.
+</blockquote><p class="paragraph"/><h3>Event types</h3><p class="paragraph"/><h4>The beforeInsert event</h4><p class="paragraph"/>Fired before an object is saved to the db<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   Date dateCreated<p class="paragraph"/>   def beforeInsert() &#123;
+       dateCreated = <span class="java&#45;keyword">new</span> Date()
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h4>The beforeUpdate event</h4><p class="paragraph"/>Fired before an existing object is updated<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   Date dateCreated
+   Date lastUpdated<p class="paragraph"/>   def beforeInsert() &#123;
+       dateCreated = <span class="java&#45;keyword">new</span> Date()
+   &#125;
+   def beforeUpdate() &#123;
+       lastUpdated = <span class="java&#45;keyword">new</span> Date()
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h4>The beforeDelete event</h4><p class="paragraph"/>Fired before an object is deleted.<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   <span class="java&#45;object">String</span> name
+   Date dateCreated
+   Date lastUpdated<p class="paragraph"/>   def beforeDelete() &#123;
+	  ActivityTrace.withNewSession &#123;
+	 	  <span class="java&#45;keyword">new</span> ActivityTrace(eventName:<span class="java&#45;quote">"Person Deleted"</span>,data:name).save()
+	  &#125;      
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Notice the usage of <code>withNewSession</code> method above. Since events are triggered whilst Hibernate is flushing using persistence methods like <code>save()</code> and <code>delete()</code> won't result in objects being saved unless you run your operations with a new <code>Session</code>.<p class="paragraph"/>Fortunately the <code>withNewSession</code> method allows you to share the same transactional JDBC connection even though you're using a different underlying <code>Session</code>.<p class="paragraph"/><h4>The onLoad event</h4><p class="paragraph"/>Fired when an object is loaded from the db:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   <span class="java&#45;object">String</span> name
+   Date dateCreated
+   Date lastUpdated<p class="paragraph"/>   def onLoad() &#123;
+      name = <span class="java&#45;quote">"I'm loaded"</span>
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Automatic timestamping</h4><p class="paragraph"/>The examples above demonstrated using events to update a <code>lastUpdated</code> and <code>dateCreated</code> property to keep track of updates to objects. However, this is actually not necessary. By merely defining a <code>lastUpdated</code> and <code>dateCreated</code> property these will be automatically updated for you by GORM.<p class="paragraph"/>If this is not the behaviour you want you can disable this feature with:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+   Date dateCreated
+   Date lastUpdated
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+      autoTimestamp <span class="java&#45;keyword">false</span>
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h2><a name="5.5.2 Custom ORM Mapping">5.5.2 Custom ORM Mapping</a></h2>Grails domain classes can be mapped onto many legacy schemas via an Object Relational Mapping Domain Specify Language. The following sections takes you through what is possible with the ORM DSL.<p class="paragraph"/><blockquote class="note">
+None if this is necessary if you are happy to stick to the conventions defined by GORM for table, column names and so on. You only needs this functionality if you need to in anyway tailor the way GORM maps onto legacy schemas or performs caching
+</blockquote><p class="paragraph"/>Custom mappings are defined using a  a static <code>mapping</code> block defined within your domain class:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;<p class="paragraph"/>  &#125;
+&#125;</pre></div>
+<h2><a name="5.5.2.1 Table and Column Names">5.5.2.1 Table and Column Names</a></h2><h4>Table names</h4><p class="paragraph"/>The database table name which the class maps to can be customized using a call to <code>table</code>:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+  &#125;
+&#125;</pre></div><p class="paragraph"/>In this case the class would be mapped to a table called <code>people</code> instead of the default name of <code>person</code>.<p class="paragraph"/><h4>Column names</h4><p class="paragraph"/>It is also possible to customize the mapping for individual columns onto the database. For example if its the name you want to change you can do:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      firstName column:'First_Name'
+  &#125;
+&#125;</pre></div><p class="paragraph"/>In this case we define method calls that match each property name (in this case <code>firstName</code>). We then use the named parameter <code>column</code>, to specify the column name to map onto.<p class="paragraph"/><h4>Column type</h4><p class="paragraph"/>GORM supports configuration of Hibernate types via the DSL using the type attribute. This includes specifing user types that subclass the Hibernate <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/usertype/UserType.html" class="api">org.hibernate.usertype.UserType</a> class, which allows complete customization of how a type is persisted. As an example
+if you had a <code>PostCodeType</code> you could use it as follows:<p class="paragraph"/><div class="code"><pre>class Address &#123;
+   <span class="java&#45;object">String</span> number
+   <span class="java&#45;object">String</span> postCode
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+      postCode type:PostCodeType
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Alternatively if you just wanted to map it to one of Hibernate's basic types other than the default chosen by Grails you could use:<p class="paragraph"/><div class="code"><pre>class Address &#123;
+   <span class="java&#45;object">String</span> number
+   <span class="java&#45;object">String</span> postCode
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+      postCode type:'text'
+   &#125;
+&#125;</pre></div><p class="paragraph"/>This would make the <code>postCode</code> column map to the SQL TEXT or CLOB type depending on which database is being used.<p class="paragraph"/>See the Hibernate documentation regarding <a href="http://www.hibernate.org/hib_docs/core/reference/en/html/mapping.html#mapping-types-basictypes" target="blank">Basic Types</a> for further information.<p class="paragraph"/><h4>One-to-One Mapping</h4><p class="paragraph"/>In the case of associations it is also possible to change the foreign keys used to map associations. In the case of a one-to-one association this is exactly the same as any regular column. For example consider the below:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  Address address
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      firstName column:'First_Name'
+	  address column:'Person_Adress_Id'
+  &#125;
+&#125;</pre></div><p class="paragraph"/>By default the <code>address</code> association would map to a foreign key column called <code>address_id</code>. By using the above mapping we have changed the name of the foreign key column to <code>Person_Adress_Id</code>.<p class="paragraph"/><h4>One-to-Many Mapping</h4><p class="paragraph"/>With a bidirectional one-to-many you can change the foreign key column used simple by changing the column name on the many side of the association as per the example in the previous section on one-to-one associations. However, with unidirectional association the foreign key needs to be specified on the association itself. For example given a unidirectional one-to-many relationship between <code>Person</code> and <code>Address</code> the following code will change the foreign key in the <code>address</code> table:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;keyword">static</span> hasMany = &#91;addresses:Address&#93;
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      firstName column:'First_Name'
+	  addresses column:'Person_Address_Id'
+  &#125;
+&#125;</pre></div><p class="paragraph"/>If you don't want the column to be in the <code>address</code> table, but instead some intermediate join table you can use the <code>joinTable</code> parameter:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;keyword">static</span> hasMany = &#91;addresses:Address&#93;
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      firstName column:'First_Name'
+      addresses joinTable:&#91;name:'Person_Addresses', key:'Person_Id', column:'Address_Id'&#93;
+  &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Many-to-Many Mapping</h4><p class="paragraph"/>Grails, by default maps a many-to-many association using a join table. For example consider the below many-to-many association:<p class="paragraph"/><div class="code"><pre>class Group &#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> hasMany = &#91;people:Person&#93;
+&#125;
+class Person &#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> belongsTo = Group
+	<span class="java&#45;keyword">static</span> hasMany = &#91;groups:Group&#93;
+&#125;</pre></div><p class="paragraph"/>In this case Grails will create a join table called <code>group_person</code> containing foreign keys called <code>person_id</code> and <code>group_id</code> referencing the <code>person</code> and <code>group</code> tables. If you need to change the column names you can specify a column within the mappings for each class.<p class="paragraph"/><div class="code"><pre>class Group &#123;
+   &#8230;
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+       people column:'Group_Person_Id'
+   &#125;	
+&#125;
+class Person &#123;
+   &#8230;
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+       groups column:'Group_Group_Id'
+   &#125;	
+&#125;</pre></div><p class="paragraph"/>You can also specify the name of the join table to use:<p class="paragraph"/><div class="code"><pre>class Group &#123;
+   &#8230;
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+       people column:'Group_Person_Id',joinTable:'PERSON_GROUP_ASSOCIATIONS'
+   &#125;	
+&#125;
+class Person &#123;
+   &#8230;
+   <span class="java&#45;keyword">static</span> mapping = &#123;
+       groups column:'Group_Group_Id',joinTable:'PERSON_GROUP_ASSOCIATIONS'
+   &#125;	
+&#125;</pre></div><h2><a name="5.5.2.2 Caching Strategy">5.5.2.2 Caching Strategy</a></h2><h4>Setting up caching</h4><p class="paragraph"/><a href="http://www.hibernate.org/" target="blank">Hibernate</a> features a second-level cache with a customizable cache provider. This needs to be configured in the <code>grails-app/conf/DataSource.groovy</code> file as follows:<p class="paragraph"/><div class="code"><pre>hibernate &#123;
+    cache.use_second_level_cache=<span class="java&#45;keyword">true</span>
+    cache.use_query_cache=<span class="java&#45;keyword">true</span>
+    cache.provider_class='org.hibernate.cache.EhCacheProvider'
+&#125;</pre></div><p class="paragraph"/>You can of course customize these settings how you desire, for example if you want to use a distributed caching mechanism.<p class="paragraph"/><blockquote class="note">
+For further reading on caching and in particular Hibernate's second-level cache, refer to the <a href="http://www.hibernate.org/hib_docs/reference/en/html/performance.html#performance-cache" target="blank">Hibernate documentation</a> on the subject.
+</blockquote><p class="paragraph"/><h4>Caching instances</h4><p class="paragraph"/>In your mapping block to enable caching with the default settings use a call to the <code>cache</code> method:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      cache <span class="java&#45;keyword">true</span>
+  &#125;
+&#125;</pre></div><p class="paragraph"/>This will configure a 'read-write' cache that includes both lazy and non-lazy properties. If you need to customize this further you can do:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      cache usage:'read&#45;only', include:'non&#45;lazy'
+  &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Caching associations</h4><p class="paragraph"/>As well as the ability to use Hibernate's second level cache to cache instances you can also cache collections (associations) of objects. For example:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;keyword">static</span> hasMany = &#91;addresses:Address&#93;
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      version <span class="java&#45;keyword">false</span>
+      addresses column:'Address', cache:<span class="java&#45;keyword">true</span>
+  &#125;
+&#125;
+class Address &#123;
+   <span class="java&#45;object">String</span> number
+   <span class="java&#45;object">String</span> postCode
+&#125;</pre></div><p class="paragraph"/>This will enable a 'read-write' caching mechanism on the addresses collection. You can also use:<p class="paragraph"/><div class="code"><pre>cache:'read&#45;write' // or 'read&#45;only' or 'transactional'</pre></div><p class="paragraph"/>To further configure the cache usage.<p class="paragraph"/><h4>Caching Queries</h4><p class="paragraph"/>You can cache queries such as dynamic finders and criteria. To do so using a dynamic finder you can pass the <code>cache</code> argument:<p class="paragraph"/><div class="code"><pre>def person = Person.findByFirstName(<span class="java&#45;quote">"Fred"</span>, &#91;cache:<span class="java&#45;keyword">true</span>&#93;)</pre></div><p class="paragraph"/><blockquote class="note">
+Note that in order for the results of the query to be cached, you still need to enable caching in your mapping as discussed in the previous section. 
+</blockquote><p class="paragraph"/>You can also cache criteria queries:<p class="paragraph"/><div class="code"><pre>def people = Person.withCriteria &#123;
+	like('firstName', 'Fr%')
+	cache <span class="java&#45;keyword">true</span>
+&#125;</pre></div><p class="paragraph"/><h4>Cache usages</h4><p class="paragraph"/>Below is a description of the different cache settings and their usages:
+<ul class="star">
+<li><code>read-only</code> - If your application needs to read but never modify instances of a persistent class, a read-only cache may be used.</li>
+<li><code>read-write</code> - If the application needs to update data, a read-write cache might be appropriate.</li>
+<li><code>nonstrict-read-write</code> - If the application only occasionally needs to update data (ie. if it is extremely unlikely that two transactions would try to update the same item simultaneously) and strict transaction isolation is not required, a <code>nonstrict-read-write</code> cache might be appropriate.</li>
+<li><code>transactional</code> - The <code>transactional</code> cache strategy provides support for fully transactional cache providers such as JBoss TreeCache. Such a cache may only be used in a JTA environment and you must specify <code>hibernate.transaction.manager_lookup_class</code> in the <code>grails-app/conf/DataSource.groovy</code> file's <code>hibernate</code> config.</li>
+</ul><p class="paragraph"/><h2><a name="5.5.2.3 Inheritance Strategies">5.5.2.3 Inheritance Strategies</a></h2>By default GORM classes uses <code>table-per-hierarchy</code> inheritance mapping. This has the disadvantage that columns cannot have a <code>NOT-NULL</code> constraint applied to them at the db level. If you would prefer to use a <code>table-per-subclass</code> inheritance strategy you can do so as follows:<p class="paragraph"/><div class="code"><pre>class Payment &#123;
+    <span class="java&#45;object">Long</span> id
+    <span class="java&#45;object">Long</span> version
+    <span class="java&#45;object">Integer</span> amount<p class="paragraph"/>    <span class="java&#45;keyword">static</span> mapping = &#123;
+        tablePerHierarchy <span class="java&#45;keyword">false</span>
+    &#125;
+&#125;
+class CreditCardPayment <span class="java&#45;keyword">extends</span> Payment  &#123;
+    <span class="java&#45;object">String</span> cardNumber
+&#125;</pre></div><p class="paragraph"/>The mapping of the root <code>Payment</code> class specifies that it will not be using <code>table-per-hierarchy</code> mapping for all child classes.<h2><a name="5.5.2.4 Custom Database Identity">5.5.2.4 Custom Database Identity</a></h2>You can customize how GORM generates identifiers for the database using the DSL. By default GORM relies on the native database mechanism for generating ids. This is by far the best approach, but there are still many schemas that have different approaches to identity.<p class="paragraph"/>To deal with this Hibernate defines the concept of an id generator. You can customize the id generator and the column it maps to as follows:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      version <span class="java&#45;keyword">false</span>
+      id generator:'hilo', params:&#91;table:'hi_value',column:'next_value',max_lo:100&#93;
+  &#125;
+&#125;</pre></div><p class="paragraph"/>In this case we're using one of Hibernate's built in 'hilo' generators that uses a separate table to generate ids.<p class="paragraph"/><blockquote class="note">
+For more information on  the different Hibernate generators refer to the <a href="http://www.hibernate.org/hib_docs/reference/en/html/mapping.html#mapping-declaration-id-generator" target="blank">Hibernate reference documentation</a>
+</blockquote><p class="paragraph"/>Note that if you want to merely customise the column that the id lives on you can do:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      version <span class="java&#45;keyword">false</span>
+      id column:'person_id'
+  &#125;
+&#125;</pre></div>
+<h2><a name="5.5.2.5 Composite Primary Keys">5.5.2.5 Composite Primary Keys</a></h2>GORM supports the concept of composite identifiers (identifiers composed from 2 or more properties). It is not an approach we recommend, but is available to you if you need it:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;object">String</span> lastName<p class="paragraph"/>  <span class="java&#45;keyword">static</span> mapping = &#123;
+      id composite:&#91;'firstName', 'lastName'&#93;
+  &#125;
+&#125;</pre></div><p class="paragraph"/>The above will create a composite id of the <code>firstName</code> and <code>lastName</code> properties of the Person class. When you later need to retrieve an instance by id you have to use a prototype of the object itself:<p class="paragraph"/><div class="code"><pre>def p = Person.get(<span class="java&#45;keyword">new</span> Person(firstName:<span class="java&#45;quote">"Fred"</span>, lastName:<span class="java&#45;quote">"Flintstone"</span>))
+println p.firstName</pre></div>
+<h2><a name="5.5.2.6 Database Indices">5.5.2.6 Database Indices</a></h2>To get the best performance out of your queries it is often necessary to tailor the table index definitions. How you tailor them is domain specific and a matter of monitoring usage patterns of your queries. With GORM's DSL you can specify which columns need to live in which indexes:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;object">String</span> address
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      version <span class="java&#45;keyword">false</span>
+      id column:'person_id'
+      firstName column:'First_Name', index:'Name_Idx'
+      address column:'Address', index:'Name_Idx, Address_Index'
+  &#125;
+&#125;</pre></div><p class="paragraph"/><p class="paragraph"/><h2><a name="5.5.2.7 Optimistic Locking and Versioning">5.5.2.7 Optimistic Locking and Versioning</a></h2>As discussed in the section on <a href="../guide/single.html#5.3.5 Pessimistic and Optimistic Locking" class="guide">Optimistic and Pessimistic Locking</a>, by default GORM uses optimistic locking and automatically injects a <code>version</code> property into every class which is in turn mapped to a <code>version</code> column at the database level.<p class="paragraph"/>If you're mapping to a legacy schema this can be problematic, so you can disable this feature by doing the following:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  ..
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      table 'people'
+      version <span class="java&#45;keyword">false</span>
+  &#125;
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+If you disable optimistic locking you are essentially on your own with regards to concurrent updates and are open to the risk of users losing (due to data overriding) data unless you use <a href="../guide/single.html#5.3.5 Pessimistic and Optimistic Locking" class="guide">pessimistic locking</a>
+</blockquote>
+<h2><a name="5.5.2.8 Eager and Lazy Fetching">5.5.2.8 Eager and Lazy Fetching</a></h2><h5>Lazy Collections</h5><p class="paragraph"/>As discussed in the section on <a href="../guide/single.html#5.3.4 Eager and Lazy Fetching" class="guide">Eager and Lazy fetching</a>, by default GORM collections use lazy fetching and is is configurable through the <code>fetchMode</code> setting. However, if you prefer to group all your mappings together inside the <code>mappings</code> block you can also use the ORM DSL to configure fetching:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;keyword">static</span> hasMany = &#91;addresses:Address&#93;
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      addresses lazy:<span class="java&#45;keyword">false</span>
+  &#125;
+&#125;
+class Address &#123;
+  <span class="java&#45;object">String</span> street
+  <span class="java&#45;object">String</span> postCode
+&#125;</pre></div><p class="paragraph"/><h4>Lazy Single-Ended Associations</h4><p class="paragraph"/>In GORM, one-to-one and many-to-one associations are by default lazy. Non-lazy single ended associations can be problematic in cases when you are loading many entities which have an association to another entity as a new SELECT statement is executed for each loaded entity.<p class="paragraph"/>You can make one-to-one and many-to-one associations non-lazy using the same technique as for lazy collections:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+	<span class="java&#45;object">String</span> firstName
+	<span class="java&#45;keyword">static</span> belongsTo = &#91;address:Address&#93;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		address lazy:<span class="java&#45;keyword">false</span>
+	&#125;
+&#125;
+class Address &#123;
+	<span class="java&#45;object">String</span> street
+	<span class="java&#45;object">String</span> postCode
+&#125;</pre></div><p class="paragraph"/>Here we set the <code>address</code> property of the <code>Person</code> class will be eagerly fetched.<p class="paragraph"/><h4>Lazy Single-Ended Associations and Proxies</h4><p class="paragraph"/>In order to facilitate single-ended lazy associations Hibernate uses runtime generated proxies. The way this works is that Hibernate dynamically subclasses the proxied entity to create the proxy.<p class="paragraph"/>In the previous example Hibernate would create a subclass of <code>Address</code> and return that as a proxy to the real entity. When you call any of the getters or setters Hibernate will initialize the the entity from the database.<p class="paragraph"/>Unfortunately this technique can produce surprising results. Consider the following example classes:<p class="paragraph"/><div class="code"><pre>class Animal &#123;&#125;
+class Mammal <span class="java&#45;keyword">extends</span> Animal &#123;&#125;
+class Dog <span class="java&#45;keyword">extends</span> Mammal &#123;
+	<span class="java&#45;object">String</span> name
+&#125;
+class Owner &#123;
+	Animal pet
+&#125;</pre></div><p class="paragraph"/>Given you have an <code>Owner</code> with a <code>pet</code> association that is a <code>Dog</code> consider the following code:<p class="paragraph"/><div class="code"><pre>def owner = Owner.get(1)
+def pet = Animal.get(owner.petId)
+<span class="java&#45;keyword">if</span>(pet <span class="java&#45;keyword">instanceof</span> Dog) &#123;
+	// doesn't work!
+&#125;</pre></div><p class="paragraph"/>Now you may think this code will work, but in fact it will not. The reason is Hibernate creates a dynamic proxy by subclassing <code>Animal</code> for the <code>owner.pet</code> association and caches it in the first level cache. So even if the actual proxied class is a <code>Dog</code> it won't be an instance of the <code>Dog</code> class due to the way proxies work.<p class="paragraph"/>The get around this problem GORM provides an <code>instanceOf</code> method that should always be used:<p class="paragraph"/><div class="code"><pre>def owner = Owner.get(1)
+def pet = Animal.get(owner.petId)
+<span class="java&#45;keyword">if</span>(pet?.<span class="java&#45;keyword">instanceof</span>( Dog )) &#123;
+	// <span class="java&#45;keyword">this</span> works
+&#125;</pre></div><p class="paragraph"/>However, there are cases where this particular Hibernate abstraction may still leak through. For example:<p class="paragraph"/><div class="code"><pre>def owner = Owner.get(1)
+Dog pet = Animal.get(owner.petId)</pre></div><p class="paragraph"/>In this case you will get a <code>ClassCastException</code> because the proxied <code>Animal</code> is not a <code>Dog</code> even though the actual instance <strong class="bold">is</strong> a <code>Dog</code>.<p class="paragraph"/>Our best advice is to be aware of Hibernate proxies and how to deal with them when you do run into issues.<h2><a name="5.5.2.9 Custom Cascade Behaviour">5.5.2.9 Custom Cascade Behaviour</a></h2>As describes in the section on <a href="../guide/single.html#5.3.3 Understanding Cascading Updates and Deletes" class="guide">cascading updates</a>, the primary mechanism to control the way updates and deletes are cascading from one association to another is the <a href="../ref/Domain Classes/belongsTo.html" class="domainClasses">belongsTo</a> static property.<p class="paragraph"/>However, the ORM DSL gives you complete access to Hibernate's <a href="http://www.hibernate.org/hib_docs/v3/reference/en/html_single/#objectstate-transitive" target="blank">transitive persistence</a> capabilities via the <code>cascade</code> attribute.<p class="paragraph"/>Valid settings for the cascade attribute include:
+<ul class="star">
+<li>create - cascades creation of new records from one association to another</li>
+<li>merge - merges the state of a detached association</li>
+<li>save-update - cascades only saves and updates to an association</li>
+<li>delete - cascades only deletes to an association</li>
+<li>lock - useful if a pessimistic lock should be cascaded to its associations</li>
+<li>refresh - cascades refreshes to an association</li>
+<li>evict - cascades evictions (equivalent to discard() in GORM) to associations if set</li>
+<li>all - cascade ALL operations to associations</li>
+<li>delete-orphan - Applies only to one-to-many associations and indicates that when a child is removed from an association then it should be automatically deleted</li>
+</ul><p class="paragraph"/><blockquote class="note">
+It is advisable to read the section in the Hibernate documentation on <a href="http://www.hibernate.org/hib_docs/v3/reference/en/html_single/#objectstate-transitive" target="blank">transitive persistence</a> to obtain a better understanding of the different cascade styles and recommendation for their usage
+</blockquote><p class="paragraph"/>To specific the cascade attribute simply define one or many (comma-separated) of the aforementioned settings as its value:<p class="paragraph"/><div class="code"><pre>class Person &#123;
+  <span class="java&#45;object">String</span> firstName
+  <span class="java&#45;keyword">static</span> hasMany = &#91;addresses:Address&#93;
+  <span class="java&#45;keyword">static</span> mapping = &#123;
+      addresses cascade:<span class="java&#45;quote">"all&#45;delete&#45;orphan"</span>
+  &#125;
+&#125;
+class Address &#123;
+  <span class="java&#45;object">String</span> street
+  <span class="java&#45;object">String</span> postCode
+&#125;</pre></div><p class="paragraph"/><h2><a name="5.5.2.10 Custom Hibernate Types">5.5.2.10 Custom Hibernate Types</a></h2>You saw in an earlier section that you can use composition (via the <code>embedded</code> property) to break a table into multiple objects. You can achieve a similar effect via Hibernate's custom user types. These are not domain classes themselves, but plain Java or Groovy classes with associated. Each of these types also has a corresponding "meta-type" class that implements <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/usertype/UserType.html" class="api">org.hibernate.usertype.UserType</a>.<p class="paragraph"/>The <a href="http://www.hibernate.org/hib_docs/v3/reference/en/html/mapping.html#mapping-types-custom" target="blank">Hibernate reference manual</a> has some information on custom types, but here we will focus on how to map them in Grails. Let's start by taking a look at a simple domain class that uses an old-fashioned (pre-Java 1.5) type-safe enum class:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+  <span class="java&#45;object">String</span> title
+  <span class="java&#45;object">String</span> author
+  Rating rating<p class="paragraph"/>  <span class="java&#45;keyword">static</span> mapping = &#123;
+      rating type: RatingUserType
+  &#125;
+&#125;</pre></div><p class="paragraph"/>All we have done is declare the <code>rating</code> field the enum type and set the property's type in the custom mapping to the corresponding <code>UserType</code> implementation. That's all you have to do to start using your custom type. If you want, you can also use the other column settings such as "column" to change the column name and "index" to add it to an index.<p class="paragraph"/>Custom types aren't limited to just a single column - they can be mapped to as many columns as you want. In such cases you need to explicitly define in the mapping what columns to use, since Hibernate can only use the property name for a single column. Fortunately, Grails allows you to map multiple columns to a property using this syntax:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+  <span class="java&#45;object">String</span> title
+  Name author
+  Rating rating<p class="paragraph"/>  <span class="java&#45;keyword">static</span> mapping = &#123;
+      name type: NameUserType, &#123;
+          column name: <span class="java&#45;quote">"first_name"</span>
+          column name: <span class="java&#45;quote">"last_name"</span>
+      &#125;
+      rating type: RatingUserType
+  &#125;
+&#125;</pre></div><p class="paragraph"/>The above example will create "first_name" and "last_name" columns for the <code>author</code> property. You'll be pleased to know that you can also use some of the normal column/property mapping attributes in the column definitions. For example:<p class="paragraph"/><div class="code"><pre>column name: <span class="java&#45;quote">"first_name"</span>, index: <span class="java&#45;quote">"my_idx"</span>, unique: <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>The column definitions do <em class="italic">not</em> support the following attributes: <code>type</code>, <code>cascade</code>, <code>lazy</code>, <code>cache</code>, and <code>joinTable</code>.<p class="paragraph"/>One thing to bear in mind with custom types is that they define the <em class="italic">SQL types</em> for the corresponding database columns. That helps take the burden of configuring them yourself, but what happens if you have a legacy database that uses a different SQL type for one of the columns? In that case, you need to override column's SQL type using the <code>sqlType</code> attribute:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+  <span class="java&#45;object">String</span> title
+  Name author
+  Rating rating<p class="paragraph"/>  <span class="java&#45;keyword">static</span> mapping = &#123;
+      name type: NameUserType, &#123;
+          column name: <span class="java&#45;quote">"first_name"</span>, sqlType: <span class="java&#45;quote">"text"</span>
+          column name: <span class="java&#45;quote">"last_name"</span>, sqlType: <span class="java&#45;quote">"text"</span>
+      &#125;
+      rating type: RatingUserType, sqlType: <span class="java&#45;quote">"text"</span>
+  &#125;
+&#125;</pre></div><p class="paragraph"/>Mind you, the SQL type you specify needs to still work with the custom type. So overriding a default of "varchar" with "text" is fine, but overriding "text" with "yes_no" isn't going to work.
+<h2><a name="5.5.3 Default Sort Order">5.5.3 Default Sort Order</a></h2>You can sort objects using queries arguments such as those found in the <a href="../ref/Domain Classes/list.html" class="domainClasses">list</a> method:<p class="paragraph"/><div class="code"><pre>def airports = Airport.list(sort:'name')</pre></div><p class="paragraph"/>However, you can also declare the sort order declaratively:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		sort <span class="java&#45;quote">"name"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>You can also configure the sort order if necessary:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		sort name:<span class="java&#45;quote">"desc"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Alternatively, you can configure sort order at the association level:<p class="paragraph"/><div class="code"><pre>class Airport &#123;
+	&#8230;
+	<span class="java&#45;keyword">static</span> hasMany = &#91;flights:Flight&#93;
+	<span class="java&#45;keyword">static</span> mapping = &#123;
+		flights sort:'number'
+	&#125;
+&#125;</pre></div><h2><a name="5.6 Programmatic Transactions">5.6 Programmatic Transactions</a></h2>Grails is built on Spring and hence uses Spring's Transaction abstraction for dealing with programmatic transactions. However, GORM classes have been enhanced to make this more trivial through the <a href="../ref/Domain Classes/withTransaction.html" class="domainClasses">withTransaction</a> method which accepts a block the first argument to which is the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/transaction/TransactionStatus.html" class="api">TransactionStatus</a> object.<p class="paragraph"/>A typical usage scenario is as follows:<p class="paragraph"/><div class="code"><pre>def transferFunds = &#123;
+	Account.withTransaction &#123; status &#45;&#62;
+		def source = Account.get(params.from)
+		def dest = Account.get(params.to)<p class="paragraph"/>		def amount = params.amount.toInteger()
+		<span class="java&#45;keyword">if</span>(source.active) &#123;
+			source.balance &#45;= amount
+			<span class="java&#45;keyword">if</span>(dest.active) &#123;
+				dest.amount += amount
+			&#125;
+			<span class="java&#45;keyword">else</span> &#123;
+				status.setRollbackOnly()
+			&#125;
+		&#125;<p class="paragraph"/>		
+	&#125;<p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>In this example we rollback the transactions if the destination account is not active and if any exception are thrown during the process the transaction will automatically be rolled back.<p class="paragraph"/>You can also use "save points" to rollback a transaction to a particular point in time if you don't want to rollback the entire transaction. This can be achieved through the use of Spring's <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/transaction/SavepointManager.html" class="api">SavePointManager</a> interface.<p class="paragraph"/>The <a href="../ref/Domain Classes/withTransaction.html" class="domainClasses">withTransaction</a> method deals with the begin/commit/rollback logic for you within the scope of the block.<h2><a name="5.7 GORM and Constraints">5.7 GORM and Constraints</a></h2>Although constraints are covered in the <a href="../guide/single.html#7.1 Declaring Constraints" class="guide">Validation</a> section, it is important to mention them here as some of the constraints can affect the way in which the database schema is generated.<p class="paragraph"/>Where feasible, Grails uses a domain class's constraints to influence the database columns generated for the corresponding domain class properties.<p class="paragraph"/>Consider the following example.  Suppose we have a domain model with the following property.<p class="paragraph"/><div class="code"><pre><span class="java&#45;object">String</span> name
+<span class="java&#45;object">String</span> description</pre></div><p class="paragraph"/>By default, in MySQL, Grails would define these columns as...<p class="paragraph"/><div class="code"><pre>column name | data type 
+ description | varchar(255)</pre></div><p class="paragraph"/>But perhaps the business rules for this domain class state that a description can be up to 1000 characters in length.  If that were the case, we'd likely define the column as follows <em class="italic">if</em> we were creating the table via an SQL script.<p class="paragraph"/><div class="code"><pre>column name | data type 
+ description | TEXT</pre></div><p class="paragraph"/>Chances are we'd also want to have some application-based validation to make sure we don't exceed that 1000 character limit <em class="italic">before</em> we persist any records.  In Grails, we achieve this validation via <a href="../guide/single.html#7.1 Declaring Constraints" class="guide">constraints</a>.  We'd add the following constraint declaration to the domain class.<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> constraints = &#123;
+        description(maxSize:1000)
+&#125;</pre></div><p class="paragraph"/>This constraint would provide both the application-based validation we want and it would also cause the schema to be generated as shown above.  Below is a description of the other constraints that influence schema generation.<p class="paragraph"/><h4>Constraints Affecting String Properties</h4>
+<ul class="star">
+<li><a href="../ref/Constraints/inList.html" class="constraints">inList</a></li>
+<li><a href="../ref/Constraints/maxSize.html" class="constraints">maxSize</a></li>
+<li><a href="../ref/Constraints/size.html" class="constraints">size</a></li>
+</ul><p class="paragraph"/>If either the <code>maxSize</code> or the <code>size</code> constraint is defined, Grails sets the maximum column length based on the constraint value.<p class="paragraph"/>In general, it's not advisable to use both constraints on the same domain class property.  However, if both the <code>maxSize</code> constraint and the <code>size</code> constraint are defined, then Grails sets the column length to the minimum of the <code>maxSize</code> constraint and the upper bound of the size constraint.  (Grails uses the minimum of the two, because any length that exceeds that minimum will result in a validation error.)<p class="paragraph"/>If the inList constraint is defined (and the <code>maxSize</code> and the <code>size</code> constraints are not defined), then Grails sets the maximum column length based on the length of the longest string in the list of valid values.  For example, given a list including values "Java", "Groovy", and "C++", Grails would set the column length to 6 (i.e., the number of characters in the string "Groovy").<p class="paragraph"/><h4>Constraints Affecting Numeric Properties</h4>
+<ul class="star">
+<li><a href="../ref/Constraints/min.html" class="constraints">min</a></li>
+<li><a href="../ref/Constraints/max.html" class="constraints">max</a></li>
+<li><a href="../ref/Constraints/range.html" class="constraints">range</a></li>
+</ul><p class="paragraph"/>If the <code>max</code> constraint, the <code>min</code> constraint, or the <code>range</code> constraint is defined, Grails attempts to set the column <a href="http://uk.builder.com/architecture/db/0,39026552,20268520,00.htm" target="blank">precision</a> based on the constraint value.  (The success of this attempted influence is largely dependent on how Hibernate interacts with the underlying DBMS.)<p class="paragraph"/>In general, it's not advisable to combine the pair min/max and range constraints together on the same domain class property.  However, if both of these constraints is defined, then Grails uses the minimum precision value from the constraints.  (Grails uses the minimum of the two, because any length that exceeds that minimum precision will result in a validation error.)
+<ul class="star">
+<li><a href="../ref/Constraints/scale.html" class="constraints">scale</a></li>
+</ul><p class="paragraph"/>If the scale constraint is defined, then Grails attempts to set the column <a href="http://uk.builder.com/architecture/db/0,39026552,20268520,00.htm" target="blank">scale</a> based on the constraint value.  This rule only applies to floating point numbers (i.e., java.lang.Float, java.Lang.Double, java.lang.BigDecimal, or subclasses of java.lang.BigDecimal).  (The success of this attempted influence is largely dependent on how Hibernate interacts with the underlying DBMS.)<p class="paragraph"/>The constraints define the minimum/maximum numeric values, and Grails derives the maximum number of digits for use in the precision. Keep in mind that specifying only one of min/max constraints will not affect schema generation (since there could be large negative value of property with max:100, for example), unless specified constraint value requires more digits than default Hibernate column precision is (19 at the moment). For example...<p class="paragraph"/><div class="code"><pre>someFloatValue(max:1000000, scale:3)</pre></div><p class="paragraph"/>would yield:<p class="paragraph"/><div class="code"><pre>someFloatValue DECIMAL(19, 3) // precision is <span class="java&#45;keyword">default</span></pre></div><p class="paragraph"/>but<p class="paragraph"/><div class="code"><pre>someFloatValue(max:12345678901234567890, scale:5)</pre></div><p class="paragraph"/>would yield:
+<div class="code"><pre>someFloatValue DECIMAL(25, 5) // precision = digits in max + scale</pre></div><p class="paragraph"/>and<p class="paragraph"/><div class="code"><pre>someFloatValue(max:100, min:&#45;100000)</pre></div><p class="paragraph"/>would yield:<p class="paragraph"/><div class="code"><pre>someFloatValue DECIMAL(8, 2) // precision = digits in min + <span class="java&#45;keyword">default</span> scale</pre></div>
+	</body>
+</html>

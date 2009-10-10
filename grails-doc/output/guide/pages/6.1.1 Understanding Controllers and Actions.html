@@ -1,0 +1,22 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.1.1 Understanding Controllers and Actions</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Creating a controller</h4><p class="paragraph"/>Controllers can be created with the <a href="../ref/Command Line/create-controller.html" class="commandLine">create-controller</a> target. For example try running the following command from the root of a Grails project:<p class="paragraph"/><div class="code"><pre>grails create&#45;controller book</pre></div><p class="paragraph"/>The command will result in the creation of a controller at the location <code>grails-app/controllers/BookController.groovy</code>:<p class="paragraph"/><div class="code"><pre>class BookController &#123; &#8230; &#125;</pre></div><p class="paragraph"/><code>BookController</code> by default maps to the /book URI (relative to your application root).<p class="paragraph"/><blockquote class="note">
+The <code>create-controller</code> command is merely for convenience and you can just as easily create controllers using your favorite text editor or IDE
+</blockquote><p class="paragraph"/><h4>Creating Actions</h4><p class="paragraph"/>A controller can have multiple properties that are each assigned a block of code. Each of these properties maps to a URI:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    def list = &#123;<p class="paragraph"/>        // <span class="java&#45;keyword">do</span> controller logic
+        // create model<p class="paragraph"/>        <span class="java&#45;keyword">return</span> model
+    &#125;
+&#125;</pre></div><p class="paragraph"/>This example maps to the <code>/book/list</code> URI by default thanks to the property being named <code>list</code>.<p class="paragraph"/><h4>The Default Action</h4><p class="paragraph"/>A controller has the concept of a default URI that maps to the root URI of the controller. By default the default URI in this case is <code>/book</code>. The default URI is dictated by the following rules:
+<ul class="star">
+<li>If only one action is present the default URI for a controller maps to that action.</li>
+<li>If you define an <code>index</code> action which is the action that handles requests when no action is specified in the URI <code>/book</code></li>
+<li>Alternatively you can set it explicitly with the <code>defaultAction</code> property:</li>
+</ul><p class="paragraph"/><div class="code"><pre>def defaultAction = <span class="java&#45;quote">"list"</span></pre></div>
+
+	</body>
+</html>

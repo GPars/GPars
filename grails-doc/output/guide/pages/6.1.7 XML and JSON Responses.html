@@ -1,0 +1,65 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.1.7 XML and JSON Responses</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Using the render method to output XML</h4><p class="paragraph"/>Grails' supports a few different ways to produce XML and JSON responses. The first one covered is via the <a href="../ref/Controllers/render.html" class="controllers">render</a> method.<p class="paragraph"/>The <code>render</code> method can be passed a block of code to do mark-up building in XML:<p class="paragraph"/><div class="code"><pre>def list = &#123;
+	def results = Book.list()
+	render(contentType:<span class="java&#45;quote">"text/xml"</span>) &#123;
+		books &#123;
+			<span class="java&#45;keyword">for</span>(b in results) &#123;
+				book(title:b.title)
+			&#125;
+		&#125;	
+	&#125;
+&#125;</pre></div><p class="paragraph"/>The result of this code would be something like:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;books&#62;</span>
+	  <span class="xml&#45;tag">&#60;book title=<span class="xml&#45;quote">"The Stand"</span> /&#62;</span>
+	  <span class="xml&#45;tag">&#60;book title=<span class="xml&#45;quote">"The Shining"</span> /&#62;</span>	
+<span class="xml&#45;tag">&#60;/books&#62;</span></pre></div><p class="paragraph"/>Note that you need to be careful to avoid naming conflicts when using mark-up building. For example this code would produce an error:<p class="paragraph"/><div class="code"><pre>def list = &#123;
+	def books = Book.list()  // naming conflict here
+	render(contentType:<span class="java&#45;quote">"text/xml"</span>) &#123;
+		books &#123;
+			<span class="java&#45;keyword">for</span>(b in results) &#123;
+				book(title:b.title)
+			&#125;
+		&#125;	
+	&#125;
+&#125;</pre></div><p class="paragraph"/>The reason is that there is local variable <code>books</code> which Groovy attempts to invoke as a method.<p class="paragraph"/>
+<h4>Using the render method to output JSON</h4><p class="paragraph"/>The <code>render</code> method can also be used to output JSON:<p class="paragraph"/><div class="code"><pre>def list = &#123;
+	def results = Book.list()
+	render(contentType:<span class="java&#45;quote">"text/json"</span>) &#123;
+		books &#123;
+			<span class="java&#45;keyword">for</span>(b in results) &#123;
+				book(title:b.title)
+			&#125;
+		&#125;	
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this case the result would be something along the lines of:<p class="paragraph"/><div class="code"><pre>&#91;
+	&#123;title:<span class="java&#45;quote">"The Stand"</span>&#125;, 
+	&#123;title:<span class="java&#45;quote">"The Shining"</span>&#125;
+&#93;</pre></div><p class="paragraph"/>Again the same dangers with naming conflicts apply to JSON building.<p class="paragraph"/><h4>Automatic XML Marshalling</h4><p class="paragraph"/>Grails also supports automatic marshaling of <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a> to XML via special converters.<p class="paragraph"/>To start off with import the <code>grails.converters</code> package into your controller:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;</pre></div><p class="paragraph"/>Now you can use the following highly readable syntax to automatically convert domain classes to XML:<p class="paragraph"/><div class="code"><pre>render Book.list() as XML</pre></div><p class="paragraph"/>The resulting output would look something like the following::<p class="paragraph"/><div class="code"><pre>&#60;?xml version=<span class="java&#45;quote">"1.0"</span> encoding=<span class="java&#45;quote">"ISO&#45;8859&#45;1"</span>?&#62;
+&#60;list&#62;
+  &#60;book id=<span class="java&#45;quote">"1"</span>&#62;
+    &#60;author&#62;Stephen King&#60;/author&#62;
+    &#60;title&#62;The Stand&#60;/title&#62;
+  &#60;/book&#62;
+  &#60;book id=<span class="java&#45;quote">"2"</span>&#62;
+    &#60;author&#62;Stephen King&#60;/author&#62;
+    &#60;title&#62;The Shining&#60;/title&#62;
+  &#60;/book&#62;
+&#60;/list&#62;</pre></div><p class="paragraph"/>An alternative to using the converters is to use the <a href="../guide/single.html#11.2 Encoding and Decoding Objects" class="guide">codecs</a> feature of Grails. The codecs feature provides <a href="../guide/single.html#11.2 Encoding and Decoding Objects" class="guide">encodeAsXML</a> and <a href="../guide/single.html#11.2 Encoding and Decoding Objects" class="guide">encodeAsJSON</a> methods:<p class="paragraph"/><div class="code"><pre>def xml = Book.list().encodeAsXML()
+render xml</pre></div><p class="paragraph"/>For more information on XML marshaling see the section on <a href="../guide/single.html#13.1 REST" class="guide">REST</a><p class="paragraph"/><h4>Automatic JSON Marshalling</h4><p class="paragraph"/>Grails also supports automatic marshaling to JSON via the same mechanism. Simply substitute <code>XML</code> with <code>JSON</code>:<p class="paragraph"/><div class="code"><pre>render Book.list() as JSON</pre></div><p class="paragraph"/>The resulting output would look something like the following:<p class="paragraph"/><div class="code"><pre>&#91;
+	&#123;<span class="java&#45;quote">"id"</span>:1,
+	 <span class="java&#45;quote">"class"</span>:<span class="java&#45;quote">"Book"</span>,
+	 <span class="java&#45;quote">"author"</span>:<span class="java&#45;quote">"Stephen King"</span>,
+	 <span class="java&#45;quote">"title"</span>:<span class="java&#45;quote">"The Stand"</span>&#125;,
+	&#123;<span class="java&#45;quote">"id"</span>:2,
+	 <span class="java&#45;quote">"class"</span>:<span class="java&#45;quote">"Book"</span>,
+	 <span class="java&#45;quote">"author"</span>:<span class="java&#45;quote">"Stephen King"</span>,
+	 <span class="java&#45;quote">"releaseDate"</span>:<span class="java&#45;keyword">new</span> Date(1194127343161),
+	 <span class="java&#45;quote">"title"</span>:<span class="java&#45;quote">"The Shining"</span>&#125;
+ &#93;</pre></div><p class="paragraph"/>Again as an alternative you can use the <code>encodeAsJSON</code> to achieve the same effect.
+	</body>
+</html>

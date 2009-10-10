@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>Command Line Usage</h1><p class="paragraph"/>Grails incorporates the powerful build system <span class="nobr"><a href="http://groovy.codehaus.org/Gant">Gant</a></span>, which is a Groovy wrapper around <a href="http://ant.apache.org" target="blank">Apache Ant</a>.          <a href="../../ref/Command Line/bootstrap.html" class="commandLine">bootstrap</a><p class="paragraph"/>The basic usage scenario is:<p class="paragraph"/><div class="code"><pre>grails &#91;environment&#93;&#42; &#91;command name&#93;</pre></div><p class="paragraph"/>Grails will search for Gant scripts that match the given name in the following locations:
+<ul class="star">
+<li>USER_HOME/.grails/scripts</li>
+<li>PROJECT_HOME/scripts</li>
+<li>PROJECT_HOME/plugins/*/scripts</li>
+<li>GRAILS_HOME/scripts</li>
+</ul><p class="paragraph"/>If Grails discovers multiple commands matching the name entered it will offer you a choice as to which one to execute.<p class="paragraph"/>To specify an alternative environment to execute a particular command within you can specify an optional environment parameter either with one of the built in environments:<p class="paragraph"/><div class="code"><pre>grails dev run&#45;app
+grails prod run&#45;app</pre></div><p class="paragraph"/>Or using an argument<p class="paragraph"/><div class="code"><pre>grails &#45;Dgrails.env=uat run&#45;app</pre></div><p class="paragraph"/>Refer to the user guide section on <a href="../../guide/single.html#4. The Command Line" class="guide">The Command Line</a> for more information.
+	</body>
+</html>

@@ -1,0 +1,1005 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6. The Web Layer</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1><a name="6. The Web Layer">6. The Web Layer</a></h1><h2><a name="6.1 Controllers">6.1 Controllers</a></h2>A controller handles requests and creates or prepares the response and is request-scoped.  In other words a new instance is created for each <a href="../ref/Controllers/request.html" class="controllers">request</a>. A controller can generate the response or delegate to a view. To create a controller simply create a class whose name ends with <code>Controller</code> and place it within the <code>grails-app/controllers</code> directory.<p class="paragraph"/>The default <a href="../guide/single.html#6.4 URL Mappings" class="guide">URL Mapping</a> setup ensures that the first part of your controller name is mapped to a URI and each action defined within your controller maps to URI within the controller name URI.<p class="paragraph"/><p class="paragraph"/>
+<h2><a name="6.1.1 Understanding Controllers and Actions">6.1.1 Understanding Controllers and Actions</a></h2><h4>Creating a controller</h4><p class="paragraph"/>Controllers can be created with the <a href="../ref/Command Line/create-controller.html" class="commandLine">create-controller</a> target. For example try running the following command from the root of a Grails project:<p class="paragraph"/><div class="code"><pre>grails create&#45;controller book</pre></div><p class="paragraph"/>The command will result in the creation of a controller at the location <code>grails-app/controllers/BookController.groovy</code>:<p class="paragraph"/><div class="code"><pre>class BookController &#123; &#8230; &#125;</pre></div><p class="paragraph"/><code>BookController</code> by default maps to the /book URI (relative to your application root).<p class="paragraph"/><blockquote class="note">
+The <code>create-controller</code> command is merely for convenience and you can just as easily create controllers using your favorite text editor or IDE
+</blockquote><p class="paragraph"/><h4>Creating Actions</h4><p class="paragraph"/>A controller can have multiple properties that are each assigned a block of code. Each of these properties maps to a URI:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    def list = &#123;<p class="paragraph"/>        // <span class="java&#45;keyword">do</span> controller logic
+        // create model<p class="paragraph"/>        <span class="java&#45;keyword">return</span> model
+    &#125;
+&#125;</pre></div><p class="paragraph"/>This example maps to the <code>/book/list</code> URI by default thanks to the property being named <code>list</code>.<p class="paragraph"/><h4>The Default Action</h4><p class="paragraph"/>A controller has the concept of a default URI that maps to the root URI of the controller. By default the default URI in this case is <code>/book</code>. The default URI is dictated by the following rules:
+<ul class="star">
+<li>If only one action is present the default URI for a controller maps to that action.</li>
+<li>If you define an <code>index</code> action which is the action that handles requests when no action is specified in the URI <code>/book</code></li>
+<li>Alternatively you can set it explicitly with the <code>defaultAction</code> property:</li>
+</ul><p class="paragraph"/><div class="code"><pre>def defaultAction = <span class="java&#45;quote">"list"</span></pre></div>
+<h2><a name="6.1.2 Controllers and Scopes">6.1.2 Controllers and Scopes</a></h2><h4>Available Scopes</h4><p class="paragraph"/>Scopes are essentially hash like objects that allow you to store variables. The following scopes are available to controllers:
+<ul class="star">
+<li><a href="../ref/Controllers/servletContext.html" class="controllers">servletContext</a> - Also known as application scope, this scope allows you to share state across the entire web application. The servletContext is an instance of <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/ServletContext.html" class="api">javax.servlet.ServletContext</a></li>
+<li><a href="../ref/Controllers/session.html" class="controllers">session</a> - The session allows associating state with a given user and typically uses cookies to associate a session with a client. The session object is an instance of <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpSession.html" class="api">HttpSession</a></li>
+<li><a href="../ref/Controllers/request.html" class="controllers">request</a> - The request object allows the storage of objects for the current request only. The request object is an instance of <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletRequest.html" class="api">HttpServletRequest</a></li>
+<li><a href="../ref/Controllers/params.html" class="controllers">params</a> - Mutable map of incoming request (CGI) parameters</li>
+<li><a href="../ref/Controllers/flash.html" class="controllers">flash</a> - See below.</li>
+</ul><p class="paragraph"/><h4>Accessing Scopes</h4><p class="paragraph"/>Scopes can be accessed using the variable names above in combination with Groovy's array index operator even on classes provided by the Servlet API such as the <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletRequest.html" class="api">HttpServletRequest</a>:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    def find = &#123;
+        def findBy = params&#91;<span class="java&#45;quote">"findBy"</span>&#93;
+        def appContext = request&#91;<span class="java&#45;quote">"foo"</span>&#93;
+        def loggedUser = session&#91;<span class="java&#45;quote">"logged_user"</span>&#93;<p class="paragraph"/>    &#125;
+&#125;</pre></div><p class="paragraph"/>You can even access values within scopes using the de-reference operator making the syntax even clearer:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    def find = &#123;
+        def findBy = params.findBy
+        def appContext = request.foo
+        def loggedUser = session.logged_user<p class="paragraph"/>    &#125;
+&#125;</pre></div><p class="paragraph"/>This is one of the ways that Grails unifies access to the different scopes.<p class="paragraph"/><h4>Using Flash Scope</h4><p class="paragraph"/>Grails supports the concept of <a href="../ref/Controllers/flash.html" class="controllers">flash</a> scope is a temporary store for attributes which need to be available for this request and the next request only. Afterwards the attributes are cleared. This is useful for setting a message directly before redirection, for example:<p class="paragraph"/><div class="code"><pre>def delete = &#123;
+    def b = Book.get( params.id )
+    <span class="java&#45;keyword">if</span>(!b) &#123;
+        flash.message = <span class="java&#45;quote">"User not found <span class="java&#45;keyword">for</span> id $&#123;params.id&#125;"</span>
+        redirect(action:list)
+    &#125;
+    &#8230; // remaining code
+&#125;</pre></div>
+<h2><a name="6.1.3 Models and Views">6.1.3 Models and Views</a></h2><h4>Returning the Model</h4><p class="paragraph"/>A model is essentially a map that the view uses when rendering. The keys within that map translate to variable names accessible by the view. There are a couple of ways to return a model, the first way is to explicitly return a map instance:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+ 	&#91; book : Book.get( params.id ) &#93;
+&#125;</pre></div><p class="paragraph"/>If no explicit model is returned the controller's properties will be used as the model thus allowing you to write code like this:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    List books
+    List authors
+    def list = &#123;
+           books = Book.list()
+           authors = Author.list()
+    &#125;
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+This is possible due to the fact that controllers are prototype scoped. In other words a new controller is created for each request. Otherwise code such as the above would not be thread safe.
+</blockquote><p class="paragraph"/>In the above example the <code>books</code> and <code>authors</code> properties will be available in the view.<p class="paragraph"/>A more advanced approach is to return an instance of the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/servlet/ModelAndView.html" class="api">ModelAndView</a> class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.springframework.web.servlet.ModelAndView<p class="paragraph"/>def index = &#123;
+    def favoriteBooks = &#8230; // get some books just <span class="java&#45;keyword">for</span> the index page, perhaps your favorites<p class="paragraph"/>    // forward to the list view to show them
+    <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">new</span> ModelAndView(<span class="java&#45;quote">"/book/list"</span>, &#91; bookList : favoriteBooks &#93;)
+&#125;</pre></div><p class="paragraph"/>
+<h4>Selecting the View</h4><p class="paragraph"/>In both of the previous two examples there was no code that specified which <a href="../guide/single.html#6.2 Groovy Server Pages" class="guide">view</a> to render. So how does Grails know which view to pick? The answer lies in the conventions. For the action:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+	def show = &#123;
+	 	&#91; book : Book.get( params.id ) &#93;
+	&#125;	
+&#125;</pre></div><p class="paragraph"/>Grails will automatically look for a view at the location <code>grails-app/views/book/show.gsp</code> (actually Grails will try to look for a JSP first, as Grails can equally be used with JSP).<p class="paragraph"/>If you wish to render another view, then the <a href="../ref/Controllers/render.html" class="controllers">render</a> method there to help:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+  	def map = &#91; book : Book.get( params.id ) &#93;
+    render(view:<span class="java&#45;quote">"display"</span>, model:map)
+&#125;</pre></div><p class="paragraph"/>In this case Grails will attempt to render a view at the location <code>grails-app/views/book/display.gsp</code>. Notice that Grails automatically qualifies the view location with the <code>book</code> folder of the <code>grails-app/views</code> directory. This is convenient, but if you have some shared views you need to access instead use:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+  	def map = &#91; book : Book.get( params.id ) &#93;
+    render(view:<span class="java&#45;quote">"/shared/display"</span>, model:map)
+&#125;</pre></div><p class="paragraph"/>In this case Grails will attempt to render a view at the location <code>grails-app/views/shared/display.gsp</code>.<p class="paragraph"/>
+<h4>Rendering a Response</h4><p class="paragraph"/>Sometimes its easier (typically with Ajax applications) to render snippets of text or code to the response directly from the controller. For this, the highly flexible <code>render</code> method can be used:<p class="paragraph"/><div class="code"><pre>render <span class="java&#45;quote">"Hello World!"</span></pre></div><p class="paragraph"/>
+The above code writes the text "Hello World!" to the response, other examples include:<p class="paragraph"/><div class="code"><pre>// write some markup
+render &#123;
+   <span class="java&#45;keyword">for</span>(b in books) &#123;
+      div(id:b.id, b.title)
+   &#125;
+&#125;
+// render a specific view
+render(view:'show')
+// render a template <span class="java&#45;keyword">for</span> each item in a collection
+render(template:'book_template', collection:Book.list())
+// render some text with encoding and content type
+render(text:<span class="java&#45;quote">"&#60;xml&#62;some xml&#60;/xml&#62;"</span>,contentType:<span class="java&#45;quote">"text/xml"</span>,encoding:<span class="java&#45;quote">"UTF&#45;8"</span>)</pre></div><p class="paragraph"/>If you plan on using Groovy's MarkupBuilder to generate html for use with the render method becareful of naming clashes between html elements and Grails tags. e.g.<p class="paragraph"/><div class="code"><pre>def login = &#123;
+        StringWriter w = <span class="java&#45;keyword">new</span> StringWriter()
+        def builder = <span class="java&#45;keyword">new</span> groovy.xml.MarkupBuilder(w)
+        builder.html&#123;
+            head&#123;
+                title 'Log in'
+            &#125;
+            body&#123;
+                h1 'Hello'
+                form&#123;<p class="paragraph"/>                &#125;
+            &#125;
+        &#125;<p class="paragraph"/>        def html = w.toString()
+        render html
+    &#125;</pre></div><p class="paragraph"/>Will actually <a href="../guide/single.html#6.2.2.6 Tags as Method Calls" class="guide">call the form tag</a> (which will return some text that will be ignored by the MarkupBuilder). To correctly output a &#60;form&#62; elemement, use the following:<p class="paragraph"/> <div class="code"><pre>def login = &#123;
+        // &#8230;
+        body&#123;
+            h1 'Hello'
+            builder.form&#123;<p class="paragraph"/>            &#125;
+        &#125;
+        // &#8230;
+   &#125;</pre></div>
+<h2><a name="6.1.4 Redirects and Chaining">6.1.4 Redirects and Chaining</a></h2><h4>Redirects</h4><p class="paragraph"/>                 Actions can be redirected using the <a href="../ref/Controllers/redirect.html" class="controllers">redirect</a> method present in all controllers:<p class="paragraph"/>                 <div class="code"><pre>class OverviewController &#123;
+                     def login = &#123;&#125;<p class="paragraph"/>                     def find = &#123;
+                         <span class="java&#45;keyword">if</span>(!session.user)
+                            redirect(action:login)
+                         &#8230;
+                     &#125;
+                 &#125;</pre></div><p class="paragraph"/>                 Internally the <a href="../ref/Controllers/redirect.html" class="controllers">redirect</a> method uses the <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletResponse.html" class="api">HttpServletResonse</a> object's <code>sendRedirect</code> method.<p class="paragraph"/>                 The <code>redirect</code> method expects either:
+<ul class="star">
+<li>Another closure within the same controller class:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Call the login action within the same class
+                 redirect(action:login)</pre></div>
+<ul class="star">
+<li>The name of a controller and action:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Also redirects to the index action in the home controller
+                 redirect(controller:'home',action:'index')</pre></div>
+<ul class="star">
+<li> A URI for a resource relative the application context path:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Redirect to an explicit URI
+                 redirect(uri:<span class="java&#45;quote">"/login.html"</span>)</pre></div>
+<ul class="star">
+<li>Or a full URL:</li>
+</ul><p class="paragraph"/>                 <div class="code"><pre>// Redirect to a URL
+                 redirect(url:<span class="java&#45;quote">"http://grails.org"</span>)</pre></div><p class="paragraph"/>                 Parameters can be optionally passed from one action to the next using the <code>params</code> argument of the method:<p class="paragraph"/>                 <div class="code"><pre>redirect(action:myaction, params:&#91;myparam:<span class="java&#45;quote">"myvalue"</span>&#93;)</pre></div><p class="paragraph"/>
+                 These parameters are made available through the <a href="../ref/Controllers/params.html" class="controllers">params</a> dynamic property that also accesses request parameters. If a parameter is specified with the same name as a request parameter the request parameter is overridden and the controller parameter used.<p class="paragraph"/>                 Since the <code>params</code> object is also a map, you can use it to pass the current request parameters from one action to the next:<p class="paragraph"/>                 <div class="code"><pre>redirect(action:<span class="java&#45;quote">"next"</span>, params:params)</pre></div><p class="paragraph"/>                 Finally, you can also include a fragment in the target URI:<p class="paragraph"/>                 <div class="code"><pre>redirect(controller: <span class="java&#45;quote">"test"</span>, action: <span class="java&#45;quote">"show"</span>, fragment: <span class="java&#45;quote">"profile"</span>)</pre></div><p class="paragraph"/>                 will (depending on the URL mappings) redirect to something like "/myapp/test/show#profile".<p class="paragraph"/>                 h4. Chaining<p class="paragraph"/>                 Actions can also be chained. Chaining allows the model to be retained from one action to the next. For example calling the <code>first</code> action in the below action:<p class="paragraph"/>                 <div class="code"><pre>class ExampleChainController &#123;
+                     def first = &#123;
+                         chain(action:second,model:&#91;one:1&#93;)
+                     &#125;
+                     def second  = &#123;
+                         chain(action:third,model:&#91;two:2&#93;)
+                     &#125;
+                     def third = &#123;
+                          &#91;three:3&#93;)
+                     &#125;
+                 &#125;</pre></div><p class="paragraph"/>
+                 Results in the model:<p class="paragraph"/>                 <div class="code"><pre>&#91;one:1, two:2, three:3&#93;</pre></div><p class="paragraph"/>
+                 The model can be accessed in subsequent controller actions in the chain via the <code>chainModel</code> map. This dynamic property only exists in actions following the call to the <code>chain</code> method:<p class="paragraph"/>                 <div class="code"><pre>class ChainController &#123;<p class="paragraph"/>                     def nextInChain = &#123;
+                         def model = chainModel.myModel
+                         &#8230;
+                     &#125;
+                 &#125;</pre></div><p class="paragraph"/>
+                 Like the <code>redirect</code> method you can also pass parameters to the <code>chain</code> method:<p class="paragraph"/>                 <div class="code"><pre>chain(action:<span class="java&#45;quote">"action1"</span>, model:&#91;one:1&#93;, params:&#91;myparam:<span class="java&#45;quote">"param1"</span>&#93;)</pre></div><p class="paragraph"/>
+<h2><a name="6.1.5 Controller Interceptors">6.1.5 Controller Interceptors</a></h2>Often it is useful to intercept processing based on either request, session or application state. This can be achieved via action interceptors. There are currently 2 types of interceptors: before and after.<p class="paragraph"/><blockquote class="note">
+If your interceptor is likely to apply to more than one controller, you are almost certainly better off writing a <a href="../guide/single.html#6.6 Filters" class="guide">Filter</a>. Filters can be applied to multiple controllers or URIs, without the need to change the logic of each controller
+</blockquote><p class="paragraph"/><h4>Before Interception</h4><p class="paragraph"/>The <code>beforeInterceptor</code> intercepts processing before the action is executed. If it returns <code>false</code> then the intercepted action will not be executed. The interceptor can be defined for all actions in a controller as follows:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#123;
+       println <span class="java&#45;quote">"Tracing action $&#123;actionUri&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>
+The above is declared inside the body of the controller definition.  It will be executed before all actions and does not interfere with processing. A common use case is however for authentication:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,except:'login'&#93;
+// defined as a regular method so its <span class="java&#45;keyword">private</span>
+def auth() &#123;
+     <span class="java&#45;keyword">if</span>(!session.user) &#123;
+            redirect(action:'login')
+            <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">false</span>
+     &#125;
+&#125;
+def login = &#123;
+     // display login page
+&#125;</pre></div><p class="paragraph"/>
+The above code defines a method called <code>auth</code>. A method is used so that it is not exposed as an action to the outside world (i.e. it is private). The <code>beforeInterceptor</code> then defines an interceptor that is used on all actions 'except' the login action and is told to execute the 'auth' method. The 'auth' method is referenced using Groovy's method pointer syntax, within the method itself it detects whether there is a user in the session otherwise it redirects to the login action and returns false, instruction the intercepted action not to be processed.<p class="paragraph"/><h4>After Interception</h4><p class="paragraph"/>To define an interceptor that is executed after an action use the <code>afterInterceptor</code> property:<p class="paragraph"/><div class="code"><pre>def afterInterceptor = &#123; model &#45;&#62;
+       println <span class="java&#45;quote">"Tracing action $&#123;actionUri&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>The after interceptor takes the resulting model as an argument and can hence perform post manipulation of the model or response.<p class="paragraph"/>An after interceptor may also modify the Spring MVC <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/servlet/ModelAndView.html" class="api">ModelAndView</a> object prior to rendering. In this case, the above example becomes:<p class="paragraph"/><div class="code"><pre>def afterInterceptor = &#123; model, modelAndView &#45;&#62;
+       println <span class="java&#45;quote">"Current view is $&#123;modelAndView.viewName&#125;"</span>
+       <span class="java&#45;keyword">if</span>(model.someVar) modelAndView.viewName = <span class="java&#45;quote">"/mycontroller/someotherview"</span>
+       println <span class="java&#45;quote">"View is now $&#123;modelAndView.viewName&#125;"</span>
+&#125;</pre></div><p class="paragraph"/>This allows the view to be changed based on the model returned by the current action. Note that the <code>modelAndView</code> may be <code>null</code> if the action being intercepted called redirect or render.<p class="paragraph"/>
+<h4>Interception Conditions</h4><p class="paragraph"/>Rails users will be familiar with the authentication example and how the 'except' condition was used when executing the interceptor (interceptors are called 'filters' in Rails, this terminology conflicts with the servlet filter terminology in Java land):<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,except:'login'&#93;</pre></div><p class="paragraph"/>This executes the interceptor for all actions except the specified action. A list of actions can also be defined as follows:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,except:&#91;'login','register'&#93;&#93;</pre></div><p class="paragraph"/>The other supported condition is 'only', this executes the interceptor for only the specified actions:<p class="paragraph"/><div class="code"><pre>def beforeInterceptor = &#91;action:<span class="java&#45;keyword">this</span>.&#38;auth,only:&#91;'secure'&#93;&#93;</pre></div><p class="paragraph"/><p class="paragraph"/>
+<h2><a name="6.1.6 Data Binding">6.1.6 Data Binding</a></h2>Data binding is the act of "binding" incoming request parameters onto the properties of an object or an entire graph of objects. Data binding should deal with all necessary type conversion since request parameters, which are typically delivered via a form submission, are always strings whilst the properties of a Groovy or Java object may well not be.<p class="paragraph"/>Grails uses <a href="http://www.springframework.org" target="blank">Spring&#39;s</a> underlying data binding capability to perform data binding.<p class="paragraph"/><h4>Binding Request Data to the Model</h4><p class="paragraph"/>There are two ways to bind request parameters onto the properties of a domain class. The first involves using a domain classes' implicit constructor:<p class="paragraph"/><div class="code"><pre>def save = &#123;
+  def b = <span class="java&#45;keyword">new</span> Book(params)
+  b.save()
+&#125;</pre></div><p class="paragraph"/>The data binding happens within the code <code>new Book(params)</code>. By passing the <a href="../ref/Controllers/params.html" class="controllers">params</a> object to the domain class constructor Grails automatically recognizes that you are trying to bind from request parameters. So if we had an incoming request like:<p class="paragraph"/><div class="code"><pre>/book/save?title=The%20Stand&#38;author=Stephen%20King</pre></div><p class="paragraph"/>Then the <code>title</code> and <code>author</code> request parameters would automatically get set on the domain class. If you need to perform data binding onto an existing instance then you can use the <a href="../ref/Domain Classes/properties.html" class="domainClasses">properties</a> property:<p class="paragraph"/><div class="code"><pre>def save = &#123;
+  def b = Book.get(params.id)
+  b.properties = params
+  b.save()
+&#125;</pre></div><p class="paragraph"/>This has exactly the same effect as using the implicit constructor.<p class="paragraph"/><h4>Data binding and Single-ended Associations</h4><p class="paragraph"/>If you have a <code>one-to-one</code> or <code>many-to-one</code> association you can use Grails' data binding capability to update these relationships too. For example if you have an incoming request such as:<p class="paragraph"/><div class="code"><pre>/book/save?author.id=20</pre></div><p class="paragraph"/>Grails will automatically detect the <code>.id</code> suffix on the request parameter and look-up the <code>Author</code> instance for the given id when doing data binding such as:<p class="paragraph"/><div class="code"><pre>def b = <span class="java&#45;keyword">new</span> Book(params)</pre></div><p class="paragraph"/><h4>Data Binding and Many-ended Associations</h4><p class="paragraph"/>If you have a one-to-many or many-to-many association there are different techniques for data binding depending of the association type.<p class="paragraph"/>If you have a <code>Set</code> based association (default for a <code>hasMany</code>) then the simplest way to populate an association is to simply send a list of identifiers. For example consider the usage of <code>&#60;g:select&#62;</code> below:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:select name=<span class="xml&#45;quote">"books"</span>
+          from=<span class="xml&#45;quote">"$&#123;Book.list()&#125;"</span>
+          size=<span class="xml&#45;quote">"5"</span> multiple=<span class="xml&#45;quote">"yes"</span> optionKey=<span class="xml&#45;quote">"id"</span>
+          value=<span class="xml&#45;quote">"$&#123;author?.books&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>This produces a select box that allows you to select multiple values. In this case if you submit the form Grails will automatically use the identifiers from the select box to populate the <code>books</code> association.<p class="paragraph"/>However, if you have a scenario where you want to update the properties of the associated objects the this technique won't work. Instead you have to use the subscript operator:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;0&#93;.title"</span> value=<span class="xml&#45;quote">"the Stand"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;1&#93;.title"</span> value=<span class="xml&#45;quote">"the Shining"</span> /&#62;</span></pre></div><p class="paragraph"/>However, with <code>Set</code> based association it is critical that you render the mark-up in the same order that you plan to do the update in. This is because a <code>Set</code> has no concept of order, so although we're referring to <code>books0</code> and <code>books1</code> it is not guaranteed that the order of the association will be correct on the server side unless you apply some explicit sorting yourself.<p class="paragraph"/>This is not a problem if you use <code>List</code> based associations, since a <code>List</code> has a defined order and an index you can refer to. This is also true of <code>Map</code> based associations.<p class="paragraph"/>Note also that if the association you are binding to has a size of 2 and you refer to an element that is outside the size of association:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;0&#93;.title"</span> value=<span class="xml&#45;quote">"the Stand"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;1&#93;.title"</span> value=<span class="xml&#45;quote">"the Shining"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;2&#93;.title"</span> value=<span class="xml&#45;quote">"Red Madder"</span> /&#62;</span></pre></div><p class="paragraph"/>Then Grails will automatically create a new instance for you at the defined position. If you "skipped" a few elements in the middle:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;0&#93;.title"</span> value=<span class="xml&#45;quote">"the Stand"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;1&#93;.title"</span> value=<span class="xml&#45;quote">"the Shining"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"books&#91;5&#93;.title"</span> value=<span class="xml&#45;quote">"Red Madder"</span> /&#62;</span></pre></div><p class="paragraph"/>Then Grails will automatically create instances in between. For example in the above case Grails will create 4 additional instances if the association being bound had a size of 2.<p class="paragraph"/><h4>Data binding with Multiple domain classes</h4><p class="paragraph"/>It is possible to bind data to multiple domain objects from the <a href="../ref/Controllers/params.html" class="controllers">params</a> object.<p class="paragraph"/>For example so you have an incoming request to:<p class="paragraph"/><div class="code"><pre>/book/save?book.title=The%20Stand&#38;author.name=Stephen%20King</pre></div><p class="paragraph"/>You'll notice the difference with the above request is that each parameter has a prefix such as <code>author.</code> or <code>book.</code> which is used to isolate which parameters belong to which type. Grails' <code>params</code> object is like a multi-dimensional hash and you can index into to isolate only a subset of the parameters to bind.<p class="paragraph"/><div class="code"><pre>def b = <span class="java&#45;keyword">new</span> Book(params&#91;'book'&#93;)</pre></div><p class="paragraph"/>Notice how we use the prefix before the first dot of the <code>book.title</code> parameter to isolate only parameters below this level to bind. We could do the same with an <code>Author</code> domain class:<p class="paragraph"/><div class="code"><pre>def a = <span class="java&#45;keyword">new</span> Author(params&#91;'author'&#93;)</pre></div><p class="paragraph"/><h4>Data binding and type conversion errors</h4><p class="paragraph"/>Sometimes when performing data binding it is not possible to convert a particular String into a particular target type. What you get is a type conversion error. Grails will retain type conversion errors inside the <a href="../ref/Domain Classes/errors.html" class="domainClasses">errors</a> property of a Grails domain class. Take this example:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+    &#8230;
+    URL publisherURL
+&#125;</pre></div><p class="paragraph"/>Here we have a domain class <code>Book</code> that uses the Java concrete type <code>java.net.URL</code> to represent URLs. Now say we had an incoming request such as:<p class="paragraph"/><div class="code"><pre>/book/save?publisherURL=a&#45;bad&#45;url</pre></div><p class="paragraph"/>
+In this case it is not possible to bind the string <code>a-bad-url</code> to the <code>publisherURL</code> property os a type mismatch error occurs. You can check for these like this:<p class="paragraph"/>
+<div class="code"><pre>def b = <span class="java&#45;keyword">new</span> Book(params)<p class="paragraph"/><span class="java&#45;keyword">if</span>(b.hasErrors()) &#123;
+   println <span class="java&#45;quote">"The value $&#123;b.errors.getFieldError('publisherURL').rejectedValue&#125; is not a valid URL!"</span>
+&#125;</pre></div><p class="paragraph"/>Although we have not yet covered error codes (for more information see the section on <a href="../guide/single.html#7. Validation" class="guide">Validation</a>), for type conversion errors you would want a message to use for the error inside the grails-app/i18n/messages.properties file. You can use a generic error message handler such as:<p class="paragraph"/><div class="code"><pre>typeMismatch.java.net.URL=The field &#123;0&#125; is not a valid URL</pre></div><p class="paragraph"/>Or a more specific one:<p class="paragraph"/><div class="code"><pre>typeMismatch.Book.publisherURL=The publisher URL you specified is not a valid URL</pre></div><p class="paragraph"/><h4>Data Binding and Security concerns</h4><p class="paragraph"/>When batch updating properties from request parameters you need to be careful not to allow clients to bind malicious data to domain classes that end up being persisted to the database. You can limit what properties are bound to a given domain class using the subscript operator:<p class="paragraph"/><div class="code"><pre>def p = Person.get(1)<p class="paragraph"/>p.properties&#91;'firstName','lastName'&#93; = params</pre></div><p class="paragraph"/>In this case only the <code>firstName</code> and <code>lastName</code> properties will be bound.<p class="paragraph"/>Another way to do this is instead of using domain classes as the target of data binding you could use <a href="../guide/single.html#6.1.9 Command Objects" class="guide">Command Objects</a>. Alternatively there is also the flexible <a href="../ref/Controllers/bindData.html" class="controllers">bindData</a> method.<p class="paragraph"/>The <code>bindData</code> method allows the same data binding capability, but to arbitrary objects:<p class="paragraph"/><div class="code"><pre>def p = <span class="java&#45;keyword">new</span> Person()
+bindData(p, params)</pre></div><p class="paragraph"/>However, the <code>bindData</code> method also allows you to exclude certain parameters that you don't want updated:<p class="paragraph"/><div class="code"><pre>def p = <span class="java&#45;keyword">new</span> Person()
+bindData(p, params, &#91;exclude:'dateOfBirth'&#93;)</pre></div><p class="paragraph"/>Or include only certain properties:<p class="paragraph"/><div class="code"><pre>def p = <span class="java&#45;keyword">new</span> Person()
+bindData(p, params, &#91;include:&#91;'firstName','lastName&#93;&#93;)</pre></div><p class="paragraph"/><h2><a name="6.1.7 XML and JSON Responses">6.1.7 XML and JSON Responses</a></h2><h4>Using the render method to output XML</h4><p class="paragraph"/>Grails' supports a few different ways to produce XML and JSON responses. The first one covered is via the <a href="../ref/Controllers/render.html" class="controllers">render</a> method.<p class="paragraph"/>The <code>render</code> method can be passed a block of code to do mark-up building in XML:<p class="paragraph"/><div class="code"><pre>def list = &#123;
+	def results = Book.list()
+	render(contentType:<span class="java&#45;quote">"text/xml"</span>) &#123;
+		books &#123;
+			<span class="java&#45;keyword">for</span>(b in results) &#123;
+				book(title:b.title)
+			&#125;
+		&#125;	
+	&#125;
+&#125;</pre></div><p class="paragraph"/>The result of this code would be something like:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;books&#62;</span>
+	  <span class="xml&#45;tag">&#60;book title=<span class="xml&#45;quote">"The Stand"</span> /&#62;</span>
+	  <span class="xml&#45;tag">&#60;book title=<span class="xml&#45;quote">"The Shining"</span> /&#62;</span>	
+<span class="xml&#45;tag">&#60;/books&#62;</span></pre></div><p class="paragraph"/>Note that you need to be careful to avoid naming conflicts when using mark-up building. For example this code would produce an error:<p class="paragraph"/><div class="code"><pre>def list = &#123;
+	def books = Book.list()  // naming conflict here
+	render(contentType:<span class="java&#45;quote">"text/xml"</span>) &#123;
+		books &#123;
+			<span class="java&#45;keyword">for</span>(b in results) &#123;
+				book(title:b.title)
+			&#125;
+		&#125;	
+	&#125;
+&#125;</pre></div><p class="paragraph"/>The reason is that there is local variable <code>books</code> which Groovy attempts to invoke as a method.<p class="paragraph"/>
+<h4>Using the render method to output JSON</h4><p class="paragraph"/>The <code>render</code> method can also be used to output JSON:<p class="paragraph"/><div class="code"><pre>def list = &#123;
+	def results = Book.list()
+	render(contentType:<span class="java&#45;quote">"text/json"</span>) &#123;
+		books &#123;
+			<span class="java&#45;keyword">for</span>(b in results) &#123;
+				book(title:b.title)
+			&#125;
+		&#125;	
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this case the result would be something along the lines of:<p class="paragraph"/><div class="code"><pre>&#91;
+	&#123;title:<span class="java&#45;quote">"The Stand"</span>&#125;, 
+	&#123;title:<span class="java&#45;quote">"The Shining"</span>&#125;
+&#93;</pre></div><p class="paragraph"/>Again the same dangers with naming conflicts apply to JSON building.<p class="paragraph"/><h4>Automatic XML Marshalling</h4><p class="paragraph"/>Grails also supports automatic marshaling of <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a> to XML via special converters.<p class="paragraph"/>To start off with import the <code>grails.converters</code> package into your controller:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;</pre></div><p class="paragraph"/>Now you can use the following highly readable syntax to automatically convert domain classes to XML:<p class="paragraph"/><div class="code"><pre>render Book.list() as XML</pre></div><p class="paragraph"/>The resulting output would look something like the following::<p class="paragraph"/><div class="code"><pre>&#60;?xml version=<span class="java&#45;quote">"1.0"</span> encoding=<span class="java&#45;quote">"ISO&#45;8859&#45;1"</span>?&#62;
+&#60;list&#62;
+  &#60;book id=<span class="java&#45;quote">"1"</span>&#62;
+    &#60;author&#62;Stephen King&#60;/author&#62;
+    &#60;title&#62;The Stand&#60;/title&#62;
+  &#60;/book&#62;
+  &#60;book id=<span class="java&#45;quote">"2"</span>&#62;
+    &#60;author&#62;Stephen King&#60;/author&#62;
+    &#60;title&#62;The Shining&#60;/title&#62;
+  &#60;/book&#62;
+&#60;/list&#62;</pre></div><p class="paragraph"/>An alternative to using the converters is to use the <a href="../guide/single.html#11.2 Encoding and Decoding Objects" class="guide">codecs</a> feature of Grails. The codecs feature provides <a href="../guide/single.html#11.2 Encoding and Decoding Objects" class="guide">encodeAsXML</a> and <a href="../guide/single.html#11.2 Encoding and Decoding Objects" class="guide">encodeAsJSON</a> methods:<p class="paragraph"/><div class="code"><pre>def xml = Book.list().encodeAsXML()
+render xml</pre></div><p class="paragraph"/>For more information on XML marshaling see the section on <a href="../guide/single.html#13.1 REST" class="guide">REST</a><p class="paragraph"/><h4>Automatic JSON Marshalling</h4><p class="paragraph"/>Grails also supports automatic marshaling to JSON via the same mechanism. Simply substitute <code>XML</code> with <code>JSON</code>:<p class="paragraph"/><div class="code"><pre>render Book.list() as JSON</pre></div><p class="paragraph"/>The resulting output would look something like the following:<p class="paragraph"/><div class="code"><pre>&#91;
+	&#123;<span class="java&#45;quote">"id"</span>:1,
+	 <span class="java&#45;quote">"class"</span>:<span class="java&#45;quote">"Book"</span>,
+	 <span class="java&#45;quote">"author"</span>:<span class="java&#45;quote">"Stephen King"</span>,
+	 <span class="java&#45;quote">"title"</span>:<span class="java&#45;quote">"The Stand"</span>&#125;,
+	&#123;<span class="java&#45;quote">"id"</span>:2,
+	 <span class="java&#45;quote">"class"</span>:<span class="java&#45;quote">"Book"</span>,
+	 <span class="java&#45;quote">"author"</span>:<span class="java&#45;quote">"Stephen King"</span>,
+	 <span class="java&#45;quote">"releaseDate"</span>:<span class="java&#45;keyword">new</span> Date(1194127343161),
+	 <span class="java&#45;quote">"title"</span>:<span class="java&#45;quote">"The Shining"</span>&#125;
+ &#93;</pre></div><p class="paragraph"/>Again as an alternative you can use the <code>encodeAsJSON</code> to achieve the same effect.<h2><a name="6.1.8 Uploading Files">6.1.8 Uploading Files</a></h2><h4>Programmatic File Uploads</h4><p class="paragraph"/>Grails supports file uploads via Spring's <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/multipart/MultipartHttpServletRequest.html" class="api">MultipartHttpServletRequest</a> interface. To upload a file the first step is to create a multipart form like the one below:<p class="paragraph"/><div class="code"><pre>Upload Form: <span class="xml&#45;tag">&#60;br /&#62;</span>
+	<span class="xml&#45;tag">&#60;g:form action=<span class="xml&#45;quote">"upload"</span> method=<span class="xml&#45;quote">"post"</span> enctype=<span class="xml&#45;quote">"multipart/form&#45;data"</span>&#62;</span>
+		<span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"file"</span> name=<span class="xml&#45;quote">"myFile"</span> /&#62;</span>
+		<span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"submit"</span> /&#62;</span>
+	<span class="xml&#45;tag">&#60;/g:form&#62;</span></pre></div><p class="paragraph"/>
+There are then a number of ways to handle the file upload. The first way is to work with the Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/multipart/MultipartFile.html" class="api">MultipartFile</a> instance directly:<p class="paragraph"/><div class="code"><pre>def upload = &#123;
+    def f = request.getFile('myFile')
+    <span class="java&#45;keyword">if</span>(!f.empty) &#123;
+      f.transferTo( <span class="java&#45;keyword">new</span> File('/some/local/dir/myfile.txt') )
+      response.sendError(200,'Done');
+    &#125;    
+    <span class="java&#45;keyword">else</span> &#123;
+       flash.message = 'file cannot be empty'
+       render(view:'uploadForm')
+    &#125;
+&#125;</pre></div><p class="paragraph"/><p class="paragraph"/>This is clearly handy for doing transfers to other destinations and manipulating the file directly as you can obtain an InputStream and so on via the <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/multipart/MultipartFile.html" class="api">MultipartFile</a> interface.<p class="paragraph"/><h4>File Uploads through Data Binding</h4><p class="paragraph"/>File uploads can also be performed via data binding. For example say you have an <code>Image</code> domain class as per the below example:<p class="paragraph"/><div class="code"><pre>class Image &#123;
+   <span class="java&#45;object">byte</span>&#91;&#93; myFile
+&#125;</pre></div><p class="paragraph"/>Now if you create an image and pass in the <code>params</code> object such as the below example, Grails will automatically bind the file's contents as a byte to the <code>myFile</code> property:<p class="paragraph"/><div class="code"><pre>def img = <span class="java&#45;keyword">new</span> Image(params)</pre></div><p class="paragraph"/>It is also possible to set the contents of the file as a string by changing the type of the <code>myFile</code> property on the image to a String type:<p class="paragraph"/><div class="code"><pre>class Image &#123;
+   <span class="java&#45;object">String</span> myFile
+&#125;</pre></div><p class="paragraph"/><h2><a name="6.1.9 Command Objects">6.1.9 Command Objects</a></h2>Grails controllers support the concept of command objects. A command object is similar to a form bean in something like Struts and they are useful in circumstances when you want to populate a subset of the properties needed to update a domain class. Or where there is no domain class required for the interaction, but you need features such as <a href="../guide/single.html#6.1.6 Data Binding" class="guide">data binding</a> and <a href="../guide/single.html#7. Validation" class="guide">validation</a>.<p class="paragraph"/><h4>Declaring Command Objects</h4><p class="paragraph"/>Command objects are typically declared in the same source file as a controller directly below the controller class definition. For example:<p class="paragraph"/><div class="code"><pre>class UserController &#123;
+	&#8230;
+&#125;
+class LoginCommand &#123;
+   <span class="java&#45;object">String</span> username
+   <span class="java&#45;object">String</span> password
+   <span class="java&#45;keyword">static</span> constraints = &#123;
+           username(blank:<span class="java&#45;keyword">false</span>, minSize:6)
+           password(blank:<span class="java&#45;keyword">false</span>, minSize:6)
+   &#125;
+&#125;</pre></div><p class="paragraph"/>As the previous example demonstrates you can supply <a href="../guide/single.html#7.1 Declaring Constraints" class="guide">constraints</a> to command objects just as you can with <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a>.<p class="paragraph"/><h4>Using Command Objects</h4><p class="paragraph"/>To use command objects, controller actions may optionally specify any number of command object parameters. The parameter types must be supplied so that Grails knows what objects to create, populate and validate.<p class="paragraph"/>Before the controller action is executed Grails will automatically create an instance of the command object class, populate the properties of the command object with request parameters having corresponding names and the command object will be validated. For Example:<p class="paragraph"/><div class="code"><pre>class LoginController &#123;
+  def login = &#123; LoginCommand cmd &#45;&#62;
+         <span class="java&#45;keyword">if</span>(cmd.hasErrors()) &#123;
+                redirect(action:'loginForm')
+         &#125;
+         <span class="java&#45;keyword">else</span> &#123;
+            // <span class="java&#45;keyword">do</span> something <span class="java&#45;keyword">else</span>
+        &#125;
+  &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Command Objects and Dependency Injection</h4><p class="paragraph"/>Command objects can participate in dependency injection. This is useful if your command object has some custom validation logic which may need to interact with Grails <a href="../guide/single.html#8. The Service Layer" class="guide">services</a>:<p class="paragraph"/><div class="code"><pre>class LoginCommand &#123;
+    def loginService<p class="paragraph"/>	<span class="java&#45;object">String</span> username
+	<span class="java&#45;object">String</span> password<p class="paragraph"/>	<span class="java&#45;keyword">static</span> constraints = &#123;
+		username(validator: &#123; val, obj &#45;&#62;
+			obj.loginService.canLogin(obj.username, obj.password)
+		&#125;)
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this example the command object interacts with a bean injected by name from the Spring <code>ApplicationContext</code>.<p class="paragraph"/>
+<h2><a name="6.1.10 Handling Duplicate Form Submissions">6.1.10 Handling Duplicate Form Submissions</a></h2>Grails has built in support for handling duplicate form submissions using the "Synchronizer Token Pattern". To get started you need to define a token on the <a href="../ref/Tags/form.html" class="tags">form</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:form useToken=<span class="xml&#45;quote">"true"</span> ...&#62;</span></pre></div><p class="paragraph"/>Then in your controller code you can use the <a href="../ref/Controllers/withForm.html" class="controllers">withForm</a> method to handle valid and invalid requests:<p class="paragraph"/><div class="code"><pre>withForm &#123;
+   // good request
+&#125;.invalidToken &#123;
+   // bad request
+&#125;</pre></div><p class="paragraph"/>If you only provide the <a href="../ref/Controllers/withForm.html" class="controllers">withForm</a> method and not the chained <code>invalidToken</code> method then by default Grails will store the invalid token in a <code>flash.invalidToken</code> variable and redirect the request back to the original page. This can then be checked in the view:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:if test=<span class="xml&#45;quote">"$&#123;flash.invalidToken&#125;"</span>&#62;</span>
+  Don't click the button twice!
+<span class="xml&#45;tag">&#60;/g:if&#62;</span></pre></div><p class="paragraph"/><blockquote class="warning">
+The <a href="../ref/Controllers/withForm.html" class="controllers">withForm</a> tag makes use of the <a href="../ref/Controllers/session.html" class="controllers">session</a> and hence requires session affinity if used in a cluster.
+</blockquote><h2><a name="6.2 Groovy Server Pages">6.2 Groovy Server Pages</a></h2>Groovy Servers Pages (or GSP for short) is Grails' view technology. It is designed to be familiar for users of technologies such as ASP and JSP, but to be far more flexible and intuitive.<p class="paragraph"/>In Grails GSPs live in the <code>grails-app/views</code> directory and are typically rendered automatically (by convention) or via the <a href="../ref/Controllers/render.html" class="controllers">render</a> method such as:<p class="paragraph"/><div class="code"><pre>render(view:<span class="java&#45;quote">"index"</span>)</pre></div><p class="paragraph"/>A GSP is typically a mix of mark-up and GSP tags which aid in view rendering.<p class="paragraph"/><blockquote class="note">
+	Although it is possible to have Groovy logic embedded in your GSP and doing this will be covered in this document the practice is strongly discouraged. Mixing mark-up and code is a <strong class="bold">bad</strong> thing and most GSP pages contain no code and needn't do so.
+</blockquote><p class="paragraph"/>A GSP typically has a "model" which is a set of variables that are used for view rendering. The model is passed to the GSP view from a controller. For example consider the following controller action:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+	&#91;book: Book.get(params.id)&#93;
+&#125;</pre></div><p class="paragraph"/>This action will look-up a <code>Book</code> instance and create a model that contains a key called <code>book</code>. This key can then be reference within the GSP view using the name <code>book</code>:<p class="paragraph"/><div class="code"><pre>&#60;%=book.title%&#62;</pre></div>
+<h2><a name="6.2.1 GSP Basics">6.2.1 GSP Basics</a></h2>In the next view sections we'll go through the basics of GSP and what is available to you. First off let's cover some basic syntax that users of JSP and ASP should be familiar with.<p class="paragraph"/>GSP supports the usage of <code>&#60;% %&#62;</code> blocks to embed Groovy code (again this is discouraged):<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+     <span class="xml&#45;tag">&#60;% out &#60;&#60; <span class="xml&#45;quote">"Hello GSP!"</span> %&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>As well as this syntax you can also use the <code>&#60;%= %&#62;</code> syntax to output values:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+     <span class="xml&#45;tag">&#60;%=<span class="xml&#45;quote">"Hello GSP!"</span> %&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>
+GSP also supports JSP-style server-side comments as the following example demonstrates:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+	 <span class="xml&#45;tag">&#60;%&#45;&#45; This is my comment &#45;&#45;%&#62;</span>
+     <span class="xml&#45;tag">&#60;%=<span class="xml&#45;quote">"Hello GSP!"</span> %&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div>
+<h2><a name="6.2.1.1 Variables and Scopes">6.2.1.1 Variables and Scopes</a></h2>Within the <code>&#60;% %&#62;</code> brackets you can of course declare variables:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;% now = new Date() %&#62;</span></pre></div><p class="paragraph"/>And then re-use those variables further down the page:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;%=now%&#62;</span></pre></div><p class="paragraph"/>However, within the scope of a GSP there are a number of pre-defined variables including:
+<ul class="star">
+<li><code>application</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/ServletContext.html" class="api">javax.servlet.ServletContext</a> instance</li>
+<li><code>applicationContext</code> The Spring <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/ApplicationContext.html" class="api">ApplicationContext</a> instance</li>
+<li><code>flash</code> - The <a href="../ref/Controllers/flash.html" class="controllers">flash</a> object</li>
+<li><code>grailsApplication</code> - The api:org.codehaus.groovy.grails.commons.GrailsApplication instance</li>
+<li><code>out</code> - The response writer for writing to the output stream</li>
+<li><code>params</code> - The <a href="../ref/Controllers/params.html" class="controllers">params</a> object for retrieving request parameters</li>
+<li><code>request</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletRequest.html" class="api">HttpServletRequest</a> instance</li>
+<li><code>response</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletResponse.html" class="api">HttpServletResponse</a> instance</li>
+<li><code>session</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpSession.html" class="api">HttpSession</a> instance</li>
+<li><code>webRequest</code> - The api:org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest instance</li>
+</ul><p class="paragraph"/><h2><a name="6.2.1.2 Logic and Iteration">6.2.1.2 Logic and Iteration</a></h2>Using the <code>&#60;% %&#62;</code> syntax you can of course embed loops and so on using this syntax:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+      <span class="xml&#45;tag">&#60;% &#91;1,2,3,4&#93;.each &#123; num &#45;&#62;</span> %&#62;
+         <span class="xml&#45;tag">&#60;p&#62;</span><span class="xml&#45;tag">&#60;%=<span class="xml&#45;quote">"Hello $&#123;num&#125;!"</span> %&#62;</span><span class="xml&#45;tag">&#60;/p&#62;</span>
+      <span class="xml&#45;tag">&#60;%&#125;%&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>As well as logical branching:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+   <span class="xml&#45;tag">&#60;body&#62;</span>
+      <span class="xml&#45;tag">&#60;% if(params.hello == 'true' )%&#62;</span>	
+      <span class="xml&#45;tag">&#60;%=<span class="xml&#45;quote">"Hello!"</span>%&#62;</span>
+      <span class="xml&#45;tag">&#60;% else %&#62;</span>
+      <span class="xml&#45;tag">&#60;%=<span class="xml&#45;quote">"Goodbye!"</span>%&#62;</span>
+   <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><h2><a name="6.2.1.3 Page Directives">6.2.1.3 Page Directives</a></h2>GSP also supports a few JSP-style page directives.<p class="paragraph"/>The import directive allows you to import classes into the page. However, it is rarely needed due to Groovy's default imports and <a href="../guide/single.html#6.2.2 GSP Tags" class="guide">GSP Tags</a>:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;%@ page import=<span class="xml&#45;quote">"java.awt.&#42;"</span> %&#62;</span></pre></div><p class="paragraph"/>GSP also supports the contentType directive:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;%@ page contentType=<span class="xml&#45;quote">"text/json"</span> %&#62;</span></pre></div><p class="paragraph"/>The contentType directive allows using GSP to render other formats.
+<h2><a name="6.2.1.4 Expressions">6.2.1.4 Expressions</a></h2>In GSP the <code>&#60;%= %&#62;</code> syntax introduced earlier is rarely used due to the support for GSP expressions. It is present mainly to allow ASP and JSP developers to feel at home using GSP. A GSP expression is similar to a JSP EL expression or a Groovy GString and takes the form <code>${expr}</code>:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+  <span class="xml&#45;tag">&#60;body&#62;</span>
+    Hello $&#123;params.name&#125;
+  <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>However, unlike JSP EL you can have any Groovy expression within the <code>${..}</code> parenthesis. Variables within the <code>${..}</code> are <strong class="bold">not</strong> escaped by default, so any HTML in the variable's string is output directly to the page. To reduce the risk of Cross-site-scripting (XSS) attacks, you can enable automatic HTML escaping via the <code>grails.views.default.codec</code> setting in <code>grails-app/conf/Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.views.<span class="java&#45;keyword">default</span>.codec='html'</pre></div><p class="paragraph"/>Other possible values are 'none' (for no default encoding) and 'base64'.
+<h2><a name="6.2.2 GSP Tags">6.2.2 GSP Tags</a></h2>Now that the less attractive JSP heritage has been set aside, the following sections cover GSP's built-in tags, which are the favored way to define GSP pages.<p class="paragraph"/><blockquote class="note">
+The section on <a href="../guide/single.html#6.3 Tag Libraries" class="guide">Tag Libraries</a> covers how to add your own custom tag libraries.
+</blockquote><p class="paragraph"/>All built-in GSP tags start with the prefix <code>g:</code>. Unlike JSP, you don't need to specify any tag library imports. If a tag starts with <code>g:</code> it is automatically assumed to be a GSP tag. An example GSP tag would look like:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:example /&#62;</span></pre></div><p class="paragraph"/>GSP tags can also have a body such as:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:example&#62;</span>
+   Hello world
+<span class="xml&#45;tag">&#60;/g:example&#62;</span></pre></div><p class="paragraph"/>Expressions can be passed into GSP tag attributes, if an expression is not used it will be assumed to be a String value:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:example attr=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span>&#62;</span>
+   Hello world
+<span class="xml&#45;tag">&#60;/g:example&#62;</span></pre></div><p class="paragraph"/>Maps can also be passed into GSP tag attributes, which are often used for a named parameter style syntax:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:example attr=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span> attr2=<span class="xml&#45;quote">"&#91;one:1, two:2, three:3&#93;"</span>&#62;</span>
+   Hello world
+<span class="xml&#45;tag">&#60;/g:example&#62;</span></pre></div><p class="paragraph"/>Note that within the values of attributes you must use single quotes for Strings:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:example attr=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span> attr2=<span class="xml&#45;quote">"&#91;one:'one', two:'two'&#93;"</span>&#62;</span>
+   Hello world
+<span class="xml&#45;tag">&#60;/g:example&#62;</span></pre></div><p class="paragraph"/>With the basic syntax out the way, the next sections look at the tags that are built into Grails by default.<p class="paragraph"/><h2><a name="6.2.2.1 Variables and Scopes">6.2.2.1 Variables and Scopes</a></h2>Variables can be defined within a GSP using the <a href="../ref/Tags/set.html" class="tags">set</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"now"</span> value=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>Here we assign a variable called <code>now</code> to the result of a GSP expression (which simply constructs a new <code>java.util.Date</code> instance). You can also use the body of the <code>&#60;g:set&#62;</code> tag to define a variable:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"myHTML"</span>&#62;</span>
+   Some re&#45;usable code on: $&#123;new Date()&#125;
+<span class="xml&#45;tag">&#60;/g:set&#62;</span></pre></div><p class="paragraph"/>Variables can also be placed in one of the following scopes:
+<ul class="star">
+<li><code>page</code> - Scoped to the current page (default)</li>
+<li><code>request</code> - Scoped to the current request</li>
+<li><code>flash</code> - Placed within <a href="../ref/Controllers/flash.html" class="controllers">flash</a> scope and hence available for the next request</li>
+<li><code>session</code> - Scoped for the user session</li>
+<li><code>application</code> - Application-wide scope.</li>
+</ul><p class="paragraph"/>To select which scope a variable is placed into use the <code>scope</code> attribute:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"now"</span> value=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span> scope=<span class="xml&#45;quote">"request"</span> /&#62;</span></pre></div><h2><a name="6.2.2.2 Logic and Iteration">6.2.2.2 Logic and Iteration</a></h2>GSP also supports logical and iterative tags out of the box. For logic there are <a href="../ref/Tags/if.html" class="tags">if</a>, <a href="../ref/Tags/else.html" class="tags">else</a> and <a href="../ref/Tags/elseif.html" class="tags">elseif</a> which support your typical branching scenarios:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:if test=<span class="xml&#45;quote">"$&#123;session.role == 'admin'&#125;"</span>&#62;</span>
+   <span class="xml&#45;tag">&#60;%&#45;&#45; show administrative functions &#45;&#45;%&#62;</span>
+<span class="xml&#45;tag">&#60;/g:if&#62;</span>
+<span class="xml&#45;tag">&#60;g:else&#62;</span>
+   <span class="xml&#45;tag">&#60;%&#45;&#45; show basic functions &#45;&#45;%&#62;</span>
+<span class="xml&#45;tag">&#60;/g:else&#62;</span></pre></div><p class="paragraph"/>For iteration GSP has the <a href="../ref/Tags/each.html" class="tags">each</a> and <a href="../ref/Tags/while.html" class="tags">while</a> tags:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:each in=<span class="xml&#45;quote">"$&#123;&#91;1,2,3&#93;&#125;"</span> var=<span class="xml&#45;quote">"num"</span>&#62;</span>
+   <span class="xml&#45;tag">&#60;p&#62;</span>Number $&#123;num&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:each&#62;</span><p class="paragraph"/><span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"num"</span> value=<span class="xml&#45;quote">"$&#123;1&#125;"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;g:while test=<span class="xml&#45;quote">"$&#123;num &#60; 5 &#125;"</span>&#62;</span>
+    <span class="xml&#45;tag">&#60;p&#62;</span>Number $&#123;num++&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:while&#62;</span></pre></div><h2><a name="6.2.2.3 Search and Filtering">6.2.2.3 Search and Filtering</a></h2>If you have collections of objects you often need to sort and filter them in some way. GSP supports the <a href="../ref/Tags/findAll.html" class="tags">findAll</a> and <a href="../ref/Tags/grep.html" class="tags">grep</a> for this task:<p class="paragraph"/><div class="code"><pre>Stephen King's Books:
+<span class="xml&#45;tag">&#60;g:findAll in=<span class="xml&#45;quote">"$&#123;books&#125;"</span> expr=<span class="xml&#45;quote">"it.author == 'Stephen King'"</span>&#62;</span>
+     <span class="xml&#45;tag">&#60;p&#62;</span>Title: $&#123;it.title&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:findAll&#62;</span></pre></div><p class="paragraph"/>The <code>expr</code> attribute contains a Groovy expression that can be used as a filter. Speaking of filters the <a href="../ref/Tags/grep.html" class="tags">grep</a> tag does a similar job such as filter by class:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:grep in=<span class="xml&#45;quote">"$&#123;books&#125;"</span> filter=<span class="xml&#45;quote">"NonFictionBooks.class"</span>&#62;</span>
+     <span class="xml&#45;tag">&#60;p&#62;</span>Title: $&#123;it.title&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:grep&#62;</span></pre></div><p class="paragraph"/>Or using a regular expression:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:grep in=<span class="xml&#45;quote">"$&#123;books.title&#125;"</span> filter=<span class="xml&#45;quote">"~/.&#42;?Groovy.&#42;?/"</span>&#62;</span>
+     <span class="xml&#45;tag">&#60;p&#62;</span>Title: $&#123;it&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:grep&#62;</span></pre></div><p class="paragraph"/>The above example is also interesting due to its usage of GPath. GPath is Groovy's equivalent to an XPath like language. Essentially the <code>books</code> collection is a collection of <code>Book</code> instances. However assuming each <code>Book</code> has a <code>title</code>, you can obtain a list of Book titles using the expression <code>books.title</code>. Groovy will auto-magically go through the list of Book instances, obtain each title, and return a new list!<h2><a name="6.2.2.4 Links and Resources">6.2.2.4 Links and Resources</a></h2>GSP also features tags to help you manage linking to controllers and actions. The <a href="../ref/Tags/link.html" class="tags">link</a> tag allows you to specify controller and action name pairing and it will automatically work out the link based on the <a href="../guide/single.html#6.4 URL Mappings" class="guide">URL Mappings</a>, even if you change them! Some examples of the <a href="../ref/Tags/link.html" class="tags">link</a> can be seen below:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"show"</span> id=<span class="xml&#45;quote">"1"</span>&#62;</span>Book 1<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"show"</span> id=<span class="xml&#45;quote">"$&#123;currentBook.id&#125;"</span>&#62;</span>$&#123;currentBook.name&#125;<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"book"</span>&#62;</span>Book Home<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"book"</span> action=<span class="xml&#45;quote">"list"</span>&#62;</span>Book List<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link url=<span class="xml&#45;quote">"&#91;action:'list',controller:'book'&#93;"</span>&#62;</span>Book List<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"list"</span> params=<span class="xml&#45;quote">"&#91;sort:'title',order:'asc',author:currentBook.author&#93;"</span>&#62;</span>
+     Book List
+<span class="xml&#45;tag">&#60;/g:link&#62;</span></pre></div>
+<h2><a name="6.2.2.5 Forms and Fields">6.2.2.5 Forms and Fields</a></h2><h4>Form Basics</h4><p class="paragraph"/>GSP supports many different tags for aiding in dealing with HTML forms and fields, the most basic of which is the <a href="../ref/Tags/form.html" class="tags">form</a> tag. The <code>form</code> tag is a controller/action aware version of the regular HTML form tag. The <code>url</code> attribute allows you to specify which controller and action to map to:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:form name=<span class="xml&#45;quote">"myForm"</span> url=<span class="xml&#45;quote">"&#91;controller:'book',action:'list'&#93;"</span>&#62;</span>...<span class="xml&#45;tag">&#60;/g:form&#62;</span></pre></div><p class="paragraph"/>In this case we create a form called <code>myForm</code> that submits to the <code>BookController</code>'s <code>list</code> action. Beyond that all of the usual HTML attributes apply.<p class="paragraph"/><h4>Form Fields</h4><p class="paragraph"/>As well as easy construction of forms GSP supports custom tags for dealing with different types of fields including:
+<ul class="star">
+<li><a href="../ref/Tags/textField.html" class="tags">textField</a> - For input fields of type 'text'</li>
+<li><a href="../ref/Tags/checkBox.html" class="tags">checkBox</a> - For input fields of type 'checkbox'</li>
+<li><a href="../ref/Tags/radio.html" class="tags">radio</a> - For input fields of type 'radio'</li>
+<li><a href="../ref/Tags/hiddenField.html" class="tags">hiddenField</a> - For input fields of type 'hidden'</li>
+<li><a href="../ref/Tags/select.html" class="tags">select</a> - For dealing with HTML select boxes</li>
+</ul><p class="paragraph"/>Each of these allow GSP expressions as the value:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:textField name=<span class="xml&#45;quote">"myField"</span> value=<span class="xml&#45;quote">"$&#123;myValue&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>GSP also contains extended helper versions of the above tags such as <a href="../ref/Tags/radioGroup.html" class="tags">radioGroup</a> (for creating groups of <a href="../ref/Tags/radio.html" class="tags">radio</a> tags), <a href="../ref/Tags/localeSelect.html" class="tags">localeSelect</a>, <a href="../ref/Tags/currencySelect.html" class="tags">currencySelect</a> and <a href="../ref/Tags/timeZoneSelect.html" class="tags">timeZoneSelect</a> (for selecting locale's, currencies and time zone's respectively).<p class="paragraph"/><h4>Multiple Submit Buttons</h4><p class="paragraph"/>The age old problem of dealing with multiple submit buttons is also handled elegantly with Grails via the <a href="../ref/Tags/actionSubmit.html" class="tags">actionSubmit</a> tag. It is just like a regular submit, but allows you to specify an alternative action to submit to:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:actionSubmit value=<span class="xml&#45;quote">"Some update label"</span> action=<span class="xml&#45;quote">"update"</span> /&#62;</span></pre></div><p class="paragraph"/><h2><a name="6.2.2.6 Tags as Method Calls">6.2.2.6 Tags as Method Calls</a></h2>One major different between GSP tags and other tagging technologies is that GSP tags can be called as either regular tags or as method calls from either <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a>, <a href="../guide/single.html#6.3 Tag Libraries" class="guide">tag libraries</a> or GSP views.<p class="paragraph"/><h4>Tags as method calls from GSPs</h4><p class="paragraph"/>When called as methods tags return their results as a String instead of writing directly to the response. So for example the <a href="../ref/Tags/createLinkTo.html" class="tags">createLinkTo</a> tag can equally be called as a method:<p class="paragraph"/><div class="code"><pre>Static Resource: $&#123;createLinkTo(dir:<span class="xml&#45;quote">"images"</span>, file:<span class="xml&#45;quote">"logo.jpg"</span>)&#125;</pre></div><p class="paragraph"/>This is particularly useful when you need to use a tag within an attribute:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;img src=<span class="xml&#45;quote">"$&#123;createLinkTo(dir:'images', file:'logo.jpg')&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>In view technologies that don't support this feature you have to nest tags within tags, which becomes messy quickly and often has an adverse effect of WYSWIG tools such as Dreamweaver that attempt to render the mark-up as it is not well-formed:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;img src=<span class="xml&#45;quote">"&#60;g:createLinkTo dir="</span>images<span class="xml&#45;quote">" file="</span>logo.jpg<span class="xml&#45;quote">" /&#62;</span>"</span> /&#62;</pre></div><p class="paragraph"/><h4>Tags as method calls from Controllers and Tag Libraries</h4><p class="paragraph"/>You can also invoke tags from controllers and tag libraries. Tags within the default <code>g:</code> <a href="../guide/single.html#6.3.5 Tag Namespaces" class="guide">namespace</a> can be invoked without the prefix and a String result is returned:<p class="paragraph"/><div class="code"><pre>def imageLocation = createLinkTo(dir:<span class="java&#45;quote">"images"</span>, file:<span class="java&#45;quote">"logo.jpg"</span>)</pre></div><p class="paragraph"/>However, you can also prefix the namespace to avoid naming conflicts:<p class="paragraph"/><div class="code"><pre>def imageLocation = g.createLinkTo(dir:<span class="java&#45;quote">"images"</span>, file:<span class="java&#45;quote">"logo.jpg"</span>)</pre></div><p class="paragraph"/>If you have a <a href="../guide/single.html#6.3.5 Tag Namespaces" class="guide">custom namespace</a> you can use that prefix instead (Example using the <a href="http://grails.org/FCK+editor+plugin" target="blank">FCK Editor plugin</a>):<p class="paragraph"/><div class="code"><pre>def editor = fck.editor()</pre></div><p class="paragraph"/><p class="paragraph"/><h2><a name="6.2.3 Views and Templates">6.2.3 Views and Templates</a></h2>As well as views, Grails has the concept of templates. Templates are useful for separating out your views into maintainable chunks and combined with <a href="../guide/single.html#6.2.4 Layouts with Sitemesh" class="guide">Layouts</a> provide a highly re-usable mechanism for structure views.<p class="paragraph"/><h4>Template Basics</h4><p class="paragraph"/>Grails uses the convention of placing an underscore before the name of a view to identify it as a template. For example a you may have a template that deals with rendering Books located at <code>grails-app/views/book/_bookTemplate.gsp</code>:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;div class=<span class="xml&#45;quote">"book"</span> id=<span class="xml&#45;quote">"$&#123;book?.id&#125;"</span>&#62;</span>
+   <span class="xml&#45;tag">&#60;div&#62;</span>Title: $&#123;book?.title&#125;<span class="xml&#45;tag">&#60;/div&#62;</span>
+   <span class="xml&#45;tag">&#60;div&#62;</span>Author: $&#123;book?.author?.name&#125;<span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/>To render this template from one of the views in <code>grails-app/views/book</code> you can use the <a href="../ref/Tags/render.html" class="tags">render</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:render template=<span class="xml&#45;quote">"bookTemplate"</span> model=<span class="xml&#45;quote">"&#91;book:myBook&#93;"</span> /&#62;</span></pre></div><p class="paragraph"/>Notice how we pass into a model to use using the <code>model</code> attribute of the render tag. If you have multiple <code>Book</code> instances you can also render the template for each <code>Book</code> using the render tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:render template=<span class="xml&#45;quote">"bookTemplate"</span> var=<span class="xml&#45;quote">"book"</span> collection=<span class="xml&#45;quote">"$&#123;bookList&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/><h4>Shared Templates</h4><p class="paragraph"/>In the previous example we had a template that was specific to the <code>BookController</code> and its views at <code>grails-app/views/book</code>. However, you may want to share templates across your application.<p class="paragraph"/>In this case you can place them in the root views directory at grails-app/views or any subdirectory below that location and then with the template attribute use a <code>/</code> before the template name to indicate the relative template path. For example if you had a template called <code>grails-app/views/shared/_mySharedTemplate.gsp</code>, you could reference it as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:render template=<span class="xml&#45;quote">"/shared/mySharedTemplate"</span> /&#62;</span></pre></div><p class="paragraph"/>You can also use this technique to reference templates in any directory from any view or controller:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:render template=<span class="xml&#45;quote">"/book/bookTemplate"</span> model=<span class="xml&#45;quote">"&#91;book:myBook&#93;"</span> /&#62;</span></pre></div><p class="paragraph"/><h4>The Template Namespace</h4><p class="paragraph"/>Since templates are used so frequently there is template namespace, called <code>tmpl</code>, available that makes using templates easier. Consider for example the following usage pattern:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:render template=<span class="xml&#45;quote">"bookTemplate"</span> model=<span class="xml&#45;quote">"&#91;book:myBook&#93;"</span> /&#62;</span></pre></div><p class="paragraph"/>This can be expressed with the <code>tmpl</code> namespace as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;tmpl:bookTemplate book=<span class="xml&#45;quote">"$&#123;myBook&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/><h4>Templates in Controllers and Tag Libraries</h4><p class="paragraph"/>You can also render templates from controllers using the <a href="../ref/Controllers/render.html" class="controllers">render</a> method found within controllers, which is useful for <a href="../guide/single.html#6.7 Ajax" class="guide">Ajax</a> applications:<p class="paragraph"/><div class="code"><pre>def show = &#123;
+    def b = Book.get(params.id)
+	render(template:<span class="java&#45;quote">"bookTemplate"</span>, model:&#91;book:b&#93;)
+&#125;</pre></div><p class="paragraph"/>The <a href="../ref/Controllers/render.html" class="controllers">render</a> method within controllers writes directly to the response, which is the most common behaviour. If you need to instead obtain the result of template as a String you can use the <a href="../ref/Tags/render.html" class="tags">render</a> tag:<p class="paragraph"/>
+<div class="code"><pre>def show = &#123;
+    def b = Book.get(params.id)
+	<span class="java&#45;object">String</span> content = g.render(template:<span class="java&#45;quote">"bookTemplate"</span>, model:&#91;book:b&#93;)
+	render content
+&#125;</pre></div><p class="paragraph"/>Notice the usage of the <code>g.</code> namespace which tells Grails we want to use the <a href="../guide/single.html#6.2.2.6 Tags as Method Calls" class="guide">tag as method call</a> instead of the <a href="../ref/Controllers/render.html" class="controllers">render</a> method.
+<h2><a name="6.2.4 Layouts with Sitemesh">6.2.4 Layouts with Sitemesh</a></h2><h4>Creating Layouts</h4><p class="paragraph"/>Grails leverages <a href="http://www.opensymphony.com/sitemesh/" target="blank">Sitemesh</a>, a decorator engine, to support view layouts. Layouts are located in the <code>grails-app/views/layouts</code> directory. A typical layout can be seen below:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+      <span class="xml&#45;tag">&#60;head&#62;</span>
+          <span class="xml&#45;tag">&#60;title&#62;</span><span class="xml&#45;tag">&#60;g:layoutTitle default=<span class="xml&#45;quote">"An example decorator"</span> /&#62;</span><span class="xml&#45;tag">&#60;/title&#62;</span>
+          <span class="xml&#45;tag">&#60;g:layoutHead /&#62;</span>
+      <span class="xml&#45;tag">&#60;/head&#62;</span>
+      <span class="xml&#45;tag">&#60;body onload=<span class="xml&#45;quote">"$&#123;pageProperty(name:'body.onload')&#125;"</span>&#62;</span>
+            <span class="xml&#45;tag">&#60;div class=<span class="xml&#45;quote">"menu"</span>&#62;</span><span class="xml&#45;comment">&#60;!&#45;&#45;my common menu goes here&#45;&#45;&#62;</span><span class="xml&#45;tag">&#60;/menu&#62;</span>
+                 <span class="xml&#45;tag">&#60;div class=<span class="xml&#45;quote">"body"</span>&#62;</span>
+                      <span class="xml&#45;tag">&#60;g:layoutBody /&#62;</span>
+                 <span class="xml&#45;tag">&#60;/div&#62;</span>
+            <span class="xml&#45;tag">&#60;/div&#62;</span>
+      <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>The key elements are the <a href="../ref/Tags/layoutHead.html" class="tags">layoutHead</a>, <a href="../ref/Tags/layoutTitle.html" class="tags">layoutTitle</a> and <a href="../ref/Tags/layoutBody.html" class="tags">layoutBody</a> tag usages, here is what they do:
+<ul class="star">
+<li><code>layoutTitle</code> - outputs the target page's title</li>
+<li><code>layoutHead</code> - outputs the target pages head tag contents</li>
+<li><code>layoutBody</code> - outputs the target pages body tag contents</li>
+</ul><p class="paragraph"/>The previous example also demonstrates the <a href="../ref/Tags/pageProperty.html" class="tags">pageProperty</a> tag which can be used to inspect and return aspects of the target page.<p class="paragraph"/><h4>Triggering Layouts</h4><p class="paragraph"/>There are a few ways to trigger a layout. The simplest is to add a meta tag to the view:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+    <span class="xml&#45;tag">&#60;head&#62;</span>
+	    <span class="xml&#45;tag">&#60;title&#62;</span>An Example Page<span class="xml&#45;tag">&#60;/title&#62;</span>
+        <span class="xml&#45;tag">&#60;meta name=<span class="xml&#45;quote">"layout"</span> content=<span class="xml&#45;quote">"main"</span>&#62;</span><span class="xml&#45;tag">&#60;/meta&#62;</span>
+    <span class="xml&#45;tag">&#60;/head&#62;</span>
+    <span class="xml&#45;tag">&#60;body&#62;</span>This is my content!<span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/>In this case a layout called <code>grails-app/views/layouts/main.gsp</code> will be used to layout the page. If we were to use the layout from the previous section the output would resemble the below:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+      <span class="xml&#45;tag">&#60;head&#62;</span>
+          <span class="xml&#45;tag">&#60;title&#62;</span>An Example Page<span class="xml&#45;tag">&#60;/title&#62;</span>
+      <span class="xml&#45;tag">&#60;/head&#62;</span>
+      <span class="xml&#45;tag">&#60;body onload=<span class="xml&#45;quote">""</span>&#62;</span>
+        <span class="xml&#45;tag">&#60;div class=<span class="xml&#45;quote">"menu"</span>&#62;</span><span class="xml&#45;comment">&#60;!&#45;&#45;my common menu goes here&#45;&#45;&#62;</span><span class="xml&#45;tag">&#60;/div&#62;</span>
+                 <span class="xml&#45;tag">&#60;div class=<span class="xml&#45;quote">"body"</span>&#62;</span>
+					This is my content!
+                 <span class="xml&#45;tag">&#60;/div&#62;</span>
+      <span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><p class="paragraph"/><h4>Specifying A Layout In A Controller</h4><p class="paragraph"/>Another way to specify a layout is to specify the name of the layout by assigning a value to the "layout" property in a controller. For example, if you have a controller such as:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    <span class="java&#45;keyword">static</span> layout = 'customer'<p class="paragraph"/>    def list = &#123;  &#8230; &#125;
+&#125;</pre></div><p class="paragraph"/>You can create a layout called <code>grails-app/views/layouts/customer.gsp</code> which will be applied to all views that the <code>BookController</code> delegates to.  The value of the "layout" property may contain a directory structure relative to the <code>grails-app/views/layouts/</code> directory.  For example:<p class="paragraph"/>
+<div class="code"><pre>class BookController &#123;
+    <span class="java&#45;keyword">static</span> layout = 'custom/customer'<p class="paragraph"/>    def list = &#123;  &#8230; &#125;
+&#125;</pre></div><p class="paragraph"/>Views rendered from that controller would be decorated with the <code>grails-app/views/layouts/custom/customer.gsp</code> template.<p class="paragraph"/><h4>Layout by Convention</h4><p class="paragraph"/>Another way to associate layouts is to use "layout by convention". For example, if you have a controller such as:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+    def list = &#123;  &#8230; &#125;
+&#125;</pre></div><p class="paragraph"/>You can create a layout called <code>grails-app/views/layouts/book.gsp</code>, by convention, which will be applied to all views that the <code>BookController</code> delegates to.<p class="paragraph"/>Alternatively, you can create a layout called <code>grails-app/views/layouts/book/list.gsp</code> which will only be applied to the <code>list</code> action within the <code>BookController</code>.<p class="paragraph"/>If you have both the above mentioned layouts in place the layout specific to the action will take precedence when the list action is executed.<p class="paragraph"/><h4>Inline Layouts</h4><p class="paragraph"/>Grails' also supports Sitemesh's concept of inline layouts with the <a href="../ref/Tags/applyLayout.html" class="tags">applyLayout</a> tag. The <code>applyLayout</code> tag can be used to apply a layout to a template, URL or arbitrary section of content.   Essentially, this allows to even further modularize your view structure by "decorating" your template includes.<p class="paragraph"/>Some examples of usage can be seen below:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"myLayout"</span> template=<span class="xml&#45;quote">"bookTemplate"</span> collection=<span class="xml&#45;quote">"$&#123;books&#125;"</span> /&#62;</span><p class="paragraph"/><span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"myLayout"</span> url=<span class="xml&#45;quote">"http://www.google.com"</span> /&#62;</span><p class="paragraph"/><span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"myLayout"</span>&#62;</span>
+The content to apply a layout to
+<span class="xml&#45;tag">&#60;/g:applyLayout&#62;</span></pre></div><p class="paragraph"/><h4>Server-Side Includes</h4><p class="paragraph"/>While the <a href="../ref/Tags/applyLayout.html" class="tags">applyLayout</a> tag is useful for applying layouts to external content, if you simply want to include external content in the current page you can do so with the <a href="../ref/Tags/include.html" class="tags">include</a>:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:include controller=<span class="xml&#45;quote">"book"</span> action=<span class="xml&#45;quote">"list"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:include&#62;</span></pre></div><p class="paragraph"/>You can even combine the <a href="../ref/Tags/include.html" class="tags">include</a> tag and the <a href="../ref/Tags/applyLayout.html" class="tags">applyLayout</a> tag for added flexibility:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"myLayout"</span>&#62;</span>
+   <span class="xml&#45;tag">&#60;g:include controller=<span class="xml&#45;quote">"book"</span> action=<span class="xml&#45;quote">"list"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:include&#62;</span>
+<span class="xml&#45;tag">&#60;/g:applyLayout&#62;</span></pre></div><p class="paragraph"/>Finally, you can also call the <a href="../ref/Tags/include.html" class="tags">include</a> tag from a controller or tag library as a method:<p class="paragraph"/><div class="code"><pre>def content = include(controller:<span class="java&#45;quote">"book"</span>, action:<span class="java&#45;quote">"list"</span>)</pre></div><p class="paragraph"/>The resulting content will be provided via the return value of the <a href="../ref/Tags/include.html" class="tags">include</a> tag.<h2><a name="6.2.5 Sitemesh Content Blocks">6.2.5 Sitemesh Content Blocks</a></h2>Although it is useful to decorate an entire page sometimes you may find the need to decorate independent sections of your site. To do this you can use content blocks. To get started you need to divide the page to be decorate using the <code>&#60;content&#62;</code> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;content tag=<span class="xml&#45;quote">"navbar"</span>&#62;</span>
+&#8230; draw the navbar here&#8230;
+<span class="xml&#45;tag">&#60;/content&#62;</span>
+<span class="xml&#45;tag">&#60;content tag=<span class="xml&#45;quote">"header"</span>&#62;</span>
+&#8230; draw the header here&#8230;
+<span class="xml&#45;tag">&#60;/content&#62;</span>
+<span class="xml&#45;tag">&#60;content tag=<span class="xml&#45;quote">"footer"</span>&#62;</span>
+&#8230; draw the footer here&#8230;
+<span class="xml&#45;tag">&#60;/content&#62;</span>
+<span class="xml&#45;tag">&#60;content tag=<span class="xml&#45;quote">"body"</span>&#62;</span>
+&#8230; draw the body here&#8230;
+<span class="xml&#45;tag">&#60;/content&#62;</span></pre></div><p class="paragraph"/>Then within the layout you can reference these components and apply individual layouts to each:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;html&#62;</span>
+	<span class="xml&#45;tag">&#60;body&#62;</span>
+		<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"header"</span>&#62;</span>
+			<span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"headerLayout"</span>&#62;</span><span class="xml&#45;tag">&#60;g:pageProperty name=<span class="xml&#45;quote">"page.header"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:applyLayout&#62;</span>
+		<span class="xml&#45;tag">&#60;/div&#62;</span>
+		<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"nav"</span>&#62;</span>
+			<span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"navLayout"</span>&#62;</span><span class="xml&#45;tag">&#60;g:pageProperty name=<span class="xml&#45;quote">"page.navbar"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:applyLayout&#62;</span>
+		<span class="xml&#45;tag">&#60;/div&#62;</span>
+		<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"body"</span>&#62;</span>
+			<span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"bodyLayout"</span>&#62;</span><span class="xml&#45;tag">&#60;g:pageProperty name=<span class="xml&#45;quote">"page.body"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:applyLayout&#62;</span>
+		<span class="xml&#45;tag">&#60;/div&#62;</span>
+		<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"footer"</span>&#62;</span>
+			<span class="xml&#45;tag">&#60;g:applyLayout name=<span class="xml&#45;quote">"footerLayout"</span>&#62;</span><span class="xml&#45;tag">&#60;g:pageProperty name=<span class="xml&#45;quote">"page.footer"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:applyLayout&#62;</span>			
+		<span class="xml&#45;tag">&#60;/div&#62;</span>
+	<span class="xml&#45;tag">&#60;/body&#62;</span>
+<span class="xml&#45;tag">&#60;/html&#62;</span></pre></div><h2><a name="6.3 Tag Libraries">6.3 Tag Libraries</a></h2>Like <a href="http://java.sun.com/products/jsp/" target="blank">Java Server Pages</a> (JSP), GSP supports the concept of custom tag libraries. Unlike JSP, Grails tag library mechanism is simply, elegant and completely reload-able at runtime.<p class="paragraph"/>Quite simply, to create a tag library create a Groovy class that ends with the convention <code>TagLib</code> and place it within the <code>grails-app/taglib</code> directory:<p class="paragraph"/><div class="code"><pre>class SimpleTagLib &#123;<p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>Now to create a tag simply create property that is assigned a block of code that takes two arguments: The tag attributes and the body content:<p class="paragraph"/><div class="code"><pre>class SimpleTagLib &#123;
+	def simple = &#123; attrs, body &#45;&#62;<p class="paragraph"/>    &#125;
+&#125;</pre></div><p class="paragraph"/>The <code>attrs</code> argument is a simple map of the attributes of the tag, whilst the <code>body</code> argument is another invokable block of code that returns the body content:<p class="paragraph"/><div class="code"><pre>class SimpleTagLib &#123;
+	def emoticon = &#123; attrs, body &#45;&#62;
+	   out &#60;&#60; body() &#60;&#60; attrs.happy == '<span class="java&#45;keyword">true</span>' ? <span class="java&#45;quote">" :&#45;)"</span> : <span class="java&#45;quote">" :&#45;("</span>	
+    &#125;
+&#125;</pre></div><p class="paragraph"/>As demonstrated above there is an implicit <code>out</code> variable that refers to the output <code>Writer</code> which you can use to append content to the response. Then you can simply reference the tag inside your GSP, no imports necessary:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:emoticon happy=<span class="xml&#45;quote">"true"</span>&#62;</span>Hi John<span class="xml&#45;tag">&#60;/g:emoticon&#62;</span></pre></div><p class="paragraph"/>
+<h2><a name="6.3.1 Variables and Scopes">6.3.1 Variables and Scopes</a></h2>Within the scope of a tag library there are a number of pre-defined variables including:
+<ul class="star">
+<li><code>actionName</code> - The currently executing action name</li>
+<li><code>controllerName</code> - The currently executing controller name</li>
+<li><code>flash</code> - The <a href="../ref/Controllers/flash.html" class="controllers">flash</a> object</li>
+<li><code>grailsApplication</code> - The api:org.codehaus.groovy.grails.commons.GrailsApplication instance</li>
+<li><code>out</code> - The response writer for writing to the output stream</li>
+<li><code>pageScope</code> - A reference to the <a href="../ref/Tag Libraries/pageScope.html" class="tagLibraries">pageScope</a> object used for GSP rendering (i.e. the binding)</li>
+<li><code>params</code> - The <a href="../ref/Controllers/params.html" class="controllers">params</a> object for retrieving request parameters</li>
+<li><code>pluginContextPath</code> - The context path to the plugin that contains the tag library</li>
+<li><code>request</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletRequest.html" class="api">HttpServletRequest</a> instance</li>
+<li><code>response</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpServletResponse.html" class="api">HttpServletResponse</a> instance</li>
+<li><code>servletContext</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/ServletContext.html" class="api">javax.servlet.ServletContext</a> instance</li>
+<li><code>session</code> - The <a href="http://java.sun.com/j2ee/1.4/docs/api/javax/servlet/http/HttpSession.html" class="api">HttpSession</a> instance</li>
+</ul><p class="paragraph"/><h2><a name="6.3.2 Simple Tags">6.3.2 Simple Tags</a></h2>As demonstrated it the previous example it is trivial to write simple tags that have no body and merely output content. Another example is a <code>dateFormat</code> style tag:<p class="paragraph"/><div class="code"><pre>def dateFormat = &#123; attrs, body &#45;&#62;
+	out &#60;&#60; <span class="java&#45;keyword">new</span> java.text.SimpleDateFormat(attrs.format).format(attrs.date)
+&#125;</pre></div><p class="paragraph"/>The above uses Java's <code>SimpleDateFormat</code> class to format a date and then write it to the response. The tag can then be used within a GSP as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:dateFormat format=<span class="xml&#45;quote">"dd&#45;MM&#45;yyyy"</span> date=<span class="xml&#45;quote">"$&#123;new Date()&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>With simple tags sometimes you need to write HTML mark-up to the response. One approach would be to embed the content directly:<p class="paragraph"/><div class="code"><pre>def formatBook = &#123; attrs, body &#45;&#62;
+    out &#60;&#60; <span class="java&#45;quote">"&#60;div id=&#34;$&#123;attrs.book.id&#125;&#34;&#62;"</span>	
+    out &#60;&#60; <span class="java&#45;quote">"Title : $&#123;attrs.book.title&#125;"</span>	
+	out &#60;&#60; <span class="java&#45;quote">"&#60;/div&#62;"</span>
+&#125;</pre></div><p class="paragraph"/>Although this approach may be tempting it is not very clean. A better approach would be to re-use the <a href="../ref/Tags/render.html" class="tags">render</a> tag:<p class="paragraph"/><div class="code"><pre>def formatBook = &#123; attrs, body &#45;&#62;
+    out &#60;&#60; render(template:<span class="java&#45;quote">"bookTemplate"</span>, model:&#91;book:attrs.book&#93;)	
+&#125;</pre></div><p class="paragraph"/>And then have a separate GSP template that does the actual rendering.<h2><a name="6.3.3 Logical Tags">6.3.3 Logical Tags</a></h2>You can also create logical tags where the body of the tag is only output once a set of conditions have been met. An example of this may be a set of security tags:<p class="paragraph"/><div class="code"><pre>def isAdmin = &#123; attrs, body &#45;&#62;
+     def user = attrs&#91;'user'&#93;
+     <span class="java&#45;keyword">if</span>(user != <span class="java&#45;keyword">null</span> &#38;&#38; checkUserPrivs(user)) &#123;
+           out &#60;&#60; body()
+     &#125;
+&#125;</pre></div><p class="paragraph"/>The tag above checks if the user is an administrator and only outputs the body content if he/she has the correct set of access privileges:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:isAdmin user=<span class="xml&#45;quote">"$&#123;myUser&#125;"</span>&#62;</span>
+    // some restricted content
+<span class="xml&#45;tag">&#60;/g:isAdmin&#62;</span></pre></div><p class="paragraph"/>
+<h2><a name="6.3.4 Iterative Tags">6.3.4 Iterative Tags</a></h2>Iterative tags are trivial too, since you can invoke the body multiple times:<p class="paragraph"/><div class="code"><pre>def repeat = &#123; attrs, body &#45;&#62;
+    attrs.times?.toInteger().times &#123; num &#45;&#62;
+        out &#60;&#60; body(num)
+    &#125;
+&#125;</pre></div><p class="paragraph"/>In this example we check for a <code>times</code> attribute and if it exists convert it to a number then use Groovy's <code>times</code> method to iterate by the number of times specified by the number:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:repeat times=<span class="xml&#45;quote">"3"</span>&#62;</span>
+<span class="xml&#45;tag">&#60;p&#62;</span>Repeat this 3 times! Current repeat = $&#123;it&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:repeat&#62;</span></pre></div><p class="paragraph"/>Notice how in this example we use the implicit <code>it</code> variable to refer to the current number. This works because when we invoked the body we passed in the current value inside the iteration:<p class="paragraph"/><div class="code"><pre>out &#60;&#60; body(num)</pre></div><p class="paragraph"/>That value is then passed as the default variable <code>it</code> to the tag. However, if you have nested tags this can lead to conflicts, hence you should should instead name the variables that the body uses:<p class="paragraph"/>
+<div class="code"><pre>def repeat = &#123; attrs, body &#45;&#62;
+	def <span class="java&#45;keyword">var</span> = attrs.<span class="java&#45;keyword">var</span> ? attrs.<span class="java&#45;keyword">var</span> : <span class="java&#45;quote">"num"</span>
+    attrs.times?.toInteger().times &#123; num &#45;&#62;
+        out &#60;&#60; body((<span class="java&#45;keyword">var</span>):num)
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Here we check if there is a <code>var</code> attribute and if there is use that as the name to pass into the body invocation on this line:<p class="paragraph"/><div class="code"><pre>out &#60;&#60; body((<span class="java&#45;keyword">var</span>):num)</pre></div><p class="paragraph"/><blockquote class="note">
+Note the usage of the parenthesis around the variable name. If you omit these Groovy assumes you are using a String key and not referring to the variable itself.
+</blockquote><p class="paragraph"/>Now we can change the usage of the tag as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:repeat times=<span class="xml&#45;quote">"3"</span> var=<span class="xml&#45;quote">"j"</span>&#62;</span>
+<span class="xml&#45;tag">&#60;p&#62;</span>Repeat this 3 times! Current repeat = $&#123;j&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:repeat&#62;</span></pre></div><p class="paragraph"/>Notice how we use the <code>var</code> attribute to define the name of the variable <code>j</code> and then we are able to reference that variable within the body of the tag.<h2><a name="6.3.5 Tag Namespaces">6.3.5 Tag Namespaces</a></h2>By default, tags are added to the default Grails namespace and are used with the <code>g:</code> prefix in GSP pages. However, you can specify a different namespace by adding a static property to your <code>TagLib</code> class:<p class="paragraph"/><div class="code"><pre>class SimpleTagLib &#123;
+    <span class="java&#45;keyword">static</span> namespace = <span class="java&#45;quote">"my"</span><p class="paragraph"/>    def example = &#123; attrs &#45;&#62;
+        &#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Here we have specified a <code>namespace</code> of <code>my</code> and hence the tags in this tag lib must then be referenced from GSP pages like this:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;my:example name=<span class="xml&#45;quote">"..."</span> /&#62;</span></pre></div><p class="paragraph"/>Where the prefix is the same as the value of the static <code>namespace</code> property. Namespaces are particularly useful for plugins.<p class="paragraph"/>
+Tags within namespaces can be invoked as methods using the namespace as a prefix to the method call:<p class="paragraph"/><div class="code"><pre>out &#60;&#60; my.example(name:<span class="java&#45;quote">"foo"</span>)</pre></div><p class="paragraph"/>This works from GSP, controllers or tag libraries<h2><a name="6.3.6 Using JSP Tag Libraries">6.3.6 Using JSP Tag Libraries</a></h2>In addition to the simplified tag library mechanism provided by GSP, you can also use JSP tags from GSP. To do so simply declare the JSP you want to use via the <code>taglib</code> directive:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;%@ taglib prefix=<span class="xml&#45;quote">"fmt"</span> uri=<span class="xml&#45;quote">"http://java.sun.com/jsp/jstl/fmt"</span> %&#62;</span></pre></div><p class="paragraph"/>Then you can use it like any other tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;fmt:formatNumber value=<span class="xml&#45;quote">"$&#123;10&#125;"</span> pattern=<span class="xml&#45;quote">".00"</span>/&#62;</span></pre></div><p class="paragraph"/>With the added bonus that you can invoke JSP tags like methods:<p class="paragraph"/><div class="code"><pre>$&#123;fmt.formatNumber(value:10, pattern:<span class="java&#45;quote">".00"</span>)&#125;</pre></div><h2><a name="6.3.7 Tag return value">6.3.7 Tag return value</a></h2>Since Grails 1.2, a tag library call returns an instance of <code>org.codehaus.groovy.grails.web.util.StreamCharBuffer</code> class by default.
+This change improves performance by reducing object creation and optimizing buffering during request processing. 
+In earlier Grails versions, a <code>java.lang.String</code> instance was returned.<p class="paragraph"/>Tag libraries can also return direct object values to the caller since Grails 1.2.. 
+Object returning tag names are listed in a static <code>returnObjectForTags</code> property in the tag library class.<p class="paragraph"/>Example:
+<div class="code"><pre>class ObjectReturningTagLib &#123;
+	<span class="java&#45;keyword">static</span> namespace = <span class="java&#45;quote">"cms"</span>
+	<span class="java&#45;keyword">static</span> returnObjectForTags = &#91;'content'&#93;<p class="paragraph"/>	def content = &#123; attrs, body &#45;&#62;
+		CmsContent.findByCode(attrs.code)?.content	
+    &#125;
+&#125;</pre></div><h2><a name="6.4 URL Mappings">6.4 URL Mappings</a></h2>Throughout the documentation so far the convention used for URLs has been the default of <code>/controller/action/id</code>. However, this convention is not hard wired into Grails and is in fact controlled by a URL Mappings class located at <code>grails-app/conf/UrlMappings.groovy</code>.<p class="paragraph"/>The <code>UrlMappings</code> class contains a single property called <code>mappings</code> that has been assigned a block of code:<p class="paragraph"/><div class="code"><pre>class UrlMappings &#123;
+    <span class="java&#45;keyword">static</span> mappings = &#123;
+    &#125;	
+&#125;</pre></div><p class="paragraph"/><h2><a name="6.4.1 Mapping to Controllers and Actions">6.4.1 Mapping to Controllers and Actions</a></h2>To create a simple mapping simply use a relative URL as the method name and specify named parameters for the controller and action to map to:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/product"</span>(controller:<span class="java&#45;quote">"product"</span>, action:<span class="java&#45;quote">"list"</span>)</pre></div><p class="paragraph"/>In this case we've mapped the URL <code>/product</code> to the <code>list</code> action of the <code>ProductController</code>. You could of course omit the action definition to map to the default action of the controller:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/product"</span>(controller:<span class="java&#45;quote">"product"</span>)</pre></div><p class="paragraph"/>An alternative syntax is to assign the controller and action to use within a block passed to the method:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/product"</span> &#123;
+	controller = <span class="java&#45;quote">"product"</span>
+	action = <span class="java&#45;quote">"list"</span>
+&#125;</pre></div><p class="paragraph"/>Which syntax you use is largely dependent on personal preference.<p class="paragraph"/>
+<h2><a name="6.4.2 Embedded Variables">6.4.2 Embedded Variables</a></h2><h4>Simple Variables</h4><p class="paragraph"/>The previous section demonstrated how to map trivial URLs with concrete "tokens". In URL mapping speak tokens are the sequence of characters between each slash / character. A concrete token is one which is well defined such as as <code>/product</code>. However, in many circumstances you don't know what the value of a particular token will be until runtime. In this case you can use variable placeholders within the URL for example:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+  <span class="java&#45;quote">"/product/$id"</span>(controller:<span class="java&#45;quote">"product"</span>)
+&#125;</pre></div><p class="paragraph"/>In this case by embedding a $id variable as the second token Grails will automatically map the second token into a parameter (available via the <a href="../ref/Controllers/params.html" class="controllers">params</a> object) called <code>id</code>. For example given the URL <code>/product/MacBook</code>, the following code will render "MacBook" to the response:<p class="paragraph"/><div class="code"><pre>class ProductController &#123;
+     def index = &#123; render params.id &#125;
+&#125;</pre></div><p class="paragraph"/>
+You can of course construct more complex examples of mappings. For example the traditional blog URL format could be mapped as follows:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/$blog/$year/$month/$day/$id"</span>(controller:<span class="java&#45;quote">"blog"</span>, action:<span class="java&#45;quote">"show"</span>)
+&#125;</pre></div><p class="paragraph"/>The above mapping would allow you to do things like:<p class="paragraph"/><div class="code"><pre>/graemerocher/2007/01/10/my_funky_blog_entry</pre></div><p class="paragraph"/>The individual tokens in the URL would again be mapped into the <a href="../ref/Controllers/params.html" class="controllers">params</a> object with values available for <code>year</code>, <code>month</code>, <code>day</code>, <code>id</code> and so on.<p class="paragraph"/><h4>Dynamic Controller and Action Names</h4><p class="paragraph"/>Variables can also be used to dynamically construct the controller and action name. In fact the default Grails URL mappings use this technique:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+    <span class="java&#45;quote">"/$controller/$action?/$id?"</span>()
+&#125;</pre></div><p class="paragraph"/>Here the name of the controller, action and id are implicitly obtained from the variables <code>controller</code>, <code>action</code> and <code>id</code> embedded within the URL.<p class="paragraph"/>You can also resolve the controller name and action name to execute dynamically using a closure:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+    <span class="java&#45;quote">"/$controller"</span> &#123;
+	   action = &#123; params.goHere &#125;
+    &#125;
+&#125;</pre></div><p class="paragraph"/><h4>Optional Variables</h4><p class="paragraph"/>Another characteristic of the default mapping is the ability to append a <code>?</code> at the end of a variable to make it an optional token. In a further example this technique could be applied to the blog URL mapping to have more flexible linking:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/$blog/$year?/$month?/$day?/$id?"</span>(controller:<span class="java&#45;quote">"blog"</span>, action:<span class="java&#45;quote">"show"</span>)
+&#125;</pre></div><p class="paragraph"/>With this mapping all of the below URLs would match with only the relevant parameters being populated in the <a href="../ref/Controllers/params.html" class="controllers">params</a> object:<p class="paragraph"/><div class="code"><pre>/graemerocher/2007/01/10/my_funky_blog_entry
+/graemerocher/2007/01/10
+/graemerocher/2007/01
+/graemerocher/2007
+/graemerocher</pre></div><p class="paragraph"/><h4>Arbitrary Variables</h4><p class="paragraph"/>You can also pass arbitrary parameters from the URL mapping into the controller by merely setting them in the block passed to the mapping:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/holiday/win"</span> &#123;
+     id = <span class="java&#45;quote">"Marrakech"</span>
+     year = 2007
+&#125;</pre></div><p class="paragraph"/>This variables will be available within the <a href="../ref/Controllers/params.html" class="controllers">params</a> object passed to the controller.<p class="paragraph"/><h4>Dynamically Resolved Variables</h4><p class="paragraph"/>The hard coded arbitrary variables are useful, but sometimes you need to calculate the name of the variable based on runtime factors. This is also possible by assigning a block to the variable name:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/holiday/win"</span> &#123;
+     id = &#123; params.id &#125; 
+     isEligible = &#123; session.user != <span class="java&#45;keyword">null</span> &#125; // must be logged in
+&#125;</pre></div><p class="paragraph"/>In the above case the code within the blocks is resolved when the URL is actually matched and hence can be used in combination with all sorts of logic.<h2><a name="6.4.3 Mapping to Views">6.4.3 Mapping to Views</a></h2>If you want to resolve a URL to a view, without a controller or action involved, you can do so too. For example if you wanted to map the root URL <code>/</code> to a GSP at the location <code>grails-app/views/index.gsp</code> you could use:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+      <span class="java&#45;quote">"/"</span>(view:<span class="java&#45;quote">"/index"</span>)  // map the root URL
+&#125;</pre></div><p class="paragraph"/>Alternatively if you need a view that is specific to a given controller you could use:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/help"</span>(controller:<span class="java&#45;quote">"site"</span>,view:<span class="java&#45;quote">"help"</span>) // to a view <span class="java&#45;keyword">for</span> a controller
+&#125;</pre></div><h2><a name="6.4.4 Mapping to Response Codes">6.4.4 Mapping to Response Codes</a></h2>Grails also allows you to map HTTP response codes to controllers, actions or views. All you have to do is use a method name that matches the response code you are interested in:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"500"</span>(controller:<span class="java&#45;quote">"errors"</span>, action:<span class="java&#45;quote">"serverError"</span>)
+   <span class="java&#45;quote">"404"</span>(controller:<span class="java&#45;quote">"errors"</span>, action:<span class="java&#45;quote">"notFound"</span>)
+   <span class="java&#45;quote">"403"</span>(controller:<span class="java&#45;quote">"errors"</span>, action:<span class="java&#45;quote">"forbidden"</span>)
+&#125;</pre></div><p class="paragraph"/>Or alternatively if you merely want to provide custom error pages:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"500"</span>(view:<span class="java&#45;quote">"/errors/serverError"</span>)
+   <span class="java&#45;quote">"404"</span>(view:<span class="java&#45;quote">"/errors/notFound"</span>)
+   <span class="java&#45;quote">"403"</span>(view:<span class="java&#45;quote">"/errors/forbidden"</span>)
+&#125;</pre></div><h2><a name="6.4.5 Mapping to HTTP methods">6.4.5 Mapping to HTTP methods</a></h2>URL mappings can also be configured to map based on the HTTP method (GET, POST, PUT or DELETE). This is extremely useful for RESTful APIs and for restricting mappings based on HTTP method.<p class="paragraph"/>As an example the following mappings provide a RESTful API URL mappings for the <code>ProductController</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/product/$id"</span>(controller:<span class="java&#45;quote">"product"</span>)&#123;
+       action = &#91;GET:<span class="java&#45;quote">"show"</span>, PUT:<span class="java&#45;quote">"update"</span>, DELETE:<span class="java&#45;quote">"delete"</span>, POST:<span class="java&#45;quote">"save"</span>&#93;
+   &#125;	
+&#125;</pre></div><h2><a name="6.4.6 Mapping Wildcards">6.4.6 Mapping Wildcards</a></h2>Grails' URL mappings mechanism also supports wildcard mappings. For example consider the following mapping:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+	<span class="java&#45;quote">"/images/&#42;.jpg"</span>(controller:<span class="java&#45;quote">"image"</span>)
+&#125;</pre></div><p class="paragraph"/>This mapping will match all paths to images such as <code>/image/logo.jpg</code>. Of course you can achieve the same effect with a variable:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+	<span class="java&#45;quote">"/images/$name.jpg"</span>(controller:<span class="java&#45;quote">"image"</span>)
+&#125;</pre></div><p class="paragraph"/>However, you can also use double wildcards to match more than one level below:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+	<span class="java&#45;quote">"/images/&#42;&#42;.jpg"</span>(controller:<span class="java&#45;quote">"image"</span>)
+&#125;</pre></div><p class="paragraph"/>In this cases the mapping will match <code>/image/logo.jpg</code> as well as <code>/image/other/logo.jpg</code>. Even better you can use a double wildcard variable:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+	// will match /image/logo.jpg and /image/other/logo.jpg 
+	<span class="java&#45;quote">"/images/$name&#42;&#42;.jpg"</span>(controller:<span class="java&#45;quote">"image"</span>)
+&#125;</pre></div><p class="paragraph"/>In this case it will store the path matched by the wildcard inside a <code>name</code> parameter obtainable from the <a href="../ref/Controllers/params.html" class="controllers">params</a> object:<p class="paragraph"/><div class="code"><pre>def name = params.name
+println name // prints <span class="java&#45;quote">"logo"</span> or <span class="java&#45;quote">"other/logo"</span></pre></div><p class="paragraph"/>If you are using wildcard URL mappings then you may want to exclude certain URIs from Grails' URL mapping process. To do this you can provide an <code>excludes</code> setting inside the <code>UrlMappings.groovy</code> class:<p class="paragraph"/><div class="code"><pre>class UrlMappings = &#123;
+	<span class="java&#45;keyword">static</span> excludes = &#91;<span class="java&#45;quote">"/images/&#42;&#42;"</span>, <span class="java&#45;quote">"/css/&#42;&#42;"</span>&#93;
+	<span class="java&#45;keyword">static</span> mappings = &#123;
+		&#8230;
+	&#125;
+&#125;</pre></div><p class="paragraph"/>In this case Grails won't attempt to match any URIs that start with <code>/images</code> or <code>/css</code>.<p class="paragraph"/>
+<h2><a name="6.4.7 Automatic Link Re-Writing">6.4.7 Automatic Link Re-Writing</a></h2>Another great feature of URL mappings is that they automatically customize the behaviour of the <a href="../ref/Tags/link.html" class="tags">link</a> tag so that changing the mappings don't require you to go and change all of your links.<p class="paragraph"/>This is done through a URL re-writing technique that reverse engineers the links from the URL mappings. So given a mapping such as the blog one from an earlier section:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/$blog/$year?/$month?/$day?/$id?"</span>(controller:<span class="java&#45;quote">"blog"</span>, action:<span class="java&#45;quote">"show"</span>)
+&#125;</pre></div><p class="paragraph"/>If you use the link tag as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"blog"</span> action=<span class="xml&#45;quote">"show"</span> params=<span class="xml&#45;quote">"&#91;blog:'fred', year:2007&#93;"</span>&#62;</span>My Blog<span class="xml&#45;tag">&#60;/g:link&#62;</span>
+<span class="xml&#45;tag">&#60;g:link controller=<span class="xml&#45;quote">"blog"</span> action=<span class="xml&#45;quote">"show"</span> params=<span class="xml&#45;quote">"&#91;blog:'fred', year:2007, month:10&#93;"</span>&#62;</span>My Blog &#45; October 2007 Posts<span class="xml&#45;tag">&#60;/g:link&#62;</span></pre></div><p class="paragraph"/>Grails will automatically re-write the URL in the correct format:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;a href=<span class="xml&#45;quote">"/fred/2007"</span>&#62;</span>My Blog<span class="xml&#45;tag">&#60;/a&#62;</span>
+<span class="xml&#45;tag">&#60;a href=<span class="xml&#45;quote">"/fred/2007/10"</span>&#62;</span>My Blog &#45; October 2007 Posts<span class="xml&#45;tag">&#60;/a&#62;</span></pre></div><h2><a name="6.4.8 Applying Constraints">6.4.8 Applying Constraints</a></h2>URL Mappings also support Grails' unified <a href="../guide/single.html#7.1 Declaring Constraints" class="guide">validation constraints</a> mechanism, which allows you to further "constrain" how a URL is matched. For example, if we revisit the blog sample code from earlier, the mapping currently looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   <span class="java&#45;quote">"/$blog/$year?/$month?/$day?/$id?"</span>(controller:<span class="java&#45;quote">"blog"</span>, action:<span class="java&#45;quote">"show"</span>)
+&#125;</pre></div><p class="paragraph"/>This allows URLs such as:<p class="paragraph"/><div class="code"><pre>/graemerocher/2007/01/10/my_funky_blog_entry</pre></div><p class="paragraph"/>However, it would also allow:<p class="paragraph"/><div class="code"><pre>/graemerocher/not_a_year/not_a_month/not_a_day/my_funky_blog_entry</pre></div><p class="paragraph"/>This is problematic as it forces you to do some clever parsing in the controller code. Luckily, URL Mappings can be constrained to further validate the URL tokens:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/$blog/$year?/$month?/$day?/$id?"</span> &#123;
+     controller = <span class="java&#45;quote">"blog"</span>
+     action = <span class="java&#45;quote">"show"</span>
+     constraints &#123;
+          year(matches:/&#92;d&#123;4&#125;/)
+          month(matches:/&#92;d&#123;2&#125;/)
+          day(matches:/&#92;d&#123;2&#125;/)
+     &#125;
+&#125;</pre></div><p class="paragraph"/>In this case the constraints ensure that the <code>year</code>, <code>month</code> and <code>day</code> parameters match a particular valid pattern thus relieving you of that burden later on.<h2><a name="6.4.9 Named URL Mappings">6.4.9 Named URL Mappings</a></h2>URL Mappings also support named mappings.  Simply put, named mappings are mappings
+which have a name associated with them.  The name may be used to refer to a 
+specific mapping when links are being generated.<p class="paragraph"/>The syntax for defining a named mapping is as follows:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+   name &#60;mapping name&#62;: &#60;url pattern&#62; &#123;
+      // &#8230;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>An example:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> mappings = &#123;
+    name personList: <span class="java&#45;quote">"/showPeople"</span> &#123;
+        controller = 'person'
+        action = 'list'
+    &#125;
+    name accountDetails: <span class="java&#45;quote">"/details/$acctNumber"</span> &#123;
+        controller = 'product'
+        action = 'accountDetails'
+    &#125;
+&#125;</pre></div><p class="paragraph"/>The mapping may be referenced in a link tag in a GSP.<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:link mapping=<span class="xml&#45;quote">"personList"</span>&#62;</span>List People<span class="xml&#45;tag">&#60;/g:link&#62;</span></pre></div><p class="paragraph"/>That would result in:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;a href=<span class="xml&#45;quote">"/showPeople"</span>&#62;</span>List People<span class="xml&#45;tag">&#60;/a&#62;</span></pre></div><p class="paragraph"/>Parameters may be specified using the params attribute.<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:link mapping=<span class="xml&#45;quote">"accountDetails"</span> params=<span class="xml&#45;quote">"&#91;acctNumber:'8675309'&#93;"</span>&#62;</span>Show Account<span class="xml&#45;tag">&#60;/g:link&#62;</span></pre></div><p class="paragraph"/>That would result in:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;a href=<span class="xml&#45;quote">"/details/8675309"</span>&#62;</span>Show Account<span class="xml&#45;tag">&#60;/a&#62;</span></pre></div><p class="paragraph"/>Alternatively you may reference a named mapping using the link namespace.<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;link:personList&#62;</span>List People<span class="xml&#45;tag">&#60;/link:personList&#62;</span></pre></div><p class="paragraph"/>That would result in:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;a href=<span class="xml&#45;quote">"/showPeople"</span>&#62;</span>List People<span class="xml&#45;tag">&#60;/a&#62;</span></pre></div><p class="paragraph"/>The link namespace approach allows parameters to be specified as attributes.<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;link:accountDetails acctNumber=<span class="xml&#45;quote">"8675309"</span>&#62;</span>Show Account<span class="xml&#45;tag">&#60;/link:accountDetails&#62;</span></pre></div><p class="paragraph"/>That would result in:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;a href=<span class="xml&#45;quote">"/details/8675309"</span>&#62;</span>Show Account<span class="xml&#45;tag">&#60;/a&#62;</span></pre></div>
+<h2><a name="6.5 Web Flow">6.5 Web Flow</a></h2><h4>Overview</h4><p class="paragraph"/>Grails supports the creation of web flows built on the <a href="http://opensource.atlassian.com/confluence/spring/display/WEBFLOW" target="blank">Spring Web Flow</a> project. A web flow is a conversation that spans multiple requests and retains state for the scope of the flow. A web flow also has a defined start and end state.<p class="paragraph"/>Web flows don't require an HTTP session, but instead store their state in a serialized form, which is then restored using a flow execution key that Grails passes around as a request parameter. This makes flows far more scalable than other forms of stateful application that use the HttpSession and its inherit memory and clustering concerns.<p class="paragraph"/>Web flow is essentially an advanced state machine that manages the "flow" of execution from one state to the next. Since the state is managed for you, you don't have to be concerned with ensuring that users enter an action in the middle of some multi step flow, as web flow manages that for you. This makes web flow perfect for use cases such as shopping carts, hotel booking and any application that has multi page work flows.<p class="paragraph"/><h4>Creating a Flow</h4><p class="paragraph"/>To create a flow create a regular Grails controller and then add an action that ends with the convention <code>Flow</code>. For example:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+   def index = &#123;
+      redirect(action:<span class="java&#45;quote">"shoppingCart"</span>)
+   &#125;
+   def shoppingCartFlow = &#123;
+        &#8230;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Notice when redirecting or referring to the flow as an action we omit the <code>Flow</code> suffix. In other words the name of the action of the above flow is <code>shoppingCart</code>.
+<h2><a name="6.5.1 Start and End States">6.5.1 Start and End States</a></h2>As mentioned before a flow has a defined start and end state. A start state is the state which is entered when a user first initiates a conversation (or flow). The start state of A Grails flow is the first method call that takes a block. For example:<p class="paragraph"/>
+<div class="code"><pre>class BookController &#123;
+   &#8230;
+   def shoppingCartFlow = &#123;
+       showCart &#123;
+           on(<span class="java&#45;quote">"checkout"</span>).to <span class="java&#45;quote">"enterPersonalDetails"</span>           
+           on(<span class="java&#45;quote">"continueShopping"</span>).to <span class="java&#45;quote">"displayCatalogue"</span>
+       &#125;
+       &#8230;
+       displayCatalogue &#123;
+            redirect(controller:<span class="java&#45;quote">"catalogue"</span>, action:<span class="java&#45;quote">"show"</span>)
+       &#125;
+       displayInvoice()
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Here the <code>showCart</code> node is the start state of the flow. Since the showCart state doesn't define an action or redirect it is assumed be a <a href="../guide/single.html#6.5.2 Action States and View States" class="guide">view state</a> that, by convention, refers to the view  <code>grails-app/views/book/shoppingCart/showCart.gsp</code>.<p class="paragraph"/>Notice that unlike regular controller actions, the views are stored within a directory that matches the name of the flow: <code>grails-app/views/book/shoppingCart</code>.<p class="paragraph"/>The <code>shoppingCart</code> flow also has two possible end states. The first is <code>displayCatalogue</code> which performs an external redirect to another controller and action, thus exiting the flow. The second is <code>displayInvoice</code> which is an end state as it has no events at all and will simply render a view called <code>grails-app/views/book/shoppingCart/displayInvoice.gsp</code> whilst ending the flow at the same time.<p class="paragraph"/>Once a flow has ended it can only be resumed from the start state, in this case <code>showCart</code>, and not from any other state.
+<h2><a name="6.5.2 Action States and View States">6.5.2 Action States and View States</a></h2><h4>View states</h4><p class="paragraph"/>A view state is a one that doesn't define an <code>action</code> or a <code>redirect</code>. So for example the below is a view state:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>).to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>It will look for a view called <code>grails-app/views/book/shoppingCart/enterPersonalDetails.gsp</code> by default. Note that the <code>enterPersonalDetails</code> state defines two events: <code>submit</code> and <code>return</code>. The view is responsible for <a href="../guide/single.html#6.5.3 Flow Execution Events" class="guide">triggering</a> these events. If you want to change the view to be rendered you can do so with the render method:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   render(view:<span class="java&#45;quote">"enterDetailsView"</span>)
+   on(<span class="java&#45;quote">"submit"</span>).to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>Now it will look for <code>grails-app/views/book/shoppingCart/enterDetailsView.gsp</code>. If you want to use a shared view, start with a / in view argument:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   render(view:<span class="java&#45;quote">"/shared/enterDetailsView"</span>)
+   on(<span class="java&#45;quote">"submit"</span>).to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>Now it will look for <code>grails-app/views/shared/enterDetailsView.gsp</code><p class="paragraph"/>
+<h4>Action States</h4><p class="paragraph"/>An action state is a state that executes code but does not render any view. The result of the action is used to dictate flow transition. To create an action state you need to define an action to to be executed. This is done by calling the <code>action</code> method and passing it a block of code to be executed:<p class="paragraph"/><div class="code"><pre>listBooks &#123;
+   action &#123; 
+	  &#91; bookList:Book.list() &#93;
+   &#125;
+   on(<span class="java&#45;quote">"success"</span>).to <span class="java&#45;quote">"showCatalogue"</span>
+   on(Exception).to <span class="java&#45;quote">"handleError"</span>
+&#125;</pre></div><p class="paragraph"/>As you can see an action looks very similar to a controller action and in fact you can re-use controller actions if you want. If the action successfully returns with no errors the <code>success</code> event will be triggered. In this case since we return a map, this is regarded as the "model" and is automatically placed in <a href="../guide/single.html#6.5.4 Flow Scopes" class="guide">flow scope</a>.<p class="paragraph"/>
+In addition, in the above example we also use an exception handler to deal with errors on the line:<p class="paragraph"/><div class="code"><pre>on(Exception).to <span class="java&#45;quote">"handleError"</span></pre></div><p class="paragraph"/>What this does is make the flow transition to a state called <code>handleError</code> in the case of an exception.<p class="paragraph"/>You can write more complex actions that interact with the flow request context:<p class="paragraph"/><div class="code"><pre>processPurchaseOrder  &#123;
+     action &#123;
+         def a =  flow.address
+         def p = flow.person
+         def pd = flow.paymentDetails
+         def cartItems = flow.cartItems
+         flow.clear()<p class="paragraph"/>         def o = <span class="java&#45;keyword">new</span> Order(person:p, shippingAddress:a, paymentDetails:pd)
+         o.invoiceNumber = <span class="java&#45;keyword">new</span> Random().nextInt(9999999)
+         cartItems.each &#123; o.addToItems(it) &#125;
+         o.save()
+         &#91;order:o&#93;
+     &#125;
+     on(<span class="java&#45;quote">"error"</span>).to <span class="java&#45;quote">"confirmPurchase"</span>
+     on(Exception).to <span class="java&#45;quote">"confirmPurchase"</span>
+     on(<span class="java&#45;quote">"success"</span>).to <span class="java&#45;quote">"displayInvoice"</span>
+&#125;</pre></div><p class="paragraph"/>Here is a more complex action that gathers all the information accumulated from the flow scope and creates an <code>Order</code> object. It then returns the order as the model. The important thing to note here is the interaction with the request context and "flow scope".<p class="paragraph"/><h4>Transition Actions</h4><p class="paragraph"/>Another form of action is what is known as a <em class="italic">transition</em> action. A transition action is executed directly prior to state transition once an <a href="../guide/single.html#6.5.3 Flow Execution Events" class="guide">event</a> has been triggered. A trivial example of a transition action can be seen below:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>) &#123;
+       log.trace <span class="java&#45;quote">"Going to enter shipping"</span>	
+   &#125;.to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>Notice how we pass a block of the code to <code>submit</code> event that simply logs the transition. Transition states are extremely useful for <a href="../guide/single.html#6.5.5 Data Binding and Validation" class="guide">data binding and validation</a>, which is covered in a later section.<p class="paragraph"/><p class="paragraph"/><h2><a name="6.5.3 Flow Execution Events">6.5.3 Flow Execution Events</a></h2>In order to <em class="italic">transition</em> execution of a flow from one state to the next you need some way of trigger an <em class="italic">event</em> that indicates what the flow should do next. Events can be triggered from either view states or action states.<p class="paragraph"/><h4>Triggering Events from a View State</h4><p class="paragraph"/>As discussed previously the start state of the flow in a previous code listing deals with two possible events. A <code>checkout</code> event and a <code>continueShopping</code> event:<p class="paragraph"/><div class="code"><pre>def shoppingCartFlow = &#123;
+    showCart &#123;
+        on(<span class="java&#45;quote">"checkout"</span>).to <span class="java&#45;quote">"enterPersonalDetails"</span>           
+        on(<span class="java&#45;quote">"continueShopping"</span>).to <span class="java&#45;quote">"displayCatalogue"</span>
+    &#125;
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>Since the <code>showCart</code> event is a view state it will render the view <code>grails-app/book/shoppingCart/showCart.gsp</code>. Within this view you need to have components that trigger flow execution. On a form this can be done use the <a href="../ref/Tags/submitButton.html" class="tags">submitButton</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:form action=<span class="xml&#45;quote">"shoppingCart"</span>&#62;</span>
+    <span class="xml&#45;tag">&#60;g:submitButton name=<span class="xml&#45;quote">"continueShopping"</span> value=<span class="xml&#45;quote">"Continue Shopping"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:submitButton&#62;</span>
+    <span class="xml&#45;tag">&#60;g:submitButton name=<span class="xml&#45;quote">"checkout"</span> value=<span class="xml&#45;quote">"Checkout"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:submitButton&#62;</span>
+<span class="xml&#45;tag">&#60;/g:form&#62;</span></pre></div><p class="paragraph"/>The form must submit back to the <code>shoppingCart</code> flow. The name attribute of each <a href="../ref/Tags/submitButton.html" class="tags">submitButton</a> tag signals which event will be triggered. If you don't have a form you can also trigger an event with the <a href="../ref/Tags/link.html" class="tags">link</a> tag as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:link action=<span class="xml&#45;quote">"shoppingCart"</span> event=<span class="xml&#45;quote">"checkout"</span> /&#62;</span></pre></div><p class="paragraph"/><h4>Triggering Events from an Action</h4><p class="paragraph"/>To trigger an event from an <code>action</code> you need to invoke a method. For example there is the built in <code>error()</code> and <code>success()</code> methods. The example below triggers the <code>error()</code> event on validation failure in a transition action:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>) &#123;
+         def p = <span class="java&#45;keyword">new</span> Person(params)
+         flow.person = p
+         <span class="java&#45;keyword">if</span>(!p.validate())<span class="java&#45;keyword">return</span> error()
+   &#125;.to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>In this case because of the error the transition action will make the flow go back to the <code>enterPersonalDetails</code> state.<p class="paragraph"/>With an action state you can also trigger events to redirect flow:<p class="paragraph"/><div class="code"><pre>shippingNeeded &#123;
+   action &#123;
+       <span class="java&#45;keyword">if</span>(params.shippingRequired) yes()
+       <span class="java&#45;keyword">else</span> no()
+   &#125;
+   on(<span class="java&#45;quote">"yes"</span>).to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"no"</span>).to <span class="java&#45;quote">"enterPayment"</span>
+&#125;</pre></div><p class="paragraph"/><h2><a name="6.5.4 Flow Scopes">6.5.4 Flow Scopes</a></h2><h4>Scope Basics</h4><p class="paragraph"/>You'll notice from previous examples that we used a special object called <code>flow</code> to store objects within "flow scope". Grails flows have 5 different scopes you can utilize:
+<ul class="star">
+<li><code>request</code> - Stores an object for the scope of the current request</li>
+<li><code>flash</code> - Stores the object for the current and next request only</li>
+<li><code>flow</code> - Stores objects for the scope of the flow, removing them when the flow reaches an end state</li>
+<li><code>conversation</code> - Stores objects for the scope of the conversation including the root flow and nested subflows</li>
+<li><code>session</code> - Stores objects inside the users session</li>
+</ul><p class="paragraph"/><blockquote class="note">
+Grails service classes can be automatically scoped to a web flow scope. See the documentation on <a href="../guide/single.html#8. The Service Layer" class="guide">Services</a> for more information.
+</blockquote><p class="paragraph"/>Also returning a model map from an action will automatically result in the model being placed in flow scope. For example, using a transition action, you can place objects within <code>flow</code> scope as follows:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>) &#123;
+         &#91;person:<span class="java&#45;keyword">new</span> Person(params)&#93;
+   &#125;.to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>Be aware that a new request is always created for each state, so an object placed in request scope in an action state (for example) will not be available in a subsequent view state. Use one of the other scopes to pass objects from one state to another. Also note that Web Flow: 
+<ol>
+<li>Moves objects from flash scope to request scope upon transition between states;</li>
+<li>Merges objects from the flow and conversation scopes into the view model before rendering (so you shouldn't include a scope prefix when referencing these objects within a view, e.g. GSP pages).</li>
+</ol><p class="paragraph"/><p class="paragraph"/><h4>Flow Scopes and Serialization</h4><p class="paragraph"/>When placing objects in <code>flash</code>, <code>flow</code> or <code>conversation</code> scope they must implement <code>java.io.Serializable</code> otherwise you will get an error. This has an impact on <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a> in that domain classes are typically placed within a scope so that they can be rendered in a view. For example consider the following domain class:<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>In order to place an instance of the <code>Book</code> class in a flow scope you will need to modify it as follows:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+&#125;</pre></div><p class="paragraph"/>This also impacts associations and closures you declare within a domain class. For example consider this:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+	Author author
+&#125;</pre></div><p class="paragraph"/>Here if the <code>Author</code> association is not <code>Serializable</code> you will also get an error. This also impacts closures used in <a href="../guide/single.html#5.5.1 Events and Auto Timestamping" class="guide">GORM events</a> such as <code>onLoad</code>, <code>onSave</code> and so on. The following domain class will cause an error if an instance is placed in a flow scope:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+	def onLoad = &#123;
+		println <span class="java&#45;quote">"I'm loading"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>The reason is that the assigned block on the <code>onLoad</code> event cannot be serialized. To get around this you should declare all events as <code>transient</code>:<p class="paragraph"/><div class="code"><pre>class Book <span class="java&#45;keyword">implements</span> Serializable &#123;
+	<span class="java&#45;object">String</span> title
+	<span class="java&#45;keyword">transient</span> onLoad = &#123;
+		println <span class="java&#45;quote">"I'm loading"</span>
+	&#125;
+&#125;</pre></div>
+<h2><a name="6.5.5 Data Binding and Validation">6.5.5 Data Binding and Validation</a></h2>In the section on <a href="../guide/single.html#6.5.1 Start and End States" class="guide">start and end states</a>, the start state in the first example triggered a transition to the <code>enterPersonalDetails</code> state. This state renders a view and waits for the user to enter the required information:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>).to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>The view contains a form with two submit buttons that either trigger the submit event or the return event:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:form action=<span class="xml&#45;quote">"shoppingCart"</span>&#62;</span>
+    <span class="xml&#45;comment">&#60;!&#45;&#45; Other fields &#45;&#45;&#62;</span>
+    <span class="xml&#45;tag">&#60;g:submitButton name=<span class="xml&#45;quote">"submit"</span> value=<span class="xml&#45;quote">"Continue"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:submitButton&#62;</span>
+    <span class="xml&#45;tag">&#60;g:submitButton name=<span class="xml&#45;quote">"return"</span> value=<span class="xml&#45;quote">"Back"</span>&#62;</span><span class="xml&#45;tag">&#60;/g:submitButton&#62;</span>
+<span class="xml&#45;tag">&#60;/g:form&#62;</span></pre></div><p class="paragraph"/>However, what about the capturing the information submitted by the form? To to capture the form info we can use a flow transition action:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>) &#123;
+         flow.person = <span class="java&#45;keyword">new</span> Person(params)
+         !flow.person.validate() ? error() : success()
+   &#125;.to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><p class="paragraph"/>Notice how we perform data binding from request parameters and place the <code>Person</code> instance within <code>flow</code> scope. Also interesting is that we perform <a href="../guide/single.html#7. Validation" class="guide">validation</a> and invoke the <code>error()</code> method if validation fails. This signals to the flow that the transition should halt and return to the <code>enterPersonalDetails</code> view so valid entries can be entered by the user, otherwise the transition should continue and go to the <code>enterShipping</code> state.<p class="paragraph"/>Like regular actions, flow actions also support the notion of <a href="../guide/single.html#6.1.9 Command Objects" class="guide">Command Objects</a> by defining the first argument of the closure:<p class="paragraph"/><div class="code"><pre>enterPersonalDetails &#123;
+   on(<span class="java&#45;quote">"submit"</span>) &#123; PersonDetailsCommand cmd &#45;&#62;	     
+          flow.personDetails = cmd
+         !flow.personDetails.validate() ? error() : success()
+   &#125;.to <span class="java&#45;quote">"enterShipping"</span>
+   on(<span class="java&#45;quote">"<span class="java&#45;keyword">return</span>"</span>).to <span class="java&#45;quote">"showCart"</span>
+&#125;</pre></div><h2><a name="6.5.6 Subflows and Conversations">6.5.6 Subflows and Conversations</a></h2>Grails' Web Flow integration also supports subflows. A subflow is like a flow within a flow. For example take this search flow:<p class="paragraph"/><div class="code"><pre>def searchFlow = &#123;
+            displaySearchForm &#123;
+                on(<span class="java&#45;quote">"submit"</span>).to <span class="java&#45;quote">"executeSearch"</span>
+            &#125;
+            executeSearch &#123;
+                action &#123;
+                    &#91;results:searchService.executeSearch(params.q)&#93;
+                &#125;
+                on(<span class="java&#45;quote">"success"</span>).to <span class="java&#45;quote">"displayResults"</span>
+                on(<span class="java&#45;quote">"error"</span>).to <span class="java&#45;quote">"displaySearchForm"</span>
+            &#125;
+            displayResults &#123;
+                on(<span class="java&#45;quote">"searchDeeper"</span>).to <span class="java&#45;quote">"extendedSearch"</span>
+                on(<span class="java&#45;quote">"searchAgain"</span>).to <span class="java&#45;quote">"displaySearchForm"</span>
+            &#125;
+            extendedSearch &#123;
+                subflow(extendedSearchFlow)   // &#60;&#45;&#45;&#45; extended search subflow
+                on(<span class="java&#45;quote">"moreResults"</span>).to <span class="java&#45;quote">"displayMoreResults"</span>
+                on(<span class="java&#45;quote">"noResults"</span>).to <span class="java&#45;quote">"displayNoMoreResults"</span>
+            &#125;
+            displayMoreResults()
+            displayNoMoreResults()
+&#125;</pre></div><p class="paragraph"/>It references a subflow in the <code>extendedSearch</code> state. The subflow is another flow entirely:<p class="paragraph"/><div class="code"><pre>def extendedSearchFlow = &#123;
+       startExtendedSearch &#123;
+           on(<span class="java&#45;quote">"findMore"</span>).to <span class="java&#45;quote">"searchMore"</span>
+           on(<span class="java&#45;quote">"searchAgain"</span>).to <span class="java&#45;quote">"noResults"</span>
+       &#125;
+       searchMore &#123;
+           action &#123;
+              def results = searchService.deepSearch(ctx.conversation.query)
+              <span class="java&#45;keyword">if</span>(!results)<span class="java&#45;keyword">return</span> error()
+              conversation.extendedResults = results
+           &#125;
+           on(<span class="java&#45;quote">"success"</span>).to <span class="java&#45;quote">"moreResults"</span>
+           on(<span class="java&#45;quote">"error"</span>).to <span class="java&#45;quote">"noResults"</span>
+       &#125;
+       moreResults()
+       noResults()
+&#125;</pre></div><p class="paragraph"/>Notice how it places the <code>extendedResults</code> in conversation scope. This scope differs to flow scope as it allows you to share state that spans the whole conversation not just the flow. Also notice that the end state (either <code>moreResults</code> or <code>noResults</code> of the subflow triggers the events in the main flow:<p class="paragraph"/><div class="code"><pre>extendedSearch &#123;
+         subflow(extendedSearchFlow)   // &#60;&#45;&#45;&#45; extended search subflow
+         on(<span class="java&#45;quote">"moreResults"</span>).to <span class="java&#45;quote">"displayMoreResults"</span>
+         on(<span class="java&#45;quote">"noResults"</span>).to <span class="java&#45;quote">"displayNoMoreResults"</span>
+&#125;</pre></div><p class="paragraph"/><h2><a name="6.6 Filters">6.6 Filters</a></h2>Although Grails <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a> support fine grained interceptors, these are only really useful when applied to a few controllers and become difficult to manage with larger applications. Filters on the other hand can be applied across a whole group of controllers, a URI space or a to a specific action. Filters are far easier to plug-in and maintain completely separately to your main controller logic and are useful for all sorts of cross cutting concerns such as security, logging, and so on.<p class="paragraph"/><h2><a name="6.6.1 Applying Filters">6.6.1 Applying Filters</a></h2>To create a filter create a class that ends with the convention <code>Filters</code> in the <code>grails-app/conf</code> directory. Within this class define a code block called <code>filters</code> that contains the filter definitions:<p class="paragraph"/><div class="code"><pre>class ExampleFilters &#123;
+   def filters = &#123;
+        // your filters here
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Each filter you define within the <code>filters</code> block has a name and a scope. The name is the method name and the scope is defined using named arguments. For example if you need to define a filter that applies to all controllers and all actions you can use wildcards:<p class="paragraph"/><div class="code"><pre>sampleFilter(controller:'&#42;', action:'&#42;') &#123;
+  // interceptor definitions
+&#125;</pre></div><p class="paragraph"/>The scope of the filter can be one of the following things:
+<ul class="star">
+<li>A controller and/or action name pairing with optional wildcards</li>
+<li>A URI, with Ant path matching syntax</li>
+</ul><p class="paragraph"/>Filter rule attributes:
+<ul class="star">
+<li><code>controller</code> - controller matching pattern, by default <strong class="bold"> is replaced with .</strong> and a regex is compiled</li>
+<li><code>action</code> - action matching pattern, by default <strong class="bold"> is replaced with .</strong> and a regex is compiled</li>
+<li><code>regex</code> (true/false) - use regex syntax (don't replace '<strong class="bold">' with '.</strong>')</li>
+<li><code>find</code> (true/false) - rule matches with partial match (see java.util.regex.Matcher.find())</li>
+<li><code>invert</code> (true/false) - invert the rule (NOT rule)</li>
+</ul><p class="paragraph"/>Some examples of filters include:
+<ul class="star">
+<li>All controllers and actions</li>
+</ul><p class="paragraph"/><div class="code"><pre>all(controller:'&#42;', action:'&#42;') &#123;<p class="paragraph"/>&#125;</pre></div>
+<ul class="star">
+<li>Only for the <code>BookController</code></li>
+</ul><p class="paragraph"/><div class="code"><pre>justBook(controller:'book', action:'&#42;') &#123;<p class="paragraph"/>&#125;</pre></div>
+<ul class="star">
+<li>Applied to a URI space</li>
+</ul><p class="paragraph"/><div class="code"><pre>someURIs(uri:'/book/&#42;&#42;') &#123;<p class="paragraph"/>&#125;</pre></div>
+<ul class="star">
+<li>Applied to all URIs</li>
+</ul><p class="paragraph"/><div class="code"><pre>allURIs(uri:'/&#42;&#42;') &#123;<p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>In addition, the order in which you define the filters dictates the order in which they are executed.<h2><a name="6.6.2 Filter Types">6.6.2 Filter Types</a></h2>Within the body of the filter you can then define one of the following interceptor types for the filter:
+<ul class="star">
+<li><code>before</code> - Executed before the action. Can return false to indicate all future filters and the action should not execute</li>
+<li><code>after</code> - Executed after an action. Takes a first argument as the view model</li>
+<li><code>afterView</code> - Executed after view rendering</li>
+</ul><p class="paragraph"/>For example to fulfill the common authentication use case you could define a filter as follows:<p class="paragraph"/><div class="code"><pre>class SecurityFilters &#123;
+   def filters = &#123;
+       loginCheck(controller:'&#42;', action:'&#42;') &#123;
+           before = &#123;
+              <span class="java&#45;keyword">if</span>(!session.user &#38;&#38; !actionName.equals('login')) &#123;
+                  redirect(action:'login')
+                  <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">false</span>
+               &#125;
+           &#125;<p class="paragraph"/>       &#125;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>
+Here the <code>loginCheck</code> filter uses a <code>before</code> interceptor to execute a block of code that checks if a user is in the session and if not redirects to the login action. Note how returning false ensure that the action itself is not executed.
+<h2><a name="6.6.3 Variables and Scopes">6.6.3 Variables and Scopes</a></h2>Filters support all the common properties available to <a href="../guide/single.html#6.1 Controllers" class="guide">controllers</a> and <a href="../guide/single.html#6.3 Tag Libraries" class="guide">tag libraries</a>, plus the application context:
+<ul class="star">
+<li><a href="../ref/Controllers/request.html" class="controllers">request</a> - The HttpServletRequest object</li>
+<li><a href="../ref/Controllers/response.html" class="controllers">response</a> - The HttpServletResponse object</li>
+<li><a href="../ref/Controllers/session.html" class="controllers">session</a> - The HttpSession object</li>
+<li><a href="../ref/Controllers/servletContext.html" class="controllers">servletContext</a> - The ServletContext object</li>
+<li><a href="../ref/Controllers/flash.html" class="controllers">flash</a> - The flash object</li>
+<li><a href="../ref/Controllers/params.html" class="controllers">params</a> - The request parameters object</li>
+<li><a href="../ref/Controllers/actionName.html" class="controllers">actionName</a> - The action name that is being dispatched to</li>
+<li><a href="../ref/Controllers/controllerName.html" class="controllers">controllerName</a> - The controller name that is being dispatched to</li>
+<li><a href="../ref/Controllers/grailsApplication.html" class="controllers">grailsApplication</a> - The Grails application currently running</li>
+<li><a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/ApplicationContext.html" class="api">applicationContext</a> - The ApplicationContext object</li>
+</ul><p class="paragraph"/>However, filters only support a subset of the methods available to controllers and tag libraries. These include:
+<ul class="star">
+<li><a href="../ref/Controllers/redirect.html" class="controllers">redirect</a> - For redirects to other controllers and actions</li>
+<li><a href="../ref/Controllers/render.html" class="controllers">render</a> - For rendering custom responses</li>
+</ul><p class="paragraph"/><h2><a name="6.7 Ajax">6.7 Ajax</a></h2>Ajax stands for Asynchronous Javascript and XML and is the driving force behind the shift to richer web applications. These types of applications in general are better suited to agile, dynamic frameworks written in languages like <a href="http://www.ruby-lang.org/" target="blank">Ruby</a> and <a href="http://groovy.codehaus.org." target="blank">Groovy</a> Grails provides support for building Ajax applications through its Ajax tag library for a full list of these see the Tag Library Reference.
+<h2><a name="6.7.1 Ajax using Prototype">6.7.1 Ajax using Prototype</a></h2>By default Grails ships with the <a href="http://www.prototypejs.org/" target="blank">Prototype</a> library, but through the <a href="../guide/single.html#12. Plug-ins" class="guide">Plug-in system</a> provides support for other frameworks such as <a href="http://dojotoolkit.org/," target="blank">Dojo</a> <a href="http://developer.yahoo.com/yui/" target="blank">Yahoo UI</a> and the <a href="http://code.google.com/webtoolkit/." target="blank">Google Web Toolkit</a><p class="paragraph"/>This section covers Grails' support for Prototype. To get started you need to add this line to the <code>&#60;head&#62;</code> tag of your page:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript library=<span class="xml&#45;quote">"prototype"</span> /&#62;</span></pre></div><p class="paragraph"/>This uses the <a href="../ref/Tags/javascript.html" class="tags">javascript</a> tag to automatically place the correct references in place for Prototype. If you require <a href="http://script.aculo.us/" target="blank">Scriptaculous</a> too you can do the following instead:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript library=<span class="xml&#45;quote">"scriptaculous"</span> /&#62;</span></pre></div><p class="paragraph"/>
+<h2><a name="6.7.1.1 Remoting Linking">6.7.1.1 Remoting Linking</a></h2>Remote content can be loaded in a number of ways, the most commons way is through the <a href="../ref/Tags/remoteLink.html" class="tags">remoteLink</a> tag. This tag allows the creation of HTML anchor tags that perform an asynchronous request and optionally set the response in an element. The simplest way to create a remote link is as follows:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"delete"</span> id=<span class="xml&#45;quote">"1"</span>&#62;</span>Delete Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span></pre></div><p class="paragraph"/>The above link sends an asynchronous request to the <code>delete</code> action of the current controller with an id of <code>1</code>. <h2><a name="6.7.1.2 Updating Content">6.7.1.2 Updating Content</a></h2>This is great, but usually you would want to provide some kind of feedback to the user as to what has happened:<p class="paragraph"/><div class="code"><pre>def delete = &#123;
+      def b = Book.get( params.id )
+      b.delete()
+      render <span class="java&#45;quote">"Book $&#123;b.id&#125; was deleted"</span>
+&#125;</pre></div><p class="paragraph"/>GSP code:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"message"</span>&#62;</span><span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"delete"</span> id=<span class="xml&#45;quote">"1"</span> update=<span class="xml&#45;quote">"message"</span>&#62;</span>Delete Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span></pre></div><p class="paragraph"/>The above example will call the action and set the contents of the <code>message</code> <code>div</code> to the response in this case <code>"Book 1 was deleted"</code>. This is done by the <code>update</code> attribute on the tag, which can also take a map to indicate what should be updated on failure:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"message"</span>&#62;</span><span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"error"</span>&#62;</span><span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"delete"</span> id=<span class="xml&#45;quote">"1"</span>
+              update=<span class="xml&#45;quote">"&#91;success:'message',failure:'error'&#93;"</span>&#62;</span>Delete Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span></pre></div><p class="paragraph"/>Here the <code>error</code> div will be updated if the request failed.<h2><a name="6.7.1.3 Remote Form Submission">6.7.1.3 Remote Form Submission</a></h2>An HTML form can also be submitted asynchronously in one of two ways. Firstly using the <a href="../ref/Tags/formRemote.html" class="tags">formRemote</a> tag which expects similar attributes to those for the <a href="../ref/Tags/remoteLink.html" class="tags">remoteLink</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:formRemote url=<span class="xml&#45;quote">"&#91;controller:'book',action:'delete'&#93;"</span> update=<span class="xml&#45;quote">"&#91;success:'message',failure:'error'&#93;"</span>&#62;</span>
+       <span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"hidden"</span> name=<span class="xml&#45;quote">"id"</span> value=<span class="xml&#45;quote">"1"</span> /&#62;</span>
+       <span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"submit"</span> value=<span class="xml&#45;quote">"Delete Book!"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;/g:formRemote &#62;</span></pre></div><p class="paragraph"/>Or alternatively you can use the <a href="../ref/Tags/submitToRemote.html" class="tags">submitToRemote</a> tag to create a submit button. This allows some buttons to submit remotely and some not depending on the action:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;form action=<span class="xml&#45;quote">"delete"</span>&#62;</span>
+       <span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"hidden"</span> name=<span class="xml&#45;quote">"id"</span> value=<span class="xml&#45;quote">"1"</span> /&#62;</span>
+       <span class="xml&#45;tag">&#60;g:submitToRemote action=<span class="xml&#45;quote">"delete"</span> update=<span class="xml&#45;quote">"&#91;success:'message',failure:'error'&#93;"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;/form&#62;</span></pre></div><p class="paragraph"/><h2><a name="6.7.1.4 Ajax Events">6.7.1.4 Ajax Events</a></h2>Specific javascript can be called if certain events occur, all the events start with the "on" prefix and allow you to give feedback to the user where appropriate, or take other action:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"show"</span> 
+              id=<span class="xml&#45;quote">"1"</span> 
+              update=<span class="xml&#45;quote">"success"</span> 
+              onLoading=<span class="xml&#45;quote">"showProgress()"</span> 
+              onComplete=<span class="xml&#45;quote">"hideProgress()"</span>&#62;</span>Show Book 1<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span></pre></div><p class="paragraph"/>The above code will execute the "showProgress()" function which may show a progress bar or whatever is appropriate. Other events include:
+<ul class="star">
+<li><code>onSuccess</code>  - The javascript function to call if successful</li>
+<li><code>onFailure</code>  - The javascript function to call if the call failed</li>
+<li><code>on_ERROR_CODE</code>  - The javascript function to call to handle specified error codes (eg on404="alert('not found!')")</li>
+<li><code>onUninitialized</code>  - The javascript function to call the a ajax engine failed to initialise</li>
+<li><code>onLoading</code>  - The javascript function to call when the remote function is loading the response</li>
+<li><code>onLoaded</code>  - The javascript function to call when the remote function is completed loading the response</li>
+<li><code>onComplete</code>  - The javascript function to call when the remote function is complete, including any updates</li>
+</ul><p class="paragraph"/>If you need a reference to the <code>XmlHttpRequest</code> object you can use the implicit event parameter <code>e</code> to obtain it:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+   function fireMe(e) &#123;
+	   alert(<span class="xml&#45;quote">"XmlHttpRequest = "</span> + e)
+   &#125;
+&#125;
+<span class="xml&#45;tag">&#60;/g:javascript&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"example"</span> 
+              update=<span class="xml&#45;quote">"success"</span> 
+              onSuccess=<span class="xml&#45;quote">"fireMe(e)"</span>&#62;</span>Ajax Link<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span></pre></div><p class="paragraph"/><h2><a name="6.7.2 Ajax with Dojo">6.7.2 Ajax with Dojo</a></h2>Grails features an external plug-in to add <a href="http://dojotoolkit.org/" target="blank">Dojo</a> support to Grails. To install the plug-in type the following command from the root of your project in a terminal window:<p class="paragraph"/><div class="code"><pre>grails install&#45;plugin dojo</pre></div><p class="paragraph"/>This will download the current supported version of Dojo and install it into your Grails project. With that done you can add the following reference to the top of your page:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript library=<span class="xml&#45;quote">"dojo"</span> /&#62;</span></pre></div><p class="paragraph"/>Now all of Grails tags such as <a href="../ref/Tags/remoteLink.html" class="tags">remoteLink</a>, <a href="../ref/Tags/formRemote.html" class="tags">formRemote</a> and <a href="../ref/Tags/submitToRemote.html" class="tags">submitToRemote</a> work with Dojo remoting.<h2><a name="6.7.3 Ajax with GWT">6.7.3 Ajax with GWT</a></h2>Grails also features support for the <a href="http://code.google.com/webtoolkit/" target="blank">Google Web Toolkit</a> through a plug-in comprehensive <a href="http://grails.org/GWT+Plugin" target="blank">documentation</a> for can be found on the Grails wiki.<h2><a name="6.7.4 Ajax on the Server">6.7.4 Ajax on the Server</a></h2>Although Ajax features the X for XML there are a number of different ways to implement Ajax which are typically broken down into:
+<ul class="star">
+<li>Content Centric Ajax - Where you merely use the HTML result of a remote call to update the page</li>
+<li>Data Centric Ajax - Where you actually send an XML or JSON response from the server and programmatically update the page</li>
+<li>Script Centric Ajax - Where the server sends down a stream of Javascript to be evaluated on the fly</li>
+</ul><p class="paragraph"/>Most of the examples in the <a href="../guide/single.html#6.7 Ajax" class="guide">Ajax</a> section cover Content Centric Ajax where you are updating the page, but you may also want to use Data Centric or Script Centric. This guide covers the different styles of Ajax.<p class="paragraph"/><h4>Content Centric Ajax</h4><p class="paragraph"/>Just to re-cap, content centric Ajax involves sending some HTML back from the server and is typically done by rendering a template with the <a href="../ref/Controllers/render.html" class="controllers">render</a> method:<p class="paragraph"/><div class="code"><pre>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>	render(template:<span class="java&#45;quote">"bookTemplate"</span>, model:&#91;book:b&#93;)
+&#125;</pre></div><p class="paragraph"/>Calling this on the client involves using the <a href="../ref/Tags/remoteLink.html" class="tags">remoteLink</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"showBook"</span> id=<span class="xml&#45;quote">"$&#123;book.id&#125;"</span> update=<span class="xml&#45;quote">"book$&#123;book.id&#125;"</span>&#62;</span>Update Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"book$&#123;book.id&#125;"</span>&#62;</span>
+   <span class="xml&#45;comment">&#60;!&#45;&#45;existing book mark&#45;up &#45;&#45;&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/><h4>Data Centric Ajax with JSON</h4><p class="paragraph"/>Data Centric Ajax typically involves evaluating the response on the client and updating programmatically. For a JSON response with Grails you would typically use Grails' <a href="../guide/single.html#6.1.7 XML and JSON Responses" class="guide">JSON marshaling</a> capability:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;<p class="paragraph"/>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>    render b as JSON	
+&#125;</pre></div><p class="paragraph"/>And then on the client parse the incoming JSON request using an Ajax event handler:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+function updateBook(e) &#123;
+	var book = eval(<span class="xml&#45;quote">"("</span>+e.responseText+<span class="xml&#45;quote">")"</span>) // evaluate the JSON
+	$(<span class="xml&#45;quote">"book"</span>+book.id+<span class="xml&#45;quote">"_title"</span>).innerHTML = book.title
+&#125;
+<span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"test"</span> update=<span class="xml&#45;quote">"foo"</span> onSuccess=<span class="xml&#45;quote">"updateBook(e)"</span>&#62;</span>Update Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span>
+<span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"bookId"</span>&#62;</span>book$&#123;book.id&#125;<span class="xml&#45;tag">&#60;/g:set&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;"</span>&#62;</span>
+	<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;_title"</span>&#62;</span>The Stand<span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/><h4>Data Centric Ajax with XML</h4><p class="paragraph"/>On the server side using XML is equally trivial:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;<p class="paragraph"/>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>    render b as XML	
+&#125;</pre></div><p class="paragraph"/>However, since DOM is involved the client gets more complicated:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+function updateBook(e) &#123;
+	var xml = e.responseXML
+	var id = xml.getElementsByTagName(<span class="xml&#45;quote">"book"</span>).getAttribute(<span class="xml&#45;quote">"id"</span>)
+	$(<span class="xml&#45;quote">"book"</span>+id+<span class="xml&#45;quote">"_title"</span>)=xml.getElementsByTagName(<span class="xml&#45;quote">"title"</span>)&#91;0&#93;.textContent
+&#125;
+<span class="xml&#45;tag">&#60;g:javascript&#62;</span>
+<span class="xml&#45;tag">&#60;g:remoteLink action=<span class="xml&#45;quote">"test"</span> update=<span class="xml&#45;quote">"foo"</span> onSuccess=<span class="xml&#45;quote">"updateBook(e)"</span>&#62;</span>Update Book<span class="xml&#45;tag">&#60;/g:remoteLink&#62;</span>
+<span class="xml&#45;tag">&#60;g:set var=<span class="xml&#45;quote">"bookId"</span>&#62;</span>book$&#123;book.id&#125;<span class="xml&#45;tag">&#60;/g:set&#62;</span>
+<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;"</span>&#62;</span>
+	<span class="xml&#45;tag">&#60;div id=<span class="xml&#45;quote">"$&#123;bookId&#125;_title"</span>&#62;</span>The Stand<span class="xml&#45;tag">&#60;/div&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/><h4>Script Centric Ajax with JavaScript</h4><p class="paragraph"/>Script centric Ajax involves actually sending Javascript back that gets evaluated on the client. An example of this can be seen below:<p class="paragraph"/><div class="code"><pre>def showBook = &#123;
+	def b = Book.get(params.id)<p class="paragraph"/>    response.contentType = <span class="java&#45;quote">"text/javascript"</span>
+    <span class="java&#45;object">String</span> title = b.title.encodeAsJavascript()
+    render <span class="java&#45;quote">"&#36;('book$&#123;b.id&#125;_title')='$&#123;title&#125;'"</span>
+&#125;</pre></div><p class="paragraph"/>The important thing to remember is to set the <code>contentType</code> to <code>text/javascript</code>. If you are using Prototype on the client the returned Javascript will automatically be evaluated due to this <code>contentType</code> setting.<p class="paragraph"/>Obviously in this case it is critical that you have an agreed client-side API as you don't want changes on the client breaking the server. This is one of the reasons Rails has something like RJS. Although Grails does not currently have a feature such as RJS there is a <a href="http://grails.org/Dynamic+Javascript+Plugin" target="blank">Dynamic JavaScript Plug-in</a> that offers similar capabilities.
+<h2><a name="6.8 Content Negotiation">6.8 Content Negotiation</a></h2>Grails has built in support for <a href="http://en.wikipedia.org/wiki/Content_negotiation" target="blank">Content negotiation</a> using either the HTTP <code>Accept</code> header, an explicit format request parameter or the extension of a mapped URI.<p class="paragraph"/><h4>Configuring Mime Types</h4><p class="paragraph"/>Before you can start dealing with content negotiation you need to tell Grails what content types you wish to support. By default Grails comes configured with a number of different content types within <code>grails-app/conf/Config.groovy</code> using the <code>grails.mime.types</code> setting:<p class="paragraph"/><div class="code"><pre>grails.mime.types = &#91; xml: &#91;'text/xml', 'application/xml'&#93;,
+                      text: 'text&#45;plain',
+                      js: 'text/javascript',
+                      rss: 'application/rss+xml',
+                      atom: 'application/atom+xml',
+                      css: 'text/css',
+                      cvs: 'text/csv',
+                      all: '&#42;/&#42;',
+                      json: 'text/json',
+                      html: &#91;'text/html','application/xhtml+xml'&#93;
+                    &#93;</pre></div><p class="paragraph"/>The above bit of configuration allows Grails to detect to format of a request containing either the 'text/xml' or 'application/xml' media types as simply 'xml'. You can add your own types by simply adding new entries into the map.<p class="paragraph"/><h4>Content Negotiation using the Accept header</h4><p class="paragraph"/>Every incoming HTTP request has a special <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html" target="blank">Accept</a> header that defines what media types (or mime types) a client can "accept". In older browsers this is typically:<p class="paragraph"/><div class="code"><pre>&#42;/&#42;</pre></div><p class="paragraph"/>Which simply means anything. However, on newer browser something all together more useful is sent such as (an example of a Firefox <code>Accept</code> header):<p class="paragraph"/><div class="code"><pre>text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,&#42;/&#42;;q=0.5</pre></div><p class="paragraph"/>Grails parses this incoming format and adds a <code>property</code> to the <a href="../ref/Servlet API/request.html" class="servletAPI">request</a> object that outlines the preferred request format. For the above example the following assertion would pass:<p class="paragraph"/><div class="code"><pre>assert 'html' == request.format</pre></div><p class="paragraph"/>Why? The <code>text/html</code> media type has the highest "quality" rating of 0.9, therefore is the highest priority. If you have an older browser as mentioned previously the result is slightly different:<p class="paragraph"/><div class="code"><pre>assert 'all' == request.format</pre></div><p class="paragraph"/>In this case 'all' possible formats are accepted by the client. To deal with different kinds of requests from <a href="../guide/single.html#6.1 Controllers" class="guide">Controllers</a> you can use the <a href="../ref/Controllers/withFormat.html" class="controllers">withFormat</a> method that acts as kind of a switch statement:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.converters.&#42;<p class="paragraph"/>class BookController &#123;
+	def books
+	def list = &#123;
+		<span class="java&#45;keyword">this</span>.books = Book.list()
+		withFormat &#123;
+			html bookList:books
+			js &#123; render <span class="java&#45;quote">"alert('hello')"</span> &#125; 
+			xml &#123; render books as XML &#125;
+		&#125;
+	&#125;
+&#125;</pre></div><p class="paragraph"/>What happens here is that if the preferred format is <code>html</code> then Grails will execute the <code>html()</code> call only. What this is does is make Grails look for a view called either <code>grails-app/views/books/list.html.gsp</code> or <code>grails-app/views/books/list.gsp</code>. If the format is <code>xml</code> then the closure will be invoked and an XML response rendered.<p class="paragraph"/>How do we handle the "all" format? Simply order the content-types within your <code>withFormat</code> block so that whichever one you want executed comes first. So in the above example, "all" will trigger the <code>html</code> handler.<p class="paragraph"/><blockquote class="note">
+When using <a href="../ref/Controllers/withFormat.html" class="controllers">withFormat</a> make sure it is the last call in your controller action as the return value of the <code>withFormat</code> method is used by the action to dictate what happens next.
+</blockquote><p class="paragraph"/><h4>Content Negotiation with the format Request Parameter</h4><p class="paragraph"/>If fiddling with request headers if not your favorite activity you can override the format used by specifying a <code>format</code> request parameter:<p class="paragraph"/><div class="code"><pre>/book/list?format=xml</pre></div><p class="paragraph"/>You can also define this parameter in the <a href="../guide/single.html#6.4 URL Mappings" class="guide">URL Mappings</a> definition:<p class="paragraph"/><div class="code"><pre><span class="java&#45;quote">"/book/list"</span>(controller:<span class="java&#45;quote">"book"</span>, action:<span class="java&#45;quote">"list"</span>) &#123;
+	format = <span class="java&#45;quote">"xml"</span>
+&#125;</pre></div><p class="paragraph"/><h4>Content Negotiation with URI Extensions</h4><p class="paragraph"/>Grails also supports content negotiation via URI extensions. For example given the following URI:<p class="paragraph"/><div class="code"><pre>/book/list.xml</pre></div><p class="paragraph"/>Grails will shave off the extension and map it to <code>/book/list</code> instead whilst simultaneously setting the content format to <code>xml</code> based on this extension. This behaviour is enabled by default, so if you wish to turn it off, you must set the <code>grails.mime.file.extensions</code> property in <code>grails-app/conf/Config.groovy</code> to <code>false</code>:<p class="paragraph"/><div class="code"><pre>grails.mime.file.extensions = <span class="java&#45;keyword">false</span></pre></div><p class="paragraph"/><h4>Testing Content Negotiation</h4><p class="paragraph"/>To test content negotiation in an integration test (see the section on <a href="../guide/single.html#9. Testing" class="guide">Testing</a>) you can either manipulate the incoming request headers:<p class="paragraph"/><div class="code"><pre>void testJavascriptOutput() &#123;
+	def controller = <span class="java&#45;keyword">new</span> TestController()
+	controller.request.addHeader <span class="java&#45;quote">"Accept"</span>, <span class="java&#45;quote">"text/javascript, text/html, application/xml, text/xml, &#42;/&#42;"</span><p class="paragraph"/>	controller.testAction()
+	assertEquals <span class="java&#45;quote">"alert('hello')"</span>, controller.response.contentAsString
+&#125;</pre></div><p class="paragraph"/>Or you can set the format parameter to achieve a similar effect:<p class="paragraph"/><div class="code"><pre>void testJavascriptOutput() &#123;
+	def controller = <span class="java&#45;keyword">new</span> TestController()
+	controller.params.format = 'js'<p class="paragraph"/>	controller.testAction()
+	assertEquals <span class="java&#45;quote">"alert('hello')"</span>, controller.response.contentAsString
+&#125;</pre></div>
+
+	</body>
+</html>

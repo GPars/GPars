@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>Database Mapping Usage</h1><p class="paragraph"/>Domain classes in Grails by default dictate the way they are mapped to the database using sensible defaults. You can customize these with the ORM Mapping DSL. For example create a <code>Book</code> domain:<p class="paragraph"/><div class="code"><pre>grails create&#45;domain&#45;class Book</pre></div><p class="paragraph"/>And then you can use the <code>mapping</code> block to customize the ORM mapping behavior.<p class="paragraph"/><div class="code"><pre>class Book &#123;
+	<span class="java&#45;object">String</span> title
+	Date releaseDate
+	Author author<p class="paragraph"/>	<span class="java&#45;keyword">static</span> mapping = &#123;
+		table <span class="java&#45;quote">"books"</span>
+		author column:<span class="java&#45;quote">"auth_id"</span>
+	&#125;
+&#125;</pre></div><p class="paragraph"/>Refer to the user guide section on <a href="../../guide/single.html#5.5.2 Custom ORM Mapping" class="guide">ORM Mapping</a> for more information.
+	</body>
+</html>

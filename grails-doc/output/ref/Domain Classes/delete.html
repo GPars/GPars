@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>delete</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Indicates that a persistent instance should be deleted.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>def book = Book.get(1)
+book.delete()</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>delete</code> method informs the persistence context that a persistent instance should be deleted. Equivalent to the Hibernate <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Session.html#delete(java.lang.Object)" class="api">delete</a> method.<p class="paragraph"/><blockquote class="warning">
+Calling <code>delete</code> on a transient instance will result in an error
+</blockquote><p class="paragraph"/>Parameters:
+<ul class="star">
+<li><code>flush</code> - If set to true persistent context will be flushed resulting in the instance being deleted immediately. Example:</li>
+</ul><p class="paragraph"/><div class="code"><pre>def book = Book.get(1)
+book.delete(flush:<span class="java&#45;keyword">true</span>)</pre></div>
+	</body>
+</html>

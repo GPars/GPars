@@ -1,0 +1,20 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>params </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>A mutable multi-dimensional map (hash) of request (CGI) parameters<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>To obtain a request parameter called <code>id</code>:
+<div class="code"><pre>class BookController &#123;
+	def show &#123;
+		def book = Book.get(params.id)
+	&#125;
+&#125;</pre></div><p class="paragraph"/>To perform data binding (see <a href="../../guide/single.html#6.1.6 Data Binding" class="guide">Data Binding</a> in the user guide):<p class="paragraph"/><div class="code"><pre>def save = &#123;
+	def book = <span class="java&#45;keyword">new</span> Book(params) // bind request parameters onto properties of book
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The standard Servlet API provides access to parameters via the <code>HttpServletRequest</code> object. Although Grails provides the same capability through the <a href="../../ref/Controllers/request.html" class="controllers">request</a> object, it goes a bit further by providing a mutable map of request parameters called <code>params</code>.<p class="paragraph"/>The <code>params</code> object can be indexed into via de-refrencing so given the URL <code>/hello?foo=bar</code> you can obtain the value of foo as follows:<p class="paragraph"/><pre class="bq"><code>
+println params.foo</code></pre><p class="paragraph"/>The params object can also be used to bind request parameters onto the properties of a domain class using either the constructor or the <a href="../../ref/Domain Classes/properties.html" class="domainClasses">properties</a> property:<p class="paragraph"/><div class="code"><pre>def book = <span class="java&#45;keyword">new</span> Book(params)
+book = Book.get(1)
+book.properties = params</pre></div><p class="paragraph"/>For further reading see <a href="../../guide/single.html#6.1.6 Data Binding" class="guide">Data Binding</a> in the user guide.
+	</body>
+</html>

@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>chain </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Uses <a href="flash.html">flash</a> storage to implicitly retain the model following an HTTP redirect from one action to another.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><pre class="bq"><code>
+chain(action:"details",model:book:new Book(title:'The Shawshank Redemption'))</code></pre><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Usage:<p class="paragraph"/><div class="code"><pre>chain(controller&#42;, action, id&#42;, model, params&#42;)</pre></div><p class="paragraph"/>Arguments:
+<ul class="star">
+<li><code>uri</code> - The full uri to redirect to (example /book/list, book/show/2)</li>
+<li><code>controller</code> (optional) - The controller to redirect to, defaults to the current controller if not specified</li>
+<li><code>action</code> - The action to redirect to, either a string name or a reference to an action within the current controller</li>
+<li><code>id</code> (optional) - The id to use in redirection</li>
+<li><code>model</code> - The model to chain to the next action</li>
+<li><code>params</code> (optional) - Parameters to pass to the action chained to.</li>
+</ul><p class="paragraph"/>The chain method stores the passed model in flash scope and then performs an HTTP redirect. The model is then restored for the next request.<p class="paragraph"/>The chain method requires either a URI to redirect to <strong class="bold">or</strong> a controller/action/id name combination
+	</body>
+</html>

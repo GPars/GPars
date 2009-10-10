@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>7.3 Validation on the Client</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Displaying Errors</h4><p class="paragraph"/>Typically if you get a validation error you want to redirect back to the view for rendering. Once there you need some way of rendering errors. Grails supports a rich set of tags for dealing with errors. If you simply want to render the errors as a list you can use <a href="../ref/Tags/renderErrors.html" class="tags">renderErrors</a>:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:renderErrors bean=<span class="xml&#45;quote">"$&#123;user&#125;"</span> /&#62;</span></pre></div><p class="paragraph"/>If you need more control you can use <a href="../ref/Tags/hasErrors.html" class="tags">hasErrors</a> and <a href="../ref/Tags/eachError.html" class="tags">eachError</a>:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:hasErrors bean=<span class="xml&#45;quote">"$&#123;user&#125;"</span>&#62;</span>
+  <span class="xml&#45;tag">&#60;ul&#62;</span>
+   <span class="xml&#45;tag">&#60;g:eachError var=<span class="xml&#45;quote">"err"</span> bean=<span class="xml&#45;quote">"$&#123;user&#125;"</span>&#62;</span>
+       <span class="xml&#45;tag">&#60;li&#62;</span>$&#123;err&#125;<span class="xml&#45;tag">&#60;/li&#62;</span> 
+   <span class="xml&#45;tag">&#60;/g:eachError&#62;</span>
+  <span class="xml&#45;tag">&#60;/ul&#62;</span>
+<span class="xml&#45;tag">&#60;/g:hasErrors&#62;</span></pre></div><p class="paragraph"/><h4>Highlighting Errors</h4><p class="paragraph"/>It is often useful to highlight using a red box or some indicator when a field has been incorrectly input. This can also be done with the <a href="../ref/Tags/hasErrors.html" class="tags">hasErrors</a> by invoking it as a method. For example:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;div class='value $&#123;hasErrors(bean:user,field:'login','errors')&#125;'&#62;</span>
+   <span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"text"</span> name=<span class="xml&#45;quote">"login"</span> value=<span class="xml&#45;quote">"$&#123;fieldValue(bean:user,field:'login')&#125;"</span>/&#62;</span>
+<span class="xml&#45;tag">&#60;/div&#62;</span></pre></div><p class="paragraph"/>What this code  does is check if the <code>login</code> field of the <code>user</code> bean has any errors and if it does adds an <code>errors</code> CSS class to the <code>div</code> thus allowing you to use CSS rules to highlight the <code>div</code>.<p class="paragraph"/>
+<h4>Retrieving Input Values</h4><p class="paragraph"/>Each error is actually an instance of the <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/validation/FieldError.html" class="api">FieldError</a> class in Spring, which retains the original input value within it. This is useful as you can use the error object to restore the value input by the user using the <a href="../ref/Tags/fieldValue.html" class="tags">fieldValue</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"text"</span> name=<span class="xml&#45;quote">"login"</span> value=<span class="xml&#45;quote">"$&#123;fieldValue(bean:user,field:'login')&#125;"</span>/&#62;</span></pre></div><p class="paragraph"/>This code will look if there is an existing <code>FieldError</code> in the <code>User</code> bean and if there is obtain the originally input value for the <code>login</code> field.
+	</body>
+</html>

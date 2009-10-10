@@ -1,0 +1,77 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>8. The Service Layer</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1><a name="8. The Service Layer">8. The Service Layer</a></h1>As well as the <a href="../guide/single.html#6. The Web Layer" class="guide">Web layer</a>, Grails defines the notion of a service layer. The Grails team discourages the embedding of core application logic inside controllers, as it does not promote re-use and a clean separation of concerns.<p class="paragraph"/>Services in Grails are seen as the place to put the majority of the logic in your application, leaving controllers responsible for handling request flow via redirects and so on.<p class="paragraph"/><h4>Creating a Service</h4><p class="paragraph"/>You can create a Grails service by running the <a href="../ref/Command Line/create-service.html" class="commandLine">create-service</a> command from the root of your project in a terminal window:<p class="paragraph"/><div class="code"><pre>grails create&#45;service simple</pre></div><p class="paragraph"/>The above example will create a service at the location <code>grails-app/services/SimpleService.groovy</code>. A service's name ends with the convention <code>Service</code>, other than that a service is a plain Groovy class:<p class="paragraph"/><div class="code"><pre>class SimpleService &#123;	
+&#125;</pre></div><h2><a name="8.1 Declarative Transactions">8.1 Declarative Transactions</a></h2><h3>Default Declarative Transactions</h3><p class="paragraph"/>Services are typically involved with co-ordinating logic between <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">domain classes</a>, and hence often involved with persistence that spans large operations. Given the nature of services they frequently require transactional behaviour. You can of course use programmatic transactions with the <a href="../ref/Domain Classes/withTransaction.html" class="domainClasses">withTransaction</a> method, however this is repetitive and doesn't fully leverage the power of Spring's underlying transaction abstraction.<p class="paragraph"/>Services allow the enablement of transaction demarcation, which is essentially a declarative way of saying all methods within this service are to be made transactional. All services have transaction demarcation enabled by default - to disable it, simply set the <code>transactional</code> property to <code>false</code>:<p class="paragraph"/><div class="code"><pre>class CountryService &#123;
+    <span class="java&#45;keyword">static</span> transactional = <span class="java&#45;keyword">false</span>
+&#125;</pre></div><p class="paragraph"/>You may also set this property to <code>true</code> in case the default changes in the future, or simply to make it clear that the service is intentionally transactional.<p class="paragraph"/><blockquote class="warning">
+Warning: <a href="../guide/single.html#8.3 Dependency Injection and Services" class="guide">dependency injection</a> is the <strong class="bold">only</strong> way that declarative transactions work. You will not get a transactional service if you use the <code>new</code> operator such as <code>new BookService()</code>
+</blockquote><p class="paragraph"/>
+The result is all methods are wrapped in a transaction and automatic rollback occurs if an exception is thrown in the body of one of the methods. The propagation level of the transaction is by default set to <a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/transaction/TransactionDefinition.html#PROPAGATION_REQUIRED" target="blank">PROPAGATION_REQUIRED</a>.<p class="paragraph"/><h3>Custom Transaction Configuration</h3><p class="paragraph"/>Grails also fully supports Spring's <code>Transactional</code> annotation for cases where you need more fine-grained control over transactions at a per-method level or need specify an alternative propagation level:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.springframework.transaction.annotation.&#42;<p class="paragraph"/>class BookService &#123;<p class="paragraph"/>	@Transactional(readOnly = <span class="java&#45;keyword">true</span>) 
+	def listBooks() &#123; Book.list() &#125;<p class="paragraph"/>	@Transactional def updateBook() &#123; 
+		// É 
+	&#125;<p class="paragraph"/>&#125;</pre></div><p class="paragraph"/>For more information refer to the section of the Spring user guide on <a href="http://static.springsource.org/spring/docs/2.5.x/reference/transaction.html#transaction-declarative-annotations" target="blank">Using @Transactional</a>.<p class="paragraph"/><blockquote class="note">
+Unlike Spring you do not need any prior configuration to use <code>Transactional</code>, just specify the annotation as needed and Grails will pick them up automatically.
+</blockquote><h2><a name="8.2 Scoped Services">8.2 Scoped Services</a></h2>By default, access to service methods is not synchronised, so nothing prevents concurrent execution of those functions. In fact, because the service is a singleton and may be used concurrently, you should be very careful about storing state in a service. Or take the easy (and better) road and never store state in a service.<p class="paragraph"/>You can change this behaviour by placing a service in a particular scope. The supported scopes are:
+<ul class="star">
+<li><code>prototype</code> - A new service is created every time it is injected into another class</li>
+<li><code>request</code> - A new service will be created per request</li>
+<li><code>flash</code> - A new service will be created for the current and next request only</li>
+<li><code>flow</code> - In web flows the service will exist for the scope of the flow</li>
+<li><code>conversation</code> - In web flows the service will exist for the scope of the conversation. ie a root flow and its sub flows</li>
+<li><code>session</code> - A service is created for the scope of a user session</li>
+<li><code>singleton</code> (default) - Only one instance of the service ever exists</li>
+</ul><p class="paragraph"/><blockquote class="note">
+If your service is <code>flash</code>, <code>flow</code> or <code>conversation</code> scoped it will need to implement <code>java.io.Serializable</code> and can only be used in the context of a <a href="../guide/single.html#6.5 Web Flow" class="guide">Web Flow</a>
+</blockquote><p class="paragraph"/>To enable one of the scopes, add a static scope property to your class whose value is one of the above:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> scope = <span class="java&#45;quote">"flow"</span></pre></div><p class="paragraph"/><h2><a name="8.3 Dependency Injection and Services">8.3 Dependency Injection and Services</a></h2><h4>Dependency Injection Basics</h4><p class="paragraph"/>A key aspect of Grails services is the ability to take advantage of the <a href="http://www.springframework.org/" target="blank">Spring Framework's</a> dependency injection capability. Grails supports "dependency injection by convention". In other words, you can use the property name representation of the class name of a service, to automatically inject them into controllers, tag libraries, and so on.<p class="paragraph"/>As an example, given a service called <code>BookService</code>, if you place a property called <code>bookService</code> within a controller as follows:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+   def bookService
+   &#8230;
+&#125;</pre></div><p class="paragraph"/>In this case, the Spring container will automatically inject an instance of that service based on its configured scope. All dependency injection is done by name; Grails does not support typed injection. You can also specify the type as follows:<p class="paragraph"/><div class="code"><pre>class AuthorService &#123;
+	BookService bookService
+&#125;</pre></div><p class="paragraph"/>However, this has an adverse effect on reloading with an error thrown if the <code>BookService</code> changes in development mode.<p class="paragraph"/><blockquote class="note">
+NOTE: Normally the property name is generated by lower casing the first letter of the type.  For example, an instance
+of the <code>BookService</code> class would map to a property named <code>bookService</code>.  To be consistent with standard JavaBean convetions,
+if the first 2 letters of the class name are upper case, the property name is the same as the class name.  For example, an 
+instance of the <code>MYhelperService</code> class would map to a property named <code>MYhelperService</code>.  See section 8.8 of the JavaBean
+specification for more information on de-capitalization rules.
+</blockquote><p class="paragraph"/><h4>Dependency Injection and Services</h4><p class="paragraph"/>You can inject services in other services with the same technique. Say you had an <code>AuthorService</code> that needed to use the <code>BookService</code>, declaring the <code>AuthorService</code> as follows would allow that:<p class="paragraph"/><div class="code"><pre>class AuthorService &#123;
+	def bookService
+&#125;</pre></div><p class="paragraph"/><h4>Dependency Injection and Domain Classes</h4><p class="paragraph"/>You can even inject services into domain classes, which can aid in the development of rich domain models:<p class="paragraph"/><div class="code"><pre>class Book &#123;	
+	&#8230;
+	def bookService
+	def buyBook() &#123;
+		bookService.buyBook(<span class="java&#45;keyword">this</span>)
+	&#125;
+&#125;</pre></div>
+<h2><a name="8.4 Using Services from Java">8.4 Using Services from Java</a></h2>One of the powerful things about services is that since they encapsulate re-usable logic, you can use them from other classes, including Java classes. There are a couple of ways you can re-use a service from Java. The simplest way is to move your service into a package within the <code>grails-app/services</code> directory. The reason this is a critical step is that it is not possible to import classes into Java from the default package (the package used when no package declaration is present). So for example the <code>BookService</code> below cannot be used from Java as it stands:<p class="paragraph"/><div class="code"><pre>class BookService &#123;
+	void buyBook(Book book) &#123;
+		// logic
+	&#125;
+&#125;</pre></div><p class="paragraph"/>However, this can be rectified by placing this class in a package, by moving the class into a sub directory such as <code>grails-app/services/bookstore</code> and then modifying the package declaration:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> bookstore
+class BookService &#123;
+	void buyBook(Book book) &#123;
+		// logic
+	&#125;
+&#125;</pre></div><p class="paragraph"/>An alternative to packages is to instead have an interface within a package that the service implements:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> bookstore;
+<span class="java&#45;keyword">interface</span> BookStore &#123;
+	void buyBook(Book book);
+&#125;</pre></div><p class="paragraph"/>And then the service:<p class="paragraph"/><div class="code"><pre>class BookService <span class="java&#45;keyword">implements</span> bookstore.BookStore &#123;
+	void buyBook(Book b) &#123;
+		// logic
+	&#125;
+&#125;</pre></div><p class="paragraph"/>This latter technique is arguably cleaner, as the Java side only has a reference to the interface and not to the implementation class. Either way, the goal of this exercise to enable Java to statically resolve the class (or interface) to use, at compile time. Now that this is done you can create a Java class within the <code>src/java</code> package, and provide a setter that uses the type and the name of the bean in Spring:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> bookstore;
+// note: <span class="java&#45;keyword">this</span> is Java class
+<span class="java&#45;keyword">public</span> class BookConsumer &#123;
+	<span class="java&#45;keyword">private</span> BookStore store;<p class="paragraph"/>	<span class="java&#45;keyword">public</span> void setBookStore(BookStore storeInstance) &#123;
+		<span class="java&#45;keyword">this</span>.store = storeInstance;
+	&#125;	
+	&#8230;
+&#125;</pre></div><p class="paragraph"/>Once this is done you can configure the Java class as a Spring bean in <code>grails-app/conf/spring/resources.xml</code> (For more information one this see the section on <a href="../guide/single.html#14. Grails and Spring" class="guide">Grails and Spring</a>):<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;bean id=<span class="xml&#45;quote">"bookConsumer"</span> class=<span class="xml&#45;quote">"bookstore.BookConsumer"</span>&#62;</span>
+	<span class="xml&#45;tag">&#60;property name=<span class="xml&#45;quote">"bookStore"</span> ref=<span class="xml&#45;quote">"bookService"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;/bean&#62;</span></pre></div><p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,16 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.7.1.3 Remote Form Submission</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		An HTML form can also be submitted asynchronously in one of two ways. Firstly using the <a href="../ref/Tags/formRemote.html" class="tags">formRemote</a> tag which expects similar attributes to those for the <a href="../ref/Tags/remoteLink.html" class="tags">remoteLink</a> tag:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:formRemote url=<span class="xml&#45;quote">"&#91;controller:'book',action:'delete'&#93;"</span> update=<span class="xml&#45;quote">"&#91;success:'message',failure:'error'&#93;"</span>&#62;</span>
+       <span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"hidden"</span> name=<span class="xml&#45;quote">"id"</span> value=<span class="xml&#45;quote">"1"</span> /&#62;</span>
+       <span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"submit"</span> value=<span class="xml&#45;quote">"Delete Book!"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;/g:formRemote &#62;</span></pre></div><p class="paragraph"/>Or alternatively you can use the <a href="../ref/Tags/submitToRemote.html" class="tags">submitToRemote</a> tag to create a submit button. This allows some buttons to submit remotely and some not depending on the action:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;form action=<span class="xml&#45;quote">"delete"</span>&#62;</span>
+       <span class="xml&#45;tag">&#60;input type=<span class="xml&#45;quote">"hidden"</span> name=<span class="xml&#45;quote">"id"</span> value=<span class="xml&#45;quote">"1"</span> /&#62;</span>
+       <span class="xml&#45;tag">&#60;g:submitToRemote action=<span class="xml&#45;quote">"delete"</span> update=<span class="xml&#45;quote">"&#91;success:'message',failure:'error'&#93;"</span> /&#62;</span>
+<span class="xml&#45;tag">&#60;/form&#62;</span></pre></div><p class="paragraph"/>
+	</body>
+</html>

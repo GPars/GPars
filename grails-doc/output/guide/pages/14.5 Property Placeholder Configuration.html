@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>14.5 Property Placeholder Configuration</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails supports the notion of property placeholder configuration through an extended version of Spring's <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/config/PropertyPlaceholderConfigurer.html" class="api">PropertyPlaceholderConfigurer</a>, which is typically useful when used in combination with <a href="../guide/single.html#3.4 Externalized Configuration" class="guide">externalized configuration</a>.<p class="paragraph"/>Settings defined in either <a href="http://groovy.codehaus.org/ConfigSlurper" target="blank">ConfigSlurper</a> scripts of Java properties files can be used as placeholder values for Spring configuration in <code>grails-app/conf/spring/resources.xml</code>. For example given the following entries in <code>grails-app/conf/Config.groovy</code> (or an externalized config):<p class="paragraph"/><div class="code"><pre>database.driver=<span class="java&#45;quote">"com.mysql.jdbc.Driver"</span>
+database.dbname=<span class="java&#45;quote">"mysql:mydb"</span></pre></div><p class="paragraph"/>You can then specify placeholders in <code>resources.xml</code> as follows using the familiar ${..} syntax:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;bean id=<span class="xml&#45;quote">"dataSource"</span> class=<span class="xml&#45;quote">"org.springframework.jdbc.datasource.DriverManagerDataSource"</span>&#62;</span>
+   <span class="xml&#45;tag">&#60;property name=<span class="xml&#45;quote">"driverClassName"</span>&#62;</span><span class="xml&#45;tag">&#60;value&#62;</span>$&#123;database.driver&#125;<span class="xml&#45;tag">&#60;/value&#62;</span><span class="xml&#45;tag">&#60;/property&#62;</span>
+   <span class="xml&#45;tag">&#60;property name=<span class="xml&#45;quote">"url"</span>&#62;</span><span class="xml&#45;tag">&#60;value&#62;</span>jdbc:$&#123;database.dbname&#125;<span class="xml&#45;tag">&#60;/value&#62;</span><span class="xml&#45;tag">&#60;/property&#62;</span>
+ <span class="xml&#45;tag">&#60;/bean&#62;</span></pre></div>
+	</body>
+</html>

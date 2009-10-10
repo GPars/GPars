@@ -1,0 +1,52 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>validator</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Adds custom validation to a field.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>even( validator: &#123;
+   <span class="java&#45;keyword">return</span> (it % 2) == 0
+&#125;)<p class="paragraph"/>password1( validator: &#123;
+   val, obj &#45;&#62;
+      obj.properties&#91;'password2'&#93; == val
+&#125;)<p class="paragraph"/>magicNumber( validator:
+   someClosureWithTwoParameters)<p class="paragraph"/>// This one assumes you have an error message defined like:
+// classname.propertyName.custom.error=My error shows arguments &#123;3&#125; and &#123;4&#125; <span class="java&#45;keyword">for</span> value &#123;0&#125;
+otherProperty( validator: &#123; <span class="java&#45;keyword">return</span> &#91;'custom.error', arg1, arg2&#93; &#125; )<p class="paragraph"/>// The following example does not use custom validation.
+// A custom message may be defined in messages.properties:
+// user.login.blank=Please enter a login
+// which will be used instead of <span class="java&#45;keyword">default</span>.blank.message
+class User &#123;
+    <span class="java&#45;object">String</span> login
+    <span class="java&#45;keyword">static</span> constraints = &#123;
+        login(blank:<span class="java&#45;keyword">false</span>)
+    &#125;
+&#125;<p class="paragraph"/>// In the following example, custom validation is used:
+// user.login.validator.invalid=Please enter a login
+class User &#123;
+   <span class="java&#45;object">String</span> login
+    <span class="java&#45;keyword">static</span> constraints = &#123;
+        login(validator: &#123;
+            <span class="java&#45;keyword">return</span> (it.length != 0)
+    	&#125;)
+    &#125;
+&#125;<p class="paragraph"/>// The following might define the error message as:
+// user.login.invalid.bountyhunter=Invalid bounty hunter (&#123;2&#125;) tried to log in.  (<span class="java&#45;object">Class</span> name = &#123;1&#125;.  Property name = &#123;0&#125;)
+class User &#123;
+    <span class="java&#45;object">String</span> login
+    <span class="java&#45;keyword">static</span> constraints = &#123;
+        login(validator: &#123;
+            <span class="java&#45;keyword">if</span> (!it.startsWith('boba')) <span class="java&#45;keyword">return</span> &#91;'invalid.bountyhunter'&#93;
+        &#125;)
+    &#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Set to a closure or block to use for custom validation. A single or no parameter block receives the value, a two-parameter block receives the value and object reference.<p class="paragraph"/>A three-parameter Closure receives the value, object reference and the errors object.<p class="paragraph"/>The closure can return:
+<ul class="star">
+<li><code>null</code> or <code>true</code> to indicate that the value is valid</li>
+<li><code>false</code> to indicate an invalid value and use the default message code</li>
+<li>a string to indicate the error code to append to the "classname.propertName." string used to resolve the error message. If a field specific message cannot be resolved, the error code itself will be resolved allowing for global error messages.</li>
+<li>a list containing a string as above, and then any number of arguments following it, which can be used as formatted message arguments indexed at 3 onwards. See <code>grails-app/i18n/message.properties</code> to see how the default error message codes use the arguments.</li>
+</ul><p class="paragraph"/>If the closure is a three-parameter closure the return value is ignored and the closure is expected to populate the errors object.<p class="paragraph"/>The closure also has access to the name of the field that the constraint applies to via <code>propertyName</code>:
+<div class="code"><pre>myField(validator: &#123; val, obj &#45;&#62; <span class="java&#45;keyword">return</span> propertyName == <span class="java&#45;quote">"myField"</span> &#125;)</pre></div><p class="paragraph"/>Error Code: <code>className.propertyName.validator.error</code><p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,36 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>webflow </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>webflow</code> plug-in sets up Grails' support for <a href="http://opensource.atlassian.com/confluence/spring/display/WEBFLOW." target="blank">Spring Webflow</a><p class="paragraph"/><h2>Examples</h2><p class="paragraph"/>An example web flow:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+   &#8230;
+   def shoppingCartFlow = &#123;
+       showCart &#123;
+           on(<span class="java&#45;quote">"checkout"</span>).to <span class="java&#45;quote">"enterPersonalDetails"</span>           
+           on(<span class="java&#45;quote">"continueShopping"</span>).to <span class="java&#45;quote">"displayCatalogue"</span>
+       &#125;
+       &#8230;
+       displayCatalogue &#123;
+            redirect(controller:<span class="java&#45;quote">"catalogue"</span>, action:<span class="java&#45;quote">"show"</span>)
+       &#125;
+       displayInvoice()
+   &#125;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Refer to the section on <a href="../../guide/single.html#6.5 Web Flow" class="guide">Web Flow</a> in the Grails user guide which details how Grails' web flow support works.<p class="paragraph"/>Configured Spring Beans:
+<ul class="star">
+<li><code>conversationManager</code> - An instance of the <code>org.springframework.webflow.conversation.impl.SessionBindingConversationManager</code> that manages conversations in the session.</li>
+<li><code>executionListenerLoader</code> - A Web Flow <code>org.springframework.webflow.execution.factory.StaticFlowExecutionListenerLoader</code> that uses the <code>hibernateConversationListener</code> bean with flow execution events to manage the Hibernate session.</li>
+<li><code>flowBuilderServices</code> - An instance of the <code>org.springframework.webflow.engine.builder.support.FlowBuilderServices</code> class used to help the Flow engine locate services.</li>
+<li><code>flowExecutor</code> - An instance of the api:org.codehaus.groovy.grails.webflow.execution.GrailsFlowExecutorImpl that knows how to execute Grails flows based on flow execution keys.</li>
+<li><code>flowExecutionFactory</code> - An instance of the <code>org.springframework.webflow.engine.impl.FlowExecutionImplFactory</code> that constructs flow executions.</li>
+<li><code>flowExecutionSnapshotFactory</code> - An instance of the <code>org.springframework.webflow.execution.repository.snapshot.SerializedFlowExecutionSnapshotFactory</code> class that is used to create flow snapshots that can be stored for resumption later on.</li>
+<li><code>flowExecutionRepository</code> - An instance of the <code>org.springframework.webflow.execution.repository.impl.DefaultFlowExecutionRepository</code> class that is used to store flows.</li>
+<li><code>flowRegistry</code> - An instance of the <code>org.codehaus.groovy.grails.webflow.engine.builder.ControllerFlowRegistry</code> class that stores persisted flows.</li>
+<li><code>flowScopeRegistrar</code> - An instance of the Spring Web Flow <code>org.springframework.webflow.config.scope.ScopeRegistrar</code> class which registers the flow scopes with the <code>ApplicationContext</code> so that services can be scoped using flow scopes such as <code>flow</code>, <code>conversation</code> and <code>flash</code>.</li>
+<li><code>hibernateConversationListener</code> - An instance of the Web Flow <code>org.codehaus.groovy.grails.webflow.persistence.SessionAwareHibernateFlowExecutionListener</code> class that manages the Hibernate session for the scope of a flow, allowing atomic use of flows.</li>
+<li><code>viewFactoryCreator</code> - An instance of the <code>org.springframework.webflow.mvc.builder.MvcViewFactoryCreator</code> class used to construct views</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

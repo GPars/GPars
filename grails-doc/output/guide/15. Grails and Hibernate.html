@@ -1,0 +1,48 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>15. Grails and Hibernate</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1><a name="15. Grails and Hibernate">15. Grails and Hibernate</a></h1>If <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">GORM (Grails Object Relational Mapping)</a> is not flexible enough for your liking you can alternatively map your domain class using Hibernate. To do this create a <code>hibernate.cfg.xml</code> file in the <code>grails-app/conf/hibernate</code> directory of your project and the corresponding HBM mapping xml files for your domain classes.<p class="paragraph"/><blockquote class="note">
+For more info on how to do this read the <a href="http://www.hibernate.org/" target="blank">documentation on mapping</a> on the Hibernate Website
+</blockquote><p class="paragraph"/>This will allow you to map Grails domain classes onto a wider range of legacy systems and be more flexible in the creation of your database schema.<p class="paragraph"/>Grails also allows you to write your domain model in Java or re-use an existing domain model that has been mapped using Hibernate. All you have to do is place the necessary <code>hibernate.cfg.xml</code> file and corresponding mappings files in the <code>grails-app/conf/hibernate</code> directory.<p class="paragraph"/>Additionally, the good news is you will still be able to call all of the dynamic persistent and query methods allowed in <a href="../guide/single.html#5. Object Relational Mapping (GORM)" class="guide">GORM</a>!<h2><a name="15.1 Mapping with Hibernate Annotations">15.1 Mapping with Hibernate Annotations</a></h2>Grails also supports creating domain classes mapped with Hibernate's Java 5.0 Annotations support. To do so you need to tell Grails that you are using an annotation configuration by setting the <code>configClass</code>  in your <a href="../guide/single.html#3.3 The DataSource" class="guide">DataSource</a> as follows:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsAnnotationConfiguration
+dataSource &#123;
+	configClass = GrailsAnnotationConfiguration.class
+   &#8230; // remaining properties
+&#125;</pre></div><p class="paragraph"/>That's it for the configuration! Make sure you have Java 5.0 installed as this is required to use annotations. Now to create an annotated class we simply create a new Java class in <code>src/java</code> and use the annotations defined as part of the EJB 3.0 spec (for more info on this see the <a href="http://annotations.hibernate.org/" target="blank">Hibernate Annotations Docs</a>):<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.books;
+@Entity
+<span class="java&#45;keyword">public</span> class Book &#123;
+    <span class="java&#45;keyword">private</span> <span class="java&#45;object">Long</span> id;
+    <span class="java&#45;keyword">private</span> <span class="java&#45;object">String</span> title;
+    <span class="java&#45;keyword">private</span> <span class="java&#45;object">String</span> description;
+    <span class="java&#45;keyword">private</span> Date date;<p class="paragraph"/>    @Id
+    @GeneratedValue
+    <span class="java&#45;keyword">public</span> <span class="java&#45;object">Long</span> getId() &#123;
+        <span class="java&#45;keyword">return</span> id;
+    &#125;<p class="paragraph"/>    <span class="java&#45;keyword">public</span> void setId(<span class="java&#45;object">Long</span> id) &#123;
+        <span class="java&#45;keyword">this</span>.id = id;
+    &#125;<p class="paragraph"/>    <span class="java&#45;keyword">public</span> <span class="java&#45;object">String</span> getTitle() &#123;
+        <span class="java&#45;keyword">return</span> title;
+    &#125;<p class="paragraph"/>    <span class="java&#45;keyword">public</span> void setTitle(<span class="java&#45;object">String</span> title) &#123;
+        <span class="java&#45;keyword">this</span>.title = title;
+    &#125;<p class="paragraph"/>    <span class="java&#45;keyword">public</span> <span class="java&#45;object">String</span> getDescription() &#123;
+        <span class="java&#45;keyword">return</span> description;
+    &#125;<p class="paragraph"/>    <span class="java&#45;keyword">public</span> void setDescription(<span class="java&#45;object">String</span> description) &#123;
+        <span class="java&#45;keyword">this</span>.description = description;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Once that is done you need to register the class with the Hibernate <code>sessionFactory</code>, to do you need to add entries to the <code>grails-app/conf/hibernate/hibernate.cfg.xml</code> file as follows:<p class="paragraph"/><div class="code"><pre>&#60;!DOCTYPE hibernate&#45;configuration SYSTEM
+  <span class="xml&#45;quote">"http://hibernate.sourceforge.net/hibernate&#45;configuration&#45;3.0.dtd"</span>&#62;
+<span class="xml&#45;tag">&#60;hibernate&#45;configuration&#62;</span>
+    <span class="xml&#45;tag">&#60;session&#45;factory&#62;</span>
+        <span class="xml&#45;tag">&#60;mapping package=<span class="xml&#45;quote">"com.books"</span> /&#62;</span>
+        <span class="xml&#45;tag">&#60;mapping class=<span class="xml&#45;quote">"com.books.Book"</span> /&#62;</span>
+    <span class="xml&#45;tag">&#60;/session&#45;factory&#62;</span>
+<span class="xml&#45;tag">&#60;/hibernate&#45;configuration&#62;</span></pre></div><p class="paragraph"/>When Grails loads it will register the necessary dynamic methods with the class. To see what else you can do with a Hibernate domain class see the section on <a href="../guide/single.html#16. Scaffolding" class="guide">Scaffolding</a>.<p class="paragraph"/><h2><a name="15.2 Further Reading">15.2 Further Reading</a></h2>Grails committer, Jason Rudolph, took the time to write many useful articles about using Grails with custom Hibernate mappings including:
+<ul class="star">
+<li><a href="http://jasonrudolph.com/blog/2006/06/20/hoisting-grails-to-your-legacy-db/" target="blank">Hoisting Grails to Your Legacy DB</a> - An excellent article about using Grails with Hibernate XML</li>
+<li><a href="http://www.infoq.com/articles/grails-ejb-tutorial" target="blank">Grails + EJB3 Domain Models</a> - Another great article about using Grails with EJB3-style annotated domain models</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

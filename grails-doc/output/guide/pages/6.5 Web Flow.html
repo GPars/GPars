@@ -1,0 +1,18 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.5 Web Flow</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h4>Overview</h4><p class="paragraph"/>Grails supports the creation of web flows built on the <a href="http://opensource.atlassian.com/confluence/spring/display/WEBFLOW" target="blank">Spring Web Flow</a> project. A web flow is a conversation that spans multiple requests and retains state for the scope of the flow. A web flow also has a defined start and end state.<p class="paragraph"/>Web flows don't require an HTTP session, but instead store their state in a serialized form, which is then restored using a flow execution key that Grails passes around as a request parameter. This makes flows far more scalable than other forms of stateful application that use the HttpSession and its inherit memory and clustering concerns.<p class="paragraph"/>Web flow is essentially an advanced state machine that manages the "flow" of execution from one state to the next. Since the state is managed for you, you don't have to be concerned with ensuring that users enter an action in the middle of some multi step flow, as web flow manages that for you. This makes web flow perfect for use cases such as shopping carts, hotel booking and any application that has multi page work flows.<p class="paragraph"/><h4>Creating a Flow</h4><p class="paragraph"/>To create a flow create a regular Grails controller and then add an action that ends with the convention <code>Flow</code>. For example:<p class="paragraph"/><div class="code"><pre>class BookController &#123;
+   def index = &#123;
+      redirect(action:<span class="java&#45;quote">"shoppingCart"</span>)
+   &#125;
+   def shoppingCartFlow = &#123;
+        &#8230;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Notice when redirecting or referring to the flow as an action we omit the <code>Flow</code> suffix. In other words the name of the action of the above flow is <code>shoppingCart</code>.
+
+	</body>
+</html>

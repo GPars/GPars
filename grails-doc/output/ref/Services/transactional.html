@@ -1,0 +1,14 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>transactional </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Enables transaction demarcation if set to <code>true</code><p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>class BookService &#123;
+    <span class="java&#45;keyword">static</span> transactional = <span class="java&#45;keyword">true</span>
+	&#8230;
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>By default services have automatic transaction management such as propagation and so on. By setting <code>transactional</code> to <code>false</code> you disable automatic Spring managed transaction demarcation for every method in the service. When set to the <code>true</code>, The propagation level of the transaction is by default set to <a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/transaction/TransactionDefinition.html#PROPAGATION_REQUIRED" target="blank">PROPAGATION_REQUIRED</a>.<p class="paragraph"/>You can also configure services using Spring's <a href="http://static.springsource.org/spring/docs/2.5.x/api/org/springframework/transaction/annotation/Transactional.html" target="blank">@Transactional</a> annotation. See <a href="../../guide/single.html#8.1 Declarative Transactions" class="guide">Declarative Transactions</a> in the user guide for more information.
+
+	</body>
+</html>

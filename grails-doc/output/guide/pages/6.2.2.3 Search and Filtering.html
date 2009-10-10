@@ -1,0 +1,17 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.2.2.3 Search and Filtering</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		If you have collections of objects you often need to sort and filter them in some way. GSP supports the <a href="../ref/Tags/findAll.html" class="tags">findAll</a> and <a href="../ref/Tags/grep.html" class="tags">grep</a> for this task:<p class="paragraph"/><div class="code"><pre>Stephen King's Books:
+<span class="xml&#45;tag">&#60;g:findAll in=<span class="xml&#45;quote">"$&#123;books&#125;"</span> expr=<span class="xml&#45;quote">"it.author == 'Stephen King'"</span>&#62;</span>
+     <span class="xml&#45;tag">&#60;p&#62;</span>Title: $&#123;it.title&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:findAll&#62;</span></pre></div><p class="paragraph"/>The <code>expr</code> attribute contains a Groovy expression that can be used as a filter. Speaking of filters the <a href="../ref/Tags/grep.html" class="tags">grep</a> tag does a similar job such as filter by class:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:grep in=<span class="xml&#45;quote">"$&#123;books&#125;"</span> filter=<span class="xml&#45;quote">"NonFictionBooks.class"</span>&#62;</span>
+     <span class="xml&#45;tag">&#60;p&#62;</span>Title: $&#123;it.title&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:grep&#62;</span></pre></div><p class="paragraph"/>Or using a regular expression:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:grep in=<span class="xml&#45;quote">"$&#123;books.title&#125;"</span> filter=<span class="xml&#45;quote">"~/.&#42;?Groovy.&#42;?/"</span>&#62;</span>
+     <span class="xml&#45;tag">&#60;p&#62;</span>Title: $&#123;it&#125;<span class="xml&#45;tag">&#60;/p&#62;</span>
+<span class="xml&#45;tag">&#60;/g:grep&#62;</span></pre></div><p class="paragraph"/>The above example is also interesting due to its usage of GPath. GPath is Groovy's equivalent to an XPath like language. Essentially the <code>books</code> collection is a collection of <code>Book</code> instances. However assuming each <code>Book</code> has a <code>title</code>, you can obtain a list of Book titles using the expression <code>books.title</code>. Groovy will auto-magically go through the list of Book instances, obtain each title, and return a new list!
+	</body>
+</html>

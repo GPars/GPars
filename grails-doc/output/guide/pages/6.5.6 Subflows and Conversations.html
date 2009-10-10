@@ -1,0 +1,52 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>6.5.6 Subflows and Conversations</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Grails' Web Flow integration also supports subflows. A subflow is like a flow within a flow. For example take this search flow:<p class="paragraph"/><div class="code"><pre>def searchFlow = &#123;
+            displaySearchForm &#123;
+                on(<span class="java&#45;quote">"submit"</span>).to <span class="java&#45;quote">"executeSearch"</span>
+            &#125;
+            executeSearch &#123;
+                action &#123;
+                    &#91;results:searchService.executeSearch(params.q)&#93;
+                &#125;
+                on(<span class="java&#45;quote">"success"</span>).to <span class="java&#45;quote">"displayResults"</span>
+                on(<span class="java&#45;quote">"error"</span>).to <span class="java&#45;quote">"displaySearchForm"</span>
+            &#125;
+            displayResults &#123;
+                on(<span class="java&#45;quote">"searchDeeper"</span>).to <span class="java&#45;quote">"extendedSearch"</span>
+                on(<span class="java&#45;quote">"searchAgain"</span>).to <span class="java&#45;quote">"displaySearchForm"</span>
+            &#125;
+            extendedSearch &#123;
+                subflow(extendedSearchFlow)   // &#60;&#45;&#45;&#45; extended search subflow
+                on(<span class="java&#45;quote">"moreResults"</span>).to <span class="java&#45;quote">"displayMoreResults"</span>
+                on(<span class="java&#45;quote">"noResults"</span>).to <span class="java&#45;quote">"displayNoMoreResults"</span>
+            &#125;
+            displayMoreResults()
+            displayNoMoreResults()
+&#125;</pre></div><p class="paragraph"/>It references a subflow in the <code>extendedSearch</code> state. The subflow is another flow entirely:<p class="paragraph"/><div class="code"><pre>def extendedSearchFlow = &#123;
+       startExtendedSearch &#123;
+           on(<span class="java&#45;quote">"findMore"</span>).to <span class="java&#45;quote">"searchMore"</span>
+           on(<span class="java&#45;quote">"searchAgain"</span>).to <span class="java&#45;quote">"noResults"</span>
+       &#125;
+       searchMore &#123;
+           action &#123;
+              def results = searchService.deepSearch(ctx.conversation.query)
+              <span class="java&#45;keyword">if</span>(!results)<span class="java&#45;keyword">return</span> error()
+              conversation.extendedResults = results
+           &#125;
+           on(<span class="java&#45;quote">"success"</span>).to <span class="java&#45;quote">"moreResults"</span>
+           on(<span class="java&#45;quote">"error"</span>).to <span class="java&#45;quote">"noResults"</span>
+       &#125;
+       moreResults()
+       noResults()
+&#125;</pre></div><p class="paragraph"/>Notice how it places the <code>extendedResults</code> in conversation scope. This scope differs to flow scope as it allows you to share state that spans the whole conversation not just the flow. Also notice that the end state (either <code>moreResults</code> or <code>noResults</code> of the subflow triggers the events in the main flow:<p class="paragraph"/><div class="code"><pre>extendedSearch &#123;
+         subflow(extendedSearchFlow)   // &#60;&#45;&#45;&#45; extended search subflow
+         on(<span class="java&#45;quote">"moreResults"</span>).to <span class="java&#45;quote">"displayMoreResults"</span>
+         on(<span class="java&#45;quote">"noResults"</span>).to <span class="java&#45;quote">"displayNoMoreResults"</span>
+&#125;</pre></div><p class="paragraph"/>
+	</body>
+</html>

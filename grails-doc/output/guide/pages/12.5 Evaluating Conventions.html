@@ -1,0 +1,28 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>12.5 Evaluating Conventions</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Before moving onto looking at providing runtime configuration based on conventions you first need to understand how to evaluated those conventions from a plug-in. Essentially every plugin has an implicit <code>application</code> variable which is an instance of the api:org.codehaus.groovy.grails.commons.GrailsApplication interface.<p class="paragraph"/>The <code>GrailsApplication</code> interface provides methods to evaluate the conventions within the project and internally stores references to all classes within a GrailsApplication using the api:org.codehaus.groovy.grails.commons.GrailsClass interface.<p class="paragraph"/>A <code>GrailsClass</code> represents a physical Grails resources such as a controller or a tag library. For example to get all <code>GrailsClass</code> instances you can do:<p class="paragraph"/><div class="code"><pre>application.allClasses.each &#123; println it.name &#125;</pre></div><p class="paragraph"/>There are a few "magic" properties that the <code>GrailsApplication</code> instance possesses that allow you to narrow the type of artefact you are interested in. For example if you only want to controllers you can do:<p class="paragraph"/><div class="code"><pre>application.controllerClasses.each &#123; println it.name &#125;</pre></div><p class="paragraph"/>The dynamic method conventions are as follows:
+<ul class="star">
+<li><code>*Classes</code> - Retrieves all the classes for a particular artefact name. Example <code>application.controllerClasses</code>.</li>
+<li><code>get*Class</code> - Retrieves a named class for a particular artefact. Example <code>application.getControllerClass("ExampleController")</code></li>
+<li><code>is*Class</code> - Returns true if the given class is of the given artefact type. Example <code>application.isControllerClass(ExampleController.class)</code></li>
+<li><code>add*Class</code> - Adds a class for the given artefact type and returns the added <code>GrailsClass</code> instance - Example <code>application.addControllerClass(ExampleController.class)</code></li>
+</ul><p class="paragraph"/>The <code>GrailsClass</code> interface itself provides a number of useful methods that allow you to further evaluate and work with the conventions. These include:
+<ul class="star">
+<li><code>getPropertyValue</code> - Gets the initial value of the given property on the class</li>
+<li><code>hasProperty</code> - Returns true if the class has the specified property</li>
+<li><code>newInstance</code> - Creates a new instance of this class.</li>
+<li><code>getName</code> -  Returns the logical name of the class in the application without the trailing convention part if applicable</li>
+<li><code>getShortName</code> - Returns the short name of the class without package prefix</li>
+<li><code>getFullName</code> - Returns the full name of the class in the application with the trailing convention part and with the package name</li>
+<li><code>getPropertyName</code> - Returns the name of the class as a property name</li>
+<li><code>getLogicalPropertyName</code> - Returns the logical property name of the class in the application without the trailing convention part if applicable</li>
+<li><code>getNaturalName</code> - Returns the name of the property in natural terms (eg. 'lastName' becomes 'Last Name')</li>
+<li><code>getPackageName</code> - Returns the package name</li>
+</ul><p class="paragraph"/>For a full reference refer to the api:org.codehaus.groovy.grails.commons.GrailsClass.
+	</body>
+</html>

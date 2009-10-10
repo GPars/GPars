@@ -1,0 +1,15 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>create-unit-test</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>The <code>create-unit-test</code> command will create an unit test for the given base name.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>grails create&#45;unit&#45;test book</pre></div><p class="paragraph"/><h2>Description          </h2><p class="paragraph"/>Creates a unit test for the given base name. For example for a base name <code>book</code> an unit test called <code>BookTests</code> will be created in the <code>test/unit</code> directory.<p class="paragraph"/>An unit test differs from an integration test in that the Grails environment is not loaded for each test execution and it is left up to you to perform the appropriate Mocking using GroovyMock or a Mock library such as <a href="http://www.easymock.org/." target="blank">EasyMock</a><p class="paragraph"/>Refer to the section on <a href="../../guide/single.html#9. Testing" class="guide">Unit Testing</a> of the user guide for information on unit vs. integration testing.<p class="paragraph"/><blockquote class="note">
+Note that this command is merely for convenience and you can also create integration tests in your favourite text editor or IDE if you choose.
+</blockquote><p class="paragraph"/>Usage:<p class="paragraph"/><div class="code"><pre>grails create&#45;unit&#45;test &#91;name&#93;</pre></div><p class="paragraph"/>Fired Events: 
+<ul class="star">
+<li><code>CreatedFile</code> - When the unit test is created</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

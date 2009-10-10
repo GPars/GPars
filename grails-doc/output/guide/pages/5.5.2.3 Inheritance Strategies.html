@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>5.5.2.3 Inheritance Strategies</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		By default GORM classes uses <code>table-per-hierarchy</code> inheritance mapping. This has the disadvantage that columns cannot have a <code>NOT-NULL</code> constraint applied to them at the db level. If you would prefer to use a <code>table-per-subclass</code> inheritance strategy you can do so as follows:<p class="paragraph"/><div class="code"><pre>class Payment &#123;
+    <span class="java&#45;object">Long</span> id
+    <span class="java&#45;object">Long</span> version
+    <span class="java&#45;object">Integer</span> amount<p class="paragraph"/>    <span class="java&#45;keyword">static</span> mapping = &#123;
+        tablePerHierarchy <span class="java&#45;keyword">false</span>
+    &#125;
+&#125;
+class CreditCardPayment <span class="java&#45;keyword">extends</span> Payment  &#123;
+    <span class="java&#45;object">String</span> cardNumber
+&#125;</pre></div><p class="paragraph"/>The mapping of the root <code>Payment</code> class specifies that it will not be using <code>table-per-hierarchy</code> mapping for all child classes.
+	</body>
+</html>

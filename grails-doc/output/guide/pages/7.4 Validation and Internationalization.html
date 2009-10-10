@@ -1,0 +1,23 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>7.4 Validation and Internationalization</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		Another important thing to note about errors in Grails is that the messages that the errors display are not hard coded anywhere. The <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/validation/FieldError.html" class="api">FieldError</a> class in Spring essentially resolves messages from message bundles using Grails' <a href="../guide/single.html#10. Internationalization" class="guide">i18n</a> support.<p class="paragraph"/><h4>Constraints and Message Codes</h4><p class="paragraph"/>The codes themselves are dictated by a convention. For example consider the constraints we looked at earlier:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.mycompany.myapp<p class="paragraph"/>class User &#123;
+    ...<p class="paragraph"/>    <span class="java&#45;keyword">static</span> constraints = &#123;
+        login(size:5..15, blank:<span class="java&#45;keyword">false</span>, unique:<span class="java&#45;keyword">true</span>)
+        password(size:5..15, blank:<span class="java&#45;keyword">false</span>)
+        email(email:<span class="java&#45;keyword">true</span>, blank:<span class="java&#45;keyword">false</span>)
+        age(min:18, nullable:<span class="java&#45;keyword">false</span>)
+    &#125;
+&#125;</pre></div><p class="paragraph"/>If the <code>blank</code> constraint was violated Grails will, by convention, look for a message code in the form:<p class="paragraph"/><div class="code"><pre>&#91;<span class="java&#45;object">Class</span> Name&#93;.&#91;Property Name&#93;.&#91;Constraint Code&#93;</pre></div><p class="paragraph"/>In the case of the <code>blank</code> constraint this would be <code>user.login.blank</code> so you would need a message such as the following in your <code>grails-app/i18n/messages.properties</code> file:<p class="paragraph"/><div class="code"><pre>user.login.blank=Your login name must be specified!</pre></div><p class="paragraph"/>The class name is looked for both with and without a package, with the packaged version taking precedence. So for example, com.mycompany.myapp.User.login.blank will be used before user.login.blank. This allows for cases where you domain class encounters message code clashes with plugins.<p class="paragraph"/>For a reference on what codes are for which constraints refer to the reference guide for each constraint.<p class="paragraph"/><h4>Displaying Messages</h4><p class="paragraph"/>The <a href="../ref/Tags/renderErrors.html" class="tags">renderErrors</a> tag will automatically deal with looking up messages for you using the <a href="../ref/Tags/message.html" class="tags">message</a> tag. However, if you need more control of rendering you will need to do this yourself:<p class="paragraph"/><div class="code"><pre><span class="xml&#45;tag">&#60;g:hasErrors bean=<span class="xml&#45;quote">"$&#123;user&#125;"</span>&#62;</span>
+  <span class="xml&#45;tag">&#60;ul&#62;</span>
+   <span class="xml&#45;tag">&#60;g:eachError var=<span class="xml&#45;quote">"err"</span> bean=<span class="xml&#45;quote">"$&#123;user&#125;"</span>&#62;</span>
+       <span class="xml&#45;tag">&#60;li&#62;</span><span class="xml&#45;tag">&#60;g:message error=<span class="xml&#45;quote">"$&#123;err&#125;"</span> /&#62;</span><span class="xml&#45;tag">&#60;/li&#62;</span> 
+   <span class="xml&#45;tag">&#60;/g:eachError&#62;</span>
+  <span class="xml&#45;tag">&#60;/ul&#62;</span>
+<span class="xml&#45;tag">&#60;/g:hasErrors&#62;</span></pre></div><p class="paragraph"/>In this example within the body of the <a href="../ref/Tags/eachError.html" class="tags">eachError</a> tag we use the <a href="../ref/Tags/message.html" class="tags">message</a> tag in combination with its <code>error</code> argument to read the message for the given error.<p class="paragraph"/>
+	</body>
+</html>

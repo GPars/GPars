@@ -1,0 +1,15 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>attach</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Attaches a detached domain instance to the Hibernate session bound to the current thread<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>def b = Book.get(1)
+b.title = <span class="java&#45;quote">"Blah"</span>
+b.save(flush:<span class="java&#45;keyword">true</span>)<p class="paragraph"/>b.discard()<p class="paragraph"/>&#8230;
+<span class="java&#45;keyword">if</span>(!b.isAttached()) &#123;
+	b.attach()
+&#125;</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Grails uses Hibernate which manages each persistent object in a persistence session. A new session is created per request and is closed at the end of the request. If an object is read from the session and placed into a web scope such as the HttpSession it is seen as detached, since the persistence session has been closed. You can use the attach() method to re-attach an existing persistent instance to the persistence session of the current request.
+	</body>
+</html>

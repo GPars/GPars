@@ -1,0 +1,12 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>3.7.4 Inherited Dependencies</title>
+     	<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		By default every Grails application inherits a bunch of framework dependencies. This is done through the line:<p class="paragraph"/><div class="code"><pre>inherits <span class="java&#45;quote">"global"</span></pre></div><p class="paragraph"/>Inside the <code>BuildConfig.groovy</code> file. If you wish exclude certain inherited dependencies then you can do so using the <code>excludes</code> method:<p class="paragraph"/><div class="code"><pre>inherits(<span class="java&#45;quote">"global"</span>) &#123;
+	excludes <span class="java&#45;quote">"oscache"</span>, <span class="java&#45;quote">"ehcache"</span>
+&#125;</pre></div><p class="paragraph"/><p class="paragraph"/>
+	</body>
+</html>

@@ -1,0 +1,19 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>getAll</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Retrieves an instances of the domain class for the specified ids and returns a list of these instances, ordered by the original ids list. If some of provided ids are null or there are no instances with these ids, then result list will contain null values on corresponding positions.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>// get a list which contains Book instances with ids 2, 1, 3 respectively
+def bookList = Book.getAll(2,1,3)
+// can take a list of ids as only argument, extremely useful when ids list calculated in code
+def bookList = Book.getAll(&#91;1,2,3&#93;)
+// when called without arguments returns list of all objects
+def bookList = Book.getAll()</pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>Parameters:
+<ul class="star">
+<li><code>varargs</code>* - A variable argument list of ids</li>
+<li><code>ids</code>* - A list of ids</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>

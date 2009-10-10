@@ -1,0 +1,33 @@
+<html>
+     <head>
+     	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+     	<title>Grails Reference</title>
+     	<link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8">
+     </head>
+	<body class="body">
+		<h1>codecs </h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Provides facility to register encoders and decoders of textual data as methods on any object<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><pre class="bq"><code>
+class HTMLCodec {
+    static encode = { theTarget -&#62;
+        HtmlUtils.htmlEscape(theTarget.toString())
+    }    
+    static decode = { theTarget -&#62;
+    	HtmlUtils.htmlUnescape(theTarget.toString())
+    }
+}
+assert "&#38;lt;p&#38;gt;Hello World!&#38;lt;/p&#38;gt;" == "&#60;p&#62;Hello World!&#60;/p&#62;".encodeAsHTML()
+assert "&#60;p&#62;Hello World!&#60;/p&#62;" == "&#38;lt;p&#38;gt;Hello World!&#38;lt;/p&#38;gt;".decodeHTML()</code></pre><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>This plug-in searches for classes that end in the convention <code>Codec</code> and dynamically registers <code>encodeAsCodec</code> and <code>decodeCodec</code> methods on <code>java.lang.Object</code> so that any data can be encoded and decoded. For more information refer to the section of <a href="../../guide/single.html#11.2 Encoding and Decoding Objects" class="guide">Encoding and Decoding Objects</a> in the user guide.<p class="paragraph"/>Provided Codecs:
+<ul class="star">
+<li><code>HTMLCodec</code> - encodes/decodes HTML mark-up</li>
+<li><code>URLCodec</code> - encodes/decodes URLs</li>
+<li><code>JavascriptCodec</code> - encodes (escapes) Javascript</li>
+<li><code>Base64Codec</code> - encodes/decodes Base64 data</li>
+<li><code>HexCodec</code> - encodes a byte array or list of integers into a hex string, and decodes hex strings into byte array</li>
+<li><code>MD5Codec</code> - encodes a byte array or list of integers, or the characters of a string (using default system encoding) into an MD5 digest as a hex string</li>
+<li><code>MD5BytesCodec</code> - encodes a byte array or list of integers, or the characters of a string (using default system encoding) into an MD5 digest as a byte array</li>
+<li><code>SHA1Codec</code> - encodes a byte array or list of integers, or the characters of a string (using default system encoding) into an SHA1 digest as a hex string</li>
+<li><code>SHA1BytesCodec</code> - encodes a byte array or list of integers, or the characters of a string (using default system encoding) into an SHA1 digest as a byte array</li>
+<li><code>SHA256Codec</code> - encodes a byte array or list of integers, or the characters of a string (using default system encoding) into an SHA256 digest as a hex string</li>
+<li><code>SHA256BytesCodec</code> - encodes byte array or list of integers, or the characters of a string (using default system encoding) into an SHA256 digest as a byte array</li>
+</ul><p class="paragraph"/>
+	</body>
+</html>
