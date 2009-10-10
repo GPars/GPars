@@ -107,6 +107,18 @@ public class ParallelizerTest extends GroovyTestCase {
     }
   }
 
+  private def qsort(list) {
+   if (!list) return []
+   def bucket = list.groupByAsync { it <=> list.first() }
+   [ *qsort(bucket[-1]), *bucket[0], *qsort(bucket[1]) ]
+  }
+
+  public void testQuicksort() {
+    Parallelizer.withParallelizer{
+     assertEquals([0, 1, 2, 3],  qsort([0,3,1,2]))
+    }
+  }
+
   public void testCategoryUsage() {
     Parallelizer.doParallel(5) {
       assertEquals(new HashSet([2, 4, 6]), new HashSet((Collection) new HashSet([1, 2, 3]).collectAsync {it * 2}))

@@ -275,7 +275,7 @@ public class ParallelArrayUtil {
    * Example:
    * Parallelizer.withParallelizer {*     assert ([1, 2, 3, 4, 5].groupByAsync {Number number -> number % 2}).size() == 2
    *}*/
-  public static <T> List<T> groupByAsync(Collection<T> collection, Closure cl) {
+  public static <T> Map groupByAsync(Collection<T> collection, Closure cl) {
     final def map = new ConcurrentHashMap()
     eachAsync(collection, {
       def result = cl(it)
@@ -283,7 +283,7 @@ public class ParallelArrayUtil {
       def list = map.putIfAbsent(result, myList)
       if (list != null) list.add(it)
     })
-    return map.values().asList()
+    return map
 
   }
 

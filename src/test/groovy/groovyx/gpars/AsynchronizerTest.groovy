@@ -174,6 +174,18 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
   }
 
+  private def qsort(list) {
+   if (!list) return []
+   def bucket = list.groupByAsync { it <=> list.first() }
+   [ *qsort(bucket[-1]), *bucket[0], *qsort(bucket[1]) ]
+  }
+
+  public void testQuicksort() {
+    Asynchronizer.withAsynchronizer {
+     assertEquals([0, 1, 2, 3],  qsort([0,3,1,2]))
+    }
+  }
+
   public void testAsyncTask() {
     Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
       final AtomicBoolean flag = new AtomicBoolean(false)

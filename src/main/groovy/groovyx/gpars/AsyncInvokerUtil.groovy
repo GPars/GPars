@@ -323,7 +323,7 @@ public class AsyncInvokerUtil {
    * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
    *     assert ([1, 2, 3, 4, 5].groupByAsync{Number number -> number % 2}).size() == 2
    */
-  public static Collection groupByAsync(Object collection, Closure cl) {
+  public static Map groupByAsync(Object collection, Closure cl) {
     final def map = new ConcurrentHashMap()
     eachAsync(collection, {
       def result = cl(it)
@@ -331,7 +331,7 @@ public class AsyncInvokerUtil {
       def list = map.putIfAbsent(result, myList)
       if (list != null) list.add(it)
     })
-    return map.values().asList()
+    return map
   }
 
   private static List<Object> processResult(List<Future<Object>> futures) {
