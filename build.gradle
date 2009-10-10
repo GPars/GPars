@@ -146,11 +146,9 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
     'DemoPotentialDeadlock',                      // may deadlock (on purpose)
     'DemoNonDeterministicDeadlockWithDataFlows',  // may deadlock (on purpose)
     'DemoDeadLock',                               // deadlock (on purpose)
-    'DemoPhysicalCalculations',                   // needs non-daemon threads
     'DemoRemote',                                 // doesn't work in an automated environment
     'DemoSwing',                                  // maybe we don't want these to run on the CI ..
     'DemoSwingMashup',                            // but they can be run locally
-    'DemoLoadBalancer',  // todo: should be runnable
   ]
 
   classpath = sourceSets.main.runtimeClasspath
