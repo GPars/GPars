@@ -16,10 +16,11 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import org.codehaus.groovy.runtime.TimeCategory
 
 /**
  *
@@ -28,33 +29,61 @@ import groovyx.gpars.actor.Actors
  */
 
 public class TimeCategoryActorsTest extends GroovyTestCase {
-  public void testReceive() {
-    volatile def result = ''
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testReceive() {
+        volatile def result = ''
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final Actor actor = Actors.actor {
-      result = receive(3.seconds)
-      latch.countDown()
+        final Actor actor = Actors.actor {
+            use(TimeCategory) {
+                result = receive(3.seconds)
+            }
+            latch.countDown()
+        }
+        actor.start()
+
+        latch.await(30, TimeUnit.SECONDS)
+        assertNull(result)
     }
-    actor.start()
 
-    latch.await(30, TimeUnit.SECONDS)
-    assertNull(result)
-  }
+    public void testTimeCategoryNotAvailable() {
+        volatile def exceptions = 0
+        final CountDownLatch latch = new CountDownLatch(1)
 
-  public void testReceiveWithHandler() {
-    volatile def result = ''
-    final CountDownLatch latch = new CountDownLatch(1)
+        final def actor = Actors.actor {
+            try {
+                receive(1.second) {}
+            } catch (MissingPropertyException ignore) {exceptions++ }
+            loop {
+                try {
+                    try {
+                        receive(1.minute) {}
+                    } catch (MissingPropertyException ignore) {exceptions++ }
+                    stop()
+                } finally {
+                    latch.countDown()
+                }
+            }
+        }.start()
 
-    final Actor actor = Actors.actor {
-      receive(2.seconds) {
-        result = it
-      }
-      latch.countDown()
+        latch.await()
+        assertEquals 2, exceptions
     }
-    actor.start()
 
-    latch.await(30, TimeUnit.SECONDS)
-    assertNull(result)
-  }
+    public void testReceiveWithHandler() {
+        volatile def result = ''
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final Actor actor = Actors.actor {
+            use(TimeCategory) {
+                receive(2.seconds) {
+                    result = it
+                }
+                latch.countDown()
+            }
+        }
+        actor.start()
+
+        latch.await(30, TimeUnit.SECONDS)
+        assertNull(result)
+    }
 }

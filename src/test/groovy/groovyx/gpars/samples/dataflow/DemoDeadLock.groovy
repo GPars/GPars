@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowVariable
+import java.util.concurrent.TimeUnit
 import static groovyx.gpars.dataflow.DataFlow.start
 
 /**
@@ -35,7 +36,7 @@ final def actor = start {
     System.exit 0
   }
 
-  react(5.seconds) {x, y ->
+  react(5, TimeUnit.SECONDS) {x, y ->
     println "Got replies: a:${x} b:${b}"
   }
 }

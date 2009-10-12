@@ -327,7 +327,7 @@ public abstract class AbstractPooledActor extends Actor {
    * The method never returns, but instead frees the processing thread back to the thread pool.
    *
    * @param duration Time to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
-   *                 The TimeCategory DSL to specify timeouts is available inside the Actor's act() method.
+   *                 The TimeCategory DSL to specify timeouts must be enabled explicitly inside the Actor's act() method.
    * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
    *                 the closure to send a reply back to the actor, which sent the original message.
    */
@@ -653,7 +653,7 @@ public abstract class AbstractPooledActor extends Actor {
         if (code instanceof Closure)
         //noinspection deprecation
         {
-          GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) code);
+          GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) code);
         } else {
           code.run();
         }
@@ -702,7 +702,7 @@ public abstract class AbstractPooledActor extends Actor {
       code = new CurriedClosure(code, args);
     }
     //noinspection deprecation
-    GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), code);
+    GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
     doLoopCall();
   }
 

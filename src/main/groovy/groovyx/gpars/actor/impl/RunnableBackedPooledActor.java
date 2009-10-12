@@ -22,7 +22,6 @@ import groovy.lang.MissingMethodException;
 import groovy.lang.MissingPropertyException;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
-import org.codehaus.groovy.runtime.TimeCategory;
 
 import java.util.Arrays;
 
@@ -65,7 +64,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
   @Override protected void act() {
     if (action != null) {
       if (action instanceof Closure) {
-        GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) action);
+        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) action);
       } else {
         action.run();
       }
