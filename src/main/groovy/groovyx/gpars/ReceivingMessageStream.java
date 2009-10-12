@@ -164,7 +164,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
   }
 
   public static final class ReplyCategory {
-    public static void reply(Object original, Object reply) {
+    public static void reply(final Object original, final Object reply) {
       if (original instanceof ReceivingMessageStream) {
         ((ReceivingMessageStream) original).reply(reply);
         return;

@@ -29,7 +29,7 @@ import java.util.Arrays;
 /**
  * Utility class to implement AbstractPooledActor backed by any Runnable (including Closure)
  *
- * @author Alex Tkachman
+ * @author Alex Tkachman, Vaclav Pech
  */
 public class RunnableBackedPooledActor extends AbstractPooledActor {
 
@@ -38,16 +38,16 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
   public RunnableBackedPooledActor() {
   }
 
-  public RunnableBackedPooledActor(Runnable handler) {
+  public RunnableBackedPooledActor(final Runnable handler) {
     setAction(handler);
   }
 
-  protected void setAction(Runnable handler) {
+  final void setAction(final Runnable handler) {
     if (handler == null) {
       action = null;
     } else {
       if (handler instanceof Closure) {
-        Closure cloned = (Closure) ((Closure) handler).clone();
+        final Closure cloned = (Closure) ((Closure) handler).clone();
         if (cloned.getOwner() == cloned.getDelegate()) {
           // otherwise someone else already took care for setting delegate for the closure
           cloned.setDelegate(this);
@@ -62,7 +62,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
     }
   }
 
-  protected void act() {
+  @Override protected void act() {
     if (action != null) {
       if (action instanceof Closure) {
         GroovyCategorySupport.use(Arrays.<Class>asList(TimeCategory.class, ReplyCategory.class), (Closure) action);
@@ -72,15 +72,15 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
     }
   }
 
-  private static class RunnableBackedPooledActorDelegate extends GroovyObjectSupport {
-    final Object first, second;
+  private static final class RunnableBackedPooledActorDelegate extends GroovyObjectSupport {
+    private final Object first, second;
 
-    RunnableBackedPooledActorDelegate(Object f, Object s) {
-      first = f;
-      second = s;
+    RunnableBackedPooledActorDelegate(final Object first, final Object second) {
+      this.first = first;
+      this.second = second;
     }
 
-    public Object invokeMethod(String name, Object args) {
+    @Override public Object invokeMethod(final String name, final Object args) {
       try {
         return InvokerHelper.invokeMethod(first, name, args);
       }
@@ -89,7 +89,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
       }
     }
 
-    public Object getProperty(String propertyName) {
+    @Override public Object getProperty(final String propertyName) {
       try {
         return InvokerHelper.getProperty(first, propertyName);
       }
@@ -98,7 +98,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
       }
     }
 
-    public void setProperty(String propertyName, Object newValue) {
+    @Override public void setProperty(final String propertyName, final Object newValue) {
       try {
         InvokerHelper.setProperty(first, propertyName, newValue);
       }
