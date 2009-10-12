@@ -54,8 +54,8 @@ long meassureAsynchronizer(iterations, List list) {
   Asynchronizer.withAsynchronizer(30) {
     for (i in iterations) {
       int result
-      list.eachAsync {result = it}
-      def elements = list.collectAsync {it}
+      list.eachParallel {result = it}
+      def elements = list.collectParallel {it}
       result = elements[-1]
     }
   }
@@ -68,8 +68,8 @@ long meassureParallelizer(iterations, List list) {
   Parallelizer.withParallelizer(30) {
     for (i in iterations) {
       int result
-      list.eachAsync {result = it}
-      def elements = list.collectAsync {it}
+      list.eachParallel {result = it}
+      def elements = list.collectParallel {it}
       result = elements[-1]
     }
   }

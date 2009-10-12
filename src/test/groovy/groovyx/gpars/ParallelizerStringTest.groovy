@@ -21,46 +21,46 @@ package groovyx.gpars
  * Date: Oct 23, 2008
  */
 public class ParallelizerStringTest extends GroovyTestCase {
-  public void testEachAsyncWithThreadPoolAndString() {
+  public void testEachParallelWithThreadPoolAndString() {
     Parallelizer.withParallelizer(5) {
       def result = Collections.synchronizedSet(new HashSet())
-      'abc'.eachAsync {result.add(it.toUpperCase())}
+      'abc'.eachParallel {result.add(it.toUpperCase())}
       assertEquals(new HashSet(['A', 'B', 'C']), result)
     }
   }
 
-  public void testCollectAsyncWithThreadPoolAndString() {
+  public void testCollectParallelWithThreadPoolAndString() {
     Parallelizer.withParallelizer(5) {
-      def result = 'abc'.collectAsync {it.toUpperCase()}
+      def result = 'abc'.collectParallel {it.toUpperCase()}
       assertEquals(['A', 'B', 'C'], result)
     }
   }
 
-  public void testFindAllAsyncWithThreadPoolAndString() {
+  public void testFindAllParallelWithThreadPoolAndString() {
     Parallelizer.withParallelizer(5) {
-      def result = 'aBC'.findAllAsync {it == it.toUpperCase()}
+      def result = 'aBC'.findAllParallel {it == it.toUpperCase()}
       assertEquals(['B', 'C'], result)
     }
   }
 
-  public void testFindAsyncWithThreadPoolAndString() {
+  public void testFindParallelWithThreadPoolAndString() {
     Parallelizer.withParallelizer(5) {
-      def result = 'aBC'.findAsync {it == it.toUpperCase()}
+      def result = 'aBC'.findParallel {it == it.toUpperCase()}
       assert (result in ['B', 'C'])
     }
   }
 
-  public void testAnyAsyncWithThreadPoolAndString() {
+  public void testAnyParallelWithThreadPoolAndString() {
     Parallelizer.withParallelizer(5) {
-      assert 'aBc'.anyAsync {it == it.toUpperCase()}
-      assert !'abc'.anyAsync {it == it.toUpperCase()}
+      assert 'aBc'.anyParallel {it == it.toUpperCase()}
+      assert !'abc'.anyParallel {it == it.toUpperCase()}
     }
   }
 
-  public void testAllAsyncWithThreadPoolAndString() {
+  public void testAllParallelWithThreadPoolAndString() {
     Parallelizer.withParallelizer(5) {
-      assert !'aBC'.allAsync {it == it.toUpperCase()}
-      assert 'ABC'.allAsync() {it == it.toUpperCase()}
+      assert !'aBC'.allParallel {it == it.toUpperCase()}
+      assert 'ABC'.allParallel() {it == it.toUpperCase()}
     }
   }
 }

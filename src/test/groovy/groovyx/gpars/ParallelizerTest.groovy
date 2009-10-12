@@ -21,85 +21,85 @@ package groovyx.gpars
  * Date: Oct 23, 2008
  */
 public class ParallelizerTest extends GroovyTestCase {
-  public void testEachAsyncWithThreadPool() {
+  public void testEachParallelWithThreadPool() {
     Parallelizer.doParallel(5) {
       def result = Collections.synchronizedSet(new HashSet())
-      [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+      [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
       assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
     }
   }
 
-  public void testEachAsyncOnOneElementCollections() {
+  public void testEachParallelOnOneElementCollections() {
     Parallelizer.doParallel(5) {
-      [1].eachAsync {}
-      [1].eachAsync {}
-      [1].eachAsync {}
-      'a'.eachAsync {}
-      [1].iterator().eachAsync {}
-      'a'.iterator().eachAsync {}
+      [1].eachParallel {}
+      [1].eachParallel {}
+      [1].eachParallel {}
+      'a'.eachParallel {}
+      [1].iterator().eachParallel {}
+      'a'.iterator().eachParallel {}
     }
   }
 
-  public void testEachAsyncOnEmpty() {
+  public void testEachParallelOnEmpty() {
     Parallelizer.doParallel(5) {
-      [].eachAsync {throw new RuntimeException('Should not be thrown')}
-      [].eachAsync {throw new RuntimeException('Should not be thrown')}
-      [].eachAsync {throw new RuntimeException('Should not be thrown')}
-      ''.eachAsync {throw new RuntimeException('Should not be thrown')}
-      [].iterator().eachAsync {throw new RuntimeException('Should not be thrown')}
-      ''.iterator().eachAsync {throw new RuntimeException('Should not be thrown')}
+      [].eachParallel {throw new RuntimeException('Should not be thrown')}
+      [].eachParallel {throw new RuntimeException('Should not be thrown')}
+      [].eachParallel {throw new RuntimeException('Should not be thrown')}
+      ''.eachParallel {throw new RuntimeException('Should not be thrown')}
+      [].iterator().eachParallel {throw new RuntimeException('Should not be thrown')}
+      ''.iterator().eachParallel {throw new RuntimeException('Should not be thrown')}
     }
   }
 
-  public void testCollectAsyncWithThreadPool() {
+  public void testCollectParallelWithThreadPool() {
     Parallelizer.doParallel(5) {
-      def result = [1, 2, 3, 4, 5].collectAsync {Number number -> number * 10}
+      def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}
       assertEquals([10, 20, 30, 40, 50], result)
     }
   }
 
-  public void testCollectAsyncWithThreadPoolOnRange() {
+  public void testCollectParallelWithThreadPoolOnRange() {
     Parallelizer.doParallel(5) {
-      def result = (1..5).collectAsync {Number number -> number * 10}
+      def result = (1..5).collectParallel {Number number -> number * 10}
       assertEquals([10, 20, 30, 40, 50], result)
     }
   }
 
-  public void testFindAllAsyncWithThreadPool() {
+  public void testFindAllParallelWithThreadPool() {
     Parallelizer.doParallel(5) {
-      def result = [1, 2, 3, 4, 5].findAllAsync {Number number -> number > 3}
+      def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}
       assertEquals([4, 5], result)
     }
   }
 
-  public void testFindAsyncWithThreadPool() {
+  public void testFindParallelWithThreadPool() {
     Parallelizer.doParallel(5) {
-      def result = [1, 2, 3, 4, 5].findAsync {Number number -> number > 3}
+      def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}
       assert (result in [4, 5])
     }
   }
 
-  public void testAnyAsyncWithThreadPool() {
+  public void testAnyParallelWithThreadPool() {
     Parallelizer.doParallel(5) {
-      assert [1, 2, 3, 4, 5].anyAsync {Number number -> number > 3}
-      assert ![1, 2, 3].anyAsync {Number number -> number > 3}
+      assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}
+      assert ![1, 2, 3].anyParallel {Number number -> number > 3}
     }
   }
 
-  public void testAllAsyncWithThreadPool() {
+  public void testAllParallelWithThreadPool() {
     Parallelizer.doParallel(5) {
-      assert ![1, 2, 3, 4, 5].allAsync {Number number -> number > 3}
-      assert [1, 2, 3].allAsync() {Number number -> number <= 3}
+      assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}
+      assert [1, 2, 3].allParallel() {Number number -> number <= 3}
     }
   }
 
   @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
   public void testGroupBy() {
     Parallelizer.withParallelizer(5) {
-      assert [1, 2, 3, 4, 5].groupByAsync {it > 2}
-      assert ([1, 2, 3, 4, 5].groupByAsync {Number number -> 1}).size() == 1
-      assert ([1, 2, 3, 4, 5].groupByAsync {Number number -> number}).size() == 5
-      final def groups = ([1, 2, 3, 4, 5].groupByAsync {Number number -> number % 2})
+      assert [1, 2, 3, 4, 5].groupByParallel {it > 2}
+      assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> 1}).size() == 1
+      assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number}).size() == 5
+      final def groups = ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2})
       assert groups.size() == 2
       assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
       assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
@@ -109,7 +109,7 @@ public class ParallelizerTest extends GroovyTestCase {
 
   private def qsort(list) {
    if (!list) return []
-   def bucket = list.groupByAsync { it <=> list.first() }
+   def bucket = list.groupByParallel { it <=> list.first() }
    [ *qsort(bucket[-1]), *bucket[0], *qsort(bucket[1]) ]
   }
 
@@ -121,8 +121,8 @@ public class ParallelizerTest extends GroovyTestCase {
 
   public void testCategoryUsage() {
     Parallelizer.doParallel(5) {
-      assertEquals(new HashSet([2, 4, 6]), new HashSet((Collection) new HashSet([1, 2, 3]).collectAsync {it * 2}))
-      assertEquals(new HashSet([2, 3]), new HashSet((Collection) [1, 2, 3].findAllAsync {it > 1}))
+      assertEquals(new HashSet([2, 4, 6]), new HashSet((Collection) new HashSet([1, 2, 3]).collectParallel {it * 2}))
+      assertEquals(new HashSet([2, 3]), new HashSet((Collection) [1, 2, 3].findAllParallel {it > 1}))
     }
   }
 }

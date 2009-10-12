@@ -49,7 +49,7 @@ start {
 start {
   doAsync {
     println "Number of Groovy sites today: " +
-            ([dzone, jroller, theserverside].findAllAsync {
+            ([dzone, jroller, theserverside].findAllParallel {
               it.val.toUpperCase().contains 'GROOVY'
             }).size()
   }

@@ -39,21 +39,21 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
   }
 
-  public void testCallAsync() {
+  public void testCallParallel() {
     Asynchronizer.doAsync(5) {ExecutorService service ->
       def resultA = 0, resultB = 0
       final CountDownLatch latch = new CountDownLatch(2)
-      AsyncInvokerUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
-      AsyncInvokerUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
+      AsyncInvokerUtil.callParallel({number -> resultA = number; latch.countDown()}, 2)
+      AsyncInvokerUtil.callParallel({number -> resultB = number; latch.countDown()}, 3)
       latch.await()
       assertEquals 2, resultA
       assertEquals 3, resultB
     }
   }
 
-  public void testCallAsyncWithResult() {
+  public void testCallParallelWithResult() {
     Asynchronizer.doAsync(5) {ExecutorService service ->
-      assertEquals 6, AsyncInvokerUtil.callAsync({it * 2}, 3).get()
+      assertEquals 6, AsyncInvokerUtil.callParallel({it * 2}, 3).get()
     }
   }
 
@@ -93,7 +93,7 @@ public class AsyncUtilTest extends GroovyTestCase {
   public void testMissingAsynchronizer() {
     final AtomicInteger counter = new AtomicInteger(0)
     shouldFail(IllegalStateException.class) {
-      AsyncInvokerUtil.callAsync({counter.set it}, 1)
+      AsyncInvokerUtil.callParallel({counter.set it}, 1)
     }
     assertEquals 0, counter.get()
   }
@@ -110,9 +110,9 @@ public class AsyncUtilTest extends GroovyTestCase {
 
   public testNestedCalls() {
     Asynchronizer.doAsync(5) {pool ->
-      def result = ['abc', '123', 'xyz'].findAllAsync {word ->
+      def result = ['abc', '123', 'xyz'].findAllParallel {word ->
         Asynchronizer.doAsync(pool) {
-          word.anyAsync {it in ['a', 'y', '5']}
+          word.anyParallel {it in ['a', 'y', '5']}
         }
       }
       assertEquals(['abc', 'xyz'], result)

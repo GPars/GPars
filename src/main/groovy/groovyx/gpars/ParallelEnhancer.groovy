@@ -21,7 +21,7 @@ import groovyx.gpars.scheduler.Pool
 
 /**
  * ParallelEnhancer allows classes or instances to be enhanced with asynchronous variants of iterative methods,
- * like eachAsync(), collectAsync(), findAllAsync() and others. These operations split processing into multiple
+ * like eachParallel(), collectParallel(), findAllParallel() and others. These operations split processing into multiple
  * concurrently executable tasks and perform them on the underlying instance of the ForkJoinPool class from JSR-166y.
  * The pool itself is stored in a final property threadPool and can be managed through static methods
  * on the ParallelEnhancer class.
@@ -67,9 +67,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public def eachAsync(Closure cl) {
+  public def eachParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.eachAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.eachParallel(mixedIn[Object], cl)
     }
   }
 
@@ -81,9 +81,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public def eachWithIndexAsync(Closure cl) {
+  public def eachWithIndexParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.eachWithIndexAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.eachWithIndexParallel(mixedIn[Object], cl)
     }
   }
 
@@ -94,9 +94,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    * */
-  public def collectAsync(Closure cl) {
+  public def collectParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.collectAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.collectParallel(mixedIn[Object], cl)
     }
   }
 
@@ -107,9 +107,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public def findAllAsync(Closure cl) {
+  public def findAllParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.findAllAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.findAllParallel(mixedIn[Object], cl)
     }
   }
 
@@ -120,9 +120,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public def grepAsync(Closure cl) {
+  public def grepParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.grepAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.grepParallel(mixedIn[Object], cl)
     }
   }
 
@@ -133,9 +133,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public def findAsync(Closure cl) {
+  public def findParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.findAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.findParallel(mixedIn[Object], cl)
     }
   }
 
@@ -146,9 +146,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public boolean allAsync(Closure cl) {
+  public boolean allParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.allAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.allParallel(mixedIn[Object], cl)
     }
   }
 
@@ -159,9 +159,9 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public boolean anyAsync(Closure cl) {
+  public boolean anyParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-      ParallelArrayUtil.anyAsync(mixedIn[Object], cl)
+      ParallelArrayUtil.anyParallel(mixedIn[Object], cl)
     }
   }
 
@@ -172,7 +172,7 @@ public final class ParallelEnhancer {
    * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
    * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
    */
-  public def groupByAsync(Closure cl) {
+  public def groupByParallel(Closure cl) {
     Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
       ParallelArrayUtil.groupAsync(mixedIn[Object], cl)
     }

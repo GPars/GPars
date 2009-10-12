@@ -9,7 +9,7 @@ class Parallel {
   @Delegate adaptee
   private final static FJPool threadPool = new FJPool()
 
-  def each(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.eachAsync(yield) } }
+  def each(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.eachParallel(yield) } }
 
   static void prepare(obj) {
     obj.metaClass.getParallel = {->

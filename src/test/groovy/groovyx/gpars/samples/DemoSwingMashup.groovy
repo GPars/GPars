@@ -48,7 +48,7 @@ final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation:
     button('Click', actionPerformed: {
       doOutside {
         withParallelizer(threadPoolSize) {
-          urls.eachAsync {url ->
+          urls.eachParallel {url ->
             edt {logMessages.text += "Started downloading from $url \n"}
             def content = url.toURL().text
             edt {logMessages.text += "Done downloading from $url \n"}

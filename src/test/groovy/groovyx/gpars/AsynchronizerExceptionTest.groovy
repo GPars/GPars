@@ -87,7 +87,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
   public void testEachWithException() {
     shouldFail(AsyncException.class) {
       Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.eachAsync {throw new RuntimeException('test')}
+        'abc'.eachParallel {throw new RuntimeException('test')}
       }
     }
   }
@@ -95,7 +95,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
   public void testCollectWithException() {
     shouldFail(AsyncException.class) {
       Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.collectAsync {if (it == 'b') throw new RuntimeException('test')}
+        'abc'.collectParallel {if (it == 'b') throw new RuntimeException('test')}
       }
     }
   }
@@ -103,7 +103,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
   public void testFindAllWithException() {
     shouldFail(AsyncException.class) {
       Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.findAllAsync {if (it == 'b') throw new RuntimeException('test') else return true}
+        'abc'.findAllParallel {if (it == 'b') throw new RuntimeException('test') else return true}
       }
     }
   }
@@ -111,7 +111,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
   public void testFindWithException() {
     shouldFail(AsyncException.class) {
       Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.findAsync {if (it == 'b') throw new RuntimeException('test') else return true}
+        'abc'.findParallel {if (it == 'b') throw new RuntimeException('test') else return true}
       }
     }
   }
@@ -119,7 +119,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
   public void testAllWithException() {
     shouldFail(AsyncException.class) {
       Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.allAsync {if (it == 'b') throw new RuntimeException('test')}
+        'abc'.allParallel {if (it == 'b') throw new RuntimeException('test')}
       }
     }
   }
@@ -127,7 +127,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
   public void testAnyWithException() {
     shouldFail(AsyncException.class) {
       Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.anyAsync {if (it == 'b') throw new RuntimeException('test')}
+        'abc'.anyParallel {if (it == 'b') throw new RuntimeException('test')}
       }
     }
   }

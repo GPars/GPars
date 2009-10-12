@@ -27,16 +27,16 @@ import jsr166y.forkjoin.ForkJoinPool
  * <pre>
  * Parallelizer.withParallelizer(5) {
  *   final AtomicInteger result = new AtomicInteger(0)
- *   [1, 2, 3, 4, 5].eachAsync {result.addAndGet(it)}
+ *   [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
  *   assertEquals 15, result
  *}
  * Parallelizer.withParallelizer(5) {
- *   final List result = [1, 2, 3, 4, 5].collectAsync {it * 2}
+ *   final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}
  *   assert ([2, 4, 6, 8, 10].equals(result))
  *}
  * Parallelizer.withParallelizer(5) {
- *   assert [1, 2, 3, 4, 5].allAsync {it > 0}
- *  assert ![1, 2, 3, 4, 5].allAsync {it > 1}
+ *   assert [1, 2, 3, 4, 5].allParallel {it > 0}
+ *  assert ![1, 2, 3, 4, 5].allParallel {it > 1}
  *}
  * </pre>
  * @author Vaclav Pech
@@ -77,15 +77,15 @@ public class Parallelizer {
    * and runs the supplied closure.
    * It is an identical alternative for withParallelizer() with a shorter name.
    * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
    * category class.
-   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
    * Parallelizer.doParallel {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
    *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
    *}
    * </pre>
@@ -100,15 +100,15 @@ public class Parallelizer {
    * and runs the supplied closure.
    * It is an identical alternative for withParallelizer() with a shorter name.
    * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
    * category class.
-   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
    * Parallelizer.doParallel(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
    *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
    *}
    * </pre>
@@ -124,16 +124,16 @@ public class Parallelizer {
    * and runs the supplied closure.
    * It is an identical alternative for withParallelizer() with a shorter name.
    * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
    * category class.
-   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
    * // todo: fix copy-paste error in example
    * Parallelizer.doParallel(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
    *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
    *}
    * </pre>
@@ -149,15 +149,15 @@ public class Parallelizer {
    * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
    * and runs the supplied closure.
    * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
    * category class.
-   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
    * Parallelizer.withParallelizer {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
    *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
    *}
    *  </pre>
@@ -171,15 +171,15 @@ public class Parallelizer {
    * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
    * and runs the supplied closure.
    * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
    * category class.
-   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
    * Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
    *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
    *}
    *  </pre>
@@ -194,16 +194,16 @@ public class Parallelizer {
    * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
    * and runs the supplied closure.
    * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
    * category class.
-   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
    * //todo: fix copy-paste error in example
    * Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
    *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
    *}
    *  </pre>
@@ -225,15 +225,15 @@ public class Parallelizer {
    * Reuses an instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
    * and runs the supplied closure.
    * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-   * enhanced with the <i>eachAsync()</i>, <i>collectAsync()</i> and other methods from the <i>ParallelArrayUtil</i>
+   * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
    * category class.
-   * E.g. calling <i>images.eachAsync{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
+   * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
    * operation on each image in the <i>images</i> collection in parallel.
    * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
    * <pre>
    * Parallelizer.withExistingParallelizer(anotherPool) {ForkJoinPool pool ->
    *     def result = Collections.synchronizedSet(new HashSet())
-   *     [1, 2, 3, 4, 5].eachAsync {Number number -> result.add(number * 10)}
+   *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
    *     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
    *}
    *  </pre>

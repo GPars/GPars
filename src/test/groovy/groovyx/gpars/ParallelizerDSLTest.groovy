@@ -28,14 +28,14 @@ import static groovyx.gpars.Parallelizer.withParallelizer
 public class ParallelizerDSLTest extends GroovyTestCase {
   public void testDSLInitialization() {
     withParallelizer {
-      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-      assert [1, 2, 3, 4, 5].allAsync {it > 0}
-      assert [1, 2, 3, 4, 5].findAsync {Number number -> number > 2} in [3, 4, 5]
+      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+      assert [1, 2, 3, 4, 5].allParallel {it > 0}
+      assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
     }
     withParallelizer(5) {
-      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-      assert [1, 2, 3, 4, 5].allAsync {it > 0}
-      assert [1, 2, 3, 4, 5].findAsync {Number number -> number > 2} in [3, 4, 5]
+      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+      assert [1, 2, 3, 4, 5].allParallel {it > 0}
+      assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
     }
 
     def handler = {Thread failedThread, Throwable throwable ->
@@ -43,15 +43,15 @@ public class ParallelizerDSLTest extends GroovyTestCase {
     } as UncaughtExceptionHandler
 
     withParallelizer(5, handler) {
-      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-      assert [1, 2, 3, 4, 5].allAsync {it > 0}
-      assert [1, 2, 3, 4, 5].findAsync {Number number -> number > 2} in [3, 4, 5]
+      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+      assert [1, 2, 3, 4, 5].allParallel {it > 0}
+      assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
     }
 
     withExistingParallelizer(new ForkJoinPool(5)) {
-      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-      assert [1, 2, 3, 4, 5].allAsync {it > 0}
-      assert [1, 2, 3, 4, 5].findAsync {Number number -> number > 2} in [3, 4, 5]
+      assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+      assert [1, 2, 3, 4, 5].allParallel {it > 0}
+      assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
     }
   }
 }

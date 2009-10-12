@@ -1,6 +1,6 @@
 *GPars* (formerly *GParallelizer*) allows Groovy code to easily handle tasks concurrently, leveraging either the JSR-166y _Parallel Arrays_ or Java's executor services.
 
-The framework offers developers straightforward Groovy-based Domain Specific Languages (DSLs) to declare, which parts of the code should be performed in parallel. Objects are enhanced with asynchronous methods like _eachAsync()_, _collectAsync()_ and others, to perform these collection-based operations in parallel. Closures can be turned into asynchronous variants, which when invoked schedule the original closure for processing in an executor service. The library also provides helper methods for running a bunch of closures concurrently.
+The framework offers developers straightforward Groovy-based Domain Specific Languages (DSLs) to declare, which parts of the code should be performed in parallel. Objects are enhanced with asynchronous methods like _eachParallel()_, _collectParallel()_ and others, to perform these collection-based operations in parallel. Closures can be turned into asynchronous variants, which when invoked schedule the original closure for processing in an executor service. The library also provides helper methods for running a bunch of closures concurrently.
 
 The library has two logical parts, which differ in the implementation technology.
 # *Parallelizer* uses JSR-166y Parallel Arrays and is limited to collection processing.
@@ -15,13 +15,13 @@ Examples of use:
 //summarize numbers concurrently
 Parallelizer.withParallelizer(5) {
   final AtomicInteger result = new AtomicInteger(0)
-  [1, 2, 3, 4, 5].eachAsync {result.addAndGet(it)}
+  [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
   assertEquals 15, result
 }
 
 //multiply numbers asynchronously
 Parallelizer.withParallelizer(5) {
-  final List result = [1, 2, 3, 4, 5].collectAsync {it * 2}
+  final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}
   assert ([2, 4, 6, 8, 10].equals(result))
 }
 }}}
@@ -29,8 +29,8 @@ The passed-in closure takes an instance of a _ForkJoinPool_ as a parameter, whic
 {{{
 //check whether all elements within a collection meet certain criteria
 Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
-  assert [1, 2, 3, 4, 5].allAsync {it > 0}
-  assert ![1, 2, 3, 4, 5].allAsync {it > 1}
+  assert [1, 2, 3, 4, 5].allParallel {it > 0}
+  assert ![1, 2, 3, 4, 5].allParallel {it > 1}
 }
 }}}
 The _Parallelizer.withParallelizer()_ method takes optional parameters for number of threads in the created pool and unhandled exception handler. The _Parallelizer.withExistingParallelizer()_ takes an already existing thread pool to reuse.
@@ -39,17 +39,17 @@ The DSL is valid only within the associated block of code and only for the threa
 Alternatively, the _Parallelizer_ class can be statically imported _import static org.gpars.Parallelizer.`*`_, which will allow omitting the _Parallelizer_ class name.
 {{{
 withParallelizer {
-  assert [1, 2, 3, 4, 5].allAsync {it > 0}
-  assert ![1, 2, 3, 4, 5].allAsync {it > 1}
+  assert [1, 2, 3, 4, 5].allParallel {it > 0}
+  assert ![1, 2, 3, 4, 5].allParallel {it > 1}
 }
 }}}
 The following methods on collections are currently supported:
-* eachAsync()
-* collectAsync()
-* findAllAsync()
-* findAsync()
-* allAsync()
-* anyAsync()
+* eachParallel()
+* collectParallel()
+* findAllParallel()
+* findParallel()
+* allParallel()
+* anyParallel()
 
 ==Usage of Asynchronizer==
 
@@ -59,7 +59,7 @@ Examples of use:
 {{{
 //multiply numbers asynchronously
 Asynchronizer.withAsynchronizer(5) {
-  Collection<Future> result = [1, 2, 3, 4, 5].collectAsync{it * 10}
+  Collection<Future> result = [1, 2, 3, 4, 5].collectParallel{it * 10}
   assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
 }
 
@@ -84,22 +84,22 @@ The _Asynchronizer.withAsynchronizer()_ method takes optional parameters for num
 Alternatively, the _Asynchronizer_ class can be statically imported _import static org.gpars.Asynchronizer.`*`_, which will allow omitting the _Asynchronizer_ class name.
 {{{
 withAsynchronizer {
-  def result = [1, 2, 3, 4, 5].findAsync{Number number -> number > 2}
+  def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}
   assert result in [3, 4, 5]
 }
 }}}
 
 The following methods on all objects, which support iterations in Groovy, are currently supported:
-* eachAsync()
-* collectAsync()
-* findAllAsync()
-* findAsync()
-* allAsync()
-* anyAsync()
+* eachParallel()
+* collectParallel()
+* findAllParallel()
+* findParallel()
+* allParallel()
+* anyParallel()
 
 The following methods are added to closures inside the _Asynchronizer.withAsynchronizer()_ blocks:
 * async() - Creates an asynchronous variant of the supplied closure, which when invoked returns a future for the potential return value
-* callAsync() - Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
+* callParallel() - Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
 
 Example:
 {{{

@@ -27,20 +27,20 @@ def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 AsyncEnhancer.enhanceInstance(list)
 
-println list.collectAsync {it * 2 }
+println list.collectParallel {it * 2 }
 
 final Iterator iterator = list.iterator()
 AsyncEnhancer.enhanceInstance iterator
 
-iterator.eachAsync {
+iterator.eachParallel {
   println it
 }
 
 final String text = 'want to be very big'
 AsyncEnhancer.enhanceInstance text
-println((text.collectAsync {it.toUpperCase()}).join())
+println((text.collectParallel {it.toUpperCase()}).join())
 
 def animals = ['dog', 'ant', 'cat', 'whale']
 AsyncEnhancer.enhanceInstance animals
-println(animals.anyAsync {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-println(animals.allAsync {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')

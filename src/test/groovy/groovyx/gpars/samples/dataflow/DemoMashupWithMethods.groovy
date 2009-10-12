@@ -29,7 +29,7 @@ start {
   def pages = urls.collect { downloadPage(it) }
   doAsync {
     println "Number of Groovy sites today: " +
-            (pages.findAllAsync {
+            (pages.findAllParallel {
               it.val.toUpperCase().contains 'GROOVY'
             }).size()
   }

@@ -22,7 +22,7 @@ public class AsynchronizerIteratorTest extends GroovyTestCase {
 
     Asynchronizer.withAsynchronizer {
       def result = Collections.synchronizedSet(new HashSet())
-      list.iterator().eachAsync {
+      list.iterator().eachParallel {
         result << it
       }
       assertEquals 9, result.size()
@@ -33,7 +33,7 @@ public class AsynchronizerIteratorTest extends GroovyTestCase {
     def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     Asynchronizer.withAsynchronizer {
-      def result = list.iterator().collectAsync { 2 * it }
+      def result = list.iterator().collectParallel { 2 * it }
       assertEquals 9, result.size()
       assert result.any {it == 12}
     }
@@ -43,10 +43,10 @@ public class AsynchronizerIteratorTest extends GroovyTestCase {
     def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     Asynchronizer.withAsynchronizer {
-      assert list.iterator().anyAsync { it == 6 }
-      assert list.iterator().allAsync { it < 10 }
-      assertEquals 8, list.iterator().findAsync { it == 8 }
-      assertEquals 3, (list.iterator().findAllAsync { it > 6 }).size()
+      assert list.iterator().anyParallel { it == 6 }
+      assert list.iterator().allParallel { it < 10 }
+      assertEquals 8, list.iterator().findParallel { it == 8 }
+      assertEquals 3, (list.iterator().findAllParallel { it > 6 }).size()
     }
   }
 }
