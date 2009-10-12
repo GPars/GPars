@@ -23,7 +23,7 @@ import static groovyx.gpars.actor.Actors.actor
  * The console actor sends a message to decrypt, prints out the reply and terminates both actors.
  * The main thread waits on both actors to finish using the join() method to prevent premature exit,
  * since both actors use the default pooled actor group,  which uses a daemon thread pool.
- * @author Dierk , Koenig, Vaclav Pech
+ * @author Dierk Koenig, Vaclav Pech
  */
 
 def decryptor = actor {
