@@ -1,12 +1,15 @@
 package groovyx.gpars
 
+import groovyx.gpars.scheduler.FJPool
+
 // only a spike - just to get the discussion rolling
 // Author: Dierk Koenig
 
 class Parallel {
   @Delegate adaptee
+  private final static FJPool threadPool = new FJPool()
 
-  def each(Closure yield) { Parallelizer.withParallelizer { adaptee.eachAsync(yield) } }
+  def each(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.eachAsync(yield) } }
 
   static void prepare(obj) {
     obj.metaClass.getParallel = {->
