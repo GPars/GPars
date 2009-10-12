@@ -16,13 +16,14 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.CyclicBarrier
-import java.util.concurrent.atomic.AtomicBoolean
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.impl.ActorReplyException
+import groovyx.gpars.dataflow.DataFlowVariable
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.atomic.AtomicBoolean
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -382,4 +383,48 @@ public class ReplyTest extends GroovyTestCase {
     assert (issues[0] instanceof IllegalStateException) || (issues[1] instanceof IllegalStateException)
   }
 
+    public void testOriginatorDetection() {
+      final CyclicBarrier barrier = new CyclicBarrier(2)
+      final CyclicBarrier completedBarrier = new CyclicBarrier(3)
+      final DataFlowVariable originator1 = new DataFlowVariable()
+      final DataFlowVariable originator2 = new DataFlowVariable()
+      final DataFlowVariable originator3 = new DataFlowVariable()
+      final DataFlowVariable originator4 = new DataFlowVariable()
+
+      final def bouncer = actor {
+          receive {msg1 ->
+              originator1 << msg1.sender
+              receive {msg2 ->
+                  originator2 << msg2.sender
+                  receive {msg3 ->
+                    originator3 << msg3.sender
+                  }
+                  def msg4 = receive()
+                  originator4 << msg4.sender
+              }
+          }
+      }.start()
+
+      final def actor1 = actor {
+          bouncer << 'msg1'
+      }.start()
+
+        assert actor1 == originator1.val
+
+      final def actor2 = actor {
+          bouncer << 'msg2'
+      }.start()
+
+        assert actor2 == originator2.val
+
+        bouncer << 'msg3'
+
+        assertNull originator3.val
+
+        final def actor4 = actor {
+            bouncer << 'msg4'
+        }.start()
+
+          assert actor4 == originator4.val
+    }
 }

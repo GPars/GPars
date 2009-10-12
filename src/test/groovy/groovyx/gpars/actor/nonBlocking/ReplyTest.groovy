@@ -24,6 +24,7 @@ import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.impl.ActorReplyException
 import static groovyx.gpars.actor.Actors.actor
+import groovyx.gpars.dataflow.DataFlowVariable
 
 /**
  *
@@ -388,4 +389,40 @@ public class ReplyTest extends GroovyTestCase {
     assert (issues[0] instanceof IllegalArgumentException) || (issues[1] instanceof IllegalArgumentException)
     assert (issues[0] instanceof IllegalStateException) || (issues[1] instanceof IllegalStateException)
   }
+
+    public void testOriginatorDetection() {
+      final CyclicBarrier barrier = new CyclicBarrier(2)
+      final CyclicBarrier completedBarrier = new CyclicBarrier(3)
+      final DataFlowVariable originator1 = new DataFlowVariable()
+      final DataFlowVariable originator2 = new DataFlowVariable()
+      final DataFlowVariable originator3 = new DataFlowVariable()
+
+      final def bouncer = actor {
+          react {msg1 ->
+              originator1 << msg1.sender
+              react {msg2 ->
+                  originator2 << msg2.sender
+                  react {msg3 ->
+                    originator3 << msg3.sender
+                  }
+              }
+          }
+      }.start()
+
+      final def actor1 = actor {
+          bouncer << 'msg1'
+      }.start()
+
+        assert actor1 == originator1.val
+
+      final def actor2 = actor {
+          bouncer << 'msg2'
+      }.start()
+
+        assert actor2 == originator2.val
+
+        bouncer << 'msg3'
+
+        assertNull originator3.val
+    }
 }

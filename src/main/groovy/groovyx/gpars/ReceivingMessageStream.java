@@ -20,7 +20,6 @@ import groovy.lang.Closure;
 import groovy.time.BaseDuration;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
-import groovyx.gpars.actor.impl.AbstractPooledActor;
 import groovyx.gpars.actor.impl.ActorReplyException;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Alex Tkachman
+ * @author Alex Tkachman, Vaclav Pech
  */
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 public abstract class ReceivingMessageStream extends MessageStream {
@@ -163,7 +162,24 @@ public abstract class ReceivingMessageStream extends MessageStream {
     return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
   }
 
+    /**
+     * Enhances objects with the ability to send replies and detect message originators.
+     */
   public static final class ReplyCategory {
+      /**
+       * Retrieves the originator of a message
+       * @param original The message to detect the originator of
+       * @return The message originator
+       */
+    public static MessageStream getSender(final Object original) {
+        final ReceivingMessageStream actor = Actor.threadBoundActor();
+        if (actor == null) {
+          throw new IllegalStateException("message originator detection in a non-actor");
+        }
+
+          return actor.obj2Sender.get(original);
+    }
+
     public static void reply(final Object original, final Object reply) {
       if (original instanceof ReceivingMessageStream) {
         ((ReceivingMessageStream) original).reply(reply);
@@ -175,12 +191,12 @@ public abstract class ReceivingMessageStream extends MessageStream {
         return;
       }
 
-      final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
+      final ReceivingMessageStream actor = Actor.threadBoundActor();
       if (actor == null) {
         throw new IllegalStateException("reply from non-actor");
       }
 
-      MessageStream sender = actor.obj2Sender.get(original);
+      final MessageStream sender = actor.obj2Sender.get(original);
       if (sender == null) {
         throw new IllegalStateException("Cannot send a reply message " + original.toString() + " to a null recipient.");
       }
@@ -188,7 +204,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
       sender.send(reply);
     }
 
-    public static void replyIfExists(Object original, Object reply) {
+    public static void replyIfExists(final Object original, final Object reply) {
       if (original instanceof ReceivingMessageStream) {
         ((ReceivingMessageStream) original).replyIfExists(reply);
         return;
@@ -199,7 +215,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
         return;
       }
 
-      final AbstractPooledActor actor = (AbstractPooledActor) Actor.threadBoundActor();
+      final ReceivingMessageStream actor = Actor.threadBoundActor();
       if (actor != null) {
         final MessageStream sender = actor.obj2Sender.get(original);
         if (sender != null) {
