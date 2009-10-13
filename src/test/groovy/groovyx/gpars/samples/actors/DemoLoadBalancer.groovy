@@ -29,64 +29,64 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  */
 
 final class LoadBalancer extends AbstractPooledActor {
-  int workers = 0
-  List taskQueue = []
-  private static final QUEUE_SIZE_TRIGGER = 10
+    int workers = 0
+    List taskQueue = []
+    private static final QUEUE_SIZE_TRIGGER = 10
 
-  void act() {
-    loop {
-      def message = receive()
-      switch (message) {
-        case NeedMoreWork:
-          if (taskQueue.size() == 0) {
-            println 'No more tasks in the task queue. Terminating the worker.'
-            message.reply DemoWorker.EXIT
-            workers -= 1
-          } else message.reply taskQueue.remove(0)
-          break
-        case WorkToDo:
-          taskQueue << message
-          if ((workers == 0) || (taskQueue.size() >= QUEUE_SIZE_TRIGGER)) {
-            println 'Need more workers. Starting one.'
-            workers += 1
-            new DemoWorker(this).start()
-          }
-      }
-      println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
+    void act() {
+        loop {
+            def message = receive()
+            switch (message) {
+                case NeedMoreWork:
+                    if (taskQueue.size() == 0) {
+                        println 'No more tasks in the task queue. Terminating the worker.'
+                        message.reply DemoWorker.EXIT
+                        workers -= 1
+                    } else message.reply taskQueue.remove(0)
+                    break
+                case WorkToDo:
+                    taskQueue << message
+                    if ((workers == 0) || (taskQueue.size() >= QUEUE_SIZE_TRIGGER)) {
+                        println 'Need more workers. Starting one.'
+                        workers += 1
+                        new DemoWorker(this).start()
+                    }
+            }
+            println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
+        }
     }
-  }
 }
 
 final class DemoWorker extends AbstractPooledActor {
-  final static Object EXIT = new Object()
-  private static final Random random = new Random()
+    final static Object EXIT = new Object()
+    private static final Random random = new Random()
 
-  Actor balancer
+    Actor balancer
 
-  def DemoWorker(balancer) {
-    this.balancer = balancer
-  }
+    def DemoWorker(balancer) {
+        this.balancer = balancer
+    }
 
-  void act() {
-    loop {
-      this.balancer << new NeedMoreWork()
-      react {
-        switch (it) {
-          case WorkToDo:
-            processMessage(it)
-            break
-          case EXIT: stop()
+    void act() {
+        loop {
+            this.balancer << new NeedMoreWork()
+            react {
+                switch (it) {
+                    case WorkToDo:
+                        processMessage(it)
+                        break
+                    case EXIT: stop()
+                }
+            }
         }
-      }
+
     }
 
-  }
-
-  private void processMessage(message) {
-    synchronized (random) {
-      Thread.sleep random.nextInt(5000)
+    private void processMessage(message) {
+        synchronized (random) {
+            Thread.sleep random.nextInt(5000)
+        }
     }
-  }
 }
 final class WorkToDo {}
 final class NeedMoreWork {}
@@ -95,16 +95,16 @@ final Actor balancer = new LoadBalancer().start()
 
 //produce tasks
 for (i in 1..20) {
-  Thread.sleep 100
-  balancer << new WorkToDo()
+    Thread.sleep 100
+    balancer << new WorkToDo()
 }
 
 //produce tasks in a parallel thread
 Thread.start {
-  for (i in 1..10) {
-    Thread.sleep 1000
-    balancer << new WorkToDo()
-  }
+    for (i in 1..10) {
+        Thread.sleep 1000
+        balancer << new WorkToDo()
+    }
 }
 
 Thread.sleep 35000

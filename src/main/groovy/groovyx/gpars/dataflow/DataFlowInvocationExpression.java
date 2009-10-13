@@ -24,33 +24,33 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  * @author Alex Tkachman
  */
 public class DataFlowInvocationExpression extends DataFlowComplexExpression {
-  private Object receiver;
-  private final String methodName;
+    private Object receiver;
+    private final String methodName;
 
-  public DataFlowInvocationExpression(final Object receiver, final String methodName, final Object[] args) {
-    super(args);
-    this.receiver = receiver;
-    this.methodName = methodName;
-    subscribe();
-  }
-
-  @Override
-  protected Object evaluate() {
-    if (receiver instanceof DataFlowExpression) {
-      receiver = ((DataFlowExpression) receiver).value;
+    public DataFlowInvocationExpression(final Object receiver, final String methodName, final Object[] args) {
+        super(args);
+        this.receiver = receiver;
+        this.methodName = methodName;
+        subscribe();
     }
 
-    super.evaluate();
+    @Override
+    protected Object evaluate() {
+        if (receiver instanceof DataFlowExpression) {
+            receiver = ((DataFlowExpression) receiver).value;
+        }
 
-    return InvokerHelper.invokeMethod(receiver, methodName, args);
-  }
+        super.evaluate();
 
-  @Override
-  protected void subscribe(final DataFlowExpressionsCollector listener) {
-    if (receiver instanceof DataFlowExpression) {
-      receiver = listener.subscribe(receiver);
+        return InvokerHelper.invokeMethod(receiver, methodName, args);
     }
 
-    super.subscribe(listener);
-  }
+    @Override
+    protected void subscribe(final DataFlowExpressionsCollector listener) {
+        if (receiver instanceof DataFlowExpression) {
+            receiver = listener.subscribe(receiver);
+        }
+
+        super.subscribe(listener);
+    }
 }

@@ -34,56 +34,56 @@ import groovyx.gpars.serial.RemoteSerialized;
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
 public class DataFlowVariable<T> extends DataFlowExpression<T> {
-  /**
-   * Creates a new unbound Dataflow Variable
-   */
-  public DataFlowVariable() {
-  }
-
-  /**
-   * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
-   *
-   * @param value The value to assign
-   */
-  public void leftShift(final T value) {
-    bind(value);
-  }
-
-  /**
-   * Assigns a value from one DataFlowVariable instance to this variable.
-   * Can only be invoked once on each instance of DataFlowVariable
-   *
-   * @param ref The DataFlowVariable instance the value of which to bind
-   * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
-   */
-  public void leftShift(final DataFlowExpression<T> ref) {
-    ref.getValAsync(new MessageStream() {
-      public MessageStream send(Object message) {
-        bind(ref.value);
-        return this;
-      }
-    });
-  }
-
-  @Override
-  public Class getRemoteClass() {
-    return RemoteDataFlowVariable.class;
-  }
-
-  public static class RemoteDataFlowVariable extends DataFlowVariable implements RemoteSerialized {
-    private final RemoteHost remoteHost;
-    private boolean disconnected;
-
-    public RemoteDataFlowVariable(RemoteHost host) {
-      remoteHost = host;
-      getValAsync(new MessageStream() {
-        public MessageStream send(Object message) {
-          if (!disconnected) {
-            remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));
-          }
-          return this;
-        }
-      });
+    /**
+     * Creates a new unbound Dataflow Variable
+     */
+    public DataFlowVariable() {
     }
-  }
+
+    /**
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     *
+     * @param value The value to assign
+     */
+    public void leftShift(final T value) {
+        bind(value);
+    }
+
+    /**
+     * Assigns a value from one DataFlowVariable instance to this variable.
+     * Can only be invoked once on each instance of DataFlowVariable
+     *
+     * @param ref The DataFlowVariable instance the value of which to bind
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
+    public void leftShift(final DataFlowExpression<T> ref) {
+        ref.getValAsync(new MessageStream() {
+            public MessageStream send(Object message) {
+                bind(ref.value);
+                return this;
+            }
+        });
+    }
+
+    @Override
+    public Class getRemoteClass() {
+        return RemoteDataFlowVariable.class;
+    }
+
+    public static class RemoteDataFlowVariable extends DataFlowVariable implements RemoteSerialized {
+        private final RemoteHost remoteHost;
+        private boolean disconnected;
+
+        public RemoteDataFlowVariable(RemoteHost host) {
+            remoteHost = host;
+            getValAsync(new MessageStream() {
+                public MessageStream send(Object message) {
+                    if (!disconnected) {
+                        remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));
+                    }
+                    return this;
+                }
+            });
+        }
+    }
 }

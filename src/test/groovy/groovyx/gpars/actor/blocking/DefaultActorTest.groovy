@@ -16,50 +16,50 @@
 
 package groovyx.gpars.actor.blocking
 
+import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * @author Vaclav Pech, Dierk Koenig
  * Date: Jan 7, 2009
  */
 public class DefaultActorTest extends GroovyTestCase {
-  public void testDefaultMessaging() {
-    DefaultTestActor actor = new DefaultTestActor()
-    actor.start()
-    actor.send "Message"
-    actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
-    assert actor.receiveWasCalled.get()
-  }
+    public void testDefaultMessaging() {
+        DefaultTestActor actor = new DefaultTestActor()
+        actor.start()
+        actor.send "Message"
+        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
+        assert actor.receiveWasCalled.get()
+    }
 
-  public void testThreadName() {
-    DefaultTestActor actor = new DefaultTestActor()
-    actor.start()
-    actor << ''
-    actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
+    public void testThreadName() {
+        DefaultTestActor actor = new DefaultTestActor()
+        actor.start()
+        actor << ''
+        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
 
-    assert actor.threadName.startsWith("Actor Thread ")
-    actor.stop()
-  }
+        assert actor.threadName.startsWith("Actor Thread ")
+        actor.stop()
+    }
 }
 
 class DefaultTestActor extends AbstractPooledActor {
 
-  final AtomicBoolean receiveWasCalled = new AtomicBoolean(false)
-  final CountDownLatch receiveCallsOutstanding = new CountDownLatch(1)
+    final AtomicBoolean receiveWasCalled = new AtomicBoolean(false)
+    final CountDownLatch receiveCallsOutstanding = new CountDownLatch(1)
 
-  volatile def threadName = ''
+    volatile def threadName = ''
 
-  @Override protected void act() {
-    threadName = Thread.currentThread().name
-    println threadName
-    receive {
-      receiveWasCalled.set true
-      receiveCallsOutstanding.countDown()
+    @Override protected void act() {
+        threadName = Thread.currentThread().name
+        println threadName
+        receive {
+            receiveWasCalled.set true
+            receiveCallsOutstanding.countDown()
 
-      stop()
+            stop()
+        }
     }
-  }
 }

@@ -29,137 +29,137 @@ import java.util.concurrent.atomic.AtomicLong;
  *         Date: Feb 27, 2009
  */
 public class DefaultPool implements Pool {
-  private ThreadPoolExecutor pool;
-  private static final long SHUTDOWN_TIMEOUT = 30L;
+    private ThreadPoolExecutor pool;
+    private static final long SHUTDOWN_TIMEOUT = 30L;
 
-  /**
-   * Creates the pool with default number of daemon threads.
-   */
-  public DefaultPool() {
-    this(true);
-  }
+    /**
+     * Creates the pool with default number of daemon threads.
+     */
+    public DefaultPool() {
+        this(true);
+    }
 
-  /**
-   * Creates the pool with default number of threads.
-   *
-   * @param daemon Sets the daemon flag of threads in the pool.
-   */
-  public DefaultPool(final boolean daemon) {
-    this(daemon, DefaultPool.retrieveDefaultPoolSize());
-  }
+    /**
+     * Creates the pool with default number of threads.
+     *
+     * @param daemon Sets the daemon flag of threads in the pool.
+     */
+    public DefaultPool(final boolean daemon) {
+        this(daemon, DefaultPool.retrieveDefaultPoolSize());
+    }
 
-  /**
-   * Creates the pool with specified number of threads.
-   *
-   * @param daemon   Sets the daemon flag of threads in the pool.
-   * @param poolSize The required size of the pool
-   */
-  public DefaultPool(final boolean daemon, final int poolSize) {
-    if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
-    pool = createPool(daemon, poolSize);
-  }
+    /**
+     * Creates the pool with specified number of threads.
+     *
+     * @param daemon   Sets the daemon flag of threads in the pool.
+     * @param poolSize The required size of the pool
+     */
+    public DefaultPool(final boolean daemon, final int poolSize) {
+        if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        pool = createPool(daemon, poolSize);
+    }
 
-  /**
-   * Creates the pool around the given executor service
-   *
-   * @param pool The executor service to use
-   */
-  public DefaultPool(final ThreadPoolExecutor pool) {
-    this.pool = pool;
-  }
+    /**
+     * Creates the pool around the given executor service
+     *
+     * @param pool The executor service to use
+     */
+    public DefaultPool(final ThreadPoolExecutor pool) {
+        this.pool = pool;
+    }
 
-  /**
-   * Creates a fixed-thread pool of given size. Each thread will have the uncaught exception handler set
-   * to print the unhandled exception to standard error output.
-   *
-   * @param daemon   Sets the daemon flag of threads in the pool.
-   * @param poolSize The required pool size  @return The created thread pool
-   * @return The newly created thread pool
-   */
-  private static ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
-    assert poolSize > 0;
-    return (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
-      public Thread newThread(final Runnable r) {
-        final Thread thread = new Thread(r, createThreadName());
-        thread.setDaemon(daemon);
-        thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-          public void uncaughtException(final Thread t, final Throwable e) {
-            System.err.println(UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
-            e.printStackTrace(System.err);
-          }
+    /**
+     * Creates a fixed-thread pool of given size. Each thread will have the uncaught exception handler set
+     * to print the unhandled exception to standard error output.
+     *
+     * @param daemon   Sets the daemon flag of threads in the pool.
+     * @param poolSize The required pool size  @return The created thread pool
+     * @return The newly created thread pool
+     */
+    private static ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
+        assert poolSize > 0;
+        return (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
+            public Thread newThread(final Runnable r) {
+                final Thread thread = new Thread(r, createThreadName());
+                thread.setDaemon(daemon);
+                thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    public void uncaughtException(final Thread t, final Throwable e) {
+                        System.err.println(UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
+                        e.printStackTrace(System.err);
+                    }
+                });
+                return thread;
+            }
         });
-        return thread;
-      }
-    });
-  }
-
-  /**
-   * Created a JVM-unique name for Actors' threads.
-   *
-   * @return The name prefix
-   */
-  protected static String createThreadName() {
-    return "Actor Thread " + DefaultPool.threadCount.incrementAndGet();
-  }
-
-  /**
-   * Unique counter for Actors' threads
-   */
-  private static final AtomicLong threadCount = new AtomicLong(0L);
-
-  /**
-   * Resizes the thread pool to the specified value
-   *
-   * @param poolSize The new pool size
-   */
-  public final void resize(final int poolSize) {
-    if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
-    pool.setCorePoolSize(poolSize);
-  }
-
-  /**
-   * Sets the pool size to the default
-   */
-  public final void resetDefaultSize() {
-    resize(DefaultPool.retrieveDefaultPoolSize());
-  }
-
-  /**
-   * schedules a new task for processing with the pool
-   *
-   * @param task The task to schedule
-   */
-  public final void execute(final Runnable task) {
-    pool.execute(task);
-  }
-
-  /**
-   * Retrieves the internal executor service.
-   *
-   * @return The underlying thread pool
-   */
-  public final ExecutorService getExecutorService() {
-    return pool;
-  }
-
-  /**
-   * Gently stops the pool
-   */
-  public final void shutdown() {
-    pool.shutdown();
-    try {
-      pool.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
-    } catch (InterruptedException ignored) {
-      Thread.currentThread().interrupt();  // set the interrupted flag
     }
-  }
 
-  private static int retrieveDefaultPoolSize() {
-    final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
-    try {
-      return Integer.parseInt(poolSizeValue);
-    } catch (NumberFormatException ignored) {
-      return Runtime.getRuntime().availableProcessors() + 1;
+    /**
+     * Created a JVM-unique name for Actors' threads.
+     *
+     * @return The name prefix
+     */
+    protected static String createThreadName() {
+        return "Actor Thread " + DefaultPool.threadCount.incrementAndGet();
     }
-  }
+
+    /**
+     * Unique counter for Actors' threads
+     */
+    private static final AtomicLong threadCount = new AtomicLong(0L);
+
+    /**
+     * Resizes the thread pool to the specified value
+     *
+     * @param poolSize The new pool size
+     */
+    public final void resize(final int poolSize) {
+        if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        pool.setCorePoolSize(poolSize);
+    }
+
+    /**
+     * Sets the pool size to the default
+     */
+    public final void resetDefaultSize() {
+        resize(DefaultPool.retrieveDefaultPoolSize());
+    }
+
+    /**
+     * schedules a new task for processing with the pool
+     *
+     * @param task The task to schedule
+     */
+    public final void execute(final Runnable task) {
+        pool.execute(task);
+    }
+
+    /**
+     * Retrieves the internal executor service.
+     *
+     * @return The underlying thread pool
+     */
+    public final ExecutorService getExecutorService() {
+        return pool;
+    }
+
+    /**
+     * Gently stops the pool
+     */
+    public final void shutdown() {
+        pool.shutdown();
+        try {
+            pool.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();  // set the interrupted flag
+        }
+    }
+
+    private static int retrieveDefaultPoolSize() {
+        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
+        try {
+            return Integer.parseInt(poolSizeValue);
+        } catch (NumberFormatException ignored) {
+            return Runtime.getRuntime().availableProcessors() + 1;
+        }
+    }
 }

@@ -17,7 +17,7 @@
 package groovyx.gpars.issues
 
 @Immutable final class TestMessage {
-  String value
+    String value
 }
 
 final class Foo {}

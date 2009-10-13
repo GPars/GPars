@@ -16,50 +16,50 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actor
-import static groovyx.gpars.actor.Actors.actor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
+import static groovyx.gpars.actor.Actors.actor
 
 public class SharedMemoryTest extends GroovyTestCase {
 
-  private static final long MAX_COUNTER = 1000
+    private static final long MAX_COUNTER = 1000
 
-  public void testSharedAccess() {
-    long counter = 0
+    public void testSharedAccess() {
+        long counter = 0
 
-    Actors.defaultPooledActorGroup.resize 2
-    def latch = new CountDownLatch(1)
+        Actors.defaultPooledActorGroup.resize 2
+        def latch = new CountDownLatch(1)
 
-    Actor actor1 = actor {
-      loop {
-        react {
-          assert it == counter * 2
-          counter += 1
-          it.reply counter.longValue() * 2
+        Actor actor1 = actor {
+            loop {
+                react {
+                    assert it == counter * 2
+                    counter += 1
+                    it.reply counter.longValue() * 2
+                }
+            }
+        }.start()
+
+        Actor actor2 = actor {
+            loop {
+                if (counter < MAX_COUNTER) actor1.send counter.longValue() * 2
+                else {
+                    actor1.stop()
+                    stop()
+                    latch.countDown()
+                }
+                react {
+                    assert it == counter * 2
+                    counter += 1
+                }
+            }
         }
-      }
-    }.start()
+        actor2.start()
 
-    Actor actor2 = actor {
-      loop {
-        if (counter < MAX_COUNTER) actor1.send counter.longValue() * 2
-        else {
-          actor1.stop()
-          stop()
-          latch.countDown()
-        }
-        react {
-          assert it == counter * 2
-          counter += 1
-        }
-      }
+
+        latch.await()
+        Actors.defaultPooledActorGroup.resize(5)
+        assertEquals MAX_COUNTER, counter
     }
-    actor2.start()
-
-
-    latch.await()
-    Actors.defaultPooledActorGroup.resize(5)
-    assertEquals MAX_COUNTER, counter
-  }
 }

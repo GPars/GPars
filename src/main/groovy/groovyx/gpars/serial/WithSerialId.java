@@ -38,56 +38,56 @@ import java.io.Serializable;
  * @author Alex Tkachman
  */
 public abstract class WithSerialId implements Serializable {
-  /**
-   * See SerialHandle class for details
-   */
-  public volatile SerialHandle serialHandle;
+    /**
+     * See SerialHandle class for details
+     */
+    public volatile SerialHandle serialHandle;
 
-  /**
-   * Gets serial handle for the object
-   * If needed new handle created and serialization host subscribed for the object handle
-   *
-   * @return serial handle for the object
-   */
-  public final SerialHandle getOrCreateSerialHandle() {
-    if (serialHandle == null) {
-      synchronized (this) {
+    /**
+     * Gets serial handle for the object
+     * If needed new handle created and serialization host subscribed for the object handle
+     *
+     * @return serial handle for the object
+     */
+    public final SerialHandle getOrCreateSerialHandle() {
         if (serialHandle == null) {
-          serialHandle = SerialHandle.create(this, null);
+            synchronized (this) {
+                if (serialHandle == null) {
+                    serialHandle = SerialHandle.create(this, null);
+                }
+            }
         }
-      }
-    }
-    return serialHandle;
-  }
-
-  /**
-   * Class of remote object to be created
-   *
-   * @return Throws UnsupportedOperationException
-   */
-  public <T extends RemoteSerialized> Class<T> getRemoteClass() {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Replace object by handle for serialization
-   *
-   * @return handle to serialize
-   * @throws ObjectStreamException If the object cannot be serialized
-   */
-  @SuppressWarnings({"UnusedDeclaration"})
-  protected final Object writeReplace() throws ObjectStreamException {
-    final SerialHandle handle = getOrCreateSerialHandle();
-    if (this instanceof RemoteSerialized) {
-      return new LocalHandle(handle.getSerialId());
+        return serialHandle;
     }
 
-    final SerialContext host = SerialContext.get();
-    handle.subscribe(host);
-    return createRemoteHandle(handle, host);
-  }
+    /**
+     * Class of remote object to be created
+     *
+     * @return Throws UnsupportedOperationException
+     */
+    public <T extends RemoteSerialized> Class<T> getRemoteClass() {
+        throw new UnsupportedOperationException();
+    }
 
-  protected RemoteHandle createRemoteHandle(final SerialHandle handle, final SerialContext host) {
-    return new DefaultRemoteHandle(handle.getSerialId(), host.getHostId(), getRemoteClass());
-  }
+    /**
+     * Replace object by handle for serialization
+     *
+     * @return handle to serialize
+     * @throws ObjectStreamException If the object cannot be serialized
+     */
+    @SuppressWarnings({"UnusedDeclaration"})
+    protected final Object writeReplace() throws ObjectStreamException {
+        final SerialHandle handle = getOrCreateSerialHandle();
+        if (this instanceof RemoteSerialized) {
+            return new LocalHandle(handle.getSerialId());
+        }
+
+        final SerialContext host = SerialContext.get();
+        handle.subscribe(host);
+        return createRemoteHandle(handle, host);
+    }
+
+    protected RemoteHandle createRemoteHandle(final SerialHandle handle, final SerialContext host) {
+        return new DefaultRemoteHandle(handle.getSerialId(), host.getHostId(), getRemoteClass());
+    }
 }

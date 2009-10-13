@@ -19,25 +19,25 @@ package groovyx.gpars.samples.actors.safevariable
 import groovyx.gpars.actor.Safe
 
 class Conference extends Safe<Long> {
-  def Conference() { super(0L) }
+    def Conference() { super(0L) }
 
-  private def register(long num) { data += num }
+    private def register(long num) { data += num }
 
-  private def unregister(long num) { data -= num }
+    private def unregister(long num) { data -= num }
 }
 
 final Safe<Long> conference = new Conference()
 
 final Thread t1 = Thread.start {
-  conference << {register(10L)}
+    conference << {register(10L)}
 }
 
 final Thread t2 = Thread.start {
-  conference << {register(5L)}
+    conference << {register(5L)}
 }
 
 final Thread t3 = Thread.start {
-  conference << {unregister(3L)}
+    conference << {unregister(3L)}
 }
 
 [t1, t2, t3]*.join()

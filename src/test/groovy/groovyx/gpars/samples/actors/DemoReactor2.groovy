@@ -25,21 +25,21 @@ import groovyx.gpars.actor.Actors
  */
 
 final def doubler = Actors.reactor {
-  2 * it
+    2 * it
 }.start()
 
 Actor actor = Actors.actor {
-  (1..10).each {doubler << it}
-  int i = 0
-  loop {
-    i += 1
-    if (i > 10) stop()
-    else {
-      react {message ->
-        println "Double of $i = $message"
-      }
+    (1..10).each {doubler << it}
+    int i = 0
+    loop {
+        i += 1
+        if (i > 10) stop()
+        else {
+            react {message ->
+                println "Double of $i = $message"
+            }
+        }
     }
-  }
 }.start()
 
 actor.join()

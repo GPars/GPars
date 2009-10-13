@@ -21,15 +21,15 @@ import groovyx.gpars.actor.Safe
 final Safe counter = new Safe<Long>(0L)
 
 final Thread t1 = Thread.start {
-  counter << {updateValue it + 1}
+    counter << {updateValue it + 1}
 }
 
 final Thread t2 = Thread.start {
-  counter << {updateValue it + 6}
+    counter << {updateValue it + 6}
 }
 
 final Thread t3 = Thread.start {
-  counter << {updateValue it - 2}
+    counter << {updateValue it - 2}
 }
 
 [t1, t2, t3]*.join()

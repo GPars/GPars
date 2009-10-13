@@ -17,7 +17,6 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -28,22 +27,22 @@ import static groovyx.gpars.actor.Actors.actor
 Closure innerLoop
 
 Closure outerLoop = {->
-  react {a ->
-    println 'Outer: ' + a
-    innerLoop()
-  }
+    react {a ->
+        println 'Outer: ' + a
+        innerLoop()
+    }
 }
 
 innerLoop = {->
-  react {b ->
-    println 'Inner ' + b
-    if (b == 0) outerLoop()
-    else innerLoop()
-  }
+    react {b ->
+        println 'Inner ' + b
+        if (b == 0) outerLoop()
+        else innerLoop()
+    }
 }
 
 Actor actor = actor {
-  outerLoop()
+    outerLoop()
 }
 outerLoop.delegate = actor
 innerLoop.delegate = actor

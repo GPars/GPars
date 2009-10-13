@@ -16,8 +16,8 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.Pool
 
 /**
  * Provides logical grouping for pooled actors. Each group has an underlying thread pool, which will perform actions
@@ -59,25 +59,25 @@ import groovyx.gpars.scheduler.DefaultPool
  */
 public final class PooledActorGroup extends ActorGroup {
 
-  /**
-   * Creates a group of pooled actors. The actors will share a common daemon thread pool.
-   */
-  public def PooledActorGroup(final Pool threadPool) {
-    super(threadPool)
-  }
+    /**
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     */
+    public def PooledActorGroup(final Pool threadPool) {
+        super(threadPool)
+    }
 
-  /**
-   * Creates a group of pooled actors. The actors will share a common daemon thread pool.
-   */
-  def PooledActorGroup() {
-    super(new DefaultPool(true))
-  }
+    /**
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     */
+    def PooledActorGroup() {
+        super(new DefaultPool(true))
+    }
 
-  /**
-   * Creates a group of pooled actors. The actors will share a common daemon thread pool.
-   * @param poolSize The initial size of the underlying thread pool
-   */
-  def PooledActorGroup(final int poolSize) {
-    super(new DefaultPool(true, poolSize))
-  }
+    /**
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * @param poolSize The initial size of the underlying thread pool
+     */
+    def PooledActorGroup(final int poolSize) {
+        super(new DefaultPool(true, poolSize))
+    }
 }

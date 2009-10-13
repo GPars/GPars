@@ -16,36 +16,36 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.impl.AbstractPooledActor
+import java.util.concurrent.CountDownLatch
 
 public class ImmutableMessageTest extends GroovyTestCase {
 
-  public void testSend() {
-    volatile String result
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testSend() {
+        volatile String result
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final AbstractPooledActor bouncer = Actors.actor {
-      react {
-        it.reply new TestMessage(it.value)
-      }
-    }.start()
+        final AbstractPooledActor bouncer = Actors.actor {
+            react {
+                it.reply new TestMessage(it.value)
+            }
+        }.start()
 
-    Actors.actor {
-      bouncer << new TestMessage('Value')
-      react {
-        result = it.value
-        latch.countDown()
-      }
-    }.start()
+        Actors.actor {
+            bouncer << new TestMessage('Value')
+            react {
+                result = it.value
+                latch.countDown()
+            }
+        }.start()
 
-    latch.await()
-    assertEquals 'Value', result
+        latch.await()
+        assertEquals 'Value', result
 
-  }
+    }
 }
 
 @Immutable final class TestMessage {
-  String value
+    String value
 }

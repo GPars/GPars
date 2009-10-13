@@ -16,9 +16,9 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
+import groovyx.gpars.scheduler.Pool
 
 /**
  * Provides a common super class of pooled actor groups.
@@ -28,52 +28,52 @@ import groovyx.gpars.actor.impl.RunnableBackedPooledActor
  */
 public abstract class ActorGroup {
 
-  /**
-   * Stores the group actors' thread pool
-   */
-  private @Delegate Pool threadPool
+    /**
+     * Stores the group actors' thread pool
+     */
+    private @Delegate Pool threadPool
 
-  public Pool getThreadPool() { return threadPool; }
+    public Pool getThreadPool() { return threadPool; }
 
-  /**
-   * Creates a group of pooled actors. The actors will share a common daemon thread pool.
-   */
-  protected def ActorGroup(final Pool threadPool) {
-    this.threadPool = threadPool
-  }
+    /**
+     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     */
+    protected def ActorGroup(final Pool threadPool) {
+        this.threadPool = threadPool
+    }
 
-  /**
-   * Creates a new instance of PooledActor, using the passed-in runnable/closure as the body of the actor's act() method.
-   * The created actor will belong to the pooled actor group.
-   * @param handler The body of the newly created actor's act method.
-   * @return A newly created instance of the AbstractPooledActor class
-   */
-  public final AbstractPooledActor actor(Runnable handler) {
-    final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
-    actor.actorGroup = this
-    return actor
-  }
+    /**
+     * Creates a new instance of PooledActor, using the passed-in runnable/closure as the body of the actor's act() method.
+     * The created actor will belong to the pooled actor group.
+     * @param handler The body of the newly created actor's act method.
+     * @return A newly created instance of the AbstractPooledActor class
+     */
+    public final AbstractPooledActor actor(Runnable handler) {
+        final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
+        actor.actorGroup = this
+        return actor
+    }
 
-  /**
-   * Creates a reactor around the supplied code.
-   * When a reactor receives a message, the supplied block of code is run with the message
-   * as a parameter and the result of the code is send in reply.
-   * @param The code to invoke for each received message
-   * @return A new instance of ReactiveEventBasedThread
-   */
-  public final AbstractPooledActor reactor(final Closure code) {
-    final def actor = new ReactiveActor(code)
-    actor.actorGroup = this
-    actor
-  }
+    /**
+     * Creates a reactor around the supplied code.
+     * When a reactor receives a message, the supplied block of code is run with the message
+     * as a parameter and the result of the code is send in reply.
+     * @param The code to invoke for each received message
+     * @return A new instance of ReactiveEventBasedThread
+     */
+    public final AbstractPooledActor reactor(final Closure code) {
+        final def actor = new ReactiveActor(code)
+        actor.actorGroup = this
+        actor
+    }
 
-  //todo javadoc
-  /**
-   *
-   */
-  public final AbstractPooledActor messageHandler(final Closure code) {
-    final def actor = new DynamicDispatchActor(code)
-    actor.actorGroup = this
-    actor
-  }
+    //todo javadoc
+    /**
+     *
+     */
+    public final AbstractPooledActor messageHandler(final Closure code) {
+        final def actor = new DynamicDispatchActor(code)
+        actor.actorGroup = this
+        actor
+    }
 }

@@ -26,13 +26,13 @@ def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPar
 final def buffer = new DataFlowStream()
 
 start {
-  for (word in words) {
-    buffer << word.toUpperCase()
-  }
+    for (word in words) {
+        buffer << word.toUpperCase()
+    }
 }
 
 start {
-  while (true) println buffer.val
+    while (true) println buffer.val
 }
 
 System.in.read()

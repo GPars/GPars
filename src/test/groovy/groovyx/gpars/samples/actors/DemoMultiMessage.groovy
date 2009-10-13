@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.impl.AbstractPooledActor
 import static java.util.concurrent.TimeUnit.SECONDS
 
 /**
@@ -31,57 +31,57 @@ import static java.util.concurrent.TimeUnit.SECONDS
 
 final PooledActorGroup group = new PooledActorGroup(1)
 class Messages {
-  static def REPLY = 'Received your kind offer. Now processing it and comparing with others.'
+    static def REPLY = 'Received your kind offer. Now processing it and comparing with others.'
 }
 
 final AbstractPooledActor actor = group.actor {
-  react {offerA ->
-    reply Messages.REPLY  //sent to all senders
-    react {offerB ->
-      reply Messages.REPLY  //sent to all senders
-      react {offerC ->
+    react {offerA ->
         reply Messages.REPLY  //sent to all senders
-        def winnerOffer = [offerA, offerB, offerC].min {it.price}
-        winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
-        ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the losers only
-      }
+        react {offerB ->
+            reply Messages.REPLY  //sent to all senders
+            react {offerC ->
+                reply Messages.REPLY  //sent to all senders
+                def winnerOffer = [offerA, offerB, offerC].min {it.price}
+                winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
+                ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the losers only
+            }
+        }
     }
-  }
 }
 actor.start()
 
 final def a1 = group.actor {
-  actor << new Offer(price: 10)
-  loop {
-    react(3, SECONDS) {
-      println "Agent 1: $it"
+    actor << new Offer(price: 10)
+    loop {
+        react(3, SECONDS) {
+            println "Agent 1: $it"
+        }
     }
-  }
 }
 a1.start()
 
 final def a2 = group.actor {
-  actor << [price: 20]
-  loop {
-    react(3, SECONDS) {
-      println "Agent 2: $it"
+    actor << [price: 20]
+    loop {
+        react(3, SECONDS) {
+            println "Agent 2: $it"
+        }
     }
-  }
 }.start()
 
 final def a3 = group.actor {
-  actor << new Offer(price: 5)
-  loop {
-    react(3, SECONDS) {
-      println "Agent 3: $it"
+    actor << new Offer(price: 5)
+    loop {
+        react(3, SECONDS) {
+            println "Agent 3: $it"
+        }
     }
-  }
 }.start()
 
 [actor, a1, a2, a3]*.join()
 
 class Offer {
-  int price
+    int price
 }
 
 

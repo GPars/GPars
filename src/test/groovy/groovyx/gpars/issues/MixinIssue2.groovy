@@ -17,36 +17,36 @@
 package groovyx.gpars.issues
 
 class SampleA {
-  private void foo() {
-    println 'Original foo ' + receive('')
-  }
+    private void foo() {
+        println 'Original foo ' + receive('')
+    }
 
-  private String bar() {
-    "Bar"
-  }
+    private String bar() {
+        "Bar"
+    }
 
-  protected Object receive() {
-    return "Message " + bar()
-  }
+    protected Object receive() {
+        return "Message " + bar()
+    }
 
-  protected Object receive(Object param) {
-    receive() + param
-  }
+    protected Object receive(Object param) {
+        receive() + param
+    }
 
-  public void perform() {
-    foo()
-    foo()
-  }
+    public void perform() {
+        foo()
+        foo()
+    }
 }
 
 class SampleB {}
 
 SampleB.metaClass {
-  mixin SampleA
+    mixin SampleA
 
-  foo = {->
-    println 'New foo ' + receive('')
-  }
+    foo = {->
+        println 'New foo ' + receive('')
+    }
 }
 
 final SampleA a = new SampleA()

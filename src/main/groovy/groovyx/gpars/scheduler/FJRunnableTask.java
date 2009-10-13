@@ -25,18 +25,18 @@ import jsr166y.forkjoin.AsyncAction;
  *         Date: Jun 16, 2009
  */
 final class FJRunnableTask extends AsyncAction {
-  private final Runnable runnable;
+    private final Runnable runnable;
 
-  FJRunnableTask(final Runnable runnable) {
-    this.runnable = runnable;
-  }
-
-  @Override protected void compute() {
-    try {
-      runnable.run();
-      finish();
-    } catch (Exception e) {
-      finishExceptionally(e);
+    FJRunnableTask(final Runnable runnable) {
+        this.runnable = runnable;
     }
-  }
+
+    @Override protected void compute() {
+        try {
+            runnable.run();
+            finish();
+        } catch (Exception e) {
+            finishExceptionally(e);
+        }
+    }
 }

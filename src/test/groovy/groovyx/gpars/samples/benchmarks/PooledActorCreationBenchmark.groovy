@@ -16,44 +16,44 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import java.util.concurrent.CountDownLatch
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.impl.AbstractPooledActor
+import java.util.concurrent.CountDownLatch
 
 public class PooledActorCreationBenchmark implements Benchmark {
 
-  public long perform(final int numberOfIterations) {
-    final CountDownLatch latch = new CountDownLatch(1)
+    public long perform(final int numberOfIterations) {
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final AbstractPooledActor initiator = Actors.actor {
-      int iteration = 0
-      loop {
-        if (iteration == numberOfIterations) {
-          latch.countDown()
-          Thread.yield()
-          stop()
-          return
+        final AbstractPooledActor initiator = Actors.actor {
+            int iteration = 0
+            loop {
+                if (iteration == numberOfIterations) {
+                    latch.countDown()
+                    Thread.yield()
+                    stop()
+                    return
+                }
+                iteration += 1
+
+                new PooledBouncer().start() << '1'
+                react { }
+            }
         }
-        iteration += 1
 
-        new PooledBouncer().start() << '1'
-        react { }
-      }
+        final long t1 = System.currentTimeMillis()
+        initiator.start()
+        latch.await()
+        final long t2 = System.currentTimeMillis()
+
+        return (t2 - t1)
     }
-
-    final long t1 = System.currentTimeMillis()
-    initiator.start()
-    latch.await()
-    final long t2 = System.currentTimeMillis()
-
-    return (t2 - t1)
-  }
 }
 
 class PooledBouncer extends AbstractPooledActor {
-  void act() {
-    react {
-      reply '2'
+    void act() {
+        react {
+            reply '2'
+        }
     }
-  }
 }

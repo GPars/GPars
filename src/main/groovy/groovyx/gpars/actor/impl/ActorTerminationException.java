@@ -25,6 +25,6 @@ package groovyx.gpars.actor.impl;
  */
 final class ActorTerminationException extends ActorException {
 
-  ActorTerminationException() {
-  }
+    ActorTerminationException() {
+    }
 }

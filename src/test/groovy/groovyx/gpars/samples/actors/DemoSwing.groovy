@@ -17,68 +17,68 @@
 package groovyx.gpars.samples.actors
 
 import groovy.swing.SwingBuilder
-import javax.swing.JFrame
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.PooledActorGroup
+import javax.swing.JFrame
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
-  vbox() {
-    button('Click', actionPerformed: {
-      bar()
-      Actors.actor {
-        react {
-          doLater {
-            println 'Invoked later'
-          }
-        }
-      }.start().send 'Message'
+    vbox() {
+        button('Click', actionPerformed: {
+            bar()
+            Actors.actor {
+                react {
+                    doLater {
+                        println 'Invoked later'
+                    }
+                }
+            }.start().send 'Message'
 
-    })
-  }
+        })
+    }
 }
 
 frame.visible = true
 frame.pack()
 
 public void foo() {
-  println 'Running'
-  final def group = new PooledActorGroup(20)
+    println 'Running'
+    final def group = new PooledActorGroup(20)
 
-  final def nestedActor = group.actor {
-    println 'Started nested actor'
-    react {
-      println 'Finished nested actor'
-      reply 20
+    final def nestedActor = group.actor {
+        println 'Started nested actor'
+        react {
+            println 'Finished nested actor'
+            reply 20
+        }
     }
-  }
-  nestedActor.start()
+    nestedActor.start()
 
-  final Actor actor = group.actor {
-    println 'Started an actor'
-    nestedActor.sendAndWait(10)
-    println 'Done'
-  }
-  actor.start()
-  println 'Running controller'
+    final Actor actor = group.actor {
+        println 'Started an actor'
+        nestedActor.sendAndWait(10)
+        println 'Done'
+    }
+    actor.start()
+    println 'Running controller'
 }
 
 public void bar() {
-  final def group = new PooledActorGroup(20)
+    final def group = new PooledActorGroup(20)
 
-  final Actor actor = group.actor {
-    println 'Started an actor ' + delegate + ":" + owner
-    final def nestedActor = group.actor {
-      println 'Started nested actor ' + delegate + ":" + owner
-      react {
-        println 'Finished nested actor ' + delegate + ":" + owner.owner + ":" + getResolveStrategy()
-        reply 20
-      }
-    }.start()
-    nestedActor.sendAndWait(10)
-    println 'Done'
-  }
-  actor.start()
-  println 'Running controller'
+    final Actor actor = group.actor {
+        println 'Started an actor ' + delegate + ":" + owner
+        final def nestedActor = group.actor {
+            println 'Started nested actor ' + delegate + ":" + owner
+            react {
+                println 'Finished nested actor ' + delegate + ":" + owner.owner + ":" + getResolveStrategy()
+                reply 20
+            }
+        }.start()
+        nestedActor.sendAndWait(10)
+        println 'Done'
+    }
+    actor.start()
+    println 'Running controller'
 
 }

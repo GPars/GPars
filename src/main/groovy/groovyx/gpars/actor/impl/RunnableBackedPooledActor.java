@@ -32,78 +32,78 @@ import java.util.Arrays;
  */
 public class RunnableBackedPooledActor extends AbstractPooledActor {
 
-  private Runnable action;
+    private Runnable action;
 
-  public RunnableBackedPooledActor() {
-  }
+    public RunnableBackedPooledActor() {
+    }
 
-  public RunnableBackedPooledActor(final Runnable handler) {
-    setAction(handler);
-  }
+    public RunnableBackedPooledActor(final Runnable handler) {
+        setAction(handler);
+    }
 
-  final void setAction(final Runnable handler) {
-    if (handler == null) {
-      action = null;
-    } else {
-      if (handler instanceof Closure) {
-        final Closure cloned = (Closure) ((Closure) handler).clone();
-        if (cloned.getOwner() == cloned.getDelegate()) {
-          // otherwise someone else already took care for setting delegate for the closure
-          cloned.setDelegate(this);
-          cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
+    final void setAction(final Runnable handler) {
+        if (handler == null) {
+            action = null;
         } else {
-          cloned.setDelegate(new RunnableBackedPooledActorDelegate(cloned.getDelegate(), this));
+            if (handler instanceof Closure) {
+                final Closure cloned = (Closure) ((Closure) handler).clone();
+                if (cloned.getOwner() == cloned.getDelegate()) {
+                    // otherwise someone else already took care for setting delegate for the closure
+                    cloned.setDelegate(this);
+                    cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
+                } else {
+                    cloned.setDelegate(new RunnableBackedPooledActorDelegate(cloned.getDelegate(), this));
+                }
+                action = cloned;
+            } else {
+                action = handler;
+            }
         }
-        action = cloned;
-      } else {
-        action = handler;
-      }
-    }
-  }
-
-  @Override protected void act() {
-    if (action != null) {
-      if (action instanceof Closure) {
-        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) action);
-      } else {
-        action.run();
-      }
-    }
-  }
-
-  private static final class RunnableBackedPooledActorDelegate extends GroovyObjectSupport {
-    private final Object first, second;
-
-    RunnableBackedPooledActorDelegate(final Object first, final Object second) {
-      this.first = first;
-      this.second = second;
     }
 
-    @Override public Object invokeMethod(final String name, final Object args) {
-      try {
-        return InvokerHelper.invokeMethod(first, name, args);
-      }
-      catch (MissingMethodException mme) {
-        return InvokerHelper.invokeMethod(second, name, args);
-      }
+    @Override protected void act() {
+        if (action != null) {
+            if (action instanceof Closure) {
+                GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) action);
+            } else {
+                action.run();
+            }
+        }
     }
 
-    @Override public Object getProperty(final String propertyName) {
-      try {
-        return InvokerHelper.getProperty(first, propertyName);
-      }
-      catch (MissingPropertyException mpe) {
-        return InvokerHelper.getProperty(second, propertyName);
-      }
-    }
+    private static final class RunnableBackedPooledActorDelegate extends GroovyObjectSupport {
+        private final Object first, second;
 
-    @Override public void setProperty(final String propertyName, final Object newValue) {
-      try {
-        InvokerHelper.setProperty(first, propertyName, newValue);
-      }
-      catch (MissingPropertyException mpe) {
-        InvokerHelper.setProperty(second, propertyName, newValue);
-      }
+        RunnableBackedPooledActorDelegate(final Object first, final Object second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        @Override public Object invokeMethod(final String name, final Object args) {
+            try {
+                return InvokerHelper.invokeMethod(first, name, args);
+            }
+            catch (MissingMethodException mme) {
+                return InvokerHelper.invokeMethod(second, name, args);
+            }
+        }
+
+        @Override public Object getProperty(final String propertyName) {
+            try {
+                return InvokerHelper.getProperty(first, propertyName);
+            }
+            catch (MissingPropertyException mpe) {
+                return InvokerHelper.getProperty(second, propertyName);
+            }
+        }
+
+        @Override public void setProperty(final String propertyName, final Object newValue) {
+            try {
+                InvokerHelper.setProperty(first, propertyName, newValue);
+            }
+            catch (MissingPropertyException mpe) {
+                InvokerHelper.setProperty(second, propertyName, newValue);
+            }
+        }
     }
-  }
 }

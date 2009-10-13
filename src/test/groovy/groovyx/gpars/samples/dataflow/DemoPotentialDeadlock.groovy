@@ -31,16 +31,16 @@ final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
 
 start {
-  b << 20 + a.val
+    b << 20 + a.val
 }
 
 start {
-  println "Result: ${b.val}"
-  System.exit 0
+    println "Result: ${b.val}"
+    System.exit 0
 }
 
 Thread.sleep 2000
 
 start {
-  a << 10
+    a << 10
 }

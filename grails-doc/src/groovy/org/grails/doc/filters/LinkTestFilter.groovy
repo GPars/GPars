@@ -1,7 +1,7 @@
 /**
  * @author Graeme Rocher
  * @since 1.0
- * 
+ *
  * Created: Oct 31, 2007
  */
 package org.grails.doc.filters
@@ -20,20 +20,18 @@ class LinkTestFilter extends RegexTokenFilter {
         super(/\[(.*?)\]/)
     }
 
-
     /**
-   * Returns the view of the wiki name that is shown to the
-   * user. Overwrite to support other views for example
-   * transform "WikiLinking" to "Wiki Linking".
-   * Does nothing by default.
-   *
-   * @return view The view of the wiki name
-   */
+     * Returns the view of the wiki name that is shown to the
+     * user. Overwrite to support other views for example
+     * transform "WikiLinking" to "Wiki Linking".
+     * Does nothing by default.
+     *
+     * @return view The view of the wiki name
+     */
+    protected String getWikiView(String name) {
+        return name;
+    }
 
-  protected String getWikiView(String name) {
-    return name;
-  }
-  
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context) {
         def engine = context.getRenderContext().getRenderEngine()
 
@@ -64,8 +62,8 @@ class LinkTestFilter extends RegexTokenFilter {
                     name = name.substring(0, hashIndex);
                 }
 
-                if (name.indexOf("http://")>-1) {
-                    buffer << "<a href=\"${name}${hash ? '#'+hash:''}\" target=\"blank\">${Encoder.escape(alias)}</a>"
+                if (name.indexOf("http://") > -1) {
+                    buffer << "<a href=\"${name}${hash ? '#' + hash : ''}\" target=\"blank\">${Encoder.escape(alias)}</a>"
                 } else {
                     // internal link
 

@@ -31,23 +31,23 @@ final def b = new DataFlowVariable()
 
 final def actor = start {
 
-  delegate.metaClass.onTimeout = {
-    println 'Deadlock detected'
-    System.exit 0
-  }
+    delegate.metaClass.onTimeout = {
+        println 'Deadlock detected'
+        System.exit 0
+    }
 
-  react(5, TimeUnit.SECONDS) {x, y ->
-    println "Got replies: a:${x} b:${b}"
-  }
+    react(5, TimeUnit.SECONDS) {x, y ->
+        println "Got replies: a:${x} b:${b}"
+    }
 }
 
 start {
-  b << 20 + a.val
-  actor.send b.val
+    b << 20 + a.val
+    actor.send b.val
 }
 
 start {
-  a << 10 + b.val
-  actor.send a.val
+    a << 10 + b.val
+    actor.send a.val
 }
 

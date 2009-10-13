@@ -16,27 +16,27 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
 
 public class RepeatLoopTest extends GroovyTestCase {
 
-  public void testLoopWihtoutReact() {
-    volatile int count = 0
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testLoopWihtoutReact() {
+        volatile int count = 0
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    Actors.actor {
-      loop {
-        if (count == 10) {
-          stop()
-          latch.countDown()
-          return
-        }
-        count += 1
-      }
-    }.start()
+        Actors.actor {
+            loop {
+                if (count == 10) {
+                    stop()
+                    latch.countDown()
+                    return
+                }
+                count += 1
+            }
+        }.start()
 
-    latch.await()
-    assertEquals 10, count
-  }
+        latch.await()
+        assertEquals 10, count
+    }
 }

@@ -23,236 +23,236 @@ import groovyx.gpars.actor.PooledActorGroup
 import org.codehaus.groovy.runtime.NullObject
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
-  public void testDispatch() {
-    final TestDynamicDispatchActor actor = new TestDynamicDispatchActor()
-    actor.start()
+    public void testDispatch() {
+        final TestDynamicDispatchActor actor = new TestDynamicDispatchActor()
+        actor.start()
 
-    actor.sendAndWait 1
-    assertFalse actor.stringFlag
-    assert actor.integerFlag
-    assertFalse actor.objectFlag
-    actor.clearFlags();
+        actor.sendAndWait 1
+        assertFalse actor.stringFlag
+        assert actor.integerFlag
+        assertFalse actor.objectFlag
+        actor.clearFlags();
 
-    actor.sendAndWait ''
-    assert actor.stringFlag
-    assertFalse actor.integerFlag
-    assertFalse actor.objectFlag
-    actor.clearFlags();
+        actor.sendAndWait ''
+        assert actor.stringFlag
+        assertFalse actor.integerFlag
+        assertFalse actor.objectFlag
+        actor.clearFlags();
 
-    actor.sendAndWait 1.0
-    assertFalse actor.stringFlag
-    assertFalse actor.integerFlag
-    assert actor.objectFlag
-    actor.clearFlags();
+        actor.sendAndWait 1.0
+        assertFalse actor.stringFlag
+        assertFalse actor.integerFlag
+        assert actor.objectFlag
+        actor.clearFlags();
 
-    actor.sendAndWait new ArrayList()
-    assertFalse actor.stringFlag
-    assertFalse actor.integerFlag
-    assertFalse actor.objectFlag
-    assert actor.listFlag
-    actor.clearFlags();
-  }
-
-  public void testDispatchWithWhen() {
-    volatile boolean stringFlag = false
-    volatile boolean doubleFlag = false
-    volatile boolean objectFlag = false
-
-    final Actor actor = new DynamicDispatchActor({
-      when {String msg -> stringFlag = true; reply false}
-      when {Double msg -> doubleFlag = true; reply false}
-      when {msg -> objectFlag = true; reply false}
-    })
-    actor.start()
-
-    actor.sendAndWait 1.0 as Double
-    assertFalse stringFlag
-    assert doubleFlag
-    assertFalse objectFlag
-
-    actor.sendAndWait ''
-    assert stringFlag
-
-    actor.sendAndWait new ArrayList()
-    assert objectFlag
-  }
-
-  public void testSendingList() {
-    final Actor actor = new TestDynamicDispatchActor()
-    actor.start()
-
-    actor.sendAndWait(new ArrayList())
-    assert actor.listFlag
-  }
-
-  public void testSendingListViaWhen() {
-    volatile boolean flag = false
-
-    final Actor actor = new DynamicDispatchActor({
-      when {List msg -> flag = true; reply false}
-    })
-    actor.start()
-
-    actor.sendAndWait(new ArrayList())
-    assert flag
-  }
-
-  public void testSendingSubclassViaWhen() {
-    volatile boolean numberFlag = false
-    volatile boolean doubleFlag = false
-
-    final Actor actor = new DynamicDispatchActor({
-      when {Number msg -> numberFlag = true; reply false}
-      when {Double msg -> doubleFlag = true; reply false}
-    })
-    actor.start()
-
-    actor.sendAndWait(1.0)
-    assert numberFlag
-    assertFalse doubleFlag
-    numberFlag = false
-
-    actor.sendAndWait(1.0 as Double)
-    assertFalse numberFlag
-    assert doubleFlag
-
-  }
-
-  public void testDispatcher() {
-    volatile boolean stringFlag = false
-    volatile boolean integerFlag = false
-    volatile boolean objectFlag = false
-
-    def actor = Actors.messageHandler {
-      when {String message ->
-        stringFlag = true
-        reply false
-      }
-
-      when {Integer message ->
-        integerFlag = true
-        reply false
-      }
-
-      when {Object message ->
-        objectFlag = true
-        reply false
-      }
+        actor.sendAndWait new ArrayList()
+        assertFalse actor.stringFlag
+        assertFalse actor.integerFlag
+        assertFalse actor.objectFlag
+        assert actor.listFlag
+        actor.clearFlags();
     }
 
-    actor.start()
+    public void testDispatchWithWhen() {
+        volatile boolean stringFlag = false
+        volatile boolean doubleFlag = false
+        volatile boolean objectFlag = false
 
-    actor.sendAndWait 1
-    assertFalse stringFlag
-    assert integerFlag
-    assertFalse objectFlag
+        final Actor actor = new DynamicDispatchActor({
+            when {String msg -> stringFlag = true; reply false}
+            when {Double msg -> doubleFlag = true; reply false}
+            when {msg -> objectFlag = true; reply false}
+        })
+        actor.start()
 
-    actor.sendAndWait ''
-    assert stringFlag
-    assert integerFlag
-    assertFalse objectFlag
+        actor.sendAndWait 1.0 as Double
+        assertFalse stringFlag
+        assert doubleFlag
+        assertFalse objectFlag
 
-    actor.sendAndWait 1.0
-    assert stringFlag
-    assert integerFlag
-    assert objectFlag
+        actor.sendAndWait ''
+        assert stringFlag
 
-    actor.sendAndWait new ArrayList()
-    assert stringFlag
-    assert integerFlag
-    assert objectFlag
-  }
-
-  public void testWhenAttachedAfterCtor() {
-    volatile boolean stringFlag = false
-    volatile boolean integerFlag = false
-
-    def dda = new DynamicDispatchActor()
-    dda.when {String message ->
-      stringFlag = true
-      reply false
-    }
-    dda.start()
-
-    dda.sendAndWait ''
-    assert stringFlag
-    assertFalse integerFlag
-
-    dda.when {int message ->
-      integerFlag = true
-      reply false
+        actor.sendAndWait new ArrayList()
+        assert objectFlag
     }
 
-    dda.sendAndWait 1
-    assert stringFlag
-  }
+    public void testSendingList() {
+        final Actor actor = new TestDynamicDispatchActor()
+        actor.start()
 
-  public void testNullHandlerForSendWithNull() {
-    volatile boolean nullFlag = false
-
-    def dda = new DynamicDispatchActor()
-    dda.when {NullObject message ->
-      nullFlag = true
-      reply false
+        actor.sendAndWait(new ArrayList())
+        assert actor.listFlag
     }
-    dda.start()
 
-    dda.sendAndWait(null)
-    assert nullFlag
-  }
+    public void testSendingListViaWhen() {
+        volatile boolean flag = false
 
-  public void testClosureMessage() {
-    volatile boolean flag = false
+        final Actor actor = new DynamicDispatchActor({
+            when {List msg -> flag = true; reply false}
+        })
+        actor.start()
 
-    def dda = new DynamicDispatchActor()
-    dda.when {Closure cl ->
-      reply cl()
+        actor.sendAndWait(new ArrayList())
+        assert flag
     }
-    dda.start()
 
-    dda.sendAndWait { flag = true }
-    assert flag
-  }
+    public void testSendingSubclassViaWhen() {
+        volatile boolean numberFlag = false
+        volatile boolean doubleFlag = false
 
-  public void testGroup() {
-    final PooledActorGroup group = new PooledActorGroup()
-    final DynamicDispatchActor handler = group.messageHandler {}
-    assertSame group, handler.actorGroup
-  }
+        final Actor actor = new DynamicDispatchActor({
+            when {Number msg -> numberFlag = true; reply false}
+            when {Double msg -> doubleFlag = true; reply false}
+        })
+        actor.start()
+
+        actor.sendAndWait(1.0)
+        assert numberFlag
+        assertFalse doubleFlag
+        numberFlag = false
+
+        actor.sendAndWait(1.0 as Double)
+        assertFalse numberFlag
+        assert doubleFlag
+
+    }
+
+    public void testDispatcher() {
+        volatile boolean stringFlag = false
+        volatile boolean integerFlag = false
+        volatile boolean objectFlag = false
+
+        def actor = Actors.messageHandler {
+            when {String message ->
+                stringFlag = true
+                reply false
+            }
+
+            when {Integer message ->
+                integerFlag = true
+                reply false
+            }
+
+            when {Object message ->
+                objectFlag = true
+                reply false
+            }
+        }
+
+        actor.start()
+
+        actor.sendAndWait 1
+        assertFalse stringFlag
+        assert integerFlag
+        assertFalse objectFlag
+
+        actor.sendAndWait ''
+        assert stringFlag
+        assert integerFlag
+        assertFalse objectFlag
+
+        actor.sendAndWait 1.0
+        assert stringFlag
+        assert integerFlag
+        assert objectFlag
+
+        actor.sendAndWait new ArrayList()
+        assert stringFlag
+        assert integerFlag
+        assert objectFlag
+    }
+
+    public void testWhenAttachedAfterCtor() {
+        volatile boolean stringFlag = false
+        volatile boolean integerFlag = false
+
+        def dda = new DynamicDispatchActor()
+        dda.when {String message ->
+            stringFlag = true
+            reply false
+        }
+        dda.start()
+
+        dda.sendAndWait ''
+        assert stringFlag
+        assertFalse integerFlag
+
+        dda.when {int message ->
+            integerFlag = true
+            reply false
+        }
+
+        dda.sendAndWait 1
+        assert stringFlag
+    }
+
+    public void testNullHandlerForSendWithNull() {
+        volatile boolean nullFlag = false
+
+        def dda = new DynamicDispatchActor()
+        dda.when {NullObject message ->
+            nullFlag = true
+            reply false
+        }
+        dda.start()
+
+        dda.sendAndWait(null)
+        assert nullFlag
+    }
+
+    public void testClosureMessage() {
+        volatile boolean flag = false
+
+        def dda = new DynamicDispatchActor()
+        dda.when {Closure cl ->
+            reply cl()
+        }
+        dda.start()
+
+        dda.sendAndWait { flag = true }
+        assert flag
+    }
+
+    public void testGroup() {
+        final PooledActorGroup group = new PooledActorGroup()
+        final DynamicDispatchActor handler = group.messageHandler {}
+        assertSame group, handler.actorGroup
+    }
 }
 
 final class TestDynamicDispatchActor extends DynamicDispatchActor {
-  volatile boolean stringFlag = false
-  volatile boolean integerFlag = false
-  volatile boolean listFlag = false
-  volatile boolean objectFlag = false
+    volatile boolean stringFlag = false
+    volatile boolean integerFlag = false
+    volatile boolean listFlag = false
+    volatile boolean objectFlag = false
 
-  def clearFlags() {
-    stringFlag = false;
-    integerFlag = false;
-    listFlag = false;
-    objectFlag = false;
-  }
-
-  TestDynamicDispatchActor() {
-    when {String message ->
-      stringFlag = true
-      reply false
+    def clearFlags() {
+        stringFlag = false;
+        integerFlag = false;
+        listFlag = false;
+        objectFlag = false;
     }
-  }
 
-  void onMessage(Integer message) {
-    integerFlag = true
-    reply false
-  }
+    TestDynamicDispatchActor() {
+        when {String message ->
+            stringFlag = true
+            reply false
+        }
+    }
 
-  void onMessage(Object message) {
-    objectFlag = true
-    reply false
-  }
+    void onMessage(Integer message) {
+        integerFlag = true
+        reply false
+    }
 
-  void onMessage(List message) {
-    listFlag = true
-    reply false
-  }
+    void onMessage(Object message) {
+        objectFlag = true
+        reply false
+    }
+
+    void onMessage(List message) {
+        listFlag = true
+        reply false
+    }
 }

@@ -16,83 +16,83 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import static groovyx.gpars.dataflow.DataFlow.start
 
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
-  public void testActorGroup() {
-    final AbstractPooledActor actor = start {
-      react {}
+    public void testActorGroup() {
+        final AbstractPooledActor actor = start {
+            react {}
+        }
+        assertEquals DataFlowActor.DATA_FLOW_GROUP, actor.actorGroup
+        actor << 'Message'
     }
-    assertEquals DataFlowActor.DATA_FLOW_GROUP, actor.actorGroup
-    actor << 'Message'
-  }
 
-  public void testBasicLifeCycle() {
-    AtomicInteger counter = new AtomicInteger(0)
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testBasicLifeCycle() {
+        AtomicInteger counter = new AtomicInteger(0)
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final def thread = start {
-      enhance(delegate, counter, latch)
-      counter.incrementAndGet()
+        final def thread = start {
+            enhance(delegate, counter, latch)
+            counter.incrementAndGet()
+        }
+        latch.await()
+        assertEquals 2, counter.get()
     }
-    latch.await()
-    assertEquals 2, counter.get()
-  }
 
-  public void testExceptionLifeCycle() {
-    AtomicInteger counter = new AtomicInteger(0)
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testExceptionLifeCycle() {
+        AtomicInteger counter = new AtomicInteger(0)
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final def thread = start {
-      enhance(delegate, counter, latch)
-      counter.incrementAndGet()
-      if (true) throw new RuntimeException('test')
+        final def thread = start {
+            enhance(delegate, counter, latch)
+            counter.incrementAndGet()
+            if (true) throw new RuntimeException('test')
+        }
+        latch.await()
+        assertEquals 3, counter.get()
     }
-    latch.await()
-    assertEquals 3, counter.get()
-  }
 
-  public void testTimeoutLifeCycle() {
-    AtomicInteger counter = new AtomicInteger(0)
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testTimeoutLifeCycle() {
+        AtomicInteger counter = new AtomicInteger(0)
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final def thread = start {
-      enhance(delegate, counter, latch)
-      counter.incrementAndGet()
-      react(10.milliseconds) {}  //will timeout
+        final def thread = start {
+            enhance(delegate, counter, latch)
+            counter.incrementAndGet()
+            react(10.milliseconds) {}  //will timeout
+        }
+        latch.await()
+        assertEquals 3, counter.get()
     }
-    latch.await()
-    assertEquals 3, counter.get()
-  }
 
-  private void enhance(final AbstractPooledActor thread, final AtomicInteger counter, final CountDownLatch latch) {
+    private void enhance(final AbstractPooledActor thread, final AtomicInteger counter, final CountDownLatch latch) {
 
-    thread.metaClass {
-      afterStart = {->  //won't be called
-        counter.incrementAndGet()
-      }
+        thread.metaClass {
+            afterStart = {->  //won't be called
+                counter.incrementAndGet()
+            }
 
-      afterStop = {List undeliveredMessages ->
-        counter.incrementAndGet()
-        latch.countDown()
-      }
+            afterStop = {List undeliveredMessages ->
+                counter.incrementAndGet()
+                latch.countDown()
+            }
 
-      onInterrupt = {InterruptedException e ->
-        counter.incrementAndGet()
-      }
+            onInterrupt = {InterruptedException e ->
+                counter.incrementAndGet()
+            }
 
-      onTimeout = {->
-        counter.incrementAndGet()
-      }
+            onTimeout = {->
+                counter.incrementAndGet()
+            }
 
-      onException = {Exception e ->
-        counter.incrementAndGet()
-      }
+            onException = {Exception e ->
+                counter.incrementAndGet()
+            }
+        }
     }
-  }
 
 }

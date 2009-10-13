@@ -16,57 +16,57 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.dataflow.DataFlowVariable
+import java.util.concurrent.CountDownLatch
 import static groovyx.gpars.actor.Actors.actor
 
 public class NullMessageTest extends GroovyTestCase {
-  public void testNullMesage() {
-    volatile def result = ''
-    final def latch = new CountDownLatch(1)
-    final AbstractPooledActor actor = actor {
-      react {
-        result = it
-        latch.countDown()
-      }
-    }.start()
-    actor << null
-    latch.await()
-    assertNull result
-  }
+    public void testNullMesage() {
+        volatile def result = ''
+        final def latch = new CountDownLatch(1)
+        final AbstractPooledActor actor = actor {
+            react {
+                result = it
+                latch.countDown()
+            }
+        }.start()
+        actor << null
+        latch.await()
+        assertNull result
+    }
 
-  public void testNullMesageFromActor() {
-    volatile def result = ''
-    final def latch = new CountDownLatch(1)
-    final AbstractPooledActor actor = actor {
-      react {
-        result = it
-        latch.countDown()
-      }
-    }.start()
-    Actors.actor {
-      actor << null
-      latch.await()
-    }.start()
-    latch.await()
-    assertNull result
-  }
+    public void testNullMesageFromActor() {
+        volatile def result = ''
+        final def latch = new CountDownLatch(1)
+        final AbstractPooledActor actor = actor {
+            react {
+                result = it
+                latch.countDown()
+            }
+        }.start()
+        Actors.actor {
+            actor << null
+            latch.await()
+        }.start()
+        latch.await()
+        assertNull result
+    }
 
-  public void testNullMesageFromActorWithReply() {
-    final def result = new DataFlowVariable()
-    final AbstractPooledActor actor = actor {
-      react {
-        reply 10
-      }
-    }.start()
-    Actors.actor {
-      actor << null
-      react {
-        result << it
-      }
-    }.start()
-    assertEquals 10, result.val
-  }
+    public void testNullMesageFromActorWithReply() {
+        final def result = new DataFlowVariable()
+        final AbstractPooledActor actor = actor {
+            react {
+                reply 10
+            }
+        }.start()
+        Actors.actor {
+            actor << null
+            react {
+                result << it
+            }
+        }.start()
+        assertEquals 10, result.val
+    }
 }

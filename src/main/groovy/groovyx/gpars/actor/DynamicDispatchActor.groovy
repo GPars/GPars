@@ -17,8 +17,8 @@
 package groovyx.gpars.actor
 
 import groovyx.gpars.actor.impl.AbstractPooledActor
-import org.codehaus.groovy.runtime.NullObject
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
+import org.codehaus.groovy.runtime.NullObject
 
 /**
  * A pooled actor allowing for an alternative structure of the message handling code.
@@ -39,40 +39,40 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
 
 public class DynamicDispatchActor extends AbstractPooledActor {
 
-  /**
-   * Creates a new instance without any when handlers registered
-   */
-  DynamicDispatchActor() {
-    this(null)
-  }
-
-  /**
-   * Creates an instance, processing all when{} calls in the supplied closure
-   * @param closure A closure to run against te actor, typically to register handlers
-   */
-  DynamicDispatchActor(Closure closure) {
-    if (closure) {
-      Closure cloned = (Closure) closure.clone()
-      cloned.resolveStrategy = Closure.DELEGATE_FIRST
-      cloned.delegate = this
-      cloned.call()
+    /**
+     * Creates a new instance without any when handlers registered
+     */
+    DynamicDispatchActor() {
+        this(null)
     }
-  }
 
-  /**
-   * Loops reading messages using the react() method and dispatches to the corresponding onMessage() method.
-   */
-  final void act() {
-    loop {
-      react {msg ->
-        if (msg == null)
-          msg = NullObject.nullObject
-        onMessage msg
-      }
+    /**
+     * Creates an instance, processing all when{} calls in the supplied closure
+     * @param closure A closure to run against te actor, typically to register handlers
+     */
+    DynamicDispatchActor(Closure closure) {
+        if (closure) {
+            Closure cloned = (Closure) closure.clone()
+            cloned.resolveStrategy = Closure.DELEGATE_FIRST
+            cloned.delegate = this
+            cloned.call()
+        }
     }
-  }
 
-  void when(Closure closure) {
-    DefaultGroovyMethods.getMetaClass(this).onMessage closure
-  }
+    /**
+     * Loops reading messages using the react() method and dispatches to the corresponding onMessage() method.
+     */
+    final void act() {
+        loop {
+            react {msg ->
+                if (msg == null)
+                    msg = NullObject.nullObject
+                onMessage msg
+            }
+        }
+    }
+
+    void when(Closure closure) {
+        DefaultGroovyMethods.getMetaClass(this).onMessage closure
+    }
 }

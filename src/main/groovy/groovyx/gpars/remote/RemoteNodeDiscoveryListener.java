@@ -22,34 +22,34 @@ import groovy.lang.Closure;
  * Listener for remote node events
  */
 public class RemoteNodeDiscoveryListener {
-  public void onConnect(RemoteNode node) {
-  }
-
-  public void onDisconnect(RemoteNode node) {
-  }
-
-  /**
-   * Discovery listener backed by closure with two params
-   * - node
-   * - "connected" | "disconnected"
-   *
-   * @author Alex Tkachman
-   */
-  public static class RemoteNodeDiscoveryListenerClosure extends RemoteNodeDiscoveryListener {
-    private final Closure closure;
-
-    public RemoteNodeDiscoveryListenerClosure(Closure closure) {
-      this.closure = (Closure) closure.clone();
-    }
-
-    @Override
     public void onConnect(RemoteNode node) {
-      closure.call(new Object[]{node, "connected"});
     }
 
-    @Override
     public void onDisconnect(RemoteNode node) {
-      closure.call(new Object[]{node, "disconnected"});
     }
-  }
+
+    /**
+     * Discovery listener backed by closure with two params
+     * - node
+     * - "connected" | "disconnected"
+     *
+     * @author Alex Tkachman
+     */
+    public static class RemoteNodeDiscoveryListenerClosure extends RemoteNodeDiscoveryListener {
+        private final Closure closure;
+
+        public RemoteNodeDiscoveryListenerClosure(Closure closure) {
+            this.closure = (Closure) closure.clone();
+        }
+
+        @Override
+        public void onConnect(RemoteNode node) {
+            closure.call(new Object[]{node, "connected"});
+        }
+
+        @Override
+        public void onDisconnect(RemoteNode node) {
+            closure.call(new Object[]{node, "disconnected"});
+        }
+    }
 }

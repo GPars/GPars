@@ -39,11 +39,11 @@ def judge = actor {
 }.start()
 
 def typist1 = actor {
-  judge.send 'This is how much I can type in 10 secon'
+    judge.send 'This is how much I can type in 10 secon'
 }.start()
 
 def typist2 = actor {
-  judge.send 'This is how much I can type in 10 seconds. I\'ve practised a lot over night.'
+    judge.send 'This is how much I can type in 10 seconds. I\'ve practised a lot over night.'
 }.start()
 
 judge.join()

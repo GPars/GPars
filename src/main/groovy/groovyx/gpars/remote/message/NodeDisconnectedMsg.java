@@ -29,18 +29,18 @@ import java.util.UUID;
  */
 public class NodeDisconnectedMsg extends SerialMsg {
 
-  /**
-   * Id of node disconnected
-   */
-  public final UUID nodeId;
+    /**
+     * Id of node disconnected
+     */
+    public final UUID nodeId;
 
-  public NodeDisconnectedMsg(LocalNode node) {
-    super();
-    nodeId = node.getId();
-  }
+    public NodeDisconnectedMsg(LocalNode node) {
+        super();
+        nodeId = node.getId();
+    }
 
-  @Override
-  public void execute(RemoteConnection conn) {
-    conn.getHost().getLocalHost().disconnectRemoteNode(nodeId);
-  }
+    @Override
+    public void execute(RemoteConnection conn) {
+        conn.getHost().getLocalHost().disconnectRemoteNode(nodeId);
+    }
 }

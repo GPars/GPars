@@ -9,43 +9,43 @@ import groovyx.gpars.serial.SerialMsg;
  * @author Alex Tkachman
  */
 public abstract class RemoteConnection {
-  private final LocalHost localHost;
+    private final LocalHost localHost;
 
-  private RemoteHost host;
+    private RemoteHost host;
 
-  public RemoteConnection(LocalHost provider) {
-    this.localHost = provider;
-  }
-
-  public void onMessage(SerialMsg msg) {
-    if (host == null) {
-      final HostIdMsg idMsg = (HostIdMsg) msg;
-      host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
-    } else {
-      throw new IllegalStateException("Unexpected message: " + msg);
+    public RemoteConnection(LocalHost provider) {
+        this.localHost = provider;
     }
-  }
 
-  public void onException(Throwable cause) {
-  }
+    public void onMessage(SerialMsg msg) {
+        if (host == null) {
+            final HostIdMsg idMsg = (HostIdMsg) msg;
+            host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
+        } else {
+            throw new IllegalStateException("Unexpected message: " + msg);
+        }
+    }
 
-  public void onConnect() {
-    write(new HostIdMsg(localHost.getId()));
-  }
+    public void onException(Throwable cause) {
+    }
 
-  public void onDisconnect() {
-    localHost.onDisconnect(host);
-  }
+    public void onConnect() {
+        write(new HostIdMsg(localHost.getId()));
+    }
 
-  public abstract void write(SerialMsg msg);
+    public void onDisconnect() {
+        localHost.onDisconnect(host);
+    }
 
-  public RemoteHost getHost() {
-    return host;
-  }
+    public abstract void write(SerialMsg msg);
 
-  public void setHost(RemoteHost host) {
-    this.host = host;
-  }
+    public RemoteHost getHost() {
+        return host;
+    }
 
-  public abstract void disconnect();
+    public void setHost(RemoteHost host) {
+        this.host = host;
+    }
+
+    public abstract void disconnect();
 }

@@ -25,18 +25,18 @@ import groovyx.gpars.Asynchronizer
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 Asynchronizer.withAsynchronizer {
-  println list.collectParallel {it * 2 }
+    println list.collectParallel {it * 2 }
 
-  list.iterator().eachParallel {
-    println it
-  }
+    list.iterator().eachParallel {
+        println it
+    }
 
-  if (list.allParallel {it < 10 }) println 'The list contains only small numbers.'
+    if (list.allParallel {it < 10 }) println 'The list contains only small numbers.'
 
-  final String text = 'want to be big'
-  println((text.collectParallel {it.toUpperCase()}).join())
+    final String text = 'want to be big'
+    println((text.collectParallel {it.toUpperCase()}).join())
 
-  def animals = ['dog', 'ant', 'cat', 'whale']
-  println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-  println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+    def animals = ['dog', 'ant', 'cat', 'whale']
+    println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+    println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 }

@@ -30,25 +30,25 @@ import java.util.concurrent.Semaphore
  */
 public class EnhancedSemaphore extends Semaphore {
 
-  /**
-   * Creates a new EnhancedSemaphore, delegating to the Semaphore class constructor.
-   * @param permits Maximum number of concurrently accepted threads.
-   */
-  def EnhancedSemaphore(final int permits) {
-    super(permits);
-  }
-
-  /**
-   * Performs the passed-in closure with the Semaphore acquired and releases the Semaphore automatically
-   * after the closure finishes.
-   * @param cl The closure to perform with the Semaphore acquired
-   */
-  public void withSemaphore(Closure cl) {
-    acquire()
-    try {
-      cl.call()
-    } finally {
-      release()
+    /**
+     * Creates a new EnhancedSemaphore, delegating to the Semaphore class constructor.
+     * @param permits Maximum number of concurrently accepted threads.
+     */
+    def EnhancedSemaphore(final int permits) {
+        super(permits);
     }
-  }
+
+    /**
+     * Performs the passed-in closure with the Semaphore acquired and releases the Semaphore automatically
+     * after the closure finishes.
+     * @param cl The closure to perform with the Semaphore acquired
+     */
+    public void withSemaphore(Closure cl) {
+        acquire()
+        try {
+            cl.call()
+        } finally {
+            release()
+        }
+    }
 }

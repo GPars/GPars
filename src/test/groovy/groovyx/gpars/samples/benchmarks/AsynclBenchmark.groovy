@@ -38,41 +38,41 @@ time = meassureParallelizer(numOfIterations, items)
 println "Parallelizer $time"
 
 long meassureSequential(iterations, List list) {
-  final long t1 = System.currentTimeMillis()
-  for (i in iterations) {
-    int result
-    list.each {result = it}
-    def elements = list.collect {it}
-    result = elements[-1]
-  }
-  final long t2 = System.currentTimeMillis()
-  return t2 - t1
+    final long t1 = System.currentTimeMillis()
+    for (i in iterations) {
+        int result
+        list.each {result = it}
+        def elements = list.collect {it}
+        result = elements[-1]
+    }
+    final long t2 = System.currentTimeMillis()
+    return t2 - t1
 }
 
 long meassureAsynchronizer(iterations, List list) {
-  final long t1 = System.currentTimeMillis()
-  Asynchronizer.withAsynchronizer(30) {
-    for (i in iterations) {
-      int result
-      list.eachParallel {result = it}
-      def elements = list.collectParallel {it}
-      result = elements[-1]
+    final long t1 = System.currentTimeMillis()
+    Asynchronizer.withAsynchronizer(30) {
+        for (i in iterations) {
+            int result
+            list.eachParallel {result = it}
+            def elements = list.collectParallel {it}
+            result = elements[-1]
+        }
     }
-  }
-  final long t2 = System.currentTimeMillis()
-  return t2 - t1
+    final long t2 = System.currentTimeMillis()
+    return t2 - t1
 }
 
 long meassureParallelizer(iterations, List list) {
-  final long t1 = System.currentTimeMillis()
-  Parallelizer.withParallelizer(30) {
-    for (i in iterations) {
-      int result
-      list.eachParallel {result = it}
-      def elements = list.collectParallel {it}
-      result = elements[-1]
+    final long t1 = System.currentTimeMillis()
+    Parallelizer.withParallelizer(30) {
+        for (i in iterations) {
+            int result
+            list.eachParallel {result = it}
+            def elements = list.collectParallel {it}
+            result = elements[-1]
+        }
     }
-  }
-  final long t2 = System.currentTimeMillis()
-  return t2 - t1
+    final long t2 = System.currentTimeMillis()
+    return t2 - t1
 }

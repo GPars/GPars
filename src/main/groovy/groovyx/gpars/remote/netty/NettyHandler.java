@@ -26,45 +26,45 @@ import org.jboss.netty.channel.*;
 @ChannelPipelineCoverage("one")
 public class NettyHandler extends SimpleChannelHandler {
 
-  private Channel channel;
+    private Channel channel;
 
-  private final RemoteConnection connection;
+    private final RemoteConnection connection;
 
-  public NettyHandler(NettyTransportProvider provider) {
-    connection = new NettyRemoteConnection(provider, this);
-  }
+    public NettyHandler(NettyTransportProvider provider) {
+        connection = new NettyRemoteConnection(provider, this);
+    }
 
-  @Override
-  public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-    channel = e.getChannel();
-    channel.getPipeline().addFirst("encoder", new RemoteObjectEncoder(connection));
-    channel.getPipeline().addFirst("decoder", new RemoteObjectDecoder(connection));
-  }
+    @Override
+    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        channel = e.getChannel();
+        channel.getPipeline().addFirst("encoder", new RemoteObjectEncoder(connection));
+        channel.getPipeline().addFirst("decoder", new RemoteObjectDecoder(connection));
+    }
 
-  @Override
-  public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-    connection.onConnect();
-  }
+    @Override
+    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        connection.onConnect();
+    }
 
-  @Override
-  public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-    connection.onDisconnect();
-  }
+    @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        connection.onDisconnect();
+    }
 
-  @Override
-  public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-    final SerialMsg msg = (SerialMsg) e.getMessage();
-    msg.execute(connection);
-  }
+    @Override
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+        final SerialMsg msg = (SerialMsg) e.getMessage();
+        msg.execute(connection);
+    }
 
-  @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-    //noinspection ThrowableResultOfMethodCallIgnored
-    connection.onException(e.getCause());
-    e.getCause().printStackTrace();
-  }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+        //noinspection ThrowableResultOfMethodCallIgnored
+        connection.onException(e.getCause());
+        e.getCause().printStackTrace();
+    }
 
-  public Channel getChannel() {
-    return channel;
-  }
+    public Channel getChannel() {
+        return channel;
+    }
 }

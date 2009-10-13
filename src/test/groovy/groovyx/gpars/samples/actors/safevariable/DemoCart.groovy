@@ -20,33 +20,33 @@ import groovyx.gpars.actor.Safe
 
 class ShoppingCart {
 
-  private def cartState = new Safe<Map<String, Integer>>([:])
+    private def cartState = new Safe<Map<String, Integer>>([:])
 
-  public void addItem(String product, int quantity) {
-    cartState << {it[product] = quantity}
-  }
+    public void addItem(String product, int quantity) {
+        cartState << {it[product] = quantity}
+    }
 
-  public void removeItem(String product) {
-    cartState << {it.remove(product)}
-  }
+    public void removeItem(String product) {
+        cartState << {it.remove(product)}
+    }
 
-  public Object listContent() {
-    return cartState.val
-  }
+    public Object listContent() {
+        return cartState.val
+    }
 
-  public void increaseQuantity(String product, int quantityChange) {
-    cartState << this.&changeQuantity.curry(product, quantityChange)
-  }
+    public void increaseQuantity(String product, int quantityChange) {
+        cartState << this.&changeQuantity.curry(product, quantityChange)
+    }
 
-  public void clearItems() {
-    cartState << performClear
-  }
+    public void clearItems() {
+        cartState << performClear
+    }
 
-  private void changeQuantity(String product, int quantityChange, Map items) {
-    items[product] = (items[product] ?: 0) + quantityChange
-  }
+    private void changeQuantity(String product, int quantityChange, Map items) {
+        items[product] = (items[product] ?: 0) + quantityChange
+    }
 
-  private Closure performClear = { it.clear() }
+    private Closure performClear = { it.clear() }
 }
 
 final ShoppingCart cart = new ShoppingCart()

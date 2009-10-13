@@ -32,150 +32,150 @@ import groovyx.gpars.scheduler.Pool
  */
 public final class AsyncEnhancer {
 
-  /**
-   * Holds the internal ExecutorService instance wrapped into a DefaultPool
-   */
-  @SuppressWarnings("GroovyConstantNamingConvention")
-  private final static DefaultPool threadPool = new DefaultPool(true)
+    /**
+     * Holds the internal ExecutorService instance wrapped into a DefaultPool
+     */
+    @SuppressWarnings("GroovyConstantNamingConvention")
+    private final static DefaultPool threadPool = new DefaultPool(true)
 
-  /**
-   * Enhances a single instance by mixing-in an instance of AsyncEnhancer.
-   */
-  public static void enhanceInstance(Object collection) {
-    //noinspection GroovyGetterCallCanBePropertyAccess
-    collection.getMetaClass().mixin AsyncEnhancer
-  }
-
-  /**
-   * Enhances a class and so all instances created in the future by mixing-in an instance of AsyncEnhancer.
-   * Enhancing classes needs to be done with caution, since it may have impact in unrelated parts of the application.
-   */
-  public static void enhanceClass(Class clazz) {
-    //noinspection GroovyGetterCallCanBePropertyAccess
-    clazz.getMetaClass().mixin AsyncEnhancer
-  }
-
-  /**
-   * Retrieves the underlying pool
-   */
-  public Pool getThreadPool() { return threadPool }
-
-  /**
-   * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure
-   * to evaluate each collection's element. A CountDownLatch is used to make the calling thread wait for all the results.
-   * After this method returns, all the closures have been finished and all the potential shared resources have been updated
-   * by the threads.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public def eachParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.eachParallel(mixedIn[Object], cl)
+    /**
+     * Enhances a single instance by mixing-in an instance of AsyncEnhancer.
+     */
+    public static void enhanceInstance(Object collection) {
+        //noinspection GroovyGetterCallCanBePropertyAccess
+        collection.getMetaClass().mixin AsyncEnhancer
     }
-  }
 
-  /**
-   * Iterates over a collection/object with the <i>eachWithIndex()</i> method using an asynchronous variant of the supplied closure
-   * to evaluate each collection's element. A CountDownLatch is used to make the calling thread wait for all the results.
-   * After this method returns, all the closures have been finished and all the potential shared resources have been updated
-   * by the threads.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public def eachWithIndexParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.eachWithIndexParallel(mixedIn[Object], cl)
+    /**
+     * Enhances a class and so all instances created in the future by mixing-in an instance of AsyncEnhancer.
+     * Enhancing classes needs to be done with caution, since it may have impact in unrelated parts of the application.
+     */
+    public static void enhanceClass(Class clazz) {
+        //noinspection GroovyGetterCallCanBePropertyAccess
+        clazz.getMetaClass().mixin AsyncEnhancer
     }
-  }
 
-  /**
-   * Iterates over a collection/object with the <i>collect()</i> method using an asynchronous variant of the supplied closure
-   * to evaluate each collection's element.
-   * After this method returns, all the closures have been finished and the caller can safely use the result.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public def collectParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.collectParallel(mixedIn[Object], cl)
-    }
-  }
+    /**
+     * Retrieves the underlying pool
+     */
+    public Pool getThreadPool() { return threadPool }
 
-  /**
-   * Performs the <i>findAll()</i> operation using an asynchronous variant of the supplied closure
-   * to evaluate each collection's/object's element.
-   * After this method returns, all the closures have been finished and the caller can safely use the result.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public def findAllParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.findAllParallel(mixedIn[Object], cl)
+    /**
+     * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure
+     * to evaluate each collection's element. A CountDownLatch is used to make the calling thread wait for all the results.
+     * After this method returns, all the closures have been finished and all the potential shared resources have been updated
+     * by the threads.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def eachParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.eachParallel(mixedIn[Object], cl)
+        }
     }
-  }
 
-  /**
-   * Performs the <i>grep()()</i> operation using an asynchronous variant of the supplied closure
-   * to evaluate each collection's/object's element.
-   * After this method returns, all the closures have been finished and the caller can safely use the result.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public def grepParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.grepParallel(mixedIn[Object], cl)
+    /**
+     * Iterates over a collection/object with the <i>eachWithIndex()</i> method using an asynchronous variant of the supplied closure
+     * to evaluate each collection's element. A CountDownLatch is used to make the calling thread wait for all the results.
+     * After this method returns, all the closures have been finished and all the potential shared resources have been updated
+     * by the threads.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def eachWithIndexParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.eachWithIndexParallel(mixedIn[Object], cl)
+        }
     }
-  }
 
-  /**
-   * Performs the <i>find()</i> operation using an asynchronous variant of the supplied closure
-   * to evaluate each collection's/object's element.
-   * After this method returns, all the closures have been finished and the caller can safely use the result.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public def findParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.findParallel(mixedIn[Object], cl)
+    /**
+     * Iterates over a collection/object with the <i>collect()</i> method using an asynchronous variant of the supplied closure
+     * to evaluate each collection's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def collectParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.collectParallel(mixedIn[Object], cl)
+        }
     }
-  }
 
-  /**
-   * Performs the <i>all()</i> operation using an asynchronous variant of the supplied closure
-   * to evaluate each collection's/object's element.
-   * After this method returns, all the closures have been finished and the caller can safely use the result.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public boolean allParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.allParallel(mixedIn[Object], cl)
+    /**
+     * Performs the <i>findAll()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def findAllParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.findAllParallel(mixedIn[Object], cl)
+        }
     }
-  }
 
-  /**
-   * Performs the <i>any()</i> operation using an asynchronous variant of the supplied closure
-   * to evaluate each collection's/object's element.
-   * After this method returns, all the closures have been finished and the caller can safely use the result.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public boolean anyParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.anyParallel(mixedIn[Object], cl)
+    /**
+     * Performs the <i>grep()()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def grepParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.grepParallel(mixedIn[Object], cl)
+        }
     }
-  }
 
-  /**
-   * Performs the <i>groupBy()</i> operation using an asynchronous variant of the supplied closure
-   * to evaluate each collection's/object's element.
-   * After this method returns, all the closures have been finished and the caller can safely use the result.
-   * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-   * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-   */
-  public def groupByParallel(Closure cl) {
-    Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-      AsyncInvokerUtil.groupByParallel(mixedIn[Object], cl)
+    /**
+     * Performs the <i>find()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def findParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.findParallel(mixedIn[Object], cl)
+        }
     }
-  }
+
+    /**
+     * Performs the <i>all()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public boolean allParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.allParallel(mixedIn[Object], cl)
+        }
+    }
+
+    /**
+     * Performs the <i>any()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public boolean anyParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.anyParallel(mixedIn[Object], cl)
+        }
+    }
+
+    /**
+     * Performs the <i>groupBy()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public def groupByParallel(Closure cl) {
+        Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
+            AsyncInvokerUtil.groupByParallel(mixedIn[Object], cl)
+        }
+    }
 }

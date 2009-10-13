@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * Shows actor solution to The Dining Philosophers problem
@@ -26,65 +26,65 @@ import groovyx.gpars.actor.Actors
 Actors.defaultPooledActorGroup.resize 5
 
 final class Philosopher extends AbstractPooledActor {
-  private Random random = new Random()
+    private Random random = new Random()
 
-  String name
-  def forks = []
+    String name
+    def forks = []
 
-  void act() {
-    assert 2 == forks.size()
-    loop {
-      think()
-      forks*.send new Take()
-      react {a, b ->
-        if ([a, b].any {Rejected.isCase it}) {
-          println "$name: \tOops, can't get my forks! Giving up."
-          [a, b].find {Accepted.isCase it}?.reply new Finished()
-        } else {
-          eat()
-          reply new Finished()
+    void act() {
+        assert 2 == forks.size()
+        loop {
+            think()
+            forks*.send new Take()
+            react {a, b ->
+                if ([a, b].any {Rejected.isCase it}) {
+                    println "$name: \tOops, can't get my forks! Giving up."
+                    [a, b].find {Accepted.isCase it}?.reply new Finished()
+                } else {
+                    eat()
+                    reply new Finished()
+                }
+            }
         }
-      }
     }
-  }
 
-  void think() {
-    println "$name: \tI'm thinking"
-    Thread.sleep random.nextInt(5000)
-    println "$name: \tI'm done thinking"
-  }
+    void think() {
+        println "$name: \tI'm thinking"
+        Thread.sleep random.nextInt(5000)
+        println "$name: \tI'm done thinking"
+    }
 
-  void eat() {
-    println "$name: \tI'm EATING"
-    Thread.sleep random.nextInt(2000)
-    println "$name: \tI'm done EATING"
-  }
+    void eat() {
+        println "$name: \tI'm EATING"
+        Thread.sleep random.nextInt(2000)
+        println "$name: \tI'm done EATING"
+    }
 }
 
 final class Fork extends AbstractPooledActor {
 
-  String name
-  boolean available = true
+    String name
+    boolean available = true
 
-  void act() {
-    loop {
-      react {message ->
-        switch (message) {
-          case Take:
-            if (available) {
-              available = false
-              reply new Accepted()
-            } else reply new Rejected()
-            break
-          case Finished:
-            assert !available
-            available = true
-            break
-          default: throw new IllegalStateException("Cannot process the message: $message")
+    void act() {
+        loop {
+            react {message ->
+                switch (message) {
+                    case Take:
+                        if (available) {
+                            available = false
+                            reply new Accepted()
+                        } else reply new Rejected()
+                        break
+                    case Finished:
+                        assert !available
+                        available = true
+                        break
+                    default: throw new IllegalStateException("Cannot process the message: $message")
+                }
+            }
         }
-      }
     }
-  }
 }
 
 final class Take {}

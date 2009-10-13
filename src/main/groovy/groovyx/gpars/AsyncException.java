@@ -26,36 +26,36 @@ import java.util.List;
  * @see AsyncInvokerUtil
  */
 public final class AsyncException extends RuntimeException {
-  private final List<Throwable> concurrentExceptions;
+    private final List<Throwable> concurrentExceptions;
 
-  public AsyncException(final String message, final List<Throwable> concurrentExceptions) {
-    super(message);
-    this.concurrentExceptions = concurrentExceptions;
-  }
-
-  public List<Throwable> getConcurrentExceptions() {
-    return concurrentExceptions;
-  }
-
-  @Override
-  public String getMessage() {
-    return super.getMessage() + ' ' + buildMessage();
-  }
-
-  @Override
-  public String toString() {
-    return buildMessage();
-  }
-
-  @SuppressWarnings({"StringBufferWithoutInitialCapacity"})
-  private String buildMessage() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("AsyncException");
-    sb.append("{concurrentExceptions=").append("[\n");
-    for (final Throwable cuncurrentException : concurrentExceptions) {
-      sb.append(cuncurrentException.toString()).append('\n');
+    public AsyncException(final String message, final List<Throwable> concurrentExceptions) {
+        super(message);
+        this.concurrentExceptions = concurrentExceptions;
     }
-    sb.append("]}");
-    return sb.toString();
-  }
+
+    public List<Throwable> getConcurrentExceptions() {
+        return concurrentExceptions;
+    }
+
+    @Override
+    public String getMessage() {
+        return super.getMessage() + ' ' + buildMessage();
+    }
+
+    @Override
+    public String toString() {
+        return buildMessage();
+    }
+
+    @SuppressWarnings({"StringBufferWithoutInitialCapacity"})
+    private String buildMessage() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("AsyncException");
+        sb.append("{concurrentExceptions=").append("[\n");
+        for (final Throwable cuncurrentException : concurrentExceptions) {
+            sb.append(cuncurrentException.toString()).append('\n');
+        }
+        sb.append("]}");
+        return sb.toString();
+    }
 }

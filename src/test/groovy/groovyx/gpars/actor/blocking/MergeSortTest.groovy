@@ -16,11 +16,11 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.scheduler.ResizablePool
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -29,72 +29,72 @@ import groovyx.gpars.scheduler.ResizablePool
  */
 public class MergeSortTest extends GroovyTestCase {
 
-  private def split(List<Integer> list) {
-    int listSize = list.size()
-    int middleIndex = listSize / 2
-    def list1 = list[0..<middleIndex]
-    def list2 = list[middleIndex..listSize - 1]
-    return [list1, list2]
-  }
-
-  private List<Integer> merge(List<Integer> a, List<Integer> b) {
-    int i = 0, j = 0
-    final int newSize = a.size() + b.size()
-    List<Integer> result = new ArrayList<Integer>(newSize)
-
-    while ((i < a.size()) && (j < b.size())) {
-      if (a[i] <= b[j]) result << a[i++]
-      else result << b[j++]
+    private def split(List<Integer> list) {
+        int listSize = list.size()
+        int middleIndex = listSize / 2
+        def list1 = list[0..<middleIndex]
+        def list2 = list[middleIndex..listSize - 1]
+        return [list1, list2]
     }
 
-    if (i < a.size()) result.addAll(a[i..-1])
-    else result.addAll(b[j..-1])
-    return result
-  }
+    private List<Integer> merge(List<Integer> a, List<Integer> b) {
+        int i = 0, j = 0
+        final int newSize = a.size() + b.size()
+        List<Integer> result = new ArrayList<Integer>(newSize)
 
-  def group = new PooledActorGroup(new ResizablePool(false, 50))
-
-  Closure createMessageHandler(def parentActor) {
-    return {
-      receive {List<Integer> message ->
-        assert message != null
-        switch (message.size()) {
-          case 0..1:
-            parentActor.send(message)
-            break
-          case 2:
-            if (message[0] <= message[1]) parentActor.send(message)
-            else parentActor.send(message[-1..0])
-
-            break
-          default:
-            def splitList = split(message)
-
-            def child1 = group.actor(createMessageHandler(delegate))
-            def child2 = group.actor(createMessageHandler(delegate))
-            child1.start().send(splitList[0])
-            child2.start().send(splitList[1])
-
-            parentActor.send merge(receive(), receive())
+        while ((i < a.size()) && (j < b.size())) {
+            if (a[i] <= b[j]) result << a[i++]
+            else result << b[j++]
         }
-      }
+
+        if (i < a.size()) result.addAll(a[i..-1])
+        else result.addAll(b[j..-1])
+        return result
     }
 
-  }
+    def group = new PooledActorGroup(new ResizablePool(false, 50))
 
-  public void testDefaultMergeSort() {
-    volatile def result = null;
-    final CountDownLatch latch = new CountDownLatch(1)
+    Closure createMessageHandler(def parentActor) {
+        return {
+            receive {List<Integer> message ->
+                assert message != null
+                switch (message.size()) {
+                    case 0..1:
+                        parentActor.send(message)
+                        break
+                    case 2:
+                        if (message[0] <= message[1]) parentActor.send(message)
+                        else parentActor.send(message[-1..0])
 
-    def resultActor = Actors.actor {
-      result = receive(30, TimeUnit.SECONDS)
-      latch.countDown()
-    }.start()
+                        break
+                    default:
+                        def splitList = split(message)
 
-    def sorter = Actors.actor(createMessageHandler(resultActor))
-    sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+                        def child1 = group.actor(createMessageHandler(delegate))
+                        def child2 = group.actor(createMessageHandler(delegate))
+                        child1.start().send(splitList[0])
+                        child2.start().send(splitList[1])
 
-    latch.await(30, TimeUnit.SECONDS)
-    assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
-  }
+                        parentActor.send merge(receive(), receive())
+                }
+            }
+        }
+
+    }
+
+    public void testDefaultMergeSort() {
+        volatile def result = null;
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        def resultActor = Actors.actor {
+            result = receive(30, TimeUnit.SECONDS)
+            latch.countDown()
+        }.start()
+
+        def sorter = Actors.actor(createMessageHandler(resultActor))
+        sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+
+        latch.await(30, TimeUnit.SECONDS)
+        assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
+    }
 }

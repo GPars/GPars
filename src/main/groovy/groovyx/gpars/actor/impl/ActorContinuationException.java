@@ -25,6 +25,6 @@ package groovyx.gpars.actor.impl;
  */
 final class ActorContinuationException extends ActorException {
 
-  ActorContinuationException() {
-  }
+    ActorContinuationException() {
+    }
 }

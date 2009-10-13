@@ -9,16 +9,16 @@ package groovyx.gpars.issues
  */
 
 class FailingA {
-  protected void act() {
-    throw new UnsupportedOperationException()
-  }
+    protected void act() {
+        throw new UnsupportedOperationException()
+    }
 }
 
 //@Immutable
 final class FailingB extends FailingA {
-  public void act() {
+    public void act() {
 
-  }
+    }
 }
 
 final def b = new FailingB()

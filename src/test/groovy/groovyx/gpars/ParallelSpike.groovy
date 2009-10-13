@@ -6,16 +6,16 @@ import groovyx.gpars.scheduler.FJPool
 // Author: Dierk Koenig
 
 class Parallel {
-  @Delegate adaptee
-  private final static FJPool threadPool = new FJPool()
+    @Delegate adaptee
+    private final static FJPool threadPool = new FJPool()
 
-  def each(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.eachParallel(yield) } }
+    def each(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.eachParallel(yield) } }
 
-  static void prepare(obj) {
-    obj.metaClass.getParallel = {->
-      new Parallel(adaptee: delegate)
+    static void prepare(obj) {
+        obj.metaClass.getParallel = {->
+            new Parallel(adaptee: delegate)
+        }
     }
-  }
 }
 
 // works on objects

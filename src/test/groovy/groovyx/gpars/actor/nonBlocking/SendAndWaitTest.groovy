@@ -16,216 +16,216 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.CyclicBarrier
-import java.util.concurrent.TimeUnit
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 public class SendAndWaitTest extends GroovyTestCase {
 
-  public void testSuccessfulMessages() {
-    CountDownLatch latch = new CountDownLatch(1)
+    public void testSuccessfulMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
 
-    final Actor actor = Actors.actor {
-      react {
-        reply 2
-      }
-    }
-
-    actor.metaClass.afterStop = {
-      latch.countDown()
-    }
-
-    actor.start()
-
-    def result = actor.sendAndWait(1)
-
-    latch.await()
-    assertEquals 2, result
-  }
-
-  public void testMessagesToStoppedActor() {
-    final CyclicBarrier barrier = new CyclicBarrier(2)
-
-    final Actor actor = Actors.actor {
-      react {
-        reply 2
-      }
-    }
-
-    actor.metaClass.afterStop = {
-      barrier.await()
-    }
-
-    actor.start()
-
-    def result = actor.sendAndWait(1)
-    barrier.await()
-    shouldFail(IllegalStateException) {
-      actor.sendAndWait 2
-    }
-
-    assertEquals 2, result
-  }
-
-  public void testFailedMessages() {
-    CountDownLatch latch = new CountDownLatch(1)
-    final CyclicBarrier barrier = new CyclicBarrier(2)
-
-    final Actor actor = Actors.actor {
-      react {
-        reply 2
-        barrier.await()
-        Thread.sleep 3000  //give the second message time to hit the queue
-      }
-    }
-
-    actor.metaClass.afterStop = {
-      latch.countDown()
-    }
-
-    actor.start()
-
-    def result = actor.sendAndWait(1)
-    barrier.await()
-    shouldFail(IllegalStateException) {
-      actor.sendAndWait 2
-    }
-
-    latch.await()
-    assertEquals 2, result
-  }
-
-  public void testFailedMessagesOnException() {
-    CountDownLatch latch = new CountDownLatch(1)
-    final CyclicBarrier barrier = new CyclicBarrier(2)
-
-    final Actor actor = Actors.actor {
-      react {
-        reply 2
-        barrier.await()
-        Thread.sleep 3000  //give the second message time to hit the queue
-        if (true) throw new RuntimeException('test')
-      }
-    }
-
-    actor.metaClass {
-      onException = {}
-      afterStop = {
-        latch.countDown()
-      }
-    }
-
-    actor.start()
-
-    def result = actor.sendAndWait(1)
-    barrier.await()
-    shouldFail(IllegalStateException) {
-      actor.sendAndWait 2
-    }
-
-    latch.await()
-    assertEquals 2, result
-  }
-
-  public void testTimeoutSuccessfulMessages() {
-    CountDownLatch latch = new CountDownLatch(1)
-    final CyclicBarrier barrier = new CyclicBarrier(2)
-
-    final Actor actor = Actors.actor {
-      barrier.await()
-      Thread.sleep 1000
-      react {
-        reply 2
-        react {
-          reply 4
+        final Actor actor = Actors.actor {
+            react {
+                reply 2
+            }
         }
-      }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
+
+        actor.start()
+
+        def result = actor.sendAndWait(1)
+
+        latch.await()
+        assertEquals 2, result
     }
 
-    actor.metaClass.afterStop = {
-      latch.countDown()
-    }
+    public void testMessagesToStoppedActor() {
+        final CyclicBarrier barrier = new CyclicBarrier(2)
 
-    actor.start()
+        final Actor actor = Actors.actor {
+            react {
+                reply 2
+            }
+        }
 
-    barrier.await()
-    def result1 = actor.sendAndWait(1, 5, TimeUnit.SECONDS)
-    def result2 = actor.sendAndWait(3, 5, TimeUnit.SECONDS)
+        actor.metaClass.afterStop = {
+            barrier.await()
+        }
 
-    latch.await()
-    assertEquals 2, result1
-    assertEquals 4, result2
-  }
+        actor.start()
 
-  public void testTimeoutMessages() {
-    CountDownLatch latch = new CountDownLatch(1)
-    final CyclicBarrier barrier = new CyclicBarrier(2)
-
-    final Actor actor = Actors.actor {
-      barrier.await()
-      react {
+        def result = actor.sendAndWait(1)
         barrier.await()
-      }
+        shouldFail(IllegalStateException) {
+            actor.sendAndWait 2
+        }
+
+        assertEquals 2, result
     }
 
-    actor.metaClass.afterStop = {
-      latch.countDown()
+    public void testFailedMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final Actor actor = Actors.actor {
+            react {
+                reply 2
+                barrier.await()
+                Thread.sleep 3000  //give the second message time to hit the queue
+            }
+        }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
+
+        actor.start()
+
+        def result = actor.sendAndWait(1)
+        barrier.await()
+        shouldFail(IllegalStateException) {
+            actor.sendAndWait 2
+        }
+
+        latch.await()
+        assertEquals 2, result
     }
 
-    actor.start()
+    public void testFailedMessagesOnException() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
 
-    barrier.await()
-    def result = actor.sendAndWait(1, 2, TimeUnit.SECONDS)
-    barrier.await()
+        final Actor actor = Actors.actor {
+            react {
+                reply 2
+                barrier.await()
+                Thread.sleep 3000  //give the second message time to hit the queue
+                if (true) throw new RuntimeException('test')
+            }
+        }
 
-    latch.await()
-    assertNull result
-  }
+        actor.metaClass {
+            onException = {}
+            afterStop = {
+                latch.countDown()
+            }
+        }
 
-  public void testTimeoutWithActorStopMessages() {
-    CountDownLatch latch = new CountDownLatch(1)
-    final CyclicBarrier barrier = new CyclicBarrier(2)
+        actor.start()
 
-    final Actor actor = Actors.actor {
-      barrier.await()
-      react { }
+        def result = actor.sendAndWait(1)
+        barrier.await()
+        shouldFail(IllegalStateException) {
+            actor.sendAndWait 2
+        }
+
+        latch.await()
+        assertEquals 2, result
     }
 
-    actor.metaClass.afterStop = {
-      latch.countDown()
+    public void testTimeoutSuccessfulMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
+        final Actor actor = Actors.actor {
+            barrier.await()
+            Thread.sleep 1000
+            react {
+                reply 2
+                react {
+                    reply 4
+                }
+            }
+        }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
+
+        actor.start()
+
+        barrier.await()
+        def result1 = actor.sendAndWait(1, 5, TimeUnit.SECONDS)
+        def result2 = actor.sendAndWait(3, 5, TimeUnit.SECONDS)
+
+        latch.await()
+        assertEquals 2, result1
+        assertEquals 4, result2
     }
 
-    actor.start()
+    public void testTimeoutMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
 
-    barrier.await()
-    def result = actor.sendAndWait(1, 2, TimeUnit.SECONDS)
+        final Actor actor = Actors.actor {
+            barrier.await()
+            react {
+                barrier.await()
+            }
+        }
 
-    latch.await()
-    assertNull result
-  }
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
 
-  public void testSuccessfulMessagesFromActor() {
-    CountDownLatch latch = new CountDownLatch(1)
+        actor.start()
 
-    final PooledActorGroup group = new PooledActorGroup(2)
+        barrier.await()
+        def result = actor.sendAndWait(1, 2, TimeUnit.SECONDS)
+        barrier.await()
 
-    final Actor actor = group.actor {
-      react {
-        reply 2
-      }
+        latch.await()
+        assertNull result
     }
-    actor.start()
 
-    volatile def result
-    group.actor {
-      result = actor.sendAndWait(1)
-      latch.countDown()
-    }.start()
+    public void testTimeoutWithActorStopMessages() {
+        CountDownLatch latch = new CountDownLatch(1)
+        final CyclicBarrier barrier = new CyclicBarrier(2)
 
-    latch.await()
-    assertEquals 2, result
-  }
+        final Actor actor = Actors.actor {
+            barrier.await()
+            react { }
+        }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
+
+        actor.start()
+
+        barrier.await()
+        def result = actor.sendAndWait(1, 2, TimeUnit.SECONDS)
+
+        latch.await()
+        assertNull result
+    }
+
+    public void testSuccessfulMessagesFromActor() {
+        CountDownLatch latch = new CountDownLatch(1)
+
+        final PooledActorGroup group = new PooledActorGroup(2)
+
+        final Actor actor = group.actor {
+            react {
+                reply 2
+            }
+        }
+        actor.start()
+
+        volatile def result
+        group.actor {
+            result = actor.sendAndWait(1)
+            latch.countDown()
+        }.start()
+
+        latch.await()
+        assertEquals 2, result
+    }
 }

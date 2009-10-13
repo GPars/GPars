@@ -16,11 +16,11 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.Actors
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import static groovyx.gpars.actor.Actors.actor
-import groovyx.gpars.actor.Actors
 
 /**
  *
@@ -29,91 +29,91 @@ import groovyx.gpars.actor.Actors
  */
 public class TimeoutTest extends GroovyTestCase {
 
-  protected void setUp() {
-    super.setUp();
-    Actors.defaultPooledActorGroup.resize(5)
-  }
-
-  public void testTimeout() {
-    final def barrier = new CyclicBarrier(2)
-    final AtomicBoolean codeFlag = new AtomicBoolean(false)
-    final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
-
-    final def actor = actor {
-      loop {
-        react(1000) {
-          codeFlag.set(true)  //should never reach
-        }
-      }
-    }.start()
-
-    actor.metaClass {
-      onTimeout = {-> timeoutFlag.set(true) }
-      afterStop = {messages -> barrier.await() }
+    protected void setUp() {
+        super.setUp();
+        Actors.defaultPooledActorGroup.resize(5)
     }
 
-    barrier.await()
-    assertFalse codeFlag.get()
-    assert timeoutFlag.get()
-  }
+    public void testTimeout() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicBoolean codeFlag = new AtomicBoolean(false)
+        final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-  public void testMessageBeforeTimeout() {
-    final def barrier = new CyclicBarrier(2)
-    final AtomicBoolean codeFlag = new AtomicBoolean(false)
-    final AtomicBoolean nestedCodeFlag = new AtomicBoolean(false)
-    final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
+        final def actor = actor {
+            loop {
+                react(1000) {
+                    codeFlag.set(true)  //should never reach
+                }
+            }
+        }.start()
 
-    final def actor = actor {
-      loop {
+        actor.metaClass {
+            onTimeout = {-> timeoutFlag.set(true) }
+            afterStop = {messages -> barrier.await() }
+        }
+
         barrier.await()
-        react(5000) {
-          codeFlag.set(true)
-          react(1000) {
-            nestedCodeFlag.set(true)  //should never reach
-          }
-        }
-      }
-    }.start()
-
-    actor.metaClass {
-      onTimeout = {-> timeoutFlag.set(true) }
-      afterStop = {messages -> barrier.await() }
+        assertFalse codeFlag.get()
+        assert timeoutFlag.get()
     }
 
-    barrier.await()
-    actor.send 'message'
+    public void testMessageBeforeTimeout() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicBoolean codeFlag = new AtomicBoolean(false)
+        final AtomicBoolean nestedCodeFlag = new AtomicBoolean(false)
+        final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-    barrier.await()
-    assert codeFlag.get()
-    assertFalse nestedCodeFlag.get()
-    assert timeoutFlag.get()
-  }
+        final def actor = actor {
+            loop {
+                barrier.await()
+                react(5000) {
+                    codeFlag.set(true)
+                    react(1000) {
+                        nestedCodeFlag.set(true)  //should never reach
+                    }
+                }
+            }
+        }.start()
 
-  public void testTimeoutInLoop() {
-    final def barrier = new CyclicBarrier(2)
-    final AtomicInteger codeCounter = new AtomicInteger(0)
-    final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
+        actor.metaClass {
+            onTimeout = {-> timeoutFlag.set(true) }
+            afterStop = {messages -> barrier.await() }
+        }
 
-    final def actor = actor {
-      loop {
         barrier.await()
-        react(1000) {
-          codeCounter.incrementAndGet()
-        }
-      }
-    }.start()
+        actor.send 'message'
 
-    actor.metaClass {
-      onTimeout = {-> timeoutFlag.set(true) }
-      afterStop = {messages -> barrier.await() }
+        barrier.await()
+        assert codeFlag.get()
+        assertFalse nestedCodeFlag.get()
+        assert timeoutFlag.get()
     }
 
-    barrier.await()
-    actor.send 'message'
-    barrier.await()
+    public void testTimeoutInLoop() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicInteger codeCounter = new AtomicInteger(0)
+        final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-    barrier.await()
-    assertEquals(1, codeCounter.get())
-    assert timeoutFlag.get()
-  }
+        final def actor = actor {
+            loop {
+                barrier.await()
+                react(1000) {
+                    codeCounter.incrementAndGet()
+                }
+            }
+        }.start()
+
+        actor.metaClass {
+            onTimeout = {-> timeoutFlag.set(true) }
+            afterStop = {messages -> barrier.await() }
+        }
+
+        barrier.await()
+        actor.send 'message'
+        barrier.await()
+
+        barrier.await()
+        assertEquals(1, codeCounter.get())
+        assert timeoutFlag.get()
+    }
 }

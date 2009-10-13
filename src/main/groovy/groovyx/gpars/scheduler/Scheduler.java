@@ -16,8 +16,6 @@
 
 package groovyx.gpars.scheduler;
 
-import groovyx.gpars.scheduler.Pool;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -31,142 +29,142 @@ import java.util.concurrent.atomic.AtomicInteger;
  * - if no tasks were taken for processing during last 0.5sec new worker starts
  */
 public final class Scheduler implements Pool {
-  private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+    private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 
-  AtomicInteger threadCount = new AtomicInteger();
+    AtomicInteger threadCount = new AtomicInteger();
 
-  volatile long lastTaskPoke = -10;
+    volatile long lastTaskPoke = -10;
 
-  volatile long schedulerTime;
+    volatile long schedulerTime;
 
-  volatile boolean terminating;
+    volatile boolean terminating;
 
-  private final int coreSize;
+    private final int coreSize;
 
-  static final RuntimeException TERMINATE = new RuntimeException("terminate");
+    static final RuntimeException TERMINATE = new RuntimeException("terminate");
 
-  public Scheduler() {
-    this(0);
-  }
-
-  public Scheduler(final int coreSize) {
-    this.coreSize = coreSize;
-    new WatchdogThread().start();
-
-    for (int i = 0; i != coreSize; ++i) {
-      startNewThread();
-    }
-  }
-
-  public void execute(final Runnable task) {
-    if (terminating) {
-      throw new RuntimeException("Scheduler is shutting down");
+    public Scheduler() {
+        this(0);
     }
 
-    try {
-      queue.put(task);
-      if (threadCount.get() == 0) {
-        startNewThread();
-      }
-    } catch (InterruptedException ignored) {
-      Thread.currentThread().interrupt();
-    }
-  }
+    public Scheduler(final int coreSize) {
+        this.coreSize = coreSize;
+        new WatchdogThread().start();
 
-  public Runnable loop(final Runnable operation) {
-    return new Runnable() {
-      public void run() {
-        operation.run();
-        if (!terminating) {
-          execute(this);
-        }
-      }
-    };
-  }
-
-  private void startNewThread() {
-    threadCount.incrementAndGet();
-    new WorkerThread().start();
-  }
-
-  public void resize(final int poolSize) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void resetDefaultSize() {
-    throw new UnsupportedOperationException();
-  }
-
-  @SuppressWarnings({"ObjectAllocationInLoop"})
-  public void shutdown() {
-    terminating = true;
-    final int count = threadCount.get();
-    for (int i = 0; i != count; ++i) {
-      try {
-        queue.put(new Runnable() {
-          public void run() {
-            throw TERMINATE;
-          }
-        });
-      } catch (InterruptedException ignored) { //
-        Thread.currentThread().interrupt();
-      }
-    }
-  }
-
-  private class WorkerThread extends Thread {
-    {
-      setDaemon(true);
-    }
-
-    @Override
-    public void run() {
-      try {
-        try {
-          while (!terminating) {
-            final Runnable task = queue.poll(10L, TimeUnit.SECONDS);
-            if (task == null) {
-              return;
-            }
-
-            lastTaskPoke = schedulerTime;
-            try {
-              task.run();
-            }
-            catch (Throwable t) {
-              if (TERMINATE != t) {
-                //todo allow for a plugable handler
-                t.printStackTrace();
-              }
-            }
-          }
-        } catch (InterruptedException e) {//
-        }
-      }
-      finally {
-        threadCount.decrementAndGet();
-      }
-    }
-  }
-
-  private class WatchdogThread extends Thread {
-    {
-      setDaemon(true);
-    }
-
-    @Override
-    public void run() {
-      while (!terminating) {
-        try {
-          schedulerTime++;
-          if (schedulerTime > lastTaskPoke + 10) {
+        for (int i = 0; i != coreSize; ++i) {
             startNewThread();
-          }
-          Thread.sleep(50);
-        } catch (InterruptedException e) {
-          break;
         }
-      }
     }
-  }
+
+    public void execute(final Runnable task) {
+        if (terminating) {
+            throw new RuntimeException("Scheduler is shutting down");
+        }
+
+        try {
+            queue.put(task);
+            if (threadCount.get() == 0) {
+                startNewThread();
+            }
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public Runnable loop(final Runnable operation) {
+        return new Runnable() {
+            public void run() {
+                operation.run();
+                if (!terminating) {
+                    execute(this);
+                }
+            }
+        };
+    }
+
+    private void startNewThread() {
+        threadCount.incrementAndGet();
+        new WorkerThread().start();
+    }
+
+    public void resize(final int poolSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void resetDefaultSize() {
+        throw new UnsupportedOperationException();
+    }
+
+    @SuppressWarnings({"ObjectAllocationInLoop"})
+    public void shutdown() {
+        terminating = true;
+        final int count = threadCount.get();
+        for (int i = 0; i != count; ++i) {
+            try {
+                queue.put(new Runnable() {
+                    public void run() {
+                        throw TERMINATE;
+                    }
+                });
+            } catch (InterruptedException ignored) { //
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    private class WorkerThread extends Thread {
+        {
+            setDaemon(true);
+        }
+
+        @Override
+        public void run() {
+            try {
+                try {
+                    while (!terminating) {
+                        final Runnable task = queue.poll(10L, TimeUnit.SECONDS);
+                        if (task == null) {
+                            return;
+                        }
+
+                        lastTaskPoke = schedulerTime;
+                        try {
+                            task.run();
+                        }
+                        catch (Throwable t) {
+                            if (TERMINATE != t) {
+                                //todo allow for a plugable handler
+                                t.printStackTrace();
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {//
+                }
+            }
+            finally {
+                threadCount.decrementAndGet();
+            }
+        }
+    }
+
+    private class WatchdogThread extends Thread {
+        {
+            setDaemon(true);
+        }
+
+        @Override
+        public void run() {
+            while (!terminating) {
+                try {
+                    schedulerTime++;
+                    if (schedulerTime > lastTaskPoke + 10) {
+                        startNewThread();
+                    }
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }
+    }
 }

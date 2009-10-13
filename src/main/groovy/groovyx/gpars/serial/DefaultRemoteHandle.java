@@ -27,17 +27,17 @@ import java.util.UUID;
  */
 public class DefaultRemoteHandle extends RemoteHandle {
 
-  private final Class klazz;
+    private final Class klazz;
 
-  public DefaultRemoteHandle(UUID id, UUID hostId, Class klazz) {
-    super(hostId, id);
-    this.klazz = klazz;
-  }
+    public DefaultRemoteHandle(UUID id, UUID hostId, Class klazz) {
+        super(hostId, id);
+        this.klazz = klazz;
+    }
 
-  protected WithSerialId createObject(SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    WithSerialId obj;
-    final Constructor constructor = klazz.getConstructor(RemoteHost.class);
-    obj = (WithSerialId) constructor.newInstance(context);
-    return obj;
-  }
+    protected WithSerialId createObject(SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        WithSerialId obj;
+        final Constructor constructor = klazz.getConstructor(RemoteHost.class);
+        obj = (WithSerialId) constructor.newInstance(context);
+        return obj;
+    }
 }

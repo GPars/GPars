@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.start
 
@@ -29,16 +29,16 @@ import static groovyx.gpars.dataflow.DataFlow.start
 final DataFlowVariable a = new DataFlowVariable()
 
 final AbstractPooledActor doubler = Actors.actor {
-  react {
-    a << 2 * it
-  }
+    react {
+        a << 2 * it
+    }
 }.start()
 
 final AbstractPooledActor thread = start {
-  react {
-    doubler << it  //send a number to the doubler
-    println "Result ${a.val}"  //wait for the result to be bound to 'a'
-  }
+    react {
+        doubler << it  //send a number to the doubler
+        println "Result ${a.val}"  //wait for the result to be bound to 'a'
+    }
 }
 
 thread << 10

@@ -29,33 +29,33 @@ DataFlowVariable<Integer> z = new DataFlowVariable<Integer>()
 DataFlowVariable<Integer> v = new DataFlowVariable<Integer>()
 
 start {
-  println 'Thread main'
+    println 'Thread main'
 
-  x << 1
+    x << 1
 
-  println("'x' set to: " + x.val)
-  println("Waiting for 'y' to be set...")
+    println("'x' set to: " + x.val)
+    println("Waiting for 'y' to be set...")
 
-  if (x.val > y.val) {
-    z << x
-    println("'z' set to 'x': " + z.val)
-  } else {
-    z << y
-    println("'z' set to 'y': " + z.val)
-  }
+    if (x.val > y.val) {
+        z << x
+        println("'z' set to 'x': " + z.val)
+    } else {
+        z << y
+        println("'z' set to 'y': " + z.val)
+    }
 }
 
 start {
-  println("Thread 'setY', sleeping...")
-  Thread.sleep(5000)
-  y << 2
-  println("'y' set to: " + y.val)
+    println("Thread 'setY', sleeping...")
+    Thread.sleep(5000)
+    y << 2
+    println("'y' set to: " + y.val)
 }
 
 start {
-  println("Thread 'setV'")
-  v << y
-  println("'v' set to 'y': " + v.val)
+    println("Thread 'setV'")
+    v << y
+    println("'v' set to 'y': " + v.val)
 }
 
 System.in.read()

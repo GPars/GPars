@@ -21,83 +21,83 @@ import groovyx.gpars.actor.impl.AbstractPooledActor.Reaction
 import groovyx.gpars.actor.impl.ActorException
 
 public class ReactionTest extends GroovyTestCase {
-  public void testHolder() {
-    final Reaction holder = new Reaction(null, 5)
-    assertEquals 0, holder.currentSize
-    assertFalse holder.ready
+    public void testHolder() {
+        final Reaction holder = new Reaction(null, 5)
+        assertEquals 0, holder.currentSize
+        assertFalse holder.ready
 
-    shouldFail(IllegalStateException) {
-      holder.messages
+        shouldFail(IllegalStateException) {
+            holder.messages
+        }
+
+        holder.addMessage(createMessage('Message 1'))
+        assertEquals 1, holder.currentSize
+        assertFalse holder.ready
+
+        shouldFail(IllegalStateException) {
+            holder.messages
+        }
+
+        holder.addMessage createMessage('Message 2')
+        holder.addMessage createMessage('Message 3')
+        holder.addMessage createMessage('Message 4')
+        holder.addMessage createMessage('Message 5')
+        assertEquals 5, holder.currentSize
+        assert holder.ready
+
+        List<ActorMessage> messages = holder.messages
+        assertEquals 5, messages.size()
+        assertEquals(['Message 1', 'Message 2', 'Message 3', 'Message 4', 'Message 5'], messages*.payLoad)
     }
 
-    holder.addMessage(createMessage('Message 1'))
-    assertEquals 1, holder.currentSize
-    assertFalse holder.ready
+    public void testTimeout() {
+        final Reaction holder = new Reaction(null, 5)
+        assertFalse holder.ready
+        assertFalse holder.timeout
 
-    shouldFail(IllegalStateException) {
-      holder.messages
+        holder.addMessage createMessage(ActorException.TIMEOUT)
+        assert holder.ready
+        assert holder.timeout
     }
 
-    holder.addMessage createMessage('Message 2')
-    holder.addMessage createMessage('Message 3')
-    holder.addMessage createMessage('Message 4')
-    holder.addMessage createMessage('Message 5')
-    assertEquals 5, holder.currentSize
-    assert holder.ready
+    public void testZeroHolder() {
+        final Reaction holder = new Reaction(null, 0)
+        assertFalse holder.ready
+        assertFalse holder.timeout
 
-    List<ActorMessage> messages = holder.messages
-    assertEquals 5, messages.size()
-    assertEquals(['Message 1', 'Message 2', 'Message 3', 'Message 4', 'Message 5'], messages*.payLoad)
-  }
+        holder.addMessage createMessage('Message 1')
+        assert holder.ready
+        assertFalse holder.timeout
+    }
 
-  public void testTimeout() {
-    final Reaction holder = new Reaction(null, 5)
-    assertFalse holder.ready
-    assertFalse holder.timeout
+    public void testZeroHolderTimeout() {
+        final Reaction holder = new Reaction(null, 0)
+        assertFalse holder.ready
+        assertFalse holder.timeout
 
-    holder.addMessage createMessage(ActorException.TIMEOUT)
-    assert holder.ready
-    assert holder.timeout
-  }
+        holder.addMessage createMessage(ActorException.TIMEOUT)
+        assert holder.ready
+        assert holder.timeout
+    }
 
-  public void testZeroHolder() {
-    final Reaction holder = new Reaction(null, 0)
-    assertFalse holder.ready
-    assertFalse holder.timeout
+    public void testMessageDump() {
+        final Reaction holder = new Reaction(null, 3)
+        assertEquals([null, null, null], holder.dumpMessages())
 
-    holder.addMessage createMessage('Message 1')
-    assert holder.ready
-    assertFalse holder.timeout
-  }
+        final ActorMessage msg1 = createMessage('Message 1')
+        holder.addMessage(msg1)
+        assertEquals([msg1, null, null], holder.dumpMessages())
 
-  public void testZeroHolderTimeout() {
-    final Reaction holder = new Reaction(null, 0)
-    assertFalse holder.ready
-    assertFalse holder.timeout
+        final ActorMessage msg2 = createMessage('Message 2')
+        holder.addMessage(msg2)
+        assertEquals([msg1, msg2, null], holder.dumpMessages())
 
-    holder.addMessage createMessage(ActorException.TIMEOUT)
-    assert holder.ready
-    assert holder.timeout
-  }
+        final ActorMessage msg3 = createMessage('Message 3')
+        holder.addMessage(msg3)
+        assertEquals([msg1, msg2, msg3], holder.dumpMessages())
+    }
 
-  public void testMessageDump() {
-    final Reaction holder = new Reaction(null, 3)
-    assertEquals([null, null, null], holder.dumpMessages())
-
-    final ActorMessage msg1 = createMessage('Message 1')
-    holder.addMessage(msg1)
-    assertEquals([msg1, null, null], holder.dumpMessages())
-
-    final ActorMessage msg2 = createMessage('Message 2')
-    holder.addMessage(msg2)
-    assertEquals([msg1, msg2, null], holder.dumpMessages())
-
-    final ActorMessage msg3 = createMessage('Message 3')
-    holder.addMessage(msg3)
-    assertEquals([msg1, msg2, msg3], holder.dumpMessages())
-  }
-
-  private final ActorMessage createMessage(Object payLoad) {
-    new ActorMessage(payLoad, null)
-  }
+    private final ActorMessage createMessage(Object payLoad) {
+        new ActorMessage(payLoad, null)
+    }
 }

@@ -25,6 +25,6 @@ package groovyx.gpars.actor.impl;
  */
 final class ActorTimeoutException extends ActorException {
 
-  ActorTimeoutException() {
-  }
+    ActorTimeoutException() {
+    }
 }

@@ -25,30 +25,36 @@ import groovyx.gpars.actor.NonDaemonActorGroup
  * Author: Vaclav Pech, Dierk Koenig
  */
 
-enum Move { ROCK, PAPER, SCISSORS }
+enum Move {
+    ROCK, PAPER, SCISSORS
+}
 
 final /*static*/ BEATS = [
-        [Move.ROCK,     Move.SCISSORS],
-        [Move.PAPER,    Move.ROCK],
+        [Move.ROCK, Move.SCISSORS],
+        [Move.PAPER, Move.ROCK],
         [Move.SCISSORS, Move.PAPER]
 ].asImmutable()
 
-@Immutable class Stroke { String player; Move move }
-
-random = new Random()
-def randomMove() {
-  sleep random.nextInt(10) // mimic some longer interministic processing time
-  return Move.values()[random.nextInt(Move.values().length)]
+@Immutable class Stroke {
+    String player;
+    Move move
 }
 
-def announce = { Stroke first, Stroke second ->
-  String winner = "tie"
-  if ([first, second]*.move in BEATS) winner = first.player
-  if ([second, first]*.move in BEATS) winner = second.player
+random = new Random()
 
-  def out = new StringBuilder()
-  [first, second].each { out << "${it.player} ${it.move.toString().padRight(8)}, " }
-  out << "winner = ${winner}"
+def randomMove() {
+    sleep random.nextInt(10) // mimic some longer interministic processing time
+    return Move.values()[random.nextInt(Move.values().length)]
+}
+
+def announce = {Stroke first, Stroke second ->
+    String winner = "tie"
+    if ([first, second]*.move in BEATS) winner = first.player
+    if ([second, first]*.move in BEATS) winner = second.player
+
+    def out = new StringBuilder()
+    [first, second].each { out << "${it.player} ${it.move.toString().padRight(8)}, " }
+    out << "winner = ${winner}"
 }
 
 ActorGroup pooled = new NonDaemonActorGroup() // uses default pool size
@@ -57,21 +63,25 @@ final player1 = pooled.reactor { new Stroke("Player 1", randomMove()) }.start()
 final player2 = pooled.reactor { new Stroke("Player 2", randomMove()) }.start()
 
 def coordinator = pooled.actor {
-  int count = 0
-  loop {
-    count++
-    if (count >= 120) {
-      [player1, player2, delegate]*.stop()
-      Thread.start { pooled.shutdown() }
-      return
-    } 
-    react {
-      player1.send()
-      player2.send()
-      react { Stroke first -> react { Stroke second ->
-        println announce(first, second)
-        send()
-  } } } }
+    int count = 0
+    loop {
+        count++
+        if (count >= 120) {
+            [player1, player2, delegate]*.stop()
+            Thread.start { pooled.shutdown() }
+            return
+        }
+        react {
+            player1.send()
+            player2.send()
+            react {Stroke first ->
+                react {Stroke second ->
+                    println announce(first, second)
+                    send()
+                }
+            }
+        }
+    }
 }.start()
 
 coordinator.send()

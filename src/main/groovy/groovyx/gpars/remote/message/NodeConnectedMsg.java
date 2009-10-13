@@ -30,21 +30,21 @@ import java.util.UUID;
  */
 public class NodeConnectedMsg extends SerialMsg {
 
-  /**
-   * Id of node connected
-   */
-  public final UUID nodeId;
+    /**
+     * Id of node connected
+     */
+    public final UUID nodeId;
 
-  public final Actor mainActor;
+    public final Actor mainActor;
 
-  public NodeConnectedMsg(LocalNode node) {
-    super();
-    nodeId = node.getId();
-    mainActor = node.getMainActor();
-  }
+    public NodeConnectedMsg(LocalNode node) {
+        super();
+        nodeId = node.getId();
+        mainActor = node.getMainActor();
+    }
 
-  @Override
-  public void execute(RemoteConnection conn) {
-    conn.getHost().getLocalHost().connectRemoteNode(nodeId, conn.getHost(), mainActor);
-  }
+    @Override
+    public void execute(RemoteConnection conn) {
+        conn.getHost().getLocalHost().connectRemoteNode(nodeId, conn.getHost(), mainActor);
+    }
 }

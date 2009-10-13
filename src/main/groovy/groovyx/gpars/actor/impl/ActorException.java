@@ -28,10 +28,10 @@ package groovyx.gpars.actor.impl;
  */
 public abstract class ActorException extends RuntimeException {
 
-  public static final ActorException CONTINUE = new ActorContinuationException();
-  public static final ActorException TERMINATE = new ActorTerminationException();
-  public static final ActorException TIMEOUT = new ActorTimeoutException();
+    public static final ActorException CONTINUE = new ActorContinuationException();
+    public static final ActorException TERMINATE = new ActorTerminationException();
+    public static final ActorException TIMEOUT = new ActorTimeoutException();
 
-  ActorException() {
-  }
+    ActorException() {
+    }
 }

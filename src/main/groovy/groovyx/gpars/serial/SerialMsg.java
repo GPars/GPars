@@ -27,12 +27,12 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public abstract class SerialMsg implements Serializable {
-  public UUID hostId;
+    public UUID hostId;
 
-  public SerialMsg() {
-  }
+    public SerialMsg() {
+    }
 
-  public void execute(RemoteConnection conn) {
-    conn.onMessage(this);
-  }
+    public void execute(RemoteConnection conn) {
+        conn.onMessage(this);
+    }
 }

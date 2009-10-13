@@ -17,8 +17,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import java.util.concurrent.Executors
 import groovyx.gpars.dataflow.DataFlows
+import java.util.concurrent.Executors
 
 final LIMIT = 3 * 100 * 1000
 
@@ -32,9 +32,9 @@ scheduler.execute { df.result = many.collect { df[it] }.sum() }
 
 // each in a newly started executor:
 many.each {num ->
-  scheduler.execute {
-    df[num] = 1
-  }
+    scheduler.execute {
+        df[num] = 1
+    }
 }
 
 // Wait for the result to be available

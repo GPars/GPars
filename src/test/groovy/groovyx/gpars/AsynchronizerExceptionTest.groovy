@@ -26,109 +26,109 @@ import java.util.concurrent.*
  * Date: Nov 17, 2008
  */
 public class AsynchronizerExceptionTest extends GroovyTestCase {
-  public void testDoInParralelWithException() {
-    shouldFail {
-      AsyncInvokerUtil.doInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+    public void testDoInParralelWithException() {
+        shouldFail {
+            AsyncInvokerUtil.doInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+        }
     }
-  }
 
-  public void testExecuteInParralelWithException() {
-    List<Future<Object>> result = AsyncInvokerUtil.executeInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
-    shouldFail {
-      result*.get()
+    public void testExecuteInParralelWithException() {
+        List<Future<Object>> result = AsyncInvokerUtil.executeInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+        shouldFail {
+            result*.get()
+        }
     }
-  }
 
-  public void testStartInParralelWithException() {
-    final AtomicReference<Throwable> thrownException = new AtomicReference<Throwable>()
-    final CountDownLatch latch = new CountDownLatch(4)
-    UncaughtExceptionHandler handler = {thread, throwable -> thrownException.set(throwable)} as UncaughtExceptionHandler
+    public void testStartInParralelWithException() {
+        final AtomicReference<Throwable> thrownException = new AtomicReference<Throwable>()
+        final CountDownLatch latch = new CountDownLatch(4)
+        UncaughtExceptionHandler handler = {thread, throwable -> thrownException.set(throwable)} as UncaughtExceptionHandler
 
-    Thread thread = AsyncInvokerUtil.startInParallel(
-            handler,
-            {latch.countDown()},
-            {latch.countDown(); throw new RuntimeException('test1')},
-            {latch.countDown(); throw new RuntimeException('test2')},
-            {latch.countDown()})
+        Thread thread = AsyncInvokerUtil.startInParallel(
+                handler,
+                {latch.countDown()},
+                {latch.countDown(); throw new RuntimeException('test1')},
+                {latch.countDown(); throw new RuntimeException('test2')},
+                {latch.countDown()})
 
-    latch.await()
-    thread.join()
-    assert thrownException.get() instanceof AsyncException
-  }
-
-  public void testThreadException() {
-    volatile def thrownException = null
-    final def latch = new CountDownLatch(1)
-    final def thread = new Thread({throw new RuntimeException('test')} as Runnable)
-    thread.uncaughtExceptionHandler = {t, throwable -> thrownException = throwable; latch.countDown()} as UncaughtExceptionHandler
-    thread.start()
-    latch.await()
-    assert thrownException instanceof RuntimeException
-  }
-
-  public void testThreadPoolException() {
-    ExecutorService pool = Executors.newFixedThreadPool(2, {
-      final def thread = new Thread(it as Runnable)
-      thread.uncaughtExceptionHandler = {t, throwable -> thrownException = throwable; latch.countDown()} as UncaughtExceptionHandler
-      thread.daemon = false
-      thread
-    } as ThreadFactory)
-    def future = pool.submit {throw new RuntimeException('test')} as Runnable
-    try {
-      future.get()
-    } catch (Exception e) {
-      assert e instanceof ExecutionException
-      assert e.cause instanceof InvokerInvocationException
-      assert e.cause.cause instanceof RuntimeException
+        latch.await()
+        thread.join()
+        assert thrownException.get() instanceof AsyncException
     }
-    pool.shutdown()
-  }
 
-  public void testEachWithException() {
-    shouldFail(AsyncException.class) {
-      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.eachParallel {throw new RuntimeException('test')}
-      }
+    public void testThreadException() {
+        volatile def thrownException = null
+        final def latch = new CountDownLatch(1)
+        final def thread = new Thread({throw new RuntimeException('test')} as Runnable)
+        thread.uncaughtExceptionHandler = {t, throwable -> thrownException = throwable; latch.countDown()} as UncaughtExceptionHandler
+        thread.start()
+        latch.await()
+        assert thrownException instanceof RuntimeException
     }
-  }
 
-  public void testCollectWithException() {
-    shouldFail(AsyncException.class) {
-      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.collectParallel {if (it == 'b') throw new RuntimeException('test')}
-      }
+    public void testThreadPoolException() {
+        ExecutorService pool = Executors.newFixedThreadPool(2, {
+            final def thread = new Thread(it as Runnable)
+            thread.uncaughtExceptionHandler = {t, throwable -> thrownException = throwable; latch.countDown()} as UncaughtExceptionHandler
+            thread.daemon = false
+            thread
+        } as ThreadFactory)
+        def future = pool.submit {throw new RuntimeException('test')} as Runnable
+        try {
+            future.get()
+        } catch (Exception e) {
+            assert e instanceof ExecutionException
+            assert e.cause instanceof InvokerInvocationException
+            assert e.cause.cause instanceof RuntimeException
+        }
+        pool.shutdown()
     }
-  }
 
-  public void testFindAllWithException() {
-    shouldFail(AsyncException.class) {
-      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.findAllParallel {if (it == 'b') throw new RuntimeException('test') else return true}
-      }
+    public void testEachWithException() {
+        shouldFail(AsyncException.class) {
+            Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+                'abc'.eachParallel {throw new RuntimeException('test')}
+            }
+        }
     }
-  }
 
-  public void testFindWithException() {
-    shouldFail(AsyncException.class) {
-      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.findParallel {if (it == 'b') throw new RuntimeException('test') else return true}
-      }
+    public void testCollectWithException() {
+        shouldFail(AsyncException.class) {
+            Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+                'abc'.collectParallel {if (it == 'b') throw new RuntimeException('test')}
+            }
+        }
     }
-  }
 
-  public void testAllWithException() {
-    shouldFail(AsyncException.class) {
-      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.allParallel {if (it == 'b') throw new RuntimeException('test')}
-      }
+    public void testFindAllWithException() {
+        shouldFail(AsyncException.class) {
+            Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+                'abc'.findAllParallel {if (it == 'b') throw new RuntimeException('test') else return true}
+            }
+        }
     }
-  }
 
-  public void testAnyWithException() {
-    shouldFail(AsyncException.class) {
-      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-        'abc'.anyParallel {if (it == 'b') throw new RuntimeException('test')}
-      }
+    public void testFindWithException() {
+        shouldFail(AsyncException.class) {
+            Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+                'abc'.findParallel {if (it == 'b') throw new RuntimeException('test') else return true}
+            }
+        }
     }
-  }
+
+    public void testAllWithException() {
+        shouldFail(AsyncException.class) {
+            Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+                'abc'.allParallel {if (it == 'b') throw new RuntimeException('test')}
+            }
+        }
+    }
+
+    public void testAnyWithException() {
+        shouldFail(AsyncException.class) {
+            Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+                'abc'.anyParallel {if (it == 'b') throw new RuntimeException('test')}
+            }
+        }
+    }
 }

@@ -33,7 +33,7 @@ final Iterator iterator = list.iterator()
 AsyncEnhancer.enhanceInstance iterator
 
 iterator.eachParallel {
-  println it
+    println it
 }
 
 final String text = 'want to be very big'

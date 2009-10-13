@@ -1,52 +1,52 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <title>GPars</title>
+    <title>GPars</title>
 </head>
 <body>
 <p>
-  <em>GPars (formerly GParallelizer) offers Groovy developers intuitive ways to handle tasks concurrently.</em>
+    <em>GPars (formerly GParallelizer) offers Groovy developers intuitive ways to handle tasks concurrently.</em>
 </p>
 
 <p>
-  The framework provides straightforward Groovy-based Domain Specific Languages (DSLs) to declare, which
-  parts of the code should be performed in parallel. Objects are enhanced with asynchronous methods like
-  eachParallel(), collectParallel() and others, to perform collection-based operations in parallel. Also, closures
-  can be turned into their asynchronous variants, which when invoked schedule the original closure for
-  processing in an executor service. The library also provides several helper methods for running a set of
-  closures concurrently.
+    The framework provides straightforward Groovy-based Domain Specific Languages (DSLs) to declare, which
+    parts of the code should be performed in parallel. Objects are enhanced with asynchronous methods like
+    eachParallel(), collectParallel() and others, to perform collection-based operations in parallel. Also, closures
+    can be turned into their asynchronous variants, which when invoked schedule the original closure for
+    processing in an executor service. The library also provides several helper methods for running a set of
+    closures concurrently.
 </p>
 
 <p>
-  Effective Scala-like actors are ready to make your code leverage an inherently safer way to organize
-  concurrent code by eliminating mutable shared state altogether. With actors support you can quickly
-  create several independent Actors, which consume messages passed to them in their own thread and
-  communicate with other actors by sending them messages. You then build your solution by combining
-  these actors into a communication network.
+    Effective Scala-like actors are ready to make your code leverage an inherently safer way to organize
+    concurrent code by eliminating mutable shared state altogether. With actors support you can quickly
+    create several independent Actors, which consume messages passed to them in their own thread and
+    communicate with other actors by sending them messages. You then build your solution by combining
+    these actors into a communication network.
 </p>
 
 <p>
-  The library has four logical parts.
+    The library has four logical parts.
 </p>
 <ol>
-  <li>
-    Actors provide a Groovy implementation of Scala-like actors, remote actors, Clojure-like agents
-    and a couple of specialized actors like DynamicDispatchActor or Reactor.
-  </li>
-  <li>
-    Dataflow Concurrency (since version 0.8) allows for very natural shared-memory concurrency model,
-    based on single-assignment variables.
-  </li>
-  <li>
-    And CSP implementation is likely to appear soon as well.
-  </li>
-  <li>
-    Asynchronizer uses the Java 1.5 built-in support for executor services to enable multi-threaded
-    collection and closure processing.
-  </li>
-  <li>
-    Parallelizer uses JSR-166y Parallel Arrays to enable multi-threaded collection processing.
-  </li>
+    <li>
+        Actors provide a Groovy implementation of Scala-like actors, remote actors, Clojure-like agents
+        and a couple of specialized actors like DynamicDispatchActor or Reactor.
+    </li>
+    <li>
+        Dataflow Concurrency (since version 0.8) allows for very natural shared-memory concurrency model,
+        based on single-assignment variables.
+    </li>
+    <li>
+        And CSP implementation is likely to appear soon as well.
+    </li>
+    <li>
+        Asynchronizer uses the Java 1.5 built-in support for executor services to enable multi-threaded
+        collection and closure processing.
+    </li>
+    <li>
+        Parallelizer uses JSR-166y Parallel Arrays to enable multi-threaded collection processing.
+    </li>
 </ol>
 </body>
 </html>

@@ -16,142 +16,142 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 public class DataFlowStreamTest extends GroovyTestCase {
 
-  public void testStream() {
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testStream() {
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final DataFlowStream stream = new DataFlowStream()
-    final AbstractPooledActor thread = DataFlow.start {
-      stream << 10
-      final DataFlowVariable variable = new DataFlowVariable()
-      stream << variable
-      latch.countDown()
-      react {
-        variable << 20
-      }
+        final DataFlowStream stream = new DataFlowStream()
+        final AbstractPooledActor thread = DataFlow.start {
+            stream << 10
+            final DataFlowVariable variable = new DataFlowVariable()
+            stream << variable
+            latch.countDown()
+            react {
+                variable << 20
+            }
+        }
+
+        latch.await()
+        assertEquals 2, stream.length()
+        assertEquals 10, stream.val
+        assertEquals 1, stream.length()
+        thread << 'Proceed'
+        assertEquals 20, stream.val
+        assertEquals 0, stream.length()
     }
 
-    latch.await()
-    assertEquals 2, stream.length()
-    assertEquals 10, stream.val
-    assertEquals 1, stream.length()
-    thread << 'Proceed'
-    assertEquals 20, stream.val
-    assertEquals 0, stream.length()
-  }
+    public void testNullValues() {
+        final CountDownLatch latch = new CountDownLatch(1)
 
-  public void testNullValues() {
-    final CountDownLatch latch = new CountDownLatch(1)
+        final DataFlowStream stream = new DataFlowStream()
+        final AbstractPooledActor thread = DataFlow.start {
+            stream << null
+            final DataFlowVariable variable = new DataFlowVariable()
+            stream << variable
+            latch.countDown()
+            react {
+                variable << null
+            }
+        }
 
-    final DataFlowStream stream = new DataFlowStream()
-    final AbstractPooledActor thread = DataFlow.start {
-      stream << null
-      final DataFlowVariable variable = new DataFlowVariable()
-      stream << variable
-      latch.countDown()
-      react {
-        variable << null
-      }
+        latch.await()
+        assertEquals 2, stream.length()
+        assertEquals null, stream.val
+        assertEquals 1, stream.length()
+        thread << 'Proceed'
+        assertEquals null, stream.val
+        assertEquals 0, stream.length()
     }
 
-    latch.await()
-    assertEquals 2, stream.length()
-    assertEquals null, stream.val
-    assertEquals 1, stream.length()
-    thread << 'Proceed'
-    assertEquals null, stream.val
-    assertEquals 0, stream.length()
-  }
+    public void testTake() {
+        final CountDownLatch latch = new CountDownLatch(1)
 
-  public void testTake() {
-    final CountDownLatch latch = new CountDownLatch(1)
+        final DataFlowStream stream = new DataFlowStream()
+        final AbstractPooledActor thread = DataFlow.start {
+            final DataFlowVariable variable = new DataFlowVariable()
+            stream << variable
+            latch.countDown()
+            react {
+                variable << 20
+            }
+        }
 
-    final DataFlowStream stream = new DataFlowStream()
-    final AbstractPooledActor thread = DataFlow.start {
-      final DataFlowVariable variable = new DataFlowVariable()
-      stream << variable
-      latch.countDown()
-      react {
-        variable << 20
-      }
+        latch.await()
+        assertEquals 1, stream.length()
+        thread << 'Proceed'
+        def value = stream.val
+        assertEquals 0, stream.length()
+        assertEquals 20, value
     }
 
-    latch.await()
-    assertEquals 1, stream.length()
-    thread << 'Proceed'
-    def value = stream.val
-    assertEquals 0, stream.length()
-    assertEquals 20, value
-  }
+    public void testIteration() {
+        final CyclicBarrier barrier = new CyclicBarrier(2)
 
-  public void testIteration() {
-    final CyclicBarrier barrier = new CyclicBarrier(2)
+        final DataFlowStream stream = new DataFlowStream()
+        final AbstractPooledActor thread = DataFlow.start {
+            (0..10).each {stream << it}
+            barrier.await()
+            react {
+                stream << 11
+                barrier.await()
+            }
+        }
 
-    final DataFlowStream stream = new DataFlowStream()
-    final AbstractPooledActor thread = DataFlow.start {
-      (0..10).each {stream << it}
-      barrier.await()
-      react {
-        stream << 11
         barrier.await()
-      }
+        assertEquals 11, stream.length()
+        stream.eachWithIndex {index, element -> assertEquals index, element }
+        assertEquals 11, stream.length()
+
+        thread << 'Proceed'
+        barrier.await()
+        assertEquals 12, stream.length()  //todo sometimes fails
+        (0..10).each {
+            assertEquals it, stream.val
+        }
     }
 
-    barrier.await()
-    assertEquals 11, stream.length()
-    stream.eachWithIndex {index, element -> assertEquals index, element }
-    assertEquals 11, stream.length()
+    public void testIterationWithNulls() {
+        final CyclicBarrier barrier = new CyclicBarrier(2)
 
-    thread << 'Proceed'
-    barrier.await()
-    assertEquals 12, stream.length()  //todo sometimes fails
-    (0..10).each {
-      assertEquals it, stream.val
-    }
-  }
+        final DataFlowStream stream = new DataFlowStream()
+        DataFlow.start {
+            (0..10).each {stream << null}
+            barrier.await()
+        }
 
-  public void testIterationWithNulls() {
-    final CyclicBarrier barrier = new CyclicBarrier(2)
+        barrier.await()
+        assertEquals 11, stream.length()
+        stream.each {assertNull it }
+        assertEquals 11, stream.length()
 
-    final DataFlowStream stream = new DataFlowStream()
-    DataFlow.start {
-      (0..10).each {stream << null}
-      barrier.await()
+        for (i in (0..10)) { assertNull stream.val }
     }
 
-    barrier.await()
-    assertEquals 11, stream.length()
-    stream.each {assertNull it }
-    assertEquals 11, stream.length()
-
-    for (i in (0..10)) { assertNull stream.val }
-  }
-
-  public void testToString() {
-    final DataFlowStream<Integer> stream = new DataFlowStream<Integer>()
-    assertEquals 'DataFlowStream(queue=[])', stream.toString()
-    stream << 10
-    assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=10)])', stream.toString()
-    stream << 20
-    assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=10), DataFlowVariable(value=20)])', stream.toString()
-    stream.val
-    assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=20)])', stream.toString()
-    stream.val
-    assertEquals 'DataFlowStream(queue=[])', stream.toString()
-    final DataFlowVariable variable = new DataFlowVariable()
-    stream << variable
-    assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=null)])', stream.toString()
-    variable << '30'
-    Thread.sleep 1000  //let the value propagate asynchronously into the variable stored in the stream
-    assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
-    assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
-    stream.val
-    assertEquals 'DataFlowStream(queue=[])', stream.toString()
-    assertEquals 'DataFlowStream(queue=[])', stream.toString()
-  }
+    public void testToString() {
+        final DataFlowStream<Integer> stream = new DataFlowStream<Integer>()
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+        stream << 10
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=10)])', stream.toString()
+        stream << 20
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=10), DataFlowVariable(value=20)])', stream.toString()
+        stream.val
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=20)])', stream.toString()
+        stream.val
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+        final DataFlowVariable variable = new DataFlowVariable()
+        stream << variable
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=null)])', stream.toString()
+        variable << '30'
+        Thread.sleep 1000  //let the value propagate asynchronously into the variable stored in the stream
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
+        assertEquals 'DataFlowStream(queue=[DataFlowVariable(value=30)])', stream.toString()
+        stream.val
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+        assertEquals 'DataFlowStream(queue=[])', stream.toString()
+    }
 }

@@ -24,50 +24,50 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  * @author Jordi Campos i Miralles, Departament de Matem�tica Aplicada i An�lisi, MAiA Facultat de Matem�tiques, Universitat de Barcelona
  */
 class GameMaster extends AbstractPooledActor {
-  int secretNum
+    int secretNum
 
-  void afterStart() {
-    secretNum = new Random().nextInt(20)
-  }
-
-  void act() {
-    loop
-    {
-      react {int num ->
-        if (num > secretNum)
-        reply 'too large'
-        else if (num < secretNum)
-        reply 'too small'
-        else {
-          reply 'you win'
-          stop()
-        }
-      }
+    void afterStart() {
+        secretNum = new Random().nextInt(20)
     }
-  }
+
+    void act() {
+        loop
+        {
+            react {int num ->
+                if (num > secretNum)
+                    reply 'too large'
+                else if (num < secretNum)
+                    reply 'too small'
+                else {
+                    reply 'you win'
+                    stop()
+                }
+            }
+        }
+    }
 }
 
 class Player extends AbstractPooledActor {
-  String name
-  AbstractPooledActor server
-  int myNum
+    String name
+    AbstractPooledActor server
+    int myNum
 
-  void act() {
-    loop
-    {
-      myNum = new Random().nextInt(20)
+    void act() {
+        loop
+        {
+            myNum = new Random().nextInt(20)
 
-      server << myNum
+            server << myNum
 
-      react {
-        switch (it) {
-          case 'too large': println "$name: $myNum was too large"; break
-          case 'too small': println "$name: $myNum was too small"; break
-          case 'you win': println "$name: I won $myNum"; stop(); break
+            react {
+                switch (it) {
+                    case 'too large': println "$name: $myNum was too large"; break
+                    case 'too small': println "$name: $myNum was too small"; break
+                    case 'you win': println "$name: I won $myNum"; stop(); break
+                }
+            }
         }
-      }
     }
-  }
 }
 
 final def master = new GameMaster().start()

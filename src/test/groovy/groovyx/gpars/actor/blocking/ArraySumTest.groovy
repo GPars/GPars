@@ -16,13 +16,13 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.impl.AbstractPooledActor
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  *
@@ -31,109 +31,109 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  */
 
 public class ArraySumTest extends GroovyTestCase {
-  ActorGroup group = new PooledActorGroup(10)
+    ActorGroup group = new PooledActorGroup(10)
 
-  public void testArraySummaryUsingActorMethod() {
-    AtomicInteger result = new AtomicInteger(0)
-    CountDownLatch latch = new CountDownLatch(1)
+    public void testArraySummaryUsingActorMethod() {
+        AtomicInteger result = new AtomicInteger(0)
+        CountDownLatch latch = new CountDownLatch(1)
 
-    Actor actor = group.actor {
-      new Processor(delegate, group).start().send([1, 2, 3, 4, 5])
-      receive {
-        result.set it[0]
-        latch.countDown()
-      }
-      stop()
+        Actor actor = group.actor {
+            new Processor(delegate, group).start().send([1, 2, 3, 4, 5])
+            receive {
+                result.set it[0]
+                latch.countDown()
+            }
+            stop()
+        }
+        actor.start()
+
+        latch.await(30, TimeUnit.SECONDS)
+        assertEquals 15, result
     }
-    actor.start()
 
-    latch.await(30, TimeUnit.SECONDS)
-    assertEquals 15, result
-  }
+    public void testArraySummary() {
+        final ArrayCalculator calculator = new ArrayCalculator([1, 2, 3, 4, 5], group).start()
 
-  public void testArraySummary() {
-    final ArrayCalculator calculator = new ArrayCalculator([1, 2, 3, 4, 5], group).start()
-
-    calculator.latch.await(30, TimeUnit.SECONDS)
-    assertEquals 15, calculator.result
-  }
+        calculator.latch.await(30, TimeUnit.SECONDS)
+        assertEquals 15, calculator.result
+    }
 }
 
 class Processor extends AbstractPooledActor {
 
-  Actor parent
+    Actor parent
 
-  def Processor(Actor parent, group) {
-    this.parent = parent
-    actorGroup = group
-  }
-
-  protected void act() {
-    receive() {List<Integer> list ->
-      switch (list.size()) {
-        case 0: parent.send([0])
-          break
-        case 1: parent.send([list[0]])
-          break
-        case 2: parent.send([list[0] + list[1]])
-          break
-        default:
-          def splitList1
-          def splitList2
-          (splitList1, splitList2) = split(list)
-          Actor replyActor = new ReplyActor(parent).start()
-          new Processor(replyActor, actorGroup).start().send(splitList1)
-          new Processor(replyActor, actorGroup).start().send(splitList2)
-      }
+    def Processor(Actor parent, group) {
+        this.parent = parent
+        actorGroup = group
     }
-    stop()
-  }
 
-  private split(List<Integer> list) {
-    int listSize = list.size()
-    int middleIndex = listSize / 2
-    def list1 = list[0..<middleIndex]
-    def list2 = list[middleIndex..listSize - 1]
-    return [list1, list2]
-  }
+    protected void act() {
+        receive() {List<Integer> list ->
+            switch (list.size()) {
+                case 0: parent.send([0])
+                    break
+                case 1: parent.send([list[0]])
+                    break
+                case 2: parent.send([list[0] + list[1]])
+                    break
+                default:
+                    def splitList1
+                    def splitList2
+                    (splitList1, splitList2) = split(list)
+                    Actor replyActor = new ReplyActor(parent).start()
+                    new Processor(replyActor, actorGroup).start().send(splitList1)
+                    new Processor(replyActor, actorGroup).start().send(splitList2)
+            }
+        }
+        stop()
+    }
+
+    private split(List<Integer> list) {
+        int listSize = list.size()
+        int middleIndex = listSize / 2
+        def list1 = list[0..<middleIndex]
+        def list2 = list[middleIndex..listSize - 1]
+        return [list1, list2]
+    }
 }
 
 class ReplyActor extends AbstractPooledActor {
 
-  Actor parent
+    Actor parent
 
-  def ReplyActor(Actor parent) {
-    this.parent = parent
-    actorGroup = parent.actorGroup
-  }
+    def ReplyActor(Actor parent) {
+        this.parent = parent
+        actorGroup = parent.actorGroup
+    }
 
-  void act() {
-    def sum = 0
+    void act() {
+        def sum = 0
 
-    2.times { sum += receive()}
-    parent.send([sum])
-    stop()
-  }
+        2.times { sum += receive()}
+        parent.send([sum])
+        stop()
+    }
 }
 class ArrayCalculator extends AbstractPooledActor {
 
-  List<Integer> listToCalculate;
+    List<Integer> listToCalculate;
 
-  AtomicInteger result = new AtomicInteger(0)
+    AtomicInteger result = new AtomicInteger(0)
 
-  CountDownLatch latch = new CountDownLatch(1)
+    CountDownLatch latch = new CountDownLatch(1)
 
-  def ArrayCalculator(final List<Integer> listToCalculate, final group) {
-    this.listToCalculate = listToCalculate;
-    this.actorGroup = group
-  }
-
-  protected void act() {
-    new Processor(this, actorGroup).start().send(listToCalculate)
-    receive {
-      result.set it[0]
-      latch.countDown()
+    def ArrayCalculator(final List<Integer> listToCalculate, final group) {
+        this.listToCalculate = listToCalculate;
+        this.actorGroup = group
     }
-    stop()
-  }
+
+    protected void act() {
+        new Processor(this, actorGroup).start().send(listToCalculate)
+        receive {
+            result.set it[0]
+            latch.countDown()
+        }
+        stop()
+    }
 }

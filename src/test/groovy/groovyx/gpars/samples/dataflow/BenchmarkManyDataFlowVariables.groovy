@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import java.util.concurrent.Executors
 import groovyx.gpars.dataflow.DataFlowVariable
+import java.util.concurrent.Executors
 
 final many = 1..(limit)
 
@@ -29,7 +29,7 @@ def scheduler = Executors.newFixedThreadPool(20)
 scheduler.execute { result << dfs.sum { it.val } }
 
 dfs.each {df ->
-  scheduler.execute { df << 1 }
+    scheduler.execute { df << 1 }
 }
 
 assert many.size() == result.val

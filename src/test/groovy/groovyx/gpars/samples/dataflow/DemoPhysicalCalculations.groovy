@@ -37,7 +37,7 @@ final def distance = new DataFlowVariable()
 final def author = new DataFlowVariable()
 
 start {
-  println """
+    println """
 Calculating distance required to stop a moving ball.
 ====================================================
 The ball has a radius of ${radius.val} meters and is made of a material with ${density.val} kg/m3 density,
@@ -52,39 +52,39 @@ This example has been calculated asynchronously in multiple threads using GParal
 Author: ${author.val}
 """
 
-  System.exit 0
+    System.exit 0
 }
 
 start {
-  mass << volume.val * density.val
+    mass << volume.val * density.val
 }
 
 start {
-  volume << Math.PI * (radius.val ** 3)
+    volume << Math.PI * (radius.val ** 3)
 }
 
 start {
-  radius << 2.5
-  density << 998.2071  //water
-  acceleration << 9.80665 //free fall
-  decelerationForce << 900
+    radius << 2.5
+    density << 998.2071  //water
+    acceleration << 9.80665 //free fall
+    decelerationForce << 900
 }
 
 start {
-  println 'Enter your name:'
-  def name = new InputStreamReader(System.in).readLine()
-  author << (name?.trim()?.size() > 0 ? name : 'anonymous')
+    println 'Enter your name:'
+    def name = new InputStreamReader(System.in).readLine()
+    author << (name?.trim()?.size() > 0 ? name : 'anonymous')
 }
 
 start {
-  time << 10
-  velocity << acceleration.val * time.val
+    time << 10
+    velocity << acceleration.val * time.val
 }
 
 start {
-  deceleration << decelerationForce.val / mass.val
+    deceleration << decelerationForce.val / mass.val
 }
 
 start {
-  distance << deceleration.val * ((velocity.val / deceleration.val) ** 2) * 0.5
+    distance << deceleration.val * ((velocity.val / deceleration.val) ** 2) * 0.5
 }

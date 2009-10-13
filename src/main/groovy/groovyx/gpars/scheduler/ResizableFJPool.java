@@ -26,54 +26,54 @@ package groovyx.gpars.scheduler;
  *         Date: Feb 27, 2009
  */
 public final class ResizableFJPool extends FJPool {
-  private static final int MAX_POOL_SIZE = 1000;
+    private static final int MAX_POOL_SIZE = 1000;
 
-  /**
-   * Creates the pool with default number of threads.
-   */
-  public ResizableFJPool() {
-  }
-
-  /**
-   * Creates the pool with specified number of threads.
-   *
-   * @param poolSize The required size of the pool
-   */
-  public ResizableFJPool(final int poolSize) {
-    super(poolSize);
-  }
-
-  /**
-   * schedules a new task for processing with the pool
-   *
-   * @param task The task to schedule
-   */
-  @Override public void execute(final Runnable task) {
-    synchronized (this) {
-      final int currentPoolSize = pool.getPoolSize();
-      final int submissionCount = pool.getActiveSubmissionCount();
-      final int needForThreads = submissionCount + 1 - currentPoolSize;
-      if (needForThreads > 0) {
-        if (currentPoolSize + needForThreads > ResizableFJPool.MAX_POOL_SIZE) {
-          throw new IllegalStateException("The thread pool executor cannot run the task. " +
-                  "The upper limit of the thread pool size has probably been reached. " +
-                  "Current pool size: " + currentPoolSize + " Maximum pool size: " + ResizableFJPool.MAX_POOL_SIZE);
-        }
-        pool.addWorkers(needForThreads);
-      }
+    /**
+     * Creates the pool with default number of threads.
+     */
+    public ResizableFJPool() {
     }
-    super.execute(new Runnable() {
-      public void run() {
-        task.run();
-        synchronized (ResizableFJPool.this) {
-          final int currentPoolSize = pool.getPoolSize();
-          final int submissionCount = pool.getActiveSubmissionCount();
-          final int desiredPoolSize = Math.max(submissionCount, getConfiguredPoolSize());
-          final int change = currentPoolSize - desiredPoolSize;
 
-          if (change >= 3) pool.removeWorkers(change);
+    /**
+     * Creates the pool with specified number of threads.
+     *
+     * @param poolSize The required size of the pool
+     */
+    public ResizableFJPool(final int poolSize) {
+        super(poolSize);
+    }
+
+    /**
+     * schedules a new task for processing with the pool
+     *
+     * @param task The task to schedule
+     */
+    @Override public void execute(final Runnable task) {
+        synchronized (this) {
+            final int currentPoolSize = pool.getPoolSize();
+            final int submissionCount = pool.getActiveSubmissionCount();
+            final int needForThreads = submissionCount + 1 - currentPoolSize;
+            if (needForThreads > 0) {
+                if (currentPoolSize + needForThreads > ResizableFJPool.MAX_POOL_SIZE) {
+                    throw new IllegalStateException("The thread pool executor cannot run the task. " +
+                            "The upper limit of the thread pool size has probably been reached. " +
+                            "Current pool size: " + currentPoolSize + " Maximum pool size: " + ResizableFJPool.MAX_POOL_SIZE);
+                }
+                pool.addWorkers(needForThreads);
+            }
         }
-      }
-    });
-  }
+        super.execute(new Runnable() {
+            public void run() {
+                task.run();
+                synchronized (ResizableFJPool.this) {
+                    final int currentPoolSize = pool.getPoolSize();
+                    final int submissionCount = pool.getActiveSubmissionCount();
+                    final int desiredPoolSize = Math.max(submissionCount, getConfiguredPoolSize());
+                    final int change = currentPoolSize - desiredPoolSize;
+
+                    if (change >= 3) pool.removeWorkers(change);
+                }
+            }
+        });
+    }
 }

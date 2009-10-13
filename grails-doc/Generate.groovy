@@ -32,7 +32,7 @@ def compare = [compare: {o1, o2 ->
     for (i in 0..<nums1.size()) {
         result = nums1[i].compareTo(nums2[i])
         if (result != 0) break
-    }        
+    }
     result
 },
         equals: { false }] as Comparator

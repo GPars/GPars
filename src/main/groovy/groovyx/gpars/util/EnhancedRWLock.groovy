@@ -30,35 +30,35 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
  */
 public class EnhancedRWLock extends ReentrantReadWriteLock {
 
-  def EnhancedRWLock() { super() }
+    def EnhancedRWLock() { super() }
 
-  def EnhancedRWLock(final boolean fair) { super(fair); }
+    def EnhancedRWLock(final boolean fair) { super(fair); }
 
-  /**
-   * Performs the passed-in closure with the read lock locked and unlocks the read lock automatically
-   * after the closure finishes.
-   * @param cl The closure to perform with the read lock held
-   */
-  public void withReadLock(Closure cl) {
-    readLock().lock()
-    try {
-      cl.call()
-    } finally {
-      readLock().unlock()
+    /**
+     * Performs the passed-in closure with the read lock locked and unlocks the read lock automatically
+     * after the closure finishes.
+     * @param cl The closure to perform with the read lock held
+     */
+    public void withReadLock(Closure cl) {
+        readLock().lock()
+        try {
+            cl.call()
+        } finally {
+            readLock().unlock()
+        }
     }
-  }
 
-  /**
-   * Performs the passed-in closure with the write lock locked and unlocks the write lock automatically
-   * after the closure finishes.
-   * @param cl The closure to perform with the write lock held
-   */
-  public void withWriteLock(Closure cl) {
-    writeLock().lock()
-    try {
-      cl.call()
-    } finally {
-      writeLock().unlock()
+    /**
+     * Performs the passed-in closure with the write lock locked and unlocks the write lock automatically
+     * after the closure finishes.
+     * @param cl The closure to perform with the write lock held
+     */
+    public void withWriteLock(Closure cl) {
+        writeLock().lock()
+        try {
+            cl.call()
+        } finally {
+            writeLock().unlock()
+        }
     }
-  }
 }

@@ -26,30 +26,30 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public abstract class RemoteHandle implements Serializable {
-  protected final UUID serialId;
-  protected final UUID hostId;
+    protected final UUID serialId;
+    protected final UUID hostId;
 
-  public RemoteHandle(UUID hostId, UUID id) {
-    this.hostId = hostId;
-    serialId = id;
-  }
-
-  @SuppressWarnings({"CatchGenericClass", "UnusedDeclaration", "OverlyBroadCatchBlock"})
-  protected final Object readResolve() throws ObjectStreamException {
-    final SerialContext context = SerialContext.get();
-    final SerialHandle serialHandle = context.get(serialId);
-
-    WithSerialId obj;
-    if (serialHandle == null || (obj = serialHandle.get()) == null) {
-      try {
-        obj = createObject(context);
-        obj.serialHandle = SerialHandle.create(obj, serialId);
-      } catch (Exception t) {
-        throw new WriteAbortedException(t.getMessage(), t);
-      }
+    public RemoteHandle(UUID hostId, UUID id) {
+        this.hostId = hostId;
+        serialId = id;
     }
-    return obj;
-  }
 
-  protected abstract WithSerialId createObject(SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
+    @SuppressWarnings({"CatchGenericClass", "UnusedDeclaration", "OverlyBroadCatchBlock"})
+    protected final Object readResolve() throws ObjectStreamException {
+        final SerialContext context = SerialContext.get();
+        final SerialHandle serialHandle = context.get(serialId);
+
+        WithSerialId obj;
+        if (serialHandle == null || (obj = serialHandle.get()) == null) {
+            try {
+                obj = createObject(context);
+                obj.serialHandle = SerialHandle.create(obj, serialId);
+            } catch (Exception t) {
+                throw new WriteAbortedException(t.getMessage(), t);
+            }
+        }
+        return obj;
+    }
+
+    protected abstract WithSerialId createObject(SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 }

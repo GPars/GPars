@@ -25,28 +25,28 @@ import groovyx.gpars.actor.DynamicDispatchActor
 
 final class MyActor extends DynamicDispatchActor {
 
-  def MyActor(final closure) { super(closure); }
+    def MyActor(final closure) { super(closure); }
 
-  void onMessage(String message) {
-    println 'Received string'
-  }
+    void onMessage(String message) {
+        println 'Received string'
+    }
 
-  void onMessage(Integer message) {
-    println 'Received integer'
-  }
+    void onMessage(Integer message) {
+        println 'Received integer'
+    }
 
-  void onMessage(Object message) {
-    println 'Received object'
-  }
+    void onMessage(Object message) {
+        println 'Received object'
+    }
 
-  void onMessage(List message) {
-    println 'Received list'
-    stop()
-  }
+    void onMessage(List message) {
+        println 'Received list'
+        stop()
+    }
 }
 
 final def actor = new MyActor({
-  when {BigDecimal num -> println 'Received BigDecimal'}
+    when {BigDecimal num -> println 'Received BigDecimal'}
 }).start()
 
 actor << 1

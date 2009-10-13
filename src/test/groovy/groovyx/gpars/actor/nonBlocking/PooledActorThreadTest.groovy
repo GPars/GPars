@@ -16,30 +16,30 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
 
 public class PooledActorThreadTest extends GroovyTestCase {
-  public void testActorThread() {
-    volatile boolean flag1 = false
-    volatile boolean flag2 = false
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testActorThread() {
+        volatile boolean flag1 = false
+        volatile boolean flag2 = false
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    final Actor actor
-    actor = Actors.actor {
-      flag1 = isActorThread()
-      react {
-        flag2 = isActorThread()
-        latch.countDown()
-      }
+        final Actor actor
+        actor = Actors.actor {
+            flag1 = isActorThread()
+            react {
+                flag2 = isActorThread()
+                latch.countDown()
+            }
 
-    }.start()
+        }.start()
 
-    assertFalse actor.isActorThread()
-    actor.send 'Message'
-    latch.await()
-    assert flag1
-    assert flag2
-  }
+        assertFalse actor.isActorThread()
+        actor.send 'Message'
+        latch.await()
+        assert flag1
+        assert flag2
+    }
 }

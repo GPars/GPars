@@ -8,22 +8,22 @@ import java.util.concurrent.TimeUnit
  */
 class MessageStreamTest extends GroovyTestCase {
 
-  public void testResultWaiterWithTimeoutAndException() {
-    final def waiter = new ResultWaiter()
-    waiter.send new RuntimeException('test')
-    shouldFail(RuntimeException) {
-      waiter.result
+    public void testResultWaiterWithTimeoutAndException() {
+        final def waiter = new ResultWaiter()
+        waiter.send new RuntimeException('test')
+        shouldFail(RuntimeException) {
+            waiter.result
+        }
+        shouldFail(RuntimeException) {
+            waiter.getResult(10, TimeUnit.MILLISECONDS)
+        }
     }
-    shouldFail(RuntimeException) {
-      waiter.getResult(10, TimeUnit.MILLISECONDS)
+
+    void testSendWithoutArguments() {
+        def called = false
+        def stream = [send: {msg -> called = true; null }] as MessageStream
+        stream.send()
+        assert called
     }
-  }
-  
-  void testSendWithoutArguments() {
-    def called = false
-    def stream = [send: { msg -> called = true; null }] as MessageStream
-    stream.send()
-    assert called
-  }
 
 }

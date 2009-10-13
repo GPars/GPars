@@ -17,7 +17,6 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.impl.AbstractPooledActor
-import groovyx.gpars.actor.Actors
 
 /**
  * Demonstrates a way to do continuation-style loops with Actors.
@@ -25,27 +24,27 @@ import groovyx.gpars.actor.Actors
  */
 class MyLoopActor extends AbstractPooledActor {
 
-  protected void act() {
-    loop {
-      outerLoop()
+    protected void act() {
+        loop {
+            outerLoop()
+        }
     }
-  }
 
-  private void outerLoop() {
-    react {a ->
-      println 'Outer: ' + a
-      if (a != 0) innerLoop()
-      else println 'Done'
+    private void outerLoop() {
+        react {a ->
+            println 'Outer: ' + a
+            if (a != 0) innerLoop()
+            else println 'Done'
+        }
     }
-  }
 
-  private void innerLoop() {
-    react {b ->
-      println 'Inner ' + b
-      if (b == 0) outerLoop()
-      else innerLoop()
+    private void innerLoop() {
+        react {b ->
+            println 'Inner ' + b
+            if (b == 0) outerLoop()
+            else innerLoop()
+        }
     }
-  }
 }
 
 MyLoopActor actor = new MyLoopActor()

@@ -17,12 +17,12 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import org.codehaus.groovy.runtime.TimeCategory
 import static groovyx.gpars.actor.Actors.actor
-import java.util.concurrent.CountDownLatch
 
 /**
  *

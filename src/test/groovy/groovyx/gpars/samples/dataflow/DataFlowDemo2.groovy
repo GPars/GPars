@@ -24,16 +24,16 @@ import static groovyx.gpars.dataflow.DataFlow.start
  *
  */
 List<Integer> ints(int n, int max) {
-  if (n == max) return []
-  else return [n, * ints(n + 1, max)]
+    if (n == max) return []
+    else return [n, * ints(n + 1, max)]
 }
 
 List<Integer> sum(int s, List<Integer> stream) {
-  switch (stream.size()) {
-    case 0: return [s]
-    default:
-      return [s, * sum(stream[0] + s, stream.size() > 1 ? stream[1..-1] : [])]
-  }
+    switch (stream.size()) {
+        case 0: return [s]
+        default:
+            return [s, * sum(stream[0] + s, stream.size() > 1 ? stream[1..-1] : [])]
+    }
 }
 
 def x = new DataFlowVariable<List<Integer>>()
