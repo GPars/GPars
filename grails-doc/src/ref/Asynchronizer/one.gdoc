@@ -7,7 +7,7 @@ The _Asynchronizer_ class enables a Java's Executor Service-based DSL on collect
 Examples of use:
 {code} //multiply numbers asynchronously
  Asynchronizer.withAsynchronizer(5) {
-     Collection<Future> result = [1, 2, 3, 4, 5].collectAsync{it * 10}
+     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel{it * 10}
      assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
  }
 
@@ -28,17 +28,20 @@ The passed-in closure takes an instance of a ExecutorService as a parameter, whi
 
 Alternatively, the _Asynchronizer_ class can be statically imported _import static org.gparallelizer.Asynchronizer.`*`_, which will allow omitting the _Asynchronizer_ class name.
 {code} withAsynchronizer {
-     def result = [1, 2, 3, 4, 5].findAsync{Number number -> number > 2}
+     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}
      assert result in [3, 4, 5]
  }
 {code}
 The following methods on all objects, which support iterations in Groovy, are currently supported:
-* eachAsync()
-* collectAsync()
-* findAllAsync()
-* findAsync()
-* allAsync()
-* anyAsync()
+* eachParallel()
+* eachWithIndexParallel()
+* collectParallel()
+* findAllParallel()
+* findParallel()
+* allParallel()
+* anyParallel()
+* grepParallel()
+* groupByParallel()
 
 h3. Closures enhancements
 
@@ -80,11 +83,11 @@ As an alternative since the 0.8 release you can use the _AsyncEnhancer_ class to
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 AsyncEnhancer.enhanceInstance(list)
-println list.collectAsync {it * 2 }
+println list.collectParallel {it * 2 }
 
 def animals = ['dog', 'ant', 'cat', 'whale']
 AsyncEnhancer.enhanceInstance animals
-println (animals.anyAsync {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-println (animals.allAsync {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+println (animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+println (animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 {code}
-If exceptions are thrown while processing any of the passed-in closures, an instance of _AsyncException_ wrapping all the original exceptions gets re-thrown from the xxxAsync methods.
+If exceptions are thrown while processing any of the passed-in closures, an instance of _AsyncException_ wrapping all the original exceptions gets re-thrown from the xxxParallel methods.

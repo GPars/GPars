@@ -116,9 +116,9 @@ start {
 }
 
 start {
-    doAsync {
+    doParallel {
         println "Number of Groovy sites today: " +
-                ([dzone, jroller, theserverside].findAllAsync {
+                ([dzone, jroller, theserverside].findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'
                 }).size()
     }
@@ -143,9 +143,9 @@ final List urls = ['http://www.dzone.com', 'http://www.jroller.com', 'http://www
 
 start {
     def pages = urls.collect { downloadPage(it) }
-    doAsync {
+    doParallel {
         println "Number of Groovy sites today: " +
-                (pages.findAllAsync {
+                (pages.findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'
                 }).size()
     }

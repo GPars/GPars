@@ -16,19 +16,19 @@ Examples of use:
 {code} //summarize numbers concurrently
  Parallelizer.withParallelizer(5) {
      final AtomicInteger result = new AtomicInteger(0)
-     [1, 2, 3, 4, 5].eachAsync {result.addAndGet(it)}
+     [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
      assertEquals 15, result
  }
 
  //multiply numbers asynchronously
  Parallelizer.withParallelizer(5) {
-     final List result = [1, 2, 3, 4, 5].collectAsync {it * 2}
+     final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}
      assert ([2, 4, 6, 8, 10].equals(result))
  }
 {code}The passed-in closure takes an instance of a ForkJoinPool as a parameter, which can be then used freely inside the closure.
 {code} //check whether all elements within a collection meet certain criteria
  Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
-     assert [1, 2, 3, 4, 5].allAsync {it > 0}
-     assert ![1, 2, 3, 4, 5].allAsync {it > 1}
+     assert [1, 2, 3, 4, 5].allParallel {it > 0}
+     assert ![1, 2, 3, 4, 5].allParallel {it > 1}
  }
 {code}
