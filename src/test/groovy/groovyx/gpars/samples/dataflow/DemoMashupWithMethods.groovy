@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.Asynchronizer.doAsync
+
 import static groovyx.gpars.dataflow.DataFlow.start
 
 /**
@@ -27,7 +27,7 @@ final List urls = ['http://www.dzone.com', 'http://www.jroller.com', 'http://www
 
 start {
     def pages = urls.collect { downloadPage(it) }
-    doAsync {
+    doParallel {
         println "Number of Groovy sites today: " +
                 (pages.findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'

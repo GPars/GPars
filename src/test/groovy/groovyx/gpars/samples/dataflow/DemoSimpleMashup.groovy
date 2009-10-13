@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.Asynchronizer.doAsync
+
 import static groovyx.gpars.dataflow.DataFlow.start
 
 /**
@@ -47,7 +47,7 @@ start {
 }
 
 start {
-    doAsync {
+    doParallel {
         println "Number of Groovy sites today: " +
                 ([dzone, jroller, theserverside].findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'

@@ -77,12 +77,12 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.doAsync {ExecutorService service ->
+     * Asynchronizer.doParallel {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param cl The block of code to invoke with the DSL enabled
      */
-    public static doAsync(Closure cl) {
+    public static doParallel(Closure cl) {
         return withAsynchronizer(cl)
     }
 
@@ -99,13 +99,13 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.doAsync(5) {ExecutorService service ->
+     * Asynchronizer.doParallel(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param cl The block of code to invoke with the DSL enabled
      */
-    public static doAsync(int numberOfThreads, Closure cl) {
+    public static doParallel(int numberOfThreads, Closure cl) {
         return withAsynchronizer(numberOfThreads, cl)
     }
 
@@ -122,14 +122,14 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.doAsync(5) {ExecutorService service ->
+     * Asynchronizer.doParallel(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param threadFactory Factory for threads in the pool
      * @param cl The block of code to invoke with the DSL enabled
      */
-    public static doAsync(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
+    public static doParallel(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
         return withAsynchronizer(numberOfThreads, threadFactory, cl)
     }
 
