@@ -1,18 +1,20 @@
-h1. Constraints Usage
+Check out the small example written in Groovy using GParallelizer, which sums results of calculations performed by three concurrently run threads:
+{code}import static org.gparallelizer.dataflow.DataFlow.start
 
-Constraints provide Grails with a declarative DSL for defining validation rules, schema generation and CRUD generation meta data. An example of a set of constraints applied to a domain class are as follows:
+final def x = new DataFlowVariable()
+final def y = new DataFlowVariable()
+final def z = new DataFlowVariable()
 
-{code:java}
-class User {
-    ...
-
-    static constraints = {
-        login(size:5..15, blank:false, unique:true)
-        password(size:5..15, blank:false)
-        email(email:true, blank:false)
-        age(min:18, nullable:false)
-    }
+start {
+    z << x.val + y.val
+    println "Result: ${z.val}"
 }
-{code}
 
-Refer to the user guide topic on [Constraints|guide:constraints] for more information.
+start {
+    x << 10
+}
+
+start {
+    y << 5
+}
+{code}We start three logical threads, which run in parallel and perform their tasks. When a thread needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another thread (using the '<<' operator). Each _DataFlowVariable_ can be set only once in its lifetime. Notice that you don't have to bother with ordering and synchronizing the threads and their access to shared variables. The values are magically transferred among threads at the right time without your intervention.

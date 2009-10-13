@@ -1,32 +1,237 @@
+The actor support in gpars were inspired by the Actors library in Scala but have meanwhile gone beyond that.
+
+Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can naturally avoid issues like deadlocks, livelocks or starvation, so typical for shared memory.
+A nice wrap-up of the key [concepts behind actors|http://ruben.savanne.be/articles/concurrency-in-erlang-scala] was written recently by Ruben Vermeersch
+
 h1. Actors
 
-Grails incorporates the powerful build system {link:Gant|http://groovy.codehaus.org/Gant}, which is a Groovy wrapper around [Apache Ant|http://ant.apache.org].          [bootstrap|commandLine]
+Gpars used to come with two types of actors: _thread-bound actors_ and _event-driven actors_. You will find both in 0.8 versions but since 0.9, there is only one type of actor that is not bound to an exclusive thread.
+_References to thread-bound actors have been removed from this page when copying_ _[the old description|http://code.google.com/p/gparallelizer/wiki/Actors]_.
 
-The basic usage scenario is:
+Actors can share a relatively small thread pool. This can go as far as having many concurrent actors that share a single pooled thread. They avoid the threading limitations of the JVM.
 
-{code:java}
-grails [environment]* [command name]
+Actor code is processed in chunks separated by quiet periods of waiting for new events (messages). This can be naturally modeled through _continuations_. As JVM doesn't support continuations directly, they have to be simulated in the actors frameworks, which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
+
+{code}
+import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+
+class GameMaster extends AbstractPooledActor {
+    int secretNum
+
+    void afterStart() {
+        secretNum = new Random().nextInt(10)
+    }
+
+    void act() {
+        loop {
+            react { int num ->
+                if ( num > secretNum )
+                    reply 'too large'
+                else if ( num < secretNum )
+                    reply 'too small'
+                else {
+                    reply 'you win'
+                    stop()
+                    System.exit 0
+}   }   }   }   }
+
+class Player extends AbstractPooledActor {
+    String              name
+    AbstractPooledActor server
+    int                 myNum
+
+    void act() {
+        loop {
+            myNum = new Random().nextInt(10)
+            server.send myNum
+            react {
+                switch( it ) {
+                    case 'too large': println "$name: $myNum was too large"; break
+                    case 'too small': println "$name: $myNum was too small"; break
+                    case 'you win':   println "$name: I won $myNum"; stop(); break
+}   }   }   }   }
+
+def master = new GameMaster().start()
+new Player( name: 'Player', server: master ).start()
+
+[master, player]*.join()
+{code}
+example by _Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàlisi, MAiA Facultat de Matemàtiques, Universitat de Barcelona_
+
+h1. Usage of Actors
+
+Gpars provides consistent Actor APIs and DSLs.
+
+h2. Sending messages
+
+Messages can be sent to actors using the _send()_ method. Alternatively, the _<<_ operator can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available. The _reply_ is returned from the _sendAndWait()_ method as a return value.
+The _sendAndWait()_ methods may also return after a timeout expires or in case of termination of the called actor.
+{code}
+actor << 'Message'
+actor.send 'Message'
+def reply1 = actor.sendAndWait('Message')
+def reply2 = actor.sendAndWait(10, TimeUnit.SECONDS, 'Message')
+def reply3 = actor.sendAndWait(10.seconds, 'Message')
 {code}
 
-Grails will search for Gant scripts that match the given name in the following locations:
+All _send()_ and _sendAndWait()_ methods will throw an exception if invoked on a non-active actor.
 
-* USER_HOME/.grails/scripts
-* PROJECT_HOME/scripts
-* PROJECT_HOME/plugins/*/scripts
-* GRAILS_HOME/scripts
+h2. Creating Actors
 
-If Grails discovers multiple commands matching the name entered it will offer you a choice as to which one to execute.
+Actors share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned to back the pool once a message has been processed and the actor is idle waiting for some more messages to arrive.
 
-To specify an alternative environment to execute a particular command within you can specify an optional environment parameter either with one of the built in environments:
+For example, this is how you create an actor that prints out all messages that it receives.
 
-{code:java}
-grails dev run-app
-grails prod run-app
+{code}
+import static org.gparallelizer.actors.pooledActors.PooledActors.*
+
+def console = actor {
+    loop {
+        react {
+            println it
+        }
+    }
+}
 {code}
 
-Or using an argument
+Notice the _loop()_ method call, which ensures that the actor doesn't stop after having processed the first message.
 
-{code:java}
-grails -Dgrails.env=uat run-app{code}
+Here's an example with a decryptor service, which can decrypt submitted messages and send the decrypted messages back to the originators.
 
-Refer to the user guide section on [The Command Line|guide:commandLine] for more information.
+{code}
+import static org.gparallelizer.actors.pooledActors.PooledActors.*
+
+final def decryptor = actor {
+    loop {
+        react {String message->
+            if ('stopService' == message) stop()
+            else reply message.reverse()
+        }
+    }
+}.start()
+
+actor {
+    decryptor.send 'suonorhcnysa si yvoorG'
+    react {
+        println 'Decrypted message: ' + it
+        decryptor.send 'stopService'
+    }
+}.start()
+{code}
+
+Here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates.
+
+{code}
+import static org.gparallelizer.actors.pooledActors.PooledActors.*
+
+def me = actor {
+    friend.send('Hi')
+    react(30.seconds) {
+        //continue conversation
+    }
+}
+me.metaClass.onTimeout = {-> friend.send('I see, busy as usual. Never mind.')}
+me.start()
+{code}
+
+
+h2. Sending replies
+
+The _reply/replyIfExists_ methods are not only defined on the actors themselves, but also on the messages upon their reception, which is particularly handy when accepting multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed messages, whereas _reply()_ called on messages sends a reply to the author of the particular message only.
+
+{code}
+react {offerA, offerB, offerC ->
+
+    //sent to each of the senders
+    reply 'Received your kind offer. Now processing it and comparing with others.'
+
+    offerA.reply 'You were the fastest'  //sent to the author of offerA only
+
+    def winnerOffer = [offerA, offerB, offerC].min {it.price}
+    winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
+    ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the loosers only
+}
+{code}
+
+The _reply/replyIfExists_ methods work reliably across the actor types, so that event-driven (pooled) actors can send replies to thread-bound actors and vice versa.
+
+{code}
+//a thread-bound actor
+final Actor doubler = Actors.actor {
+    receive {num ->
+        reply 2 * num
+    }
+}.start()
+
+//an event-driven actor
+PooledActors.actor {
+    doubler << 10
+    doubler << 100
+    react {a, b ->
+        println "Doubles for 10 and 100 are $a and $b"
+    }
+}.start()
+{code}
+
+h2. Blocking message read
+
+Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message. This allows for a non-continuation style code and also might have positive performance implications in certain scenarios.
+
+Mixing _react()_ and _receive()_ calls within a single actor is also possible.
+
+
+{code}
+Actors.actor {
+    def msg1 = receive()
+    receive {msg2, msg3 ->
+        [msg1, msg2, msg3]*.reply 'Hi!'
+    }
+    react {msg4 ->
+        msg4.reply 'You're the last today!'
+    }
+}.start()
+{code}
+
+h2. Undelivered messages
+
+Sometimes messages cannot be delivered to the target actor. When special action needs to be taken for undelivered messages, at actor termination all unprocessed messages from its queue have their _onDeliveryError()_ method called. The _onDeliveryError()_ method or closure defined on the message can, for example, send a notification back to the original sender of the message.
+
+{code}
+final AbstractPooledActor me
+me = PooledActors.actor {
+    def message1 = 1
+    def message2 = 2
+
+    message1.metaClass.onDeliveryError = {->
+        me << "Could not deliver $delegate"
+    }
+
+    message2.metaClass.onDeliveryError = {->
+        me << "Could not deliver $delegate"
+    }
+
+    actor1 << message1
+    actor2 << message1
+    ...
+}
+{code}
+
+h2. Joining actors
+
+Note: Available since the 0.8 version
+
+Actors provide a _join()_ method to allow callers to wait for the actor to terminate. A variant accepting a timeout is also available. The Groovy _spread-dot_ operator comes in handy when joining multiple actors at a time.
+
+{code}
+def master = new GameMaster().start()
+def player = new Player(name: 'Player', server: master).start()
+
+[master, player]*.join()
+{code}
+
+h2. Custom schedulers
+
+Actors leverage the standard JDK concurrency library by default.  To provide a custom thread scheduler use the appropriate constructor parameter when creating an actor group. The supplied scheduler will orchestrate threads in the group's thread pool.
+
+
+Please also see the numerous Actor [Demos].
