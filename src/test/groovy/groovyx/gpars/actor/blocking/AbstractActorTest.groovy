@@ -74,7 +74,6 @@ public class AbstractActorTest extends GroovyTestCase {
         actor.start()
         actor.send null
         assert actor.receiveWasCalled
-        actor.stop()
     }
 
     public void testAfterStart() {
