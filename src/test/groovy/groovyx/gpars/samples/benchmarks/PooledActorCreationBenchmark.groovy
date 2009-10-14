@@ -23,13 +23,10 @@ import java.util.concurrent.CountDownLatch
 public class PooledActorCreationBenchmark implements Benchmark {
 
     public long perform(final int numberOfIterations) {
-        final CountDownLatch latch = new CountDownLatch(1)
-
         final AbstractPooledActor initiator = Actors.actor {
             int iteration = 0
             loop {
                 if (iteration == numberOfIterations) {
-                    latch.countDown()
                     Thread.yield()
                     stop()
                     return
@@ -43,7 +40,7 @@ public class PooledActorCreationBenchmark implements Benchmark {
 
         final long t1 = System.currentTimeMillis()
         initiator.start()
-        latch.await()
+        initiator.join()
         final long t2 = System.currentTimeMillis()
 
         return (t2 - t1)
