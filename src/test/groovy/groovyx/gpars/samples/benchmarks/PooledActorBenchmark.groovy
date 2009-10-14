@@ -16,6 +16,7 @@
 
 package groovyx.gpars.samples.benchmarks
 
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
@@ -23,9 +24,8 @@ import java.util.concurrent.CountDownLatch
 public class PooledActorBenchmark implements Benchmark {
 
     public long perform(final int numberOfIterations) {
-        final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor bouncer = Actors.actor {
+        final Actor bouncer = Actors.actor {
             loop {
                 react {
                     reply '2'
@@ -37,7 +37,6 @@ public class PooledActorBenchmark implements Benchmark {
             int iteration = 0
             loop {
                 if (iteration >= numberOfIterations) {
-                    latch.countDown()
                     Thread.yield()
                     stop()
                     return
@@ -51,7 +50,7 @@ public class PooledActorBenchmark implements Benchmark {
 
         final long t1 = System.currentTimeMillis()
         initiator.start()
-        latch.await()
+        initiator.join()
         final long t2 = System.currentTimeMillis()
         bouncer.stop()
 
