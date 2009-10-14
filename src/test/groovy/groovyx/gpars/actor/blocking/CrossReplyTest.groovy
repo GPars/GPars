@@ -43,7 +43,6 @@ public class CrossReplyTest extends GroovyTestCase {
         actor.start()
 
         barrier.await()
-        incrementor.stop()
         assertEquals 3, result
     }
 
@@ -92,7 +91,6 @@ public class CrossReplyTest extends GroovyTestCase {
         actor.start()
 
         barrier.await()
-        incrementor.stop()
         assertEquals 3, result
     }
 

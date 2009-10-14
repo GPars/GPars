@@ -182,7 +182,10 @@ public class ReplyTest extends GroovyTestCase {
 
         actor.send 'messsage'
         barrier.await()
-        actor.stop()
+
+        shouldFail(IllegalStateException) {
+          actor.stop()
+        }
 
         assert flag.get()
     }

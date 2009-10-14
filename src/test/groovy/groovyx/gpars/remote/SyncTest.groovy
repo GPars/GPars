@@ -59,8 +59,8 @@ public class SyncTest extends GroovyTestCase {
 
         a2.sendAndContinue("test") {
             assertEquals "so it goes", it
-            stop()
             a1.stop()
+            stop()
         }
 
         a1.join()

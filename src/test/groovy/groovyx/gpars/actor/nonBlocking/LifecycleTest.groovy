@@ -138,8 +138,9 @@ public class LifecycleTest extends GroovyTestCase {
 
         actor.send 'message'
         actor.stop()
-        actor.stop()
-        actor.stop()
+        shouldFail(IllegalStateException) {
+          actor.stop()
+        }
         latch.await()
         assertEquals 1, counter.intValue()
         assertFalse actor.isActive()
@@ -317,14 +318,9 @@ public class LifecycleTest extends GroovyTestCase {
         Thread.sleep 500
         assertFalse actor.isActive()
 
-        actor.start()
-
-        barrier.await()
-        assert actor.isActive()
-        barrier.await()
-        assertEquals 2, counter.intValue()
-        Thread.sleep 500
-        assertFalse actor.isActive()
+        shouldFail(IllegalStateException) {
+          actor.start()
+        }
     }
 
     public void testDoubleStart() {

@@ -28,8 +28,8 @@ public class RepeatLoopTest extends GroovyTestCase {
         Actors.actor {
             loop {
                 if (count == 10) {
-                    stop()
                     latch.countDown()
+                    stop()
                     return
                 }
                 count += 1

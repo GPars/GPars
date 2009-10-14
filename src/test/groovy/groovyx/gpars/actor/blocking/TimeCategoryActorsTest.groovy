@@ -49,7 +49,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def actor = Actors.actor {
+        Actors.actor {
             try {
                 receive(1.second) {}
             } catch (MissingPropertyException ignore) {exceptions++ }
@@ -62,6 +62,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
                 } finally {
                     latch.countDown()
                 }
+              println "123"
             }
         }.start()
 

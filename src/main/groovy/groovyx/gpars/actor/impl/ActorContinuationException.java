@@ -23,7 +23,7 @@ package groovyx.gpars.actor.impl;
  * @author Vaclav Pech
  *         Date: Feb 17, 2009
  */
-final class ActorContinuationException extends ActorException {
+public final class ActorContinuationException extends ActorException {
 
     ActorContinuationException() {
     }

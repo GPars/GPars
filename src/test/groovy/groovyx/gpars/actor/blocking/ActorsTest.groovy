@@ -37,8 +37,8 @@ public class ActorsTest extends GroovyTestCase {
             loop {
                 final int value = counter.incrementAndGet()
                 if (value == 3) {
-                    stop()
                     latch.countDown()
+                    stop()
                 }
             }
         }

@@ -35,24 +35,38 @@ public class AbstractActorTest extends GroovyTestCase {
         shouldFail(IllegalStateException) {
             actor.send("Message")
         }
-        actor.stop()
+        shouldFail(IllegalStateException) {
+            actor.stop()
+        }
         actor.start()
         shouldFail(IllegalStateException) {
             actor.start()
         }
+
         actor.stop()
-        actor.stop()
-        actor.stop()
+
+        shouldFail(IllegalStateException) {
+          actor.stop()
+        }
+        shouldFail(IllegalStateException) {
+          actor.stop()
+        }
 
         while (actor.isActive()) Thread.sleep(100)
 
         shouldFail(IllegalStateException) {
             actor.send("Message")
         }
-        actor.stop()
+        shouldFail(IllegalStateException) {
+            actor.stop()
+        }
 
-        actor.start()
-        actor.stop()
+        shouldFail(IllegalStateException) {
+            actor.start()
+        }
+        shouldFail(IllegalStateException) {
+            actor.stop()
+        }
     }
 
     public void testMessageMayBeNull() {

@@ -121,7 +121,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
         actor.start()
         assertEquals daemonGroup, actor.actorGroup
-        shouldFail {
+        shouldFail(IllegalStateException) {
             actor.actorGroup = nonDaemonGroup
         }
         daemonGroup.shutdown()

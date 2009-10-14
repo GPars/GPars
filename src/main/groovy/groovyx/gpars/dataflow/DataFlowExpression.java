@@ -110,6 +110,15 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
+     * Check if value set already for this expression
+     *
+     * @return true if bound already
+     */
+    public boolean isBound () {
+       return state == S_INITIALIZED;
+    }
+
+    /**
      * Asynchronously retrieves the value of the variable. Sends the actual value of the variable as a message
      * back the the supplied actor once the value has been bound.
      * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message

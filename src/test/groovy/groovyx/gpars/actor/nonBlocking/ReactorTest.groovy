@@ -19,8 +19,45 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.ReactiveActor
 import java.util.concurrent.atomic.AtomicInteger
+import groovyx.gpars.actor.DefaultPooledActor
+import groovyx.gpars.actor.Actors
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 public class ReactorTest extends GroovyTestCase {
+
+    public void testSimple() {
+        def res = []
+        CountDownLatch latch = new CountDownLatch(6)
+        final def processor = Actors.reactor {
+            res << 2 * it
+            latch.countDown()
+        }.start()
+
+        (0..5).each {
+          processor << it
+        }
+
+        latch.await()
+        processor.stop()
+        processor.join()
+
+        assertEquals ([0, 2, 4, 6, 8, 10], res)
+    }
+
+    public void testWait() {
+        final def processor = Actors.reactor {
+            2 * it
+        }.start()
+
+        assertEquals (20, processor.sendAndWait(10))
+        assertEquals (40, processor.sendAndWait(20))
+        assertEquals (60, processor.sendAndWait(30))
+
+        processor.stop()
+        processor.join(10,TimeUnit.SECONDS)
+    }
 
     public void testMessageProcessing() {
         final def group = new PooledActorGroup(4)
