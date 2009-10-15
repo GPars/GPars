@@ -22,7 +22,7 @@ import groovy.time.Duration;
 import groovyx.gpars.MessageStream;
 import groovyx.gpars.SequentialProcessingActor;
 import groovyx.gpars.actor.ActorMessage;
-import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
+import static groovyx.gpars.actor.impl.ActorException.*;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.ArrayList;
@@ -223,10 +223,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
 
         for (int i = 0; i != toReceive; ++i) {
-            if (stopFlag != S_RUNNING) {
-                throw TERMINATE;
-            }
-
+            checkStopTerminate();
             messages.add(takeMessage());
         }
         enhanceReplies(messages);

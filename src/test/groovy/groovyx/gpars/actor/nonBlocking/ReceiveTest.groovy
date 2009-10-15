@@ -76,8 +76,7 @@ public class ReceiveTest extends GroovyTestCase {
         def actor = Actors.actor {
             loop {
                 if (df.contains('result1')) {
-                    stop()
-                    return
+                    terminate()
                 }
                 df.result1 = receive()
                 receive {

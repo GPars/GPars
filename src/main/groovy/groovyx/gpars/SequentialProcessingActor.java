@@ -21,9 +21,7 @@ import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.impl.*;
-import static groovyx.gpars.actor.impl.ActorException.CONTINUE;
-import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
-import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
+import static groovyx.gpars.actor.impl.ActorException.*;
 
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
@@ -37,12 +35,11 @@ import groovy.time.Duration;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.CurriedClosure;
-import org.codehaus.groovy.runtime.InvokerHelper;
 
 /**
  * @author Alex Tkachman
  */
-public abstract class SequentialProcessingActor extends Actor {
+public abstract class SequentialProcessingActor extends Actor implements Runnable {
 
     /**
      * The actor group to which the actor belongs
@@ -72,19 +69,27 @@ public abstract class SequentialProcessingActor extends Actor {
 
     private static final AtomicIntegerFieldUpdater<SequentialProcessingActor> countUpdater = AtomicIntegerFieldUpdater.newUpdater(SequentialProcessingActor.class, "count");
 
-    private final Runnable TASK = new TaskRunnable();
-
     private volatile Thread waitingThread;
     private volatile Thread currentThread;
 
-    public static final ActorMessage startMessage = new ActorMessage ("startMessage",null);
-    public static final ActorMessage stopMessage  = new ActorMessage ("stopMessage",null);
-    public static final ActorMessage loopMessage  = new ActorMessage ("loopMessage",null);
+    private static final ActorMessage startMessage      = new ActorMessage ("startMessage",null);
+    private static final ActorMessage stopMessage       = new ActorMessage ("stopMessage",null);
+    private static final ActorMessage loopMessage       = new ActorMessage ("loopMessage",null);
+    private static final ActorMessage terminateMessage  = new ActorMessage ("terminateMessage",null);
 
-    protected static final int S_NOT_STARTED  = 0;
-    protected static final int S_RUNNING      = 1;
-    private static final int S_STOPPING     = 2;
-    protected static final int S_STOPPED      = 3;
+    protected static final int S_ACTIVE_MASK         = 1;
+    protected static final int S_FINISHING_MASK      = 2;
+    protected static final int S_FINISHED_MASK       = 4;
+    protected static final int S_STOP_TERMINATE_MASK = 8;
+
+    protected static final int S_NOT_STARTED       = 0;
+    protected static final int S_RUNNING           = S_ACTIVE_MASK;
+
+    protected static final int S_STOPPING     = S_STOP_TERMINATE_MASK | S_FINISHING_MASK | S_ACTIVE_MASK;
+    protected static final int S_TERMINATING  =                     0 | S_FINISHING_MASK | S_ACTIVE_MASK;
+
+    protected static final int S_STOPPED      = S_STOP_TERMINATE_MASK | S_FINISHED_MASK;
+    protected static final int S_TERMINATED   =                     0 | S_FINISHED_MASK;
 
     /**
      * Indicates whether the actor should terminate
@@ -110,64 +115,55 @@ public abstract class SequentialProcessingActor extends Actor {
      */
     @Override
     public final boolean isActive() {
-        int flag = stopFlag;
-        return flag != S_STOPPED && flag != S_NOT_STARTED;
+        return (stopFlag & S_ACTIVE_MASK) != 0;
     }
 
     private ActorMessage getMessage() {
         assert isActorThread();
 
         ActorMessage toProcess;
-        if (outputQueue == null) {
-            Node node = inputQueueUpdater.getAndSet(this, null);
-            while (node != null) {
-                Node next = node.next;
-                node.next = outputQueue;
-                outputQueue = node;
-                node = next;
-            }
-        }
+        transferQueues();
 
         toProcess = outputQueue.msg;
         outputQueue = outputQueue.next;
+
+        throwIfNeeded(toProcess);
+
         return toProcess;
     }
 
-    protected ActorMessage pollMessage() {
+    private void throwIfNeeded(ActorMessage toProcess) {
+        if (toProcess == stopMessage) {
+            stopFlag = S_STOPPING;
+            throw STOP;
+        }
+
+        if (toProcess == terminateMessage) {
+            stopFlag = S_TERMINATING;
+            throw TERMINATE;
+        }
+    }
+
+    protected final ActorMessage pollMessage() {
         assert isActorThread();
 
         ActorMessage toProcess = null;
-        if (outputQueue == null) {
-            Node node = inputQueueUpdater.getAndSet(this, null);
-            while (node != null) {
-                Node next = node.next;
-                node.next = outputQueue;
-                outputQueue = node;
-                node = next;
-            }
-        }
+        transferQueues();
 
         if (outputQueue != null) {
             toProcess = outputQueue.msg;
             outputQueue = outputQueue.next;
         }
+
         return toProcess;
     }
 
-    protected ActorMessage takeMessage() throws InterruptedException {
+    protected final ActorMessage takeMessage() throws InterruptedException {
         assert isActorThread();
 
         while (true) {
             ActorMessage toProcess = null;
-            if (outputQueue == null) {
-                Node node = inputQueueUpdater.getAndSet(this, null);
-                while (node != null) {
-                    Node next = node.next;
-                    node.next = outputQueue;
-                    outputQueue = node;
-                    node = next;
-                }
-            }
+            transferQueues();
 
             if (outputQueue != null) {
                 toProcess = outputQueue.msg;
@@ -178,6 +174,7 @@ public abstract class SequentialProcessingActor extends Actor {
                 // so we have to decrement
                 countUpdater.decrementAndGet(SequentialProcessingActor.this);
 
+                throwIfNeeded(toProcess);
                 return toProcess;
             }
 
@@ -195,15 +192,7 @@ public abstract class SequentialProcessingActor extends Actor {
         long endTime = System.nanoTime() + timeUnit.toNanos(timeout);
         do {
             ActorMessage toProcess = null;
-            if (outputQueue == null) {
-                Node node = inputQueueUpdater.getAndSet(this, null);
-                while (node != null) {
-                    Node next = node.next;
-                    node.next = outputQueue;
-                    outputQueue = node;
-                    node = next;
-                }
-            }
+            transferQueues();
 
             if (outputQueue != null) {
                 toProcess = outputQueue.msg;
@@ -214,6 +203,7 @@ public abstract class SequentialProcessingActor extends Actor {
                 // so we have to decrement
                 countUpdater.decrementAndGet(SequentialProcessingActor.this);
 
+                throwIfNeeded(toProcess);
                 return toProcess;
             }
 
@@ -225,31 +215,16 @@ public abstract class SequentialProcessingActor extends Actor {
         return null;
     }
 
-    protected void processNextMessage(ActorMessage toProcess) {
-        if (stopFlag != S_RUNNING)
-            throw TERMINATE;
-
-        if (toProcess == startMessage) {
-            handleStart();
-            // if we came here it means no loop were started
-            throw TERMINATE;
+    private void transferQueues() {
+        if (outputQueue == null) {
+            Node node = inputQueueUpdater.getAndSet(this, null);
+            while (node != null) {
+                Node next = node.next;
+                node.next = outputQueue;
+                outputQueue = node;
+                node = next;
+            }
         }
-
-        if (toProcess == stopMessage) {
-            throw TERMINATE;
-        }
-
-        if (toProcess == loopMessage) {
-            loopCode.run();
-            throw new IllegalStateException("Should not reach here");
-        }
-
-        if (reaction != null) {
-            reaction.offer(toProcess);
-            throw CONTINUE;
-        }
-
-        throw new IllegalStateException("Unexpected message " + toProcess);
     }
 
     protected SequentialProcessingActor() {
@@ -284,8 +259,10 @@ public abstract class SequentialProcessingActor extends Actor {
     }
 
     public final MessageStream send(Object message) {
-        if (stopFlag == S_STOPPED || stopFlag == S_NOT_STARTED) {
-            throw new IllegalStateException("The actor hasn't been started.");
+        int flag = stopFlag;
+        if (flag != S_RUNNING) {
+            if (message != terminateMessage && message != stopMessage)
+                throw new IllegalStateException("The actor can not accept messages at this point.");
         }
 
         ActorMessage actorMessage;
@@ -305,7 +282,7 @@ public abstract class SequentialProcessingActor extends Actor {
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
                 if (cnt == 0) {
-                    if (stopFlag != S_STOPPED)
+                    if (flag != S_STOPPED)
                         schedule();
                 }
                 else {
@@ -322,11 +299,21 @@ public abstract class SequentialProcessingActor extends Actor {
     }
 
     private void schedule() {
-        if (isActive())
-            actorGroup.getThreadPool().execute(TASK);
+        actorGroup.getThreadPool().execute(this);
     }
 
     protected void scheduleLoop() {
+        if (stopFlag == S_TERMINATING)
+            throw TERMINATE;
+
+        transferQueues();
+
+        if (outputQueue != null) {
+            if (outputQueue.msg == stopMessage) {
+                throw STOP;
+            }
+        }
+
         countUpdater.getAndIncrement(this);
 
         Node node = new Node();
@@ -353,14 +340,21 @@ public abstract class SequentialProcessingActor extends Actor {
 
     protected final void handleTermination() {
         Thread.interrupted();
-        if (stopFlagUpdater.compareAndSet(this, S_STOPPING, S_STOPPED) || stopFlagUpdater.compareAndSet(this, S_RUNNING, S_STOPPED)) {
-            try {
-                doOnTermination ();
-            } finally {
-                if (!getJoinLatch().isBound()) {
-                    //noinspection unchecked
-                    getJoinLatch().bind(null);
-                }
+
+        if (stopFlag == S_STOPPING)
+            stopFlag = S_STOPPED;
+        else
+            if (stopFlag == S_TERMINATING)
+                stopFlag = S_TERMINATED;
+            else
+                throw new IllegalStateException();
+
+        try {
+            doOnTermination ();
+        } finally {
+            if (!getJoinLatch().isBound()) {
+                //noinspection unchecked
+                getJoinLatch().bind(null);
             }
         }
     }
@@ -404,37 +398,53 @@ public abstract class SequentialProcessingActor extends Actor {
             throw new IllegalStateException("Actor has already been started.");
         }
 
-        reaction = null;
-        loopCode = null;
-        getJoinLatch().rebind();
-
         send(startMessage);
-
         return this;
     }
 
     /**
-     * Stops the Actor. The background thread will be interrupted, unprocessed messages will be passed to the afterStop
+     * Send message to stop to the actor.
+     * All messages in queue will be processed before stopped but no new messages will be accepted
+     * after that point
+     *
+     * @return this (the actor itself) to allow method chaining
+     */
+    @Override public final Actor stop() {
+        if (stopFlagUpdater.compareAndSet(this, S_RUNNING, S_STOPPING)) {
+            send (stopMessage);
+        }
+        return this;
+    }
+
+    /**
+     * Terminate the Actor. The background thread will be interrupted, unprocessed messages will be passed to the afterStop
      * method, if exists.
      * Has no effect if the Actor is not started.
      *
      * @return this (the actor itself) to allow method chaining
      */
-    @Override public final Actor stop() {
-        if (!stopFlagUpdater.compareAndSet(this, S_RUNNING, S_STOPPING)) {
-            throw new IllegalStateException("Actor has already been stopped");
+    @Override public final Actor terminate() {
+        for (;;) {
+            int flag = stopFlag;
+            if ((flag & S_FINISHED_MASK) != 0 || flag == S_TERMINATING)
+                break;
+
+            if (stopFlagUpdater.compareAndSet(this, flag, S_TERMINATING)) {
+                if (isActorThread()) {
+                    throw TERMINATE;
+                }
+
+                if (currentThread != null) {
+                    currentThread.interrupt();
+                }
+                else {
+                    // just to make sure that scheduled
+                    send(terminateMessage);
+                }
+                break;
+            }
         }
 
-        if (!isActorThread()) {
-            if (currentThread != null) {
-                currentThread.interrupt();
-            }
-            else {
-                send(stopMessage);
-            }
-        } else {
-            throw TERMINATE;
-        }
         return this;
     }
 
@@ -511,53 +521,72 @@ public abstract class SequentialProcessingActor extends Actor {
     }
 
     private static class Node {
-        volatile Node         next;
-        ActorMessage msg;
+        volatile Node next;
+        ActorMessage  msg;
     }
 
-    private class TaskRunnable implements Runnable {
-        public void run() {
+    public void run() {
+        try {
+            assert currentThread == null;
+
+            registerCurrentActorWithThread(SequentialProcessingActor.this);
+            currentThread = Thread.currentThread();
+
             try {
-                assert currentThread == null;
-
-                registerCurrentActorWithThread(SequentialProcessingActor.this);
-                currentThread = Thread.currentThread();
-
-                try {
-                    ActorMessage toProcess = getMessage();
-                    if (toProcess == AbstractPooledActor.stopMessage)
-                        throw TERMINATE;
-                    
-                    processNextMessage(toProcess);
-                }
-                catch (GroovyRuntimeException gre) {
-                    throw ScriptBytecodeAdapter.unwrap(gre);
-                }
-
-                if (stopFlag != S_RUNNING)
+                if (stopFlag == S_TERMINATING) {
                     throw TERMINATE;
-
-            } catch (ActorContinuationException continuation) {//
-            } catch (ActorTerminationException termination) {
-                handleTermination();
-            } catch (ActorTimeoutException timeout) {
-                handleTimeout();
-                handleTermination();
-            } catch (InterruptedException e) {
-                handleInterrupt(e);
-                handleTermination();
-            } catch (Throwable e) {
-                handleException(e);
-                handleTermination();
-            } finally {
-                Thread.interrupted();
-                deregisterCurrentActorWithThread();
-
-                currentThread = null;
-                int cnt = countUpdater.decrementAndGet(SequentialProcessingActor.this);
-                if(cnt > 0 && isActive()) {
-                    schedule();
                 }
+
+                ActorMessage toProcess = getMessage();
+
+                if (toProcess == startMessage) {
+                    handleStart();
+
+                    // if we came here it means no loop wes started
+                    stopFlag = S_STOPPING;
+                    throw STOP;
+                }
+
+                if (toProcess == loopMessage) {
+                    loopCode.run();
+                    throw new IllegalStateException("Should not reach here");
+                }
+
+                if (reaction != null) {
+                    reaction.offer(toProcess);
+                    throw CONTINUE;
+                }
+
+                throw new IllegalStateException("Unexpected message " + toProcess);
+            }
+            catch (GroovyRuntimeException gre) {
+                throw ScriptBytecodeAdapter.unwrap(gre);
+            }
+        } catch (ActorContinuationException continuation) {//
+        } catch (ActorTerminationException termination) {
+            handleTermination();
+        } catch (ActorStopException termination) {
+            handleTermination();
+        } catch (ActorTimeoutException timeout) {
+            stopFlag = S_TERMINATING;
+            handleTimeout();
+            handleTermination();
+        } catch (InterruptedException e) {
+            stopFlag = S_TERMINATING;
+            handleInterrupt(e);
+            handleTermination();
+        } catch (Throwable e) {
+            stopFlag = S_TERMINATING;
+            handleException(e);
+            handleTermination();
+        } finally {
+            Thread.interrupted();
+            deregisterCurrentActorWithThread();
+
+            currentThread = null;
+            int cnt = countUpdater.decrementAndGet(SequentialProcessingActor.this);
+            if(cnt > 0 && isActive()) {
+                schedule();
             }
         }
     }
@@ -596,15 +625,25 @@ public abstract class SequentialProcessingActor extends Actor {
     }
 
     private void doLoopCall() {
-        if (stopFlag != S_RUNNING)
-            throw TERMINATE;
+        checkStopTerminate();
 
         if (loopCode != null) {
             scheduleLoop();
         }
         else {
             // case of react called directly from act ()
-            throw TERMINATE;
+            stopFlag = S_STOPPING;
+            throw STOP;
+        }
+    }
+
+    protected final void checkStopTerminate() {
+        if (stopFlag != S_RUNNING) {
+            if (stopFlag == S_TERMINATING)
+                throw TERMINATE;
+
+            if (stopFlag != S_STOPPING)
+                throw new IllegalStateException("Should not reach here");
         }
     }
 

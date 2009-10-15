@@ -96,7 +96,7 @@ public class LifecycleTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
 
         final AbstractPooledActor actor = group.actor {
-            Thread.sleep 10000
+            Thread.sleep 2000
             react {
                 counter.incrementAndGet()
             }
@@ -109,6 +109,31 @@ public class LifecycleTest extends GroovyTestCase {
         actor.send('message')
         actor.stop()
 
+        Thread.sleep 3000
+        assertEquals 1, counter.intValue()
+
+        shouldFail(IllegalStateException) {
+            actor.send 'message'
+        }
+    }
+
+    public void testTerminate() {
+        final AtomicInteger counter = new AtomicInteger(0)
+
+        final AbstractPooledActor actor = group.actor {
+            Thread.sleep 10000
+            react {
+                counter.incrementAndGet()
+            }
+        }.start()
+
+        actor.metaClass {
+            onInterrupt = {}
+        }
+
+        actor.send('message')
+        actor.terminate()
+  
         Thread.sleep 1000
         assertEquals 0, counter.intValue()
 
@@ -118,12 +143,10 @@ public class LifecycleTest extends GroovyTestCase {
     }
 
     public void testReentrantStop() {
-        final def barrier = new CyclicBarrier(2)
         final def latch = new CountDownLatch(1)
         final AtomicInteger counter = new AtomicInteger(0)
 
         final AbstractPooledActor actor = group.actor {
-            barrier.await()
             react {
             }
         }.start()
@@ -138,9 +161,7 @@ public class LifecycleTest extends GroovyTestCase {
 
         actor.send 'message'
         actor.stop()
-        shouldFail(IllegalStateException) {
-          actor.stop()
-        }
+        actor.stop()
         latch.await()
         assertEquals 1, counter.intValue()
         assertFalse actor.isActive()
@@ -173,7 +194,7 @@ public class LifecycleTest extends GroovyTestCase {
         assertEquals 1, counter.intValue()
         Thread.sleep 500
 
-        actor.stop()
+        actor.terminate()
 
         latch.await(30, TimeUnit.SECONDS)
         assertFalse actor.isActive()
@@ -209,7 +230,7 @@ public class LifecycleTest extends GroovyTestCase {
         barrier.await()
         assert actor.isActive()
         Thread.sleep 500
-        actor.stop()
+        actor.terminate()
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals 0, counter.intValue()
@@ -259,7 +280,7 @@ public class LifecycleTest extends GroovyTestCase {
         actor.send 'message2'
         actor.send 'message3'
         barrier.await()
-        actor.stop()
+        actor.terminate()
 
         afterStopBarrier.await(30, TimeUnit.SECONDS)
         assert onInterruptFlag.get()

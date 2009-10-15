@@ -94,7 +94,7 @@ public class LoopTest extends GroovyTestCase {
 
         barrier.await()
         actor.send 'message'
-        actor.stop()
+        actor.terminate()
         afterStopBarrier.await()
         assertEquals 0, counter.intValue()
     }
@@ -128,7 +128,7 @@ public class LoopTest extends GroovyTestCase {
         barrier.await()
         actor.send 'message'
         barrier.await()
-        actor.stop()
+        actor.terminate()
 
         afterBarrier.await()
         assertEquals 1, counter.intValue()

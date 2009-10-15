@@ -2,6 +2,7 @@ package groovyx.gpars.dataflow
 
 import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
+import java.util.concurrent.TimeUnit
 
 public class DistributedDataFlowTest extends GroovyTestCase {
     void testDF() {
@@ -53,7 +54,7 @@ public class DistributedDataFlowTest extends GroovyTestCase {
         }
 
         nodes.each {
-            it.mainActor.join()
+            it.mainActor.join(5,TimeUnit.SECONDS)
             it.localHost.disconnect()
         }
     }

@@ -41,9 +41,7 @@ public class DefaultActorTest extends GroovyTestCase {
         actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
 
         assert actor.threadName.startsWith("Actor Thread ")
-        shouldFail(IllegalStateException) {
-          actor.stop()
-        }
+        actor.stop()
     }
 }
 

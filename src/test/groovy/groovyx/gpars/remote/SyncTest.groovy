@@ -2,6 +2,7 @@ package groovyx.gpars.remote
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.remote.netty.NettyTransportProvider
+import java.util.concurrent.TimeUnit
 
 public class SyncTest extends GroovyTestCase {
     void testDistSync() {
@@ -31,7 +32,7 @@ public class SyncTest extends GroovyTestCase {
             }
         })
 
-        node1.mainActor.join()
+        node1.mainActor.join(5,TimeUnit.SECONDS)
         node1.localHost.disconnect()
         node2.localHost.disconnect()
     }

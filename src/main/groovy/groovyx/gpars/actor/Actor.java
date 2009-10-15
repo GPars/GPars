@@ -65,12 +65,22 @@ public abstract class Actor extends ReceivingMessageStream {
     public abstract Actor start();
 
     /**
-     * Stops the Actor. Unprocessed messages will be passed to the afterStop method, if exists.
+     * Send message to stop to the Actor. All messages already in queue will be processed first.
+     * No new messages will be accepted since that point.
      * Has no effect if the Actor is not started.
      *
      * @return same actor
      */
     public abstract Actor stop();
+
+    /**
+     * Terminates the Actor. Unprocessed messages will be passed to the afterStop method, if exists.
+     * No new messages will be accepted since that point.
+     * Has no effect if the Actor is not started.
+     *
+     * @return same actor
+     */
+    public abstract Actor terminate();
 
     /**
      * Checks the current status of the Actor.
@@ -200,6 +210,11 @@ public abstract class Actor extends ReceivingMessageStream {
             return this;
         }
 
+        @Override public Actor terminate() {
+            remoteHost.write(new TerminateActorMsg(this));
+            return this;
+        }
+
         @Override public boolean isActive() {
             throw new UnsupportedOperationException();
         }
@@ -235,6 +250,19 @@ public abstract class Actor extends ReceivingMessageStream {
             @Override
             public void execute(final RemoteConnection conn) {
                 actor.stop();
+            }
+        }
+
+        public static class TerminateActorMsg extends SerialMsg {
+            private final Actor actor;
+
+            public TerminateActorMsg(final RemoteActor remoteActor) {
+                actor = remoteActor;
+            }
+
+            @Override
+            public void execute(final RemoteConnection conn) {
+                actor.terminate();
             }
         }
     }

@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actors
 
 public class JoinTest extends GroovyTestCase {
     public void testActorJoin() {
-        final def actor = Actors.actor { Thread.sleep 500; stop() }.start()
+        final def actor = Actors.actor { Thread.sleep 500; terminate() }.start()
         actor.join()
         assertFalse actor.isActive()
     }

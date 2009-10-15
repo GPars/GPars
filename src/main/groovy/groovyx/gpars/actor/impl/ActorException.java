@@ -23,13 +23,14 @@ package groovyx.gpars.actor.impl;
  * ActorAction is a parent to these exception. It also holds initialized instances of each of the concrete subclasses
  * to avoid need for exception object creation each time.
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  *         Date: Feb 17, 2009
  */
 public abstract class ActorException extends RuntimeException {
 
     public static final ActorException CONTINUE = new ActorContinuationException();
     public static final ActorException TERMINATE = new ActorTerminationException();
+    public static final ActorException STOP = new ActorStopException();
     public static final ActorException TIMEOUT = new ActorTimeoutException();
 
     ActorException() {

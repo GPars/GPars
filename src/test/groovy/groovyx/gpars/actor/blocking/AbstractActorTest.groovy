@@ -35,38 +35,27 @@ public class AbstractActorTest extends GroovyTestCase {
         shouldFail(IllegalStateException) {
             actor.send("Message")
         }
-        shouldFail(IllegalStateException) {
-            actor.stop()
-        }
+        actor.stop()
         actor.start()
         shouldFail(IllegalStateException) {
             actor.start()
         }
 
         actor.stop()
-
-        shouldFail(IllegalStateException) {
-          actor.stop()
-        }
-        shouldFail(IllegalStateException) {
-          actor.stop()
-        }
+        actor.stop()
+        actor.stop()
 
         while (actor.isActive()) Thread.sleep(100)
 
         shouldFail(IllegalStateException) {
             actor.send("Message")
         }
-        shouldFail(IllegalStateException) {
             actor.stop()
-        }
 
         shouldFail(IllegalStateException) {
             actor.start()
         }
-        shouldFail(IllegalStateException) {
             actor.stop()
-        }
     }
 
     public void testMessageMayBeNull() {
@@ -120,7 +109,7 @@ public class AbstractActorTest extends GroovyTestCase {
         final InterruptionTestActor actor = new InterruptionTestActor()
         actor.start()
         actor.startLatch.await(30, TimeUnit.SECONDS)
-        actor.stop()
+        actor.terminate()
 
         actor.stopLatch.await(30, TimeUnit.SECONDS)
         assert actor.afterStopFlag.get()
@@ -137,7 +126,7 @@ public class AbstractActorTest extends GroovyTestCase {
         actor.send('Message 2')
         actor.send('Message 3')
 
-        actor.stop()
+        actor.terminate()
 
         actor.stopLatch.await(30, TimeUnit.SECONDS)
         assert actor.afterStopFlag.get()

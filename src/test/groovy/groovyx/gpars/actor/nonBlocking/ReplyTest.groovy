@@ -352,7 +352,6 @@ public class ReplyTest extends GroovyTestCase {
         //send and terminate
         final AbstractPooledActor actor1 = actor {
             bouncer << 1
-            stop()
         }
         actor1.metaClass.afterStop = {
             latches[0].countDown()
@@ -363,7 +362,6 @@ public class ReplyTest extends GroovyTestCase {
         final AbstractPooledActor actor2 = actor {
             latches[1].await()
             bouncer << 5
-            stop()
         }
         actor2.metaClass.afterStop = {
             latches[2].countDown()
