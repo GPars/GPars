@@ -1,9 +1,10 @@
 #! /bin/sh
 
-#  This script is here for the Codehaus Bamboo build.  It has to know that the build executes in .. and this directory is ../checkout.
+#  This script is here only for the Codehaus Bamboo build.  The script has to know that the build actually
+#  executes in .. not . and that this directory is ../checkout.
 #
-#  The build task assembles and then checks.
+#  Use the -i option on grdlew so that the log has extra information in by default.
 
 cd checkout
 
-./gradlew clean build
+./gradlew -i clean build
