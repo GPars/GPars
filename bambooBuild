@@ -1,5 +1,9 @@
 #! /bin/sh
 
+#  This script is here for the Codehaus Bamboo build.  It has to know that the build executes in .. and this directory is ../checkout.
+#
 #  The build task assembles and then checks.
+
+cd checkout
 
 ./gradlew clean build
