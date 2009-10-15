@@ -1,3 +1,5 @@
 #! /bin/sh
 
+#  The build task assembles and then checks.
+
 ./gradlew clean build
