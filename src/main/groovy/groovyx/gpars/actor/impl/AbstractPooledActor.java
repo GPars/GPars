@@ -21,12 +21,13 @@ import groovy.lang.MetaClass;
 import groovy.time.Duration;
 import groovyx.gpars.MessageStream;
 import groovyx.gpars.SequentialProcessingActor;
-import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
-import static groovyx.gpars.actor.impl.ActorException.*;
+import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -312,17 +313,6 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      */
     protected final void receive(Duration duration, Closure handler) throws InterruptedException {
         receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler);
-    }
-
-    /**
-     * Adds a message to the Actor's queue. Can only be called on a started Actor.
-     * If there's no ActorAction scheduled for the actor a new one is created and scheduled on the thread pool.
-     *
-     * @param message may be null to simply trigger the actors receive/react
-     * @return this (the actor itself) to allow method chaining
-     */
-    public final Actor oldSend(final Object message) {
-        return null;
     }
 
     /**
