@@ -47,11 +47,21 @@ import org.codehaus.groovy.runtime.NullObject
  */
 public class Safe<T> extends DynamicDispatchActor {
 
+    /**
+     * Allows reads not to wait in the message queue.
+     * Writes and reads are mutually separated by using write or read locks respectively.
+     */
     private EnhancedRWLock lock = new EnhancedRWLock()
+
     /**
      * Holds the internal mutable state
      */
     protected T data
+
+    /**
+     * Function converting the internal state during read to prevent internal state escape from
+     * the protected boundary of the agent
+     */
     final Closure copy = {it}
 
     /**
@@ -81,6 +91,9 @@ public class Safe<T> extends DynamicDispatchActor {
         start()
     }
 
+    /**
+     * Accepts a NullObject instance and sets the internal state to null
+     */
     final void onMessage(NullObject obj) {
         lock.withWriteLock {
             updateValue null
@@ -142,7 +155,7 @@ public class Safe<T> extends DynamicDispatchActor {
     }
 
     /**
-     * Blocks utntil all messages in the queue prior to call to await() complete.
+     * Blocks until all messages in the queue prior to call to await() complete.
      * Provides a means to synchronize with the Safe
      */
     final public void await() {

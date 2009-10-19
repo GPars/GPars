@@ -41,6 +41,24 @@ public class SafeTest extends GroovyTestCase {
         assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
     }
 
+    public void testListWithCloneCopyStrategy() {
+        def jugMembers = new Safe<List>(['Me'], {it?.clone()})  //add Me
+
+        jugMembers.send {it.add 'James'}  //add James
+
+        final Thread t1 = Thread.start {
+            jugMembers.send {it.add 'Joe'}  //add Joe
+        }
+
+        final Thread t2 = Thread.start {
+            jugMembers << {it.add 'Dave'}  //add Dave
+            jugMembers << {it.add 'Alice'}  //add Alice
+        }
+
+        [t1, t2]*.join()
+        assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
+    }
+
     public void testCounter() {
         final Safe counter = new Safe<Long>(0L)
 
@@ -191,5 +209,25 @@ public class SafeTest extends GroovyTestCase {
         counter.await()
         assertEquals 1, counter.instantVal
         assertEquals 1, counter.val
+    }
+
+    public void testIncompatibleMessageType() {
+        final Safe counter = new Safe<Long>(0L)
+        counter << 'test'
+        assertEquals 'test', counter.val
+        counter << 1L
+        assertEquals 1L, counter.val
+    }
+
+    public void testNullMessage() {
+        final Safe counter = new Safe<Long>(0L)
+        counter << 'test'
+
+        final DataFlowVariable result = new DataFlowVariable<Long>()
+
+        counter.valAsync {
+            result << it
+        }
+        assertEquals 'test', result.val
     }
 }
