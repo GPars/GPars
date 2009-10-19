@@ -14,33 +14,25 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package groovyx.gpars.samples.actors.safevariable
+package groovyx.gpars.samples.actors.safe
 
 import groovyx.gpars.actor.Safe
 
-class Conference extends Safe<Long> {
-    def Conference() { super(0L) }
+def jugMembers = new Safe<List<String>>(['Me'])  //add Me
 
-    private def register(long num) { data += num }
-
-    private def unregister(long num) { data -= num }
-}
-
-final Safe<Long> conference = new Conference()
+jugMembers.send {it.add 'James'}  //add James
 
 final Thread t1 = Thread.start {
-    conference << {register(10L)}
+    jugMembers.send {it.add 'Joe'}  //add Joe
 }
 
 final Thread t2 = Thread.start {
-    conference << {register(5L)}
+    jugMembers << {it.add 'Dave'}  //add Dave
+    jugMembers << {it.add 'Alice'}  //add Alice
 }
 
-final Thread t3 = Thread.start {
-    conference << {unregister(3L)}
-}
+[t1, t2]*.join()
+println jugMembers.val
+jugMembers.valAsync {println "Current members: $it"}
 
-[t1, t2, t3]*.join()
-
-assert 12L == conference.val
-
+System.in.read()
