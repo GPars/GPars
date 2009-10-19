@@ -217,3 +217,25 @@ printer << {stop()}
 printer.join()
 {code}
 For latest update, see the respective [Demos].
+
+.h2 Reading the value
+
+To follow the clojure philosophy closely the Safe class gives reads higher priority than to writes.
+By using the _instantVal_ property your read request will bypass the incomming message queue of the Safe
+and return the current snapshot of the internal state.
+The _val_ property will wait in the message queue for processing, just like the non-blocking variant
+_valAsync(Clojure cl)_, which will invoke the provided closure with the internal state as a parameter.
+
+You have to bear in mind that the _instantVal_ property might return although correct, but randomly looking results, since the internal state
+of the Safe at the time of _instantVal_ execution is non-deterministic and depends on the messages that have been processed
+before the thread scheduler executes the body of _instantVal_.
+
+The _await()_ method allows you to wait for processing all the messages submitted to the Safe before and so blocks
+the calling thread.
+
+.h3 State copy strategy
+
+To avoid leaking the internal state the Safe class allows to specify a copy strategy as the second constructor argument.
+With the copy strategy specified, the internal state is processed by the copy strategy closure and the output value
+of the copy strategy value is returned to the caller instead of the actual internal state. This applies to _instantVal_,
+_val_ as well as to _valAsync()_.
