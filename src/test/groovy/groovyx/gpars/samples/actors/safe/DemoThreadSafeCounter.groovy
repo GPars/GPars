@@ -18,6 +18,10 @@ package groovyx.gpars.samples.actors.safe
 
 import groovyx.gpars.actor.Safe
 
+/**
+ * A thread-safe counter. Threads can submit commands, which increase or decrease the internal counter without fear
+ * of mutual races or lost updates.
+ */
 final Safe counter = new Safe<Long>(0L)
 
 final Thread t1 = Thread.start {
@@ -35,3 +39,4 @@ final Thread t3 = Thread.start {
 [t1, t2, t3]*.join()
 
 assert 5 == counter.val
+counter.stop().join()

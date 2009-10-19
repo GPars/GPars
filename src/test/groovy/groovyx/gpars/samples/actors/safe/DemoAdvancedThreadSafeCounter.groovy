@@ -18,6 +18,11 @@ package groovyx.gpars.samples.actors.safe
 
 import groovyx.gpars.actor.Safe
 
+/**
+ * Conference stores number of registartions and allows parties to register and unregister.
+ * It inherits from the Safe class and adds the register() and unregister() private methods,
+ * which callers may use it the commands they submit to the Conference.
+ */
 class Conference extends Safe<Long> {
     def Conference() { super(0L) }
 
@@ -26,21 +31,26 @@ class Conference extends Safe<Long> {
     private def unregister(long num) { data -= num }
 }
 
-final Safe<Long> conference = new Conference()
+final Safe<Long> conference = new Conference()  //new Conference created
+
+/**
+ * Three external parties will try to register/unregister concurrently
+ */
 
 final Thread t1 = Thread.start {
-    conference << {register(10L)}
+    conference << {register(10L)}               //send a command to register 10 attendees
 }
 
 final Thread t2 = Thread.start {
-    conference << {register(5L)}
+    conference << {register(5L)}                //send a command to register 5 attendees
 }
 
 final Thread t3 = Thread.start {
-    conference << {unregister(3L)}
+    conference << {unregister(3L)}              //send a command to unregister 3 attendees
 }
 
 [t1, t2, t3]*.join()
 
 assert 12L == conference.val
+conference.stop().join()
 

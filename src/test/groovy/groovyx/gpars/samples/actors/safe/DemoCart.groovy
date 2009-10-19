@@ -18,6 +18,11 @@ package groovyx.gpars.samples.actors.safe
 
 import groovyx.gpars.actor.Safe
 
+/**
+ * A thread-safe shopping cart, which can store purchased products together with their quantities.
+ * Each public method internaly submits a function for processing by the internal Safe instance
+ * to protect the shared mutable HashMap from races by multiple threads.
+ */
 class ShoppingCart {
 
     private def cartState = new Safe<Map<String, Integer>>([:])
@@ -35,11 +40,11 @@ class ShoppingCart {
     }
 
     public void increaseQuantity(String product, int quantityChange) {
-        cartState << this.&changeQuantity.curry(product, quantityChange)
+        cartState << this.&changeQuantity.curry(product, quantityChange)  //Submit the private changeQuantity() method as a function with the two parameters pre-filled
     }
 
     public void clearItems() {
-        cartState << performClear
+        cartState << performClear  //Submit the private performClear() method as a function
     }
 
     private void changeQuantity(String product, int quantityChange, Map items) {

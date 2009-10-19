@@ -19,47 +19,26 @@ package groovyx.gpars.samples.actors.safe
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.Safe
 
-final Closure cl = {
-    it ? new LinkedList(it) : null
-}
+def name = new Safe<String>()           //new Safe
 
-final Safe<List> agent = new Safe<List>([1], cl)
-
-agent << {it << 2}
-agent << {println it}
-
-println(agent.sendAndWait {it})
-println(agent.sendAndWait {it.size()})
-println agent.val
-
-agent << [1, 2, 3, 4, 5]
-println agent.val
-
-agent << {delegate.stop()}
-agent.stop()
-agent.join()
-
-
-def name = new Safe<String>()
-
-name << {updateValue 'Joe' }
-name << {updateValue(it + ' and Dave')}
+name << {updateValue 'Joe' }            //Set the state to 'Joe'
+name << {updateValue(it + ' and Dave')} //Set the state to a new value derived from the previous value
 println name.val
 println(name.sendAndWait({it.size()}))
 
-name << 'Alice'
+name << 'Alice'                         //Set a new state
 println name.val
 name.valAsync {println "Async: $it"}
 
-name << 'James'
+name << 'James'                         //Set a new state
 println name.val
 
-Actors.actor {
-    name << {it.toUpperCase()}
-    react {
+Actors.actor {                          //Create a new actor to communicate with the Safe
+    name << {it.toUpperCase()}          //Construct an upper cased string and reply it back. The internal state of the Safe doesn't change here
+    react {                             //Wait for the reply with the uppercased string
         println it
     }
-}.start().join()
+}.start().join()                        //Start and wait for termination of the actor
 
 name.stop()
 name.join()

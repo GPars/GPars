@@ -18,6 +18,9 @@ package groovyx.gpars.samples.actors.safe
 
 import groovyx.gpars.actor.Safe
 
+/**
+ * Create a new Safe wrapping a list of strings
+ */
 def jugMembers = new Safe<List<String>>(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
@@ -35,4 +38,5 @@ final Thread t2 = Thread.start {
 println jugMembers.val
 jugMembers.valAsync {println "Current members: $it"}
 
-System.in.read()
+jugMembers.await()
+jugMembers.stop().join()
