@@ -233,6 +233,8 @@ public class SafeTest extends GroovyTestCase {
 
     public void testException() {
         final Safe counter = new Safe<Long>(0L)
+        final DataFlowVariable result = new DataFlowVariable()
+        counter.metaClass.onException = {result << it}
         counter << {throw new RuntimeException('test')}
         counter.join()
         assertFalse counter.isActive()
@@ -242,5 +244,6 @@ public class SafeTest extends GroovyTestCase {
         shouldFail(IllegalStateException) {
             counter << {updateValue 1L}
         }
+        assertNotNull result.val
     }
 }
