@@ -8,6 +8,9 @@
     todo make pooled actors use receive()
     todo eachWithIndexParallel(), grepParallel(), groupByParallel()
     todo merge pooled and threaded actors
+    todo remove disableSendingReplies
+    todo build with Groovy 1.6.5
+    todo change actor group for DFVs
 
     Planned for the next release
 
@@ -15,18 +18,15 @@
     todo tune maven repository upload - from CI?
     todo tag sources at releases
 
-    todo remove disableSendingReplies
-     
+
     todo enable @Immutable in code with latest Maia
 
-    todo build with Groovy 1.6.5
-    
+
     todo DataFlows
     todo Detecting deadlock in the DataFlows class
     todo used generics with DataFlows to support DataFlowVariable.val type hints in IDE
 
     todo remove messages and exceptions from the test output
-    todo change actor group for DFVs
 
     todo leverage dynamic Groovy dispatch for message dispatch
 def actor = actor {
@@ -47,8 +47,6 @@ and the we can do
 
 assertEquals 5, actor.minus ( 10,  actor.plus(2, 3) )
 
-todo consider removing multiple messages for react()
-todo consider removing dynamic replies on messages
 
     Backlog
     todo CSP
