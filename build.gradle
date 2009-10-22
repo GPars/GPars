@@ -152,6 +152,7 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoSwing',                                  // maybe we don't want these to run on the CI ..
             'DemoSwingMashup',                            // but they can be run locally
             'DemoSwingCollectionProcessing',                            
+            'DemoSwingActors',                            
     ]
 
     classpath = sourceSets.main.runtimeClasspath
