@@ -5,15 +5,36 @@ import groovyx.gpars.scheduler.FJPool
 // only a spike - just to get the discussion rolling
 // Author: Dierk Koenig
 
-class Parallel {
+final class Parallel {
     @Delegate adaptee
-    private final static FJPool threadPool = new FJPool()
+    private FJPool threadPool
+    private final static FJPool sharedThreadPool = new FJPool()
 
     def each(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.eachParallel(yield) } }
+    def eachWithIndex(Closure yield, index) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.eachWithIndexParallel(yield, index) } }
+    def collect(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.collectParallel(yield) } }
+    def find(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.findParallel(yield) } }
+    def findAll(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.findAllParallel(yield) } }
+    def grep(filter) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.grepParallel(filter) } }
+    def all(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.allParallel(yield) } }
+    def any(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.anyParallel(yield) } }
+    def groupBy(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.groupByParallel(yield) } }
+
+    public void shutdown() {
+        if (threadPool!=sharedThreadPool) {
+            threadPool.shutdown()
+        }
+    }
 
     static void prepare(obj) {
         obj.metaClass.getParallel = {->
-            new Parallel(adaptee: delegate)
+            new Parallel(adaptee: delegate, threadPool:sharedThreadPool)
+        }
+    }
+
+    static void prepare(obj, FJPool threadPool) {
+        obj.metaClass.getParallel = {->
+            new Parallel(adaptee: delegate, threadPool:threadPool)
         }
     }
 }
@@ -33,3 +54,12 @@ Parallel.prepare Set
 def set = (1..6) as Set
 set.parallel.each threadPrinter
 set.each threadPrinter
+
+def nums = (1..20)
+Parallel.prepare nums, new FJPool()
+final def pnums = nums.parallel
+assert 10 == pnums.grep(1..10).size()
+assert 5 == pnums.grep(1..5).size()
+nums.parallel.shutdown()
+//should fail
+//pnums.each {}
