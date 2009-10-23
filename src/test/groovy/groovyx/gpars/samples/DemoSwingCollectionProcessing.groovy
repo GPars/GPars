@@ -19,7 +19,8 @@ class FileProcessor {
         for (counter in (1..wordCount)) {
             if (counter % 100 == 0) {
                 SwingUtilities.invokeLater {(slider.value = (int) (counter / 100))}
-                Thread.sleep 100
+//                Thread.sleep 100
+                1.upto(5000) {new Random().nextInt(30)}
             }
         }
     }
