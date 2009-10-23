@@ -24,6 +24,7 @@ import groovyx.gpars.actor.Safe
  * which callers may use it the commands they submit to the Conference.
  */
 class Conference extends Safe<Long> {
+    
     def Conference() { super(0L) }
 
     private def register(long num) { data += num }
