@@ -50,6 +50,13 @@ public class ParallelizerStringTest extends GroovyTestCase {
         }
     }
 
+    public void testGrepParallelWithThreadPoolAndString() {
+        Parallelizer.withParallelizer(5) {
+            def result = 'aBC'.grepParallel('B')
+            assertEquals (['B'], result)
+        }
+    }
+
     public void testAnyParallelWithThreadPoolAndString() {
         Parallelizer.withParallelizer(5) {
             assert 'aBc'.anyParallel {it == it.toUpperCase()}

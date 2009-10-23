@@ -53,6 +53,13 @@ public class AsynchronizerStringTest extends GroovyTestCase {
         }
     }
 
+    public void testGrepParallelWithThreadPoolAndString() {
+        Asynchronizer.withAsynchronizer(5) {
+            def result = 'aBC'.grepParallel('B')
+            assertEquals (['B'], result)
+        }
+    }
+
     public void testAllParallelWithString() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             assert 'ABC'.allParallel {it == it.toUpperCase()}

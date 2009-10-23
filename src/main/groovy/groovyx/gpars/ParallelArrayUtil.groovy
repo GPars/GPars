@@ -174,22 +174,6 @@ public class ParallelArrayUtil {
 
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
-     * rule as the filter predicate.
-     * The filter will be effectively used concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
-     * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
-     *     assertEquals(new HashSet([4, 5]), result)
-     *}*/
-    public static <T> Collection<T> grepParallel(Collection<T> collection, filter) {
-        createPA(collection, retrievePool()).withFilter({filter.isCase it} as Predicate).all().asList()
-    }
-
-    /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
@@ -231,6 +215,38 @@ public class ParallelArrayUtil {
      *}*/
     public static Object findParallel(Object collection, Closure cl) {
         return findParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * rule as the filter predicate.
+     * The filter will be effectively used concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
+     *     assertEquals(new HashSet([4, 5]), result)
+     *}*/
+    public static <T> Collection<T> grepParallel(Collection<T> collection, filter) {
+        createPA(collection, retrievePool()).withFilter({filter.isCase it} as Predicate).all().asList()
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * rule as the filter predicate.
+     * The filter will be effectively used concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
+     *     assertEquals(new HashSet([4, 5]), result)
+     *}*/
+    public static Object grepParallel(Object collection, filter) {
+        return grepParallel(createCollection(collection), filter)
     }
 
     /**
