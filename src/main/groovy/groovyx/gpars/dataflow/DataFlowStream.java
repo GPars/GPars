@@ -53,7 +53,7 @@ public final class DataFlowStream<T> {
 
     /**
      * Adds a DataFlowVariable to the buffer.
-     * Implementation detail - in fact another DFV is added to the buffer and an asynchronous 'whenbound' handler
+     * Implementation detail - in fact another DFV is added to the buffer and an asynchronous 'whenBound' handler
      * is registered with the supplied DFV to update the one stired in the buffer.
      *
      * @param ref The DFV to add to the stream

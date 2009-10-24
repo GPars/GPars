@@ -34,7 +34,10 @@ import java.util.concurrent.ConcurrentMap
  *
  * <pre>
  final df = new DataFlows()
- start { df[0] = df.x + df.y }start { df.x = 10 }start { df.y = 5 }assert 15 == df[0]
+ start { df[0] = df.x + df.y }
+ start { df.x = 10 }
+ start { df.y = 5 }
+ assert 15 == df[0]
  * </pre>
  *
  * @author Vaclav Pech, Dierk Koenig, Alex Tkachman
@@ -169,11 +172,9 @@ public final class DataFlows {
     }
 
     /**
-     * Checks whether a certain key is contained in the map. Doesn't chack, whether the variable has already been bound.
+     * Checks whether a certain key is contained in the map. Doesn't check, whether the variable has already been bound.
      * @param name The name of the DFV to check.
      */
-    //todo test
-
     public def contains(name) {
         variables.containsKey(name)
     }

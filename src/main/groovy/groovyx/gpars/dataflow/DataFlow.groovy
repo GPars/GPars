@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 
 /**
  * Contains factory methods to create dataflow actors and starting them.
@@ -29,11 +29,12 @@ public abstract class DataFlow {
     /**
      * Creates a new instance of SingleRunActor to run the supplied code.
      */
-    public static AbstractPooledActor start(final Closure code) {
+    public static Actor start(final Closure code) {
         new SingleRunActor(body: code).start()
     }
 
-    public static DataFlowExpression invoke(Object receiver, String methodName, Object ... args) {
-        return new DataFlowInvocationExpression(receiver, methodName, args);
-    }
+    //todo remove
+//    public static DataFlowExpression invoke(Object receiver, String methodName, Object ... args) {
+//        return new DataFlowInvocationExpression(receiver, methodName, args);
+//    }
 }
