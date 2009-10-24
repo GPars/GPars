@@ -38,16 +38,27 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 
 /**
+ * The base class for all dataflow elements.
+ *
  * @author Alex Tkachman, Vaclav Pech
  */
 public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject {
 
+    /**
+     * Updater for the state field
+     */
     protected static final AtomicIntegerFieldUpdater<DataFlowExpression> stateUpdater
             = AtomicIntegerFieldUpdater.newUpdater(DataFlowExpression.class, "state");
 
+    /**
+     * Updater for the waiting field
+     */
     protected static final AtomicReferenceFieldUpdater<DataFlowExpression, WaitingThread> waitingUpdater
             = AtomicReferenceFieldUpdater.newUpdater(DataFlowExpression.class, WaitingThread.class, "waiting");
 
+    /**
+     * The current metaclass
+     */
     private MetaClass metaClass = InvokerHelper.getMetaClass(getClass());
 
     /**
@@ -66,6 +77,9 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      */
     private volatile WaitingThread<T> waiting;
 
+    /**
+     * Possible states
+     */
     protected static final int S_NOT_INITIALIZED = 0;
     protected static final int S_INITIALIZING = 1;
     protected static final int S_INITIALIZED = 2;
@@ -110,7 +124,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Check if value set already for this expression
+     * Check if value has been set already for this expression
      *
      * @return true if bound already
      */
@@ -132,10 +146,10 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
     /**
      * Used by Dataflow operators.
-     * Asynchronously retrieves the value of the variable. Sends a message back the the supplied actor
-     * with a map holding the supplied index under the 'index' key and the actual value of the variable under
+     * Asynchronously retrieves the value of the variable. Sends a message back the the supplied MessageStream
+     * with a map holding the supplied attachment under the 'attachment' key and the actual value of the variable under
      * the 'result' key once the value has been bound.
-     * Index is an arbitrary value helping the actor.operator match its request with the reply.
+     * Attachment is an arbitrary value helping the actor.operator match its request with the reply.
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
      *
@@ -310,17 +324,26 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
     }
 
-    public void doBindRemote(final BindDataFlow msg) {
-        doBindImpl(value);
-        notifyRemote(msg.hostId);
+    /**
+     * Binds the value after receiving a bing message over the wire
+     * @param hostId Id of the bind originator host
+     * @param message The value to bind
+     */
+    public void doBindRemote(final UUID hostId, final T message) {
+        doBindImpl(message);
+        notifyRemote(hostId);
     }
 
+    /**
+     * Sends notifications to all subscribers
+     * @param hostId The local host id
+     */
     private void notifyRemote(final UUID hostId) {
         if (serialHandle != null) {
             Actors.defaultPooledActorGroup.getThreadPool().execute(new Runnable() {
                 public void run() {
                     final Object sub = serialHandle.getSubscribers();
-                    if (sub instanceof SerialContext) {
+                    if (sub instanceof RemoteHost) {
                         final RemoteHost host = (RemoteHost) sub;
                         if (hostId == null || !host.getHostId().equals(hostId)) {
                             host.write(new BindDataFlow(DataFlowExpression.this, value, host.getLocalHost().getId()));
@@ -345,7 +368,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
     /**
      * Sends the result back to the actor, which is waiting asynchronously for the value to be bound.
-     * The message will either be a map holding the index under the 'index' key and the actual bound value under the 'result' key,
+     * The message will either be a map holding the attachment under the 'attachment' key and the actual bound value under the 'result' key,
      * or it will be the result itself if the callback doesn't care about the index.
      *
      * @param attachment An arbitrary object identifying the request
@@ -386,7 +409,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Send result to provided stream when became available
+     * Send result to provided stream when it becomes available
      *
      * @param stream stream where to send result
      */
@@ -479,10 +502,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * Listener for availability of data flow expressions we depend from
      */
-    protected final class DataFlowExpressionsCollector extends MessageStream {
+    final class DataFlowExpressionsCollector extends MessageStream {
         private final AtomicInteger count = new AtomicInteger(1);
-
-        protected DataFlowExpressionsCollector() { }
 
         @Override public MessageStream send(final Object message) {
             if (count.decrementAndGet() == 0) {
@@ -520,13 +541,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         return getClass().getSimpleName() + "(value=" + value + ')';
     }
 
-    /**
-     * Never use this method.
-     */
-    public void rebind() {
-        state = S_NOT_INITIALIZED;
-    }
-
     private static class TransformOne<V> extends DataFlowExpression<V> {
         Object arg;
         private final Closure closure;
@@ -562,18 +576,34 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
     }
 
+    //todo sort out generics
+    /**
+     * Represents a remote message binding a value to a remoted DataFlowExpression
+     */
     public static class BindDataFlow extends SerialMsg {
         private final DataFlowExpression expr;
         private final Object message;
 
+        /**
+         *
+         * @param expr The local DataFlowExpression instance
+         * @param message The actual value to bind
+         * @param hostId The identification of the host to send the bind information to
+         */
         public BindDataFlow(final DataFlowExpression expr, final Object message, final UUID hostId) {
+            super(hostId);
             this.expr = expr;
             this.message = message;
         }
 
+        /**
+         * Performs the actual bind on the remote host
+         *
+         * @param conn The connection object
+         */
         @Override
         public void execute(final RemoteConnection conn) {
-            expr.doBindRemote(this);
+            expr.doBindRemote(hostId, message);
         }
     }
 }

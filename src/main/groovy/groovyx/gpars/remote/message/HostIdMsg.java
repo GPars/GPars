@@ -21,17 +21,17 @@ import groovyx.gpars.serial.SerialMsg;
 import java.util.UUID;
 
 /**
- * Message sent by NetTransportProvider immediately after connection to another host set up set up
+ * Message sent by NetTransportProvider immediately after connection to another host is set up
  *
- * @author Alex Tkachman
+ * @author Alex Tkachman, Vaclav Pech
  */
 public class HostIdMsg extends SerialMsg {
 
     /**
      * Construct message representing current state of the transport provider
+     * @param id Local host id
      */
-    public HostIdMsg(UUID id) {
-        super();
-        hostId = id;
+    public HostIdMsg(final UUID id) {
+        super(id);
     }
 }

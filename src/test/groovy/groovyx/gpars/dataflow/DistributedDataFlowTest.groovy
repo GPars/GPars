@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit
 
 public class DistributedDataFlowTest extends GroovyTestCase {
     void testDF() {
+        final DataFlows df = new DataFlows()
+
         def results = [one: new DataFlowVariable(), two: new DataFlowVariable()]
         def nodes = ["one", "two"].collect {node ->
             new LocalNode(new NettyTransportProvider(), {
@@ -32,7 +34,7 @@ public class DistributedDataFlowTest extends GroovyTestCase {
                             case "dataFlow":  // 1
                                 msg.actor << [command: "setDataFlow", dataFlow: msg.dataFlow, value: node]
                                 msg.dataFlow.whenBound {v ->
-                                    println v
+                                    df."$node" = v
                                 }
                                 msg.dataFlow << node
                                 break
@@ -57,5 +59,9 @@ public class DistributedDataFlowTest extends GroovyTestCase {
             it.mainActor.join(5,TimeUnit.SECONDS)
             it.localHost.disconnect()
         }
+        assertEquals 'two', results.one.val
+        assertEquals 'one', results.two.val
+        assertEquals 'one', df['one']
+        assertEquals 'two', df['two']
     }
 }
