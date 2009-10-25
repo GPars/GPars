@@ -16,28 +16,27 @@
 
 package groovyx.gpars;
 
-import groovyx.gpars.actor.ActorGroup;
-import groovyx.gpars.actor.Actors;
+import groovy.lang.Closure;
+import groovy.lang.GroovyRuntimeException;
+import groovy.time.Duration;
 import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.ActorGroup;
 import groovyx.gpars.actor.ActorMessage;
+import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.impl.*;
 import static groovyx.gpars.actor.impl.ActorException.*;
-
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
-import java.util.*;
-
-import groovy.lang.GroovyRuntimeException;
-import groovy.lang.Closure;
-import groovy.time.Duration;
-import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
-import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.CurriedClosure;
+import org.codehaus.groovy.runtime.GroovyCategorySupport;
+import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import java.util.concurrent.locks.LockSupport;
 
 /**
- * @author Alex Tkachman
+ * @author Alex Tkachman, Vaclav Pech
  */
 public abstract class SequentialProcessingActor extends Actor implements Runnable {
 
@@ -61,8 +60,20 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     private volatile Reaction reaction;
 
+    /**
+     * Stored incoming messages. The most recetly received message is in the head of the list.
+     */
     private volatile Node inputQueue;
+
+    /**
+     * Stores messages ready for processing by the actor. The oldest message is in the head of the list.
+     * Messages are transfered from the inputQueue into the output queue in the transferQueues() method.
+     */
     private Node outputQueue;
+
+    /**
+     * Counter of messages in the queues
+     */
     private volatile int  count;
 
     private static final AtomicReferenceFieldUpdater<SequentialProcessingActor,Node> inputQueueUpdater = AtomicReferenceFieldUpdater.newUpdater(SequentialProcessingActor.class, Node.class, "inputQueue");
@@ -72,10 +83,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     private volatile Thread waitingThread;
     private volatile Thread currentThread;
 
-    private static final ActorMessage startMessage      = new ActorMessage ("startMessage",null);
-    private static final ActorMessage stopMessage       = new ActorMessage ("stopMessage",null);
-    private static final ActorMessage loopMessage       = new ActorMessage ("loopMessage",null);
-    private static final ActorMessage terminateMessage  = new ActorMessage ("terminateMessage",null);
+    private static final ActorMessage startMessage      = new ActorMessage<String>("startMessage",null);
+    private static final ActorMessage stopMessage       = new ActorMessage<String>("stopMessage",null);
+    private static final ActorMessage loopMessage       = new ActorMessage<String>("loopMessage",null);
+    private static final ActorMessage terminateMessage  = new ActorMessage<String>("terminateMessage",null);
 
     protected static final int S_ACTIVE_MASK         = 1;
     protected static final int S_FINISHING_MASK      = 2;
@@ -106,7 +117,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Checks whether the current thread is the actor's current thread.
      */
-    public final boolean isActorThread() {
+    @Override public final boolean isActorThread() {
         return Thread.currentThread() == currentThread;
     }
 
@@ -118,13 +129,16 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         return (stopFlag & S_ACTIVE_MASK) != 0;
     }
 
+    /**
+     * Retrieves the next message from the queue
+     * @return The message
+     */
     private ActorMessage getMessage() {
         assert isActorThread();
 
-        ActorMessage toProcess;
         transferQueues();
 
-        toProcess = outputQueue.msg;
+        final ActorMessage toProcess = outputQueue.msg;
         outputQueue = outputQueue.next;
 
         throwIfNeeded(toProcess);
@@ -132,7 +146,11 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         return toProcess;
     }
 
-    private void throwIfNeeded(ActorMessage toProcess) {
+    /**
+     * Checks the supplied message and throws either STOP or TERMINATE, if the message is a Stop or Terminate message respectively.
+     * @param toProcess The next message to process by the actors
+     */
+    private void throwIfNeeded(final ActorMessage toProcess) {
         if (toProcess == stopMessage) {
             stopFlag = S_STOPPING;
             throw STOP;
@@ -144,82 +162,100 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    /**
+     * Polls a message from the queues
+     * @return The message
+     */
     protected final ActorMessage pollMessage() {
         assert isActorThread();
 
-        ActorMessage toProcess = null;
         transferQueues();
 
+        ActorMessage toProcess = null;
         if (outputQueue != null) {
             toProcess = outputQueue.msg;
             outputQueue = outputQueue.next;
         }
-
         return toProcess;
     }
 
+    /**
+     * Takes a message from the queues. Blocks until a message is available.
+     * @return The message
+     * @throws InterruptedException If the thread gets interrupted.
+     */
     protected final ActorMessage takeMessage() throws InterruptedException {
         assert isActorThread();
 
         while (true) {
-            ActorMessage toProcess = null;
-            transferQueues();
-
-            if (outputQueue != null) {
-                toProcess = outputQueue.msg;
-                outputQueue = outputQueue.next;
-
-                // we are in actor thread, so counter >= 1
-                // as we found message it is >= 2
-                // so we have to decrement
-                countUpdater.decrementAndGet(SequentialProcessingActor.this);
-
-                throwIfNeeded(toProcess);
-                return toProcess;
-            }
-
-            waitingThread = Thread.currentThread();
-            LockSupport.park();
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException();
-            }
+            final ActorMessage message = awaitNextMessage(0L);
+            if (message!=null) return message;
         }
     }
 
-    protected ActorMessage takeMessage(long timeout, TimeUnit timeUnit) {
+    /**
+     * Takes a message from the queues. Blocks until a message is available.
+     * @param timeout Max time to wait for a message
+     * @param timeUnit The units for the timeout
+     * @return The message
+     * @throws InterruptedException If the thread gets interrupted.
+     */
+    protected ActorMessage takeMessage(final long timeout, final TimeUnit timeUnit) throws InterruptedException {
         assert isActorThread();
 
-        long endTime = System.nanoTime() + timeUnit.toNanos(timeout);
+        final long endTime = System.nanoTime() + timeUnit.toNanos(timeout);
         do {
-            ActorMessage toProcess = null;
-            transferQueues();
-
-            if (outputQueue != null) {
-                toProcess = outputQueue.msg;
-                outputQueue = outputQueue.next;
-
-                // we are in actor thread, so counter >= 1
-                // as we found message it is >= 2
-                // so we have to decrement
-                countUpdater.decrementAndGet(SequentialProcessingActor.this);
-
-                throwIfNeeded(toProcess);
-                return toProcess;
-            }
-
-            waitingThread = Thread.currentThread();
-            LockSupport.parkNanos(endTime - System.nanoTime());
-        }
-        while (System.nanoTime() < endTime);
+            final ActorMessage message = awaitNextMessage(endTime);
+            if (message!=null) return message;
+        } while (System.nanoTime() < endTime);
 
         return null;
     }
 
+    /**
+     * Holds common functionality for takeMessage() methods.
+     * @param endTime End of the timeout, 0 if no timeout was set
+     * @return The next message
+     * @throws InterruptedException If the thread has been interrupted
+     */
+    private ActorMessage awaitNextMessage(final long endTime) throws InterruptedException {
+        transferQueues();
+
+        if (outputQueue != null) return retrieveNextMessage();
+
+        waitingThread = Thread.currentThread();
+        if (endTime==0L) LockSupport.park(); else LockSupport.parkNanos(endTime - System.nanoTime());
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+        return null;
+    }
+
+    /**
+     * Takes the next message from the outputQueue, decrements the cuonter and possibly throws control exceptions
+     * @return The next message
+     */
+    private ActorMessage retrieveNextMessage() {
+        final ActorMessage toProcess = outputQueue.msg;
+        outputQueue = outputQueue.next;
+
+        // we are in actor thread, so counter >= 1
+        // as we found message it is >= 2
+        // so we have to decrement
+        countUpdater.decrementAndGet(this);
+
+        throwIfNeeded(toProcess);
+        return toProcess;
+    }
+
+    /**
+     * Transfers messages from the input queue into the output queue, reverting the order of the elements.
+     */
     private void transferQueues() {
         if (outputQueue == null) {
             Node node = inputQueueUpdater.getAndSet(this, null);
             while (node != null) {
-                Node next = node.next;
+                final Node next = node.next;
                 node.next = outputQueue;
                 outputQueue = node;
                 node = next;
@@ -227,6 +263,9 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    /**
+     * Creates a new instance, sets the default actor group.
+     */
     protected SequentialProcessingActor() {
         setActorGroup(Actors.defaultPooledActorGroup);
     }
@@ -258,27 +297,26 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         return actorGroup;
     }
 
-    public final MessageStream send(Object message) {
-        int flag = stopFlag;
+    @Override public final MessageStream send(final Object message) {
+        final int flag = stopFlag;
         if (flag != S_RUNNING) {
             if (message != terminateMessage && message != stopMessage)
                 throw new IllegalStateException("The actor can not accept messages at this point.");
         }
 
-        ActorMessage actorMessage;
+        final ActorMessage actorMessage;
         if (message instanceof ActorMessage) {
             actorMessage = (ActorMessage) message;
         } else {
             actorMessage = ActorMessage.build(message);
         }
 
-        Node toAdd = new Node();
-        toAdd.msg = actorMessage;
+        final Node toAdd = new Node(actorMessage);
 
-        int cnt = countUpdater.getAndIncrement(this);
+        final int cnt = countUpdater.getAndIncrement(this);
 
         for (;;) {
-            Node prev = inputQueue;
+            final Node prev = inputQueue;
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
                 if (cnt == 0) {
@@ -286,7 +324,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                         schedule();
                 }
                 else {
-                    Thread w = waitingThread;
+                    final Thread w = waitingThread;
                     if (w != null) {
                         waitingThread = null;
                         LockSupport.unpark(w);
@@ -298,6 +336,9 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         return this;
     }
 
+    /**
+     * Schedules the current actor for processing on the actor group's thread pool.
+     */
     private void schedule() {
         actorGroup.getThreadPool().execute(this);
     }
@@ -316,29 +357,34 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         countUpdater.getAndIncrement(this);
 
-        Node node = new Node();
-        node.msg = loopMessage;
+        final Node node = new Node(loopMessage);
         node.next = outputQueue;
         outputQueue = node;
 
         throw CONTINUE;
     }
 
-    protected void handleStart() {
+    private void handleStart() {
         doOnStart ();
     }
 
+    /**
+     * Allows subclasses to add behavior to run after actor's start
+     */
     protected void doOnStart() {
     }
 
-    protected final void handleTimeout() {
+    private void handleTimeout() {
         doOnTimeout();
     }
 
+    /**
+     * Allows subclasses to add behavior to run after actor's timeout
+     */
     protected void doOnTimeout() {
     }
 
-    protected final void handleTermination() {
+    private void handleTermination() {
         Thread.interrupted();
 
         if (stopFlag == S_STOPPING)
@@ -359,10 +405,14 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    /**
+     * Allows subclasses to add behavior to run after actor's termination
+     */
     protected void doOnTermination() {
+        //todo unprocessed messages?
     }
 
-    protected final void handleException(final Throwable exception) {
+    private void handleException(final Throwable exception) {
         try {
             doOnException(exception);
         }
@@ -371,10 +421,14 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    /**
+     * Allows subclasses to add behavior to run after exception in actor's body
+     * @param exception The exception that was fired
+     */
     protected void doOnException(final Throwable exception) {
     }
 
-    protected final void handleInterrupt(final InterruptedException exception) {
+    private void handleInterrupt(final InterruptedException exception) {
         Thread.interrupted();
         try {
             doOnInterrupt(exception);
@@ -384,6 +438,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    /**
+     * Allows subclasses to add behavior to run after actor's interruption
+     * @param exception The InterruptedException
+     */
     protected void doOnInterrupt(final InterruptedException exception) {
     }
 
@@ -425,7 +483,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     @Override public final Actor terminate() {
         for (;;) {
-            int flag = stopFlag;
+            final int flag = stopFlag;
             if ((flag & S_FINISHED_MASK) != 0 || flag == S_TERMINATING)
                 break;
 
@@ -520,16 +578,23 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         throw CONTINUE;
     }
 
+    /**
+     * Represents an element in the message queue. Holds an ActorMessage and a reference to the next element in the queue.
+     * The reference is null for the last element in the queue.
+     */
     private static class Node {
         volatile Node next;
-        ActorMessage  msg;
+        final ActorMessage  msg;
+
+        Node(final ActorMessage actorMessage) { this.msg = actorMessage; }
     }
 
+    @SuppressWarnings({"ThrowCaughtLocally"})
     public void run() {
         try {
             assert currentThread == null;
 
-            registerCurrentActorWithThread(SequentialProcessingActor.this);
+            registerCurrentActorWithThread(this);
             currentThread = Thread.currentThread();
 
             try {
@@ -537,12 +602,12 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                     throw TERMINATE;
                 }
 
-                ActorMessage toProcess = getMessage();
+                final ActorMessage toProcess = getMessage();
 
                 if (toProcess == startMessage) {
                     handleStart();
 
-                    // if we came here it means no loop wes started
+                    // if we came here it means no loop was started
                     stopFlag = S_STOPPING;
                     throw STOP;
                 }
@@ -584,7 +649,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             deregisterCurrentActorWithThread();
 
             currentThread = null;
-            int cnt = countUpdater.decrementAndGet(SequentialProcessingActor.this);
+            final int cnt = countUpdater.decrementAndGet(this);
             if(cnt > 0 && isActive()) {
                 schedule();
             }
@@ -647,11 +712,11 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
-    void runReaction(List<ActorMessage> messages, int maxNumberOfParameters, Closure code) {
-        for (ActorMessage message : messages) {
+    void runReaction(final List<ActorMessage> messages, final int maxNumberOfParameters, Closure code) {
+        for (final ActorMessage message : messages) {
             if (message.getPayLoad() == TIMEOUT) {
                 final List<ActorMessage> saved = new ArrayList<ActorMessage>();
-                for (ActorMessage m : messages) {
+                for (final ActorMessage m : messages) {
                     if (m != null && m.getPayLoad() != TIMEOUT) {
                         saved.add(m);
                     }
@@ -661,7 +726,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             }
         }
 
-        for (ActorMessage message : messages) {
+        for (final ActorMessage message : messages) {
             if (message != null) {
                 getSenders().add(message.getSender());
                 obj2Sender.put(message.getPayLoad(), message.getSender());
@@ -669,7 +734,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
 
         if (maxNumberOfParameters > 0) {
-            Object args[] = new Object[messages.size()];
+            final Object[] args = new Object[messages.size()];
             for (int i = 0; i < args.length; i++) {
                 final ActorMessage am = messages.get(i);
                 args[i] = am == null ? null : am.getPayLoad();
