@@ -451,7 +451,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Evaluate expression after the ones we depend from are ready
+     * Evaluate expression after the ones we depend on are ready
      *
      * @return value to bind
      */
