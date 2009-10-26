@@ -3,12 +3,13 @@ package groovyx.gpars.benchmark
 import groovyx.gpars.actor.PooledActorGroup
 
 class Foo {
-    static final def iterations = 1000000
+    static final def iterations = 4000000
 
     static def perform(num) {
         def sum = 0
         for (i in 1..num) {
-            sum += 6.3 * i + i * 2//new Random().nextInt(i)
+//            sum += 6.3 * i + i * 2
+            new Random().nextInt(i)
         }
         return sum
     }
