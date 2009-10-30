@@ -5,7 +5,7 @@ import groovyx.gpars.scheduler.FJPool
 // only a spike - just to get the discussion rolling
 // Author: Dierk Koenig
 
-final class Parallel {
+final class ParallelS {
     @Delegate adaptee
     private FJPool threadPool
     private final static FJPool sharedThreadPool = new FJPool()
@@ -28,20 +28,20 @@ final class Parallel {
 
     static void prepare(obj) {
         obj.metaClass.getParallel = {->
-            new Parallel(adaptee: delegate, threadPool:sharedThreadPool)
+            new ParallelS(adaptee: delegate, threadPool:sharedThreadPool)
         }
     }
 
     static void prepare(obj, FJPool threadPool) {
         obj.metaClass.getParallel = {->
-            new Parallel(adaptee: delegate, threadPool:threadPool)
+            new ParallelS(adaptee: delegate, threadPool:threadPool)
         }
     }
 }
 
 // works on objects
 def obj = (1..6).toList()
-Parallel.prepare obj
+ParallelS.prepare obj
 
 def threadPrinter = { println Thread.currentThread() }
 
@@ -50,13 +50,18 @@ obj.parallel.each threadPrinter
 obj.each threadPrinter
 
 // but just as well on classes or interfaces
-Parallel.prepare Set
+ParallelS.prepare Set
 def set = (1..6) as Set
 set.parallel.each threadPrinter
 set.each threadPrinter
 
+final List items = [1, 2, 3, 4, 5]
+ParallelS.prepare items
+Collection c = items.parallel  //will fail
+
+
 def nums = (1..20)
-Parallel.prepare nums, new FJPool()
+ParallelS.prepare nums, new FJPool()
 final def pnums = nums.parallel
 assert 10 == pnums.grep(1..10).size()
 assert 5 == pnums.grep(1..5).size()

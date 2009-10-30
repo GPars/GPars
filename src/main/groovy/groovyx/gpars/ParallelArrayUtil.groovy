@@ -54,6 +54,29 @@ public class ParallelArrayUtil {
     }
 
     /**
+     * Creates a Parallel instance wrapping the object it is invoked on. Wrapping objects with instances of the Parallel class
+     * overrides the iterative methods like each(), collect() and such to call their parallel variants from the ParallelArrayUtil class
+     * like eachParallel(), collectParallel() and such.
+     * @param The object to wrap
+     * @param The instance of the Parallel class wrapping the original object and overriding the iterative methods with new parallel behavior
+     */
+    public static Object makeTransparentlyParallel(Object collection) {
+//        if (collection instanceof Parallel) return new Parallel(adaptee: collection.adaptee)
+//        else new Parallel(adaptee: collection)
+        //todo update the mixin check
+
+        if (!(collection.hasProperty('transparentlyParallel'))) collection.metaClass.mixin(Parallel)
+        return collection
+    }
+
+
+
+    /**
+     * Indicates whether the iterative methods like each() or collect() work have been altered to work concurrently.
+     */
+    public static boolean isTransparentlyParallel(Object collection) { false }
+    
+    /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the transformation operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
