@@ -16,17 +16,17 @@
 
 package groovyx.gpars
 
+import groovyx.gpars.util.PoolUtils
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
-import groovyx.gpars.util.PoolUtils
 
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
  * E.g.
  * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
- *     Collection<Future> result = [1, 2, 3, 4, 5].collect({it * 10}.async())
+ *     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel({it * 10}.async())
  *     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
  *}*
  * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->

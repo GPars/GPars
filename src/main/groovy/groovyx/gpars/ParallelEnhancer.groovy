@@ -20,12 +20,12 @@ import groovyx.gpars.scheduler.FJPool
 import groovyx.gpars.scheduler.Pool
 
 /**
- * ParallelEnhancer allows classes or instances to be enhanced with asynchronous variants of iterative methods,
+ * ParallelEnhancer allows classes or instances to be enhanced with parallel variants of iterative methods,
  * like eachParallel(), collectParallel(), findAllParallel() and others. These operations split processing into multiple
  * concurrently executable tasks and perform them on the underlying instance of the ForkJoinPool class from JSR-166y.
  * The pool itself is stored in a final property threadPool and can be managed through static methods
  * on the ParallelEnhancer class.
- * All enhanced classes and instances will share the underlying pool.
+ * All enhanced classes and instances will share the underlying pool. Use the getThreadPool() method to get hold of the thread pool.
  *
  * @author Vaclav Pech
  * Date: Jun 15, 2009
@@ -57,7 +57,7 @@ public final class ParallelEnhancer {
     /**
      * Retrieves the underlying pool
      */
-    public Pool getThreadPool() { return threadPool }
+    public static Pool getThreadPool() { return threadPool }
 
     /**
      * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure

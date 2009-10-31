@@ -25,11 +25,21 @@ import jsr166y.forkjoin.ForkJoinPool
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
  * shows to be much faster (10 - 20 times) compared to the executor service implementation in Asynchronizer.
  * E.g.
- * <pre>
- * Parallelizer.withParallelizer(5) {*   final AtomicInteger result = new AtomicInteger(0)
- *   [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}*   assertEquals 15, result
- *}* Parallelizer.withParallelizer(5) {*   final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}*   assert ([2, 4, 6, 8, 10].equals(result))
- *}* Parallelizer.withParallelizer(5) {*   assert [1, 2, 3, 4, 5].allParallel {it > 0}*  assert ![1, 2, 3, 4, 5].allParallel {it > 1}*}* </pre>
+ <pre>
+Parallelizer.withParallelizer(5) {
+    final AtomicInteger result = new AtomicInteger(0)
+    [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
+    assertEquals 15, result
+}
+Parallelizer.withParallelizer(5) {
+    final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}
+    assert ([2, 4, 6, 8, 10].equals(result))
+ }
+ Parallelizer.withParallelizer(5) {
+    assert [1, 2, 3, 4, 5].allParallel {it > 0}
+    assert ![1, 2, 3, 4, 5].allParallel {it > 1}
+ }
+ </pre>
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */

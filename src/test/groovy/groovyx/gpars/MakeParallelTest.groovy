@@ -170,8 +170,8 @@ class MakeParallelTest extends GroovyTestCase {
         return map
     }
 
+    //todo update + test enhancers with transparent parallel
     //todo update samples - Asynchronizer, making parallel, propagation, combinations
     //todo update documentation
     //todo move the enhancement methods
-    //todo update + test enhancers with transparent parallel
 }
