@@ -16,6 +16,8 @@
 
 package groovyx.gpars.scheduler;
 
+import groovyx.gpars.util.PoolUtils;
+
 import java.util.concurrent.*;
 
 /**
@@ -36,7 +38,7 @@ public final class ResizablePool extends DefaultPool {
      * @param daemon Sets the daemon flag of threads in the pool.
      */
     public ResizablePool(final boolean daemon) {
-        this(daemon, Runtime.getRuntime().availableProcessors() + 1);
+        this(daemon, PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
