@@ -23,9 +23,9 @@ import java.util.concurrent.ConcurrentHashMap
  * Author: Vaclav Pech
  * Date: Oct 30, 2009
  */
-class ParallelTest extends GroovyTestCase {
+class MakeParallelTest extends GroovyTestCase {
 
-    public void testParallelProperty() {
+    public void testMakeParallelAvailability() {
         shouldFail {
             [].makeTransparentlyParallel()
             [1].makeTransparentlyParallel()
@@ -57,14 +57,14 @@ class ParallelTest extends GroovyTestCase {
         }
     }
 
-    public void testParallelType() {
+    public void testMakeParallelTypeCompatibility() {
         Parallelizer.doParallel {
             Collection c = [1, 2, 3, 4, 5].makeTransparentlyParallel()
             String s = 'abcde'.makeTransparentlyParallel()
         }
     }
 
-    public void testIsTransparentlyParallel() {
+    public void testIsTransparentlyParallelCheck() {
         def items = [1, 2, 3, 4, 5]
         shouldFail {
             items.transparentlyParallel
@@ -84,35 +84,7 @@ class ParallelTest extends GroovyTestCase {
         }
     }
 
-    public void testIsTransparentlyParallelWithTransparentParallelArrayUtil() {
-        def items = [1, 2, 3, 4, 5]
-        shouldFail {
-            items.transparentlyParallel
-        }
-        Parallelizer.doTransparentlyParallel {
-            assertTrue items.isTransparentlyParallel()
-            assertTrue 'abc'.isTransparentlyParallel()
-            shouldFail {
-                items.makeTransparentlyParallel()
-            }
-            assertTrue items.isTransparentlyParallel()
-            shouldFail {
-                'abcde'.makeTransparentlyParallel()
-            }
-        }
-
-        shouldFail {
-            assertFalse items.isTransparentlyParallel()
-        }
-        shouldFail {
-            assertFalse 'abcde'.isTransparentlyParallel()
-        }
-        shouldFail {
-            assertTrue 'ab'.isTransparentlyParallel()
-        }
-    }
-
-    public void testNestedParallel() {
+    public void testIdempotenceOfNestingMakeParallel() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
@@ -121,10 +93,10 @@ class ParallelTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() > 2
     }
 
-    public void testChainedParallel() {
+    public void testMakeParallelPropagationToResults() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
@@ -136,7 +108,19 @@ class ParallelTest extends GroovyTestCase {
         assert map.keys().size() > 3
     }
 
-    public void testParallelWithString() {
+    public void testNoMakeParallelPropagationToResultsWithGroupBy() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        Parallelizer.doParallel(5) {
+            items.makeTransparentlyParallel().groupBy {it % 2}.each {
+                Thread.sleep 500
+                map[Thread.currentThread()] = ''
+            }
+        }
+        assert map.keys().size() == 1
+    }
+
+    public void testMakeParallelPropagationToResultsWithString() {
         def items = 'abcde'
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
@@ -148,7 +132,7 @@ class ParallelTest extends GroovyTestCase {
         assert map.keys().size() > 3
     }
 
-    public void testParallelWithIterator() {
+    public void testMakeParallelPropagationToResultsWithIterator() {
         def items = [1, 2, 3, 4, 5].iterator()
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
@@ -160,7 +144,7 @@ class ParallelTest extends GroovyTestCase {
         assert map.keys().size() > 3
     }
 
-    public void testParallelInMethodCall() {
+    public void testTransparentParallelInMethodCall() {
         def items = [1, 2, 3, 4, 5]
         assertEquals 1, foo(items).keys().size()
 
@@ -179,56 +163,12 @@ class ParallelTest extends GroovyTestCase {
         return map
     }
 
-    public void testTransparentEach() {
-        def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().each {
-                Thread.sleep 100
-                map[Thread.currentThread()] = ''
-            }
-        }
-        assert map.keys().size() > 1
-    }
-
-    public void testTransparentEachWithIndex() {
-        def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().eachWithIndex {e, i ->
-                Thread.sleep 100
-                map[Thread.currentThread()] = ''
-            }
-        }
-        assert map.keys().size() > 1
-    }
-
     //todo test mixing transparent and non-transparent enhancements in all variants
-
-    public void testUsingNonTransparentEachInTransparentContext() {
-        def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().eachParallel {
-                Thread.sleep 100
-                map[Thread.currentThread()] = ''
-            }
-        }
-        assert map.keys().size() > 1
-    }
-
-    public void testUsingTransparentEachInTransparentContext() {
-        def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doTransparentlyParallel(5) {
-            Parallelizer.doParallel(5) {
-                items.makeTransparentlyParallel().each {
-                    Thread.sleep 100
-                    map[Thread.currentThread()] = ''
-                }
-            }
-        }
-        assert map.keys().size() > 1
-    }
-
+    //todo test transparent parallel
+    //todo test on other types
+    //todo update samples
+    //todo update javadoc
+    //todo update documentation
+    //todo move the enhancement methods
+    //todo update enhancers
 }

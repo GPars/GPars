@@ -65,8 +65,6 @@ public class ParallelArrayUtil {
         return collection
     }
 
-
-
     /**
      * Indicates whether the iterative methods like each() or collect() work have been altered to work concurrently.
      */
@@ -368,7 +366,7 @@ public class ParallelArrayUtil {
      * Example:
      * Parallelizer.withParallelizer {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      *}*/
-    public static List<Object> groupByParallel(Object collection, Closure cl) {
+    public static Map groupByParallel(Object collection, Closure cl) {
         return groupByParallel(createCollection(collection), cl)
     }
 }

@@ -35,6 +35,6 @@ final class Parallel {
     public def final grep(filter) { mixedIn[Object].grepParallel(filter).makeTransparentlyParallel()}
     public def final all(Closure yield) { mixedIn[Object].allParallel(yield)}
     public def final any(Closure yield) { mixedIn[Object].anyParallel(yield)}
-    public def final groupBy(Closure yield) { mixedIn[Object].groupByParallel(yield).makeTransparentlyParallel()}
+    public def final groupBy(Closure yield) { mixedIn[Object].groupByParallel(yield)}
     def final boolean isTransparentlyParallel() {return true}
 }
