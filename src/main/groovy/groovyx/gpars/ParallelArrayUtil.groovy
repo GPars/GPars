@@ -60,7 +60,7 @@ public class ParallelArrayUtil {
      */
     public static Object makeTransparentlyParallel(Object collection) {
         if (!(collection.respondsTo('isTransparentlyParallel'))) throw new IllegalStateException("Cannot make the object transparently parellel. Apparently we're not inside a Parallelizer.doParallel() block.")
-        if (!collection.isTransparentlyParallel()) collection.metaClass.mixin(Parallel)
+        if (!collection.isTransparentlyParallel()) collection.metaClass.mixin(TransparentParallel)
         return collection
     }
 

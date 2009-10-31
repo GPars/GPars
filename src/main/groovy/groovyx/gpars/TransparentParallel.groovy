@@ -25,7 +25,7 @@ package groovyx.gpars
  * Author: Vaclav Pech, Dierk Koenig
  * Date: Oct 30, 2009
  */
-final class Parallel {
+final class TransparentParallel {
     public def final each(Closure yield) { mixedIn[Object].eachParallel(yield) }
     public def final eachWithIndex(Closure yield) { mixedIn[Object].eachWithIndexParallel(yield)}
     public def final collect(Closure yield) { mixedIn[Object].collectParallel(yield).makeTransparentlyParallel()}
