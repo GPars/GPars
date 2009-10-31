@@ -28,7 +28,7 @@ final class Parallel {
     //todo update javadoc
     
     public def final each(Closure yield) { mixedIn[Object].eachParallel(yield) }
-    public def final eachWithIndex(Closure yield, index) { mixedIn[Object].eachWithIndexParallel(yield, index)}
+    public def final eachWithIndex(Closure yield) { mixedIn[Object].eachWithIndexParallel(yield)}
     public def final collect(Closure yield) { mixedIn[Object].collectParallel(yield).makeTransparentlyParallel()}
     public def final find(Closure yield) { mixedIn[Object].findParallel(yield)}
     public def final findAll(Closure yield) { mixedIn[Object].findAllParallel(yield).makeTransparentlyParallel()}

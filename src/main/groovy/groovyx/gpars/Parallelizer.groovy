@@ -35,7 +35,7 @@ import jsr166y.forkjoin.ForkJoinPool
  */
 public class Parallelizer {
 
-    private static ThreadLocal<ForkJoinPool> currentPool = new ThreadLocal<ForkJoinPool>()
+    private static final ThreadLocal<ForkJoinPool> currentPool = new ThreadLocal<ForkJoinPool>()
     private static final int defaultPoolSize = PoolUtils.retrieveDefaultPoolSize()
 
     protected static retrieveCurrentPool() {
@@ -43,7 +43,7 @@ public class Parallelizer {
     }
 
     private static createPool() {
-        return createPool(Runtime.runtime.availableProcessors() + 1)
+        return createPool(PoolUtils.retrieveDefaultPoolSize())
     }
 
     private static createPool(int poolSize) {

@@ -112,17 +112,6 @@ class ParallelTest extends GroovyTestCase {
         }
     }
 
-    public void testParallel() {
-        def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().eachWithIndex {e, i ->
-                map[Thread.currentThread()] = ''
-            }
-        }
-        assert map.keys().size() > 1
-    }
-
     public void testNestedParallel() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
@@ -189,4 +178,57 @@ class ParallelTest extends GroovyTestCase {
         }
         return map
     }
+
+    public void testTransparentEach() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        Parallelizer.doParallel(5) {
+            items.makeTransparentlyParallel().each {
+                Thread.sleep 100
+                map[Thread.currentThread()] = ''
+            }
+        }
+        assert map.keys().size() > 1
+    }
+
+    public void testTransparentEachWithIndex() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        Parallelizer.doParallel(5) {
+            items.makeTransparentlyParallel().eachWithIndex {e, i ->
+                Thread.sleep 100
+                map[Thread.currentThread()] = ''
+            }
+        }
+        assert map.keys().size() > 1
+    }
+
+    //todo test mixing transparent and non-transparent enhancements in all variants
+
+    public void testUsingNonTransparentEachInTransparentContext() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        Parallelizer.doParallel(5) {
+            items.makeTransparentlyParallel().eachParallel {
+                Thread.sleep 100
+                map[Thread.currentThread()] = ''
+            }
+        }
+        assert map.keys().size() > 1
+    }
+
+    public void testUsingTransparentEachInTransparentContext() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        Parallelizer.doTransparentlyParallel(5) {
+            Parallelizer.doParallel(5) {
+                items.makeTransparentlyParallel().each {
+                    Thread.sleep 100
+                    map[Thread.currentThread()] = ''
+                }
+            }
+        }
+        assert map.keys().size() > 1
+    }
+
 }

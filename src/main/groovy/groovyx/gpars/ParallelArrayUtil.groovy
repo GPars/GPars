@@ -123,7 +123,11 @@ public class ParallelArrayUtil {
      */
     public static <T> Collection<T> eachWithIndexParallel(Collection<T> collection, Closure cl) {
         def indexedCollection = []
-        collection.eachWithIndex {element, index -> indexedCollection << [element, index]}
+        int index = 0
+        for(element in collection) {
+            indexedCollection << [element, index]
+            index++
+        }
         createPA(indexedCollection, retrievePool()).withMapping({cl(it[0], it[1])} as Mapper).all()
         return collection
     }
