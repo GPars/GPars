@@ -17,16 +17,15 @@
 package groovyx.gpars
 
 /**
- * Wraps a collection within a Parallelizer.doParallel() block overriding the iterative methods, like each, collect and such
- * to delegate to eachParalles, collectParallel and other parallel iterative methods.
- * The returned collections are again wrapped in a Parallel instance, so their iterative methods are parallel as well.
+ * Enhances by mixing-in a collection within a Parallelizer.doParallel() block overriding the iterative methods,
+ * like each, collect and such to delegate to eachParallel, collectParallel and other parallel iterative methods.
+ * The collections returned from collect(), findAll() and grep() are again mixed with a Parallel instance,
+ * so their iterative methods are transparently parallel as well.
  *
  * Author: Vaclav Pech, Dierk Koenig
  * Date: Oct 30, 2009
  */
 final class Parallel {
-    //todo update javadoc
-    
     public def final each(Closure yield) { mixedIn[Object].eachParallel(yield) }
     public def final eachWithIndex(Closure yield) { mixedIn[Object].eachWithIndexParallel(yield)}
     public def final collect(Closure yield) { mixedIn[Object].collectParallel(yield).makeTransparentlyParallel()}

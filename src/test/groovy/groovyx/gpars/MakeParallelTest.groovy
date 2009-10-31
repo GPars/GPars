@@ -67,7 +67,10 @@ class MakeParallelTest extends GroovyTestCase {
     public void testIsTransparentlyParallelCheck() {
         def items = [1, 2, 3, 4, 5]
         shouldFail {
-            items.transparentlyParallel
+            items.isTransparentlyParallel()
+        }
+        shouldFail(IllegalStateException) {
+            ParallelArrayUtil.makeTransparentlyParallel(items)
         }
         Parallelizer.doParallel {
             assertFalse items.isTransparentlyParallel()
@@ -81,6 +84,10 @@ class MakeParallelTest extends GroovyTestCase {
         assertTrue 'abcde'.isTransparentlyParallel()
         shouldFail {
             assertTrue 'ab'.isTransparentlyParallel()
+        }
+
+        shouldFail(IllegalStateException) {
+            ParallelArrayUtil.makeTransparentlyParallel('abcdefgh2')
         }
     }
 
@@ -163,12 +170,8 @@ class MakeParallelTest extends GroovyTestCase {
         return map
     }
 
-    //todo test mixing transparent and non-transparent enhancements in all variants
-    //todo test transparent parallel
-    //todo test on other types
-    //todo update samples
-    //todo update javadoc
+    //todo update samples - Asynchronizer, making parallel, propagation, combinations
     //todo update documentation
     //todo move the enhancement methods
-    //todo update enhancers
+    //todo update + test enhancers with transparent parallel
 }

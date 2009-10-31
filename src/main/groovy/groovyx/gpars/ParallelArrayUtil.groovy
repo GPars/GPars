@@ -51,14 +51,16 @@ public class ParallelArrayUtil {
     }
 
     /**
-     * Creates a Parallel instance wrapping the object it is invoked on. Wrapping objects with instances of the Parallel class
-     * overrides the iterative methods like each(), collect() and such to call their parallel variants from the ParallelArrayUtil class
+     * Creates a Parallel class instance and mixes it in the object it is invoked on. The Parallel class
+     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the ParallelArrayUtil class
      * like eachParallel(), collectParallel() and such.
+     * After mixing-in, the isTransparentlyParallel() method will return true.
      * @param The object to wrap
      * @param The instance of the Parallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
     public static Object makeTransparentlyParallel(Object collection) {
-        if (!(collection.hasProperty('transparentlyParallel'))) collection.metaClass.mixin(Parallel)
+        if (!(collection.respondsTo('isTransparentlyParallel'))) throw new IllegalStateException("Cannot make the object transparently parellel. Apparently we're not inside a Parallelizer.doParallel() block.")
+        if (!collection.isTransparentlyParallel()) collection.metaClass.mixin(Parallel)
         return collection
     }
 
