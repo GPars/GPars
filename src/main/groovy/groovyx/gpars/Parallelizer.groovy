@@ -118,8 +118,7 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * // todo: fix copy-paste error in example
-     * Parallelizer.doParallel(5) {ForkJoinPool pool ->
+     * Parallelizer.doParallel(5, handler) {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -190,8 +189,7 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * //todo: fix copy-paste error in example
-     * Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
+     * Parallelizer.withParallelizer(5, handler) {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*  </pre>
