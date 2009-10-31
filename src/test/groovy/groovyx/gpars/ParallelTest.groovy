@@ -82,19 +82,45 @@ class ParallelTest extends GroovyTestCase {
         shouldFail {
             assertTrue 'ab'.isTransparentlyParallel()
         }
-        //todo make again non-transparently parallel
-        //todo test Parallelizer.doTransparentlyParallel
+    }
+
+    public void testIsTransparentlyParallelWithTransparentParallelArrayUtil() {
+        def items = [1, 2, 3, 4, 5]
+        shouldFail {
+            items.transparentlyParallel
+        }
+        Parallelizer.doTransparentlyParallel {
+            assertTrue items.isTransparentlyParallel()
+            assertTrue 'abc'.isTransparentlyParallel()
+            shouldFail {
+                items.makeTransparentlyParallel()
+            }
+            assertTrue items.isTransparentlyParallel()
+            shouldFail {
+                'abcde'.makeTransparentlyParallel()
+            }
+        }
+
+        shouldFail {
+            assertFalse items.isTransparentlyParallel()
+        }
+        shouldFail {
+            assertFalse 'abcde'.isTransparentlyParallel()
+        }
+        shouldFail {
+            assertTrue 'ab'.isTransparentlyParallel()
+        }
     }
 
     public void testParallel() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().each {
+            items.makeTransparentlyParallel().eachWithIndex {e, i ->
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 3
+        assert map.keys().size() > 1
     }
 
     public void testNestedParallel() {
@@ -113,7 +139,7 @@ class ParallelTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().collect {it * 2}.findAll{it > 1}.each {
+            items.makeTransparentlyParallel().collect {it * 2}.findAll {it > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -125,7 +151,7 @@ class ParallelTest extends GroovyTestCase {
         def items = 'abcde'
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().collect {it * 2}.findAll{it.size() > 1}.each {
+            items.makeTransparentlyParallel().collect {it * 2}.findAll {it.size() > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -137,7 +163,7 @@ class ParallelTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5].iterator()
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().collect {it * 2}.findAll{it > 1}.each {
+            items.makeTransparentlyParallel().collect {it * 2}.findAll {it > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -157,7 +183,7 @@ class ParallelTest extends GroovyTestCase {
 
     private def foo(Collection c) {
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        c.collect {it * 2}.findAll{it > 1}.each {
+        c.collect {it * 2}.findAll {it > 1}.each {
             Thread.sleep 50
             map[Thread.currentThread()] = ''
         }

@@ -41,10 +41,10 @@ public class ParallelArrayUtil {
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {
-        return ParallelArray.createFromCopy(collection.toArray(new Object[collection.size()]), pool)
+//        return ParallelArray.createFromCopy(collection.toArray(new Object[collection.size()]), pool)
 
 //todo should be using generics, but groovyc blows on that
-//        return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
+        return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
     }
 
     static java.util.Collection createCollection(Object object) {
@@ -61,10 +61,6 @@ public class ParallelArrayUtil {
      * @param The instance of the Parallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
     public static Object makeTransparentlyParallel(Object collection) {
-//        if (collection instanceof Parallel) return new Parallel(adaptee: collection.adaptee)
-//        else new Parallel(adaptee: collection)
-        //todo update the mixin check
-
         if (!(collection.hasProperty('transparentlyParallel'))) collection.metaClass.mixin(Parallel)
         return collection
     }
@@ -303,6 +299,36 @@ public class ParallelArrayUtil {
     }
 
     /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a boolean value indicating, whenther all the elements
+     * of the collection meet the predicate.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>allParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}*     assert [1, 2, 3].allParallel() {Number number -> number <= 3}*}*/
+    public static <T> boolean allParallel(Collection<T> collection, Closure cl) {
+        createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).all().size() == collection.size()
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a boolean value indicating, whenther all the elements
+     * of the collection meet the predicate.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>allParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}*     assert [1, 2, 3].allParallel() {Number number -> number <= 3}*}*/
+    public static boolean allParallel(Object collection, Closure cl) {
+        return allParallel(createCollection(collection), cl)
+    }
+    
+    /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
@@ -340,35 +366,5 @@ public class ParallelArrayUtil {
      *}*/
     public static List<Object> groupByParallel(Object collection, Closure cl) {
         return groupByParallel(createCollection(collection), cl)
-    }
-
-    /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
-     * closure as the filter predicate.
-     * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a boolean value indicating, whenther all the elements
-     * of the collection meet the predicate.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>allParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
-     * Example:
-     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}*     assert [1, 2, 3].allParallel() {Number number -> number <= 3}*}*/
-    public static <T> boolean allParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).all().size() == collection.size()
-    }
-
-    /**
-     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
-     * closure as the filter predicate.
-     * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a boolean value indicating, whenther all the elements
-     * of the collection meet the predicate.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>allParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
-     * Example:
-     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}*     assert [1, 2, 3].allParallel() {Number number -> number <= 3}*}*/
-    public static boolean allParallel(Object collection, Closure cl) {
-        return allParallel(createCollection(collection), cl)
     }
 }
