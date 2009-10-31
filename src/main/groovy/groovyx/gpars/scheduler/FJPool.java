@@ -16,6 +16,7 @@
 
 package groovyx.gpars.scheduler;
 
+import groovyx.gpars.util.PoolUtils;
 import jsr166y.forkjoin.ForkJoinPool;
 
 import java.util.concurrent.TimeUnit;
@@ -37,7 +38,7 @@ public class FJPool implements Pool {
      * Creates the pool with default number of threads.
      */
     public FJPool() {
-        this(FJPool.retrieveDefaultPoolSize());
+        this(PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
@@ -85,7 +86,7 @@ public class FJPool implements Pool {
      * Sets the pool size to the default
      */
     public final void resetDefaultSize() {
-        resize(FJPool.retrieveDefaultPoolSize());
+        resize(PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
@@ -115,15 +116,6 @@ public class FJPool implements Pool {
             pool.awaitTermination(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();  // set the interrupted flag
-        }
-    }
-
-    private static int retrieveDefaultPoolSize() {
-        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
-        try {
-            return Integer.parseInt(poolSizeValue);
-        } catch (NumberFormatException e) {
-            return Runtime.getRuntime().availableProcessors() + 1;
         }
     }
 

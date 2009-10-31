@@ -16,6 +16,8 @@
 
 package groovyx.gpars.scheduler;
 
+import groovyx.gpars.util.PoolUtils;
+
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,7 +47,7 @@ public class DefaultPool implements Pool {
      * @param daemon Sets the daemon flag of threads in the pool.
      */
     public DefaultPool(final boolean daemon) {
-        this(daemon, DefaultPool.retrieveDefaultPoolSize());
+        this(daemon, PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
@@ -121,7 +123,7 @@ public class DefaultPool implements Pool {
      * Sets the pool size to the default
      */
     public final void resetDefaultSize() {
-        resize(DefaultPool.retrieveDefaultPoolSize());
+        resize(PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
@@ -151,15 +153,6 @@ public class DefaultPool implements Pool {
             pool.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();  // set the interrupted flag
-        }
-    }
-
-    private static int retrieveDefaultPoolSize() {
-        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
-        try {
-            return Integer.parseInt(poolSizeValue);
-        } catch (NumberFormatException ignored) {
-            return Runtime.getRuntime().availableProcessors() + 1;
         }
     }
 }
