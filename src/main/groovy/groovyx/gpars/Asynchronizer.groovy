@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
+import groovyx.gpars.util.PoolUtils
 
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
@@ -36,14 +37,15 @@ import java.util.concurrent.TimeUnit
  */
 class Asynchronizer {
 
-    private static ThreadLocal<ExecutorService> currentInvoker = new ThreadLocal<ExecutorService>()
+    private static final ThreadLocal<ExecutorService> currentInvoker = new ThreadLocal<ExecutorService>()
+    private static final int defaultPoolSize = PoolUtils.retrieveDefaultPoolSize()
 
     protected static ExecutorService retrieveCurrentPool() {
         currentInvoker.get()
     }
 
     private static createPool() {
-        return createPool(Runtime.runtime.availableProcessors() + 1)
+        return createPool(PoolUtils.retrieveDefaultPoolSize())
     }
 
     private static createPool(int poolSize) {
@@ -83,7 +85,7 @@ class Asynchronizer {
      * @param cl The block of code to invoke with the DSL enabled
      */
     public static doParallel(Closure cl) {
-        return withAsynchronizer(cl)
+        return doParallel(defaultPoolSize, cl)
     }
 
     /**
@@ -106,7 +108,7 @@ class Asynchronizer {
      * @param cl The block of code to invoke with the DSL enabled
      */
     public static doParallel(int numberOfThreads, Closure cl) {
-        return withAsynchronizer(numberOfThreads, cl)
+        return doParallel(numberOfThreads, createDefaultThreadFactory(), cl)
     }
 
     /**
@@ -130,7 +132,14 @@ class Asynchronizer {
      * @param cl The block of code to invoke with the DSL enabled
      */
     public static doParallel(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
-        return withAsynchronizer(numberOfThreads, threadFactory, cl)
+        final ExecutorService pool = createPool(numberOfThreads, threadFactory)
+        try {
+            return withExistingAsynchronizer(pool, cl)
+        } finally {
+            pool.shutdown()
+            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
+        }
+
     }
 
     /**
@@ -149,6 +158,7 @@ class Asynchronizer {
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param cl The block of code to invoke with the DSL enabled
+     * @deprecated Use doParallel() instead
      */
     public static withAsynchronizer(Closure cl) {
         return withAsynchronizer(3, cl)
@@ -171,6 +181,7 @@ class Asynchronizer {
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param cl The block of code to invoke with the DSL enabled
+     * @deprecated Use doParallel() instead
      */
     public static withAsynchronizer(int numberOfThreads, Closure cl) {
         return withAsynchronizer(numberOfThreads, createDefaultThreadFactory(), cl)
@@ -194,6 +205,7 @@ class Asynchronizer {
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param threadFactory Factory for threads in the pool
      * @param cl The block of code to invoke with the DSL enabled
+     * @deprecated Use doParallel() instead
      */
     public static withAsynchronizer(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
         final ExecutorService pool = createPool(numberOfThreads, threadFactory)

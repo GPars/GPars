@@ -43,7 +43,7 @@ public class AsyncInvokerUtil {
     /**
      * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
      */
-    public static Future callParallel(final Closure cl, final Object ... args) {
+    public static Future callAsync(final Closure cl, final Object ... args) {
         callParallel {-> cl(* args)}
     }
 
@@ -61,25 +61,27 @@ public class AsyncInvokerUtil {
      * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
      */
     public static Closure async(Closure cl) {
-        return {Object ... args -> callParallel(cl, * args)}
+        return {Object ... args -> callAsync(cl, * args)}
     }
 
     /**
      * Starts multiple closures in separate threads, collecting their return values
      * If an exception is thrown from the closure when called on any of the collection's elements,
      * it will be rethrown in the calling thread when it calls the Future.get() method.
+     * @return The result values of all closures
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static List<Object> doInParallel(Closure ... closures) {
-        return processResult(executeInParallel(closures))
+        return processResult(executeAsync(closures))
     }
 
     /**
      * Starts multiple closures in separate threads, collecting Futures for their return values
      * If an exception is thrown from the closure when called on any of the collection's elements,
      * it will be rethrown in the calling thread when it calls the Future.get() method.
-     */
-    public static List<Future<Object>> executeInParallel(Closure ... closures) {
+     * @return Futures for the result values or exceptions of all closures
+    */
+    public static List<Future<Object>> executeAsync(Closure ... closures) {
         Asynchronizer.withAsynchronizer(closures.size()) {ExecutorService executorService ->
             List<Future<Object>> result = closures.collect {cl ->
                 executorService.submit({

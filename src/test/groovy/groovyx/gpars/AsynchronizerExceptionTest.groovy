@@ -33,7 +33,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
     }
 
     public void testExecuteInParralelWithException() {
-        List<Future<Object>> result = AsyncInvokerUtil.executeInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+        List<Future<Object>> result = AsyncInvokerUtil.executeAsync({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
         shouldFail {
             result*.get()
         }

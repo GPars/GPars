@@ -42,7 +42,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testExecuteInParallel() {
-        assertEquals([10, 20], AsyncInvokerUtil.executeInParallel({10}, {20})*.get())
+        assertEquals([10, 20], AsyncInvokerUtil.executeAsync({10}, {20})*.get())
     }
 
     public void testAsyncWithCollectionAndResult() {
