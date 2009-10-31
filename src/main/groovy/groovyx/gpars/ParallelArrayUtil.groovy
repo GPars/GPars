@@ -41,9 +41,6 @@ public class ParallelArrayUtil {
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {
-//        return ParallelArray.createFromCopy(collection.toArray(new Object[collection.size()]), pool)
-
-//todo should be using generics, but groovyc blows on that
         return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
     }
 
