@@ -16,6 +16,7 @@
 
 package groovyx.gpars;
 
+import groovyx.gpars.dataflow.DataFlowVariable;
 import jsr166y.forkjoin.RecursiveAction;
 import jsr166y.forkjoin.TaskBarrier;
 
@@ -25,29 +26,57 @@ import jsr166y.forkjoin.TaskBarrier;
  * Author: Vaclav Pech
  * Date: Nov 1, 2009
  */
+@SuppressWarnings({"AbstractClassWithOnlyOneDirectInheritor"})
 public abstract class AbstractForkJoinWorker<T> extends RecursiveAction implements ForkJoinWorker<T> {
-    private T value;
+    private final DataFlowVariable<T> value = new DataFlowVariable<T>();
     private TaskBarrier taskBarrier;
+    private final TaskBarrier childTaskBarrier = new TaskBarrier(1);
 
-    protected AbstractForkJoinWorker() {
-    }
+    protected AbstractForkJoinWorker() { }
 
-    protected AbstractForkJoinWorker(final TaskBarrier taskBarrier) {
-        setTaskBarrier(taskBarrier);
-    }
-
+    /**
+     * Sets the parent barrier which it waits on for all workers to finish their work.
+     * The worker is supposed to register to the barrier and call arriveAndDeregister() once it has completed its work.
+     * @param taskBarrier The barrier to use for communication with the parent
+     */
     public final void setTaskBarrier(final TaskBarrier taskBarrier) {
         if (taskBarrier==null) return;
         this.taskBarrier = taskBarrier;
         this.taskBarrier.register();
     }
 
+    /**
+     * Retrieves the result of the worker
+     * @return The value calculated by the worker
+     */
+    public final T getResult() throws InterruptedException {
+        return value.getVal();
+    }
+
+    /**
+     * Sets the result of the calculation of the worker. Informs the parent about completion.
+     * @param value The result to store and report to the parent worker
+     */
     protected final void setResult(final T value) {
-        this.value = value;
+        this.value.bind(value);
         taskBarrier.arriveAndDeregister();
     }
 
-    public final T getResult() {
-        return value;
+    /**
+     * Blocks until all children finish their calculations, releasing the physical thread temporarily to the thread pool
+     * to do some work stealing.
+     */
+    protected final void awaitChildren() {
+        childTaskBarrier.arriveAndAwait();
+    }
+
+    /**
+     * Forks a child task. Makes sure it has a means to indicate back completion.
+     * @param child The child task
+     */
+    protected final void forkOffChild(final AbstractForkJoinWorker child) {
+        assert taskBarrier!=null;
+        child.setTaskBarrier(childTaskBarrier);
+        child.fork();
     }
 }

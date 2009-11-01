@@ -19,7 +19,6 @@ package groovyx.gpars.samples.forkjoin
 import groovyx.gpars.AbstractForkJoinWorker
 import groovyx.gpars.ForkJoinOrchestrator
 import groovyx.gpars.Parallelizer
-import jsr166y.forkjoin.TaskBarrier
 
 /**
  * Shows use of the ForkJoin mechanics to implement merge sort.
@@ -35,11 +34,9 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
         this.numbers = numbers
     }
 
-    def SortWorker(final List<Integer> numbers, final TaskBarrier taskBarrier) {
-        super(taskBarrier)
-        this.numbers = numbers
-    }
-
+    /**
+     * Splits a list of numbers in half
+     */
     def split(List<Integer> list) {
         int listSize = list.size()
         int middleIndex = listSize / 2
@@ -48,6 +45,9 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
         return [list1, list2]
     }
 
+    /**
+     * Merges two sorted lists into one
+     */
     List<Integer> merge(List<Integer> a, List<Integer> b) {
         int i = 0, j = 0
         final int newSize = a.size() + b.size()
@@ -63,23 +63,25 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
         return result
     }
 
+    /**
+     * Sorts a small list or delegates to two children, if the list contains more than two elements.
+     */
     protected void compute() {
         println "Sorting $numbers"
         switch (numbers.size()) {
             case 0..1:
-                this.result = numbers
+                setResult numbers
                 break
             case 2:
-                if (numbers[0] <= numbers[1]) this.result = numbers
-                else this.result = numbers[-1..0]
+                if (numbers[0] <= numbers[1]) setResult numbers
+                else setResult numbers[-1..0]
                 break
             default:
                 def splitList = split(numbers)
-                final TaskBarrier childTaskBarrier = new TaskBarrier(1)
-                def workers = [new SortWorker(splitList[0], childTaskBarrier), new SortWorker(splitList[1], childTaskBarrier)]
-                workers*.fork()
-                childTaskBarrier.arriveAndAwait()
-                this.result = merge(* workers*.result)
+                def workers = [new SortWorker(splitList[0]), new SortWorker(splitList[1])]
+                workers.each{forkOffChild it}
+                awaitChildren()
+                setResult merge(* workers*.result)
         }
     }
 }
@@ -90,10 +92,8 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
  as few as one thread is enough to keep the computation going.
  */
 
-Parallelizer.doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    final def nums = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
-    final ForkJoinOrchestrator orchestrator = new ForkJoinOrchestrator(rootWorker: new SortWorker(nums))
-    pool.execute(orchestrator)
-//    pool.execute(new Sorter(numbers:nums, result:result))
-    println "Sorted numbers: ${orchestrator.result}"
+final def nums = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
+
+Parallelizer.doParallel(1) {  //feel free to experiment with the number of fork/join threads in the pool
+    println "Sorted numbers: ${new ForkJoinOrchestrator(new SortWorker(nums)).perform()}"
 }

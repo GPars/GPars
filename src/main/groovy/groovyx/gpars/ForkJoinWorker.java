@@ -36,5 +36,5 @@ public interface ForkJoinWorker<T> {
      * Retrieves the result of the worker
      * @return The value calculated by the worker
      */
-    T getResult();
+    T getResult() throws InterruptedException;
 }

@@ -16,11 +16,9 @@
 
 package groovyx.gpars.samples.forkjoin
 
+import groovyx.gpars.AbstractForkJoinWorker
 import groovyx.gpars.ForkJoinOrchestrator
-import groovyx.gpars.ForkJoinWorker
 import groovyx.gpars.Parallelizer
-import jsr166y.forkjoin.RecursiveAction
-import jsr166y.forkjoin.TaskBarrier
 
 /**
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.
@@ -29,46 +27,29 @@ import jsr166y.forkjoin.TaskBarrier
  * Date: Jul 16, 2008
  */
 
-public final class FileCounter extends RecursiveAction implements ForkJoinWorker<Long>{
+public final class FileCounter extends AbstractForkJoinWorker<Long> {
     private final File file;
-    private final TaskBarrier taskBarrier;
-
-    long count = 0;
 
     def FileCounter(final File file) {
         this.file = file
     }
 
-    def FileCounter(final File file, final TaskBarrier taskBarrier) {
-        this.file = file
-        setTaskBarrier taskBarrier
-    }
-
     protected void compute() {
-        final TaskBarrier childTaskBarrier = new TaskBarrier(1)
+        long count = 0;
         def fileCounters = []
         file.eachFile {
             if (it.isDirectory()) {
                 println "Forking a thread for $it"
-                def childCounter = new FileCounter(it, childTaskBarrier)
-                childCounter.fork()
+                def childCounter = new FileCounter(it)
+                forkOffChild(childCounter)
                 fileCounters << childCounter
             } else {
                 count++
             }
         }
-        childTaskBarrier.arriveAndAwait()
-        this.count += (fileCounters*.count)?.sum() ?: 0
-        taskBarrier.arriveAndDeregister()
-    }
-
-    void setTaskBarrier(TaskBarrier taskBarrier) {
-        this.taskBarrier = taskBarrier
-        this.taskBarrier.register()
-    }
-
-    java.lang.Long getResult() {
-        return this.count
+        awaitChildren()
+        count += (fileCounters*.result)?.sum() ?: 0
+        setResult(count)
     }
 }
 
@@ -80,7 +61,5 @@ public final class FileCounter extends RecursiveAction implements ForkJoinWorker
 
 Parallelizer.doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
     final String dir = ".."
-    final ForkJoinOrchestrator orchestrator = new ForkJoinOrchestrator<Long>(rootWorker: new FileCounter(new File(dir)))
-    pool.execute(orchestrator)
-    println "Number of files: ${orchestrator.result}"
+    println "Number of files: ${new ForkJoinOrchestrator<Long>(new FileCounter(new File(dir))).perform()}"
 }
