@@ -38,143 +38,25 @@ public final class ParallelEnhancer {
     private final static FJPool threadPool = new FJPool()
 
     /**
-     * Enhances a single instance by mixing-in an instance of ParallelEnhancer.
+     * Enhances a single instance by mixing-in an instance of Parallel.
      */
-    public static void enhanceInstance(Object collection) {
+    public static Object enhanceInstance(Object collection) {
         //noinspection GroovyGetterCallCanBePropertyAccess
-        collection.getMetaClass().mixin ParallelEnhancer
+        collection.getMetaClass().mixin Parallel
+        return collection
     }
 
     /**
-     * Enhances a class and so all instances created in the future by mixing-in an instance of ParallelEnhancer.
+     * Enhances a class and so all instances created in the future by mixing-in an instance of Parallel.
      * Enhancing classes needs to be done with caution, since it may have impact in unrelated parts of the application.
      */
     public static void enhanceClass(Class clazz) {
         //noinspection GroovyGetterCallCanBePropertyAccess
-        clazz.getMetaClass().mixin ParallelEnhancer
+        clazz.getMetaClass().mixin Parallel
     }
 
     /**
      * Retrieves the underlying pool
      */
     public static Pool getThreadPool() { return threadPool }
-
-    /**
-     * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure
-     * to evaluate each collection's element.
-     * After this method returns, all the closures have been finished and all the potential shared resources have been updated
-     * by the threads.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public def eachParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.eachParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Iterates over a collection/object with the <i>eachWithIndex()</i> method using an asynchronous variant of the supplied closure
-     * to evaluate each collection's element.
-     * After this method returns, all the closures have been finished and all the potential shared resources have been updated
-     * by the threads.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public def eachWithIndexParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.eachWithIndexParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Iterates over a collection/object with the <i>collect()</i> method using an asynchronous variant of the supplied closure
-     * to evaluate each collection's element.
-     * After this method returns, all the closures have been finished and the caller can safely use the result.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     * */
-    public def collectParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.collectParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Performs the <i>findAll()</i> operation using an asynchronous variant of the supplied closure
-     * to evaluate each collection's/object's element.
-     * After this method returns, all the closures have been finished and the caller can safely use the result.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public def findAllParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.findAllParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Performs the <i>grep()</i> operation using an asynchronous variant of the supplied closure
-     * to evaluate each collection's/object's element.
-     * After this method returns, all the closures have been finished and the caller can safely use the result.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public def grepParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.grepParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Performs the <i>find()</i> operation using an asynchronous variant of the supplied closure
-     * to evaluate each collection's/object's element.
-     * After this method returns, all the closures have been finished and the caller can safely use the result.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public def findParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.findParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Performs the <i>all()</i> operation using an asynchronous variant of the supplied closure
-     * to evaluate each collection's/object's element.
-     * After this method returns, all the closures have been finished and the caller can safely use the result.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public boolean allParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.allParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Performs the <i>any()</i> operation using an asynchronous variant of the supplied closure
-     * to evaluate each collection's/object's element.
-     * After this method returns, all the closures have been finished and the caller can safely use the result.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public boolean anyParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.anyParallel(mixedIn[Object], cl)
-        }
-    }
-
-    /**
-     * Performs the <i>groupBy()</i> operation using an asynchronous variant of the supplied closure
-     * to evaluate each collection's/object's element.
-     * After this method returns, all the closures have been finished and the caller can safely use the result.
-     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
-     */
-    public def groupByParallel(Closure cl) {
-        Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) {
-            ParallelArrayUtil.groupAsync(mixedIn[Object], cl)
-        }
-    }
 }

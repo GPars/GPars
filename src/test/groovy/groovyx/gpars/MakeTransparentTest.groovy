@@ -23,79 +23,79 @@ import java.util.concurrent.ConcurrentHashMap
  * Author: Vaclav Pech
  * Date: Oct 30, 2009
  */
-class MakeParallelTest extends GroovyTestCase {
+class MakeTransparentTest extends GroovyTestCase {
 
-    public void testMakeParallelAvailability() {
+    public void testMakeTransparentAvailability() {
         shouldFail {
-            [].makeTransparentlyParallel()
-            [1].makeTransparentlyParallel()
-            'abcde'.makeTransparentlyParallel()
+            [].makeTransparent()
+            [1].makeTransparent()
+            'abcde'.makeTransparent()
         }
 
         def items = [1, 2, 3, 4, 5]
 
         shouldFail {
-            items.makeTransparentlyParallel()
+            items.makeTransparent()
         }
 
         Parallelizer.doParallel {
-            assertNotNull([1].makeTransparentlyParallel())
-            assertNotNull('abcde'.makeTransparentlyParallel())
-            assertTrue items == items.makeTransparentlyParallel()
-            assertNotNull(items.makeTransparentlyParallel())
-            assertTrue items.makeTransparentlyParallel() == items.makeTransparentlyParallel().makeTransparentlyParallel()
-            final def p1 = items.makeTransparentlyParallel()
-            assertTrue p1 == p1.makeTransparentlyParallel()
+            assertNotNull([1].makeTransparent())
+            assertNotNull('abcde'.makeTransparent())
+            assertTrue items == items.makeTransparent()
+            assertNotNull(items.makeTransparent())
+            assertTrue items.makeTransparent() == items.makeTransparent().makeTransparent()
+            final def p1 = items.makeTransparent()
+            assertTrue p1 == p1.makeTransparent()
         }
 
         shouldFail {
-            [1].makeTransparentlyParallel()
+            [1].makeTransparent()
         }
 
         shouldFail {
-            items.makeTransparentlyParallel()
+            items.makeTransparent()
         }
     }
 
-    public void testMakeParallelTypeCompatibility() {
+    public void testMakeTransparentTypeCompatibility() {
         Parallelizer.doParallel {
-            Collection c = [1, 2, 3, 4, 5].makeTransparentlyParallel()
-            String s = 'abcde'.makeTransparentlyParallel()
+            Collection c = [1, 2, 3, 4, 5].makeTransparent()
+            String s = 'abcde'.makeTransparent()
         }
     }
 
-    public void testIsTransparentlyParallelCheck() {
+    public void testIsTransparentCheck() {
         def items = [1, 2, 3, 4, 5]
         shouldFail {
-            items.isTransparentlyParallel()
+            items.isTransparent()
         }
         shouldFail(IllegalStateException) {
-            ParallelArrayUtil.makeTransparentlyParallel(items)
+            ParallelArrayUtil.makeTransparent(items)
         }
         Parallelizer.doParallel {
-            assertFalse items.isTransparentlyParallel()
-            assertFalse 'abc'.isTransparentlyParallel()
-            assertTrue items.makeTransparentlyParallel().isTransparentlyParallel()
-            assertTrue items.isTransparentlyParallel()
-            assertTrue 'abcde'.makeTransparentlyParallel().isTransparentlyParallel()
+            assertFalse items.isTransparent()
+            assertFalse 'abc'.isTransparent()
+            assertTrue items.makeTransparent().isTransparent()
+            assertTrue items.isTransparent()
+            assertTrue 'abcde'.makeTransparent().isTransparent()
         }
 
-        assertTrue items.isTransparentlyParallel()
-        assertTrue 'abcde'.isTransparentlyParallel()
+        assertTrue items.isTransparent()
+        assertTrue 'abcde'.isTransparent()
         shouldFail {
-            assertTrue 'ab'.isTransparentlyParallel()
+            assertTrue 'ab'.isTransparent()
         }
 
         shouldFail(IllegalStateException) {
-            ParallelArrayUtil.makeTransparentlyParallel('abcdefgh2')
+            ParallelArrayUtil.makeTransparent('abcdefgh2')
         }
     }
 
-    public void testIdempotenceOfNestingMakeParallel() {
+    public void testIdempotenceOfNestingMakeTransparent() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().makeTransparentlyParallel().each {
+            items.makeTransparent().makeTransparent().each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -103,11 +103,11 @@ class MakeParallelTest extends GroovyTestCase {
         assert map.keys().size() > 2
     }
 
-    public void testMakeParallelPropagationToResults() {
+    public void testMakeTransparentPropagationToResults() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().collect {it * 2}.findAll {it > 1}.each {
+            items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -115,11 +115,11 @@ class MakeParallelTest extends GroovyTestCase {
         assert map.keys().size() > 3
     }
 
-    public void testNoMakeParallelPropagationToResultsWithGroupBy() {
+    public void testNoMakeTransparentPropagationToResultsWithGroupBy() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().groupBy {it % 2}.each {
+            items.makeTransparent().groupBy {it % 2}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -127,28 +127,28 @@ class MakeParallelTest extends GroovyTestCase {
         assert map.keys().size() == 1
     }
 
-    public void testMakeParallelPropagationToResultsWithString() {
+    public void testMakeTransparentPropagationToResultsWithString() {
         def items = 'abcde'
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().collect {it * 2}.findAll {it.size() > 1}.each {
+            items.makeTransparent().collect {it * 2}.findAll {it.size() > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 3
+        assert map.keys().size() > 1
     }
 
-    public void testMakeParallelPropagationToResultsWithIterator() {
+    public void testMakeTransparentPropagationToResultsWithIterator() {
         def items = [1, 2, 3, 4, 5].iterator()
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().collect {it * 2}.findAll {it > 1}.each {
+            items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 3
+        assert map.keys().size() > 1
     }
 
     public void testTransparentParallelInMethodCall() {
@@ -157,7 +157,7 @@ class MakeParallelTest extends GroovyTestCase {
 
         Parallelizer.doParallel(5) {
             assertEquals 1, foo(items).keys().size()
-            assert foo(items.makeTransparentlyParallel()).keys().size() > 3
+            assert foo(items.makeTransparent()).keys().size() > 3
         }
     }
 

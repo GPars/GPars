@@ -24,13 +24,13 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: Oct 30, 2009
  */
 
-class MakeParallelCornerCaseTest extends GroovyTestCase {
+class MakeTransparentCornerCaseTest extends GroovyTestCase {
 
     public void testUsingNonTransparentEachInTransparentContext() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().eachParallel {
+            items.makeTransparent().eachParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
             }
@@ -42,12 +42,12 @@ class MakeParallelCornerCaseTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            def result = items.makeTransparentlyParallel().collectParallel {
+            def result = items.makeTransparent().collectParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
             }
-            assertFalse result.isTransparentlyParallel()
+            assertFalse result.isTransparent()
         }
         assert map.keys().size() > 2
     }
@@ -56,12 +56,12 @@ class MakeParallelCornerCaseTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            def result = items.makeTransparentlyParallel().findAllParallel {
+            def result = items.makeTransparent().findAllParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
             }
-            assertFalse result.isTransparentlyParallel()
+            assertFalse result.isTransparent()
         }
         assert map.keys().size() > 2
     }
@@ -70,7 +70,7 @@ class MakeParallelCornerCaseTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().groupByParallel {
+            items.makeTransparent().groupByParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return 'a'

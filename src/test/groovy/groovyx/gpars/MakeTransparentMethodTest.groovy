@@ -24,13 +24,13 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: Oct 30, 2009
  */
 
-class MakeParallelMethodTest extends GroovyTestCase {
+class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentEach() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().each {
+            items.makeTransparent().each {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
             }
@@ -42,7 +42,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().eachWithIndex {e, i ->
+            items.makeTransparent().eachWithIndex {e, i ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
             }
@@ -54,7 +54,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().collect {
+            items.makeTransparent().collect {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return it
@@ -67,7 +67,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().grep {
+            items.makeTransparent().grep {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return true
@@ -80,7 +80,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().find {
+            items.makeTransparent().find {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
@@ -93,7 +93,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().findAll {
+            items.makeTransparent().findAll {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return true
@@ -106,7 +106,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().all {
+            items.makeTransparent().all {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
@@ -119,7 +119,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().any {
+            items.makeTransparent().any {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
@@ -132,7 +132,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = 'abcdefg'
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().any {
+            items.makeTransparent().any {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
@@ -145,7 +145,7 @@ class MakeParallelMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparentlyParallel().groupBy {
+            items.makeTransparent().groupBy {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return it

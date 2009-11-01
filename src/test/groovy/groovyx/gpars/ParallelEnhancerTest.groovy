@@ -16,6 +16,8 @@
 
 package groovyx.gpars
 
+import java.util.concurrent.ConcurrentHashMap
+
 public class ParallelEnhancerTest extends GroovyTestCase {
     public void testInstanceEnhancement() {
         final List list = [1, 2, 3, 4, 5]
@@ -87,4 +89,16 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         shouldFail(IllegalArgumentException) {list.collectParallel {if (it > 4) throw new IllegalArgumentException('test') else 1}}
         shouldFail(IllegalArgumentException) {list.eachParallel {if (it > 4) throw new IllegalArgumentException('test')}}
     }
+
+    public void testEnhancementPropagationToResults() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        ParallelEnhancer.enhanceInstance items
+        items.collectParallel {it * 2}.findAllParallel {it > 1}.eachParallel {
+            Thread.sleep 500
+            map[Thread.currentThread()] = ''
+        }
+        assert map.keys().size() > 2
+    }
+
 }

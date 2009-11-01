@@ -26,14 +26,18 @@ package groovyx.gpars
  * Date: Oct 30, 2009
  */
 final class TransparentParallel {
-    public def final each(Closure yield) { mixedIn[Object].eachParallel(yield) }
-    public def final eachWithIndex(Closure yield) { mixedIn[Object].eachWithIndexParallel(yield)}
-    public def final collect(Closure yield) { mixedIn[Object].collectParallel(yield).makeTransparentlyParallel()}
-    public def final find(Closure yield) { mixedIn[Object].findParallel(yield)}
-    public def final findAll(Closure yield) { mixedIn[Object].findAllParallel(yield).makeTransparentlyParallel()}
-    public def final grep(filter) { mixedIn[Object].grepParallel(filter).makeTransparentlyParallel()}
-    public def final all(Closure yield) { mixedIn[Object].allParallel(yield)}
-    public def final any(Closure yield) { mixedIn[Object].anyParallel(yield)}
-    public def final groupBy(Closure yield) { mixedIn[Object].groupByParallel(yield)}
-    def final boolean isTransparentlyParallel() {return true}
+    public def final each(Closure yield) { this.eachParallel(yield) }
+    public def final eachWithIndex(Closure yield) { this.eachWithIndexParallel(yield)}
+    public def final collect(Closure yield) { this.collectParallel(yield).makeTransparent()}
+    public def final find(Closure yield) { this.findParallel(yield)}
+    public def final findAll(Closure yield) { this.findAllParallel(yield).makeTransparent()}
+    public def final grep(filter) { this.grepParallel(filter).makeTransparent()}
+    public def final all(Closure yield) { this.allParallel(yield)}
+    public def final any(Closure yield) { this.anyParallel(yield)}
+    public def final groupBy(Closure yield) { this.groupByParallel(yield)}
+
+    /**
+     * Indicates, whether the iterative methods like each() or collect() have been made parallel.
+     */
+    public def boolean isTransparent() {return true}
 }
