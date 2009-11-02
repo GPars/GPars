@@ -48,3 +48,16 @@ println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some
 //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
 // here use parallel implementation under the covers
 println animals.makeTransparent().collect{it.toUpperCase()}.groupBy{it.contains 'A'}
+
+
+/**
+ * A function implemented using standard sequential collect() and findAll() methods.
+ */
+def selectImportantNames(names) {
+    names.collect {it.toUpperCase()}.findAll{it.size() > 4}
+}
+
+def names = ['Joe', 'Alice', 'Dave', 'Jason']
+ParallelEnhancer.enhanceInstance(names)
+//The selectImportantNames() will process the name collections concurrently
+assert ['ALICE', 'JASON'] == selectImportantNames(names.makeTransparent())

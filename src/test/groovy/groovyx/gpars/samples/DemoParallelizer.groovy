@@ -42,5 +42,15 @@ Parallelizer.doParallel {
     //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
     // here use parallel implementation under the covers
     println animals.makeTransparent().collect{it.toUpperCase()}.groupBy{it.contains 'A'}
+
+    //The selectImportantNames() will process the name collections concurrently
+    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeTransparent())
+}
+
+/**
+ * A function implemented using standard sequential collect() and findAll() methods.
+ */
+def selectImportantNames(names) {
+    names.collect {it.toUpperCase()}.findAll{it.size() > 4}
 }
 

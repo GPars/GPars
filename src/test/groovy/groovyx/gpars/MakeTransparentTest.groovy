@@ -169,8 +169,4 @@ class MakeTransparentTest extends GroovyTestCase {
         }
         return map
     }
-
-    //todo update samples - Asynchronizer, making parallel, propagation, combinations
-    //todo update documentation
-    //todo move the enhancement methods
 }
