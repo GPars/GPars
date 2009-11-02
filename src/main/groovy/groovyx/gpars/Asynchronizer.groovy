@@ -36,17 +36,33 @@ import java.util.concurrent.*
  */
 class Asynchronizer {
 
+    /**
+     * Maps threads to their appropriate thread pools
+     */
     private static final ThreadLocal<ExecutorService> currentInvoker = new ThreadLocal<ExecutorService>()
+
+    /**
+     * Caches the default pool size.
+     */
     private static final int defaultPoolSize = PoolUtils.retrieveDefaultPoolSize()
 
+    /**
+     * Retrieves the pool assigned to the current thread.
+     */
     protected static ExecutorService retrieveCurrentPool() {
         currentInvoker.get()
     }
 
+    /**
+     * Creates a new pool with the default size()
+     */
     private static createPool() {
         return createPool(PoolUtils.retrieveDefaultPoolSize())
     }
 
+    /**
+     * Creates a new pool with the given size()
+     */
     private static createPool(int poolSize) {
         return createPool(poolSize, createDefaultThreadFactory())
     }
