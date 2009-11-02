@@ -19,7 +19,7 @@ package groovyx.gpars.samples
 import groovyx.gpars.AsyncEnhancer
 
 /**
- * Demonstrates asynchronous collection processing using ParallelArrays through the ParallelEnhancer class.
+ * Demonstrates parallel collection processing using ParallelArrays through the ParallelEnhancer class.
  * Requires the jsr166y jar on the class path.
  */
 

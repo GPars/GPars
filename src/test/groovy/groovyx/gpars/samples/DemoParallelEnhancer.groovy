@@ -19,7 +19,7 @@ package groovyx.gpars.samples
 import groovyx.gpars.ParallelEnhancer
 
 /**
- * Demonstrates asynchronous collection processing using ParallelArrays through the ParallelEnhancer class.
+ * Demonstrates parallel collection processing using ParallelArrays through the ParallelEnhancer class.
  * Requires the jsr166y jar on the class path.
  */
 
@@ -44,3 +44,7 @@ def animals = ['dog', 'ant', 'cat', 'whale']
 ParallelEnhancer.enhanceInstance animals
 println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
 println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+
+//Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
+// here use parallel implementation under the covers
+println animals.makeTransparent().collect{it.toUpperCase()}.groupBy{it.contains 'A'}

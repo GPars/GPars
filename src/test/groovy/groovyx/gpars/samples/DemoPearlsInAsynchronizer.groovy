@@ -19,24 +19,25 @@ package groovyx.gpars.samples
 import groovyx.gpars.Asynchronizer
 
 /**
- * Demonstrates parallel collection processing using Executor services through the Asynchronizer class.
+ * Demonstrates asynchronous processing using the Asynchronizer class.
  */
 
-def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 Asynchronizer.doParallel {
-    println list.collectParallel {it * 2 }
+    /**
+     * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
+     * It will return a Future for the result value.
+     */
+    assert 6 == {it*2}.callAsync(3).get()
 
-    list.iterator().eachParallel {
-        println it
-    }
+    /**
+     * An asynchronous variant of a closure is created using the async() method.
+     * When invoked, it will returned a Future for the calculated value.
+     */
+    def doubler = {it*2}.async()
+    assert 20 == doubler(10).get()
+    assert [2, 4, 6] == [1, 2, 3].collect(doubler)*.get()
 
-    if (list.allParallel {it < 10 }) println 'The list contains only small numbers.'
-
-    final String text = 'want to be big'
-    println((text.collectParallel {it.toUpperCase()}).join())
-
-    def animals = ['dog', 'ant', 'cat', 'whale']
-    println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-    println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+    //todo enhance with parameters, perhaps move to Asynchronizer
+//    assert 6 == [{it*2}.curry(3)].executeAsync().get()
+//    assert 6 == [{it*2}.curry(3)].doInParallel()
 }

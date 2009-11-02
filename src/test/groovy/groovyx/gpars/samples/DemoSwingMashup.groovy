@@ -17,8 +17,8 @@
 package groovyx.gpars.samples
 
 import groovy.swing.SwingBuilder
+import groovyx.gpars.ParallelEnhancer
 import javax.swing.JFrame
-import static groovyx.gpars.Parallelizer.withParallelizer
 
 /**
  * A simple mashup sample, downloads content of three websites and checks how many of them refer to Groovy.
@@ -47,16 +47,15 @@ final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation:
         }
         button('Click', actionPerformed: {
             doOutside {
-                withParallelizer(threadPoolSize) {
-                    urls.eachParallel {url ->
-                        edt {logMessages.text += "Started downloading from $url \n"}
-                        def content = url.toURL().text
-                        edt {logMessages.text += "Done downloading from $url \n"}
-                        if (content.toUpperCase().contains('GROOVY'))
-                            edt {
-                                result.text += "A groovy site found: ${url} \n"
-                            }
-                    }
+                ParallelEnhancer.enhanceInstance(urls).makeTransparent()
+                urls.each {url ->
+                    edt {logMessages.text += "Started downloading from $url \n"}
+                    def content = url.toURL().text
+                    edt {logMessages.text += "Done downloading from $url \n"}
+                    if (content.toUpperCase().contains('GROOVY'))
+                        edt {
+                            result.text += "A groovy site found: ${url} \n"
+                        }
                 }
             }
         })

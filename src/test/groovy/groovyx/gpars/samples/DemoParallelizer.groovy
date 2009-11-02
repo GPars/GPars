@@ -15,7 +15,7 @@
 //  limitations under the License. 
 
 /**
- * Demonstrates asynchronous collection processing using ParallelArrays through the Parallelizer class.
+ * Demonstrates parallel collection processing using ParallelArrays through the Parallelizer class.
  * Requires the jsr166y jar on the class path.
  */
 
@@ -25,7 +25,7 @@ import groovyx.gpars.Parallelizer
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-Parallelizer.withParallelizer {
+Parallelizer.doParallel {
     println list.collectParallel {it * 2 }
 
     list.iterator().eachParallel {
@@ -38,5 +38,9 @@ Parallelizer.withParallelizer {
     def animals = ['dog', 'ant', 'cat', 'whale']
     println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
     println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+
+    //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
+    // here use parallel implementation under the covers
+    println animals.makeTransparent().collect{it.toUpperCase()}.groupBy{it.contains 'A'}
 }
 
