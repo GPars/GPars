@@ -262,4 +262,13 @@ public class Parallelizer {
             currentPool.remove()
         }
     }
+
+    /**
+     * Creates a ForkJoinOrchestrator with the supplied root worker and runs it, waiting for the result.
+     * @param rootWorker The worker that calculates the root of the Fork/Join problem
+     * @return The result of the calculation
+     */
+    public static <T> T orchestrate(AbstractForkJoinWorker<T> rootWorker) {
+        new ForkJoinOrchestrator<T>(rootWorker).perform()
+    }
 }
