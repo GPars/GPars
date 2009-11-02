@@ -16,9 +16,7 @@
 
 package groovyx.gpars
 
-import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.atomic.AtomicBoolean
-import org.codehaus.groovy.runtime.InvokerInvocationException
 import java.util.concurrent.*
 
 /**
@@ -62,65 +60,6 @@ public class AsyncInvokerUtil {
      */
     public static Closure async(Closure cl) {
         return {Object ... args -> callAsync(cl, * args)}
-    }
-
-    /**
-     * Starts multiple closures in separate threads, collecting their return values
-     * If an exception is thrown from the closure when called on any of the collection's elements,
-     * it will be rethrown in the calling thread when it calls the Future.get() method.
-     * @return The result values of all closures
-     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     */
-    public static List<Object> doInParallel(Closure ... closures) {
-        return processResult(executeAsync(closures))
-    }
-
-    /**
-     * Starts multiple closures in separate threads, collecting Futures for their return values
-     * If an exception is thrown from the closure when called on any of the collection's elements,
-     * it will be rethrown in the calling thread when it calls the Future.get() method.
-     * @return Futures for the result values or exceptions of all closures
-    */
-    public static List<Future<Object>> executeAsync(Closure ... closures) {
-        Asynchronizer.withAsynchronizer(closures.size()) {ExecutorService executorService ->
-            List<Future<Object>> result = closures.collect {cl ->
-                executorService.submit({
-                    cl.call()
-                } as Callable<Object>)
-            }
-            result
-        }
-    }
-
-    /**
-     * Starts multiple closures in separate threads, using a new thread for the startup.
-     * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported using System.err.
-     * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     */
-    public static void startInParallel(Closure ... closures) {
-        startInParallel(createDefaultUncaughtExceptionHandler(), closures)
-    }
-
-    /**
-     * Starts multiple closures in separate threads, using a new thread for the startup.
-     * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported to the supplied instance of UncaughtExceptionHandler.
-     * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     * Unwraps potential InvokerInvocationException before control is passed to the UncaughtExceptionHandler instance.
-     * @return The thread that submits the closures to the thread executor service so that the caller can take ownership of it and e.g. call <i>join()</i> on it to wait for all the closures to finish processing.
-     */
-    public static Thread startInParallel(java.lang.Thread.UncaughtExceptionHandler uncaughtExceptionHandler, Closure ... closures) {
-        final Thread thread = new Thread({
-            doInParallel(closures)
-        } as Runnable)
-        thread.daemon = false
-        thread.uncaughtExceptionHandler = {Thread t, Throwable throwable ->
-            if (throwable instanceof InvokerInvocationException)
-                uncaughtExceptionHandler.uncaughtException(t, throwable.cause)
-            else
-                uncaughtExceptionHandler.uncaughtException(t, throwable)
-        } as UncaughtExceptionHandler
-        thread.start()
-        return thread
     }
 
     /**
@@ -336,7 +275,7 @@ public class AsyncInvokerUtil {
         return map
     }
 
-    private static List<Object> processResult(List<Future<Object>> futures) {
+    static List<Object> processResult(List<Future<Object>> futures) {
         final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
 
         final List<Object> result = futures.collect {
@@ -350,12 +289,5 @@ public class AsyncInvokerUtil {
 
         if (exceptions.empty) return result
         else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
-    }
-
-    private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {
-        return {Thread failedThread, Throwable throwable ->
-            System.err.println "Error processing background thread ${failedThread.name}: ${throwable.message}"
-            throwable.printStackTrace(System.err)
-        } as UncaughtExceptionHandler
     }
 }
