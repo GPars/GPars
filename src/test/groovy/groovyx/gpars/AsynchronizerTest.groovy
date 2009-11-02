@@ -30,7 +30,7 @@ public class AsynchronizerTest extends GroovyTestCase {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
-            AsyncInvokerUtil.startInParallel({resultA = 1; latch.countDown()}, {resultB = 1; latch.countDown()})
+            Asynchronizer.startInParallel({resultA = 1; latch.countDown()}, {resultB = 1; latch.countDown()})
             latch.await()
             assertEquals 1, resultA
             assertEquals 1, resultB
@@ -38,11 +38,11 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testDoInParallel() {
-        assertEquals([10, 20], AsyncInvokerUtil.doInParallel({10}, {20}))
+        assertEquals([10, 20], Asynchronizer.doInParallel({10}, {20}))
     }
 
     public void testExecuteInParallel() {
-        assertEquals([10, 20], AsyncInvokerUtil.executeAsync({10}, {20})*.get())
+        assertEquals([10, 20], Asynchronizer.executeAsync({10}, {20})*.get())
     }
 
     public void testAsyncWithCollectionAndResult() {

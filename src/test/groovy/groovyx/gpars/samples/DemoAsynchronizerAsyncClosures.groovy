@@ -27,17 +27,26 @@ Asynchronizer.doParallel {
      * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
      * It will return a Future for the result value.
      */
-    assert 6 == {it*2}.callAsync(3).get()
+    assert 6 == {it * 2}.callAsync(3).get()
 
     /**
      * An asynchronous variant of a closure is created using the async() method.
      * When invoked, it will returned a Future for the calculated value.
      */
-    def doubler = {it*2}.async()
-    assert 20 == doubler(10).get()
-    assert [2, 4, 6] == [1, 2, 3].collect(doubler)*.get()
+    def asyncDoubler = {it * 2}.async()
+    assert 20 == asyncDoubler(10).get()
+    assert [2, 4, 6] == [1, 2, 3].collect(asyncDoubler)*.get()
 
-    //todo enhance with parameters, perhaps move to Asynchronizer
-//    assert 6 == [{it*2}.curry(3)].executeAsync().get()
-//    assert 6 == [{it*2}.curry(3)].doInParallel()
+    /**
+     * Run multiple asynchronous closures in parallel by combining Asynchronizer methods with lists and operators
+     */
+    final Closure doubler = {it * 2}
+    final Closure modulo2 = {it % 2}
+    final Closure exp2 = {2 ** it}
+
+    def results = []
+    [1, 2, 3, 4, 5].each {num ->
+        results << [doubler, {it * 3}, {it ** 2}, exp2, modulo2]*.callAsync(num)
+    }
+    for (result in results) println result*.get()
 }

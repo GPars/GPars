@@ -33,7 +33,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
     }
 
     public void testExecuteInParralelWithException() {
-        List<Future<Object>> result = AsyncInvokerUtil.executeAsync({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+        List<Future<Object>> result = Asynchronizer.executeAsync({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
         shouldFail {
             result*.get()
         }
@@ -44,7 +44,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(4)
         UncaughtExceptionHandler handler = {thread, throwable -> thrownException.set(throwable)} as UncaughtExceptionHandler
 
-        Thread thread = AsyncInvokerUtil.startInParallel(
+        Thread thread = Asynchronizer.startInParallel(
                 handler,
                 {latch.countDown()},
                 {latch.countDown(); throw new RuntimeException('test1')},
