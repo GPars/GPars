@@ -170,9 +170,6 @@ class MakeTransparentTest extends GroovyTestCase {
         return map
     }
 
-    //todo update javadoc
-    //todo test Fork/Join
-    //todo blog on Fork/Join
     //todo update samples - Asynchronizer, making parallel, propagation, combinations
     //todo update documentation
     //todo move the enhancement methods

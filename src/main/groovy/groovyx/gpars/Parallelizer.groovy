@@ -45,17 +45,33 @@ Parallelizer.withParallelizer(5) {
  */
 public class Parallelizer {
 
+    /**
+     * Maps threads to their appropriate thread pools
+     */
     private static final ThreadLocal<ForkJoinPool> currentPool = new ThreadLocal<ForkJoinPool>()
+
+    /**
+     * Caches the default pool size.
+     */
     private static final int defaultPoolSize = PoolUtils.retrieveDefaultPoolSize()
 
+    /**
+     * Retrieves the pool assigned to the current thread.
+     */
     protected static retrieveCurrentPool() {
         return currentPool.get()
     }
 
+    /**
+     * Creates a new pool with the default size()
+     */
     private static createPool() {
         return createPool(PoolUtils.retrieveDefaultPoolSize())
     }
 
+    /**
+     * Creates a new pool with the given size()
+     */
     private static createPool(int poolSize) {
         return createPool(poolSize, createDefaultUncaughtExceptionHandler())
     }
@@ -266,7 +282,7 @@ public class Parallelizer {
     /**
      * Creates a ForkJoinOrchestrator with the supplied root worker and runs it, waiting for the result.
      * @param rootWorker The worker that calculates the root of the Fork/Join problem
-     * @return The result of the calculation
+     * @return The result of the whole calculation
      */
     public static <T> T orchestrate(AbstractForkJoinWorker<T> rootWorker) {
         new ForkJoinOrchestrator<T>(rootWorker).perform()

@@ -17,9 +17,11 @@
 package groovyx.gpars
 
 /**
- * Enhances by mixing-in a collection within a Parallelizer.doParallel() block overriding the iterative methods,
- * like each, collect and such to delegate to eachParallel, collectParallel and other parallel iterative methods.
- * The collections returned from collect(), findAll() and grep() are again mixed with a Parallel instance,
+ * Enhances objects by being mixed-in either within a Parallelizer.doParallel() block or after enhancement by
+ * the ParallelEnhancer through the makeTransparent() method.
+ * It overrides the iterative methods, like each, collect and such to delegate to eachParallel, collectParallel
+ * and other parallel iterative methods.
+ * The collections returned from collect(), findAll() and grep() are again mixed with a TransparentParallel instance,
  * so their iterative methods are transparently parallel as well.
  *
  * Author: Vaclav Pech, Dierk Koenig
