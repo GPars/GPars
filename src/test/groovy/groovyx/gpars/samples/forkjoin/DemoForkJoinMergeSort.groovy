@@ -24,7 +24,7 @@ import static groovyx.gpars.Parallelizer.orchestrate
  * Shows use of the ForkJoin mechanics to implement merge sort.
  *
  * Author: Vaclav Pech
- * Date: Jul 16, 2008
+ * Date: Nov 1, 2008
  */
 
 public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {

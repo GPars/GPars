@@ -24,7 +24,7 @@ import static groovyx.gpars.Parallelizer.orchestrate
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.
  *
  * Author: Vaclav Pech
- * Date: Jul 16, 2008
+ * Date: Nov 1, 2008
  */
 
 public final class FileCounter extends AbstractForkJoinWorker<Long> {
