@@ -22,16 +22,23 @@ import jsr166y.forkjoin.TaskBarrier
 
 /**
  * Orchestrates a Fork/Join algorithm hiding all the details of manipulating TaskBarriers and starting the sub-tasks.
- * A root worker implementation must be provided. It will calculate the root of the problem, most likely starting other workers
+ * A root worker implementation must be provided as an instance of a custom AbstractForkJoinWorker subclass.
+ * The worker will calculate the root of the problem, most likely starting other workers
  * to solve their respective sup-problems.
  * The ForkJoinOrchestrator relies on being invoked inside the Parallelizer.doParallel() block.
+ * The Parallelizer.orchestrate() method can be used as a useful shorthand for instantiating a ForkJoinOrchestrator
+ * and calling start() plus getResult() on it.
+ * Parallelizer.orchestrate(rootWorker) is equivalent to
+ * new ForkJoinOrchestrator(rootWorker).start().getResult()
+ * Calls to getResult() block the caller and to allow the caller to do dsme work concurrently with the Fork/Join tasks,
+ * it is not necessary to call it immediately after starting the calculation with start().
  *
  * Author: Vaclav Pech
  * Date: Nov 1, 2009
  */
 public final class ForkJoinOrchestrator<T> extends RecursiveAction {
     private final DataFlowVariable<T> result = new DataFlowVariable<T>()
-    private final ForkJoinWorker<T> rootWorker
+    private final AbstractForkJoinWorker<T> rootWorker
 
     /**
      * Creates a new instance with the given root worker.

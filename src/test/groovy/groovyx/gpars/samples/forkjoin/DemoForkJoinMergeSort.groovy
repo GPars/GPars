@@ -17,8 +17,8 @@
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
-import groovyx.gpars.ForkJoinOrchestrator
-import groovyx.gpars.Parallelizer
+import static groovyx.gpars.Parallelizer.doParallel
+import static groovyx.gpars.Parallelizer.orchestrate
 
 /**
  * Shows use of the ForkJoin mechanics to implement merge sort.
@@ -31,7 +31,7 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
     private final List numbers
 
     def SortWorker(final List<Integer> numbers) {
-        this.numbers = numbers
+        this.numbers = numbers.asImmutable()
     }
 
     /**
@@ -70,18 +70,17 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
         println "Sorting $numbers"
         switch (numbers.size()) {
             case 0..1:
-                setResult numbers
+                setResult numbers                                   //store own result
                 break
             case 2:
-                if (numbers[0] <= numbers[1]) setResult numbers
-                else setResult numbers[-1..0]
+                if (numbers[0] <= numbers[1]) setResult numbers     //store own result
+                else setResult numbers[-1..0]                       //store own result
                 break
             default:
                 def splitList = split(numbers)
-                def workers = [new SortWorker(splitList[0]), new SortWorker(splitList[1])]
-                workers.each{forkOffChild it}
-                awaitChildren()
-                setResult merge(* workers*.result)
+                [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each{forkOffChild it}  //fork a child task
+                awaitChildren()                         //wait for all children to finish their work
+                setResult merge(* childrenResults)      //use results of children tasks to calculate and store own result
         }
     }
 }
@@ -94,6 +93,6 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
 
 final def nums = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
 
-Parallelizer.doParallel(1) {  //feel free to experiment with the number of fork/join threads in the pool
-    println "Sorted numbers: ${new ForkJoinOrchestrator(new SortWorker(nums)).perform()}"
+doParallel(1) {  //feel free to experiment with the number of fork/join threads in the pool
+    println "Sorted numbers: ${orchestrate(new SortWorker(nums))}"
 }

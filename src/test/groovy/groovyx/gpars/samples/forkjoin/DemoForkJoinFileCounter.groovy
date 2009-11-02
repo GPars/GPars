@@ -17,8 +17,8 @@
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
-import groovyx.gpars.ForkJoinOrchestrator
-import groovyx.gpars.Parallelizer
+import static groovyx.gpars.Parallelizer.doParallel
+import static groovyx.gpars.Parallelizer.orchestrate
 
 /**
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.
@@ -36,20 +36,16 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
 
     protected void compute() {
         long count = 0;
-        def fileCounters = []
         file.eachFile {
             if (it.isDirectory()) {
                 println "Forking a thread for $it"
-                def childCounter = new FileCounter(it)
-                forkOffChild(childCounter)
-                fileCounters << childCounter
+                forkOffChild(new FileCounter(it))           //fork a child task
             } else {
                 count++
             }
         }
-        awaitChildren()
-        count += (fileCounters*.result)?.sum() ?: 0
-        setResult(count)
+        awaitChildren()                                     //wait for all children to finish their work
+        setResult(count + ((childrenResults)?.sum() ?: 0))  //use results of children tasks to calculate and store own result
     }
 }
 
@@ -59,7 +55,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
  as few as one thread is enough to keep the computation going.
  */
 
-Parallelizer.doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    final String dir = ".."
-    println "Number of files: ${new ForkJoinOrchestrator<Long>(new FileCounter(new File(dir))).perform()}"
+doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
+    println "Number of files: ${orchestrate(
+            new FileCounter(new File("..")))}"
 }

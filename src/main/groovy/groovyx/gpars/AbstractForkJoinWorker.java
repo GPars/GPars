@@ -20,17 +20,41 @@ import groovyx.gpars.dataflow.DataFlowVariable;
 import jsr166y.forkjoin.RecursiveAction;
 import jsr166y.forkjoin.TaskBarrier;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Implements the contract between the ForkJoinOrchestrator and the workers as defined by ForkJoinWorker.
+ * Implements the contract between the ForkJoinOrchestrator and the task workers.
+ * Subclasses need to implement the compute() to perform the actual Fork/Join algorithm leveraging the options
+ * provided by the AbstractForkJoinWorker class.
  *
  * Author: Vaclav Pech
  * Date: Nov 1, 2009
  */
-@SuppressWarnings({"AbstractClassWithOnlyOneDirectInheritor"})
-public abstract class AbstractForkJoinWorker<T> extends RecursiveAction implements ForkJoinWorker<T> {
+@SuppressWarnings({"AbstractClassWithOnlyOneDirectInheritor", "CollectionWithoutInitialCapacity"})
+public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
+
+    /**
+     * Stores the result of the worker
+     */
     private final DataFlowVariable<T> value = new DataFlowVariable<T>();
+
+    /**
+     * The barrier obtained from the parent worker
+     */
+    @SuppressWarnings({"InstanceVariableMayNotBeInitialized", "FieldHasSetterButNoGetter"})
     private TaskBarrier taskBarrier;
+
+    /**
+     * A berrier to synchronize with the child workers on
+     */
     private final TaskBarrier childTaskBarrier = new TaskBarrier(1);
+
+    /**
+     * Stores the child workers
+     */
+    private final List<AbstractForkJoinWorker<T>> children = new ArrayList<AbstractForkJoinWorker<T>>();
 
     protected AbstractForkJoinWorker() { }
 
@@ -39,7 +63,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction implemen
      * The worker is supposed to register to the barrier and call arriveAndDeregister() once it has completed its work.
      * @param taskBarrier The barrier to use for communication with the parent
      */
-    public final void setTaskBarrier(final TaskBarrier taskBarrier) {
+    final void setTaskBarrier(final TaskBarrier taskBarrier) {
         if (taskBarrier==null) return;
         this.taskBarrier = taskBarrier;
         this.taskBarrier.register();
@@ -48,6 +72,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction implemen
     /**
      * Retrieves the result of the worker
      * @return The value calculated by the worker
+     * @throws java.lang.InterruptedException If interrupted while waiting for the result
      */
     public final T getResult() throws InterruptedException {
         return value.getVal();
@@ -72,11 +97,29 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction implemen
 
     /**
      * Forks a child task. Makes sure it has a means to indicate back completion.
+     * The worker is stored in the internal list of workers for evidence and easy result retrieval through getChildrenResults().
      * @param child The child task
      */
-    protected final void forkOffChild(final AbstractForkJoinWorker child) {
-        assert taskBarrier!=null;
+    protected final void forkOffChild(final AbstractForkJoinWorker<T> child) {
+        children.add(child);
+        assert taskBarrier != null;
         child.setTaskBarrier(childTaskBarrier);
         child.fork();
+    }
+
+    /**
+     * Retrieves the unmodifiable list of workers.
+     * @return All workers forked through the forkOff() method.
+     */
+    protected final List<AbstractForkJoinWorker<T>> getChildren() {
+        return Collections.unmodifiableList(children);
+    }
+    
+    protected final List<T> getChildrenResults() throws InterruptedException {
+        final List<T> results = new ArrayList<T>();
+        for (final AbstractForkJoinWorker<T> worker : getChildren()) {
+            results.add(worker.getResult());
+        }
+        return results;
     }
 }
