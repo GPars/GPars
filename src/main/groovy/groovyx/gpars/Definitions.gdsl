@@ -1,6 +1,13 @@
 package groovyx.gpars
 
-enhanceClass(classname: "java.lang.Object") {
+/**
+ * Enhance collections with parallel methods
+ */
+def parallelCollection = context(ctype: "java.lang.Object")
+
+contributor(parallelCollection) {
+//    property name: 'request', type: 'javax.servlet.http.HttpServletRequest'
+
     method name: "eachParallel", type: "void", params: [closure: 'groovy.lang.Closure']
     method name: "eachWithIndexParallel", type: "void", params: [closure: 'groovy.lang.Closure']
     method name: "collectParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
@@ -10,4 +17,53 @@ enhanceClass(classname: "java.lang.Object") {
     method name: "anyParallel", type: "boolean", params: [closure: 'groovy.lang.Closure']
     method name: "allParallel", type: "boolean", params: [closure: 'groovy.lang.Closure']
     method name: "groupByParallel", type: "boolean", params: [closure: 'groovy.lang.Closure']
+    method name: "makeTransparent", type: "Object"
 }
+
+/**
+ * Enhances actors' body with actor's react, loop and receive methods
+ */
+def actorBody = context(scope: closureScope())
+
+contributor(actorBody) {
+    def call = enclosingCall("actor")
+    if (call) {
+        def currentMethod = call.bind()
+        def clazz = currentMethod?.containingClass
+        final def clazzName = clazz?.qualName?.toUpperCase()
+        if ((clazzName?.contains("ACTORGROUP")) || (clazzName?.contains("ACTORS"))) {
+            method name: "react", type: "void", params: [closure: 'groovy.lang.Closure']
+            method name: "react", type: "void", params: [timeout:'long', unit:'java.util.concurrent.TimeUnit', closure: 'groovy.lang.Closure']
+            method name: "react", type: "void", params: [timeout:'groovy.time.Duration', closure: 'groovy.lang.Closure']
+            method name: "receive", type: "void", params: [closure: 'groovy.lang.Closure']
+            method name: "receive", type: "void", params: [timeout:'long', unit:'java.util.concurrent.TimeUnit', closure: 'groovy.lang.Closure']
+            method name: "receive", type: "void", params: [timeout:'groovy.time.Duration', closure: 'groovy.lang.Closure']
+            method name: "receive", type: "Object"
+            method name: "receive", type: "Object", params: [timeout:'long', unit:'java.util.concurrent.TimeUnit']
+            method name: "receive", type: "Object", params: [timeout:'groovy.time.Duration']
+            method name: "loop", type: "void", params: [closure: 'groovy.lang.Closure']
+        }
+    }
+}
+
+/**
+ * Enhances closures withinh the Asynchronizer blocks with async() and callAsync() methods
+ */
+
+def asynchronizerBody = context(ctype: "groovy.lang.Closure", scope: closureScope())
+
+contributor(asynchronizerBody) {
+    def call = enclosingCall("doParallel")
+    if (call) {
+        def currentMethod = call.bind()
+        def clazz = currentMethod?.containingClass
+        final def clazzName = clazz?.qualName?.toUpperCase()
+        if (clazzName?.contains("ASYNCHRONIZER")) {
+            method name: "async", type: "groovy.lang.Closure"
+            method name: "callAsync", type: "java.util.concurrent.Future"
+            //todo enable
+//            method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')
+        }
+    }
+}
+
