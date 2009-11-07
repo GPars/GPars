@@ -31,12 +31,12 @@ Asynchronizer.doParallel {
         println it
     }
 
-    if (list.allParallel {it < 10 }) println 'The list contains only small numbers.'
+    if (list.everyParallel {it < 10 }) println 'The list contains only small numbers.'
 
     final String text = 'want to be big'
     println((text.collectParallel {it.toUpperCase()}).join())
 
     def animals = ['dog', 'ant', 'cat', 'whale']
     println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-    println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+    println(animals.everyParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 }

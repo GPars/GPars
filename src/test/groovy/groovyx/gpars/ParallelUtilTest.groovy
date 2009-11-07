@@ -107,8 +107,8 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     public void testAll() {
         Parallelizer.withParallelizer(5) {
-            assert ParallelArrayUtil.allParallel([1, 2, 3, 4, 5], {it > 0})
-            assert !ParallelArrayUtil.allParallel([1, 2, 3, 4, 5], {it > 1})
+            assert ParallelArrayUtil.everyParallel([1, 2, 3, 4, 5], {it > 0})
+            assert !ParallelArrayUtil.everyParallel([1, 2, 3, 4, 5], {it > 1})
         }
     }
 

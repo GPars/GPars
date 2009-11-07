@@ -50,7 +50,7 @@ println((text.collectParallel {it.toUpperCase()}).join())
 def animals = ['dog', 'ant', 'cat', 'whale']
 ParallelEnhancer.enhanceInstance animals
 println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-println(animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+println(animals.everyParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 
 //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
 // here use parallel implementation under the covers

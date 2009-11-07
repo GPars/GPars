@@ -29,12 +29,12 @@ public class ParallelizerDSLTest extends GroovyTestCase {
     public void testDSLInitialization() {
         withParallelizer {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
-            assert [1, 2, 3, 4, 5].allParallel {it > 0}
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
         withParallelizer(5) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
-            assert [1, 2, 3, 4, 5].allParallel {it > 0}
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
 
@@ -44,13 +44,13 @@ public class ParallelizerDSLTest extends GroovyTestCase {
 
         withParallelizer(5, handler) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
-            assert [1, 2, 3, 4, 5].allParallel {it > 0}
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
 
         withExistingParallelizer(new ForkJoinPool(5)) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
-            assert [1, 2, 3, 4, 5].allParallel {it > 0}
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
     }

@@ -36,8 +36,8 @@ Parallelizer.withParallelizer(5) {
     assert ([2, 4, 6, 8, 10].equals(result))
  }
  Parallelizer.withParallelizer(5) {
-    assert [1, 2, 3, 4, 5].allParallel {it > 0}
-    assert ![1, 2, 3, 4, 5].allParallel {it > 1}
+    assert [1, 2, 3, 4, 5].everyParallel {it > 0}
+    assert ![1, 2, 3, 4, 5].everyParallel {it > 1}
  }
  </pre>
  * @author Vaclav Pech

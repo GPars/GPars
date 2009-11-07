@@ -106,7 +106,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
-            items.makeTransparent().all {
+            items.makeTransparent().every {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false

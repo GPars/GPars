@@ -62,8 +62,8 @@ public class AsynchronizerStringTest extends GroovyTestCase {
 
     public void testAllParallelWithString() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assert 'ABC'.allParallel {it == it.toUpperCase()}
-            assert !'aBC'.allParallel {it == it.toUpperCase()}
+            assert 'ABC'.everyParallel {it == it.toUpperCase()}
+            assert !'aBC'.everyParallel {it == it.toUpperCase()}
         }
     }
 

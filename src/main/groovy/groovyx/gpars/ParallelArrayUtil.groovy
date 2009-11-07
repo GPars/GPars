@@ -308,10 +308,10 @@ public class ParallelArrayUtil {
      * of the collection meet the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>allParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}*     assert [1, 2, 3].allParallel() {Number number -> number <= 3}*}*/
-    public static <T> boolean allParallel(Collection<T> collection, Closure cl) {
+     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
+    public static <T> boolean everyParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).all().size() == collection.size()
     }
 
@@ -323,11 +323,11 @@ public class ParallelArrayUtil {
      * of the collection meet the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>allParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}*     assert [1, 2, 3].allParallel() {Number number -> number <= 3}*}*/
-    public static boolean allParallel(Object collection, Closure cl) {
-        return allParallel(createCollection(collection), cl)
+     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
+    public static boolean everyParallel(Object collection, Closure cl) {
+        return everyParallel(createCollection(collection), cl)
     }
     
     /**

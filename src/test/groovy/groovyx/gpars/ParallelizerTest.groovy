@@ -88,8 +88,8 @@ public class ParallelizerTest extends GroovyTestCase {
 
     public void testAllParallelWithThreadPool() {
         Parallelizer.doParallel(5) {
-            assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 3}
-            assert [1, 2, 3].allParallel() {Number number -> number <= 3}
+            assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}
+            assert [1, 2, 3].everyParallel() {Number number -> number <= 3}
         }
     }
 

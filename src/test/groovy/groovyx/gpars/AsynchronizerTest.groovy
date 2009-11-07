@@ -149,8 +149,8 @@ public class AsynchronizerTest extends GroovyTestCase {
 
     public void testAllParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assert [1, 2, 3, 4, 5].allParallel {Number number -> number > 0}
-            assert ![1, 2, 3, 4, 5].allParallel {Number number -> number > 2}
+            assert [1, 2, 3, 4, 5].everyParallel {Number number -> number > 0}
+            assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 2}
         }
     }
 

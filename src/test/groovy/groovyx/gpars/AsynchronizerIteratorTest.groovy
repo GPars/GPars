@@ -44,7 +44,7 @@ public class AsynchronizerIteratorTest extends GroovyTestCase {
 
         Asynchronizer.withAsynchronizer {
             assert list.iterator().anyParallel { it == 6 }
-            assert list.iterator().allParallel { it < 10 }
+            assert list.iterator().everyParallel { it < 10 }
             assertEquals 8, list.iterator().findParallel { it == 8 }
             assertEquals 3, (list.iterator().findAllParallel { it > 6 }).size()
         }

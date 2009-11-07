@@ -119,7 +119,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
     public void testAllWithException() {
         shouldFail(AsyncException.class) {
             Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-                'abc'.allParallel {if (it == 'b') throw new RuntimeException('test')}
+                'abc'.everyParallel {if (it == 'b') throw new RuntimeException('test')}
             }
         }
     }

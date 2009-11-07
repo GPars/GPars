@@ -147,9 +147,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public boolean allParallel(Closure cl) {
+    public boolean everyParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.allParallel(mixedIn[Object], cl)
+            AsyncInvokerUtil.everyParallel(mixedIn[Object], cl)
         }
     }
 

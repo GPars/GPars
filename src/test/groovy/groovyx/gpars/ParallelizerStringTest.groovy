@@ -66,8 +66,8 @@ public class ParallelizerStringTest extends GroovyTestCase {
 
     public void testAllParallelWithThreadPoolAndString() {
         Parallelizer.withParallelizer(5) {
-            assert !'aBC'.allParallel {it == it.toUpperCase()}
-            assert 'ABC'.allParallel() {it == it.toUpperCase()}
+            assert !'aBC'.everyParallel {it == it.toUpperCase()}
+            assert 'ABC'.everyParallel() {it == it.toUpperCase()}
         }
     }
 }

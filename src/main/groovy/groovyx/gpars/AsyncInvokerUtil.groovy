@@ -222,13 +222,13 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert service.allParallel([1, 2, 3, 4, 5]){Number number -> number > 0}*     assert !service.allParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*}*
+     *     assert service.everyParallel([1, 2, 3, 4, 5]){Number number -> number > 0}*     assert !service.everyParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert [1, 2, 3, 4, 5].allParallel{Number number -> number > 0}*     assert ![1, 2, 3, 4, 5].allParallel{Number number -> number > 2}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     *     assert [1, 2, 3, 4, 5].everyParallel{Number number -> number > 0}*     assert ![1, 2, 3, 4, 5].everyParallel{Number number -> number > 2}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static boolean allParallel(Object collection, Closure cl) {
+    public static boolean everyParallel(Object collection, Closure cl) {
         final AtomicBoolean flag = new AtomicBoolean(true)
         eachParallel(collection, {value -> if (!cl(value)) flag.set(false)})
         return flag.get()

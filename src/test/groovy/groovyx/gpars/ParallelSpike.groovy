@@ -16,7 +16,7 @@ final class ParallelS {
     def find(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.findParallel(yield) } }
     def findAll(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.findAllParallel(yield) } }
     def grep(filter) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.grepParallel(filter) } }
-    def all(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.allParallel(yield) } }
+    def all(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.everyParallel(yield) } }
     def any(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.anyParallel(yield) } }
     def groupBy(Closure yield) { Parallelizer.withExistingParallelizer(threadPool.forkJoinPool) { adaptee.groupByParallel(yield) } }
 
