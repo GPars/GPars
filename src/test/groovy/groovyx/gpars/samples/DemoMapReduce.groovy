@@ -17,6 +17,9 @@
 /**
  * Demonstrates several parallel map/reduce algorithms using the Parallelizer class and leveraging the underlying parallel array library.
  * Requires the jsr166y jar on the class path.
+ *
+ * @author Vaclav Pech
+ * Date: Nov 6, 2009
  */
 
 package groovyx.gpars.samples
@@ -32,6 +35,9 @@ Parallelizer.doParallel {
     assert 20 == (1..5).parallel.filter {it % 2 == 0}.map {it ** 2}.sum()                               //summarize squares of even numbers using sum
     def n = 10
     println ((1..n).parallel.reduce{a, b -> a * b})
+
+    final def bitSizes = [4, 6, 8, 1, 4, 2, 4, 5, 7, 6, 7, 3, 2, 4, 5, 6, 7, 2 ,1, 2]
+    assert 256 == bitSizes.parallel.map{2**it}.max()                                                    //find max value range
 
 
     assert 'abc' == 'abc'.parallel.reduce {a, b -> a + b}                                               //concatenate
