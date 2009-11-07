@@ -378,9 +378,12 @@ public class ParallelArrayUtil {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      */
     public static <T> T minParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).min(cl as Comparator)
+        createPA(collection, retrievePool()).min(createComparator(cl) as Comparator)
     }
 
     /**
@@ -391,6 +394,9 @@ public class ParallelArrayUtil {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      */
     public static Object minParallel(Object collection, Closure cl) {
         return minParallel(createCollection(collection), cl)
@@ -426,9 +432,12 @@ public class ParallelArrayUtil {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      */
     public static <T> T maxParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).max(cl as Comparator)
+        createPA(collection, retrievePool()).max(createComparator(cl) as Comparator)
     }
 
     /**
@@ -439,6 +448,9 @@ public class ParallelArrayUtil {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      */
     public static Object maxParallel(Object collection, Closure cl) {
         return maxParallel(createCollection(collection), cl)
@@ -533,6 +545,15 @@ public class ParallelArrayUtil {
     public static Object getParallel(Object collection) {
         return getParallel(createCollection(collection))
     }
+
+    /**
+     * Builds a comparator depending on the number of arguments accepted by the supplied closure.
+     */
+    @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
+    static Closure createComparator(final Closure handler) {
+        if (handler.maximumNumberOfParameters == 2) return handler
+        else return {a, b -> handler(a).compareTo(handler(b))}
+    }
 }
 
 /**
@@ -595,11 +616,13 @@ abstract class AbstractParallelCollection<T> {
 
     /**
      * Finds in parallel the minimum of all values in the collection. The supplied comparator is used.
-     * @param cl A two-argument closure comparing the arguments and returning either negative, positive or zero value to indicate, which argument is smaller.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      * @return The minimum element of the collection
      */
     public final T min(Closure cl) {
-        pa.min(cl as Comparator)
+        return pa.min(ParallelArrayUtil.createComparator(cl) as Comparator)
     }
 
     /**
@@ -612,11 +635,13 @@ abstract class AbstractParallelCollection<T> {
 
     /**
      * Finds in parallel the maximum of all values in the collection. The supplied comparator is used.
-     * @param cl A two-argument closure comparing the arguments and returning either negative, positive or zero value to indicate, which argument is smaller.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      * @return The maximum element of the collection
      */
     public final T max(Closure cl) {
-        pa.max(cl as Comparator)
+        pa.max(ParallelArrayUtil.createComparator(cl) as Comparator)
     }
 
     /**

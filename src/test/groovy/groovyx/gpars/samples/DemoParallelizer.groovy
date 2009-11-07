@@ -32,9 +32,9 @@ Parallelizer.doParallel {
         println it
     }
     println "Minimum: ${list.minParallel()}"
-    println "Minimum: ${list.minParallel{a, b -> a - b}}"
+    println "Minimum: ${list.minParallel{a, b -> a - b}}"   //Using a comparator closure
     println "Maximum: ${list.maxParallel()}"
-    println "Maximum: ${list.maxParallel{a, b -> a - b}}"
+    println "Maximum: ${list.maxParallel{it * 3}}"          //Using a value retrieval closure
     println "Sum: ${list.sumParallel()}"
     println "Product: ${list.foldParallel{a, b -> a * b}}"
 

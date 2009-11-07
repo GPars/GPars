@@ -183,6 +183,9 @@ public class ParallelUtilTest extends GroovyTestCase {
         Parallelizer.doParallel(5) {
             assertEquals 1, [1, 2, 3, 4, 5].minParallel {a, b -> a - b}
             assertEquals 5, [1, 2, 3, 4, 5].minParallel {a, b -> b - a}
+            assertEquals 1, [1, 2, 3, 4, 5].minParallel {it}
+            assertEquals 1, [1, 2, 3, 4, 5].minParallel {it * 2}
+            assertEquals 1, [1, 2, 3, 4, 5].minParallel {a -> a + 10}
             assertEquals 1, [1, 2, 3, 4, 5].minParallel()
             assertEquals 'a', 'abc'.minParallel()
         }
@@ -192,6 +195,9 @@ public class ParallelUtilTest extends GroovyTestCase {
         Parallelizer.doParallel(5) {
             assertEquals 5, [1, 2, 3, 4, 5].maxParallel {a, b -> a - b}
             assertEquals 1, [1, 2, 3, 4, 5].maxParallel {a, b -> b - a}
+            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {it}
+            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {it * 2}
+            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {a -> a + 10}
             assertEquals 5, [1, 2, 3, 4, 5].maxParallel()
             assertEquals 'c', 'abc'.maxParallel()
         }

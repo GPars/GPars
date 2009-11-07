@@ -105,6 +105,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         final List list = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance list
         assertEquals 1, list.minParallel {a, b -> a - b}
+        assertEquals 1, list.minParallel {it}
         assertEquals 5, list.minParallel {a, b -> b - a}
         assertEquals 1, list.minParallel()
     }
@@ -114,6 +115,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         ParallelEnhancer.enhanceInstance list
 
         assertEquals 5, list.maxParallel {a, b -> a - b}
+        assertEquals 5, list.maxParallel {it}
         assertEquals 1, list.maxParallel {a, b -> b - a}
         assertEquals 5, list.maxParallel()
     }

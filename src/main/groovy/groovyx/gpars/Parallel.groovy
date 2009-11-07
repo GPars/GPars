@@ -157,6 +157,9 @@ final class Parallel {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      */
     public def minParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -185,6 +188,9 @@ final class Parallel {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
      */
     public def maxParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {

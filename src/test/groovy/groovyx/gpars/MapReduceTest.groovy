@@ -70,8 +70,10 @@ public class MapReduceTest extends GroovyTestCase {
     public void testMinMax() {
         Parallelizer.doParallel(5) {
             assertEquals 1, [1, 2, 3, 4, 5].parallel.map{it}.min {a, b -> a - b}
+            assertEquals 1, [1, 2, 3, 4, 5].parallel.map{it}.min {it}
             assertEquals 1, [1, 2, 3, 4, 5].parallel.map{it}.min()
             assertEquals 5, [1, 2, 3, 4, 5].parallel.map{it}.max {a, b -> a - b}
+            assertEquals 5, [1, 2, 3, 4, 5].parallel.map{it}.max {it}
             assertEquals 5, [1, 2, 3, 4, 5].parallel.map{it}.max()
             assertEquals 'a', 'abc'.parallel.map{it}.min()
             assertEquals 'c', 'abc'.parallel.map{it}.max()

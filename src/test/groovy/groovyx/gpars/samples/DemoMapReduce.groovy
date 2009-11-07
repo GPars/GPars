@@ -74,7 +74,7 @@ Parallelizer.doParallel {
     final def shortestSite = urls.parallel.map {[url: it, content: it.toURL().text.toUpperCase()]}
             .filter {it.content.contains('GROOVY')}
             .map {[url: it.url, length: it.content.split().size()]}
-            .min {a, b -> a.length - b.length}
+            .min {it.length}
     println "The shortest groovy site today: $shortestSite.url has $shortestSite.length tokens"
 
     /**
