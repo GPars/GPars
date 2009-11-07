@@ -535,85 +535,144 @@ public class ParallelArrayUtil {
     }
 }
 
+/**
+ * Wraps a ParallelArray instance in map/reduce operation chains.
+ */
 abstract class AbstractParallelCollection<T> {
 
+    /**
+     * The wrapper ParallelArray instance
+     */
     final def pa
 
+    /**
+     * Creates an instance wrapping the supplied instance of ParallelAray
+     */
     def AbstractParallelCollection(final pa) {
         this.pa = pa
     }
 
+    /**
+     * Reconstructs a collection from the wrapped ParallelArray instance
+     * @return A collection containing all elements of the wrapped ParallelArray
+     */
     public final Object getCollection() {
         this.pa.all()
     }
 
+    /**
+     * Performs a parallel reduce operation. It will use the supplied two-argument closure to gradualy reduce two elements into one.
+     * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
+     * @return The product of reduction
+     */
     public final T reduce(Closure cl) {
         pa.reduce(cl as Reducer, null)
     }
 
+    /**
+     * Summarizes all elements of the collection in parallel using the "plus()" operator of the elements
+     * @return The summary od all elements in the collection
+     */
     public final T sum() {
         reduce{a, b -> a + b}
     }
 
+    /**
+     * Size of the collection
+     * @return The number of elements in the collection
+     */
     public final T size() {
         pa.size()
     }
 
+    /**
+     * Finds in parallel the minimum of all values in the collection. The implicit comparator is used.
+     * @return The minimum element of the collection
+     */
     public final T min() {
         pa.min()
     }
 
+    /**
+     * Finds in parallel the minimum of all values in the collection. The supplied comparator is used.
+     * @param cl A two-argument closure comparing the arguments and returning either negative, positive or zero value to indicate, which argument is smaller.
+     * @return The minimum element of the collection
+     */
     public final T min(Closure cl) {
         pa.min(cl as Comparator)
     }
 
+    /**
+     * Finds in parallel the maximum of all values in the collection. The implicit comparator is used.
+     * @return The maximum element of the collection
+     */
     public final T max() {
         pa.max()
     }
 
+    /**
+     * Finds in parallel the maximum of all values in the collection. The supplied comparator is used.
+     * @param cl A two-argument closure comparing the arguments and returning either negative, positive or zero value to indicate, which argument is smaller.
+     * @return The maximum element of the collection
+     */
     public final T max(Closure cl) {
         pa.max(cl as Comparator)
     }
 
+    /**
+     * Applies concurrently the supplied function to all elements in the collection, returning a collection containing
+     * the transformed values.
+     * @param A closure calculating a transformed value from the original one
+     * @return A collection holding the new values
+     */
     public final MappedCollection map(Closure cl) {
         new MappedCollection(pa.withMapping({cl(it)} as Mapper))
     }
 
+    /**
+     * Filteres concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
+     * @param A closure indicating whether to propagate the given element into the filtered collection
+     * @return A collection holding the allowed values
+     */
     public abstract ParallelCollection filter(Closure cl)
 }
 
+/**
+ * The dafault ParallelArray wrapper class
+ */
 final class ParallelCollection<T> extends AbstractParallelCollection {
 
     def ParallelCollection(final pa) {
         super(pa)
     }
 
+    /**
+     * Filteres concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
+     * @param A closure indicating whether to propagate the given element into the filtered collection
+     * @return A collection holding the allowed values
+     */
     public ParallelCollection filter(Closure cl) {
+        //We have to do it this way since WithFilter doesn't allow all of the operations we may need later
         pa.withFilter({cl(it)} as Predicate).all().parallel
-//        new FilterredCollection(pa.withFilter({cl(it)} as Predicate).all().parallel)
     }
 }
 
+/**
+ * The ParallelArray wrapper used after the map() operation
+ */
 final class MappedCollection<T> extends AbstractParallelCollection {
 
     def MappedCollection(final ParallelArray.WithMapping pa) {
         super(pa)
     }
 
+    /**
+     * Filteres concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
+     * @param A closure indicating whether to propagate the given element into the filtered collection
+     * @return A collection holding the allowed values
+     */
     public ParallelCollection filter(Closure cl) {
+        //We have to do it this suboptimal way since WithMapper doesn't support filter()
         collection.parallel.filter(cl)
-//        new FilterredCollection(pa.all().filter.withFilter({cl(it)} as Predicate))
     }
-
 }
-
-//final class FilterredCollection<T> extends AbstractParallelCollection {
-//
-//    def FilterredCollection(final ParallelArray.WithFilter pa) {
-//        super(pa)
-//    }
-//
-//    public FilterredCollection filter(Closure cl) {
-//        new FilterredCollection(pa.withFilter({cl(it)} as Predicate))
-//    }
-//}

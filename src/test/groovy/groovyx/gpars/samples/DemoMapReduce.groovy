@@ -30,7 +30,7 @@ Parallelizer.doParallel {
     assert 55 == [1, 2, 3, 4, 5].parallel.map {it ** 2}.reduce {a, b -> a + b}                          //summarize squares
     assert 20 == [1, 2, 3, 4, 5].parallel.filter {it % 2 == 0}.map {it ** 2}.reduce {a, b -> a + b}     //summarize squares of even numbers
     assert 20 == (1..5).parallel.filter {it % 2 == 0}.map {it ** 2}.sum()                               //summarize squares of even numbers using sum
-    def n = 2
+    def n = 10
     println ((1..n).parallel.reduce{a, b -> a * b})
 
 
@@ -38,17 +38,30 @@ Parallelizer.doParallel {
     assert 'aa:bb:cc:dd:ee' == 'abcde'.parallel.map {it * 2}.reduce {a, b -> "$a:$b"}                   //concatenate dupplicated characters with separator
     assert 'aa-bb-dd' == 'abcde'.parallel.filter {it != 'e'}.map {it * 2}.filter {it != 'cc'}.reduce {a, b -> "$a-$b"}  //filter out some elements
 
+
     def urls = [
             'http://www.jroller.com',
             'http://www.dzone.com',
             'http://www.infoq.com',
             'http://www.theserverside.com'
     ]
+
     //Number of sites mentioning Groovy
     println 'Number of groovy sites today: ' + urls.parallel.map {it.toURL().text.toUpperCase()}.filter {it.contains('GROOVY')}.collection.size()
-    println 'Number of words on the longest groovy site today: ' + urls.parallel.map {it.toURL().text.toUpperCase()}.filter {it.contains('GROOVY')}.map{it.split().size()}.max()
-    println 'Number of occurencies of the word GROOVY today: ' + urls.parallel.map {it.toURL().text.toUpperCase()}.filter {it.contains('GROOVY')}
-            .map{it.split()}.map{it.findAll{word -> word.contains 'GROOVY'}.size()}.sum()
+
+    println 'Number of words on the longest groovy site today: ' + urls.parallel
+            .map {it.toURL().text.toUpperCase()}
+            .filter {it.contains('GROOVY')}
+            .map{it.split().size()}
+            .max()
+
+    println 'Number of occurencies of the word GROOVY today: ' + urls.parallel
+            .map {it.toURL().text.toUpperCase()}
+            .filter {it.contains('GROOVY')}
+            .map{it.split()}
+            .map{it.findAll{word -> word.contains 'GROOVY'}
+            .size()}
+            .sum()
 
     /**
      * Passing a map around to remember the original url along the way

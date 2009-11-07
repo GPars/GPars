@@ -68,8 +68,7 @@ contributor(asynchronizerBody) {
         if (clazzName?.contains("ASYNCHRONIZER")) {
             method name: "async", type: "groovy.lang.Closure"
             method name: "callAsync", type: "java.util.concurrent.Future"
-            //todo enable
-//            method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')
+            method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')
         }
     }
 }
