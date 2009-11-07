@@ -21,6 +21,7 @@ import jsr166y.forkjoin.ForkJoinExecutor
 import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.Ops.Mapper
 import jsr166y.forkjoin.Ops.Predicate
+import jsr166y.forkjoin.Ops.Reducer
 import jsr166y.forkjoin.ParallelArray
 
 /**
@@ -331,7 +332,7 @@ public class ParallelArrayUtil {
     
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
-     * closure as the filter predicate.
+     * closure as the mapping predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a list of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
@@ -355,7 +356,7 @@ public class ParallelArrayUtil {
 
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
-     * closure as the filter predicate.
+     * closure as the mapping predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a list of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
@@ -368,4 +369,251 @@ public class ParallelArrayUtil {
     public static Map groupByParallel(Object collection, Closure cl) {
         return groupByParallel(createCollection(collection), cl)
     }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the supplied
+     * closure as the comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static <T> T minParallel(Collection<T> collection, Closure cl) {
+        createPA(collection, retrievePool()).min(cl as Comparator)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the supplied
+     * closure as the comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static Object minParallel(Object collection, Closure cl) {
+        return minParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static <T> T minParallel(Collection<T> collection) {
+        createPA(collection, retrievePool()).min()
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static Object minParallel(Object collection) {
+        return minParallel(createCollection(collection))
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the supplied
+     * closure as the comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the maximum of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static <T> T maxParallel(Collection<T> collection, Closure cl) {
+        createPA(collection, retrievePool()).max(cl as Comparator)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the supplied
+     * closure as the comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the maximum of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static Object maxParallel(Object collection, Closure cl) {
+        return maxParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the default comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the maximum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static <T> T maxParallel(Collection<T> collection) {
+        createPA(collection, retrievePool()).max()
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the default comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the maximum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static Object maxParallel(Object collection) {
+        return maxParallel(createCollection(collection))
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the reduceParallel()
+     * method with the + operator and the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the sum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static <T> T sumParallel(Collection<T> collection) {
+        reduceParallel(collection) {a, b -> a + b}
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the reduceParallel()
+     * method with the + operator and the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the sum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static Object sumParallel(Object collection) {
+        return sumParallel(createCollection(collection))
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static <T> T reduceParallel(Collection<T> collection, Closure cl) {
+        createPA(collection, retrievePool()).reduce(cl as Reducer, null)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public static Object reduceParallel(Object collection, Closure cl) {
+        return reduceParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a ParallelCollection around a ParallelArray wrapping te eleents of the original collection.
+     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+     * ParallelArray implementation.
+     */
+    public static <T> ParallelCollection<T> getParallel(Collection<T> collection) {
+        new ParallelCollection(createPA(collection, retrievePool()))
+    }
+
+    /**
+     * Creates a ParallelCollection around a ParallelArray wrapping te eleents of the original collection.
+     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+     * ParallelArray implementation.
+     */
+    public static Object getParallel(Object collection) {
+        return getParallel(createCollection(collection))
+    }
 }
+
+abstract class AbstractParallelCollection<T> {
+
+    final def pa
+
+    def AbstractParallelCollection(final pa) {
+        this.pa = pa
+    }
+
+    public final Object getCollection() {
+        this.pa.all()
+    }
+
+    public final T reduce(Closure cl) {
+        pa.reduce(cl as Reducer, null)
+    }
+
+    public final T sum() {
+        reduce{a, b -> a + b}
+    }
+
+    public final T size() {
+        pa.size()
+    }
+
+    public final T min() {
+        pa.min()
+    }
+
+    public final T min(Closure cl) {
+        pa.min(cl as Comparator)
+    }
+
+    public final T max() {
+        pa.max()
+    }
+
+    public final T max(Closure cl) {
+        pa.max(cl as Comparator)
+    }
+
+    public final MappedCollection map(Closure cl) {
+        new MappedCollection(pa.withMapping({cl(it)} as Mapper))
+    }
+
+    public abstract ParallelCollection filter(Closure cl)
+}
+
+final class ParallelCollection<T> extends AbstractParallelCollection {
+
+    def ParallelCollection(final pa) {
+        super(pa)
+    }
+
+    public ParallelCollection filter(Closure cl) {
+        pa.withFilter({cl(it)} as Predicate).all().parallel
+//        new FilterredCollection(pa.withFilter({cl(it)} as Predicate).all().parallel)
+    }
+}
+
+final class MappedCollection<T> extends AbstractParallelCollection {
+
+    def MappedCollection(final ParallelArray.WithMapping pa) {
+        super(pa)
+    }
+
+    public ParallelCollection filter(Closure cl) {
+        collection.parallel.filter(cl)
+//        new FilterredCollection(pa.all().filter.withFilter({cl(it)} as Predicate))
+    }
+
+}
+
+//final class FilterredCollection<T> extends AbstractParallelCollection {
+//
+//    def FilterredCollection(final ParallelArray.WithFilter pa) {
+//        super(pa)
+//    }
+//
+//    public FilterredCollection filter(Closure cl) {
+//        new FilterredCollection(pa.withFilter({cl(it)} as Predicate))
+//    }
+//}

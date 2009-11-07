@@ -6,7 +6,7 @@ package groovyx.gpars
 def parallelCollection = context(ctype: "java.lang.Object")
 
 contributor(parallelCollection) {
-//    property name: 'request', type: 'javax.servlet.http.HttpServletRequest'
+    property name: 'parallel', type: 'groovyx.gpars.ParallelCollection'
 
     method name: "eachParallel", type: "void", params: [closure: 'groovy.lang.Closure']
     method name: "eachWithIndexParallel", type: "void", params: [closure: 'groovy.lang.Closure']
@@ -17,7 +17,13 @@ contributor(parallelCollection) {
     method name: "anyParallel", type: "boolean", params: [closure: 'groovy.lang.Closure']
     method name: "allParallel", type: "boolean", params: [closure: 'groovy.lang.Closure']
     method name: "groupByParallel", type: "boolean", params: [closure: 'groovy.lang.Closure']
-    method name: "makeTransparent", type: "Object"
+    method name: "minParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
+    method name: "minParallel", type: "Object"
+    method name: "maxParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
+    method name: "maxParallel", type: "Object"
+    method name: "sumParallel", type: "Object"
+    method name: "reduceParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
+    method name: "makeTransparent", type: "groovyx.gpars.TransparentParallel"
 }
 
 /**

@@ -37,6 +37,12 @@ final class TransparentParallel {
     public def final all(Closure yield) { this.allParallel(yield)}
     public def final any(Closure yield) { this.anyParallel(yield)}
     public def final groupBy(Closure yield) { this.groupByParallel(yield)}
+    public def final min(Closure yield) { this.minParallel(yield)}
+    public def final min() { this.minParallel()}
+    public def final max(Closure yield) { this.maxParallel(yield)}
+    public def final max() { this.maxParallel()}
+    public def final sum() { this.sumParallel()}
+    public def final reduce(Closure yield) { this.reduceParallel(yield)}
 
     /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.

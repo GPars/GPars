@@ -17,6 +17,7 @@
 package groovyx.gpars
 
 import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
@@ -175,6 +176,52 @@ public class ParallelUtilTest extends GroovyTestCase {
                 }
             }
             assertEquals(['abc', 'xyz'], result)
+        }
+    }
+
+    public void testMin() {
+        Parallelizer.doParallel(5) {
+            assertEquals 1, [1, 2, 3, 4, 5].minParallel {a, b -> a - b}
+            assertEquals 5, [1, 2, 3, 4, 5].minParallel {a, b -> b - a}
+            assertEquals 1, [1, 2, 3, 4, 5].minParallel()
+            assertEquals 'a', 'abc'.minParallel()
+        }
+    }
+
+    public void testMax() {
+        Parallelizer.doParallel(5) {
+            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {a, b -> a - b}
+            assertEquals 1, [1, 2, 3, 4, 5].maxParallel {a, b -> b - a}
+            assertEquals 5, [1, 2, 3, 4, 5].maxParallel()
+            assertEquals 'c', 'abc'.maxParallel()
+        }
+    }
+
+    public void testSum() {
+        Parallelizer.doParallel(5) {
+            assertEquals 15, [1, 2, 3, 4, 5].sumParallel()
+            assertEquals 'abc', 'abc'.sumParallel()
+        }
+    }
+
+    public void testReduce() {
+        Parallelizer.doParallel(5) {
+            assertEquals 15, [1, 2, 3, 4, 5].reduceParallel() {a, b -> a + b}
+            assertEquals 'abc', 'abc'.reduceParallel {a, b -> a + b}
+            assertEquals 55, [1, 2, 3, 4, 5].collectParallel {it ** 2}.reduceParallel {a, b -> a + b}
+        }
+    }
+
+    public void testReduceThreads() {
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+
+        Parallelizer.doParallel(5) {
+            assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].reduceParallel {a, b ->
+                Thread.sleep 200
+                map[Thread.currentThread()] = ''
+                a + b
+            }
+            assert map.keys().size() > 1
         }
     }
 }

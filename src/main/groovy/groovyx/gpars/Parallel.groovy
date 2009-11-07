@@ -150,6 +150,102 @@ final class Parallel {
     }
 
     /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the supplied
+     * closure as the comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public def minParallel(Closure cl) {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.minParallel(mixedIn[Object], cl)
+        }
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public def minParallel() {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelArrayUtil.minParallel(mixedIn[Object])
+        }
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the supplied
+     * closure as the comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the maximum of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public def maxParallel(Closure cl) {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.maxParallel(mixedIn[Object], cl)
+        }
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the default comparator.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the maximum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public def maxParallel() {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.maxParallel(mixedIn[Object])
+        }
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the reduceParallel()
+     * method with the + operator and the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the sum of the elements in the collection.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public def sumParallel() {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.sumParallel(mixedIn[Object])
+        }
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     */
+    public def reduceParallel(Closure cl) {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.reduceParallel(mixedIn[Object], cl)
+        }
+    }
+
+    /**
+     * Creates a ParallelCollection around a ParallelArray wrapping te eleents of the original collection.
+     * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
+     * ParallelArray implementation.
+     */
+    public ParallelCollection getParallel() {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.getParallel(mixedIn[Object])
+        }
+    }
+
+    /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.
      */
     public def boolean isTransparent() {return false}

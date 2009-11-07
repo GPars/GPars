@@ -101,4 +101,53 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assert map.keys().size() > 2
     }
 
+    public void testMin() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+        assertEquals 1, list.minParallel {a, b -> a - b}
+        assertEquals 5, list.minParallel {a, b -> b - a}
+        assertEquals 1, list.minParallel()
+    }
+
+    public void testMax() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 5, list.maxParallel {a, b -> a - b}
+        assertEquals 1, list.maxParallel {a, b -> b - a}
+        assertEquals 5, list.maxParallel()
+    }
+
+    public void testSum() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 15, list.sumParallel()
+
+        def s = 'aaaaabbbbccccc'
+        ParallelEnhancer.enhanceInstance s
+        assertEquals 'aaaaabbbbccccc', s.sumParallel()
+    }
+
+    public void testReduce() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 15, list.reduceParallel() {a, b -> a + b}
+        assertEquals 55, list.collectParallel {it ** 2}.reduceParallel {a, b -> a + b}
+    }
+
+    public void testReduceThreads() {
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 15, list.reduceParallel {a, b ->
+            Thread.sleep 200
+            map[Thread.currentThread()] = ''
+            a + b
+        }
+        assert map.keys().size() > 1
+    }
 }

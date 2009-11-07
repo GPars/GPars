@@ -179,4 +179,46 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         }
         return map
     }
+
+    public void testTransparentMin() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        ParallelEnhancer.enhanceInstance(items)
+        items.makeTransparent().min {a, b ->
+            Thread.sleep 100
+            map[Thread.currentThread()] = ''
+            return a - b
+        }
+        assert map.keys().size() > 1
+    }
+
+    public void testTransparentMax() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        ParallelEnhancer.enhanceInstance(items)
+        items.makeTransparent().max {a, b ->
+            Thread.sleep 100
+            map[Thread.currentThread()] = ''
+            return a - b
+        }
+        assert map.keys().size() > 1
+    }
+
+    public void testTransparentSum() {
+        def items = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance(items)
+        assertEquals 15, items.makeTransparent().sum()
+    }
+
+    public void testTransparentReduce() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        ParallelEnhancer.enhanceInstance(items)
+        items.makeTransparent().reduce {a, b ->
+            Thread.sleep 100
+            map[Thread.currentThread()] = ''
+            return a + b
+        }
+        assert map.keys().size() > 1
+    }
 }
