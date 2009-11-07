@@ -467,7 +467,7 @@ public class ParallelArrayUtil {
     }
 
     /**
-     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the reduceParallel()
+     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the foldParallel()
      * method with the + operator and the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the sum of the elements in the collection.
@@ -475,11 +475,11 @@ public class ParallelArrayUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static <T> T sumParallel(Collection<T> collection) {
-        reduceParallel(collection) {a, b -> a + b}
+        foldParallel(collection) {a, b -> a + b}
     }
 
     /**
-     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the reduceParallel()
+     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the foldParallel()
      * method with the + operator and the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the sum of the elements in the collection.
@@ -499,7 +499,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
-    public static <T> T reduceParallel(Collection<T> collection, Closure cl) {
+    public static <T> T foldParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).reduce(cl as Reducer, null)
     }
 
@@ -512,8 +512,8 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
-    public static Object reduceParallel(Object collection, Closure cl) {
-        return reduceParallel(createCollection(collection), cl)
+    public static Object foldParallel(Object collection, Closure cl) {
+        return foldParallel(createCollection(collection), cl)
     }
 
     /**

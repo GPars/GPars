@@ -42,7 +42,7 @@ final class TransparentParallel {
     public def final max(Closure yield) { this.maxParallel(yield)}
     public def final max() { this.maxParallel()}
     public def final sum() { this.sumParallel()}
-    public def final reduce(Closure yield) { this.reduceParallel(yield)}
+    public def final fold(Closure yield) { this.foldParallel(yield)}
 
     /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.

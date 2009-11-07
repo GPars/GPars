@@ -133,8 +133,8 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         final List list = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance list
 
-        assertEquals 15, list.reduceParallel() {a, b -> a + b}
-        assertEquals 55, list.collectParallel {it ** 2}.reduceParallel {a, b -> a + b}
+        assertEquals 15, list.foldParallel() {a, b -> a + b}
+        assertEquals 55, list.collectParallel {it ** 2}.foldParallel {a, b -> a + b}
     }
 
     public void testReduceThreads() {
@@ -143,7 +143,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         final List list = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance list
 
-        assertEquals 15, list.reduceParallel {a, b ->
+        assertEquals 15, list.foldParallel {a, b ->
             Thread.sleep 200
             map[Thread.currentThread()] = ''
             a + b

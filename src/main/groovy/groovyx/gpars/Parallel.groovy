@@ -206,7 +206,7 @@ final class Parallel {
     }
 
     /**
-     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the reduceParallel()
+     * Creates a Parallel Array out of the supplied collection/object and summarizes its elements using the foldParallel()
      * method with the + operator and the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the sum of the elements in the collection.
@@ -228,9 +228,9 @@ final class Parallel {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
-    public def reduceParallel(Closure cl) {
+    public def foldParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.reduceParallel(mixedIn[Object], cl)
+            ParallelArrayUtil.foldParallel(mixedIn[Object], cl)
         }
     }
 

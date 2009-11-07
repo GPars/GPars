@@ -22,7 +22,8 @@ contributor(parallelCollection) {
     method name: "maxParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
     method name: "maxParallel", type: "Object"
     method name: "sumParallel", type: "Object"
-    method name: "reduceParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
+    method name: "foldParallel", type: "Object", params: [closure: 'groovy.lang.Closure']
+    method name: "fold", type: "Object", params: [closure: 'groovy.lang.Closure']
     method name: "makeTransparent", type: "groovyx.gpars.TransparentParallel"
 }
 

@@ -206,9 +206,9 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     public void testReduce() {
         Parallelizer.doParallel(5) {
-            assertEquals 15, [1, 2, 3, 4, 5].reduceParallel() {a, b -> a + b}
-            assertEquals 'abc', 'abc'.reduceParallel {a, b -> a + b}
-            assertEquals 55, [1, 2, 3, 4, 5].collectParallel {it ** 2}.reduceParallel {a, b -> a + b}
+            assertEquals 15, [1, 2, 3, 4, 5].foldParallel() {a, b -> a + b}
+            assertEquals 'abc', 'abc'.foldParallel {a, b -> a + b}
+            assertEquals 55, [1, 2, 3, 4, 5].collectParallel {it ** 2}.foldParallel {a, b -> a + b}
         }
     }
 
@@ -216,7 +216,7 @@ public class ParallelUtilTest extends GroovyTestCase {
         final ConcurrentHashMap map = new ConcurrentHashMap()
 
         Parallelizer.doParallel(5) {
-            assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].reduceParallel {a, b ->
+            assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].foldParallel {a, b ->
                 Thread.sleep 200
                 map[Thread.currentThread()] = ''
                 a + b
