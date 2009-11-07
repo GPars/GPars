@@ -59,8 +59,7 @@ Parallelizer.doParallel {
             .map {it.toURL().text.toUpperCase()}
             .filter {it.contains('GROOVY')}
             .map{it.split()}
-            .map{it.findAll{word -> word.contains 'GROOVY'}
-            .size()}
+            .map{it.findAll{word -> word.contains 'GROOVY'}.size()}
             .sum()
 
     /**
