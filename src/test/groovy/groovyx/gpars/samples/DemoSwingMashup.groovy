@@ -17,7 +17,6 @@
 package groovyx.gpars.samples
 
 import groovy.swing.SwingBuilder
-import groovyx.gpars.ParallelEnhancer
 import javax.swing.JFrame
 
 /**
@@ -47,7 +46,6 @@ final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation:
         }
         button('Click', actionPerformed: {
             doOutside {
-                ParallelEnhancer.enhanceInstance(urls).makeTransparent()
                 urls.each {url ->
                     edt {logMessages.text += "Started downloading from $url \n"}
                     def content = url.toURL().text

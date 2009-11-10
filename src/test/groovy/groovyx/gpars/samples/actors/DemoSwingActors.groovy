@@ -66,6 +66,7 @@ def contentDownloader = Actors.reactor {
 //    def content = it.site.toURL().text
     def content = defaultSites[it.site]
     Thread.sleep 2000
+    if (it.site.contains('info')) Thread.sleep 10000
 
     contentDownloaderArea.report "Downloaded"
     new WordFindResponse(content, it)
