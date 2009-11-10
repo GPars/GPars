@@ -36,27 +36,35 @@ final def threadPoolSize = 2  //feel free to play around with various values
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
     vbox() {
-        label 'Sites:'
+        panel() {
+            gridLayout()
+            label 'Sites:'
+        }
         scrollPane() {
             textArea(columns: 80, rows: 20, id: 'result')
         }
-        label 'Log:'
+        panel() {
+            gridLayout()
+            label 'Log:'
+        }
         scrollPane() {
             textArea(columns: 80, rows: 25, id: 'logMessages')
         }
-        button('Click', actionPerformed: {
-            doOutside {
-                urls.each {url ->
-                    edt {logMessages.text += "Started downloading from $url \n"}
-                    def content = url.toURL().text
-                    edt {logMessages.text += "Done downloading from $url \n"}
-                    if (content.toUpperCase().contains('GROOVY'))
-                        edt {
-                            result.text += "A groovy site found: ${url} \n"
-                        }
+        hbox {
+            button('Search for Groovy', mnemonic:'S', actionPerformed: {
+                doOutside {
+                    urls.each {url ->
+                        edt {logMessages.text += "Started downloading from $url \n"}
+                        def content = url.toURL().text
+                        edt {logMessages.text += "Done downloading from $url \n"}
+                        if (content.toUpperCase().contains('GROOVY'))
+                            edt {
+                                result.text += "A groovy site found: ${url} \n"
+                            }
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 }
 
