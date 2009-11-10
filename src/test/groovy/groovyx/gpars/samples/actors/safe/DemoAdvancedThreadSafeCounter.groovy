@@ -23,7 +23,7 @@ import groovyx.gpars.actor.Safe
  * It inherits from the Safe class and adds the register() and unregister() private methods,
  * which callers may use it the commands they submit to the Conference.
  */
-class Conference extends Safe<Long> {
+class Conference extends Safe {
     
     def Conference() { super(0L) }
 
@@ -32,7 +32,7 @@ class Conference extends Safe<Long> {
     private def unregister(long num) { data -= num }
 }
 
-final Safe<Long> conference = new Conference()  //new Conference created
+final Safe conference = new Conference()  //new Conference created
 
 /**
  * Three external parties will try to register/unregister concurrently
