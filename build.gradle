@@ -32,7 +32,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gpars'
 group = 'groovyx.gpars'
-version = '0.9-beta-1-SNAPSHOT'
+version = '0.9-beta-1'
 
 manifest.mainAttributes(
         'Implementation-Title': archivesBaseName,
@@ -54,22 +54,19 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.3.GA'
-    deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: hasProperty('wagonSvnVersion') ? wagonSvnVersion : '1.9'
+    deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
 }
 
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
 
-/*
+[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '1G')
+
 gradle.taskGraph.whenReady {taskGraph ->
    if (!taskGraph.hasTask(':release')) {
-       final Date date = new Date()
-       //  TODO: Should only put the date in the artefact name when uploading to the Maven repository, otherwise
-       //  should just append SNAPSHOT.
-       version += '-SNAPSHOT' // + new SimpleDateFormat('-yyyyMMddHHmmssZ').format(date)
+       version += '-SNAPSHOT'
    }
 }
-*/
 
 task release(dependsOn: ['build']) << {
     println 'We release now'
@@ -79,10 +76,12 @@ uploadArchives {
     repositories.mavenDeployer {
         uniqueVersion = false
         configuration = configurations.deployerJars
-        //repository(url: 'java-net:/maven2-repository/trunk/repository/') {
-        //}
-        repository(url: 'https://dav.codehaus.org/repository/gpars')
-        snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars')
+        repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
+            authentication(userName: repoUserName, password: repoPassword)
+        }
+        snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
+            authentication(userName: repoUserName, password: repoPassword)
+        }
     }
 }
 
@@ -140,7 +139,7 @@ task zipSamples(type: Zip) {
 
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
-    gradleVersion = '0.8'
+    gradleVersion = '0.9-20091111095904+0100-maven_webdav'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
