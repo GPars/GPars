@@ -79,7 +79,6 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
             default:
                 def splitList = split(numbers)
                 [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each{forkOffChild it}  //fork a child task
-                awaitChildren()                         //wait for all children to finish their work
                 setResult merge(* childrenResults)      //use results of children tasks to calculate and store own result
         }
     }

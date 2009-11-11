@@ -89,7 +89,8 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
 
     /**
      * Blocks until all children finish their calculations, releasing the physical thread temporarily to the thread pool
-     * to do some work stealing.
+     * to do some work stealing. It is not ususaly necesary to call the awaitChildren() method directly
+     * since the getChildrenResults() method calls it itself before returning the children results. 
      */
     protected final void awaitChildren() {
         childTaskBarrier.arriveAndAwait();
@@ -114,8 +115,14 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
     protected final List<AbstractForkJoinWorker<T>> getChildren() {
         return Collections.unmodifiableList(children);
     }
-    
+
+    /**
+     * Waits for and returns the results of the child tasks.
+     * @return A list of results returned from the child tasks
+     * @throws InterruptedException If the current thread got interrupted while waiting for the results
+     */
     protected final List<T> getChildrenResults() throws InterruptedException {
+        awaitChildren();
         final List<T> results = new ArrayList<T>();
         for (final AbstractForkJoinWorker<T> worker : getChildren()) {
             results.add(worker.getResult());
