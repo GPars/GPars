@@ -31,7 +31,7 @@ usePlugin 'maven'
 defaultTasks 'test'
 
 archivesBaseName = 'gpars'
-group = 'groovyx.gpars'
+group = 'org.codehaus.gpars'
 version = '0.9-beta-1'
 
 manifest.mainAttributes(
