@@ -152,7 +152,8 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoSwingMashup',                            // but they can be run locally
             'DemoSwingCollectionProcessing',                            
             'DemoSwingActors',                            
-            'DemoMapReduce',                            
+            'DemoSwingDataFlowOperators',
+            'DemoMapReduce',
     ]
 
     classpath = sourceSets.main.runtimeClasspath
