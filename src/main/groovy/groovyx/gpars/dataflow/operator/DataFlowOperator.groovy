@@ -21,6 +21,17 @@ import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.PooledActorGroup
 
 /**
+ * Dataflow operators form the basic units in dataflow networks. Operators are typically combined into oriented graphs that transform data.
+ * They accept a set of input and output dataflow channels so that once values are available to be consumed in all
+ * the input channels the operator's body is triggered on the values, potentially generating values for the output channels.
+ * The output channels at the same time are suitable to be used as input channels by some other dataflow operators.
+ * The channels allow operators to communicate.
+ *
+ * Dataflow operators enable creation of highly concurrent applications yet the abstraction hides the low-level concurrency primitives
+ * and exposes much friendlier API.
+ * Since operators internaly leverage the actor implementation, they reuse a pool of threads and so the actual number of threads
+ * used by the calculation can be kept much lower than the actual number of operators used in the network.
+ *
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
@@ -28,11 +39,21 @@ public final class DataFlowOperator {
 
     private static final dfOperatorActorGroup = new PooledActorGroup()
 
-
+    /**
+     * Creates an operator using the default operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
     public static DataFlowOperator operator(final Map channels, final Closure code) {
         return new DataFlowOperator(channels, code).start(dfOperatorActorGroup)
     }
 
+    /**
+     * Creates an operator using the specified operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param group The operator actor group to use with the operator
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
     public static DataFlowOperator operator(final Map channels, final ActorGroup group, final Closure code) {
         return new DataFlowOperator(channels, code).start(group)
     }
@@ -42,13 +63,26 @@ public final class DataFlowOperator {
     private final Closure code
     private final Actor actor
 
-    public def DataFlowOperator(final Map channels, final Closure code) {
-        this.inputs = channels.inputs.asImmutable()
+    /**
+     * Creates an operator
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    private def DataFlowOperator(final Map channels, final Closure code) {
         this.outputs = channels.outputs.asImmutable()
         this.code = code.clone()
         this.code.delegate = this
+        this.inputs = channels.inputs.asImmutable()
+
+        final int parameters = code.maximumNumberOfParameters
+        if (parameters != this.inputs.size())
+            throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${this.inputs.size()} input streams. The numbers must match.")
     }
 
+    /**
+     * Starts an operator using the specified operator actor group
+     * @param group The operator actor group to use with the operator
+     */
     private DataFlowOperator start(ActorGroup group) {
         actor = group.actor {
             loop {
@@ -60,15 +94,6 @@ public final class DataFlowOperator {
         actor.start()
         return this
     }
-
-    //todo test and document async val for actors
-    //todo check whether the number of parameters and input channels match
-    //todo think of ways to sync with operators - join, stop, implement actor
-    //todo groups
-    //todo interruptions
-    //todo Non-blocking DFStream
-    //todo test with limited number of threads
-    //todo docs
 
     private void handleValueMessage(Map values, count) {
         if (values.size() < count) {
@@ -82,11 +107,35 @@ public final class DataFlowOperator {
         }
     }
 
-    public void stop() {
-        actor.stop()
-    }
+    /**
+     * Stops the operator
+     */
+    public void stop() { actor.stop() }
 
-    private Map bindOutput(final int idx, final value) {
+    /**
+     * Joins the operator waiting for it to finish
+     */
+    public void join() { actor.join() }
+
+    /**
+     * Used by the operator's body to send a value to the given output channel
+     */
+    Map bindOutput(final int idx, final value) {
         outputs[idx] << value
     }
+
+    /**
+     * Used by the operator's body to send a value to the first / only output channel
+     */
+    Map bindOutput(final value) { bindOutput 0, value }
+
+    /**
+     * The operator's output channel of the given index
+     */
+    public getOutputs(int idx) { outputs[idx] }
+
+    /**
+     * The operator's first / only output channel
+     */
+    public getOutput() { outputs[0] }
 }
