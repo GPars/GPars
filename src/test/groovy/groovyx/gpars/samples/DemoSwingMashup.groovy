@@ -17,7 +17,6 @@
 package groovyx.gpars.samples
 
 import groovy.swing.SwingBuilder
-import groovyx.gpars.Parallelizer
 import javax.swing.JFrame
 
 /**
@@ -52,19 +51,16 @@ final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation:
             textArea(columns: 80, rows: 25, id: 'logMessages')
         }
         hbox {
-            button('Search for Groovy', mnemonic:'S', actionPerformed: {
+            button('Search for Groovy', mnemonic: 'S', actionPerformed: {
                 doOutside {
-                    Parallelizer.doParallel {
-                        urls.makeTransparent()
-                        urls.each {url ->
-                            edt {logMessages.text += "Started downloading from $url \n"}
-                            def content = url.toURL().text
-                            edt {logMessages.text += "Done downloading from $url \n"}
-                            if (content.toUpperCase().contains('GROOVY'))
-                                edt {
-                                    result.text += "A groovy site found: ${url} \n"
-                                }
-                        }
+                    urls.each {url ->
+                        edt {logMessages.text += "Started downloading from $url \n"}
+                        def content = url.toURL().text
+                        edt {logMessages.text += "Done downloading from $url \n"}
+                        if (content.toUpperCase().contains('GROOVY'))
+                            edt {
+                                result.text += "A groovy site found: ${url} \n"
+                            }
                     }
                 }
             })
