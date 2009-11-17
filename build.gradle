@@ -77,10 +77,10 @@ uploadArchives {
         uniqueVersion = false
         configuration = configurations.deployerJars
         repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
-            authentication(userName: hasProperty('repoUserName') ? repoUserName : '', password: hasProperty('repoPassword') ? repoPassword : '')
+            authentication(userName: hasProperty('gpars_repoUserName') ? gpars_repoUserName : '', password: hasProperty('gpars_repoPassword') ? gpars_repoPassword : '')
         }
         snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
-            authentication(userName: hasProperty('repoUserName') ? repoUserName : '', password: hasProperty('repoPassword') ? repoPassword : '')
+            authentication(userName: hasProperty('gpars_repoUserName') ? gpars_repoUserName : '', password: hasProperty('gpars_repoPassword') ? gpars_repoPassword : '')
         }
     }
 }
