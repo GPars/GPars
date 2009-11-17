@@ -60,7 +60,7 @@ dependencies {
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
 
-[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '128M')
+[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '256M')
 
 gradle.taskGraph.whenReady {taskGraph ->
    if (!taskGraph.hasTask(':release')) {
