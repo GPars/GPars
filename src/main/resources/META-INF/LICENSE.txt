@@ -1,6 +1,7 @@
 /***
  * GPars (formerly GParallelizer): a groovy concurrency library.
- * It provides support for configuring parallel system using Groovy:
+ * It provides support for configuring parallel system using Groovy
+ * The project resides at http://gpars.codehaus.org
  */
 
 /*
