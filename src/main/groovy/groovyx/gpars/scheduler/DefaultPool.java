@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Represents the actors' thread pool, which performs tasks on behalf of the actors.
  * The actors' thread pool size defaults to the n + 1, where n is the number of processors/cores available on the machine.
- * The VM parameter -Dgparallelizer.poolsize can be used the configure the default size of the actors' thread pool.
+ * The VM parameter -Dgpars.poolsize can be used the configure the default size of the actors' thread pool.
  * The resize() and resetDefaultSize() methods can be used to configure size of the thread pool at runtime.
  *
  * @author Vaclav Pech

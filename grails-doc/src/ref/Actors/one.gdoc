@@ -239,7 +239,7 @@ def actor2 = myGroup.actor {
 }
 {code}
 
-The _event-driven_ actors belonging to the same group share the *underlying thread pool* of that group. The pool by default contains *n + 1 threads*, where *n* stands for the number of *CPUs* detected by the JVM. The *pool size* can be set *explicitly* either by setting the _gparallelizer.poolsize_ system property or individually for each actor group by specifying the appropriate constructor parameter. 
+The _event-driven_ actors belonging to the same group share the *underlying thread pool* of that group. The pool by default contains *n + 1 threads*, where *n* stands for the number of *CPUs* detected by the JVM. The *pool size* can be set *explicitly* either by setting the _gpars.poolsize_ system property or individually for each actor group by specifying the appropriate constructor parameter.
 
 {code}
 def myGroup = new PooledActorGroup(10)  //the pool will contain 10 threads
