@@ -60,7 +60,7 @@ def sites = new DataFlowStream()
 DataFlowOperator.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
 
     contentDownloaderArea.report "Downloading ${request.site}"
-//    def content = it.site.toURL().text
+//    def content = request.site.toURL().text
     def content = defaultSites[request.site]
     Thread.sleep 2000
     if (request.site.contains('info')) Thread.sleep 10000

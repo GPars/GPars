@@ -120,14 +120,14 @@ public final class DataFlowOperator {
     /**
      * Used by the operator's body to send a value to the given output channel
      */
-    Map bindOutput(final int idx, final value) {
+    void bindOutput(final int idx, final value) {
         outputs[idx] << value
     }
 
     /**
      * Used by the operator's body to send a value to the first / only output channel
      */
-    Map bindOutput(final value) { bindOutput 0, value }
+    void bindOutput(final value) { bindOutput 0, value }
 
     /**
      * The operator's output channel of the given index
