@@ -67,7 +67,7 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
      * Sorts a small list or delegates to two children, if the list contains more than two elements.
      */
     protected void compute() {
-        println "Sorting $numbers"
+        println "Thread ${Thread.currentThread().name[-1]}: Sorting $numbers"
         switch (numbers.size()) {
             case 0..1:
                 setResult numbers                                   //store own result
