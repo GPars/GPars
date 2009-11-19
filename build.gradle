@@ -43,6 +43,7 @@ manifest.mainAttributes(
 repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
+    mavenRepo urls: ["http://snapshots.repository.codehaus.org"]
 }
 
 configurations {
@@ -54,6 +55,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
+    compile group: 'org.grails', name: 'grails-docs', version: '1.2.0.BUILD-SNAPSHOT'
+    compile group: 'radeox', name: 'radeox', version: '1.0-b2'
     deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
 }
 
@@ -117,7 +120,19 @@ groovydoc {
     overview = 'overview.html'
 }
 
-task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
+task documentation(dependsOn: ['javadoc', 'groovydoc', 'docs'], description: 'Create the API documentation.')
+
+task docs << {
+	ant.taskdef (name: 'docs', classname : 'grails.doc.ant.DocPublisherTask') {
+		classpath {
+			configurations.compile.resolve().each { f ->
+				pathelement(location:f)
+			}
+		}
+
+	}
+	ant.docs(src:"grails-doc/src", dest:"build/guide/docs", properties:"grails-doc/src/doc.properties")
+}
 
 task zipDoc(type: Zip, dependsOn: documentation) {
     appendix = 'docs'
