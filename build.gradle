@@ -131,7 +131,7 @@ task docs << {
 		}
 
 	}
-	ant.docs(src:"grails-doc/src", dest:"build/guide/docs", properties:"grails-doc/src/doc.properties")
+	ant.docs(src:"grails-doc/src", dest:"build/docs/guide", properties:"grails-doc/src/doc.properties")
 }
 
 task zipDoc(type: Zip, dependsOn: documentation) {
