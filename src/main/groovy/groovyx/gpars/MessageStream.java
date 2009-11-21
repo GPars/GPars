@@ -53,7 +53,9 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     /**
-     * Send message to stream and return immediately
+     * Send message to stream and return immediately. Allows to specify an arbitrary actor to send replies to.
+     * By default replies are sent to the originator (sender) of each message, however, when a different actor
+     * is specified as the optional second argument to the send() method, this supplied actor will receive the replies instead.
      *
      * @param message message to send
      * @param replyTo where to send reply
