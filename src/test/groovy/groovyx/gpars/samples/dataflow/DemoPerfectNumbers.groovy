@@ -67,8 +67,10 @@ doParallel {
     assert isPerfectWithDF(6)
     def perfectNumbers = (1..5000).findAll {isPerfectWithDF it}
     println("Perfect numbers: $perfectNumbers")
-    perfectNumbers = (33550300..33550400).findAll {isPerfectWithDF it}
-    println("Perfect numbers: $perfectNumbers")
+//    perfectNumbers = (33550300..33550400).findAll {isPerfectWithDF it}
+//    println("Perfect numbers: $perfectNumbers")
 }
+//DataFlowActor.DATA_FLOW_GROUP.shutdown()
+System.exit 0
 
 
