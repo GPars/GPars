@@ -48,7 +48,6 @@ final AbstractPooledActor actor = group.actor {
         }
     }
 }
-actor.start()
 
 final def a1 = group.actor {
     actor << new Offer(price: 10)
@@ -58,7 +57,6 @@ final def a1 = group.actor {
         }
     }
 }
-a1.start()
 
 final def a2 = group.actor {
     actor << [price: 20]
@@ -67,7 +65,7 @@ final def a2 = group.actor {
             println "Agent 2: $it"
         }
     }
-}.start()
+}
 
 final def a3 = group.actor {
     actor << new Offer(price: 5)
@@ -76,7 +74,7 @@ final def a3 = group.actor {
             println "Agent 3: $it"
         }
     }
-}.start()
+}
 
 [actor, a1, a2, a3]*.join()
 

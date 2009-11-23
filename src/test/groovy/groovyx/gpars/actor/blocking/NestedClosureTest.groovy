@@ -32,11 +32,10 @@ public class NestedClosureTest extends GroovyTestCase {
                     reply 20
                     stop()
                 }
-            }.start()
+            }
             result << nestedActor.sendAndWait(10)
             stop()
         }
-        actor.start()
         assertEquals 20, result.val
     }
 
@@ -50,10 +49,9 @@ public class NestedClosureTest extends GroovyTestCase {
                 receive {
                     reply 20
                 }
-            }.start()
+            }
             result << nestedActor.sendAndWait(10)
         }
-        actor.start()
         assertEquals 20, result.val
     }
 

@@ -69,8 +69,8 @@ Closure createMessageHandler(def parentActor) {
 
                     def child1 = GroupTestHeper.group.actor(createMessageHandler(delegate))
                     def child2 = GroupTestHeper.group.actor(createMessageHandler(delegate))
-                    child1.start().send(splitList[0])
-                    child2.start().send(splitList[1])
+                    child1.send(splitList[0])
+                    child2.send(splitList[1])
 
                     parentActor.send merge(receive(), receive())
             }
@@ -81,10 +81,10 @@ Closure createMessageHandler(def parentActor) {
 
 def resultActor = Actors.actor {
     println "Sorted array:\t${receive()}"
-}.start()
+}
 
 def sorter = Actors.actor(createMessageHandler(resultActor))
-sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3,
+sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3,
         4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3])
 
 resultActor.join()

@@ -88,7 +88,6 @@ public class LocalNode {
                 ((Closure) runnable).setResolveStrategy(Closure.DELEGATE_FIRST);
             }
             mainActor = actorGroup.actor(runnable);
-            mainActor.start();
         } else {
             mainActor = null;
         }

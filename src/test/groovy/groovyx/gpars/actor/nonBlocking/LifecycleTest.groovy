@@ -19,6 +19,7 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.dataflow.DataFlows
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
@@ -52,7 +53,7 @@ public class LifecycleTest extends GroovyTestCase {
             barrier.await()
             counter.incrementAndGet()
             barrier.await()
-        }.start()
+        }
 
         barrier.await()
         assert actor.isActive()
@@ -73,7 +74,7 @@ public class LifecycleTest extends GroovyTestCase {
                 counter.incrementAndGet()
                 barrier.await()
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -100,7 +101,7 @@ public class LifecycleTest extends GroovyTestCase {
             react {
                 counter.incrementAndGet()
             }
-        }.start()
+        }
 
         actor.metaClass {
             onInterrupt = {}
@@ -125,7 +126,7 @@ public class LifecycleTest extends GroovyTestCase {
             react {
                 counter.incrementAndGet()
             }
-        }.start()
+        }
 
         actor.metaClass {
             onInterrupt = {}
@@ -149,7 +150,7 @@ public class LifecycleTest extends GroovyTestCase {
         final AbstractPooledActor actor = group.actor {
             react {
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -180,7 +181,7 @@ public class LifecycleTest extends GroovyTestCase {
             react {
                 counter.incrementAndGet()
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -214,7 +215,7 @@ public class LifecycleTest extends GroovyTestCase {
                 Thread.sleep(10000)
                 counter.incrementAndGet()  //never reached
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -239,17 +240,28 @@ public class LifecycleTest extends GroovyTestCase {
         assertEquals 2, messagesReference.get().size()
     }
 
+    public void testStartedByFactory() {
+        final def df = new DataFlows()
+        def a1 = group.actor {df.actor=true}
+        def a2 = group.reactor {df.reactor=true} << ''
+        def a3 = group.messageHandler {df.handler=true}
+
+
+        assert df.actor
+        assert df.reactor
+        assert df.handler
+
+        a2.stop()
+        a3.stop()
+    }
+    
     public void testAfterStart() {
         final def afterStartBarrier = new CyclicBarrier(2)
         final AtomicBoolean afterStartFlag = new AtomicBoolean(false)
 
-        final AbstractPooledActor actor = group.actor { }
-
-        actor.metaClass {
-            afterStart = { afterStartFlag.set true; afterStartBarrier.await() }
+        final AbstractPooledActor actor = group.actor {
+            afterStartFlag.set true; afterStartBarrier.await()
         }
-
-        actor.start()
 
         afterStartBarrier.await(30, TimeUnit.SECONDS)
         assert afterStartFlag.get()
@@ -266,7 +278,7 @@ public class LifecycleTest extends GroovyTestCase {
                 barrier.await()
                 Thread.sleep(10000)
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -300,7 +312,7 @@ public class LifecycleTest extends GroovyTestCase {
                 barrier.await()
                 throw new RuntimeException('test')
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -330,7 +342,7 @@ public class LifecycleTest extends GroovyTestCase {
             barrier.await()
             counter.incrementAndGet()
             barrier.await()
-        }.start()
+        }
 
         barrier.await()
         assert actor.isActive()
@@ -350,7 +362,7 @@ public class LifecycleTest extends GroovyTestCase {
 
         final AbstractPooledActor actor = group.actor {
             barrier.await()
-        }.start()
+        }
 
         shouldFail(IllegalStateException) {
             actor.start()

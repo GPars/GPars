@@ -34,7 +34,7 @@ final AbstractPooledActor actor = Actors.actor {
     react {
         stop()
     }
-}.start()
+}
 
 final AbstractPooledActor me
 me = Actors.actor {
@@ -64,6 +64,6 @@ me = Actors.actor {
         }
     }
 
-}.start()
+}
 
 System.in.read()

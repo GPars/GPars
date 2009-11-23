@@ -21,8 +21,6 @@ import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 
-final def docRoot = ''  //set a folder to scan with absolute path
-
 final def group = new PooledActorGroup(23)
 
 //Messages
@@ -65,7 +63,7 @@ final class WordSortActor extends AbstractPooledActor {
 //Master actor
 final class SortMaster extends AbstractPooledActor {
 
-    String docRoot = '/'
+    String docRoot = '/'  //set a folder to scan with absolute path
     int numActors = 1
 
     List<List<String>> sorted = []

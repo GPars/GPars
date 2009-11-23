@@ -53,7 +53,7 @@ public class MessagingTest extends GroovyTestCase {
                     barrier.await()
                 }
             }
-        }.start()
+        }
 
         barrier.await()
         assertEquals 1, counter.intValue()
@@ -82,7 +82,7 @@ public class MessagingTest extends GroovyTestCase {
                     barrier.await()
                 }
             }
-        }.start()
+        }
 
         barrier.await()
         assertEquals 1, counter.intValue()
@@ -116,7 +116,7 @@ public class MessagingTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor.send('message')
         actor.send('message')
@@ -143,7 +143,7 @@ public class MessagingTest extends GroovyTestCase {
                 counter.incrementAndGet()
                 barrier.await()
             }
-        }.start()
+        }
 
         Thread.sleep(1000)
         actor.send('message')

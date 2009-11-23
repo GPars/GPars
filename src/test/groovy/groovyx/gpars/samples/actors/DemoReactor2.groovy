@@ -26,7 +26,7 @@ import groovyx.gpars.actor.Actors
 
 final def doubler = Actors.reactor {
     2 * it
-}.start()
+}
 
 Actor actor = Actors.actor {
     (1..10).each {doubler << it}
@@ -40,7 +40,7 @@ Actor actor = Actors.actor {
             }
         }
     }
-}.start()
+}
 
 actor.join()
 doubler.stop()

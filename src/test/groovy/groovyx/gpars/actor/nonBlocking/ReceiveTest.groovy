@@ -21,7 +21,7 @@ public class ReceiveTest extends GroovyTestCase {
             react {
                 df.result3 = it
             }
-        }.start()
+        }
 
         actor << 'message1'
         actor << 'message2'
@@ -54,7 +54,7 @@ public class ReceiveTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor << 'message'
         actor << 'message'
@@ -84,7 +84,7 @@ public class ReceiveTest extends GroovyTestCase {
                 }
                 barrier.await()
             }
-        }.start()
+        }
 
         actor << 'message1'
         actor << 'message2'

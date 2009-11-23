@@ -45,7 +45,7 @@ public class TimeoutTest extends GroovyTestCase {
                     codeFlag.set(true)  //should never reach
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             onTimeout = {-> timeoutFlag.set(true) }
@@ -73,7 +73,7 @@ public class TimeoutTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             onTimeout = {-> timeoutFlag.set(true) }
@@ -101,7 +101,7 @@ public class TimeoutTest extends GroovyTestCase {
                     codeCounter.incrementAndGet()
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             onTimeout = {-> timeoutFlag.set(true) }

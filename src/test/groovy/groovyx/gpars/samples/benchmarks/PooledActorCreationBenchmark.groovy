@@ -18,7 +18,6 @@ package groovyx.gpars.samples.benchmarks
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.impl.AbstractPooledActor
-import java.util.concurrent.CountDownLatch
 
 public class PooledActorCreationBenchmark implements Benchmark {
 
@@ -39,7 +38,6 @@ public class PooledActorCreationBenchmark implements Benchmark {
         }
 
         final long t1 = System.currentTimeMillis()
-        initiator.start()
         initiator.join()
         final long t2 = System.currentTimeMillis()
 

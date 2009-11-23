@@ -59,8 +59,8 @@ def announce = {Stroke first, Stroke second ->
 
 ActorGroup pooled = new NonDaemonActorGroup() // uses default pool size
 
-final player1 = pooled.reactor { new Stroke("Player 1", randomMove()) }.start()
-final player2 = pooled.reactor { new Stroke("Player 2", randomMove()) }.start()
+final player1 = pooled.reactor { new Stroke("Player 1", randomMove()) }
+final player2 = pooled.reactor { new Stroke("Player 2", randomMove()) }
 
 def coordinator = pooled.actor {
     int count = 0
@@ -82,6 +82,6 @@ def coordinator = pooled.actor {
             }
         }
     }
-}.start()
+}
 
 coordinator.send()

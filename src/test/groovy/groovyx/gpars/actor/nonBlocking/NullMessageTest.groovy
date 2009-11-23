@@ -31,7 +31,7 @@ public class NullMessageTest extends GroovyTestCase {
                 result = it
                 latch.countDown()
             }
-        }.start()
+        }
         actor << null
         latch.await()
         assertNull result
@@ -45,11 +45,11 @@ public class NullMessageTest extends GroovyTestCase {
                 result = it
                 latch.countDown()
             }
-        }.start()
+        }
         Actors.actor {
             actor << null
             latch.await()
-        }.start()
+        }
         latch.await()
         assertNull result
     }
@@ -60,13 +60,13 @@ public class NullMessageTest extends GroovyTestCase {
             react {
                 reply 10
             }
-        }.start()
+        }
         Actors.actor {
             actor << null
             react {
                 result << it
             }
-        }.start()
+        }
         assertEquals 10, result.val
     }
 }

@@ -39,7 +39,6 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
             }
             latch.countDown()
         }
-        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assertNull(result)
@@ -64,7 +63,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
                 }
               println "123"
             }
-        }.start()
+        }
 
         actor.join ()
         latch.await()
@@ -83,7 +82,6 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
                 latch.countDown()
             }
         }
-        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assertNull(result)

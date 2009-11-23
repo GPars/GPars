@@ -114,7 +114,7 @@ public class SafeTest extends GroovyTestCase {
                 result << a
                 result << b
             }
-        }.start()
+        }
 
         assertEquals 'Explicit reply', result.val
         assertEquals 10, result.val
@@ -161,7 +161,7 @@ public class SafeTest extends GroovyTestCase {
             react {
                 result << it
             }
-        }.start()
+        }
         assertEquals 0, result.val
 
         result = new DataFlowVariable()
@@ -170,7 +170,7 @@ public class SafeTest extends GroovyTestCase {
             react {
                 result << it
             }
-        }.start()
+        }
         assertNull result.val
 
         result = new DataFlowVariable()
@@ -179,7 +179,7 @@ public class SafeTest extends GroovyTestCase {
             react {
                 result << it
             }
-        }.start()
+        }
         assertNull result.val
 
     }

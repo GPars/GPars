@@ -18,7 +18,7 @@ def symbols = ['AAPL', 'GOOG', 'IBM', 'JAVA', 'GROOVY', 'SCALA', 'MSFT']
 
 def observer = actor {
     def start = System.nanoTime()
-    symbols.each {stock -> actor { owner << getYearEndClosing(stock, 2008) }.start() }
+    symbols.each {stock -> actor { owner << getYearEndClosing(stock, 2008) } }
     def top = [symbol: "", price: 0.0]
     def quoteNum = 0
     loop {
@@ -39,6 +39,6 @@ def observer = actor {
             stop()
         }
     }
-}.start()
+}
 
 observer.join()

@@ -46,7 +46,7 @@ public class SyncTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         def a2 = Actors.actor {
             loop {
@@ -56,7 +56,7 @@ public class SyncTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         a2.sendAndContinue("test") {
             assertEquals "so it goes", it

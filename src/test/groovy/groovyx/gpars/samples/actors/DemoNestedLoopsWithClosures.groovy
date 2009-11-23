@@ -47,8 +47,6 @@ Actor actor = actor {
 outerLoop.delegate = actor
 innerLoop.delegate = actor
 
-actor.start()
-
 actor.send 1
 actor.send 1
 actor.send 1

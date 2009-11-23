@@ -38,7 +38,7 @@ Actors.actor {                          //Create a new actor to communicate with
     react {                             //Wait for the reply with the uppercased string
         println it
     }
-}.start().join()                        //Start and wait for termination of the actor
+}.join()                        //Start and wait for termination of the actor
 
 name.stop()
 name.join()

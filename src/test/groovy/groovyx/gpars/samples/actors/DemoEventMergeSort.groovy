@@ -62,8 +62,8 @@ Closure createMessageHandler(def parentActor) {
 
                     def child1 = actor(createMessageHandler(delegate))
                     def child2 = actor(createMessageHandler(delegate))
-                    child1.start().send(splitList[0])
-                    child2.start().send(splitList[1])
+                    child1.send(splitList[0])
+                    child2.send(splitList[1])
 
                     react {message1 ->
                         react {message2 ->
@@ -81,9 +81,9 @@ def resultActor = actor {
         println "Sorted array:\t${it}"
         System.exit 0
     }
-}.start()
+}
 
 def sorter = actor(createMessageHandler(resultActor))
-sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
 resultActor.join()

@@ -51,6 +51,7 @@ public abstract class ActorGroup {
     public final AbstractPooledActor actor(Runnable handler) {
         final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
         actor.actorGroup = this
+        actor.start()
         return actor
     }
 
@@ -64,16 +65,19 @@ public abstract class ActorGroup {
     public final AbstractPooledActor reactor(final Closure code) {
         final def actor = new ReactiveActor(code)
         actor.actorGroup = this
+        actor.start()
         actor
     }
 
-    //todo javadoc
     /**
+     * Creates an instance of DynamicDispatchActor.
+     * @param code The closure specifying individual message handlers.
      *
      */
     public final AbstractPooledActor messageHandler(final Closure code) {
         final def actor = new DynamicDispatchActor(code)
         actor.actorGroup = this
+        actor.start()
         actor
     }
 }

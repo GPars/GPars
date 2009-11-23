@@ -33,7 +33,7 @@ final Actor doubler = Actors.actor {
     react {
         a << 2 * it
     }
-}.start()
+}
 
 final AbstractPooledActor thread = start {
     react {

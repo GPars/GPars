@@ -16,7 +16,7 @@ def symbols = ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT']
 def start = System.nanoTime()
 
 final def quotes = new DataFlowStream()
-symbols.each {stock -> actor { quotes << getYearEndClosing(stock, 2008) }.start() }
+symbols.each {stock -> actor { quotes << getYearEndClosing(stock, 2008) } }
 def top = ["", 0.0]
 1.upto(symbols.size()) {
     def quote = quotes.val

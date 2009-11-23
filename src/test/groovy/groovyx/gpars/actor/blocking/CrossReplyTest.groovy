@@ -31,7 +31,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -40,7 +39,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
         assertEquals 3, result
@@ -55,7 +53,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 it.reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -64,7 +61,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
         assertEquals 3, result
@@ -79,7 +75,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -88,7 +83,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
         assertEquals 3, result
@@ -103,7 +97,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 it.reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -112,7 +105,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
         assertEquals 3, result

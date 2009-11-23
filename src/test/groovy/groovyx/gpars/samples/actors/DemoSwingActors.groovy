@@ -70,7 +70,7 @@ def contentDownloader = Actors.reactor {
 
     contentDownloaderArea.report "Downloaded"
     new WordFindResponse(content, it)
-}.start()
+}
 
 def contentCache = Actors.actor {
     def cache = [:]
@@ -115,7 +115,7 @@ def contentCache = Actors.actor {
             }
         }
     }
-}.start()
+}
 
 wordFinder = Actors.actor {
     loop {
@@ -132,7 +132,7 @@ wordFinder = Actors.actor {
             }
         }
     }
-}.start()
+}
 
 def createActorPanel = {actorName ->
     def area = null

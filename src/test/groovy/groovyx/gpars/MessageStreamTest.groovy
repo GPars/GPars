@@ -42,7 +42,7 @@ class MessageStreamTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         def processor = Actors.actor {
             react {
@@ -50,7 +50,7 @@ class MessageStreamTest extends GroovyTestCase {
                 it.reply '2'
                 it.sender.send '3'
             }
-        }.start()
+        }
 
         processor.send('0', receiver)
         receiver.join()

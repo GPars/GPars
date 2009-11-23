@@ -34,7 +34,7 @@ public class MultiMessageTest extends GroovyTestCase {
                 result = a + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         actor.send 3
@@ -53,7 +53,7 @@ public class MultiMessageTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
 
@@ -70,7 +70,7 @@ public class MultiMessageTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
 
@@ -87,7 +87,7 @@ public class MultiMessageTest extends GroovyTestCase {
                 result = a[2] + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send([2, 10, 20])
         actor.send 3
@@ -110,7 +110,7 @@ public class MultiMessageTest extends GroovyTestCase {
                 b.reply(b + 1)
                 c.reply(c + 1)
             }
-        }.start()
+        }
 
         createReplyActor group, actor, 10, barrier, latch, result
         createReplyActor group, actor, 100, barrier, latch, result
@@ -132,7 +132,7 @@ public class MultiMessageTest extends GroovyTestCase {
             react {a, b, c ->
                 reply(20)
             }
-        }.start()
+        }
 
         createReplyActor group, actor, 10, barrier, latch, result
         createReplyActor group, actor, 100, barrier, latch, result
@@ -152,6 +152,6 @@ public class MultiMessageTest extends GroovyTestCase {
                 result.addAndGet(it)
                 latch.countDown()
             }
-        }.start()
+        }
     }
 }

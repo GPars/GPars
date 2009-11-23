@@ -45,7 +45,6 @@ public class ArraySumTest extends GroovyTestCase {
             }
             stop()
         }
-        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals 15, result

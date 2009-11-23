@@ -50,12 +50,12 @@ public class AbstractActorTest extends GroovyTestCase {
         shouldFail(IllegalStateException) {
             actor.send("Message")
         }
-            actor.stop()
+        actor.stop()
 
         shouldFail(IllegalStateException) {
             actor.start()
         }
-            actor.stop()
+        actor.stop()
     }
 
     public void testMessageMayBeNull() {
@@ -97,7 +97,6 @@ public class AbstractActorTest extends GroovyTestCase {
             flag.set(true)
             latch.countDown()
         }
-        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assert flag.get()

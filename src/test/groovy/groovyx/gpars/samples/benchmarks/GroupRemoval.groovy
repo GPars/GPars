@@ -34,14 +34,14 @@ for (i in 0..10000) {
         receive {
             reply it
         }
-    }.start()
+    }
 
     group.actor {
         actor << 'Message'
         receive {
             latch.countDown()
         }
-    }.start()
+    }
     latch.await()
     group.shutdown()
 }

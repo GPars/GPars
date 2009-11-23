@@ -40,7 +40,7 @@ final def barber = group.reactor {message ->
             println "Barber: No customers. Going to have a sleep"
             break
     }
-}.start()
+}
 
 private def doTheHaircut(Random random) {
     Thread.sleep(random.nextInt(10) * 1000)
@@ -81,7 +81,7 @@ waitingRoom = group.actor {
         }
     }
 
-}.start()
+}
 
 class Customer extends AbstractPooledActor {
     String name

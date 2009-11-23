@@ -32,7 +32,7 @@ final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation:
                         println 'Invoked later'
                     }
                 }
-            }.start().send 'Message'
+            }.send 'Message'
 
         })
     }
@@ -52,14 +52,12 @@ public void foo() {
             reply 20
         }
     }
-    nestedActor.start()
 
     final Actor actor = group.actor {
         println 'Started an actor'
         nestedActor.sendAndWait(10)
         println 'Done'
     }
-    actor.start()
     println 'Running controller'
 }
 
@@ -74,11 +72,9 @@ public void bar() {
                 println 'Finished nested actor ' + delegate + ":" + owner.owner + ":" + getResolveStrategy()
                 reply 20
             }
-        }.start()
+        }
         nestedActor.sendAndWait(10)
         println 'Done'
     }
-    actor.start()
     println 'Running controller'
-
 }

@@ -46,28 +46,29 @@ class MyPooledActor extends AbstractPooledActor {
         }
     }
 }
-testActor(new MyPooledActor())
+testActor(new MyPooledActor().start())
 
 
 Actor actor2 = actor {
+    delegate.metaClass {
+        handleA = {->
+            react {a ->
+                replyIfExists "Done"
+                handleB(a)
+            }
+        }
+
+        handleB = {a ->
+            react {b ->
+                println a + b
+                LifeCycleHelper.latch.countDown()
+            }
+        }
+    }
+
     handleA()
 }
 
-actor2.metaClass {
-    handleA = {->
-        react {a ->
-            replyIfExists "Done"
-            handleB(a)
-        }
-    }
-
-    handleB = {a ->
-        react {b ->
-            println a + b
-            LifeCycleHelper.latch.countDown()
-        }
-    }
-}
 testActor(actor2)
 
 
@@ -100,8 +101,7 @@ class LifeCycleHelper {
     static CountDownLatch latch = new CountDownLatch(3)
 }
 
-private def testActor(AbstractPooledActor actor) {
-    actor.start()
+private def testActor(Actor actor) {
     actor.send 2
     actor.send 3
 }

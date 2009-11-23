@@ -16,14 +16,12 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.ReactiveActor
-import java.util.concurrent.atomic.AtomicInteger
-import groovyx.gpars.actor.DefaultPooledActor
-import groovyx.gpars.actor.Actors
-import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 public class ReactorTest extends GroovyTestCase {
 
@@ -33,7 +31,7 @@ public class ReactorTest extends GroovyTestCase {
         final def processor = Actors.reactor {
             res << 2 * it
             latch.countDown()
-        }.start()
+        }
 
         (0..5).each {
           processor << it
@@ -49,7 +47,7 @@ public class ReactorTest extends GroovyTestCase {
     public void testWait() {
         final def processor = Actors.reactor {
             2 * it
-        }.start()
+        }
 
         assertEquals (20, processor.sendAndWait(10))
         assertEquals (40, processor.sendAndWait(20))
@@ -67,22 +65,19 @@ public class ReactorTest extends GroovyTestCase {
 
         final def processor = group.reactor {
             2 * it
-        }.start()
+        }
 
         final def a1 = group.actor {
             result1 = processor.sendAndWait(10)
         }
-        a1.start()
 
         final def a2 = group.actor {
             result2 = processor.sendAndWait(20)
         }
-        a2.start()
 
         final def a3 = group.actor {
             result3 = processor.sendAndWait(30)
         }
-        a3.start()
 
         [a1, a2, a3]*.join()
         assertEquals 20, result1

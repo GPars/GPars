@@ -48,7 +48,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                     barrier.await()
                 }
             }
-        }.start()
+        }
 
         Thread.sleep 1000
 
@@ -66,7 +66,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                     completedBarrier.await()
                 }
             }
-        }.start()
+        }
 
         actor {
             bouncer.send 10
@@ -82,7 +82,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                     completedBarrier.await()
                 }
             }
-        }.start()
+        }
 
         completedBarrier.await()
         bouncer.stop()
@@ -99,11 +99,11 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         final def incrementor = Actors.actor {
             loop { receive { it.reply it + 1 }}
-        }.start()
+        }
 
         final def decrementor = Actors.actor {
             loop { receive { it.reply it - 1 }}
-        }.start()
+        }
 
         actor {
             barrier.await()
@@ -124,7 +124,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor {
             barrier.await()
@@ -145,7 +145,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         completedBarrier.await()
         incrementor.stop()
@@ -161,21 +161,19 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass {
+                onException = {
+                    flag.set(true)
+                    barrier.await()
+                }
+            }
+
             loop {
                 receive {
                     it.reply it
                 }
             }
         }
-
-        actor.metaClass {
-            onException = {
-                flag.set(true)
-                barrier.await()
-            }
-        }
-
-        actor.start()
 
         actor.send 'messsage'
         barrier.await()
@@ -194,15 +192,13 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        receiver.start()
-
         actor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
                 barrier.await()
             }
-        }.start()
+        }
 
         barrier.await()
 
@@ -220,8 +216,6 @@ public class ReplyToMessageTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-
-        actor.start()
 
         actor.send 'messsage'
         barrier.await()
@@ -243,19 +237,15 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        replier.start()
-
         final Actor sender = actor {
+            delegate.metaClass {
+                afterStop = {
+                    latch.countDown()
+                }
+            }
+
             replier.send 'messsage'
         }
-
-        sender.metaClass {
-            afterStop = {
-                latch.countDown()
-            }
-        }
-
-        sender.start()
 
         latch.await()
         barrier.await()
@@ -278,7 +268,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                     message2.reply max
                 }
             }
-        }.start()
+        }
 
 
         actor {
@@ -288,7 +278,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                 replies1 << it
                 completedBarrier.await()
             }
-        }.start()
+        }
 
         actor {
             barrier.await()
@@ -297,7 +287,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
                 replies2 << it
                 completedBarrier.await()
             }
-        }.start()
+        }
 
         completedBarrier.await()
         assertEquals 1, replies1.size()

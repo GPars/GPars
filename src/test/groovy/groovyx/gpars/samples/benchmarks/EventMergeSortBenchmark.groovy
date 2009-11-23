@@ -63,8 +63,8 @@ Closure createMessageHandler(def parentActor) {
 
                     def child1 = actor(createMessageHandler(delegate))
                     def child2 = actor(createMessageHandler(delegate))
-                    child1.start().send(splitList[0])
-                    child2.start().send(splitList[1])
+                    child1.send(splitList[0])
+                    child2.send(splitList[1])
 
                     react {message1 ->
                         react {message2 ->
@@ -86,11 +86,11 @@ for (i in 1..100) {
     items << random.nextInt(10000)
 }
 
-def resultActor = threadGroup.actor {
+threadGroup.actor {
     final long t1 = System.currentTimeMillis()
     for (i in 1..10) {
         def sorter = pooledGroup.actor(createMessageHandler(delegate))
-        sorter.start().send(items)
+        sorter.send(items)
         receive()
     }
     final long t2 = System.currentTimeMillis()
@@ -98,7 +98,7 @@ def resultActor = threadGroup.actor {
 
     System.exit 0
 
-}.start()
+}
 
 
 System.in.read()

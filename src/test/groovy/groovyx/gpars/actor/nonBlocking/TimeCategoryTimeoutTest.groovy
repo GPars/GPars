@@ -48,7 +48,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             onTimeout = {-> timeoutFlag.set(true) }
@@ -78,7 +78,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
                     latch.countDown()
                 }
             }
-        }.start()
+        }
 
         latch.await()
         assertEquals 2, exceptions
@@ -104,7 +104,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             onTimeout = {-> timeoutFlag.set(true) }
@@ -134,7 +134,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             onTimeout = {-> timeoutFlag.set(true) }

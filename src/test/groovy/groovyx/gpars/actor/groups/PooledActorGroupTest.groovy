@@ -32,7 +32,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
         def actor = Actors.actor {
             daemon = Thread.currentThread().isDaemon()
             latch.countDown()
-        }.start()
+        }
 
         assertEquals Actors.defaultPooledActorGroup, actor.actorGroup
         latch.await()
@@ -50,7 +50,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
         def actor1 = daemonGroup.actor {
             daemon = Thread.currentThread().isDaemon()
             latch1.countDown()
-        }.start()
+        }
 
         assertEquals daemonGroup, actor1.actorGroup
         latch1.await()
@@ -59,7 +59,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
         def actor2 = nonDaemonGroup.actor {
             daemon = Thread.currentThread().isDaemon()
             latch2.countDown()
-        }.start()
+        }
 
         assertEquals nonDaemonGroup, actor2.actorGroup
         latch2.await()

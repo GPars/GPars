@@ -35,7 +35,7 @@ println ""
 
 sampleGroup.actor {
     println((actorGroup == Actors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
-}.start()
+}
 
 Thread.sleep 1000
 

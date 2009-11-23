@@ -39,7 +39,7 @@ public class SharedMemoryTest extends GroovyTestCase {
                     it.reply counter.longValue() * 2
                 }
             }
-        }.start()
+        }
 
         Actor actor2 = actor {
             loop {
@@ -55,7 +55,6 @@ public class SharedMemoryTest extends GroovyTestCase {
                 }
             }
         }
-        actor2.start()
 
 
         latch.await()

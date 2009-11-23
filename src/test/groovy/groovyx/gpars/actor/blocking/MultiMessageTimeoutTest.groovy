@@ -31,7 +31,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = a + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         actor.send 3
@@ -52,7 +52,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = a + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         actor.send 3
@@ -76,7 +76,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result << c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         barrier.await()
@@ -97,7 +97,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result << c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         barrier.await()
@@ -118,7 +118,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result << c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         actor.send 3
@@ -137,7 +137,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
 
@@ -156,7 +156,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         barrier.await()
@@ -174,7 +174,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
 
         latch.await(30, TimeUnit.SECONDS)
@@ -190,7 +190,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
 
@@ -207,7 +207,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = a[2] + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send([2, 10, 20])
         actor.send 3

@@ -31,7 +31,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = a + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         actor.send 3
@@ -52,7 +52,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = a + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         actor.send 3
@@ -76,7 +76,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result << b
                 result << c
             }
-        }.start()
+        }
 
         actor.metaClass.onTimeout = { flag = true }
         actor.metaClass.afterStop = {messages ->
@@ -103,7 +103,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result << b
                 result << c
             }
-        }.start()
+        }
 
         actor.metaClass.onTimeout = { flag = true }
         actor.metaClass.afterStop = {messages ->
@@ -129,7 +129,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result << c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         actor.send 3
@@ -148,7 +148,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
 
@@ -167,7 +167,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
         barrier.await()
@@ -182,17 +182,17 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         volatile boolean flag = false
 
         def actor = Actors.actor {
+            delegate.metaClass.onTimeout = { flag = true }
+            delegate.metaClass.afterStop = {messages ->
+                latch.countDown()
+            }
+
+
             react(0, TimeUnit.SECONDS) {->
                 result = 2
                 latch.countDown()
             }
         }
-
-        actor.metaClass.onTimeout = { flag = true }
-        actor.metaClass.afterStop = {messages ->
-            latch.countDown()
-        }
-        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assert flag
@@ -208,7 +208,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = 1
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send 2
 
@@ -225,7 +225,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
                 result = a[2] + b + c
                 latch.countDown()
             }
-        }.start()
+        }
 
         actor.send([2, 10, 20])
         actor.send 3

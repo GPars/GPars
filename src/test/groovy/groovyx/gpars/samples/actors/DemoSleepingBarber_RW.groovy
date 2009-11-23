@@ -65,7 +65,7 @@ def barber = group.reactor {message ->
     else {
         throw new RuntimeException('barber got a message of unexpected type ' + message.class)
     }
-}.start()
+}
 barbersShop = group.actor {
     def seatsTaken = 0
     def isOpen = true
@@ -99,7 +99,7 @@ barbersShop = group.actor {
             }
         }
     }
-}.start()
+}
 (0..<20).each {number ->
     Thread.sleep((Math.random() * 200 + 100) as int)
     barbersShop.send(new Customer_RW(number))

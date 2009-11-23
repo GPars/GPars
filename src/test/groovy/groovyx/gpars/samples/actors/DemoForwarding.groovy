@@ -33,13 +33,13 @@ def decryptor = actor {
 //        message.reply message.reverse()  //Alternatives to send replies
 //        message.sender.send message.reverse()
     }
-}.start()
+}
 
 def console = actor {
     react {
         println 'Decrypted message: ' + it
     }
-}.start()
+}
 
 decryptor.send 'suonorhcnysa si yvoorG', console  //Specify an actor to send replies to
 

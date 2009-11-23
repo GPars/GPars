@@ -37,14 +37,14 @@ for (i in 0..10000) {
                 latch.countDown()
             }
         }
-    }.start()
+    }
 
     group.actor {
         actor << 'Message'
         react {
             latch.countDown()
         }
-    }.start()
+    }
     latch.await()
     group.shutdown()
 }

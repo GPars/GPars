@@ -50,7 +50,7 @@ public class ReplyTest extends GroovyTestCase {
                     barrier.await()
                 }
             }
-        }.start()
+        }
 
         Thread.sleep 1000
 
@@ -68,7 +68,7 @@ public class ReplyTest extends GroovyTestCase {
                     completedBarrier.await()
                 }
             }
-        }.start()
+        }
 
         actor {
             bouncer.send 10
@@ -84,7 +84,7 @@ public class ReplyTest extends GroovyTestCase {
                     completedBarrier.await()
                 }
             }
-        }.start()
+        }
 
         completedBarrier.await()
         bouncer.stop()
@@ -102,11 +102,11 @@ public class ReplyTest extends GroovyTestCase {
 
         final def incrementor = group.actor {
             loop { receive { reply it + 1 }}
-        }.start()
+        }
 
         final def decrementor = group.actor {
             loop { receive { reply it - 1 }}
-        }.start()
+        }
 
         group.actor {
             barrier.await()
@@ -127,7 +127,7 @@ public class ReplyTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         group.actor {
             barrier.await()
@@ -148,7 +148,7 @@ public class ReplyTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         completedBarrier.await()
         incrementor.stop()
@@ -164,21 +164,19 @@ public class ReplyTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass {
+                onException = {
+                    flag.set(true)
+                    barrier.await()
+                }
+            }
+
             loop {
                 receive {
                     reply it
                 }
             }
         }
-
-        actor.metaClass {
-            onException = {
-                flag.set(true)
-                barrier.await()
-            }
-        }
-
-        actor.start()
 
         actor.send 'messsage'
         barrier.await()
@@ -198,15 +196,13 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        receiver.start()
-
         actor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
                 barrier.await()
             }
-        }.start()
+        }
 
         barrier.await()
 
@@ -224,8 +220,6 @@ public class ReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-
-        actor.start()
 
         actor.send 'messsage'
         barrier.await()
@@ -247,17 +241,15 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        replier.start()
-
-        final Actor sender = actor { replier.send 'messsage' }
-
-        sender.metaClass {
-            afterStop = {
-                latch.countDown()
+        final Actor sender = actor {
+            delegate.metaClass {
+                afterStop = {
+                    latch.countDown()
+                }
             }
-        }
 
-        sender.start()
+            replier.send 'messsage'
+        }
 
         latch.await()
         barrier.await()
@@ -279,7 +271,7 @@ public class ReplyTest extends GroovyTestCase {
                     latch.await()
                 }
             }
-        }.start()
+        }
 
         Actors.actor {
             actor.send 'Message1'
@@ -294,7 +286,7 @@ public class ReplyTest extends GroovyTestCase {
                 }
             }
 
-        }.start()
+        }
 
         latch.await()
         assertEquals 'Message6Message6', result
@@ -309,7 +301,7 @@ public class ReplyTest extends GroovyTestCase {
             receive {->
                 reply 'Message2'
             }
-        }.start()
+        }
 
         Actors.actor {
             actor.send 'Message1'
@@ -318,7 +310,7 @@ public class ReplyTest extends GroovyTestCase {
                 latch.countDown()
             }
 
-        }.start()
+        }
 
         latch.await()
         assertEquals 'Message2', result
@@ -344,28 +336,28 @@ public class ReplyTest extends GroovyTestCase {
                     latches[3].countDown()
                 }
             }
-        }.start()
+        }
 
         //send and terminate
         final Actor actor1 = actor {
+            delegate.metaClass.afterStop = {
+                latches[0].countDown()
+            }
+
             bouncer << 1
             stop()
         }
-        actor1.metaClass.afterStop = {
-            latches[0].countDown()
-        }
-        actor1.start()
 
         //wait, send and terminate
         final Actor actor2 = actor {
+            delegate.metaClass.afterStop = {
+                latches[2].countDown()
+            }
+
             latches[1].await()
             bouncer << 5
             stop()
         }
-        actor2.metaClass.afterStop = {
-            latches[2].countDown()
-        }
-        actor2.start()
 
         //keep conversation going
         actor {
@@ -373,7 +365,7 @@ public class ReplyTest extends GroovyTestCase {
             receive()
             bouncer << 6
             receive()
-        }.start()
+        }
 
         bouncer << 3
         latches[2].await()
@@ -404,17 +396,17 @@ public class ReplyTest extends GroovyTestCase {
                     originator4 << msg4.sender
                 }
             }
-        }.start()
+        }
 
         final def actor1 = actor {
             bouncer << 'msg1'
-        }.start()
+        }
 
         assert actor1 == originator1.val
 
         final def actor2 = actor {
             bouncer << 'msg2'
-        }.start()
+        }
 
         assert actor2 == originator2.val
 
@@ -424,7 +416,7 @@ public class ReplyTest extends GroovyTestCase {
 
         final def actor4 = actor {
             bouncer << 'msg4'
-        }.start()
+        }
 
         assert actor4 == originator4.val
     }

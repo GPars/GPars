@@ -33,7 +33,7 @@ def decryptor = actor {
             else stop()
         }
     }
-}.start()
+}
 
 def console = actor {
     decryptor.send 'suonorhcnysa si yvoorG'
@@ -41,6 +41,6 @@ def console = actor {
         println 'Decrypted message: ' + it
         decryptor.send false
     }
-}.start()
+}
 
 [decryptor, console]*.join()

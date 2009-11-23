@@ -57,7 +57,7 @@ public class LoopTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         Thread.sleep 1000
         assertEquals 0, counter.intValue()
@@ -83,7 +83,7 @@ public class LoopTest extends GroovyTestCase {
                     counter.incrementAndGet()
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -114,7 +114,7 @@ public class LoopTest extends GroovyTestCase {
                     Thread.sleep 10000
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -143,7 +143,7 @@ public class LoopTest extends GroovyTestCase {
             loop {
                 counter.incrementAndGet()
             }
-        }.start()
+        }
 
         actor.metaClass { onInterrupt = {} }
 

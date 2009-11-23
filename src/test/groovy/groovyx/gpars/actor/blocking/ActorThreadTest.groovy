@@ -32,7 +32,7 @@ public class ActorThreadTest extends GroovyTestCase {
             flag1 = isActorThread()
             latch.countDown()
 
-        }.start()
+        }
 
         assertFalse actor.isActorThread()
         actor.send 'Message'

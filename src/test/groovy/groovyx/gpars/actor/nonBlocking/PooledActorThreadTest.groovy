@@ -34,7 +34,7 @@ public class PooledActorThreadTest extends GroovyTestCase {
                 latch.countDown()
             }
 
-        }.start()
+        }
 
         assertFalse actor.isActorThread()
         actor.send 'Message'

@@ -31,7 +31,7 @@ public abstract class CommunicationTestBase extends GroovyTestCase {
                         println "node1: $msg"
                     }
                 }
-            }.start()
+            }
 
             loop {
                 react {command ->

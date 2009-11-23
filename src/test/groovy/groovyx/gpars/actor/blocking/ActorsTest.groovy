@@ -42,7 +42,6 @@ public class ActorsTest extends GroovyTestCase {
                 }
             }
         }
-        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals 3, counter.intValue()
@@ -60,8 +59,6 @@ public class ActorsTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        actor.start()
-
         latch.await(30, TimeUnit.SECONDS)
         assert flag.get()
     }
@@ -71,14 +68,14 @@ public class ActorsTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.onException = {}
+            delegate.metaClass.afterStop = {
+                flag.set(true)
+                latch.countDown()
+            }
+
             throw new RuntimeException('test')
         }
-        actor.metaClass.onException = {}
-        actor.metaClass.afterStop = {
-            flag.set(true)
-            latch.countDown()
-        }
-        actor.start()
 
         latch.await(30, TimeUnit.SECONDS)
         assert flag.get()

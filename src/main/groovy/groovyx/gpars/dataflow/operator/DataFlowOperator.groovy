@@ -91,7 +91,6 @@ public final class DataFlowOperator {
                 handleValueMessage(values, inputs.size())
             }
         }
-        actor.start()
         return this
     }
 

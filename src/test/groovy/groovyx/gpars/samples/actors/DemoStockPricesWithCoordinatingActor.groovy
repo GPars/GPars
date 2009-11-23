@@ -17,7 +17,7 @@ def observer = actor {
     symbols.each {stock ->
         actor {
             react {receivedStock -> reply getYearEndClosing(receivedStock, 2008)}
-        }.start().send(stock)
+        } << stock
     }
 
     def top = [symbol: "", price: 0.0]
@@ -38,6 +38,5 @@ def observer = actor {
         }
     }
 }
-observer.start()
 
 observer.join()

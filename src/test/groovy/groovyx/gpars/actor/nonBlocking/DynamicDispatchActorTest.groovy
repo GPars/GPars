@@ -140,8 +140,6 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
             }
         }
 
-        actor.start()
-
         actor.sendAndWait 1
         assertFalse stringFlag
         assert integerFlag

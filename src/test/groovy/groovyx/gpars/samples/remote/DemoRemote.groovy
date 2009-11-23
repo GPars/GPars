@@ -105,7 +105,7 @@ def mainNode = new LocalNode(transport, {
                 mainActor << [command: "broadcast", line: line, id: id]
             }
         }
-    }.start()
+    }
 
     // main loop of main actor starts here
     // the only interesting thing to notice is (and this is main point)

@@ -78,8 +78,8 @@ public class PooledMergeSortTest extends GroovyTestCase {
 
                         def child1 = group.actor(createMessageHandler(delegate))
                         def child2 = group.actor(createMessageHandler(delegate))
-                        child1.start().send(splitList[0])
-                        child2.start().send(splitList[1])
+                        child1.send(splitList[0])
+                        child2.send(splitList[1])
 
                         react {message1, message2 ->
                             parentActor.send merge(message1, message2)
@@ -100,10 +100,10 @@ public class PooledMergeSortTest extends GroovyTestCase {
                 result = it
                 latch.countDown()
             }
-        }.start()
+        }
 
         def sorter = group.actor(createMessageHandler(resultActor))
-        sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+        sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(30, TimeUnit.SECONDS)
         group.resize(5)
@@ -120,10 +120,10 @@ public class PooledMergeSortTest extends GroovyTestCase {
                 result = it
                 latch.countDown()
             }
-        }.start()
+        }
 
         def sorter = group.actor(createMessageHandler(resultActor))
-        sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+        sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)

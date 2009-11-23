@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.impl.AbstractPooledActor
+import java.util.concurrent.TimeUnit
 
 /**
  * Two actors are created to show possible ways to handle all lifecycle events of event-driven actors.
@@ -29,18 +29,10 @@ private class ExceptionFlag {
     static final boolean THROW_EXCEPTIION = true  //change the flag to test either exception or timeout
 }
 
-final Actor actor1 = Actors.actor {
-    println("Running actor1")
-    if (ExceptionFlag.THROW_EXCEPTIION) throw new RuntimeException('test')
-    else {
-        react(10.milliseconds) {}  //will timeout
-    }
-}
-actor1.metaClass {
-    afterStart = {->
-        println "actor1 has started"
-    }
+Actors.actor {
+    println "actor1 has started"
 
+delegate.metaClass {
     afterStop = {List undeliveredMessages ->
         println "actor1 has stopped"
     }
@@ -57,7 +49,12 @@ actor1.metaClass {
         println "actor1 threw an exception"
     }
 }
-actor1.start()
+    println("Running actor1")
+    if (ExceptionFlag.THROW_EXCEPTIION) throw new RuntimeException('test')
+    else {
+        react(10, TimeUnit.MILLISECONDS) {}  //will timeout
+    }
+}
 
 Thread.sleep 1000
 

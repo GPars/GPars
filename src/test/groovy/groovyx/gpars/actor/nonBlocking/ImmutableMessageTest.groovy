@@ -30,7 +30,7 @@ public class ImmutableMessageTest extends GroovyTestCase {
             react {
                 it.reply new TestMessage(it.value)
             }
-        }.start()
+        }
 
         Actors.actor {
             bouncer << new TestMessage('Value')
@@ -38,7 +38,7 @@ public class ImmutableMessageTest extends GroovyTestCase {
                 result = it.value
                 latch.countDown()
             }
-        }.start()
+        }
 
         latch.await()
         assertEquals 'Value', result
