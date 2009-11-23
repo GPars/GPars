@@ -18,7 +18,7 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * A producer-consumer demo using the DataFlowStream class. Producer downloads web content from a list of urls,
@@ -33,7 +33,7 @@ final def urls = [
         'http://www.theserverside.com'
 ]
 
-start {
+task {
     for (url in urls) {
         final def site = new DataFlowVariable()
         buffer << site
@@ -41,7 +41,7 @@ start {
     }
 }
 
-start {
+task {
     int count = 0
     0.upto(urls.size() - 1) {
         def content = buffer.val

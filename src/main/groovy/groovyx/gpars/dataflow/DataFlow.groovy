@@ -17,6 +17,8 @@
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.dataflow.operator.DataFlowOperator
 
 /**
  * Contains factory methods to create dataflow actors and starting them.
@@ -27,11 +29,72 @@ import groovyx.gpars.actor.Actor
 public abstract class DataFlow {
 
     /**
+     * The actor group used by all Dataflow Concurrency actors by default.
+     */
+    public static final DataFlowActorGroup DATA_FLOW_GROUP = new DataFlowActorGroup(1)
+
+    /**
+     * Tasks need no channels
+     */
+    private static def taskChannels = [inputs:[], outputs:[]]
+
+    /**
      * Creates a new instance of SingleRunActor to run the supplied code.
+     * @deprecated Use task() instead
      */
     public static Actor start(final Closure code) {
         new SingleRunActor(body: code).start()
     }
+
+    /**
+     * Creates an operator using the default operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowOperator task(final Closure code) {
+        return new DataFlowOperator(taskChannels, buildTaskClosure(code.clone())).start(DataFlow.DATA_FLOW_GROUP)
+    }
+
+    /**
+     * Creates an operator using the specified operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param group The operator actor group to use with the operator
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowOperator task(final ActorGroup group, final Closure code) {
+        return new DataFlowOperator(taskChannels, buildTaskClosure(code.clone())).start(group)
+    }
+
+    /**
+     * We need to wrap the closure in a no-arg closure and ensure the operator is stopped to avoid re-iteration.
+     */
+    private static def buildTaskClosure(def code) {
+        {->
+            code.delegate = delegate
+            code.call()
+            stop()
+        }
+    }
+
+    /**
+     * Creates an operator using the default operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowOperator operator(final Map channels, final Closure code) {
+        return new DataFlowOperator(channels, code).start(DataFlow.DATA_FLOW_GROUP)
+    }
+
+    /**
+     * Creates an operator using the specified operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param group The operator actor group to use with the operator
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowOperator operator(final Map channels, final ActorGroup group, final Closure code) {
+        return new DataFlowOperator(channels, code).start(group)
+    }
+
 
     //todo remove
 //    public static DataFlowExpression invoke(Object receiver, String methodName, Object ... args) {

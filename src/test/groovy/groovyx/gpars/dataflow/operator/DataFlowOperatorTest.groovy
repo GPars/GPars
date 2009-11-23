@@ -20,7 +20,7 @@ import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.operator.DataFlowOperator.operator
+import static groovyx.gpars.dataflow.DataFlow.operator
 
 /**
  * @author Vaclav Pech
@@ -172,6 +172,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         volatile boolean flag = false
 
         def op1 = operator(inputs: [a], outputs: [b, c], group) {
+            println delegate
             flag = (output==b) && (outputs[0]==b) && (outputs[1]==c)
             stop()
         }
@@ -234,5 +235,29 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
         op1 = operator(inputs: [a, b], outputs: [d], group) {x, y -> }
         op1.stop()
+    }
+
+    public void testMissingChannels() {
+        final PooledActorGroup group = new PooledActorGroup(1)
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        shouldFail(IllegalArgumentException) {
+            def op1 = operator(inputs1: [a], outputs: [d], group) {v -> }
+        }
+        shouldFail(IllegalArgumentException) {
+            def op1 = operator(inputs: [a], outputs2: [d], group) {v -> }
+        }
+        shouldFail(IllegalArgumentException) {
+            def op1 = operator(outputs: [d], group) {v -> }
+        }
+        shouldFail(IllegalArgumentException) {
+            def op1 = operator(inputs: [d], group) {v -> }
+        }
+        shouldFail(IllegalArgumentException) {
+            def op1 = operator([:], group) {v -> }
+        }
     }
 }

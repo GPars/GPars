@@ -16,9 +16,8 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.ActorGroup
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * Dataflow operators form the basic units in dataflow networks. Operators are typically combined into oriented graphs that transform data.
@@ -37,31 +36,10 @@ import groovyx.gpars.actor.PooledActorGroup
  */
 public final class DataFlowOperator {
 
-    private static final dfOperatorActorGroup = new PooledActorGroup()
-
     /**
-     * Creates an operator using the default operator actor group
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
-     * @param code The operator's body to run each time all inputs have a value to read
+     * The internal actor performing on behalf of the operator
      */
-    public static DataFlowOperator operator(final Map channels, final Closure code) {
-        return new DataFlowOperator(channels, code).start(dfOperatorActorGroup)
-    }
-
-    /**
-     * Creates an operator using the specified operator actor group
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
-     * @param group The operator actor group to use with the operator
-     * @param code The operator's body to run each time all inputs have a value to read
-     */
-    public static DataFlowOperator operator(final Map channels, final ActorGroup group, final Closure code) {
-        return new DataFlowOperator(channels, code).start(group)
-    }
-
-    private final List inputs
-    private final List outputs
-    private final Closure code
-    private final Actor actor
+    private final DataFlowOperatorActor actor
 
     /**
      * Creates an operator
@@ -69,41 +47,22 @@ public final class DataFlowOperator {
      * @param code The operator's body to run each time all inputs have a value to read
      */
     private def DataFlowOperator(final Map channels, final Closure code) {
-        this.outputs = channels.outputs.asImmutable()
-        this.code = code.clone()
-        this.code.delegate = this
-        this.inputs = channels.inputs.asImmutable()
-
         final int parameters = code.maximumNumberOfParameters
-        if (parameters != this.inputs.size())
-            throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${this.inputs.size()} input streams. The numbers must match.")
+        if (!channels || (channels.inputs==null) || (channels.outputs==null) || (parameters != channels.inputs.size()))
+            throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
+
+        code.delegate = this
+        this.actor = new DataFlowOperatorActor(channels.outputs.asImmutable(), channels.inputs.asImmutable(), code.clone())
     }
 
     /**
      * Starts an operator using the specified operator actor group
      * @param group The operator actor group to use with the operator
      */
-    private DataFlowOperator start(ActorGroup group) {
-        actor = group.actor {
-            loop {
-                inputs.eachWithIndex {input, index -> input.getValAsync(index, actor)}
-                def values = [:]
-                handleValueMessage(values, inputs.size())
-            }
-        }
+    DataFlowOperator start(ActorGroup group) {
+        actor.actorGroup = group
+        actor.start()
         return this
-    }
-
-    private void handleValueMessage(Map values, count) {
-        if (values.size() < count) {
-            actor.react {
-                values[it.attachment] = it.result
-                handleValueMessage(values, count)
-            }
-        } else {
-            def results = values.sort {it.key}.values() as List
-            code.call(* results)
-        }
     }
 
     /**
@@ -120,7 +79,7 @@ public final class DataFlowOperator {
      * Used by the operator's body to send a value to the given output channel
      */
     void bindOutput(final int idx, final value) {
-        outputs[idx] << value
+        actor.outputs[idx] << value
     }
 
     /**
@@ -131,10 +90,54 @@ public final class DataFlowOperator {
     /**
      * The operator's output channel of the given index
      */
-    public getOutputs(int idx) { outputs[idx] }
+    public getOutputs(int idx) { actor.outputs[idx] }
+
+    /**
+     * The operator's output channel of the given index
+     */
+    public getOutputs() { actor.outputs }
 
     /**
      * The operator's first / only output channel
      */
-    public getOutput() { outputs[0] }
+    public getOutput() { actor.outputs[0] }
+}
+
+/**
+ * An operator's internal actor. Repeatadly polls inputs and once they're all available it performs the operator's body.
+ */
+private final class DataFlowOperatorActor extends AbstractPooledActor {
+    final List inputs
+    final List outputs
+    final Closure code
+
+    def DataFlowOperatorActor(outputs, inputs, code) {
+        this.outputs = outputs
+        this.inputs = inputs
+        this.code = code
+    }
+
+    protected void act() {
+        loop {
+            inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
+            def values = [:]
+            handleValueMessage(values, inputs.size())
+        }
+    }
+
+    /**
+     * Calls itself recursively within a react() call, if more input values are still needed.
+     * Once all required inputs are available (received as messages), the operator's body is run.
+     */
+    private void handleValueMessage(Map values, count) {
+        if (values.size() < count) {
+            react {
+                values[it.attachment] = it.result
+                handleValueMessage(values, count)
+            }
+        } else {
+            def results = values.sort {it.key}.values() as List
+            code.call(* results)
+        }
+    }
 }

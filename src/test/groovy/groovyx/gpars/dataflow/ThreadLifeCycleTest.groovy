@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
@@ -24,10 +25,10 @@ import static groovyx.gpars.dataflow.DataFlow.start
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
     public void testActorGroup() {
-        final AbstractPooledActor actor = start {
+        final Actor actor = start {
             react {}
         }
-        assertEquals DataFlowActor.DATA_FLOW_GROUP, actor.actorGroup
+        assertEquals DataFlow.DATA_FLOW_GROUP, actor.actorGroup
         actor << 'Message'
     }
 

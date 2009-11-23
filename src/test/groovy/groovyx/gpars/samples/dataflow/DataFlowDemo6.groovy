@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * Basic sample showing three green threads cooperating on three variables.
@@ -27,16 +27,16 @@ final def x = new DataFlowVariable()
 final def y = new DataFlowVariable()
 final def z = new DataFlowVariable()
 
-start {
+task {
     z << x.val + y.val
     println "Result: ${z.val}"
     System.exit 0
 }
 
-start {
+task {
     x << 10
 }
 
-start {
+task {
     y << 5
 }

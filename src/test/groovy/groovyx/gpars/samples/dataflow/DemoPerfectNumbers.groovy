@@ -41,7 +41,7 @@ def isPerfectWithDF(num) {
     def chunk = num / processors + 1
     for (i in (1..processors)) {
         final int index = i
-        DataFlow.start {
+        DataFlow.task {
             final int start = chunk * (index - 1) + 1
             final int end = Math.min(num, chunk * index)
             def sum = 0

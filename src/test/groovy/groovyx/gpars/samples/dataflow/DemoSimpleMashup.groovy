@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.dataflow
 
+import groovyx.gpars.Parallelizer
 import groovyx.gpars.dataflow.DataFlowVariable
-
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * A simple mashup sample, downloads content of three websites and checks how many of them refer to Groovy.
@@ -28,26 +28,26 @@ def dzone = new DataFlowVariable()
 def jroller = new DataFlowVariable()
 def theserverside = new DataFlowVariable()
 
-start {
+task {
     println 'Started downloading from DZone'
     dzone << 'http://www.dzone.com'.toURL().text
     println 'Done downloading from DZone'
 }
 
-start {
+task {
     println 'Started downloading from JRoller'
     jroller << 'http://www.jroller.com'.toURL().text
     println 'Done downloading from JRoller'
 }
 
-start {
+task {
     println 'Started downloading from TheServerSide'
     theserverside << 'http://www.theserverside.com'.toURL().text
     println 'Done downloading from TheServerSide'
 }
 
-start {
-    doParallel {
+task {
+    Parallelizer.doParallel {
         println "Number of Groovy sites today: " +
                 ([dzone, jroller, theserverside].findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'
