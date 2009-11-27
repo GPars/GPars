@@ -22,7 +22,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
 /**
  * Demonstrates the use of the DataFlows class to exchange values among threads or tasks.
  *
- * @author Vaclav Pech, Dierk, Koenig
+ * @author Vaclav Pech, Dierk Koenig
  */
 
 final df = new DataFlows()
