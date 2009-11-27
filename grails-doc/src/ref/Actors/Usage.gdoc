@@ -1,6 +1,6 @@
 h1. Use of actors
 
-_Actors_ share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned back to the pool once a message has been processed and the actor is idle waiting for some more messages to arrive. Actors become detached from the underlying threads and so a relatively small thread pool can serve potentially unlimited number of actors. Virtually unlimited scalability in number of actors is the main advantage of _event-based actors_, which are detached from the underlying physical threads.
+Actors share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned back to the pool once a message has been processed and the actor is idle waiting for some more messages to arrive. Actors become detached from the underlying threads and so a relatively small thread pool can serve potentially unlimited number of actors. Virtually unlimited scalability in number of actors is the main advantage of _event-based actors_, which are detached from the underlying physical threads.
 
 Here are some examples of how to use actors. This is how you create an actor that prints out all messages that it receives.
 
@@ -33,6 +33,7 @@ class CustomActor extends AbstractPooledActor {
 
 def console=new CustomActor()
 console.start()
+{code}
 
 Messages can be sent to the actor using multiple methods
 
@@ -84,7 +85,7 @@ def me = actor {
 
 me.join()
 {code}
-Notice the possibility to use Groovy meta-programming to define actor's lifecycle notification methods (e.g. _onTimeout()_) dynamically.
+Notice the possibility to use Groovy meta-programming to define actor's lifecycle notification methods (e.g. _onTimeout()_ ) dynamically.
 
 h2. Simple calculator
 
