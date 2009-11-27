@@ -48,7 +48,7 @@ public abstract class DataFlow {
 
     /**
      * Creates a new task assigned to a thread from the default dataflow actor group.
-     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitely,
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
      * but can only exchange data using explicit DataFlowVariables and Streams.
      * @param code The task body to run
      */
@@ -58,7 +58,7 @@ public abstract class DataFlow {
 
     /**
      * Creates a new task assigned to a thread from the supplied actor group.
-     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitely,
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
      * but can only exchange data using explicit DataFlowVariables and Streams.
      * @param group The actor group to use threads of
      * @param code The task body to run
