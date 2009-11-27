@@ -89,7 +89,7 @@ And these are the three essential rules your programs have to follow:
 * It is not possible to change the value of a dataflow variable once it is bound.
 * Dataflow variables makes it easy to create concurrent stream agents.
 
-h1. Dataflow Streams
+h2. Dataflow Streams
 
 Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams to have a full picture of Dataflow Concurrency. Except for dataflow variables there's also a concept of _DataFlowStreams_ that you can leverage. You may think of them as thread-safe buffers or queues. Check out a typical producer-consumer demo:
 
@@ -108,6 +108,17 @@ task {
     while(true) println buffer.val  //read from the buffer in a loop
 }
 {code}
+
+h2. Bind handlers
+
+{code}
+def a = new DataFlowVariable()
+a >> {println "The variable has just been bound to $it"}
+a.whenBound {println "Just to confirm that the variable has been really set to $it"}
+...
+{code}
+
+A bound handlers can be registered on Dataflow Variables either using the >> operator or the _whenBound()_ method. They will be run once a value is bound to the variable.
 
 h2. Further reading
 

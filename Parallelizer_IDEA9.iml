@@ -53,8 +53,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Groovy-1.7-beta-1" level="application" />
-    <orderEntry type="library" name="gradle-0.8 (no groovy)" level="application" />
+    <orderEntry type="library" name="Groovy-1.6.6" level="application" />
   </component>
   <component name="copyright">
     <Base>

@@ -17,7 +17,6 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
-import static groovyx.gpars.dataflow.operator.DataFlowOperator.operator
 
 /**
  * Uses dataflow operators to download websites, cache their contents and check, whether they talk about particular technologies.
@@ -94,7 +93,6 @@ operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
             }
             pendingDownloads.remove(request.site)
         }
-
     }
 }
 
