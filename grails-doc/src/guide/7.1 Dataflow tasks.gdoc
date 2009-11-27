@@ -1,0 +1,190 @@
+The *Dataflow tasks* give you an easy-to-grasp abstraction of mutually-independant logical tasks or threads, which can run concurrency and exchange
+solely through Dataflow Variables and Streams.
+Check out the examples.
+
+h3. A simple mashup example
+
+In the example we're downloading the front pages of three popular web sites, each in their own task, while in a separate task we're filtering out sites talking about Groovy today and forming the output. The output task synchronizes automatically with the three download tasks on the three Dataflow variables through which the content of each website is passed to the output task.
+
+{code}import static groovyx.gpars.Parallelizer.*
+import groovyx.gpars.dataflow.DataFlowVariable
+import static groovyx.gpars.dataflow.DataFlow.task
+
+
+/**
+ * A simple mashup sample, downloads content of three websites
+ * and checks how many of them refer to Groovy.
+ */
+
+def dzone = new DataFlowVariable()
+def jroller = new DataFlowVariable()
+def theserverside = new DataFlowVariable()
+
+task {
+    println 'Started downloading from DZone'
+    dzone << 'http://www.dzone.com'.toURL().text
+    println 'Done downloading from DZone'
+}
+
+task {
+    println 'Started downloading from JRoller'
+    jroller << 'http://www.jroller.com'.toURL().text
+    println 'Done downloading from JRoller'
+}
+
+task {
+    println 'Started downloading from TheServerSide'
+    theserverside << 'http://www.theserverside.com'.toURL().text
+    println 'Done downloading from TheServerSide'
+}
+
+task {
+    doParallel {
+        println "Number of Groovy sites today: " +
+                ([dzone, jroller, theserverside].findAllParallel {
+                    it.val.toUpperCase().contains 'GROOVY'
+                }).size()
+    }
+    System.exit 0
+}
+{code}
+h3. A mashup variant with methods
+
+To avoid giving you wrong impression about structuring the Dataflow code, here's a rewrite of the mashup example, with a _downloadPage()_ method performing the actual download in a separate task and returning a DataFlowVariable instance, so that the main application thread could eventually get hold of the downloaded content.
+Dataflow variables can obviously be passed around as parameters or return values.
+{code}package groovyx.gpars.samples.dataflow
+
+import static groovyx.gpars.Asynchronizer.*
+import groovyx.gpars.dataflow.DataFlowVariable
+import static groovyx.gpars.dataflow.DataFlow.task
+
+
+/**
+ * A simple mashup sample, downloads content of three websites and checks how many of them refer to Groovy.
+ */
+final List urls = ['http://www.dzone.com', 'http://www.jroller.com', 'http://www.theserverside.com']
+
+task {
+    def pages = urls.collect { downloadPage(it) }
+    doParallel {
+        println "Number of Groovy sites today: " +
+                (pages.findAllParallel {
+                    it.val.toUpperCase().contains 'GROOVY'
+                }).size()
+    }
+    System.exit 0
+}
+
+def downloadPage(def url) {
+    def page = new DataFlowVariable()
+    task {
+        println "Started downloading from $url"
+        page << url.toURL().text
+        println "Done downloading from $url"
+    }
+    return page
+}
+{code}
+
+h3. A physical calculation example
+
+Dataflow programs naturally scale with the number of processors. Up to a certain level, the more processors you have the faster the program runs.
+Check out, for example, the following script, which calculates parameters of a simple physical experiment and prints out the results. Each task performs its part of the calculation and may depend on values calculated by some other tasks as well as its result might be needed by some of the other tasks. With Dataflow Concurrency you can split the work between tasks or reorder the tasks themselves as you like and the dataflow mechanics will ensure the calculation will be accomplished correctly.
+
+{code}import groovyx.gpars.dataflow.DataFlowActor
+import groovyx.gpars.dataflow.DataFlowVariable
+import static groovyx.gpars.dataflow.DataFlow.task
+
+final def mass = new DataFlowVariable()
+final def radius = new DataFlowVariable()
+final def volume = new DataFlowVariable()
+final def density = new DataFlowVariable()
+final def acceleration = new DataFlowVariable()
+final def time = new DataFlowVariable()
+final def velocity = new DataFlowVariable()
+final def decelerationForce = new DataFlowVariable()
+final def deceleration = new DataFlowVariable()
+final def distance = new DataFlowVariable()
+
+task {
+    println """
+Calculating distance required to stop a moving ball.
+====================================================
+The ball has a radius of ${radius.val} meters and is made of a material with ${density.val} kg/m3 density,
+which means that the ball has a volume of ${volume.val} m3 and a mass of ${mass.val} kg.
+The ball has been accelerating with ${acceleration.val} m/s2 from 0 for ${time.val} seconds and so reached a velocity of ${velocity.val} m/s.
+
+Given our ability to push the ball backwards with a force of ${decelerationForce.val} N (Newton), we can cause a deceleration
+of ${deceleration.val} m/s2 and so stop the ball at a distance of ${distance.val} m.
+
+=======================================================================================================================
+This example has been calculated asynchronously in multiple tasks using GPars DataFlow concurrency in Groovy.
+Author: ${author.val}
+"""
+
+    System.exit 0
+}
+
+task {
+    mass << volume.val * density.val
+}
+
+task {
+    volume << Math.PI * (radius.val ** 3)
+}
+
+task {
+    radius << 2.5
+    density << 	998.2071  //water
+    acceleration << 9.80665 //free fall
+    decelerationForce << 900
+}
+
+task {
+    println 'Enter your name:'
+    def name = new InputStreamReader(System.in).readLine()
+    author << (name?.trim()?.size()>0 ? name : 'anonymous')
+}
+
+task {
+    time << 10
+    velocity << acceleration.val * time.val
+}
+
+task {
+    deceleration << decelerationForce.val / mass.val
+}
+
+task {
+    distance << deceleration.val * ((velocity.val/deceleration.val) ** 2) * 0.5
+}
+{code}Note: I did my best to make all the physical calculations right. Feel free to change the values and see how long distance you need to stop the rolling ball.
+
+h2. Deterministic deadlocks
+
+If you happen to introduce a deadlock in your dependencies, the deadlock will occur each time you run the code. No randomness allowed. That's one of the benefits of Dataflow concurrency. Irrespective of the actual thread scheduling scheme, if you don't get a deadlock in tests, you won't get them in production.
+{code}
+task {
+    println a.val
+    b << 'Hi there'
+}
+
+task {
+    println b.val
+    a << 'Hello man'
+}
+{code}
+
+h2. DataFlows map
+
+As a handy shortcut the _DataFlows_ class can help you reduce the amount of code you have to write to leverage Dataflow variables.
+
+{code}def df = new DataFlows()
+df.x = 'value1'
+assert df.x == 'value1'
+
+DataFlow.task {df.y = 'value2}
+
+assert df.y == 'value2'
+{code}
+Think of DataFlows as a map with Dataflow Variables as keys storing their bound values as appropriate map values. The semantics of reading a value (e.g. df.x) and binding a value (e.g. df.x = 'value') remain identical to the semantics of plain Dataflow Variables (x.val and x << 'value' respectively).
