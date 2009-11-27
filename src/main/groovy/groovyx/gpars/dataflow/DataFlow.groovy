@@ -47,33 +47,24 @@ public abstract class DataFlow {
     }
 
     /**
-     * Creates an operator using the default operator actor group
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
-     * @param code The operator's body to run each time all inputs have a value to read
+     * Creates a new task assigned to a thread from the default dataflow actor group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitely,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * @param code The task body to run
      */
-    public static DataFlowOperator task(final Closure code) {
-        return new DataFlowOperator(taskChannels, buildTaskClosure(code.clone())).start(DataFlow.DATA_FLOW_GROUP)
+    public static void task(final Closure code) {
+        task DataFlow.DATA_FLOW_GROUP, code
     }
 
     /**
-     * Creates an operator using the specified operator actor group
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
-     * @param group The operator actor group to use with the operator
-     * @param code The operator's body to run each time all inputs have a value to read
+     * Creates a new task assigned to a thread from the supplied actor group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitely,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * @param group The actor group to use threads of
+     * @param code The task body to run
      */
-    public static DataFlowOperator task(final ActorGroup group, final Closure code) {
-        return new DataFlowOperator(taskChannels, buildTaskClosure(code.clone())).start(group)
-    }
-
-    /**
-     * We need to wrap the closure in a no-arg closure and ensure the operator is stopped to avoid re-iteration.
-     */
-    private static def buildTaskClosure(def code) {
-        {->
-            code.delegate = delegate
-            code.call()
-            stop()
-        }
+    public static void task(final ActorGroup group, final Closure code) {
+        group.threadPool.execute code
     }
 
     /**
