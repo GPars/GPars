@@ -1,8 +1,8 @@
-.h1 Use of event-driven actors
+h1. Use of actors
 
-_Event-driven actors_ share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned back to the pool once a message has been processed and the actor is idle waiting for some more messages to arrive. Actors become detached from the underlying threads and so a relatively small thread pool can serve potentially unlimited number of actors. Virtually unlimited scalability in number of actors is the main advantage of _event-based actors_ over _thread-bound ones_, where each actor has its own exclusive background thread associated with it.
+_Actors_ share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned back to the pool once a message has been processed and the actor is idle waiting for some more messages to arrive. Actors become detached from the underlying threads and so a relatively small thread pool can serve potentially unlimited number of actors. Virtually unlimited scalability in number of actors is the main advantage of _event-based actors_, which are detached from the underlying physical threads.
 
-Here are some examples of how to use _event-driven_ actors. This is how you create an actor that prints out all messages that it receives.
+Here are some examples of how to use actors. This is how you create an actor that prints out all messages that it receives.
 
 {code}
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
@@ -17,7 +17,8 @@ def console = actor {
 
 Notice the _loop()_ method call, which ensures that the actor doesn't stop after having processed the first message.
 
-As an alternative you can extend the AbstractPooledActor class and override the _act()_ method.
+As an alternative you can extend the AbstractPooledActor class and override the _act()_ method. Once you instantiate the actor, you need to start it so that it attaches itself to the thread pool and can start accepting messages.
+The _actor()_ factory method will take care of starting the actor.
 
 {code}
 class CustomActor extends AbstractPooledActor {
@@ -31,22 +32,18 @@ class CustomActor extends AbstractPooledActor {
 }
 
 def console=new CustomActor()
-{code}
-
-Once you have the actor, you need to start it so that it attaches itself to the thread pool and can start accepting messages.
-
-{code}
 console.start()
+
+Messages can be sent to the actor using multiple methods
+
+{code}
 console.send('Message')
-{code}
-
-The leftShift (<<) operator can be used to send messages to actors as a replacement for the _send()_ method.
-
-{code}
 console << 'Message'
+console.sendAndContinue 'Message', {reply -> println "I received reply: $reply"}
+console.sendAndWait 'Message'
 {code}
 
-.h3 Creating an asynchronous service
+h3. Creating an asynchronous service
 
 {code}
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
@@ -57,18 +54,19 @@ final def decryptor = actor {
             reply message.reverse()
         }
     }
-}.start()
+}
 
 def console = actor {
     decryptor.send 'suonorhcnysa si yvoorG'
     react {
         println 'Decrypted message: ' + it
     }
-}.start()
+}
 
 console.join()
 {code}
-As you can see, you create new actors with the _actor()_ method passing in the actor's body as a closure parameter. Inside the actor's body you can use _loop()_ to iterate, _react()_ to receive messages and _reply()_ to send a message to the actor, which has sent the currently processed message. With the _start()_ method you schedule the actor to the underlying thread pool for processing. When the decryptor actor doesn't find a message in its message queue, the _react()_ method gives up the thread and returns it back to the thread pool for other actors to pick up. Only after a new message arrives to the actor's message queue, the closure of the _react()_ method gets scheduled for processing with the pool. Event-based actors internally simulate continuations - actor's work is split into sequentially run chunks, which get invoked once a message is available in the inbox. Each chunk for a single actor can be performed by different thread from the thread pool.
+
+As you can see, you create new actors with the _actor()_ method passing in the actor's body as a closure parameter. Inside the actor's body you can use _loop()_ to iterate, _react()_ to receive messages and _reply()_ to send a message to the actor, which has sent the currently processed message. When the decryptor actor doesn't find a message in its message queue, the _react()_ method gives up the thread and returns it back to the thread pool for other actors to pick up. Only after a new message arrives to the actor's message queue, the closure of the _react()_ method gets scheduled for processing with the pool. Event-based actors internally simulate continuations - actor's work is split into sequentially run chunks, which get invoked once a message is available in the inbox. Each chunk for a single actor can be performed by different thread from the thread pool.
 
 Groovy's flexible syntax with closures allows our library to offer multiple ways to define actors. For instance, here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates. Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method.
 
@@ -76,18 +74,19 @@ Groovy's flexible syntax with closures allows our library to offer multiple ways
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
 
 def me = actor {
+    delegate.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
+
     friend.send('Hi')
     react(10.seconds) {
         //continue conversation
     }
-}.start()
+}
 
-me.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
 me.join()
 {code}
 Notice the possibility to use Groovy meta-programming to define actor's lifecycle notification methods (e.g. _onTimeout()_) dynamically.
 
-.h2 Simple calculator
+h2. Simple calculator
 
 A little bit more realistic example of an event-driven actor that receives two numeric messages, sums them up and sends the result to the console actor.
 {code}
@@ -102,7 +101,7 @@ final def console = actor {
             println 'Result: ' + it
         }
     }
-}.start()
+}
 
 final def calculator = actor {
     react {a ->
@@ -110,7 +109,7 @@ final def calculator = actor {
             console.send(a + b)
         }
     }
-}.start()
+}
 
 calculator.send 2
 calculator.send 3
@@ -125,7 +124,7 @@ final def calculator = actor {
     react {a, b ->
         console.send(a + b)
     }
-}.start()
+}
 {code}
 Notice that event-driven actors require special care regarding the _react()_ method. Since _event_driven actors_ need to split the code into independent chunks assignable to different threads sequentially and *continuations* are not natively supported on JVM, the chunks are created artificially with tasks and exceptions. As a result the _react()_ and _loop()_ methods never return normally and actors' code must be structured accordingly. Again, this is in line with what Scala actors do.
  
@@ -153,8 +152,8 @@ Closure createMessageHandler(def parentActor) {
 
                     def child1 = actor(createMessageHandler(delegate))
                     def child2 = actor(createMessageHandler(delegate))
-                    child1.start().send(splitList[0])
-                    child2.start().send(splitList[1])
+                    child1.send(splitList[0])
+                    child2.send(splitList[1])
 
                     react {message1, message2 ->
                         parentActor.send merge(message1, message2)
@@ -169,14 +168,14 @@ def console = new PooledActorGroup(1).actor {
         println "Sorted array:\t${it}"
         System.exit 0 
     }
-}.start()
+}
 
 def sorter = actor(createMessageHandler(console))
-sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 console.join()
 {code}
 
-Since _event-driven actors_ reuse threads from a pool, the script will work with virtually *any size of a thread pool*, no matter how many actors are created along the way.
+Since _actors_ reuse threads from a pool, the script will work with virtually *any size of a thread pool*, no matter how many actors are created along the way.
 
 For brevity I didn't include the two helper methods split() and merge() in the code snippet. You can find them below.
 {code}
@@ -206,7 +205,6 @@ List<Integer> merge(List<Integer> a, List<Integer> b) {
 
 .h3 Actor lifecycle methods
 Each Actor can define lifecycle observing methods, which will be called whenever a certain lifecycle event occurs.
-  * afterStart() - called immediately after the Actor has been started, before the act() method is called the first time.
   * afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the unprocessed messages from the queue.
   * onInterrupt(InterruptedException e) - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.
   * onTimeout() - called when no messages are sent to the actor within the timeout specified for the currently blocking react method. Timeout will result in stopping the actor.
@@ -214,18 +212,21 @@ Each Actor can define lifecycle observing methods, which will be called whenever
 
 You can either define the methods statically in your Actor class or add them dynamically to the actor's metaclass:
 {code}
-def myActor = actor {...}
+def myActor = actor {
+    delegate.metaClass.onException = {
+        log.error('Exception occurred', it)
+    }
 
-myActor.metaClass.onException = {
-    log.error('Exception occurred', it)
+...
 }
+
 {code}
 
-.h3 Pool management
+h3. Pool management
 
 Note: Describing pools and groups as they work in version 0.8 and later 
 
-_Event-driven_ actors can be organized into groups and as a default there's always an application-wide pooled actor group available. And just like the _PooledActors_ abstract factory can be used to create _event-driven_ actors in the default group, custom groups can be used as abstract factories to create new _event-driven_ actors instances belonging to these groups. 
+_Actors_ can be organized into groups and as a default there's always an application-wide pooled actor group available. And just like the _PooledActors_ abstract factory can be used to create actors in the default group, custom groups can be used as abstract factories to create new actors instances belonging to these groups.
 
 {code}
 def myGroup = new PooledActorGroup()
@@ -239,7 +240,7 @@ def actor2 = myGroup.actor {
 }
 {code}
 
-The _event-driven_ actors belonging to the same group share the *underlying thread pool* of that group. The pool by default contains *n + 1 threads*, where *n* stands for the number of *CPUs* detected by the JVM. The *pool size* can be set *explicitly* either by setting the _gpars.poolsize_ system property or individually for each actor group by specifying the appropriate constructor parameter.
+The actors belonging to the same group share the *underlying thread pool* of that group. The pool by default contains *n + 1 threads*, where *n* stands for the number of *CPUs* detected by the JVM. The *pool size* can be set *explicitly* either by setting the _gpars.poolsize_ system property or individually for each actor group by specifying the appropriate constructor parameter.
 
 {code}
 def myGroup = new PooledActorGroup(10)  //the pool will contain 10 threads
@@ -261,7 +262,7 @@ PooledActors.defaultPooledActorGroup.resetDefaultSize()
 PooledActors.defaultPooledActorGroup.shutdown()
 {code}
 
-As an alternative to the _PooledActorGroup_, which creates a pool of daemon threads, the _NonDaemonPooledActorGroup_ class can be used when non-daemon threads are required.
+As an alternative to the _PooledActorGroup_, which creates a pool of daemon threads, the _NonDaemonActorGroup_ class can be used when non-daemon threads are required.
 
 {code}
 def daemonGroup = new PooledActorGroup()
@@ -270,7 +271,7 @@ def actor1 = daemonGroup.actor {
 ...
 }
 
-def nonDaemonGroup = new NonDaemonPooledActorGroup()
+def nonDaemonGroup = new NonDaemonActorGroup()
 
 def actor2 = nonDaemonGroup.actor {
 ...
@@ -285,10 +286,10 @@ class MyActor {
 }
 {code}
 
-_Event-driven_ actors belonging to the same group share the *underlying thread pool*. With pooled actor groups you can split your actors to leverage multiple thread pools of different sizes and so assign resources to different components of your system and tune their performance. 
+Actors belonging to the same group share the *underlying thread pool*. With pooled actor groups you can split your actors to leverage multiple thread pools of different sizes and so assign resources to different components of your system and tune their performance. 
 
 {code}
-def coreActors = new NonDaemonPooledActorGroup(5)  //5 non-daemon threads pool
+def coreActors = new NonDaemonActorGroup(5)  //5 non-daemon threads pool
 def helperActors = new PooledActorGroup(1)  //1 daemon thread pool
 
 def priceCalculator = coreActors.actor {
@@ -319,15 +320,15 @@ Do not forget to shutdown custom pooled actor groups, once you no longer need th
 .h3 Common trap: App terminates while actors do not receive messages
 
 Most likely you're using daemon threads and pools, which is the default setting, and your main thread finishes. Calling _actor.join()_ on any, some or all of your actors would block the main thread until the actor terminates and thus keep all your actors running.
-Alternatively use instances of _NonDaemonThreadActorGroup_ or _NonDaemonPooledActorGroup_ and assign some of your actors to these groups.
+Alternatively use instances of _NonDaemonThreadActorGroup_ or _NonDaemonActorGroup_ and assign some of your actors to these groups.
 {code}
-def nonDaemonGroup = new NonDaemonPooledActorGroup()
+def nonDaemonGroup = new NonDaemonActorGroup()
 def myActor = nonDaemonGroup.actor {...}
 {code}
 
 alternatively
 {code}
-def nonDaemonGroup = new NonDaemonPooledActorGroup()
+def nonDaemonGroup = new NonDaemonActorGroup()
 
 class MyActor extends AbstractPooledActor {
     def MyActor() {

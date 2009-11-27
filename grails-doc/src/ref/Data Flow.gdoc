@@ -1,4 +1,4 @@
-Check out the small example written in Groovy using GParallelizer, which sums results of calculations performed by three concurrently run threads:
+Check out the small example written in Groovy using GPars, which sums results of calculations performed by three concurrently run threads:
 {code}import static org.gparallelizer.dataflow.DataFlow.start
 
 final def x = new DataFlowVariable()
@@ -17,4 +17,6 @@ start {
 start {
     y << 5
 }
-{code}We start three logical threads, which run in parallel and perform their tasks. When a thread needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another thread (using the '<<' operator). Each _DataFlowVariable_ can be set only once in its lifetime. Notice that you don't have to bother with ordering and synchronizing the threads and their access to shared variables. The values are magically transferred among threads at the right time without your intervention.
+{code}
+
+We start three logical threads, which run in parallel and perform their tasks. When a thread needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another thread (using the '<<' operator). Each _DataFlowVariable_ can be set only once in its lifetime. Notice that you don't have to bother with ordering and synchronizing the threads and their access to shared variables. The values are magically transferred among threads at the right time without your intervention.

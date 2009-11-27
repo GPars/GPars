@@ -1,6 +1,6 @@
 The actor support in gpars were inspired by the Actors library in Scala but have meanwhile gone beyond that.
 
-Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can naturally avoid issues like deadlocks, livelocks or starvation, so typical for shared memory.
+Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can help developers avoid issues like deadlocks, livelocks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
 A nice wrap-up of the key [concepts behind actors|http://ruben.savanne.be/articles/concurrency-in-erlang-scala] was written recently by Ruben Vermeersch
 
 h1. Actors
@@ -60,11 +60,13 @@ example by _Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàl
 
 h1. Usage of Actors
 
-Gpars provides consistent Actor APIs and DSLs.
+Gpars provides consistent Actor APIs and DSLs. Actors in principal perform three specific operations - send messages, receive messages and create new actors. Althought not specifically enforced by *GPars*
+messages should be immutable or at least follow the *hands-off* policy when the sender never touches the messages after the message has been sent off.
 
 h2. Sending messages
 
-Messages can be sent to actors using the _send()_ method. Alternatively, the _<<_ operator can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available. The _reply_ is returned from the _sendAndWait()_ method as a return value.
+Messages can be sent to actors using the _send()_ method. Alternatively, the _<<_ operator can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available.
+The _reply_ is returned from the _sendAndWait()_ method as a return value.
 The _sendAndWait()_ methods may also return after a timeout expires or in case of termination of the called actor.
 {code}
 actor << 'Message'
@@ -74,7 +76,85 @@ def reply2 = actor.sendAndWait(10, TimeUnit.SECONDS, 'Message')
 def reply3 = actor.sendAndWait(10.seconds, 'Message')
 {code}
 
-All _send()_ and _sendAndWait()_ methods will throw an exception if invoked on a non-active actor.
+The _sendAndContinue()_ method allows the caller to continue its processing while the supplied closure is waiting for a reply from the actor.
+{code}
+friend.sendAndContinue 'I need money!', {money -> pocket money}
+println 'I can continue while my friend is collecting money for me'
+{code}
+
+All _send()_, _sendAndWait()_ or _sendAndContinue()_ methods will throw an exception if invoked on a non-active actor.
+
+h2. Receiving messages
+
+h3. Non-blocking message retrieval
+
+h3. Blocking message retrieval
+
+Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message. This allows for a non-continuation style code and also might have positive performance implications in certain scenarios.
+
+Mixing _react()_ and _receive()_ calls within a single actor is also possible.
+
+{code}
+Actors.actor {
+    def msg1 = receive()
+    receive {msg2, msg3 ->
+        [msg1, msg2, msg3]*.reply 'Hi!'
+    }
+    react {msg4 ->
+        msg4.reply 'You're the last today!'
+    }
+}.start()
+{code}
+
+h2. Sending replies
+
+The _reply/replyIfExists_ methods are not only defined on the actors themselves, but also on the messages upon their reception, which is particularly handy when accepting multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed messages, whereas _reply()_ called on messages sends a reply to the author of the particular message only.
+
+{code}
+react {offerA, offerB, offerC ->
+
+    //sent to each of the senders
+    reply 'Received your kind offer. Now processing it and comparing with others.'
+
+    offerA.reply 'You were the fastest'  //sent to the author of offerA only
+
+    def winnerOffer = [offerA, offerB, offerC].min {it.price}
+    winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
+    ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the loosers only
+}
+{code}
+
+h3. The sender property
+
+Messages upon retrieval offer the sender property to identify the originator of the message
+{code}
+react {tweet ->
+    if (isSpam(tweet)) ignoreTweetsFrom tweet.sender
+}
+{code}
+
+h3. Forwarding
+
+When sending a message a different actor can be specified as the sender so that potential replies to the message will be forwarded to the specified actor and not to the actual originator.
+
+{code}
+def decryptor = actor {
+    react {message ->
+        reply message.reverse()
+//        message.reply message.reverse()  //Alternatives to send replies
+//        message.sender.send message.reverse()
+    }
+}
+
+def console = actor {  //This actor will print out decrypted messages, since the replies are forwarded to it
+    react {
+        println 'Decrypted message: ' + it
+    }
+}
+
+decryptor.send 'suonorhcnysa si yvoorG', console  //Specify an actor to send replies to
+
+{code}
 
 h2. Creating Actors
 
@@ -108,7 +188,7 @@ final def decryptor = actor {
             else reply message.reverse()
         }
     }
-}.start()
+}
 
 actor {
     decryptor.send 'suonorhcnysa si yvoorG'
@@ -116,7 +196,7 @@ actor {
         println 'Decrypted message: ' + it
         decryptor.send 'stopService'
     }
-}.start()
+}
 {code}
 
 Here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates.
@@ -125,71 +205,13 @@ Here's an example of an actor that waits for up to 30 seconds to receive a messa
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
 
 def me = actor {
+    delegate.metaClass.onTimeout = {-> friend.send('I see, busy as usual. Never mind.')}
+
     friend.send('Hi')
     react(30.seconds) {
         //continue conversation
     }
 }
-me.metaClass.onTimeout = {-> friend.send('I see, busy as usual. Never mind.')}
-me.start()
-{code}
-
-
-h2. Sending replies
-
-The _reply/replyIfExists_ methods are not only defined on the actors themselves, but also on the messages upon their reception, which is particularly handy when accepting multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed messages, whereas _reply()_ called on messages sends a reply to the author of the particular message only.
-
-{code}
-react {offerA, offerB, offerC ->
-
-    //sent to each of the senders
-    reply 'Received your kind offer. Now processing it and comparing with others.'
-
-    offerA.reply 'You were the fastest'  //sent to the author of offerA only
-
-    def winnerOffer = [offerA, offerB, offerC].min {it.price}
-    winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
-    ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the loosers only
-}
-{code}
-
-The _reply/replyIfExists_ methods work reliably across the actor types, so that event-driven (pooled) actors can send replies to thread-bound actors and vice versa.
-
-{code}
-//a thread-bound actor
-final Actor doubler = Actors.actor {
-    receive {num ->
-        reply 2 * num
-    }
-}.start()
-
-//an event-driven actor
-PooledActors.actor {
-    doubler << 10
-    doubler << 100
-    react {a, b ->
-        println "Doubles for 10 and 100 are $a and $b"
-    }
-}.start()
-{code}
-
-h2. Blocking message read
-
-Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message. This allows for a non-continuation style code and also might have positive performance implications in certain scenarios.
-
-Mixing _react()_ and _receive()_ calls within a single actor is also possible.
-
-
-{code}
-Actors.actor {
-    def msg1 = receive()
-    receive {msg2, msg3 ->
-        [msg1, msg2, msg3]*.reply 'Hi!'
-    }
-    react {msg4 ->
-        msg4.reply 'You're the last today!'
-    }
-}.start()
 {code}
 
 h2. Undelivered messages
@@ -217,8 +239,6 @@ me = PooledActors.actor {
 {code}
 
 h2. Joining actors
-
-Note: Available since the 0.8 version
 
 Actors provide a _join()_ method to allow callers to wait for the actor to terminate. A variant accepting a timeout is also available. The Groovy _spread-dot_ operator comes in handy when joining multiple actors at a time.
 
