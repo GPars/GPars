@@ -1,1 +1,34 @@
-todo
+Use of Parallelizer - the JSR-166y based concurrent collection processor
+
+h2. Usage of Parallelizer
+
+The _Parallelizer_ class enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Arrays implementation shows to be much faster (10 - 20 times) compared to the executor service implementation in [Asynchronizer|http://docs.codehaus.org/display/GPARS/Asynchronizer].
+
+The jsr166y-070108.jar (downloadable from e.g. [http://repo1.maven.org/maven2/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108.jar]) must be on the classpath.
+
+{code}<dependency>
+    <groupId>org.coconut.forkjoin</groupId>
+    <artifactId>jsr166y</artifactId>
+    <version>070108</version>
+</dependency>
+{code}
+Examples of use:
+{code} //summarize numbers concurrently
+ Parallelizer.withParallelizer(5) {
+     final AtomicInteger result = new AtomicInteger(0)
+     [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
+     assertEquals 15, result
+ }
+
+ //multiply numbers asynchronously
+ Parallelizer.withParallelizer(5) {
+     final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}
+     assert ([2, 4, 6, 8, 10].equals(result))
+ }
+{code}The passed-in closure takes an instance of a ForkJoinPool as a parameter, which can be then used freely inside the closure.
+{code} //check whether all elements within a collection meet certain criteria
+ Parallelizer.withParallelizer(5) {ForkJoinPool pool ->
+     assert [1, 2, 3, 4, 5].allParallel {it > 0}
+     assert ![1, 2, 3, 4, 5].allParallel {it > 1}
+ }
+{code}
