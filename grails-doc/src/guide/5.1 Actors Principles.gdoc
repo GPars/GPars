@@ -127,7 +127,7 @@ final def calculator = actor {
 {code}
 Notice that event-driven actors require special care regarding the _react()_ method. Since _event_driven actors_ need to split the code into independent chunks assignable to different threads sequentially and *continuations* are not natively supported on JVM, the chunks are created artificially with tasks and exceptions. As a result the _react()_ and _loop()_ methods never return normally and actors' code must be structured accordingly. Again, this is in line with what Scala actors do.
 
-.h3 Concurrent Merge Sort Example
+h3. Concurrent Merge Sort Example
 
 For comparison I'm also including a more involved example performing a concurrent merge sort of a list of integers using actors. You can see that thanks to flexibility of Groovy we came pretty close to the Scala's model, although I still miss Scala's pattern matching for message handling.
 
@@ -202,7 +202,7 @@ List<Integer> merge(List<Integer> a, List<Integer> b) {
 }
 {code}
 
-.h3 Actor lifecycle methods
+h3. Actor lifecycle methods
 Each Actor can define lifecycle observing methods, which will be called whenever a certain lifecycle event occurs.
   * afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the unprocessed messages from the queue.
   * onInterrupt(InterruptedException e) - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.
@@ -316,7 +316,7 @@ helperActors.shutdown()
 
 Do not forget to shutdown custom pooled actor groups, once you no longer need them and their actors, to preserve system resources.
 
-.h3 Common trap: App terminates while actors do not receive messages
+h3. Common trap: App terminates while actors do not receive messages
 
 Most likely you're using daemon threads and pools, which is the default setting, and your main thread finishes. Calling _actor.join()_ on any, some or all of your actors would block the main thread until the actor terminates and thus keep all your actors running.
 Alternatively use instances of _NonDaemonThreadActorGroup_ or _NonDaemonActorGroup_ and assign some of your actors to these groups.

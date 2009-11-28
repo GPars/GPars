@@ -1,6 +1,9 @@
 If you look under the covers of your computer, you'll most likely see a dual-core processor there.
 Now, when parallel systems are the norm in the mainstream, it has become obvious that the common shared-memory multithreading causes more troubles than it solves.
-Low-level concurrency handling is usually hard to get right. And it's not much fun either. GPars (http://gpars.codehaus.org), an open-source concurrency library for Groovy, gives you multiple high-level abstractions for writing concuccent code in Groovy - map/reduce, fork/join, asynchronous closures, actors, agent, dataflow concurrency and other concepts, which aim to make your Groovy code concurrent with little effort.
+Low-level concurrency handling is usually hard to get right. And it's not much fun either. GPars (http://gpars.codehaus.org), an open-source concurrency library for Groovy, gives you multiple high-level abstractions for writing concurrent code in Groovy - map/reduce, fork/join, asynchronous closures, actors, agent, dataflow concurrency and other concepts, which aim to make your Groovy code concurrent with little effort.
 
 The project is open sourced under the Apache 2 License (http://gpars.codehaus.org/License).
 
+todo Complete the page
+todo fix links
+todo fill references

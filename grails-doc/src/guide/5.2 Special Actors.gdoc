@@ -1,4 +1,4 @@
-.h3 Dynamic Dispatch Actor
+h3. Dynamic Dispatch Actor
 
 The _DynamicDispatchActor_ class is a pooled actor allowing for an alternative structure of the message handling code. In general _DynamicDispatchActor_ repeatedly scans for messages and dispatches arrived messages to one of the _onMessage(message)_ methods defined on the actor. The _DynamicDispatchActor_ leverages the Groovy dynamic method dispatch mechanism under the covers.
 
@@ -35,9 +35,50 @@ actor  << new ArrayList()
 actor.join()
 {code}
 
-In some scenarios, typically when no message-dependent state needs to be preserved on the actor, the dynamic dispatch code structure may be more intuitive than the one using nested _loop_ and _react_ statements.
+In some scenarios, typically when no implicit conversation-history-dependent state needs to be preserved for the actor, the dynamic dispatch code structure may be more intuitive than the traditional one using nested _loop_ and _react_ statements.
 
-.h3 Reactive Actor
+The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamicaly at actor construction time using the _when_ handlers:
+
+{code}
+final Actor actor = new DynamicDispatchActor({
+    when {String msg -> println 'A String'; reply 'Thanks'}
+    when {Double msg -> println 'A Double'; reply 'Thanks'}
+    when {msg -> println 'A something ...'; reply 'What was that?'}
+})
+actor.start()
+{code}
+
+Obviously the two aproaches can be combined:
+{code}
+final class MyActor extends DynamicDispatchActor {
+
+    def MyActor(final closure) { super(closure); }
+
+    void onMessage(String message) {
+        println 'Received string'
+    }
+
+    void onMessage(Integer message) {
+        println 'Received integer'
+    }
+
+    void onMessage(Object message) {
+        println 'Received object'
+    }
+
+    void onMessage(List message) {
+        println 'Received list'
+        stop()
+    }
+}
+
+final def actor = new MyActor({
+    when {BigDecimal num -> println 'Received BigDecimal'}
+    if (needHandleFloats) when {Float num -> println 'Got a float'}
+}).start()
+{code}
+
+h3. Reactive Actor
 
 The _ReactiveActor_ class, constructed typically by calling _PooledActors.reactor()_ or _PooledActorGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
 
