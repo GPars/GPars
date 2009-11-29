@@ -1,4 +1,4 @@
-Once you got setup, try the following script to test your setup is functional.
+Once you got setup, try the following script to test that your setup is functional.
 {code}
 import static groovyx.gpars.actor.Actors.actor
 
@@ -20,7 +20,7 @@ def decryptor = actor {
 }
 
 def console = actor {
-    decryptor.send 'suonorhcnysa si yvoorG'
+    decryptor.send 'lellarap si yvoorG'
     react {
         println 'Decrypted message: ' + it
         decryptor.send false
@@ -30,3 +30,5 @@ def console = actor {
 [decryptor, console]*.join()
 
 {code}
+
+You should get a message "Decrypted message: Groovy is parallelt" printed out on the console when you run the code.

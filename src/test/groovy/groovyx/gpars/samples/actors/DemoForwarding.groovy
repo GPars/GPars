@@ -41,6 +41,6 @@ def console = actor {
     }
 }
 
-decryptor.send 'suonorhcnysa si yvoorG', console  //Specify an actor to send replies to
+decryptor.send 'lellarap si yvoorG', console  //Specify an actor to send replies to
 
 [decryptor, console]*.join()

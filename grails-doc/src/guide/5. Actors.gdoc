@@ -149,7 +149,7 @@ def console = actor {  //This actor will print out decrypted messages, since the
     }
 }
 
-decryptor.send 'suonorhcnysa si yvoorG', console  //Specify an actor to send replies to
+decryptor.send 'lellarap si yvoorG', console  //Specify an actor to send replies to
 
 {code}
 
@@ -188,7 +188,7 @@ final def decryptor = actor {
 }
 
 actor {
-    decryptor.send 'suonorhcnysa si yvoorG'
+    decryptor.send 'lellarap si yvoorG'
     react {
         println 'Decrypted message: ' + it
         decryptor.send 'stopService'

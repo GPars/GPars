@@ -36,7 +36,7 @@ def decryptor = actor {
 }
 
 def console = actor {
-    decryptor.send 'suonorhcnysa si yvoorG'
+    decryptor.send 'lellarap si yvoorG'
     react {
         println 'Decrypted message: ' + it
         decryptor.send false
