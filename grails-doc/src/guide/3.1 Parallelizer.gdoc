@@ -4,7 +4,7 @@ h2. Usage of Parallelizer
 
 The _Parallelizer_ class enables a ParallelArray-based (from JSR-166y) DSL for collections and objects.
 
-The jsr166y-070108.jar (downloadable from e.g. [http://repo1.maven.org/maven2/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108.jar]) must be on the classpath.
+The "jsr166y-070108.jar":http://repo1.maven.org/maven2/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108.jar must be on the classpath.
 
 {code}<dependency>
     <groupId>org.coconut.forkjoin</groupId>

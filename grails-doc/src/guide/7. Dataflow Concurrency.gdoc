@@ -56,7 +56,7 @@ The data flow seamlessly among tasks / threads without your intervention or care
 
 h2. Benefits
 
-Here's what you gain by using Dataflow Concurrency (by Jonas Bonér [http://www.jonasboner.com] ):
+Here's what you gain by using Dataflow Concurrency (by "Jonas Bonér":http://www.jonasboner.com ):
 
 * No race-conditions
 * No live-locks
@@ -122,8 +122,8 @@ A bound handlers can be registered on Dataflow Variables either using the >> ope
 
 h2. Further reading
 
-[http://github.com/jboner/scala-dataflow/tree/f9a38992f5abed4df0b12f6a5293f703aa04dc33/src|Scala Dataflow library by Jonas Bonér]
+"Scala Dataflow library":http://github.com/jboner/scala-dataflow/tree/f9a38992f5abed4df0b12f6a5293f703aa04dc33/src by Jonas Bonér
 
-[http://jonasboner.com/talks/state_youre_doing_it_wrong/html/all.html|JVM concurrency presentation slides by Jonas Bonér]
+"JVM concurrency presentation slides":http://jonasboner.com/talks/state_youre_doing_it_wrong/html/all.html by Jonas Bonér
 
-[http://github.com/larrytheliquid/dataflow/tree/master|Dataflow Concurrency library for Ruby]
+"Dataflow Concurrency library for Ruby":http://github.com/larrytheliquid/dataflow/tree/master

@@ -15,7 +15,7 @@ can be processed by different cores at the same time without races or contention
 
 h3. Meet Parallel Arrays
 
-The jsr-166y library brings a very convenient abstraction called Parallel Arrays ([http://groovy.dzone.com/articles/parallelize-your-arrays-with-j]). GPars leverages the Parallel Arrays implementation
+The jsr-166y library brings a very convenient abstraction called "Parallel Arrays":http://groovy.dzone.com/articles/parallelize-your-arrays-with-j . GPars leverages the Parallel Arrays implementation
  in several ways. The *Parallelizer* class provides parallel variants of the comon Groovy iteration methods like _each()_ , _collect()_ , _findAll()_ and such.
  {code}
  def selfPortraits = images.findAllParallel{it.contains me}.collectParallel {it.resize()}

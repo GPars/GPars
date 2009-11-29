@@ -1,10 +1,9 @@
 The actor support in gpars were inspired by the Actors library in Scala but have meanwhile gone beyond that.
 
 Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can help developers avoid issues like deadlocks, livelocks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
-A nice wrap-up of the key [concepts behind actors|http://ruben.savanne.be/articles/concurrency-in-erlang-scala] was written recently by Ruben Vermeersch
+A nice wrap-up of the key "concepts behind actors":http://ruben.savanne.be/articles/concurrency-in-erlang-scala was written recently by Ruben Vermeersch
 
 Gpars used to come with two types of actors: _thread-bound actors_ and _event-driven actors_. You will find both in 0.8 versions but since 0.9, there is only one type of actor that is not bound to an exclusive thread.
-_References to thread-bound actors have been removed from this page when copying_ _[the old description|http://code.google.com/p/gparallelizer/wiki/Actors]_.
 
 Actors can share a relatively small thread pool. This can go as far as having many concurrent actors that share a single pooled thread. They avoid the threading limitations of the JVM.
 
