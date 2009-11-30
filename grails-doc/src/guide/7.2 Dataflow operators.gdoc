@@ -4,7 +4,8 @@ h3. Concepts
 
 {code}
 operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
-  
+    ...
+    bindOutput 0, x + y + z
 }
 {code}
 

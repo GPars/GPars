@@ -1,4 +1,5 @@
-Check out the small example written in Groovy using GPars, which sums results of calculations performed by three concurrently run tasks:
+Dataflow Variables
+
 {code}
 import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -20,3 +21,61 @@ task {
 }
 {code}
 We start three logical tasks, which can run in parallel and perform their particular tasks. When a task needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another taks or thread (using the '<<' operator). Each _DataFlowVariable_ can be set only once in its lifetime. Notice that you don't have to bother with ordering and synchronizing the tasks or threads and their access to shared variables. The values are magically transferred among threads at the right time without your intervention.
+
+DataFlows
+
+{code}
+
+import static groovyx.gpars.dataflow.DataFlow.task
+
+final def df = new DataFlows()
+
+task {
+    df.z = df.x + df.y
+    println "Result: ${df.z}"
+}
+
+task {
+    df.x = 10
+}
+
+task {
+    df.y = 5
+}
+{code}
+
+Dataflow Streams
+
+{code}import static groovyx.gpars.dataflow.DataFlow.task
+
+def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']
+final def buffer = new DataFlowStream()
+
+task {
+    for (word in words) {
+        buffer << word.toUpperCase()  //add to the buffer
+    }
+}
+
+task {
+    while(true) println buffer.val  //read from the buffer in a loop
+}
+{code}
+
+Bind handlers
+
+{code}
+def a = new DataFlowVariable()
+a >> {println "The variable has just been bound to $it"}
+a.whenBound {println "Just to confirm that the variable has been really set to $it"}
+...
+{code}
+
+Dataflow operators
+
+{code}
+operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+    ...
+    bindOutput 0, x + y + z
+}
+{code}

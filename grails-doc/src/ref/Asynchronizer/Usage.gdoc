@@ -1,21 +1,36 @@
 Use of Asynchronizer\- the Java Executors' based concurrent collection processor
 
-h2. Usage of Asynchronizer
+Closures enhancements
+{code}Asynchronizer.doParallel() {
+    Closure longLastingCalculation = {calculate()}
+    Closure fastCalculation = longLastingCalculation.async()  //create a new closure, which starts the original closure on a thread pool
+    Future result=fastCalculation()                           //returns almost immediately
+    //do stuff while calculation performs ...
+    println result.get()
+}
+{code}
 
-The _Asynchronizer_ class enables a Java's Executor Service-based DSL on collections and closures. At least Java 1.5 must be used.
+{code}
+Asynchronizer.doParallel() {
+    /**
+     * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
+     * It will return a Future for the result value.
+     */
+    assert 6 == {it * 2}.call(3).get()
+    assert 6 == {it * 2}.callAsync(3).get()
+}
+{code}
 
-Examples of use:
-{code} //multiply numbers asynchronously
- Asynchronizer.withAsynchronizer(5) {
-     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel{it * 10}
-     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
- }
+Executor service enhancements
+{code}Asynchronizer.doParallel {ExecutorService executorService ->
+    executorService << {println 'Inside parallel task'}
+}
+{code}
 
- //multiply numbers asynchronously using an asynchronous closure
- Asynchronizer.withAsynchronizer(5) {
-     def closure={it * 10}
-     def asyncClosure=closure.async()
-     Collection<Future> result = [1, 2, 3, 4, 5].collect(asyncClosure)
-     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
- }
+Asynchronous function processing
+{code}
+Asynchronizer.doParallel {
+    assertEquals([10, 20], AsyncInvokerUtil.doInParallel({calculateA()}, {calculateB()}))         //waits for results
+    assertEquals([10, 20], AsyncInvokerUtil.executeAsync({calculateA()}, {calculateB()})*.get())  //returns Futures instead and doesn't wait for results to be calculated
+}
 {code}

@@ -1,15 +1,24 @@
-h1. Introduction
+Safe implements a Clojure-like Agent concept
 
-In Clojure you can find a concept of Agents, which essentially behave like actors accepting code (functions) as messages. After reception the function is run against the internal state of the Agent and the return value of the function is considered to be the new internal state of the Agent.
+{code}import org.gparallelizer.actors.pooledActors.SafeVariable
 
-Essentially, agents safe-guard mutable values by allowing only a single *agent-managed thread* to make modifications to them. The mutable values are *not directly accessible* from outside, but instead *requests have to be sent to the agent* and the agent guarantees to process the requests sequentially on behalf of the callers. Agents guarantee sequential execution of all requests and so consistency of the values.
+def jugMembers = new SafeVariable<List>(['Me'])  //add Me
 
-Schematically:
-{code}agent = new Agent(0)  //created a new Agent wrapping an integer with initial value 0
-agent.send {increment()}  //asynchronous send operation, sending the increment() function
-...
-//after some delay to process the message the internal Agent's state has been updated
-...
-assert agent.val== 1
+jugMembers.send {it.add 'James'}  //add James
+
+final Thread t1 = Thread.start {
+    jugMembers.send {it.add 'Joe'}  //add Joe
+}
+
+final Thread t2 = Thread.start {
+    jugMembers << {it.add 'Dave'}  //add Dave
+    jugMembers << {it.add 'Alice'}  //add Alice
+}
+
+[t1, t2]*.join()
+println jugMembers.val
+jugMembers.valAsync {println "Current members: $it"}
+
+System.in.read()
+jugMembers.stop()
 {code}
-To wrap integers, we can certainly use AtomicXXX types on the Java platform, but when the state is a more complex object we need more support.
