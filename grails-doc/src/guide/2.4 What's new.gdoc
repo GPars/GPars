@@ -13,6 +13,7 @@ h3. Actors
 * DSL to add message handlers to DynamicDispatchActor at construction time
 * The sendAndContinue() method
 * Performance improvements
+* Reorganized actor groups
 
 h3. Dataflow
 
