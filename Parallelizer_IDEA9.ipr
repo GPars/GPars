@@ -684,7 +684,6 @@
         <inspection_tool class="UnnecessaryTemporaryOnConversionToString" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnnecessaryUnboxing" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnparsedCustomBeanInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="UnqualifiedFieldAccess" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnqualifiedStaticUsage" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignoreStaticFieldAccesses" value="false" />
           <option name="m_ignoreStaticMethodCalls" value="false" />
@@ -2977,8 +2976,8 @@
         <inspection_tool class="WaitWithoutCorrespondingNotify" enabled="true" level="WARNING" enabled_by_default="true" />
       </profile>
     </profiles>
-    <option name="PROJECT_PROFILE" value="CodeStyle" />
-    <option name="USE_PROJECT_PROFILE" value="true" />
+    <option name="PROJECT_PROFILE" />
+    <option name="USE_PROJECT_PROFILE" value="false" />
     <version value="1.0" />
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="TYPO" />
