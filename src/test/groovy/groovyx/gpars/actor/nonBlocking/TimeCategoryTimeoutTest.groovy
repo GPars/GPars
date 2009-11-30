@@ -40,7 +40,12 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final AtomicBoolean codeFlag = new AtomicBoolean(false)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        final def actor = actor {
+        actor {
+            delegate.metaClass {
+                onTimeout = {-> timeoutFlag.set(true) }
+                afterStop = {messages -> barrier.await() }
+            }
+
             loop {
                 use(TimeCategory) {
                     react(1.second) {
@@ -50,10 +55,6 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
             }
         }
 
-        actor.metaClass {
-            onTimeout = {-> timeoutFlag.set(true) }
-            afterStop = {messages -> barrier.await() }
-        }
 
         barrier.await()
         assertFalse codeFlag.get()
