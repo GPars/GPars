@@ -23,21 +23,35 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorGroup;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.Actors;
-import groovyx.gpars.actor.impl.*;
-import static groovyx.gpars.actor.impl.ActorException.*;
+import groovyx.gpars.actor.impl.AbstractPooledActor;
+import groovyx.gpars.actor.impl.ActorContinuationException;
+import groovyx.gpars.actor.impl.ActorStopException;
+import groovyx.gpars.actor.impl.ActorTerminationException;
+import groovyx.gpars.actor.impl.ActorTimeoutException;
 import org.codehaus.groovy.runtime.CurriedClosure;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 
+import static groovyx.gpars.actor.impl.ActorException.CONTINUE;
+import static groovyx.gpars.actor.impl.ActorException.STOP;
+import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
+import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
+
 /**
  * @author Alex Tkachman, Vaclav Pech
  */
+@SuppressWarnings({"UnqualifiedStaticUsage"})
 public abstract class SequentialProcessingActor extends Actor implements Runnable {
 
     /**
@@ -315,7 +329,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         final int cnt = countUpdater.getAndIncrement(this);
 
-        for (;;) {
+      //noinspection ForLoopWithMissingComponent
+      for (;;) {
             final Node prev = inputQueue;
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
@@ -482,7 +497,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * @return this (the actor itself) to allow method chaining
      */
     @Override public final Actor terminate() {
-        for (;;) {
+      //noinspection ForLoopWithMissingComponent
+      for (;;) {
             final int flag = stopFlag;
             if ((flag & S_FINISHED_MASK) != 0 || flag == S_TERMINATING)
                 break;

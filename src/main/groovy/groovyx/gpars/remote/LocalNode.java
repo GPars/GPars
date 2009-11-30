@@ -28,7 +28,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Representation of local node
@@ -52,22 +57,22 @@ public class LocalNode {
         this(null, null);
     }
 
-    public LocalNode(Runnable runnable) {
+    public LocalNode(final Runnable runnable) {
         this(null, runnable);
     }
 
-    public LocalNode(LocalHost provider) {
+    public LocalNode(final LocalHost provider) {
         this(provider, null);
     }
 
-    public LocalNode(LocalHost provider, Runnable runnable) {
+    public LocalNode(final LocalHost provider, final Runnable runnable) {
         this.scheduler = new ThreadPoolExecutor(1, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(100),
                 new ThreadFactory() {
                     ThreadFactory threadFactory = Executors.defaultThreadFactory();
 
-                    public Thread newThread(Runnable r) {
+                    public Thread newThread(final Runnable r) {
                         final Thread thread = threadFactory.newThread(r);
                         thread.setDaemon(true);
                         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -130,7 +135,7 @@ public class LocalNode {
         }
     }
 
-    public void addDiscoveryListener(RemoteNodeDiscoveryListener l) {
+    public void addDiscoveryListener(final RemoteNodeDiscoveryListener l) {
         listeners.add(l);
     }
 
@@ -138,7 +143,7 @@ public class LocalNode {
         listeners.add(new RemoteNodeDiscoveryListener.RemoteNodeDiscoveryListenerClosure(l));
     }
 
-    public void removeDiscoveryListener(RemoteNodeDiscoveryListener l) {
+    public void removeDiscoveryListener(final RemoteNodeDiscoveryListener l) {
         listeners.remove(l);
     }
 

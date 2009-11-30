@@ -49,6 +49,6 @@ public final class ActorReplyException extends RuntimeException {
 
     @Override public void printStackTrace() {
         super.printStackTrace();
-        for (Exception e : issues) e.printStackTrace();
+        for (final Exception e : issues) e.printStackTrace();
     }
 }

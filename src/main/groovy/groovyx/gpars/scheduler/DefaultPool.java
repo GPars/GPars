@@ -18,7 +18,11 @@ package groovyx.gpars.scheduler;
 
 import groovyx.gpars.util.PoolUtils;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -57,8 +61,8 @@ public class DefaultPool implements Pool {
      * @param poolSize The required size of the pool
      */
     public DefaultPool(final boolean daemon, final int poolSize) {
-        if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
-        pool = createPool(daemon, poolSize);
+        if (poolSize < 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+      this.pool = DefaultPool.createPool(daemon, poolSize);
     }
 
     /**
@@ -82,11 +86,11 @@ public class DefaultPool implements Pool {
         assert poolSize > 0;
         return (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
             public Thread newThread(final Runnable r) {
-                final Thread thread = new Thread(r, createThreadName());
+                final Thread thread = new Thread(r, DefaultPool.createThreadName());
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                     public void uncaughtException(final Thread t, final Throwable e) {
-                        System.err.println(UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
+                        System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
                         e.printStackTrace(System.err);
                     }
                 });
@@ -115,7 +119,7 @@ public class DefaultPool implements Pool {
      * @param poolSize The new pool size
      */
     public final void resize(final int poolSize) {
-        if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        if (poolSize < 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         pool.setCorePoolSize(poolSize);
     }
 
@@ -141,7 +145,7 @@ public class DefaultPool implements Pool {
      * @return The underlying thread pool
      */
     public final ExecutorService getExecutorService() {
-        return pool;
+        return this.pool;
     }
 
     /**
@@ -150,7 +154,7 @@ public class DefaultPool implements Pool {
     public final void shutdown() {
         pool.shutdown();
         try {
-            pool.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+            pool.awaitTermination(DefaultPool.SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();  // set the interrupted flag
         }

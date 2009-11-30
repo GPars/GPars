@@ -22,11 +22,11 @@ import groovy.time.Duration;
 import groovyx.gpars.MessageStream;
 import groovyx.gpars.SequentialProcessingActor;
 import groovyx.gpars.actor.ActorMessage;
-import static groovyx.gpars.actor.impl.ActorException.*;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -174,7 +174,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
             throw new IllegalStateException("The actor has been stopped.");
         }
 
-        ActorMessage message = takeMessage();
+        final ActorMessage message = takeMessage();
         enhanceReplies(Arrays.asList(message));
         if (message == null) {
             return null;
@@ -190,7 +190,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receiveImpl(long timeout, TimeUnit timeUnit) throws InterruptedException {
+    protected final Object receiveImpl(final long timeout, final TimeUnit timeUnit) throws InterruptedException {
         if (stopFlag == S_NOT_STARTED) {
             throw new IllegalStateException("The actor hasn't been started.");
         }
@@ -199,7 +199,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
             throw new IllegalStateException("The actor has been stopped.");
         }
 
-        ActorMessage message = takeMessage(timeout, timeUnit);
+        final ActorMessage message = takeMessage(timeout, timeUnit);
         enhanceReplies(Arrays.asList(message));
         if (message == null) {
             return null;
@@ -214,13 +214,13 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final void receive(Closure handler) throws InterruptedException {
+    protected final void receive(final Closure handler) throws InterruptedException {
         handler.setResolveStrategy(Closure.DELEGATE_FIRST);
         handler.setDelegate(this);
 
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
-        int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
-        int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
+        final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
+        final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
 
         for (int i = 0; i != toReceive; ++i) {
             checkStopTerminate();
@@ -232,7 +232,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
             if (maxNumberOfParameters == 0) {
                 handler.call();
             } else {
-                Object args[] = new Object[messages.size()];
+                final Object[] args = new Object[messages.size()];
                 for (int i = 0; i < args.length; i++) {
                     args[i] = messages.get(i).getPayLoad();
                 }
@@ -254,14 +254,14 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param handler  A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final void receive(long timeout, TimeUnit timeUnit, Closure handler) throws InterruptedException {
+    protected final void receive(final long timeout, final TimeUnit timeUnit, final Closure handler) throws InterruptedException {
         handler.setResolveStrategy(Closure.DELEGATE_FIRST);
         handler.setDelegate(this);
 
-        int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
-        int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
+        final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
+        final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
 
-        long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
+        final long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
 
         boolean nullAppeared = false;  //Ignore further potential messages once a null is retrieved (due to a timeout)
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
@@ -272,7 +272,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
                 if (stopFlag != S_RUNNING) {
                     throw new IllegalStateException("The actor hasn't been started.");
                 }
-                ActorMessage message =
+                final ActorMessage message =
                         takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
                 nullAppeared = (message == null);
                 messages.add(message);
@@ -286,7 +286,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
             if (maxNumberOfParameters == 0) {
                 handler.call();
             } else {
-                Object args[] = new Object[messages.size()];
+                final Object[] args = new Object[messages.size()];
                 for (int i = 0; i < args.length; i++) {
                     final ActorMessage am = messages.get(i);
                     args[i] = am == null ? am : am.getPayLoad();
@@ -308,7 +308,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param handler  A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final void receive(Duration duration, Closure handler) throws InterruptedException {
+    protected final void receive(final Duration duration, final Closure handler) throws InterruptedException {
         receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler);
     }
 
@@ -325,11 +325,11 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         ActorMessage message = pollMessage();
         while (message != null) {
             Object list = InvokerHelper.invokeMethod(message.getPayLoad(), "respondsTo", new Object[]{"onDeliveryError"});
-            if (list != null && !((List) list).isEmpty()) {
+            if (list != null && !((Collection) list).isEmpty()) {
                 InvokerHelper.invokeMethod(message.getPayLoad(), "onDeliveryError", new Object[0]);
             } else {
                 list = InvokerHelper.invokeMethod(message.getSender(), "respondsTo", new Object[]{"onDeliveryError"});
-                if (list != null && !((List) list).isEmpty()) {
+                if (list != null && !((Collection) list).isEmpty()) {
                     InvokerHelper.invokeMethod(message.getSender(), "onDeliveryError", new Object[0]);
                 }
             }
@@ -357,7 +357,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     @Override
     protected void doOnStart() {
         final Object list = InvokerHelper.invokeMethod(this, "respondsTo", new Object[]{"afterStart"});
-        if (list != null && !((List) list).isEmpty()) {
+        if (list != null && !((Collection) list).isEmpty()) {
             InvokerHelper.invokeMethod(this, "afterStart", new Object[]{});
         }
         act();
@@ -369,7 +369,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
     @SuppressWarnings({"FeatureEnvy"})
     protected void doOnTermination() {
-        List queue = sweepQueue();
+        final List queue = sweepQueue();
         if (onStop != null)
             onStop.call(queue);
 
@@ -394,7 +394,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
 
     private boolean callDynamic(final String method, final Object[] args) {
-        MetaClass metaClass = InvokerHelper.getMetaClass(this);
+        final MetaClass metaClass = InvokerHelper.getMetaClass(this);
         final List list = metaClass.respondsTo(this, method);
         if (list != null && !list.isEmpty()) {
             InvokerHelper.invokeMethod(this, method, args);

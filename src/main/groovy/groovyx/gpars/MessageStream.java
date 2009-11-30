@@ -238,7 +238,7 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     public static class RemoteMessageStream extends MessageStream implements RemoteSerialized {
-        private RemoteHost remoteHost;
+        private final RemoteHost remoteHost;
 
         public RemoteMessageStream(final RemoteHost host) {
             remoteHost = host;

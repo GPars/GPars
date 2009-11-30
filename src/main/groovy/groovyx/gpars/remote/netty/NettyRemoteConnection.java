@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Alex Tkachman
  */
 public class NettyRemoteConnection extends RemoteConnection {
-    private NettyHandler handler;
+    private final NettyHandler handler;
     private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
 
     public NettyRemoteConnection(NettyTransportProvider provider, NettyHandler netHandler) {

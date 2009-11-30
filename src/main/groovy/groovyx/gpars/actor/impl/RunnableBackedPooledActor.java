@@ -72,7 +72,8 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
     }
 
     private static final class RunnableBackedPooledActorDelegate extends GroovyObjectSupport {
-        private final Object first, second;
+        private final Object first;
+        private final Object second;
 
         RunnableBackedPooledActorDelegate(final Object first, final Object second) {
             this.first = first;

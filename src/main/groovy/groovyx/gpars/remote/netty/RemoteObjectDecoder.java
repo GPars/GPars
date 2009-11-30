@@ -26,7 +26,7 @@ import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 
 @ChannelPipelineCoverage("one")
 public class RemoteObjectDecoder extends ObjectDecoder {
-    private RemoteConnection connection;
+    private final RemoteConnection connection;
 
     /**
      * Creates a new encoder.

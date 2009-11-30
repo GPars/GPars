@@ -25,7 +25,7 @@ import groovyx.gpars.serial.SerialContext;
  * @author Alex Tkachman
  */
 public class RemoteDataFlowExpression extends DataFlowExpression implements RemoteSerialized {
-    private RemoteHost remoteHost;
+    private final RemoteHost remoteHost;
 
     public RemoteDataFlowExpression() {
         remoteHost = (RemoteHost) SerialContext.get();

@@ -22,7 +22,13 @@ import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowVariable;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
-import groovyx.gpars.serial.*;
+import groovyx.gpars.serial.DefaultRemoteHandle;
+import groovyx.gpars.serial.RemoteHandle;
+import groovyx.gpars.serial.RemoteSerialized;
+import groovyx.gpars.serial.SerialContext;
+import groovyx.gpars.serial.SerialHandle;
+import groovyx.gpars.serial.SerialMsg;
+import groovyx.gpars.serial.WithSerialId;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;

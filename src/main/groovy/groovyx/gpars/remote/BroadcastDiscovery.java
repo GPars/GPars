@@ -16,16 +16,25 @@
 
 package groovyx.gpars.remote;
 
-import java.io.*;
-import java.net.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 public class BroadcastDiscovery {
     private static InetAddress GROUP;
     private static final int PORT = 4239;
     private static final int MAGIC = 0x23982391;
-    private UUID uid;
-    private InetSocketAddress address;
+    private final UUID uid;
+    private final InetSocketAddress address;
     private Thread sendThread;
     private Thread receiveThread;
     private volatile boolean stopped;
@@ -39,7 +48,7 @@ public class BroadcastDiscovery {
         }
     }
 
-    public BroadcastDiscovery(final UUID uid, InetSocketAddress address) {
+    public BroadcastDiscovery(final UUID uid, final InetSocketAddress address) {
         this.uid = uid;
         this.address = address;
     }
@@ -47,7 +56,7 @@ public class BroadcastDiscovery {
     public void start() {
         try {
             socket = new MulticastSocket(PORT);
-            InetAddress group = GROUP;
+            final InetAddress group = GROUP;
             socket.joinGroup(group);
 
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -57,7 +66,7 @@ public class BroadcastDiscovery {
             stream.writeLong(uid.getMostSignificantBits());
             stream.writeLong(uid.getLeastSignificantBits());
             stream.writeInt(address.getPort());
-            byte[] addrBytes = address.getAddress().getAddress();
+            final byte[] addrBytes = address.getAddress().getAddress();
             stream.writeInt(addrBytes.length);
             stream.write(addrBytes);
             stream.close();
@@ -74,7 +83,7 @@ public class BroadcastDiscovery {
                         }
 
                         try {
-                            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, GROUP, PORT);
+                            final DatagramPacket packet = new DatagramPacket(bytes, bytes.length, GROUP, PORT);
                             socket.send(packet);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -87,18 +96,18 @@ public class BroadcastDiscovery {
             receiveThread = new Thread() {
                 @Override
                 public void run() {
-                    byte buf[] = new byte[3 * 8 + 3 * 4];
-                    byte addrBuf4[] = new byte[4];
-                    byte addrBuf6[] = new byte[6];
+                    final byte[] buf = new byte[3 * 8 + 3 * 4];
+                    final byte[] addrBuf4 = new byte[4];
+                    final byte[] addrBuf6 = new byte[6];
                     while (!stopped) {
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                        final DatagramPacket packet = new DatagramPacket(buf, buf.length);
                         try {
                             socket.receive(packet);
-                            DataInputStream in = new DataInputStream(new ByteArrayInputStream(buf));
+                            final DataInputStream in = new DataInputStream(new ByteArrayInputStream(buf));
                             if (in.readLong() == MAGIC) {
-                                UUID uuid = new UUID(in.readLong(), in.readLong());
-                                int port = in.readInt();
-                                int addrLen = in.readInt();
+                                final UUID uuid = new UUID(in.readLong(), in.readLong());
+                                final int port = in.readInt();
+                                final int addrLen = in.readInt();
                                 if (addrLen == 4) {
                                     in.read(addrBuf4);
                                     onDiscovery(uuid, new InetSocketAddress(InetAddress.getByAddress(addrBuf4), port));
@@ -140,6 +149,6 @@ public class BroadcastDiscovery {
         }
     }
 
-    protected void onDiscovery(UUID uuid, SocketAddress address) {
+    protected void onDiscovery(final UUID uuid, final SocketAddress address) {
     }
 }

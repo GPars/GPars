@@ -29,7 +29,11 @@ import groovyx.gpars.serial.SerialMsg;
 import groovyx.gpars.serial.WithSerialId;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;

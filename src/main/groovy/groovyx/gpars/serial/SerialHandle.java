@@ -38,11 +38,11 @@ import java.util.UUID;
  */
 public class SerialHandle extends ManagedReference<WithSerialId> {
 
-    private final static ReferenceQueue queue = new ReferenceQueue();
+    private static final ReferenceQueue queue = new ReferenceQueue();
 
-    private final static ReferenceManager manager = ReferenceManager.createThreadedManager(queue);
+    private static final ReferenceManager manager = ReferenceManager.createThreadedManager(queue);
 
-    private final static ReferenceBundle bundle = new ReferenceBundle(manager, ReferenceType.WEAK);
+    private static final ReferenceBundle bundle = new ReferenceBundle(manager, ReferenceType.WEAK);
 
     /**
      * serial id of the object
@@ -115,7 +115,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
                 if (subscribers instanceof SerialContext) {
                     if (subscribers != context) {
                         final ArrayList<SerialContext> list = new ArrayList<SerialContext>(2);
-                        list.add((RemoteHost) subscribers);
+                        list.add((SerialContext) subscribers);
                         list.add(context);
                         subscribers = list;
                     }
