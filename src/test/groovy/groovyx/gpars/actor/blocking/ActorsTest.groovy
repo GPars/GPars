@@ -47,16 +47,17 @@ public class ActorsTest extends GroovyTestCase {
         assertEquals 3, counter.intValue()
     }
 
-    public void testDefaultactor() {
+    public void testActorStopAfterTimeout() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        Actors.actor {
+            delegate.metaClass.afterStop = {
+                latch.countDown()
+            }
+
             flag.set(true)
             receive(10, TimeUnit.MILLISECONDS)
-        }
-        actor.metaClass.afterStop = {
-            latch.countDown()
         }
 
         latch.await(30, TimeUnit.SECONDS)
@@ -67,7 +68,7 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        Actors.actor {
             delegate.metaClass.onException = {}
             delegate.metaClass.afterStop = {
                 flag.set(true)
