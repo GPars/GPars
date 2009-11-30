@@ -822,7 +822,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
          * @return True, if the next continuation can start.
          */
         public boolean isReady() {
-            return timeout || (getCurrentSize() == (numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages));
+            return timeout || getCurrentSize() == (numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages);
         }
 
         /**

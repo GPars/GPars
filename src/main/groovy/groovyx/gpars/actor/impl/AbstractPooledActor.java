@@ -120,7 +120,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech, Alex Tkachman, Dierk Koenig
  *         Date: Feb 7, 2009
  */
-@SuppressWarnings({"ThrowCaughtLocally"})
+@SuppressWarnings({"ThrowCaughtLocally", "UnqualifiedStaticUsage"})
 public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
     private Closure onStop;
@@ -274,7 +274,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
                 }
                 final ActorMessage message =
                         takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
-                nullAppeared = (message == null);
+                nullAppeared = message == null;
                 messages.add(message);
             }
         }
