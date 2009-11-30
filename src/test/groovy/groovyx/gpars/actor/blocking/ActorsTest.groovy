@@ -56,8 +56,8 @@ public class ActorsTest extends GroovyTestCase {
                 latch.countDown()
             }
 
-            flag.set(true)
             receive(10, TimeUnit.MILLISECONDS)
+            flag.set(true)
         }
 
         latch.await(30, TimeUnit.SECONDS)
