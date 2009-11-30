@@ -117,7 +117,7 @@ groovydoc {
     docTitle = packageTitle
     header = packageTitle
     footer = copyrightString
-    packageNames = ['groovyx.gpars.*']
+    include 'groovyx/gpars/**'
     overview = 'overview.html'
 }
 
