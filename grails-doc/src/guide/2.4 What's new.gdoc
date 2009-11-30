@@ -1,0 +1,22 @@
+The GPars 0.9 release introduces a lot of changes compared to the previous GParallelizer 0.9 release.
+
+h3. Parallel collections
+
+* Map/Reduce
+* New parallel methods added
+* Transparently parallel methods
+
+h3. Actors
+
+* No need to start actors explicitly after calling the _actor()_ factory method
+* Removed thread-bound actors
+* DSL to add message handlers to DynamicDispatchActor at construction time
+* The sendAndContinue() method
+* Performance improvements
+
+h3. Dataflow
+
+* Tasks
+* Operators
+* The DataFlows class
+* Bound handlers through the >> operator
