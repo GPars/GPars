@@ -95,11 +95,14 @@ public class DeliveryErrorTest extends GroovyTestCase {
                 latch.countDown()
             }
 
+            barrier.await()
             react {
                 barrier.await()
                 if (true) throw new RuntimeException('test')
             }
         }
+
+        barrier.await()
 
         def message1 = 1
         message1.metaClass.onDeliveryError = {->
