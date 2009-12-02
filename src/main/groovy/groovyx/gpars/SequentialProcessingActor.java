@@ -325,7 +325,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         final int flag = stopFlag;
         if (flag != S_RUNNING) {
             if (message != terminateMessage && message != stopMessage)
-                throw new IllegalStateException("The actor can not accept messages at this point.");
+                throw new IllegalStateException("The actor cannot accept messages at this point.");
         }
 
         final ActorMessage actorMessage;
