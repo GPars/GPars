@@ -124,13 +124,14 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final PooledActorGroup group = new PooledActorGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
         volatile boolean flag = false
 
-        def op1 = operator(inputs: [a], outputs: [b], group) {v ->
+        def op1 = operator(inputs: [a, b], outputs: [c], group) {x, y ->
             flag = true
         }
-        op1.stop()
         a << 'Never delivered'
+        op1.stop()
         op1.join()
         assertFalse flag
     }
