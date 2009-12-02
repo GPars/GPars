@@ -33,13 +33,12 @@ public class DeliveryErrorTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.actor {
-            delegate.metaClass.afterStop = {
-                latch.countDown()
-            }
-
             react {}
         }
 
+        actor.metaClass.afterStop = {
+            latch.countDown()
+        }
         def message = 1
         message.metaClass.onDeliveryError = {->
             flag = true
@@ -57,13 +56,13 @@ public class DeliveryErrorTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
-            delegate.metaClass.afterStop = {
-                latch.countDown()
-            }
-
             react {
                 barrier.await()
             }
+        }
+
+        actor.metaClass.afterStop = {
+            latch.countDown()
         }
 
         def message1 = 1
