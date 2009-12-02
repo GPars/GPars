@@ -35,7 +35,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testUsingNonTransparentCollectInTransparentContextWithString() {
@@ -49,7 +49,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
             }
             assertFalse result.isTransparent()
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testUsingNonTransparentFindAllInTransparentContextWithString() {
@@ -63,7 +63,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
             }
             assertFalse result.isTransparent()
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testUsingNonTransparentGroupByInTransparentContextWithString() {
@@ -76,6 +76,6 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
                 return 'a'
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 }

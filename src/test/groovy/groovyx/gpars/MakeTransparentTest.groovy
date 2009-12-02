@@ -100,7 +100,7 @@ class MakeTransparentTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testMakeTransparentPropagationToResults() {
@@ -112,7 +112,7 @@ class MakeTransparentTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 3
+        assert map.keys().size() > 1
     }
 
     public void testNoMakeTransparentPropagationToResultsWithGroupBy() {

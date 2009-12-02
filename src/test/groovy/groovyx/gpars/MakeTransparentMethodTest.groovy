@@ -35,7 +35,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentEachWithIndex() {
@@ -47,7 +47,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentCollect() {
@@ -60,7 +60,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return it
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentGrep() {
@@ -73,7 +73,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return true
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentFind() {
@@ -86,7 +86,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return false
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentFindAll() {
@@ -99,7 +99,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return true
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentAll() {
@@ -112,7 +112,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return false
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentAny() {
@@ -125,7 +125,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return false
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentAnyOnString() {
@@ -138,7 +138,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return false
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentGroupBy() {
@@ -151,7 +151,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
                 return it
             }
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testTransparentMin() {

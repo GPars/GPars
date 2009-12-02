@@ -89,7 +89,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testIsTransparentCheck() {
