@@ -411,6 +411,9 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     private void handleTermination() {
         Thread.interrupted();
 
+        assert stopFlag != S_STOPPED;
+        assert stopFlag != S_TERMINATED;
+                
         if (stopFlag == S_STOPPING)
             stopFlag = S_STOPPED;
         else if (stopFlag == S_TERMINATING)
