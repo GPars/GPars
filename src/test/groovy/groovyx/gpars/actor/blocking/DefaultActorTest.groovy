@@ -54,7 +54,6 @@ class DefaultTestActor extends AbstractPooledActor {
 
     @Override protected void act() {
         threadName = Thread.currentThread().name
-        println threadName
         receive {
             receiveWasCalled.set true
             receiveCallsOutstanding.countDown()

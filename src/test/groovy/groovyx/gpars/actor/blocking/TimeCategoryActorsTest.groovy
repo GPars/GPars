@@ -61,7 +61,6 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
                 } finally {
                     latch.countDown()
                 }
-              println "123"
             }
         }
 
