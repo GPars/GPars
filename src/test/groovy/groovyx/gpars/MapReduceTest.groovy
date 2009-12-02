@@ -43,8 +43,8 @@ public class MapReduceTest extends GroovyTestCase {
 
     public void testMapFilter() {
         Parallelizer.doParallel(5) {
-            println ([1, 2, 3, 4, 5].parallel.map{it}.filter{it > 3}.collection)
-                assertEquals 9, [1, 2, 3, 4, 5].parallel.map{it}.filter{ it > 3 }.map {it}.reduce {a, b -> a + b }
+            assert([4, 5].containsAll([1, 2, 3, 4, 5].parallel.map{it}.filter{it > 3}.collection))
+            assertEquals 9, [1, 2, 3, 4, 5].parallel.map{it}.filter{ it > 3 }.map {it}.reduce {a, b -> a + b }
         }
     }
 
