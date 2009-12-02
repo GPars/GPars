@@ -419,7 +419,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         else if (stopFlag == S_TERMINATING)
             stopFlag = S_TERMINATED;
         else
-            throw new IllegalStateException();
+            throw new IllegalStateException("Messed up actors state detected when terminating: " + stopFlag);
 
         try {
             doOnTermination();
