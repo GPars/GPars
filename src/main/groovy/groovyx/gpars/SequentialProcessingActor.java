@@ -30,6 +30,7 @@ import groovyx.gpars.actor.impl.ActorTerminationException;
 import groovyx.gpars.actor.impl.ActorTimeoutException;
 import org.codehaus.groovy.runtime.CurriedClosure;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 
 import java.util.ArrayList;
@@ -88,33 +89,33 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Counter of messages in the queues
      */
-    private volatile int  count;
+    private volatile int count;
 
-    private static final AtomicReferenceFieldUpdater<SequentialProcessingActor,Node> inputQueueUpdater = AtomicReferenceFieldUpdater.newUpdater(SequentialProcessingActor.class, Node.class, "inputQueue");
+    private static final AtomicReferenceFieldUpdater<SequentialProcessingActor, Node> inputQueueUpdater = AtomicReferenceFieldUpdater.newUpdater(SequentialProcessingActor.class, Node.class, "inputQueue");
 
     private static final AtomicIntegerFieldUpdater<SequentialProcessingActor> countUpdater = AtomicIntegerFieldUpdater.newUpdater(SequentialProcessingActor.class, "count");
 
     private volatile Thread waitingThread;
     private volatile Thread currentThread;
 
-    private static final ActorMessage startMessage      = new ActorMessage<String>("startMessage",null);
-    private static final ActorMessage stopMessage       = new ActorMessage<String>("stopMessage",null);
-    private static final ActorMessage loopMessage       = new ActorMessage<String>("loopMessage",null);
-    private static final ActorMessage terminateMessage  = new ActorMessage<String>("terminateMessage",null);
+    private static final ActorMessage startMessage = new ActorMessage<String>("startMessage", null);
+    private static final ActorMessage stopMessage = new ActorMessage<String>("stopMessage", null);
+    private static final ActorMessage loopMessage = new ActorMessage<String>("loopMessage", null);
+    private static final ActorMessage terminateMessage = new ActorMessage<String>("terminateMessage", null);
 
-    protected static final int S_ACTIVE_MASK         = 1;
-    protected static final int S_FINISHING_MASK      = 2;
-    protected static final int S_FINISHED_MASK       = 4;
+    protected static final int S_ACTIVE_MASK = 1;
+    protected static final int S_FINISHING_MASK = 2;
+    protected static final int S_FINISHED_MASK = 4;
     protected static final int S_STOP_TERMINATE_MASK = 8;
 
-    protected static final int S_NOT_STARTED       = 0;
-    protected static final int S_RUNNING           = S_ACTIVE_MASK;
+    protected static final int S_NOT_STARTED = 0;
+    protected static final int S_RUNNING = S_ACTIVE_MASK;
 
-    protected static final int S_STOPPING     = S_STOP_TERMINATE_MASK | S_FINISHING_MASK | S_ACTIVE_MASK;
-    protected static final int S_TERMINATING  =                     0 | S_FINISHING_MASK | S_ACTIVE_MASK;
+    protected static final int S_STOPPING = S_STOP_TERMINATE_MASK | S_FINISHING_MASK | S_ACTIVE_MASK;
+    protected static final int S_TERMINATING = 0 | S_FINISHING_MASK | S_ACTIVE_MASK;
 
-    protected static final int S_STOPPED      = S_STOP_TERMINATE_MASK | S_FINISHED_MASK;
-    protected static final int S_TERMINATED   =                     0 | S_FINISHED_MASK;
+    protected static final int S_STOPPED = S_STOP_TERMINATE_MASK | S_FINISHED_MASK;
+    protected static final int S_TERMINATED = 0 | S_FINISHED_MASK;
 
     /**
      * Indicates whether the actor should terminate
@@ -131,7 +132,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Checks whether the current thread is the actor's current thread.
      */
-    @Override public final boolean isActorThread() {
+    @Override
+    public final boolean isActorThread() {
         return Thread.currentThread() == currentThread;
     }
 
@@ -145,6 +147,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Retrieves the next message from the queue
+     *
      * @return The message
      */
     private ActorMessage getMessage() {
@@ -162,6 +165,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Checks the supplied message and throws either STOP or TERMINATE, if the message is a Stop or Terminate message respectively.
+     *
      * @param toProcess The next message to process by the actors
      */
     private void throwIfNeeded(final ActorMessage toProcess) {
@@ -178,6 +182,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Polls a message from the queues
+     *
      * @return The message
      */
     protected final ActorMessage pollMessage() {
@@ -195,6 +200,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Takes a message from the queues. Blocks until a message is available.
+     *
      * @return The message
      * @throws InterruptedException If the thread gets interrupted.
      */
@@ -203,13 +209,14 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         while (true) {
             final ActorMessage message = awaitNextMessage(0L);
-            if (message!=null) return message;
+            if (message != null) return message;
         }
     }
 
     /**
      * Takes a message from the queues. Blocks until a message is available.
-     * @param timeout Max time to wait for a message
+     *
+     * @param timeout  Max time to wait for a message
      * @param timeUnit The units for the timeout
      * @return The message
      * @throws InterruptedException If the thread gets interrupted.
@@ -220,7 +227,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         final long endTime = System.nanoTime() + timeUnit.toNanos(timeout);
         do {
             final ActorMessage message = awaitNextMessage(endTime);
-            if (message!=null) return message;
+            if (message != null) return message;
         } while (System.nanoTime() < endTime);
 
         return null;
@@ -228,6 +235,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Holds common functionality for takeMessage() methods.
+     *
      * @param endTime End of the timeout, 0 if no timeout was set
      * @return The next message
      * @throws InterruptedException If the thread has been interrupted
@@ -238,7 +246,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         if (outputQueue != null) return retrieveNextMessage();
 
         waitingThread = Thread.currentThread();
-        if (endTime==0L) LockSupport.park(); else LockSupport.parkNanos(endTime - System.nanoTime());
+        if (endTime == 0L) LockSupport.park();
+        else LockSupport.parkNanos(endTime - System.nanoTime());
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -247,6 +256,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Takes the next message from the outputQueue, decrements the cuonter and possibly throws control exceptions
+     *
      * @return The next message
      */
     private ActorMessage retrieveNextMessage() {
@@ -311,7 +321,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         return actorGroup;
     }
 
-    @Override public final MessageStream send(final Object message) {
+    @Override
+    public final MessageStream send(final Object message) {
         final int flag = stopFlag;
         if (flag != S_RUNNING) {
             if (message != terminateMessage && message != stopMessage)
@@ -329,16 +340,15 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         final int cnt = countUpdater.getAndIncrement(this);
 
-      //noinspection ForLoopWithMissingComponent
-      for (;;) {
+        //noinspection ForLoopWithMissingComponent
+        for (; ;) {
             final Node prev = inputQueue;
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
                 if (cnt == 0) {
                     if (flag != S_STOPPED)
                         schedule();
-                }
-                else {
+                } else {
                     final Thread w = waitingThread;
                     if (w != null) {
                         waitingThread = null;
@@ -380,7 +390,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     }
 
     private void handleStart() {
-        doOnStart ();
+        doOnStart();
     }
 
     /**
@@ -404,14 +414,13 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         if (stopFlag == S_STOPPING)
             stopFlag = S_STOPPED;
+        else if (stopFlag == S_TERMINATING)
+            stopFlag = S_TERMINATED;
         else
-            if (stopFlag == S_TERMINATING)
-                stopFlag = S_TERMINATED;
-            else
-                throw new IllegalStateException();
+            throw new IllegalStateException();
 
         try {
-            doOnTermination ();
+            doOnTermination();
         } finally {
             if (!getJoinLatch().isBound()) {
                 //noinspection unchecked
@@ -438,6 +447,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Allows subclasses to add behavior to run after exception in actor's body
+     *
      * @param exception The exception that was fired
      */
     protected void doOnException(final Throwable exception) {
@@ -455,6 +465,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Allows subclasses to add behavior to run after actor's interruption
+     *
      * @param exception The InterruptedException
      */
     protected void doOnInterrupt(final InterruptedException exception) {
@@ -482,9 +493,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @return this (the actor itself) to allow method chaining
      */
-    @Override public final Actor stop() {
+    @Override
+    public final Actor stop() {
         if (stopFlagUpdater.compareAndSet(this, S_RUNNING, S_STOPPING)) {
-            send (stopMessage);
+            send(stopMessage);
         }
         return this;
     }
@@ -496,9 +508,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @return this (the actor itself) to allow method chaining
      */
-    @Override public final Actor terminate() {
-      //noinspection ForLoopWithMissingComponent
-      for (;;) {
+    @Override
+    public final Actor terminate() {
+        //noinspection ForLoopWithMissingComponent
+        for (; ;) {
             final int flag = stopFlag;
             if ((flag & S_FINISHED_MASK) != 0 || flag == S_TERMINATING)
                 break;
@@ -510,8 +523,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
                 if (currentThread != null) {
                     currentThread.interrupt();
-                }
-                else {
+                } else {
                     // just to make sure that scheduled
                     send(terminateMessage);
                 }
@@ -583,15 +595,50 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         code.setResolveStrategy(Closure.DELEGATE_FIRST);
         code.setDelegate(this);
 
-        assert reaction == null;
+//        if (maxNumberOfParameters > 1) {
+//            this.react(timeout, new MyClosure(code, maxNumberOfParameters, timeout, new ArrayList<MessageStream>()));
+//        } else {
+            assert reaction == null;
 
-        final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
-        if (timeout >= 0) {
-            reactCode.setTimeout(timeout);
+            final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
+            if (timeout >= 0) {
+                reactCode.setTimeout(timeout);
+            }
+            reaction = reactCode;
+            throw CONTINUE;
+//        }
+    }
+
+    class MyClosure extends groovy.lang.Closure implements org.codehaus.groovy.runtime.GeneratedClosure {
+        private final Closure code;
+        private final int maxNumberOfParameters;
+        private final long timeout;
+        private final List<MessageStream> localSenders;
+
+        public MyClosure(final Closure code, final int maxNumberOfParameters, final long timeout, final List<MessageStream> localSenders) {
+            super(code.getThisObject());
+            this.code = code;
+            this.maxNumberOfParameters = maxNumberOfParameters;
+            this.timeout = timeout;
+            this.localSenders = localSenders;
         }
-        reaction = reactCode;
 
-        throw CONTINUE;
+        @Override
+        public int getMaximumNumberOfParameters() { return 1; }
+
+        @Override
+        public Class[] getParameterTypes() { return new Class[]{Object.class}; }
+
+        public Object doCall(final Object args) {
+            localSenders.add((MessageStream) InvokerHelper.invokeMethod(args, "getSender", null));
+            final int newNumberOfParameters = maxNumberOfParameters - 1;
+            if (newNumberOfParameters <= 0) {
+                SequentialProcessingActor.this.getSenders().clear();
+                SequentialProcessingActor.this.getSenders().addAll(localSenders);
+                InvokerHelper.invokeClosure(code.curry(new Object[]{args}), null);
+            } else SequentialProcessingActor.this.react(timeout, new MyClosure(code.curry(new Object[]{args}), newNumberOfParameters, timeout, localSenders));
+            return null;
+        }
     }
 
     /**
@@ -600,9 +647,11 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     private static class Node {
         volatile Node next;
-        final ActorMessage  msg;
+        final ActorMessage msg;
 
-        Node(final ActorMessage actorMessage) { this.msg = actorMessage; }
+        Node(final ActorMessage actorMessage) {
+            this.msg = actorMessage;
+        }
     }
 
     @SuppressWarnings({"ThrowCaughtLocally"})
@@ -666,7 +715,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
             currentThread = null;
             final int cnt = countUpdater.decrementAndGet(this);
-            if(cnt > 0 && isActive()) {
+            if (cnt > 0 && isActive()) {
                 schedule();
             }
         }
@@ -710,8 +759,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         if (loopCode != null) {
             scheduleLoop();
-        }
-        else {
+        } else {
             // case of react called directly from act ()
             stopFlag = S_STOPPING;
             throw STOP;
@@ -794,7 +842,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             messages = new ActorMessage[numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages];
         }
 
-        @SuppressWarnings({"UnusedDeclaration"}) Reaction(final AbstractPooledActor actor, final int numberOfExpectedMessages) {
+        @SuppressWarnings({"UnusedDeclaration"})
+        Reaction(final AbstractPooledActor actor, final int numberOfExpectedMessages) {
             this(actor, numberOfExpectedMessages, null);
         }
 
@@ -850,7 +899,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
          *
          * @return The messages stored so far.
          */
-        @SuppressWarnings({"UnusedDeclaration"}) List<ActorMessage> dumpMessages() {
+        @SuppressWarnings({"UnusedDeclaration"})
+        List<ActorMessage> dumpMessages() {
             return Collections.unmodifiableList(Arrays.asList(messages));
         }
 
@@ -873,7 +923,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         public void setTimeout(final long timeout) {
             timer.schedule(new TimerTask() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (!isReady()) {
                         actor.send(new ActorMessage(TIMEOUT, null));
                     }
