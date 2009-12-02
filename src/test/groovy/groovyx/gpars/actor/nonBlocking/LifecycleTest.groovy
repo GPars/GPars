@@ -251,16 +251,17 @@ public class LifecycleTest extends GroovyTestCase {
         assert df.reactor
         assert df.handler
 
-        a2.stop()
-        a3.stop()
+        a2.terminate()
+        a3.terminate()
     }
     
     public void testAfterStart() {
         final def afterStartBarrier = new CyclicBarrier(2)
         final AtomicBoolean afterStartFlag = new AtomicBoolean(false)
 
-        final AbstractPooledActor actor = group.actor {
-            afterStartFlag.set true; afterStartBarrier.await()
+        group.actor {
+            afterStartFlag.set true
+            afterStartBarrier.await()
         }
 
         afterStartBarrier.await(30, TimeUnit.SECONDS)

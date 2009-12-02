@@ -23,7 +23,6 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorGroup;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.Actors;
-import groovyx.gpars.actor.impl.AbstractPooledActor;
 import groovyx.gpars.actor.impl.ActorContinuationException;
 import groovyx.gpars.actor.impl.ActorStopException;
 import groovyx.gpars.actor.impl.ActorTerminationException;
@@ -35,11 +34,11 @@ import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
@@ -82,7 +81,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Stores messages ready for processing by the actor. The oldest message is in the head of the list.
-     * Messages are transfered from the inputQueue into the output queue in the transferQueues() method.
+     * Messages are transferred from the inputQueue into the output queue in the transferQueues() method.
      */
     private Node outputQueue;
 
@@ -243,9 +242,9 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     private ActorMessage awaitNextMessage(final long endTime) throws InterruptedException {
         transferQueues();
 
+        waitingThread = Thread.currentThread();
         if (outputQueue != null) return retrieveNextMessage();
 
-        waitingThread = Thread.currentThread();
         if (endTime == 0L) LockSupport.park();
         else LockSupport.parkNanos(endTime - System.nanoTime());
         if (Thread.currentThread().isInterrupted()) {
@@ -255,7 +254,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     }
 
     /**
-     * Takes the next message from the outputQueue, decrements the cuonter and possibly throws control exceptions
+     * Takes the next message from the outputQueue, decrements the counter and possibly throws control exceptions
      *
      * @return The next message
      */
@@ -338,13 +337,13 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         final Node toAdd = new Node(actorMessage);
 
-        final int cnt = countUpdater.getAndIncrement(this);
-
         //noinspection ForLoopWithMissingComponent
         for (; ;) {
             final Node prev = inputQueue;
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
+                final int cnt = countUpdater.getAndIncrement(this);
+
                 if (cnt == 0) {
                     if (flag != S_STOPPED)
                         schedule();
@@ -422,10 +421,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         try {
             doOnTermination();
         } finally {
-            if (!getJoinLatch().isBound()) {
-                //noinspection unchecked
-                getJoinLatch().bind(null);
-            }
+            getJoinLatch().bind(null);
         }
     }
 
@@ -433,16 +429,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Allows subclasses to add behavior to run after actor's termination
      */
     protected void doOnTermination() {
-        //todo unprocessed messages?
     }
 
     private void handleException(final Throwable exception) {
-        try {
-            doOnException(exception);
-        }
-        finally {
-            getJoinLatch().bind(exception);
-        }
+        doOnException(exception);
     }
 
     /**
@@ -455,12 +445,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     private void handleInterrupt(final InterruptedException exception) {
         Thread.interrupted();
-        try {
-            doOnInterrupt(exception);
-        }
-        finally {
-            getJoinLatch().bind(exception);
-        }
+        doOnInterrupt(exception);
     }
 
     /**
@@ -595,27 +580,37 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         code.setResolveStrategy(Closure.DELEGATE_FIRST);
         code.setDelegate(this);
 
-//        if (maxNumberOfParameters > 1) {
-//            this.react(timeout, new MyClosure(code, maxNumberOfParameters, timeout, new ArrayList<MessageStream>()));
-//        } else {
+        if (maxNumberOfParameters > 1) {
+            this.react(timeout, new MultiMessageReaction(code, maxNumberOfParameters, timeout, new ArrayList<MessageStream>()));
+        } else {
             assert reaction == null;
+            assert maxNumberOfParameters <= 1;
 
-            final Reaction reactCode = new Reaction(this, maxNumberOfParameters, code);
+            final Reaction reactCode = new Reaction(this, maxNumberOfParameters==1, code);
             if (timeout >= 0) {
                 reactCode.setTimeout(timeout);
             }
             reaction = reactCode;
             throw CONTINUE;
-//        }
+        }
     }
 
-    class MyClosure extends groovy.lang.Closure implements org.codehaus.groovy.runtime.GeneratedClosure {
+    /**
+     * Enables multiple argument closures to be passed to react().
+     * The MultiMessageReaction class takes just one argument and will wrap the intented closure.
+     * After invoking the MultiMessageReaction will curry the obtained value onto the wrapped multi-argument closure.
+     * The whole process of wrapping a multi-argument closure with MultiMessageReaction class instances is repeated until all arguments
+     * are curried. At that moment the original closure, now woth all arguments curried, gets invoked.
+     *
+     * @author Vaclav Pech
+     */
+    private final class MultiMessageReaction extends groovy.lang.Closure implements org.codehaus.groovy.runtime.GeneratedClosure {
         private final Closure code;
         private final int maxNumberOfParameters;
         private final long timeout;
         private final List<MessageStream> localSenders;
 
-        public MyClosure(final Closure code, final int maxNumberOfParameters, final long timeout, final List<MessageStream> localSenders) {
+        public MultiMessageReaction(final Closure code, final int maxNumberOfParameters, final long timeout, final List<MessageStream> localSenders) {
             super(code.getThisObject());
             this.code = code;
             this.maxNumberOfParameters = maxNumberOfParameters;
@@ -636,9 +631,24 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 SequentialProcessingActor.this.getSenders().clear();
                 SequentialProcessingActor.this.getSenders().addAll(localSenders);
                 InvokerHelper.invokeClosure(code.curry(new Object[]{args}), null);
-            } else SequentialProcessingActor.this.react(timeout, new MyClosure(code.curry(new Object[]{args}), newNumberOfParameters, timeout, localSenders));
+            } else SequentialProcessingActor.this.react(timeout, new MultiMessageReaction(code.curry(new Object[]{args}), newNumberOfParameters, timeout, localSenders));
             return null;
         }
+
+//        for (final ActorMessage message : messages) {
+//            if (message.getPayLoad() == TIMEOUT) {
+//                final List<ActorMessage> saved = new ArrayList<ActorMessage>();
+//                for (final ActorMessage m : messages) {
+//                    if (m != null && m.getPayLoad() != TIMEOUT) {
+//                        saved.add(m);
+//                    }
+//                }
+//                savedBufferedMessages = saved;
+//                throw TIMEOUT;
+//            }
+//        }
+
+
     }
 
     /**
@@ -776,35 +786,13 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
-    void runReaction(final List<ActorMessage> messages, final int maxNumberOfParameters, Closure code) {
-        for (final ActorMessage message : messages) {
-            if (message.getPayLoad() == TIMEOUT) {
-                final List<ActorMessage> saved = new ArrayList<ActorMessage>();
-                for (final ActorMessage m : messages) {
-                    if (m != null && m.getPayLoad() != TIMEOUT) {
-                        saved.add(m);
-                    }
-                }
-                savedBufferedMessages = saved;
-                throw TIMEOUT;
-            }
-        }
+    void runReaction(final ActorMessage message, final Closure code) {
+        assert message != null;
 
-        for (final ActorMessage message : messages) {
-            if (message != null) {
-                getSenders().add(message.getSender());
-                obj2Sender.put(message.getPayLoad(), message.getSender());
-            }
-        }
+        if (message.getPayLoad() == TIMEOUT) throw TIMEOUT;
+        getSenders().add(message.getSender());
+        obj2Sender.put(message.getPayLoad(), message.getSender());
 
-        if (maxNumberOfParameters > 0) {
-            final Object[] args = new Object[messages.size()];
-            for (int i = 0; i < args.length; i++) {
-                final ActorMessage am = messages.get(i);
-                args[i] = am == null ? null : am.getPayLoad();
-            }
-            code = new CurriedClosure(code, args);
-        }
         //noinspection deprecation
         GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
         doLoopCall();
@@ -817,107 +805,42 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *         Date: May 22, 2009
      */
     @SuppressWarnings({"InstanceVariableOfConcreteClass"})
-    private static class Reaction implements Runnable {
-        private final int numberOfExpectedMessages;
-        private final ActorMessage[] messages;
-
-        private boolean timeout = false;
-
+    private static final class Reaction {
+        private final boolean codeNeedsArgument;
+        private AtomicBoolean isReady = new AtomicBoolean(false);
         private final Closure code;
         private final SequentialProcessingActor actor;
-
-        private int currentSize;
 
         /**
          * Creates a new instance.
          *
          * @param actor                    actor
-         * @param numberOfExpectedMessages The number of messages expected by the next continuation
+         * @param codeNeedsArgument Indicates, whether the provided code expects an argument
          * @param code                     code to execute
          */
-        Reaction(final SequentialProcessingActor actor, final int numberOfExpectedMessages, final Closure code) {
+        Reaction(final SequentialProcessingActor actor, final boolean codeNeedsArgument, final Closure code) {
             this.actor = actor;
             this.code = code;
-            this.numberOfExpectedMessages = numberOfExpectedMessages;
-            messages = new ActorMessage[numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages];
-        }
-
-        @SuppressWarnings({"UnusedDeclaration"})
-        Reaction(final AbstractPooledActor actor, final int numberOfExpectedMessages) {
-            this(actor, numberOfExpectedMessages, null);
+            this.codeNeedsArgument = codeNeedsArgument;
         }
 
         /**
-         * Retrieves the current number of messages in the buffer.
-         *
-         * @return The curent buffer size
-         */
-        public int getCurrentSize() {
-            return currentSize;
-        }
-
-        /**
-         * Indicates, whether a timeout message is held in the buffer
-         *
-         * @return True, if a timeout event has been detected.
-         */
-        public boolean isTimeout() {
-            return timeout;
-        }
-
-        /**
-         * Indicates whether the buffer contains all the messages required for the next continuation.
+         * Indicates whether a message or a timeout has arrived.
          *
          * @return True, if the next continuation can start.
          */
-        public boolean isReady() {
-            return timeout || getCurrentSize() == (numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages);
-        }
-
-        /**
-         * Adds a new message to the buffer.
-         *
-         * @param message The message to add.
-         */
-        private void addMessage(final ActorMessage message) {
-            offer(message);
-        }
-
-        /**
-         * Retrieves messages for the next continuation once the MessageHolder is ready.
-         *
-         * @return The messages to pass to the next continuation.
-         */
-        public List<ActorMessage> getMessages() {
-            if (!isReady()) throw new IllegalStateException("Cannot build messages before being in the ready state");
-            return Collections.unmodifiableList(Arrays.asList(messages));
-        }
-
-        /**
-         * Dumps so far stored messages. Useful on timeout to restore the already delivered messages
-         * to the afterStop() handler in the PooledActor's sweepQueue() method..
-         *
-         * @return The messages stored so far.
-         */
-        @SuppressWarnings({"UnusedDeclaration"})
-        List<ActorMessage> dumpMessages() {
-            return Collections.unmodifiableList(Arrays.asList(messages));
-        }
-
-        public void run() {
-            actor.runReaction(Arrays.asList(messages), numberOfExpectedMessages, code);
-        }
+        public boolean isReady() { return isReady.get(); }
 
         public void offer(final ActorMessage actorMessage) {
-            if (TIMEOUT.equals(actorMessage.getPayLoad())) {
-                timeout = true;
-            }
+            final boolean readyFlag = isReady.getAndSet(true);
+            assert !readyFlag;
 
-            messages[currentSize++] = actorMessage;
+            actor.reaction = null;
 
-            if (timeout || currentSize == (numberOfExpectedMessages == 0 ? 1 : numberOfExpectedMessages)) {
-                actor.reaction = null;
-                actor.runReaction(dumpMessages(), numberOfExpectedMessages, code);
+            if (codeNeedsArgument) {
+                actor.runReaction(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
+            } else {
+                actor.runReaction(actorMessage, code);
             }
         }
 
@@ -930,13 +853,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                     }
                 }
             }, timeout);
-        }
-
-        public void checkQueue() {
-            ActorMessage currentMessage;
-            while (!isReady() && (currentMessage = actor.pollMessage()) != null) {
-                offer(currentMessage);
-            }
         }
     }
 }

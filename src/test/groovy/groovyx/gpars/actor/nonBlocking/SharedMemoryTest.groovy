@@ -45,8 +45,8 @@ public class SharedMemoryTest extends GroovyTestCase {
                 if (counter < MAX_COUNTER) actor1.send counter.longValue() * 2
                 else {
                     actor1.stop()
-                    stop()
                     latch.countDown()
+                    terminate()
                 }
                 react {
                     assert it == counter * 2

@@ -63,7 +63,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         assertEquals 9, result
     }
 
-    public void testReactPassedZeroTimeout() {
+    public void _testReactPassedZeroTimeout() {
         CountDownLatch latch = new CountDownLatch(1)
         CyclicBarrier barrier = new CyclicBarrier(2)
         volatile List result = []
@@ -90,7 +90,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         assertEquals([2], result*.payLoad)
     }
 
-    public void testReactPassedNonZeroTimeout() {
+    public void _testReactPassedNonZeroTimeout() {
         CountDownLatch latch = new CountDownLatch(1)
         CyclicBarrier barrier = new CyclicBarrier(2)
         volatile List result = []
