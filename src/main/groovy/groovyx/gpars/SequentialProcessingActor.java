@@ -317,8 +317,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     @Override
     public final MessageStream send(final Object message) {
-        final int flag = stopFlag;
-        if (flag != S_RUNNING) {
+        if (stopFlag != S_RUNNING) {
             //noinspection ObjectEquality
             if (message != terminateMessage && message != stopMessage)
                 throw new IllegalStateException("The actor cannot accept messages at this point.");
@@ -340,7 +339,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 final int cnt = countUpdater.getAndIncrement(this);
 
                 if (cnt == 0) {
-                    assert flag == stopFlag;
                     if (stopFlag != S_STOPPED && stopFlag != S_TERMINATED)
                         schedule();
                 } else {
