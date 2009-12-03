@@ -88,6 +88,7 @@ private final class LFExceptionTestActor extends AbstractPooledActor {
             super.run()
         } catch (RuntimeException e) {
             flag3 = true
+            latch.countDown()
         }
     }
 
@@ -112,7 +113,6 @@ private final class LFExceptionTestActor extends AbstractPooledActor {
 
     public def afterStop(messages) {
         flag2 = true
-        latch.countDown()
     }
 
 }
