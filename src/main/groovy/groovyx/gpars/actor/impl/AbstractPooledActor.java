@@ -319,9 +319,10 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      */
     final List sweepQueue() {
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
-        if (savedBufferedMessages != null && !savedBufferedMessages.isEmpty()) {
-            messages.addAll(savedBufferedMessages);
-        }
+        //todo remove
+//        if (savedBufferedMessages != null && !savedBufferedMessages.isEmpty()) {
+//            messages.addAll(savedBufferedMessages);
+//        }
         ActorMessage message = pollMessage();
         while (message != null) {
             Object list = InvokerHelper.invokeMethod(message.getPayLoad(), "respondsTo", new Object[]{"onDeliveryError"});

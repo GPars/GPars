@@ -67,7 +67,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * A copy of buffer in case of timeout.
      */
-    protected List<ActorMessage> savedBufferedMessages;
+    //todo remove
+//    protected List<ActorMessage> savedBufferedMessages;
 
     /**
      * Code for the next action
@@ -410,10 +411,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     private void handleTermination() {
         Thread.interrupted();
-
-        assert stopFlag != S_STOPPED;
-        assert stopFlag != S_TERMINATED;
-                
         if (stopFlag == S_STOPPING)
             stopFlag = S_STOPPED;
         else if (stopFlag == S_TERMINATING)
@@ -669,6 +666,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     @SuppressWarnings({"ThrowCaughtLocally"})
     public void run() {
+        boolean shouldTerminate = false;
         try {
             assert currentThread == null;
 
@@ -707,22 +705,37 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             }
         } catch (ActorContinuationException continuation) {//
         } catch (ActorTerminationException termination) {
+            shouldTerminate = true;
             handleTermination();
         } catch (ActorStopException termination) {
-            handleTermination();
+            assert stopFlag != S_STOPPED;
+            assert stopFlag != S_TERMINATED;
+
+            shouldTerminate = true;
         } catch (ActorTimeoutException timeout) {
+            shouldTerminate = true;
+            assert stopFlag != S_STOPPED;
+            assert stopFlag != S_TERMINATED;
+
             stopFlag = S_TERMINATING;
             handleTimeout();
-            handleTermination();
         } catch (InterruptedException e) {
+            shouldTerminate = true;
+            assert stopFlag != S_STOPPED;
+            assert stopFlag != S_TERMINATED;
+
             stopFlag = S_TERMINATING;
             handleInterrupt(e);
-            handleTermination();
         } catch (Throwable e) {
+            shouldTerminate = true;
+            assert stopFlag != S_STOPPED;
+            assert stopFlag != S_TERMINATED;
+
             stopFlag = S_TERMINATING;
             handleException(e);
-            handleTermination();
         } finally {
+            if (shouldTerminate) handleTermination();
+
             Thread.interrupted();
             deregisterCurrentActorWithThread();
 
