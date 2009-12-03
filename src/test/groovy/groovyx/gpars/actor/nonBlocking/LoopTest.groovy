@@ -67,7 +67,7 @@ public class LoopTest extends GroovyTestCase {
             barrier.await()
             assertEquals it, counter.intValue()
         }
-        actor.stop()
+        actor.stop().join()
     }
 
     public void testLoopStop() {
@@ -148,9 +148,8 @@ public class LoopTest extends GroovyTestCase {
         actor.metaClass { onInterrupt = {} }
 
         actor.send 'message'
-        actor.stop()
+        actor.terminate().join()
 
-        Thread.sleep 1000
         assertEquals 0, counter.intValue()
     }
 }

@@ -689,6 +689,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 assert stopFlag != S_TERMINATED;
 
                 stopFlag = S_TERMINATING;
+                //noinspection ThrowableInstanceNeverThrown
                 handleInterrupt(new InterruptedException("Interruption of the actor thread detected."));
             }
 

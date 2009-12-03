@@ -57,6 +57,7 @@ public class SharedMemoryTest extends GroovyTestCase {
 
 
         latch.await()
+        [actor1, actor2]*.join()
         group.shutdown()
         assertEquals MAX_COUNTER, counter
     }
