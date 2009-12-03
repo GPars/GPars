@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 /**
  * An internal representation of received messages holding both the original message plus the sender actor reference.
- * This class is not intented to be use directly by users.
+ * This class is not intended to be use directly by users.
  *
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Feb 27, 2009

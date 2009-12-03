@@ -47,7 +47,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
     private TaskBarrier taskBarrier;
 
     /**
-     * A berrier to synchronize with the child workers on
+     * A barrier to synchronize with the child workers on
      */
     private final TaskBarrier childTaskBarrier = new TaskBarrier(1);
 
@@ -89,7 +89,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
 
     /**
      * Blocks until all children finish their calculations, releasing the physical thread temporarily to the thread pool
-     * to do some work stealing. It is not ususaly necesary to call the awaitChildren() method directly
+     * to do some work stealing. It is not ususally necessary to call the awaitChildren() method directly
      * since the getChildrenResults() method calls it itself before returning the children results. 
      */
     protected final void awaitChildren() {

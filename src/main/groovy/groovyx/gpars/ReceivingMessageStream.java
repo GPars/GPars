@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 public abstract class ReceivingMessageStream extends MessageStream {
     /**
-     * A list of senders for the currently procesed messages
+     * A list of senders for the currently processed messages
      */
     private final List<MessageStream> senders = new ArrayList<MessageStream>();
 

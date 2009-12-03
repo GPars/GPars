@@ -129,7 +129,7 @@ public abstract class MessageStream extends WithSerialId {
      * @param message  message to send
      * @param duration timeout
      * @return The message that came in reply to the original send.
-     * @throws InterruptedException if interrupted while waioting
+     * @throws InterruptedException if interrupted while waiting
      */
     public final <T> Object sendAndWait(final T message, final Duration duration) throws InterruptedException {
         return sendAndWait(message, duration.toMilliseconds(), TimeUnit.MILLISECONDS);
@@ -230,7 +230,7 @@ public abstract class MessageStream extends WithSerialId {
         }
 
         /**
-         * Handle cases when the message sent to the actor doesn't get deliverred
+         * Handle cases when the message sent to the actor doesn't get delivered
          */
         public void onDeliveryError() {
             send(new IllegalStateException("Delivery error. Maybe target actor is not active"));
