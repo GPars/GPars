@@ -47,8 +47,6 @@ public class LocalNode {
 
     private final Actor mainActor;
 
-    private final ActorGroup actorGroup;
-
     private final UUID id = UUID.randomUUID();
 
     private LocalHost localHost;
@@ -85,7 +83,7 @@ public class LocalNode {
                     }
                 });
 
-        actorGroup = new PooledActorGroup(new DefaultPool(scheduler));
+        ActorGroup actorGroup=new PooledActorGroup(new DefaultPool(scheduler));
 
         if (runnable != null) {
             if (runnable instanceof Closure) {

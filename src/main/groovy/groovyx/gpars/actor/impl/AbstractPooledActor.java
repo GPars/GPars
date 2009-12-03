@@ -341,14 +341,13 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     /**
      * Set on stop handler for this actor
      *
-     * @param onStop
+     * @param onStop The code to invoke when stopping
      */
-    public void onStop(Closure onStop) {
+    public final void onStop(final Closure onStop) {
         if (onStop != null) {
-            onStop = (Closure) onStop.clone();
-            onStop.setDelegate(this);
-            onStop.setResolveStrategy(Closure.DELEGATE_FIRST);
-            this.onStop = onStop;
+            this.onStop = (Closure) onStop.clone();
+            this.onStop.setDelegate(this);
+            this.onStop.setResolveStrategy(Closure.DELEGATE_FIRST);
         }
     }
 
