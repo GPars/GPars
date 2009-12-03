@@ -722,13 +722,15 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             handleException(e);
         } finally {
             Thread.interrupted();
-            if (shouldTerminate) handleTermination();
-            deregisterCurrentActorWithThread();
-
-            currentThread = null;
-            final int cnt = countUpdater.decrementAndGet(this);
-            if (cnt > 0 && isActive()) {
-                schedule();
+            try {
+                if (shouldTerminate) handleTermination();
+            } finally {
+                deregisterCurrentActorWithThread();
+                currentThread = null;
+                final int cnt = countUpdater.decrementAndGet(this);
+                if (cnt > 0 && isActive()) {
+                    schedule();
+                }
             }
         }
     }
