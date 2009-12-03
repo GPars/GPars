@@ -2351,11 +2351,6 @@
         <inspection_tool class="NotifyWithoutCorrespondingWait" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NumericToString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ObjectAllocationIgnoredJS" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="ObjectEquality" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_ignoreEnums" value="true" />
-          <option name="m_ignoreClassObjects" value="false" />
-          <option name="m_ignorePrivateConstructors" value="false" />
-        </inspection_tool>
         <inspection_tool class="ObjectNotify" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ObjectToString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ObsoleteCollection" enabled="true" level="WARNING" enabled_by_default="true">
@@ -2416,7 +2411,6 @@
         </inspection_tool>
         <inspection_tool class="PlatformDetectionJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="PointlessIndexOfComparison" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="ProtectedField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ProtectedInnerClass" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreEnums" value="false" />
         </inspection_tool>
@@ -2982,8 +2976,8 @@
         <inspection_tool class="WaitWithoutCorrespondingNotify" enabled="true" level="WARNING" enabled_by_default="true" />
       </profile>
     </profiles>
-    <option name="PROJECT_PROFILE" />
-    <option name="USE_PROJECT_PROFILE" value="false" />
+    <option name="PROJECT_PROFILE" value="ServerInspections" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="TYPO" />
@@ -3144,7 +3138,18 @@
   </component>
   <component name="ProjectDictionaryState">
     <dictionary name="dierkkonig" />
-    <dictionary name="vaclav" />
+    <dictionary name="vaclav">
+      <words>
+        <w>async</w>
+        <w>dataflow</w>
+        <w>deregister</w>
+        <w>deregisters</w>
+        <w>deserialization</w>
+        <w>nano</w>
+        <w>pech</w>
+        <w>throwable</w>
+      </words>
+    </dictionary>
   </component>
   <component name="ProjectKey">
     <option name="state" value="https://gparallelizer.googlecode.com/svn/trunk/Parallelizer_IDEA9.ipr" />

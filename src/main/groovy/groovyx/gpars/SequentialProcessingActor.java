@@ -70,7 +70,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     private volatile Reaction reaction;
 
     /**
-     * Stored incoming messages. The most recetly received message is in the head of the list.
+     * Stored incoming messages. The most recently received message is in the head of the list.
      */
     private volatile Node inputQueue;
 
@@ -106,10 +106,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     protected static final int S_RUNNING = S_ACTIVE_MASK;
 
     protected static final int S_STOPPING = S_STOP_TERMINATE_MASK | S_FINISHING_MASK | S_ACTIVE_MASK;
-    protected static final int S_TERMINATING = 0 | S_FINISHING_MASK | S_ACTIVE_MASK;
+    protected static final int S_TERMINATING = S_FINISHING_MASK | S_ACTIVE_MASK;
 
     protected static final int S_STOPPED = S_STOP_TERMINATE_MASK | S_FINISHED_MASK;
-    protected static final int S_TERMINATED = 0 | S_FINISHED_MASK;
+    protected static final int S_TERMINATED = S_FINISHED_MASK;
 
     /**
      * Indicates whether the actor should terminate
@@ -319,6 +319,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     public final MessageStream send(final Object message) {
         final int flag = stopFlag;
         if (flag != S_RUNNING) {
+            //noinspection ObjectEquality
             if (message != terminateMessage && message != stopMessage)
                 throw new IllegalStateException("The actor cannot accept messages at this point.");
         }
@@ -332,16 +333,15 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         final Node toAdd = new Node(actorMessage);
 
-        //noinspection ForLoopWithMissingComponent
-        for (; ;) {
+        while (true) {
             final Node prev = inputQueue;
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
                 final int cnt = countUpdater.getAndIncrement(this);
 
                 if (cnt == 0) {
-                    assert (flag == stopFlag);
-                    if ((flag != S_STOPPED) && (flag != S_TERMINATED))
+                    assert flag == stopFlag;
+                    if (stopFlag != S_STOPPED && stopFlag != S_TERMINATED)
                         schedule();
                 } else {
                     final Thread w = waitingThread;
@@ -391,8 +391,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Allows subclasses to add behavior to run after actor's start
      */
-    protected void doOnStart() {
-    }
+    protected abstract void doOnStart();
 
     private void handleTimeout() {
         doOnTimeout();
@@ -401,8 +400,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Allows subclasses to add behavior to run after actor's timeout
      */
-    protected void doOnTimeout() {
-    }
+    protected abstract void doOnTimeout();
 
     private void handleTermination() {
         if (stopFlag == S_STOPPING)
@@ -410,6 +408,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         else if (stopFlag == S_TERMINATING)
             stopFlag = S_TERMINATED;
         else
+            //noinspection ArithmeticOnVolatileField
             throw new IllegalStateException("Messed up actors state detected when terminating: " + stopFlag);
 
         try {
@@ -422,8 +421,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Allows subclasses to add behavior to run after actor's termination
      */
-    protected void doOnTermination() {
-    }
+    protected abstract void doOnTermination();
 
     private void handleException(final Throwable exception) {
         doOnException(exception);
@@ -434,8 +432,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @param exception The exception that was fired
      */
-    protected void doOnException(final Throwable exception) {
-    }
+    protected abstract void doOnException(final Throwable exception);
 
     private void handleInterrupt(final InterruptedException exception) {
         Thread.interrupted();
@@ -489,8 +486,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     @Override
     public final Actor terminate() {
-        //noinspection ForLoopWithMissingComponent
-        for (; ;) {
+        while (true) {
             final int flag = stopFlag;
             if ((flag & S_FINISHED_MASK) != 0 || flag == S_TERMINATING)
                 break;
@@ -834,6 +830,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
          *
          * @return True, if the next continuation can start.
          */
+        @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
         public boolean isReady() { return isReady.get(); }
 
         public void offer(final ActorMessage actorMessage) {
