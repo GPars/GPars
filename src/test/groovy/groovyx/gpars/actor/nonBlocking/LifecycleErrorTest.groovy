@@ -35,7 +35,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
 
 
     public void testOnException() {
-        final LFExceptionTestActor actor = new LFExceptionTestActor({react { throw new RuntimeException('Firing off a lifecycle method exception test')}})
+        final LFExceptionTestActor actor = new LFExceptionTestActor({->react { throw new LFErrorTestException('Firing off a lifecycle method exception test')}})
         actor.start()
         actor << 1
 
@@ -46,7 +46,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
     }
 
     public void testOnInterrupt() {
-        final LFExceptionTestActor actor = new LFExceptionTestActor({react { Thread.currentThread().interrupt()}})
+        final LFExceptionTestActor actor = new LFExceptionTestActor({->react { Thread.currentThread().interrupt();Thread.sleep(10)}})
         actor.start()
         actor << 1
 
@@ -56,8 +56,56 @@ public class LifecycleErrorTest extends GroovyTestCase {
         assert actor.flag3
     }
 
+    public void testOnInterruptWithReact() {
+        final LFExceptionTestActor actor = new LFExceptionTestActor({->
+            react {
+                Thread.currentThread().interrupt();
+                react {}
+            }
+        })
+        actor.start()
+        actor << 1
+
+        actor.latch.await()
+        assert actor.flag1
+        assert actor.flag2
+        assert actor.flag3
+    }
+
+    public void testOnInterruptWithLoop() {
+        final LFExceptionTestActor actor = new LFExceptionTestActor({->
+            loop {
+                react {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        })
+        actor.start()
+        actor << 1
+
+        actor.latch.await()
+        assert actor.flag1
+        assert actor.flag2
+        assert actor.flag3
+    }
+
+    public void testOnSilentInterrupt() {
+        final LFExceptionTestActor actor = new LFExceptionTestActor({->
+            react {
+                Thread.currentThread().interrupt();
+            }
+        })
+        actor.start()
+        actor << 1
+
+        actor.silentLatch.await()
+        assertFalse actor.flag1
+        assert actor.flag2
+        assertFalse actor.flag3
+    }
+
     public void testOnTimeout() {
-        final LFExceptionTestActor actor = new LFExceptionTestActor({
+        final LFExceptionTestActor actor = new LFExceptionTestActor({->
             react {
                     react(1, TimeUnit.MILLISECONDS){}
             }
@@ -77,16 +125,18 @@ private final class LFExceptionTestActor extends AbstractPooledActor {
     volatile boolean flag2 = false
     volatile boolean flag3 = false
     CountDownLatch latch = new CountDownLatch(1)
-    private final Closure code
+    CountDownLatch silentLatch = new CountDownLatch(1)
+    private volatile Closure code
 
     def LFExceptionTestActor(Closure code) {
         this.code = code
+        this.code.delegate = this
     }
 
     def void run() {
         try {
             super.run()
-        } catch (RuntimeException e) {
+        } catch (LFErrorTestException e) {
             flag3 = true
             latch.countDown()
         }
@@ -97,22 +147,29 @@ private final class LFExceptionTestActor extends AbstractPooledActor {
     }
 
     public def onException(e) {
-        flag1 = true
-        throw new RuntimeException('Testing exceptions in lifecycle methods - onException')
+        if (e instanceof LFErrorTestException) flag1 = true
+        throw new LFErrorTestException('Testing exceptions in lifecycle methods - onException')
     }
 
     public def onInterrupt(e) {
-        flag1 = true
-        throw new RuntimeException('Testing exceptions in lifecycle methods - onInterrupt')
+        if (e instanceof InterruptedException) flag1 = true
+        throw new LFErrorTestException('Testing exceptions in lifecycle methods - onInterrupt')
     }
 
     public def onTimeout() {
         flag1 = true
-        throw new RuntimeException('Testing exceptions in lifecycle methods - onTimeout')
+        throw new LFErrorTestException('Testing exceptions in lifecycle methods - onTimeout')
     }
 
     public def afterStop(messages) {
         flag2 = true
+        silentLatch.countDown()
     }
+}
 
+private final class LFErrorTestException extends RuntimeException {
+
+    def LFErrorTestException(message) {
+        super(message);
+    }
 }

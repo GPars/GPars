@@ -678,11 +678,20 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 }
 
                 throw new IllegalStateException("Unexpected message " + toProcess);
+            } catch (GroovyRuntimeException gre) {
+                    throw ScriptBytecodeAdapter.unwrap(gre);
             }
-            catch (GroovyRuntimeException gre) {
-                throw ScriptBytecodeAdapter.unwrap(gre);
+            
+        } catch (ActorContinuationException continuation) {
+            if (Thread.currentThread().isInterrupted()) {
+                shouldTerminate = true;
+                assert stopFlag != S_STOPPED;
+                assert stopFlag != S_TERMINATED;
+
+                stopFlag = S_TERMINATING;
+                handleInterrupt(new InterruptedException("Interruption of the actor thread detected."));
             }
-        } catch (ActorContinuationException continuation) {//
+
         } catch (ActorTerminationException termination) {
             shouldTerminate = true;
         } catch (ActorStopException termination) {
