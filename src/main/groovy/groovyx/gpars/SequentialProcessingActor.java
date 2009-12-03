@@ -65,12 +65,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     protected Runnable loopCode;
 
     /**
-     * A copy of buffer in case of timeout.
-     */
-    //todo remove
-//    protected List<ActorMessage> savedBufferedMessages;
-
-    /**
      * Code for the next action
      */
     private volatile Reaction reaction;
@@ -346,7 +340,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 final int cnt = countUpdater.getAndIncrement(this);
 
                 if (cnt == 0) {
-                    if (flag != S_STOPPED)
+                    assert (flag == stopFlag);
+                    if ((flag != S_STOPPED) && (flag != S_TERMINATED))
                         schedule();
                 } else {
                     final Thread w = waitingThread;
@@ -410,7 +405,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     }
 
     private void handleTermination() {
-        Thread.interrupted();
         if (stopFlag == S_STOPPING)
             stopFlag = S_STOPPED;
         else if (stopFlag == S_TERMINATING)
@@ -634,21 +628,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             } else SequentialProcessingActor.this.react(timeout, new MultiMessageReaction(code.curry(new Object[]{args}), newNumberOfParameters, timeout, localSenders));
             return null;
         }
-
-//        for (final ActorMessage message : messages) {
-//            if (message.getPayLoad() == TIMEOUT) {
-//                final List<ActorMessage> saved = new ArrayList<ActorMessage>();
-//                for (final ActorMessage m : messages) {
-//                    if (m != null && m.getPayLoad() != TIMEOUT) {
-//                        saved.add(m);
-//                    }
-//                }
-//                savedBufferedMessages = saved;
-//                throw TIMEOUT;
-//            }
-//        }
-
-
     }
 
     /**
@@ -706,7 +685,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         } catch (ActorContinuationException continuation) {//
         } catch (ActorTerminationException termination) {
             shouldTerminate = true;
-            handleTermination();
         } catch (ActorStopException termination) {
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
@@ -734,9 +712,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             stopFlag = S_TERMINATING;
             handleException(e);
         } finally {
-            if (shouldTerminate) handleTermination();
-
             Thread.interrupted();
+            if (shouldTerminate) handleTermination();
             deregisterCurrentActorWithThread();
 
             currentThread = null;

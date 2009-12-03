@@ -77,7 +77,7 @@ private final class LFExceptionTestActor extends AbstractPooledActor {
     volatile boolean flag2 = false
     volatile boolean flag3 = false
     CountDownLatch latch = new CountDownLatch(1)
-    private Closure code
+    private final Closure code
 
     def LFExceptionTestActor(Closure code) {
         this.code = code
