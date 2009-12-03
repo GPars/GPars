@@ -59,7 +59,7 @@ public class LifecycleTest extends GroovyTestCase {
         assert actor.isActive()
         barrier.await()
         assertEquals 1, counter.intValue()
-        Thread.sleep 500
+        actor.join()
         assertFalse actor.isActive()
     }
 
@@ -108,9 +108,8 @@ public class LifecycleTest extends GroovyTestCase {
         }
 
         actor.send('message')
-        actor.stop()
+        actor.stop().join()
 
-        Thread.sleep 3000
         assertEquals 1, counter.intValue()
 
         shouldFail(IllegalStateException) {
@@ -133,9 +132,8 @@ public class LifecycleTest extends GroovyTestCase {
         }
 
         actor.send('message')
-        actor.terminate()
+        actor.terminate().join()
   
-        Thread.sleep 1000
         assertEquals 0, counter.intValue()
 
         shouldFail(IllegalStateException) {
@@ -195,7 +193,7 @@ public class LifecycleTest extends GroovyTestCase {
         assertEquals 1, counter.intValue()
         Thread.sleep 500
 
-        actor.terminate()
+        actor.terminate().join()
 
         latch.await(30, TimeUnit.SECONDS)
         assertFalse actor.isActive()
@@ -231,7 +229,7 @@ public class LifecycleTest extends GroovyTestCase {
         barrier.await()
         assert actor.isActive()
         Thread.sleep 500
-        actor.terminate()
+        actor.terminate().join()
 
         latch.await(30, TimeUnit.SECONDS)
         assertEquals 0, counter.intValue()
@@ -253,6 +251,7 @@ public class LifecycleTest extends GroovyTestCase {
 
         a2.terminate()
         a3.terminate()
+        [a1, a2, a3]*.join()
     }
     
     public void testAfterStart() {
@@ -349,7 +348,7 @@ public class LifecycleTest extends GroovyTestCase {
         assert actor.isActive()
         barrier.await()
         assertEquals 1, counter.intValue()
-        Thread.sleep 500
+        actor.join()
         assertFalse actor.isActive()
 
         shouldFail(IllegalStateException) {
@@ -371,7 +370,7 @@ public class LifecycleTest extends GroovyTestCase {
 
         assert actor.isActive()
         barrier.await()
-        Thread.sleep 500
+        actor.join()
         assertFalse actor.isActive()
     }
 
