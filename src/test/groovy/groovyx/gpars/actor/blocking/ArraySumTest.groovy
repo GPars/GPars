@@ -46,14 +46,14 @@ public class ArraySumTest extends GroovyTestCase {
             stop()
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 15, result
     }
 
     public void testArraySummary() {
         final ArrayCalculator calculator = new ArrayCalculator([1, 2, 3, 4, 5], group).start()
 
-        calculator.latch.await(30, TimeUnit.SECONDS)
+        calculator.latch.await(90, TimeUnit.SECONDS)
         assertEquals 15, calculator.result
     }
 }

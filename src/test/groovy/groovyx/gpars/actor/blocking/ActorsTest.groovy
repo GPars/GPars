@@ -43,7 +43,7 @@ public class ActorsTest extends GroovyTestCase {
             }
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 3, counter.intValue()
     }
 
@@ -60,7 +60,7 @@ public class ActorsTest extends GroovyTestCase {
             flag.set(true)
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assert flag.get()
     }
 
@@ -78,7 +78,7 @@ public class ActorsTest extends GroovyTestCase {
             throw new RuntimeException('test')
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assert flag.get()
     }
 }

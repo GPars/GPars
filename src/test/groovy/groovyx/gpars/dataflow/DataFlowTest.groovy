@@ -43,7 +43,7 @@ public class DataFlowTest extends GroovyTestCase {
             y << 2
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 42, result
     }
 
@@ -74,7 +74,7 @@ public class DataFlowTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals([0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45], result)
     }
 
@@ -98,7 +98,7 @@ public class DataFlowTest extends GroovyTestCase {
         start {x << 40}
         start {y << 2}
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 42, result
     }
 
@@ -125,7 +125,7 @@ public class DataFlowTest extends GroovyTestCase {
             df.y = 2
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 42, result
     }
 }

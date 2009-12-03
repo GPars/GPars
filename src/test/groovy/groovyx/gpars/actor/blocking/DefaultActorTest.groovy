@@ -30,7 +30,7 @@ public class DefaultActorTest extends GroovyTestCase {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
         actor.send "Message"
-        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
+        actor.receiveCallsOutstanding.await(90, TimeUnit.SECONDS)
         assert actor.receiveWasCalled.get()
     }
 
@@ -38,7 +38,7 @@ public class DefaultActorTest extends GroovyTestCase {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
         actor << ''
-        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
+        actor.receiveCallsOutstanding.await(90, TimeUnit.SECONDS)
 
         assert actor.threadName.startsWith("Actor Thread ")
         actor.stop()

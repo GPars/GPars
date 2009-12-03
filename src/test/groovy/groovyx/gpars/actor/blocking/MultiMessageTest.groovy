@@ -40,7 +40,7 @@ public class MultiMessageTest extends GroovyTestCase {
         actor.send 3
         actor.send 4
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 9, result
     }
 
@@ -57,7 +57,7 @@ public class MultiMessageTest extends GroovyTestCase {
 
         actor.send 2
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 1, result
     }
 
@@ -74,7 +74,7 @@ public class MultiMessageTest extends GroovyTestCase {
 
         actor.send 2
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 1, result
     }
 
@@ -93,7 +93,7 @@ public class MultiMessageTest extends GroovyTestCase {
         actor.send 3
         actor.send 4
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 27, result
     }
 
@@ -115,7 +115,7 @@ public class MultiMessageTest extends GroovyTestCase {
         createReplyActor actor, 100, barrier, latch, result, group
         createReplyActor actor, 1000, barrier, latch, result, group
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
 
         assertEquals 1113, result.get()
     }
@@ -136,7 +136,7 @@ public class MultiMessageTest extends GroovyTestCase {
         createReplyActor actor, 100, barrier, latch, result, group
         createReplyActor actor, 1000, barrier, latch, result, group
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
 
         assertEquals 60, result.get()
     }

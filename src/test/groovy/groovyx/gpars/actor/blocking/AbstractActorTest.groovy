@@ -78,7 +78,7 @@ public class AbstractActorTest extends GroovyTestCase {
                 }] as AbstractPooledActor
 
         actor.start()
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assert flag.get()
         actor.stop()
     }
@@ -98,7 +98,7 @@ public class AbstractActorTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assert flag.get()
         assert receiveFlag.get()
         assertNull result.get()
@@ -107,10 +107,10 @@ public class AbstractActorTest extends GroovyTestCase {
     public void testInterruption() {
         final InterruptionTestActor actor = new InterruptionTestActor()
         actor.start()
-        actor.startLatch.await(30, TimeUnit.SECONDS)
+        actor.startLatch.await(90, TimeUnit.SECONDS)
         actor.terminate()
 
-        actor.stopLatch.await(30, TimeUnit.SECONDS)
+        actor.stopLatch.await(90, TimeUnit.SECONDS)
         assert actor.afterStopFlag.get()
         assert !actor.proceedFlag.get()
         assert actor.deliveredMessages.isEmpty()
@@ -121,13 +121,13 @@ public class AbstractActorTest extends GroovyTestCase {
         final AfterStopTestActor actor = new AfterStopTestActor()
         actor.start()
         actor.send('Message 1')
-        actor.startLatch.await(30, TimeUnit.SECONDS)
+        actor.startLatch.await(90, TimeUnit.SECONDS)
         actor.send('Message 2')
         actor.send('Message 3')
 
         actor.terminate()
 
-        actor.stopLatch.await(30, TimeUnit.SECONDS)
+        actor.stopLatch.await(90, TimeUnit.SECONDS)
         assert actor.afterStopFlag.get()
         assert !actor.proceedFlag.get()
         assert actor.deliveredMessages.contains('Message 1')
@@ -177,7 +177,7 @@ class AfterStopTestActor extends AbstractPooledActor {
         deliveredMessages.add(message1)
         startLatch.countDown()
 
-        receiveLatchLatch.await(30, TimeUnit.SECONDS)  //never opens, throws InterruptedException instead
+        receiveLatchLatch.await(90, TimeUnit.SECONDS)  //never opens, throws InterruptedException instead
 
         proceedFlag.set(true)  //should never reach this line
     }

@@ -37,7 +37,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 3
         actor.send 4
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 9, result
     }
 
@@ -59,7 +59,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 4
         barrier.await()
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 9, result
     }
 
@@ -80,7 +80,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
 
         actor.send 2
         barrier.await()
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals([2, null, null], result)
     }
 
@@ -101,7 +101,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
 
         actor.send 2
         barrier.await()
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals([2, null, null], result)
     }
 
@@ -124,7 +124,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 3
         actor.send 4
         barrier.await()
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals([2, 3, 4], result)
     }
 
@@ -141,7 +141,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
 
         actor.send 2
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 1, result
     }
 
@@ -161,7 +161,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 2
         barrier.await()
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 1, result
     }
 
@@ -177,7 +177,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         }
 
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 1, result
     }
 
@@ -194,7 +194,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
 
         actor.send 2
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 1, result
     }
 
@@ -213,7 +213,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 3
         actor.send 4
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 27, result
     }
 }

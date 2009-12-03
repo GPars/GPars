@@ -58,10 +58,10 @@ public class MixinTest extends GroovyTestCase {
 
         company.start()
         company.send("Message")
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         company.stop()
         assertEquals('Message', result)
-        stopLatch.await(30, TimeUnit.SECONDS)
+        stopLatch.await(90, TimeUnit.SECONDS)
         assert stopFlag.get()
     }
 
@@ -90,10 +90,10 @@ public class MixinTest extends GroovyTestCase {
 
         corp.start()
         corp.send("Message")
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         corp.stop()
         assertEquals('Message', result)
-        stopLatch.await(30, TimeUnit.SECONDS)
+        stopLatch.await(90, TimeUnit.SECONDS)
         assert stopFlag.get()
     }
 }
