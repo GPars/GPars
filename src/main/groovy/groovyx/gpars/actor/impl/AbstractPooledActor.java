@@ -123,7 +123,13 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings({"ThrowCaughtLocally", "UnqualifiedStaticUsage"})
 public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
-    private Closure onStop;
+    private volatile Closure onStop = null;
+    private static final String THE_ACTOR_HASN_T_BEEN_STARTED = "The actor hasn't been started.";
+    private static final String THE_ACTOR_HAS_BEEN_STOPPED = "The actor has been stopped.";
+    private static final String RESPONDS_TO = "respondsTo";
+    private static final String ON_DELIVERY_ERROR = "onDeliveryError";
+    private static final Object[] EMPTY_ARGUMENTS = new Object[0];
+    private static final String AFTER_START = "afterStart";
 
     protected AbstractPooledActor() {
     }
@@ -147,7 +153,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param messages List of ActorMessage wrapping the sender actor, who we need to be able to respond to,
      *                 plus the original message
      */
-    private void enhanceReplies(final List<ActorMessage> messages) {
+    private void enhanceReplies(final Iterable<ActorMessage> messages) {
         final List<MessageStream> senders = getSenders();
         senders.clear();
         for (final ActorMessage message : messages) {
@@ -167,11 +173,11 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     @Override
     protected final Object receiveImpl() throws InterruptedException {
         if (stopFlag == S_NOT_STARTED) {
-            throw new IllegalStateException("The actor hasn't been started.");
+            throw new IllegalStateException(THE_ACTOR_HASN_T_BEEN_STARTED);
         }
 
         if (stopFlag == S_STOPPED) {
-            throw new IllegalStateException("The actor has been stopped.");
+            throw new IllegalStateException(THE_ACTOR_HAS_BEEN_STOPPED);
         }
 
         final ActorMessage message = takeMessage();
@@ -186,20 +192,21 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      *
      * @param timeout  how long to wait before giving up, in units of unit
-     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
+     * @param units a TimeUnit determining how to interpret the timeout parameter
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
-    protected final Object receiveImpl(final long timeout, final TimeUnit timeUnit) throws InterruptedException {
+    @Override
+    protected final Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
         if (stopFlag == S_NOT_STARTED) {
-            throw new IllegalStateException("The actor hasn't been started.");
+            throw new IllegalStateException(THE_ACTOR_HASN_T_BEEN_STARTED);
         }
 
         if (stopFlag == S_STOPPED) {
-            throw new IllegalStateException("The actor has been stopped.");
+            throw new IllegalStateException(THE_ACTOR_HAS_BEEN_STOPPED);
         }
 
-        final ActorMessage message = takeMessage(timeout, timeUnit);
+        final ActorMessage message = takeMessage(timeout, units);
         enhanceReplies(Arrays.asList(message));
         if (message == null) {
             return null;
@@ -214,6 +221,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param handler A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
+    @SuppressWarnings({"MethodOverloadsMethodOfSuperclass"})
     protected final void receive(final Closure handler) throws InterruptedException {
         handler.setResolveStrategy(Closure.DELEGATE_FIRST);
         handler.setDelegate(this);
@@ -222,10 +230,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
         final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
 
-        for (int i = 0; i != toReceive; ++i) {
-            checkStopTerminate();
-            messages.add(takeMessage());
-        }
+        collectRequiredMessages(messages, toReceive);
         enhanceReplies(messages);
 
         try {
@@ -241,6 +246,13 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
         } finally {
             getSenders().clear();
+        }
+    }
+
+    private void collectRequiredMessages(final Collection<ActorMessage> messages, final int toReceive) throws InterruptedException {
+        for (int i = 0; i != toReceive; ++i) {
+            checkStopTerminate();
+            messages.add(takeMessage());
         }
     }
 
@@ -270,15 +282,14 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
                 messages.add(null);
             } else {
                 if (stopFlag != S_RUNNING) {
-                    throw new IllegalStateException("The actor hasn't been started.");
+                    throw new IllegalStateException(THE_ACTOR_HASN_T_BEEN_STARTED);
                 }
                 final ActorMessage message =
-                        takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0), TimeUnit.MILLISECONDS);
+                        takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0L), TimeUnit.MILLISECONDS);
                 nullAppeared = message == null;
                 messages.add(message);
             }
         }
-
 
         try {
             enhanceReplies(messages);
@@ -286,17 +297,22 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
             if (maxNumberOfParameters == 0) {
                 handler.call();
             } else {
-                final Object[] args = new Object[messages.size()];
-                for (int i = 0; i < args.length; i++) {
-                    final ActorMessage am = messages.get(i);
-                    args[i] = am == null ? am : am.getPayLoad();
-                }
+                final Object[] args = retrievePayloadOfMessages(messages);
                 handler.call(args);
             }
         }
         finally {
             getSenders().clear();
         }
+    }
+
+    private static Object[] retrievePayloadOfMessages(final List<ActorMessage> messages) {
+        final Object[] args = new Object[messages.size()];
+        for (int i = 0; i < args.length; i++) {
+            final ActorMessage am = messages.get(i);
+            args[i] = am == null ? am : am.getPayLoad();
+        }
+        return args;
     }
 
     /**
@@ -308,6 +324,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param handler  A closure accepting the retrieved message as a parameter, which will be invoked after a message is received.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
+    @SuppressWarnings({"MethodOverloadsMethodOfSuperclass", "TypeMayBeWeakened"})
     protected final void receive(final Duration duration, final Closure handler) throws InterruptedException {
         receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler);
     }
@@ -322,13 +339,13 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
         ActorMessage message = pollMessage();
         while (message != null) {
-            Object list = InvokerHelper.invokeMethod(message.getPayLoad(), "respondsTo", new Object[]{"onDeliveryError"});
+            Object list = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
             if (list != null && !((Collection) list).isEmpty()) {
-                InvokerHelper.invokeMethod(message.getPayLoad(), "onDeliveryError", new Object[0]);
+                InvokerHelper.invokeMethod(message.getPayLoad(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
             } else {
-                list = InvokerHelper.invokeMethod(message.getSender(), "respondsTo", new Object[]{"onDeliveryError"});
+                list = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
                 if (list != null && !((Collection) list).isEmpty()) {
-                    InvokerHelper.invokeMethod(message.getSender(), "onDeliveryError", new Object[0]);
+                    InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
                 }
             }
 
@@ -353,17 +370,19 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
     @Override
     protected void doOnStart() {
-        final Object list = InvokerHelper.invokeMethod(this, "respondsTo", new Object[]{"afterStart"});
+        final Object list = InvokerHelper.invokeMethod(this, RESPONDS_TO, new Object[]{AFTER_START});
         if (list != null && !((Collection) list).isEmpty()) {
-            InvokerHelper.invokeMethod(this, "afterStart", new Object[]{});
+            InvokerHelper.invokeMethod(this, AFTER_START, EMPTY_ARGUMENTS);
         }
         act();
     }
 
+    @Override
     protected void doOnTimeout() {
-        callDynamic("onTimeout", new Object[0]);
+        callDynamic("onTimeout", EMPTY_ARGUMENTS);
     }
 
+    @Override
     @SuppressWarnings({"FeatureEnvy"})
     protected void doOnTermination() {
         final List queue = sweepQueue();
@@ -373,6 +392,8 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         callDynamic("afterStop", new Object[]{queue});
     }
 
+    @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
+    @Override
     protected void doOnException(final Throwable exception) {
         if (!callDynamic("onException", new Object[]{exception})) {
             System.err.println("An exception occurred in the Actor thread " + Thread.currentThread().getName());
@@ -380,6 +401,8 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         }
     }
 
+    @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
+    @Override
     protected void doOnInterrupt(final InterruptedException exception) {
         if (!callDynamic("onInterrupt", new Object[]{exception})) {
             if (stopFlag == S_RUNNING) {
@@ -388,7 +411,6 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
             }
         }
     }
-
 
     private boolean callDynamic(final String method, final Object[] args) {
         final MetaClass metaClass = InvokerHelper.getMetaClass(this);

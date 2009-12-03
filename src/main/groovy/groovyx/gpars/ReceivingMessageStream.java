@@ -22,6 +22,7 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.impl.ActorReplyException;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -39,6 +40,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
 
     protected final WeakHashMap<Object, MessageStream> obj2Sender = new WeakHashMap<Object, MessageStream>();
 
+    @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
     protected final List<MessageStream> getSenders() {
         return senders;
     }
@@ -69,7 +71,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
                         exceptions.add(e);
                     }
                 } else {
-                    exceptions.add(new IllegalArgumentException("Cannot send a reply message " + message + " to a null recipient."));
+                    exceptions.add(new IllegalArgumentException(String.format("Cannot send a reply message %s to a null recipient.", message)));
                 }
             }
             if (!exceptions.isEmpty()) {
@@ -166,6 +168,8 @@ public abstract class ReceivingMessageStream extends MessageStream {
      * Enhances objects with the ability to send replies and detect message originators.
      */
     public static final class ReplyCategory {
+        private ReplyCategory() { }
+
         /**
          * Retrieves the originator of a message
          *
@@ -199,7 +203,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
 
             final MessageStream sender = actor.obj2Sender.get(original);
             if (sender == null) {
-                throw new IllegalStateException("Cannot send a reply message " + original.toString() + " to a null recipient.");
+                throw new IllegalStateException(MessageFormat.format("Cannot send a reply message {0} to a null recipient.", original.toString()));
             }
 
             sender.send(reply);
