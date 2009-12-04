@@ -22,7 +22,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CountDownLatch
 
 public class NullMessageTest extends GroovyTestCase {
-    public void testNullMesage() {
+    public void testNullMessage() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
         final Actor actor = Actors.actor {
@@ -36,7 +36,7 @@ public class NullMessageTest extends GroovyTestCase {
         assertNull result
     }
 
-    public void testNullMesageFromActor() {
+    public void testNullMessageFromActor() {
         Actors.defaultPooledActorGroup.resize(100)
         volatile def result = ''
         final def latch = new CountDownLatch(1)
@@ -54,7 +54,7 @@ public class NullMessageTest extends GroovyTestCase {
         assertNull result
     }
 
-    public void testNullMesageFromActorWithReply() {
+    public void testNullMessageFromActorWithReply() {
         final def result = new DataFlowVariable()
         final Actor actor = Actors.actor {
             receive {

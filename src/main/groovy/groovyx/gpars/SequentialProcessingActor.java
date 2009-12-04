@@ -585,10 +585,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     /**
      * Enables multiple argument closures to be passed to react().
-     * The MultiMessageReaction class takes just one argument and will wrap the intented closure.
+     * The MultiMessageReaction class takes just one argument and will wrap the intended closure.
      * After invoking the MultiMessageReaction will curry the obtained value onto the wrapped multi-argument closure.
      * The whole process of wrapping a multi-argument closure with MultiMessageReaction class instances is repeated until all arguments
-     * are curried. At that moment the original closure, now woth all arguments curried, gets invoked.
+     * are curried. At that moment the original closure, now worth all arguments curried, gets invoked.
      *
      * @author Vaclav Pech
      */

@@ -161,7 +161,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert objectFlag
     }
 
-    public void testWhenAttachedAfterCtor() {
+    public void testWhenAttachedAfterStart() {
         volatile boolean stringFlag = false
         volatile boolean integerFlag = false
 

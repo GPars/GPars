@@ -72,7 +72,7 @@ contributor(actorBody) {
 }
 
 /**
- * Enhances closures withinh the Asynchronizer blocks with async() and callAsync() methods
+ * Enhances closures within the Asynchronizer blocks with async() and callAsync() methods
  */
 
 def asynchronizerBody = context(ctype: "groovy.lang.Closure", scope: closureScope())
@@ -92,7 +92,7 @@ contributor(asynchronizerBody) {
 }
 
 /**
- * Enhances closures withinh the DataFlowOperator.operator blocks
+ * Enhances closures within the DataFlowOperator.operator blocks
  */
 
 def operatorBody = context(scope: closureScope())

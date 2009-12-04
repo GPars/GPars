@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Safe
 
 /**
  * A thread-safe shopping cart, which can store purchased products together with their quantities.
- * Each public method internaly submits a function for processing by the internal Safe instance
+ * Each public method internally submits a function for processing by the internal Safe instance
  * to protect the shared mutable HashMap from races by multiple threads.
  */
 class ShoppingCart {

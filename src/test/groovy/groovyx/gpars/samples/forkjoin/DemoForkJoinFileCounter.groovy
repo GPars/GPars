@@ -50,7 +50,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
 
 /**
  Fork/Join operations can be safely run with small number of threads thanks to using the TaskBarrier class to synchronize the threads.
- Although the algorithm creates as many tasks as there are subdirectories and tasks wait for the subdirectory tasks to complete,
+ Although the algorithm creates as many tasks as there are sub-directories and tasks wait for the sub-directory tasks to complete,
  as few as one thread is enough to keep the computation going.
  */
 

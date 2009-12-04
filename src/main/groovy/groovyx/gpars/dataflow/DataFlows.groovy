@@ -180,7 +180,7 @@ public final class DataFlows {
     }
 
     /**
-     * Convenience method to play nicely with Groovy's object iteration methods.
+     * Convenience method to play nicely with Groovy object iteration methods.
      * The iteration restrictions of ConcurrentHashMap concerning parallel access and
      * ConcurrentModificationException apply.
      * @return iterator over the stored key:DataFlowVariable value pairs

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Indicates problems sending replies to actors. Holds a list of exceptions that occured during reply dispatch.
+ * Indicates problems sending replies to actors. Holds a list of exceptions that occurred during reply dispatch.
  *
  * @author Vaclav Pech
  *         Date: Jun 11, 2009

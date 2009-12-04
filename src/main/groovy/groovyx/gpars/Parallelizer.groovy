@@ -267,7 +267,7 @@ public class Parallelizer {
 
 
     /**
-     * Just like withExistingParallelizer() registeres a thread pool, but doesn't install the ParallelArrayUtil category.
+     * Just like withExistingParallelizer() registers a thread pool, but doesn't install the ParallelArrayUtil category.
      * Used by ParallelEnhancer's Parallel mixins. 
      */
     static ensurePool(ForkJoinPool pool, Closure cl) {

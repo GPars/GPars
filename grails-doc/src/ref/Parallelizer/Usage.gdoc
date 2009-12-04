@@ -71,7 +71,7 @@ Available methods:
 The _collection_ property will return all elements wrapped in a Groovy collection instance.
 
 {code}
-    println 'Number of occurencies of the word GROOVY today: ' + urls.parallel
+    println 'Number of occurrences of the word GROOVY today: ' + urls.parallel
             .map {it.toURL().text.toUpperCase()}
             .filter {it.contains('GROOVY')}
             .map{it.split()}

@@ -28,7 +28,7 @@ h3. Actors
 * The sendAndContinue() method
 * Performance improvements
 * Reorganized daemon and non-daemon actor groups
-* Resizable thread-pool used by the default actor group
+* Resizeable thread-pool used by the default actor group
 * Modified the reply mechanism
 * The message sender property has been added to messages
 

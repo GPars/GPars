@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
  */
 
 private class ExceptionFlag {
-    static final boolean THROW_EXCEPTIION = true  //change the flag to test either exception or timeout
+    static final boolean THROW_EXCEPTION = true  //change the flag to test either exception or timeout
 }
 
 Actors.actor {
@@ -50,7 +50,7 @@ delegate.metaClass {
     }
 }
     println("Running actor1")
-    if (ExceptionFlag.THROW_EXCEPTIION) throw new RuntimeException('test')
+    if (ExceptionFlag.THROW_EXCEPTION) throw new RuntimeException('test')
     else {
         react(10, TimeUnit.MILLISECONDS) {}  //will timeout
     }
@@ -62,7 +62,7 @@ class PooledLifeCycleSampleActor extends AbstractPooledActor {
 
     protected void act() {
         println("Running actor2")
-        if (ExceptionFlag.THROW_EXCEPTIION) throw new RuntimeException('test')
+        if (ExceptionFlag.THROW_EXCEPTION) throw new RuntimeException('test')
         else {
             react(10.milliseconds) {}  //will timeout
         }

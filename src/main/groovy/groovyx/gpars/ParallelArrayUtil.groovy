@@ -152,7 +152,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the transformation operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -167,7 +167,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the transformation operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -182,7 +182,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -197,7 +197,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -242,7 +242,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * rule as the filter predicate.
      * The filter will be effectively used concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -258,7 +258,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * rule as the filter predicate.
      * The filter will be effectively used concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a collection of valuea from the resulting Parallel Array.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -274,7 +274,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a boolean value indicating, whenther at least
+     * After all the elements have been processed, the method returns a boolean value indicating, whether at least
      * one element of the collection meets the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
@@ -289,7 +289,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a boolean value indicating, whenther at least
+     * After all the elements have been processed, the method returns a boolean value indicating, whether at least
      * one element of the collection meets the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
@@ -304,7 +304,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a boolean value indicating, whenther all the elements
+     * After all the elements have been processed, the method returns a boolean value indicating, whether all the elements
      * of the collection meet the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
@@ -319,7 +319,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a boolean value indicating, whenther all the elements
+     * After all the elements have been processed, the method returns a boolean value indicating, whether all the elements
      * of the collection meet the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
@@ -374,7 +374,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the supplied
      * closure as the comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -390,7 +390,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the supplied
      * closure as the comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -405,7 +405,7 @@ public class ParallelArrayUtil {
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
@@ -416,7 +416,7 @@ public class ParallelArrayUtil {
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
@@ -529,7 +529,7 @@ public class ParallelArrayUtil {
     }
 
     /**
-     * Creates a ParallelCollection around a ParallelArray wrapping te eleents of the original collection.
+     * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
@@ -538,7 +538,7 @@ public class ParallelArrayUtil {
     }
 
     /**
-     * Creates a ParallelCollection around a ParallelArray wrapping te eleents of the original collection.
+     * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
@@ -567,7 +567,7 @@ abstract class AbstractParallelCollection<T> {
     final def pa
 
     /**
-     * Creates an instance wrapping the supplied instance of ParallelAray
+     * Creates an instance wrapping the supplied instance of ParallelArray
      */
     def AbstractParallelCollection(final pa) {
         this.pa = pa
@@ -582,7 +582,7 @@ abstract class AbstractParallelCollection<T> {
     }
 
     /**
-     * Performs a parallel reduce operation. It will use the supplied two-argument closure to gradualy reduce two elements into one.
+     * Performs a parallel reduce operation. It will use the supplied two-argument closure to gradually reduce two elements into one.
      * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
      * @return The product of reduction
      */
@@ -655,7 +655,7 @@ abstract class AbstractParallelCollection<T> {
     }
 
     /**
-     * Filteres concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
+     * Filters concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
@@ -663,7 +663,7 @@ abstract class AbstractParallelCollection<T> {
 }
 
 /**
- * The dafault ParallelArray wrapper class
+ * The default ParallelArray wrapper class
  */
 final class ParallelCollection<T> extends AbstractParallelCollection {
 
@@ -672,7 +672,7 @@ final class ParallelCollection<T> extends AbstractParallelCollection {
     }
 
     /**
-     * Filteres concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
+     * Filters concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
@@ -692,7 +692,7 @@ final class MappedCollection<T> extends AbstractParallelCollection {
     }
 
     /**
-     * Filteres concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
+     * Filters concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */

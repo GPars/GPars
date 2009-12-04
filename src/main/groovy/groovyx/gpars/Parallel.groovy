@@ -36,7 +36,7 @@ final class Parallel {
      * After this method returns, all the closures have been finished and all the potential shared resources have been updated
      * by the threads.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def eachParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -50,7 +50,7 @@ final class Parallel {
      * After this method returns, all the closures have been finished and all the potential shared resources have been updated
      * by the threads.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def eachWithIndexParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -63,7 +63,7 @@ final class Parallel {
      * to evaluate each collection's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      * */
     public def collectParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -76,7 +76,7 @@ final class Parallel {
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findAllParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -89,7 +89,7 @@ final class Parallel {
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def grepParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -102,7 +102,7 @@ final class Parallel {
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -115,7 +115,7 @@ final class Parallel {
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public boolean everyParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -128,7 +128,7 @@ final class Parallel {
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public boolean anyParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -141,7 +141,7 @@ final class Parallel {
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * If any of the collection's elements causes the closure to throw an exception, the exception is rethrown.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def groupByParallel(Closure cl) {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
@@ -153,7 +153,7 @@ final class Parallel {
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the supplied
      * closure as the comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -170,7 +170,7 @@ final class Parallel {
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns the minumum of the elements in the collection.
+     * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
@@ -241,7 +241,7 @@ final class Parallel {
     }
 
     /**
-     * Creates a ParallelCollection around a ParallelArray wrapping te eleents of the original collection.
+     * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */

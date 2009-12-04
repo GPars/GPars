@@ -16,8 +16,12 @@
 
 package groovyx.gpars
 
+import java.util.concurrent.Callable
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
+import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.*
 
 /**
  * This class forms the core of the DSL initialized by <i>Asynchronizer</i>. The static methods of <i>AsyncInvokerUtil</i>
@@ -47,7 +51,7 @@ public class AsyncInvokerUtil {
 
     /**
      * Submits the task for asynchronous processing returning the Future received from the executor service.
-     * Allows for the followitn syntax:
+     * Allows for the following syntax:
      * <pre>
      * executorService << {println 'Inside parallel task'}* </pre>
      */

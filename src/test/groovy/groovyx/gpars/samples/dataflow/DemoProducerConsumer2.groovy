@@ -22,7 +22,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * A producer-consumer demo using the DataFlowStream class. Producer downloads web content from a list of urls,
- * the concumenr then counts number of sites refering Groovy. 
+ * the consumer then counts number of sites referring Groovy. 
  */
 
 def buffer = new DataFlowStream()

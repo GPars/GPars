@@ -48,7 +48,7 @@ final Actor actor = new DynamicDispatchActor({
 actor.start()
 {code}
 
-Obviously the two aproaches can be combined:
+Obviously the two approaches can be combined:
 {code}
 final class MyActor extends DynamicDispatchActor {
 

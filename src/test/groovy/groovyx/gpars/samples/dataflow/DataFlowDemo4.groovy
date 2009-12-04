@@ -21,9 +21,9 @@ import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * A producer consumer sample, where the producer generates numbers into the DataFlowStream, the intermediate consumer
- * keeps reading numbers from the producer, calculates the summary of numberf it saw so far and passes the summaries
+ * keeps reading numbers from the producer, calculates the summary of numbers it saw so far and passes the summaries
  * on to the final consumer, which prints them out.
- * Since both consumers read elements using the 'val' property, they will keep reading until stopped explicitely.
+ * Since both consumers read elements using the 'val' property, they will keep reading until stopped explicitly.
  */
 void ints(int n, int max, DataFlowStream<Integer> stream) {
     if (n != max) {

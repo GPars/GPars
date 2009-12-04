@@ -35,7 +35,7 @@ println name.val
 
 Actors.actor {                          //Create a new actor to communicate with the Safe
     name << {it.toUpperCase()}          //Construct an upper cased string and reply it back. The internal state of the Safe doesn't change here
-    react {                             //Wait for the reply with the uppercased string
+    react {                             //Wait for the reply with the uppercase string
         println it
     }
 }.join()                        //Start and wait for termination of the actor

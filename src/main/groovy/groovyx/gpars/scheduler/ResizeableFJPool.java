@@ -25,13 +25,13 @@ package groovyx.gpars.scheduler;
  * @author Vaclav Pech
  *         Date: Feb 27, 2009
  */
-public final class ResizableFJPool extends FJPool {
+public final class ResizeableFJPool extends FJPool {
     private static final int MAX_POOL_SIZE = 1000;
 
     /**
      * Creates the pool with default number of threads.
      */
-    public ResizableFJPool() {
+    public ResizeableFJPool() {
     }
 
     /**
@@ -39,7 +39,7 @@ public final class ResizableFJPool extends FJPool {
      *
      * @param poolSize The required size of the pool
      */
-    public ResizableFJPool(final int poolSize) {
+    public ResizeableFJPool(final int poolSize) {
         super(poolSize);
     }
 
@@ -54,10 +54,10 @@ public final class ResizableFJPool extends FJPool {
             final int submissionCount = pool.getActiveSubmissionCount();
             final int needForThreads = submissionCount + 1 - currentPoolSize;
             if (needForThreads > 0) {
-                if (currentPoolSize + needForThreads > ResizableFJPool.MAX_POOL_SIZE) {
+                if (currentPoolSize + needForThreads > ResizeableFJPool.MAX_POOL_SIZE) {
                     throw new IllegalStateException("The thread pool executor cannot run the task. " +
                             "The upper limit of the thread pool size has probably been reached. " +
-                            "Current pool size: " + currentPoolSize + " Maximum pool size: " + ResizableFJPool.MAX_POOL_SIZE);
+                            "Current pool size: " + currentPoolSize + " Maximum pool size: " + ResizeableFJPool.MAX_POOL_SIZE);
                 }
                 pool.addWorkers(needForThreads);
             }
@@ -65,7 +65,7 @@ public final class ResizableFJPool extends FJPool {
         super.execute(new Runnable() {
             public void run() {
                 task.run();
-                synchronized (ResizableFJPool.this) {
+                synchronized (ResizeableFJPool.this) {
                     final int currentPoolSize = pool.getPoolSize();
                     final int submissionCount = pool.getActiveSubmissionCount();
                     final int desiredPoolSize = Math.max(submissionCount, getConfiguredPoolSize());

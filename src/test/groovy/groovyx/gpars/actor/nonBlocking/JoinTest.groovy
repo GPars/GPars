@@ -25,7 +25,7 @@ public class JoinTest extends GroovyTestCase {
         assertFalse actor.isActive()
     }
 
-    public void testactorJoin() {
+    public void testActorJoinWithoutTerminate() {
         final def actor = Actors.actor { Thread.sleep 500 }
         actor.join()
         assertFalse actor.isActive()

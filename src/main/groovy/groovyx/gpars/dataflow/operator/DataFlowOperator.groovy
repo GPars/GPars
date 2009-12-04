@@ -28,7 +28,7 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  *
  * Dataflow operators enable creation of highly concurrent applications yet the abstraction hides the low-level concurrency primitives
  * and exposes much friendlier API.
- * Since operators internaly leverage the actor implementation, they reuse a pool of threads and so the actual number of threads
+ * Since operators internally leverage the actor implementation, they reuse a pool of threads and so the actual number of threads
  * used by the calculation can be kept much lower than the actual number of operators used in the network.
  *
  * @author Vaclav Pech
@@ -104,7 +104,7 @@ public final class DataFlowOperator {
 }
 
 /**
- * An operator's internal actor. Repeatadly polls inputs and once they're all available it performs the operator's body.
+ * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
  */
 private final class DataFlowOperatorActor extends AbstractPooledActor {
     final List inputs

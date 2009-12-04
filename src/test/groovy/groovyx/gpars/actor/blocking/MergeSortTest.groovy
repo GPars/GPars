@@ -18,7 +18,7 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
-import groovyx.gpars.scheduler.ResizablePool
+import groovyx.gpars.scheduler.ResizeablePool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -52,7 +52,7 @@ public class MergeSortTest extends GroovyTestCase {
         return result
     }
 
-    def group = new PooledActorGroup(new ResizablePool(false, 50))
+    def group = new PooledActorGroup(new ResizeablePool(false, 50))
 
     Closure createMessageHandler(def parentActor) {
         return {

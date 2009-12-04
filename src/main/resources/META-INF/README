@@ -4,7 +4,7 @@ The framework offers developers straightforward Groovy-based Domain Specific Lan
 
 The library has two logical parts, which differ in the implementation technology.
 # *Parallelizer* uses JSR-166y Parallel Arrays and is limited to collection processing.
-# *Asynchronizer* uses the Java 1.5 built-in support for executor services and supports not only collections and all other types, which can be iterated in Groovy. but also consurrent closures' execution.
+# *Asynchronizer* uses the Java 1.5 built-in support for executor services and supports not only collections and all other types, which can be iterated in Groovy. but also concurrent closures' execution.
 
 ==Usage of Parallelizer==
 

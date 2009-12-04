@@ -18,8 +18,13 @@ package groovyx.gpars
 
 import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.TimeUnit
 import org.codehaus.groovy.runtime.InvokerInvocationException
-import java.util.concurrent.*
 
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
@@ -265,7 +270,7 @@ class Asynchronizer {
     /**
      * Starts multiple closures in separate threads, collecting their return values
      * If an exception is thrown from the closure when called on any of the collection's elements,
-     * it will be rethrown in the calling thread when it calls the Future.get() method.
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
      * @return The result values of all closures
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
@@ -276,7 +281,7 @@ class Asynchronizer {
     /**
      * Starts multiple closures in separate threads, collecting Futures for their return values
      * If an exception is thrown from the closure when called on any of the collection's elements,
-     * it will be rethrown in the calling thread when it calls the Future.get() method.
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
      * @return Futures for the result values or exceptions of all closures
     */
     public static List<Future<Object>> executeAsync(Closure ... closures) {

@@ -19,7 +19,7 @@ package groovyx.gpars.samples.actors.safe
 import groovyx.gpars.actor.Safe
 
 /**
- * Conference stores number of registartions and allows parties to register and unregister.
+ * Conference stores number of registrations and allows parties to register and unregister.
  * It inherits from the Safe class and adds the register() and unregister() private methods,
  * which callers may use it the commands they submit to the Conference.
  */

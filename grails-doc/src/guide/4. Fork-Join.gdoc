@@ -4,11 +4,11 @@ h2. The abstraction
 
 When talking about hierarchical problems, think about quick sort, merge sort, file system or general tree navigation and such.
 
- * Fork / Join algorithms essentialy split a problem at hands into several smaller sub-problems and recursively apply the same algorithm to each of the sub-problems.
+ * Fork / Join algorithms essentially split a problem at hands into several smaller sub-problems and recursively apply the same algorithm to each of the sub-problems.
  * Once the sub-problem is small enough, it is solved directly.
  * The solutions of all sub-problems are combined to solve their parent problem, which in turn helps solve its own parent problem.
 
-The mighty *JSR-166y* library solves Fork / Join orchestration prety nicely for us, but leaves a couple of rough edges, which can hurt you, if you don't pay attention enough. You still deal
+The mighty *JSR-166y* library solves Fork / Join orchestration pretty nicely for us, but leaves a couple of rough edges, which can hurt you, if you don't pay attention enough. You still deal
 with threads, pools and synchronization barriers.
 
 h3. The GPars abstraction convenience layer
@@ -46,7 +46,7 @@ doParallel(1) {pool ->  //feel free to experiment with the number of fork/join t
 h3. Fork / Join saves your resources
 
 Fork/Join operations can be safely run with small number of threads thanks to internally using the TaskBarrier class to synchronize the threads. While a thread is blocked inside an algorithm waiting for its sub-problems to be calculated, the thread is silently returned to the pool to take on any of the available sub-problems from the task queue and process them.
-Although the algorithm creates as many tasks as there are subdirectories and tasks wait for the subdirectory tasks to complete, as few as one thread is enough to keep the computation going and eventually calculate a valid result.
+Although the algorithm creates as many tasks as there are sub-directories and tasks wait for the sub-directory tasks to complete, as few as one thread is enough to keep the computation going and eventually calculate a valid result.
 
 h3. Mergesort example
 

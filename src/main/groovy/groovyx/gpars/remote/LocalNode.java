@@ -75,7 +75,7 @@ public class LocalNode {
                         thread.setDaemon(true);
                         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                             public void uncaughtException(final Thread t, final Throwable e) {
-                                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
+                                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                                 e.printStackTrace(System.err);
                             }
                         });

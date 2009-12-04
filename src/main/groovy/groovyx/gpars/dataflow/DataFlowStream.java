@@ -54,7 +54,7 @@ public final class DataFlowStream<T> {
     /**
      * Adds a DataFlowVariable to the buffer.
      * Implementation detail - in fact another DFV is added to the buffer and an asynchronous 'whenBound' handler
-     * is registered with the supplied DFV to update the one stired in the buffer.
+     * is registered with the supplied DFV to update the one stored in the buffer.
      *
      * @param ref The DFV to add to the stream
      */
@@ -81,7 +81,7 @@ public final class DataFlowStream<T> {
 
     /**
      * Takes the first unsatisfied value request and binds a value on it.
-     * If there are no unsatisfies value requests, a new DFV is stored in the queue.
+     * If there are no unsatisfied value requests, a new DFV is stored in the queue.
      *
      * @return The DFV to bind the value on
      */
@@ -134,7 +134,7 @@ public final class DataFlowStream<T> {
     }
 
     /**
-     * Checks whether there's a DFV waiting in the queue and retrieves it. If not, a new unmatch value request, represented
+     * Checks whether there's a DFV waiting in the queue and retrieves it. If not, a new unmatched value request, represented
      * by a new DFV, is added to the requests queue.
      *
      * @return The DFV to wait for value on

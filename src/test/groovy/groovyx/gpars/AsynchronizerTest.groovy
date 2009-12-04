@@ -90,7 +90,7 @@ public class AsynchronizerTest extends GroovyTestCase {
         }
     }
 
-    public void testEachWithIndexParallelOnsingleElementCollections() {
+    public void testEachWithIndexParallelOnSingleElementCollections() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             [1].eachWithIndexParallel {e, i ->}
             [1].eachWithIndexParallel {e, i ->}

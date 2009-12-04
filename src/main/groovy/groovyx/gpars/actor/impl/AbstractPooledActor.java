@@ -124,7 +124,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
     private volatile Closure onStop = null;
-    private static final String THE_ACTOR_HASN_T_BEEN_STARTED = "The actor hasn't been started.";
+    private static final String THE_ACTOR_HAS_NOT_BEEN_STARTED = "The actor hasn't been started.";
     private static final String THE_ACTOR_HAS_BEEN_STOPPED = "The actor has been stopped.";
     private static final String RESPONDS_TO = "respondsTo";
     private static final String ON_DELIVERY_ERROR = "onDeliveryError";
@@ -141,7 +141,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * The default implementation throws UnsupportedOperationException.
      */
     protected void act() {
-        throw new UnsupportedOperationException("The act() method must be overriden");
+        throw new UnsupportedOperationException("The act() method must be overridden");
     }
 
     /**
@@ -173,7 +173,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     @Override
     protected final Object receiveImpl() throws InterruptedException {
         if (stopFlag == S_NOT_STARTED) {
-            throw new IllegalStateException(THE_ACTOR_HASN_T_BEEN_STARTED);
+            throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
         }
 
         if (stopFlag == S_STOPPED) {
@@ -199,7 +199,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     @Override
     protected final Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
         if (stopFlag == S_NOT_STARTED) {
-            throw new IllegalStateException(THE_ACTOR_HASN_T_BEEN_STARTED);
+            throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
         }
 
         if (stopFlag == S_STOPPED) {
@@ -282,7 +282,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
                 messages.add(null);
             } else {
                 if (stopFlag != S_RUNNING) {
-                    throw new IllegalStateException(THE_ACTOR_HASN_T_BEEN_STARTED);
+                    throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
                 }
                 final ActorMessage message =
                         takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0L), TimeUnit.MILLISECONDS);

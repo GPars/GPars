@@ -1,4 +1,4 @@
-Adding the GPars jar files to your project or definining the apropriate dependencies in pom.xml should be enough to get you started with GPars in your IDE.
+Adding the GPars jar files to your project or defining the appropriate dependencies in pom.xml should be enough to get you started with GPars in your IDE.
 
 h3. GPars DSL recognition
 

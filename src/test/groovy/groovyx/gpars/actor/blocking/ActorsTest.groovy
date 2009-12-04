@@ -64,7 +64,7 @@ public class ActorsTest extends GroovyTestCase {
         assert flag.get()
     }
 
-    public void testDefaultactorWithException() {
+    public void testDefaultActorWithException() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
 

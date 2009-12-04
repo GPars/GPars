@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch
 import static groovyx.gpars.actor.Actors.actor
 
 public class NullMessageTest extends GroovyTestCase {
-    public void testNullMesage() {
+    public void testNullMessage() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
         final AbstractPooledActor actor = actor {
@@ -37,7 +37,7 @@ public class NullMessageTest extends GroovyTestCase {
         assertNull result
     }
 
-    public void testNullMesageFromActor() {
+    public void testNullMessageFromActor() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
         final AbstractPooledActor actor = actor {
@@ -54,7 +54,7 @@ public class NullMessageTest extends GroovyTestCase {
         assertNull result
     }
 
-    public void testNullMesageFromActorWithReply() {
+    public void testNullMessageFromActorWithReply() {
         final def result = new DataFlowVariable()
         final AbstractPooledActor actor = actor {
             react {

@@ -23,7 +23,7 @@ import java.util.concurrent.Semaphore
  * for the passed-in closure.
  * Use:
  * def extendedSemaphore = new ExtendedSemaphore()
- * extendedSemaphore.withSemaphore() {*      //sepaphore acquired here
+ * extendedSemaphore.withSemaphore() {*      //semaphore acquired here
  *}*
  * @author Vaclav Pech
  * Date: Jan 8, 2009

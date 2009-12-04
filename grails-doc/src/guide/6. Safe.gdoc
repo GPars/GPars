@@ -24,7 +24,7 @@ To wrap integers, we can certainly use AtomicXXX types on the Java platform, but
 
 h1. Concepts
 
-Gpars provides a SafeVariable class, which is a special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
+GPars provides a SafeVariable class, which is a special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
 
 A SafeVariable wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands) as messages, which can be sent to the SafeVariable just like to any other actor using the '<<' operator or any of the send() methods. After reception of a closure / command, the closure is invoked against the internal mutable field and can make changes to it. The closure is guaranteed to be run without intervention from other threads and so may freely alter the internal state of the SafeVariable held in the internal <i>data</i> field.
 
@@ -221,7 +221,7 @@ For latest update, see the respective [Demos].
 h2. Reading the value
 
 To follow the clojure philosophy closely the Safe class gives reads higher priority than to writes.
-By using the _instantVal_ property your read request will bypass the incomming message queue of the Safe
+By using the _instantVal_ property your read request will bypass the incoming message queue of the Safe
 and return the current snapshot of the internal state.
 The _val_ property will wait in the message queue for processing, just like the non-blocking variant
 _valAsync(Clojure cl)_ , which will invoke the provided closure with the internal state as a parameter.

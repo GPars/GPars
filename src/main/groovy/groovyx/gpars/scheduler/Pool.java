@@ -24,7 +24,7 @@ package groovyx.gpars.scheduler;
  */
 public interface Pool {
     String POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER = "Pool size must be a non-negative number.";
-    String UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL = "Uncaught exception occured in actor pool ";
+    String UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL = "Uncaught exception occurred in actor pool ";
 
     /**
      * Resizes the thread pool to the specified value

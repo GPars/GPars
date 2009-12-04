@@ -73,7 +73,7 @@ public class Safe<T> extends DynamicDispatchActor {
 
     /**
      * Creates a new Safe around the supplied modifiable object
-     * @param data The object to use for storing the variable's internal state     *
+     * @param data The object to use for storing the internal state of the variable
      */
     def Safe(final T data) {
         this.data = data
@@ -82,7 +82,7 @@ public class Safe<T> extends DynamicDispatchActor {
 
     /**
      * Creates a new Safe around the supplied modifiable object
-     * @param data The object to use for storing the variable's internal state
+     * @param data The object to use for storing the internal state of the variable
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      */
     def Safe(final T data, final Closure copy) {

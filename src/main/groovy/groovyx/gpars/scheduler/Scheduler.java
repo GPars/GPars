@@ -133,7 +133,7 @@ public final class Scheduler implements Pool {
                         }
                         catch (Throwable t) {
                             if (TERMINATE != t) {
-                                //todo allow for a plugable handler
+                                //todo allow for a customizable handler
                                 t.printStackTrace();
                             }
                         }

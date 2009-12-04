@@ -157,7 +157,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
      *
-     * @param attachment arbitary non-null attachment if reader needs better identification of result
+     * @param attachment arbitrary non-null attachment if reader needs better identification of result
      * @param callback   An actor to send the bound value plus the supplied index to.
      */
     void getValAsync(final Object attachment, final MessageStream callback) {

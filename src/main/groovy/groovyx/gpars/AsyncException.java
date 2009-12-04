@@ -19,7 +19,7 @@ package groovyx.gpars;
 import java.util.List;
 
 /**
- * This class wraps multiple exception, which occured in concurrently run code inside one of the <i>AsyncInvokerUtil</i> methods.
+ * This class wraps multiple exception, which occurred in concurrently run code inside one of the <i>AsyncInvokerUtil</i> methods.
  *
  * @author Vaclav Pech
  *         Date: Nov 17, 2008
@@ -52,8 +52,8 @@ public final class AsyncException extends RuntimeException {
         final StringBuilder sb = new StringBuilder();
         sb.append("AsyncException");
         sb.append("{concurrentExceptions=").append("[\n");
-        for (final Throwable cuncurrentException : concurrentExceptions) {
-            sb.append(cuncurrentException.toString()).append('\n');
+        for (final Throwable concurrentException : concurrentExceptions) {
+            sb.append(concurrentException.toString()).append('\n');
         }
         sb.append("]}");
         return sb.toString();

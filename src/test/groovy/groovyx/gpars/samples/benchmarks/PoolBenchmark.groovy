@@ -16,8 +16,13 @@
 
 package groovyx.gpars.samples.benchmarks
 
+import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.FJPool
+import groovyx.gpars.scheduler.Pool
+import groovyx.gpars.scheduler.ResizeableFJPool
+import groovyx.gpars.scheduler.ResizeablePool
+import groovyx.gpars.scheduler.Scheduler
 import java.util.concurrent.CyclicBarrier
-import groovyx.gpars.scheduler.*
 
 List items = []
 for (i in 1..1000) {items << {i + it}}
@@ -34,23 +39,23 @@ meassurePool(numOfWarmupIterations, items, new DefaultPool(true, 3))
 time = meassurePool(numOfIterations, items, new DefaultPool(true, 3))
 println "Default Pool $time"
 
-meassurePool(numOfWarmupIterations, items, new ResizablePool(true, 3))
-time = meassurePool(numOfIterations, items, new ResizablePool(true, 3))
-println "Resizable Pool $time"
+meassurePool(numOfWarmupIterations, items, new ResizeablePool(true, 3))
+time = meassurePool(numOfIterations, items, new ResizeablePool(true, 3))
+println "Resizeable Pool $time"
 
 meassurePool(numOfWarmupIterations, items, new FJPool(3))
 time = meassurePool(numOfIterations, items, new FJPool(3))
 println "FJ Pool $time"
 
-meassurePool(numOfWarmupIterations, items, new ResizableFJPool(3))
-time = meassurePool(numOfIterations, items, new ResizableFJPool(3))
-println "Resizable FJ Pool $time"
+meassurePool(numOfWarmupIterations, items, new ResizeableFJPool(3))
+time = meassurePool(numOfIterations, items, new ResizeableFJPool(3))
+println "Resizeable FJ Pool $time"
 
 meassurePool(numOfWarmupIterations, items, new Scheduler(3))
 time = meassurePool(numOfIterations, items, new Scheduler(3))
 println "Custom Scheduler $time"
 
-long meassureSequential(iterations, List tasks) {
+long measureSequential(iterations, List tasks) {
     final long t1 = System.currentTimeMillis()
     for (i in iterations) {
         for (task in tasks) {
@@ -62,7 +67,7 @@ long meassureSequential(iterations, List tasks) {
     return t2 - t1
 }
 
-long meassurePool(iterations, List tasks, Pool pool) {
+long measurePool(iterations, List tasks, Pool pool) {
     final long t1 = System.currentTimeMillis()
     for (i in iterations) {
         for (task in tasks) {

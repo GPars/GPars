@@ -19,7 +19,7 @@ package groovyx.gpars.samples.actors
 import groovyx.gpars.actor.PooledActorGroup
 
 /**
- * Demonstrates use of reactor - a specialized actor responding to incomming messages with result of running its body
+ * Demonstrates use of reactor - a specialized actor responding to incoming messages with result of running its body
  * on the message.
  */
 

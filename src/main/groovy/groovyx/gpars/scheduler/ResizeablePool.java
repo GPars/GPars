@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  *         Date: Feb 27, 2009
  */
-public final class ResizablePool extends DefaultPool {
+public final class ResizeablePool extends DefaultPool {
     private static final long KEEP_ALIVE_TIME = 10L;
 
     /**
@@ -41,7 +41,7 @@ public final class ResizablePool extends DefaultPool {
      *
      * @param daemon Sets the daemon flag of threads in the pool.
      */
-    public ResizablePool(final boolean daemon) {
+    public ResizeablePool(final boolean daemon) {
         this(daemon, PoolUtils.retrieveDefaultPoolSize());
     }
 
@@ -51,8 +51,8 @@ public final class ResizablePool extends DefaultPool {
      * @param daemon   Sets the daemon flag of threads in the pool.
      * @param poolSize The required size of the pool
      */
-    public ResizablePool(final boolean daemon, final int poolSize) {
-        super(ResizablePool.createResizablePool(daemon, poolSize));
+    public ResizeablePool(final boolean daemon, final int poolSize) {
+        super(ResizeablePool.createResizeablePool(daemon, poolSize));
     }
 
     /**
@@ -63,9 +63,9 @@ public final class ResizablePool extends DefaultPool {
      * @param poolSize The required pool size  @return The created thread pool
      * @return The newly created thread pool
      */
-    private static ThreadPoolExecutor createResizablePool(final boolean daemon, final int poolSize) {
+    private static ThreadPoolExecutor createResizeablePool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
-        return new ThreadPoolExecutor(poolSize, 1000, ResizablePool.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
+        return new ThreadPoolExecutor(poolSize, 1000, ResizeablePool.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
             public Thread newThread(final Runnable r) {
                 final Thread thread = new Thread(r, DefaultPool.createThreadName());
                 thread.setDaemon(daemon);

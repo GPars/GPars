@@ -67,7 +67,7 @@ console.join()
 
 As you can see, you create new actors with the _actor()_ method passing in the actor's body as a closure parameter. Inside the actor's body you can use _loop()_ to iterate, _react()_ to receive messages and _reply()_ to send a message to the actor, which has sent the currently processed message. When the decryptor actor doesn't find a message in its message queue, the _react()_ method gives up the thread and returns it back to the thread pool for other actors to pick up. Only after a new message arrives to the actor's message queue, the closure of the _react()_ method gets scheduled for processing with the pool. Event-based actors internally simulate continuations - actor's work is split into sequentially run chunks, which get invoked once a message is available in the inbox. Each chunk for a single actor can be performed by different thread from the thread pool.
 
-Groovy's flexible syntax with closures allows our library to offer multiple ways to define actors. For instance, here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates. Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method.
+Groovy flexible syntax with closures allows our library to offer multiple ways to define actors. For instance, here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates. Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method.
 
 {code}
 import static org.gparallelizer.actors.pooledActors.PooledActors.*
@@ -129,7 +129,7 @@ Notice that event-driven actors require special care regarding the _react()_ met
 
 h3. Concurrent Merge Sort Example
 
-For comparison I'm also including a more involved example performing a concurrent merge sort of a list of integers using actors. You can see that thanks to flexibility of Groovy we came pretty close to the Scala's model, although I still miss Scala's pattern matching for message handling.
+For comparison I'm also including a more involved example performing a concurrent merge sort of a list of integers using actors. You can see that thanks to flexibility of Groovy we came pretty close to the Scala model, although I still miss Scala pattern matching for message handling.
 
 {code}
 import static org.gparallelizer.actors.pooledActors.PooledActors.*

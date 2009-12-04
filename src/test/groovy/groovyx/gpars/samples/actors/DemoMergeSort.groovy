@@ -18,7 +18,7 @@ package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
-import groovyx.gpars.scheduler.ResizablePool
+import groovyx.gpars.scheduler.ResizeablePool
 
 /**
  * Performs merge sort using pooled actors.
@@ -48,8 +48,8 @@ List<Integer> merge(List<Integer> a, List<Integer> b) {
     return result
 }
 
-class GroupTestHeper {
-    public static final def group = new PooledActorGroup(new ResizablePool(true))
+class GroupTestHelper {
+    public static final def group = new PooledActorGroup(new ResizeablePool(true))
 }
 
 Closure createMessageHandler(def parentActor) {
@@ -67,8 +67,8 @@ Closure createMessageHandler(def parentActor) {
                 default:
                     def splitList = split(message)
 
-                    def child1 = GroupTestHeper.group.actor(createMessageHandler(delegate))
-                    def child2 = GroupTestHeper.group.actor(createMessageHandler(delegate))
+                    def child1 = GroupTestHelper.group.actor(createMessageHandler(delegate))
+                    def child2 = GroupTestHelper.group.actor(createMessageHandler(delegate))
                     child1.send(splitList[0])
                     child2.send(splitList[1])
 

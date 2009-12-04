@@ -19,7 +19,7 @@ package groovyx.gpars.scheduler;
 import jsr166y.forkjoin.AsyncAction;
 
 /**
- * Adapts Runnables to the Fork Join framework.
+ * Adapts Runnable instances to the Fork Join framework.
  *
  * @author Vaclav Pech
  *         Date: Jun 16, 2009

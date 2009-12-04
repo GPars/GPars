@@ -22,7 +22,7 @@ import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
- * Three pooled actors are created, two of them in a newly created pooled actor group, one in the fefault pooled actor
+ * Three pooled actors are created, two of them in a newly created pooled actor group, one in the default pooled actor
  * group using the factory method of the Actors class.
  * @author Vaclav Pech
  */

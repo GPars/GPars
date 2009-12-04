@@ -39,7 +39,7 @@ public class NestedClosureTest extends GroovyTestCase {
         assertEquals 20, result.val
     }
 
-    public void testNestedClosuresForactors() {
+    public void testNestedClosuresForActors() {
         final def result = new DataFlowVariable<Integer>()
 
         final def group = new PooledActorGroup(20)

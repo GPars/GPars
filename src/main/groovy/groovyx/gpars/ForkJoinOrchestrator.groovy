@@ -30,7 +30,7 @@ import jsr166y.forkjoin.TaskBarrier
  * and calling start() plus getResult() on it.
  * Parallelizer.orchestrate(rootWorker) is equivalent to
  * new ForkJoinOrchestrator(rootWorker).start().getResult()
- * Calls to getResult() block the caller and to allow the caller to do dsme work concurrently with the Fork/Join tasks,
+ * Calls to getResult() block the caller and to allow the caller to do some work concurrently with the Fork/Join tasks,
  * it is not necessary to call it immediately after starting the calculation with start().
  *
  * Author: Vaclav Pech
@@ -70,7 +70,7 @@ public final class ForkJoinOrchestrator<T> extends RecursiveAction {
     }
 
     /**
-     * Starts the root worker, waits for the alculation to finish and retrieves the result from the root worker.
+     * Starts the root worker, waits for the calculation to finish and retrieves the result from the root worker.
      */
     void compute() {
         final TaskBarrier taskBarrier = new TaskBarrier(1)

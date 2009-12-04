@@ -41,7 +41,7 @@ Parallelizer.doParallel {
 
 
     assert 'abc' == 'abc'.parallel.reduce {a, b -> a + b}                                               //concatenate
-    assert 'aa:bb:cc:dd:ee' == 'abcde'.parallel.map {it * 2}.reduce {a, b -> "$a:$b"}                   //concatenate dupplicated characters with separator
+    assert 'aa:bb:cc:dd:ee' == 'abcde'.parallel.map {it * 2}.reduce {a, b -> "$a:$b"}                   //concatenate duplicated characters with separator
     assert 'aa-bb-dd' == 'abcde'.parallel.filter {it != 'e'}.map {it * 2}.filter {it != 'cc'}.reduce {a, b -> "$a-$b"}  //filter out some elements
 
 

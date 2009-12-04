@@ -9,4 +9,4 @@ With GPars your Groovy code can easily utilize all the available processors on t
 safely solve hierarchical divide-and-conquer problems, perform functional style map/reduce collection processing or build your applications around the actor model.
 
 The project is open sourced under the "Apache 2 License":http://gpars.codehaus.org/License . If you're working on a commercial, open-source, educational or any other type of software project in Groovy,
-download the binaries or integrate them from the maven repository and get going. The way to writting highly concurrent Groovy code is wide open. Enjoy!
+download the binaries or integrate them from the maven repository and get going. The way to witting highly concurrent Groovy code is wide open. Enjoy!
