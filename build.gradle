@@ -213,7 +213,7 @@ class DemoTask extends DefaultTask {
                 Thread.currentThread().contextClassLoader
 
         )
-        System.metaClass.static.exit = {int retval -> println ">>> System.exit($retval) suppressed." }
+        System.metaClass.static.exit = {int returnCode -> println ">>> System.exit($returnCode) suppressed." }
         System.in.metaClass.read = {-> println ">>> System.in.read() suppressed"; 'Automated build' }
         new GroovyShell(classloader)
     }
