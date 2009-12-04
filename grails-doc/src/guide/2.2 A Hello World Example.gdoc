@@ -30,5 +30,7 @@ def console = actor {
 [decryptor, console]*.join()
 
 {code}
+{code:file=new File("src/test/groovy/groovyx/gpars/samples/actors/DemoDecryptor.groovy")}
+{code}
 
 You should get a message "Decrypted message: Groovy is parallelt" printed out on the console when you run the code.

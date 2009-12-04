@@ -1,4 +1,14 @@
-The GPars 0.9 release introduces a lot of changes and additions compared to the previous GParallelizer 0.9 release.
+The GPars 0.9 release introduces a lot of changes and additions compared to the previous GParallelizer 0.8.4 release.
+
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=15702
+
+h3. Project changes
+
+* Moved to "Codehaus":http://gpars.codehaus.org
+* Provided a "User Guide":http://www.gpars.org/guide/index.html
+* Changed the package structure
+* Fully built using Gradle
+* Continually built on "JetBrains public TeamCity site":http://teamcity.jetbrains.com/ and on "Codehaus Bamboo":http://bamboo.ci.codehaus.org/browse/GPARS-DEF
 
 h3. Parallel collections
 
@@ -18,6 +28,9 @@ h3. Actors
 * The sendAndContinue() method
 * Performance improvements
 * Reorganized daemon and non-daemon actor groups
+* Resizable thread-pool used by the default actor group
+* Modified the reply mechanism
+* The message sender property has been added to messages
 
 h3. Dataflow
 
@@ -33,5 +46,5 @@ h3. Safe
 
 h3. Other
 
-* Levering GroovyDSL API in IntelliJ IDEA to get IDE support for GPars DSLs
-* Added Fork / Join convenience abstraction for hierarchical (divide and conquer) tasks
+* Levering "GroovyDSL API in IntelliJ IDEA":http://jetbrains.dzone.com/articles/custom-groovy-dsl-support to get IDE support for GPars DSLs
+* Added Fork / Join convenience abstraction layer for hierarchical (divide and conquer) tasks
