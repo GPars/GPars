@@ -30,6 +30,7 @@ public class EventMixinTest extends GroovyTestCase {
 
     public void testSomething() {}
 
+    //todo enable or remove the test
     public void _testClassMixin() {
         volatile def result = null
         final CountDownLatch latch = new CountDownLatch(1)

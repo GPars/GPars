@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 public class MixinTest extends GroovyTestCase {
 
     public void testSomething() {
-        //todo enables mixin tests or remove
+        //todo enable the mixin tests or remove
     }
 
     public void _testClassMixin() {

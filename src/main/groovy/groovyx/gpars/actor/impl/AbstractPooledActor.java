@@ -339,12 +339,12 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
         ActorMessage message = pollMessage();
         while (message != null) {
-            Object list = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
-            if (list != null && !((Collection) list).isEmpty()) {
+            final Object payloadList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
+            if (payloadList != null && !((Collection) payloadList).isEmpty()) {
                 InvokerHelper.invokeMethod(message.getPayLoad(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
             } else {
-                list = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
-                if (list != null && !((Collection) list).isEmpty()) {
+                final Object senderList = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
+                if (senderList != null && !((Collection) senderList).isEmpty()) {
                     InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
                 }
             }

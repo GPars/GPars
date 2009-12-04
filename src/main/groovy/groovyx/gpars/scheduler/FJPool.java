@@ -64,6 +64,7 @@ public class FJPool implements Pool {
 
         final ForkJoinPool pool = new ForkJoinPool(poolSize);
         pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
             public void uncaughtException(final Thread t, final Throwable e) {
                 System.err.println(UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                 e.printStackTrace(System.err);

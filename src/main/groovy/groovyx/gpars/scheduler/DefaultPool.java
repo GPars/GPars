@@ -62,7 +62,7 @@ public class DefaultPool implements Pool {
      */
     public DefaultPool(final boolean daemon, final int poolSize) {
         if (poolSize < 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
-      this.pool = DefaultPool.createPool(daemon, poolSize);
+        this.pool = DefaultPool.createPool(daemon, poolSize);
     }
 
     /**
@@ -89,6 +89,7 @@ public class DefaultPool implements Pool {
                 final Thread thread = new Thread(r, DefaultPool.createThreadName());
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
                     public void uncaughtException(final Thread t, final Throwable e) {
                         System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                         e.printStackTrace(System.err);

@@ -72,7 +72,6 @@ public abstract class ActorGroup {
     /**
      * Creates an instance of DynamicDispatchActor.
      * @param code The closure specifying individual message handlers.
-     *
      */
     public final AbstractPooledActor messageHandler(final Closure code) {
         final def actor = new DynamicDispatchActor(code)

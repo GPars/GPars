@@ -71,8 +71,9 @@ public abstract class Actors {
         return defaultPooledActorGroup.reactor(code)
     }
 
-    //todo javadoc
     /**
+     * Creates an instance of DynamicDispatchActor.
+     * @param code The closure specifying individual message handlers.
      */
     public static AbstractPooledActor messageHandler(final Closure code) {
         return defaultPooledActorGroup.messageHandler(code)

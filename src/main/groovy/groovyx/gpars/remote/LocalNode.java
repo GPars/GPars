@@ -83,7 +83,7 @@ public class LocalNode {
                     }
                 });
 
-        ActorGroup actorGroup=new PooledActorGroup(new DefaultPool(scheduler));
+        final ActorGroup actorGroup=new PooledActorGroup(new DefaultPool(scheduler));
 
         if (runnable != null) {
             if (runnable instanceof Closure) {
@@ -133,33 +133,33 @@ public class LocalNode {
         }
     }
 
-    public void addDiscoveryListener(final RemoteNodeDiscoveryListener l) {
-        listeners.add(l);
+    public void addDiscoveryListener(final RemoteNodeDiscoveryListener listener) {
+        listeners.add(listener);
     }
 
-    public void addDiscoveryListener(final Closure l) {
-        listeners.add(new RemoteNodeDiscoveryListener.RemoteNodeDiscoveryListenerClosure(l));
+    public void addDiscoveryListener(final Closure listener) {
+        listeners.add(new RemoteNodeDiscoveryListener.RemoteNodeDiscoveryListenerClosure(listener));
     }
 
-    public void removeDiscoveryListener(final RemoteNodeDiscoveryListener l) {
-        listeners.remove(l);
+    public void removeDiscoveryListener(final RemoteNodeDiscoveryListener listener) {
+        listeners.remove(listener);
     }
 
     public void onConnect(final RemoteNode node) {
-        for (final RemoteNodeDiscoveryListener l : listeners) {
+        for (final RemoteNodeDiscoveryListener listener : listeners) {
             scheduler.execute(new Runnable() {
                 public void run() {
-                    l.onConnect(node);
+                    listener.onConnect(node);
                 }
             });
         }
     }
 
     public void onDisconnect(final RemoteNode node) {
-        for (final RemoteNodeDiscoveryListener l : listeners) {
+        for (final RemoteNodeDiscoveryListener listener : listeners) {
             scheduler.execute(new Runnable() {
                 public void run() {
-                    l.onDisconnect(node);
+                    listener.onDisconnect(node);
                 }
             });
         }
@@ -179,7 +179,7 @@ public class LocalNode {
 
     @Override
     public String toString() {
-        return getId().toString();
+        return id.toString();
     }
 
     public SerialHandles getLocalHost() {

@@ -107,7 +107,6 @@ def contentCache = Actors.actor {
                     if (downloads!=null) {
                         for (downloadRequest in downloads) {
                             contentCacheArea.report "Waking up"
-                            //todo output, dummy, it x msg 
                             wordFinder << new WordFindResponse(it.content, downloadRequest)
                         }
                         pendingDownloads.remove(it.site)

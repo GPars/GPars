@@ -576,7 +576,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             assert maxNumberOfParameters <= 1;
 
             final Reaction reactCode = new Reaction(this, maxNumberOfParameters==1, code);
-            if (timeout >= 0) {
+            if (timeout >= 0L) {
                 reactCode.setTimeout(timeout);
             }
             reaction = reactCode;
@@ -641,6 +641,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     @SuppressWarnings({"ThrowCaughtLocally"})
     public void run() {
         boolean shouldTerminate = false;
+        //noinspection OverlyBroadCatchBlock
         try {
             assert currentThread == null;
 
@@ -807,7 +808,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     @SuppressWarnings({"InstanceVariableOfConcreteClass"})
     private static final class Reaction {
         private final boolean codeNeedsArgument;
-        private AtomicBoolean isReady = new AtomicBoolean(false);
+        private final AtomicBoolean isReady = new AtomicBoolean(false);
         private final Closure code;
         private final SequentialProcessingActor actor;
 
@@ -850,7 +851,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 @Override
                 public void run() {
                     if (!isReady()) {
-                        actor.send(new ActorMessage(TIMEOUT, null));
+                        actor.send(new ActorMessage<Object>(TIMEOUT, null));
                     }
                 }
             }, timeout);

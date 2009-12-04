@@ -22,12 +22,13 @@ import java.util.List;
  * This class wraps multiple exception, which occurred in concurrently run code inside one of the <i>AsyncInvokerUtil</i> methods.
  *
  * @author Vaclav Pech
- *         Date: Nov 17, 2008
- * @see AsyncInvokerUtil
+ * Date: Nov 17, 2008
+ * @see groovyx.gpars.AsyncInvokerUtil
  */
 public final class AsyncException extends RuntimeException {
     private final List<Throwable> concurrentExceptions;
 
+    @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter"})
     public AsyncException(final String message, final List<Throwable> concurrentExceptions) {
         super(message);
         this.concurrentExceptions = concurrentExceptions;

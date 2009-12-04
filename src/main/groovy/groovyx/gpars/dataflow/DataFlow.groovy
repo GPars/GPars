@@ -85,10 +85,4 @@ public abstract class DataFlow {
     public static DataFlowOperator operator(final Map channels, final ActorGroup group, final Closure code) {
         return new DataFlowOperator(channels, code).start(group)
     }
-
-
-    //todo remove
-//    public static DataFlowExpression invoke(Object receiver, String methodName, Object ... args) {
-//        return new DataFlowInvocationExpression(receiver, methodName, args);
-//    }
 }

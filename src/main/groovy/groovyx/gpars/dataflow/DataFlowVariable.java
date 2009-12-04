@@ -37,8 +37,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
     /**
      * Creates a new unbound Dataflow Variable
      */
-    public DataFlowVariable() {
-    }
+    public DataFlowVariable() { }
 
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable

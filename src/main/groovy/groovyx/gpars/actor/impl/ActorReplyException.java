@@ -44,9 +44,10 @@ public final class ActorReplyException extends RuntimeException {
     }
 
     @Override public String toString() {
-        return super.toString() + getIssues();
+        return super.toString() + issues;
     }
 
+    @SuppressWarnings({"CallToPrintStackTrace"})
     @Override public void printStackTrace() {
         super.printStackTrace();
         for (final Exception e : issues) e.printStackTrace();

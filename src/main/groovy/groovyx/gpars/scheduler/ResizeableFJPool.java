@@ -16,6 +16,8 @@
 
 package groovyx.gpars.scheduler;
 
+import java.text.MessageFormat;
+
 /**
  * Represents the actors' thread pool, which performs tasks on behalf of the actors. Uses a ForkJoinPool from JSR-166y
  * The actors' thread pool size defaults to the n + 1, where n is the number of processors/cores available on the machine.
@@ -27,6 +29,8 @@ package groovyx.gpars.scheduler;
  */
 public final class ResizeableFJPool extends FJPool {
     private static final int MAX_POOL_SIZE = 1000;
+
+    private final Object lock = new Object();
 
     /**
      * Creates the pool with default number of threads.
@@ -49,15 +53,14 @@ public final class ResizeableFJPool extends FJPool {
      * @param task The task to schedule
      */
     @Override public void execute(final Runnable task) {
-        synchronized (this) {
+        synchronized (lock) {
             final int currentPoolSize = pool.getPoolSize();
             final int submissionCount = pool.getActiveSubmissionCount();
             final int needForThreads = submissionCount + 1 - currentPoolSize;
             if (needForThreads > 0) {
                 if (currentPoolSize + needForThreads > ResizeableFJPool.MAX_POOL_SIZE) {
-                    throw new IllegalStateException("The thread pool executor cannot run the task. " +
-                            "The upper limit of the thread pool size has probably been reached. " +
-                            "Current pool size: " + currentPoolSize + " Maximum pool size: " + ResizeableFJPool.MAX_POOL_SIZE);
+                    //noinspection AutoBoxing
+                    throw new IllegalStateException(MessageFormat.format("The thread pool executor cannot run the task. The upper limit of the thread pool size has probably been reached. Current pool size: {0} Maximum pool size: {1}", currentPoolSize, ResizeableFJPool.MAX_POOL_SIZE));
                 }
                 pool.addWorkers(needForThreads);
             }
@@ -65,7 +68,7 @@ public final class ResizeableFJPool extends FJPool {
         super.execute(new Runnable() {
             public void run() {
                 task.run();
-                synchronized (ResizeableFJPool.this) {
+                synchronized (ResizeableFJPool.this.lock) {
                     final int currentPoolSize = pool.getPoolSize();
                     final int submissionCount = pool.getActiveSubmissionCount();
                     final int desiredPoolSize = Math.max(submissionCount, getConfiguredPoolSize());

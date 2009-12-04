@@ -43,7 +43,7 @@ public class BroadcastDiscovery {
     static {
         try {
             GROUP = InetAddress.getByName("230.0.0.239");
-        } catch (UnknownHostException e) {
+        } catch (UnknownHostException ignored) {
             GROUP = null;
         }
     }
