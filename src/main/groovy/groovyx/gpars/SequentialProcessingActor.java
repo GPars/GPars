@@ -28,6 +28,7 @@ import groovyx.gpars.actor.impl.ActorStopException;
 import groovyx.gpars.actor.impl.ActorTerminationException;
 import groovyx.gpars.actor.impl.ActorTimeoutException;
 import org.codehaus.groovy.runtime.CurriedClosure;
+import org.codehaus.groovy.runtime.GeneratedClosure;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
@@ -592,13 +593,13 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @author Vaclav Pech
      */
-    private final class MultiMessageReaction extends groovy.lang.Closure implements org.codehaus.groovy.runtime.GeneratedClosure {
+    private final class MultiMessageReaction extends Closure implements GeneratedClosure {
         private final Closure code;
         private final int maxNumberOfParameters;
         private final long timeout;
         private final List<MessageStream> localSenders;
 
-        public MultiMessageReaction(final Closure code, final int maxNumberOfParameters, final long timeout, final List<MessageStream> localSenders) {
+        private MultiMessageReaction(final Closure code, final int maxNumberOfParameters, final long timeout, final List<MessageStream> localSenders) {
             super(code.getThisObject());
             this.code = code;
             this.maxNumberOfParameters = maxNumberOfParameters;
