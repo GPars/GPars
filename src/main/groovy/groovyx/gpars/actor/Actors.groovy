@@ -55,7 +55,7 @@ public abstract class Actors {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the AbstractPooledActor class
      */
-    public static AbstractPooledActor actor(Closure handler) {
+    public static AbstractPooledActor actor(Runnable handler) {
         return defaultPooledActorGroup.actor(handler)
     }
 
