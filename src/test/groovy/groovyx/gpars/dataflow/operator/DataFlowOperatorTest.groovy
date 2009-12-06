@@ -145,9 +145,12 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         def op1 = operator(inputs: [a], outputs: [b], group) {v ->
             Thread.currentThread().interrupt()
             flag = true
+            bindOutput 'a'
         }
-        a << 'Message'
         assertFalse flag
+        a << 'Message'
+        assertEquals 'a', b.val
+        assertTrue flag
         op1.stop()
         op1.join()
     }
