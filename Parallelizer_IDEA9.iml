@@ -34,7 +34,7 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Groovy-1.7-rc-1" level="application" />
+    <orderEntry type="library" name="Groovy-1.6.7" level="application" />
   </component>
   <component name="copyright">
     <Base>
