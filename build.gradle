@@ -58,7 +58,7 @@ dependencies {
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
     docs group: 'org.grails', name: 'grails-docs', version: '1.2.0.BUILD-SNAPSHOT'
-    compile group: 'radeox', name: 'radeox', version: '1.0-b2'
+    docs group: 'radeox', name: 'radeox', version: '1.0-b2'
     deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
 }
 
