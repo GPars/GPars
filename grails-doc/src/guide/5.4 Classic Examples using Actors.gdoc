@@ -11,9 +11,9 @@ h2. Sleeping Barber
 
 "Problem description":http://en.wikipedia.org/wiki/Sleeping_barber_problem
 
-{code}import org.gparallelizer.actors.pooledActors.PooledActorGroup
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.Actor
+{code}import groovyx.gpars.actors.pooledActors.PooledActorGroup
+import groovyx.gpars.actors.pooledActors.AbstractPooledActor
+import groovyx.gpars.actors.Actor
 
 final def group = new PooledActorGroup()
 
@@ -124,8 +124,8 @@ h2. Dining Philosophers
 
 "Problem description":http://en.wikipedia.org/wiki/Dining_philosophers_problem
 
-{code}import org.gparallelizer.actors.pooledActors.AbstractPooledActor
-import org.gparallelizer.actors.pooledActors.PooledActors
+{code}import groovyx.gpars.actors.pooledActors.AbstractPooledActor
+import groovyx.gpars.actors.pooledActors.PooledActors
 
 PooledActors.defaultPooledActorGroup.resize 5
 
@@ -316,9 +316,9 @@ Demonstrates work balancing among adaptable set of workers. The load balancer re
 If the load balancer doesn't have any tasks available in the task queue, the worker is stopped.
 If the number of tasks in the task queue exceeds certain limit, a new worker is created to increase size of the worker pool.
 
-{code}import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.DefaultThreadActor
-import org.gparallelizer.actors.pooledActors.AbstractPooledActor
+{code}import groovyx.gpars.actors.Actor
+import groovyx.gpars.actors.DefaultThreadActor
+import groovyx.gpars.actors.pooledActors.AbstractPooledActor
 
 final class LoadBalancer extends DefaultThreadActor {
     int workers = 0

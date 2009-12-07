@@ -1,6 +1,6 @@
 Safe implements a Clojure-like Agent concept
 
-{code}import org.gparallelizer.actors.pooledActors.SafeVariable
+{code}import groovyx.gpars.actors.pooledActors.SafeVariable
 
 def jugMembers = new SafeVariable<List>(['Me'])  //add Me
 

@@ -3,7 +3,7 @@ Actors share a *pool* of threads, which are dynamically assigned to actors when 
 Here are some examples of how to use actors. This is how you create an actor that prints out all messages that it receives.
 
 {code}
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actors.pooledActors.PooledActors.*
 
 def console = actor {
     loop {
@@ -45,7 +45,7 @@ console.sendAndWait 'Message'
 h3. Creating an asynchronous service
 
 {code}
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actors.pooledActors.PooledActors.*
 
 final def decryptor = actor {
     loop {
@@ -70,7 +70,7 @@ As you can see, you create new actors with the _actor()_ method passing in the a
 Groovy flexible syntax with closures allows our library to offer multiple ways to define actors. For instance, here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates. Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method.
 
 {code}
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actors.pooledActors.PooledActors.*
 
 def me = actor {
     delegate.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
@@ -89,7 +89,7 @@ h2. Simple calculator
 
 A little bit more realistic example of an event-driven actor that receives two numeric messages, sums them up and sends the result to the console actor.
 {code}
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actors.pooledActors.PooledActors.*
 
 //not necessary, just showing that a single-threaded pool can still handle multiple actors
 defaultPooledActorGroup.resize 1
@@ -132,7 +132,7 @@ h3. Concurrent Merge Sort Example
 For comparison I'm also including a more involved example performing a concurrent merge sort of a list of integers using actors. You can see that thanks to flexibility of Groovy we came pretty close to the Scala model, although I still miss Scala pattern matching for message handling.
 
 {code}
-import static org.gparallelizer.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actors.pooledActors.PooledActors.*
 
 Closure createMessageHandler(def parentActor) {
     return {

@@ -3,7 +3,7 @@ h3. Dynamic Dispatch Actor
 The _DynamicDispatchActor_ class is a pooled actor allowing for an alternative structure of the message handling code. In general _DynamicDispatchActor_ repeatedly scans for messages and dispatches arrived messages to one of the _onMessage(message)_ methods defined on the actor. The _DynamicDispatchActor_ leverages the Groovy dynamic method dispatch mechanism under the covers.
 
 {code}
-import org.gparallelizer.actors.pooledActors.DynamicDispatchActor
+import groovyx.gpars.actors.pooledActors.DynamicDispatchActor
 
 final class MyActor extends DynamicDispatchActor {
 
@@ -83,7 +83,7 @@ h3. Reactive Actor
 The _ReactiveActor_ class, constructed typically by calling _PooledActors.reactor()_ or _PooledActorGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
 
 {code}
-import org.gparallelizer.actors.pooledActors.PooledActorGroup
+import groovyx.gpars.actors.pooledActors.PooledActorGroup
 
 final def group = new PooledActorGroup()
 
@@ -114,8 +114,8 @@ doubler.join()
 Here's an example of an actor, which submits a batch of numbers to a _ReactiveActor_ for processing and then prints the results gradually as they arrive.
 
 {code}
-import org.gparallelizer.actors.Actor
-import org.gparallelizer.actors.pooledActors.PooledActors
+import groovyx.gpars.actors.Actor
+import groovyx.gpars.actors.pooledActors.PooledActors
 
 final def doubler = PooledActors.reactor {
     2 * it
