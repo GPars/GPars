@@ -125,14 +125,8 @@ groovydoc {
 task documentation(dependsOn: ['javadoc', 'groovydoc', 'docs'], description: 'Create the API documentation.')
 
 task docs << {
-	ant.taskdef (name: 'docs', classname : 'grails.doc.ant.DocPublisherTask') {
-		classpath {
-			configurations.docs.resolve().each { f ->
-				pathelement(location:f)
-			}
-		}
-	}
-	ant.docs(src:"grails-doc/src", dest:"build/docs/guide", properties:"grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir : new File('grails-doc/resources/css'), imagesDir : new File('grails-doc/resources/img') )
+  ant.taskdef (name: 'docs', classname : 'grails.doc.ant.DocPublisherTask' , classpath : configurations.docs.asPath)
+  ant.docs(src:"grails-doc/src", dest:"build/docs/guide", properties:"grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir : new File('grails-doc/resources/css'), imagesDir : new File('grails-doc/resources/img') )
 }
 
 task zipDoc(type: Zip, dependsOn: documentation) {
