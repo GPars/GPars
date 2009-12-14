@@ -138,8 +138,8 @@ public class SendAndWaitTest extends GroovyTestCase {
         }
 
         barrier.await()
-        def result1 = actor.sendAndWait(1, 5, TimeUnit.SECONDS)
-        def result2 = actor.sendAndWait(3, 5, TimeUnit.SECONDS)
+        def result1 = actor.sendAndWait(1, 30, TimeUnit.SECONDS)
+        def result2 = actor.sendAndWait(3, 30, TimeUnit.SECONDS)
 
         latch.await()
         assertEquals 2, result1
