@@ -149,6 +149,14 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testMissingPool() {
+        final AtomicInteger counter = new AtomicInteger(0)
+        shouldFail(IllegalStateException.class) {
+            ParallelArrayUtil.eachParallel([], {counter.incrementAndGet()})
+        }
+        assertEquals 0, counter.get()
+    }
+
     public void testNestedPools() {
         Parallelizer.doParallel{a->
             Parallelizer.doParallel{b->

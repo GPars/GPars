@@ -59,7 +59,7 @@ public class Parallelizer {
      * Retrieves the pool assigned to the current thread.
      */
     protected static retrieveCurrentPool() {
-        return currentPoolStack.current
+        currentPoolStack.current
     }
 
     /**
@@ -286,25 +286,5 @@ public class Parallelizer {
      */
     public static <T> T orchestrate(AbstractForkJoinWorker<T> rootWorker) {
         new ForkJoinOrchestrator<T>(rootWorker).perform()
-    }
-}
-
-class ThreadLocalPools extends ThreadLocal<List<ForkJoinPool>> {
-
-    protected List<ForkJoinPool> initialValue() {
-        new LinkedList<ForkJoinPool>()
-    }
-
-    void leftShift(pool) {
-        get() << pool
-    }
-
-    void pop() {
-        assert !get().isEmpty()
-        get().removeLast()
-    }
-
-    def getCurrent() {
-        get().last
     }
 }

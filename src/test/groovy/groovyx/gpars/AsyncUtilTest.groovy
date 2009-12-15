@@ -18,6 +18,7 @@ package groovyx.gpars
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -111,11 +112,49 @@ public class AsyncUtilTest extends GroovyTestCase {
     public testNestedCalls() {
         Asynchronizer.doParallel(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
-                Asynchronizer.doParallel(pool) {
+                Asynchronizer.withExistingAsynchronizer(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
             assertEquals(['abc', 'xyz'], result)
+        }
+    }
+
+    public void testNestedPools() {
+        Asynchronizer.doParallel{a->
+            Asynchronizer.doParallel{b->
+                Asynchronizer.doParallel{c->
+                    Asynchronizer.doParallel{d->
+                        assert d != c != b != a
+                        assert Asynchronizer.retrieveCurrentPool() == d
+                    }
+                    assert Asynchronizer.retrieveCurrentPool() == c
+                }
+                assert Asynchronizer.retrieveCurrentPool() == b
+            }
+            assert Asynchronizer.retrieveCurrentPool() == a
+        }
+    }
+
+    public void testNestedExistingPools() {
+        final def pool1 = Executors.newFixedThreadPool(1)
+        final def pool2 = Executors.newFixedThreadPool(1)
+        final def pool3 = Executors.newFixedThreadPool(1)
+        Asynchronizer.withExistingAsynchronizer(pool1){a->
+            Asynchronizer.withExistingAsynchronizer(pool2){b->
+                Asynchronizer.withExistingAsynchronizer(pool1){c->
+                    Asynchronizer.withExistingAsynchronizer(pool3){d->
+                        assert d == pool3
+                        assert c == pool1
+                        assert b == pool2
+                        assert a == pool1
+                        assert Asynchronizer.retrieveCurrentPool() == pool3
+                    }
+                    assert Asynchronizer.retrieveCurrentPool() == pool1
+                }
+                assert Asynchronizer.retrieveCurrentPool() == pool2
+            }
+            assert Asynchronizer.retrieveCurrentPool() == pool1
         }
     }
 }

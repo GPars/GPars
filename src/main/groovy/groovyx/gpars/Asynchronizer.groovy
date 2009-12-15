@@ -44,7 +44,7 @@ class Asynchronizer {
     /**
      * Maps threads to their appropriate thread pools
      */
-    private static final ThreadLocal<ExecutorService> currentInvoker = new ThreadLocal<ExecutorService>()
+    private static final ThreadLocalPools currentPoolStack = new ThreadLocalPools()
 
     /**
      * Caches the default pool size.
@@ -55,7 +55,7 @@ class Asynchronizer {
      * Retrieves the pool assigned to the current thread.
      */
     protected static ExecutorService retrieveCurrentPool() {
-        currentInvoker.get()
+        currentPoolStack.current
     }
 
     /**
@@ -255,14 +255,14 @@ class Asynchronizer {
      * @param pool The <i>ExecutorService</i> to use, the service will not be shutdown after this method returns
      */
     public static withExistingAsynchronizer(ExecutorService pool, Closure cl) {
-        currentInvoker.set(pool)
+        currentPoolStack << pool
         def result = null
         try {
             use(AsyncInvokerUtil) {
                 result = cl(pool)
             }
         } finally {
-            currentInvoker.remove()
+            currentPoolStack.pop()
         }
         return result
     }
