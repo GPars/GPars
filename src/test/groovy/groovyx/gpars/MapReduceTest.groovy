@@ -87,4 +87,15 @@ public class MapReduceTest extends GroovyTestCase {
         }
     }
 
+    public void testCollectionProperty() {
+        Parallelizer.doParallel(5) {
+            final def original = [1, 2, 3, 4, 5]
+            final def collection = original.parallel.collection
+            assertEquals original, collection
+            assert !original.is(collection)
+            assert collection instanceof ArrayList
+            assertEquals collection, collection.clone()
+        }
+    }
+
 }

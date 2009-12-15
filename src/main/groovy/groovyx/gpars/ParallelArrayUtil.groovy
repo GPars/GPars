@@ -578,7 +578,7 @@ abstract class AbstractParallelCollection<T> {
      * @return A collection containing all elements of the wrapped ParallelArray
      */
     public final Object getCollection() {
-        this.pa.all().asList()
+        this.pa.all().asList() as ArrayList
     }
 
     /**
