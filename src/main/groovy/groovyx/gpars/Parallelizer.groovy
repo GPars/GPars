@@ -48,7 +48,7 @@ public class Parallelizer {
     /**
      * Maps threads to their appropriate thread pools
      */
-    private static final ThreadLocal<ForkJoinPool> currentPool = new ThreadLocal<ForkJoinPool>()
+    private static final ThreadLocalPools currentPoolStack = new ThreadLocalPools()
 
     /**
      * Caches the default pool size.
@@ -59,7 +59,7 @@ public class Parallelizer {
      * Retrieves the pool assigned to the current thread.
      */
     protected static retrieveCurrentPool() {
-        return currentPool.get()
+        return currentPoolStack.current
     }
 
     /**
@@ -252,14 +252,14 @@ public class Parallelizer {
      */
     public static withExistingParallelizer(ForkJoinPool pool, Closure cl) {
 
-        currentPool.set(pool)
+        currentPoolStack << pool
         def result = null
         try {
             use(ParallelArrayUtil) {
                 result = cl(pool)
             }
         } finally {
-            currentPool.remove()
+            currentPoolStack.pop()
         }
         return result
     }
@@ -271,11 +271,11 @@ public class Parallelizer {
      * Used by ParallelEnhancer's Parallel mixins. 
      */
     static ensurePool(ForkJoinPool pool, Closure cl) {
-        currentPool.set(pool)
+        currentPoolStack << pool
         try {
             return cl(pool)
         } finally {
-            currentPool.remove()
+            currentPoolStack.pop()
         }
     }
 
@@ -286,5 +286,25 @@ public class Parallelizer {
      */
     public static <T> T orchestrate(AbstractForkJoinWorker<T> rootWorker) {
         new ForkJoinOrchestrator<T>(rootWorker).perform()
+    }
+}
+
+class ThreadLocalPools extends ThreadLocal<List<ForkJoinPool>> {
+
+    protected List<ForkJoinPool> initialValue() {
+        new LinkedList<ForkJoinPool>()
+    }
+
+    void leftShift(pool) {
+        get() << pool
+    }
+
+    void pop() {
+        assert !get().isEmpty()
+        get().removeLast()
+    }
+
+    def getCurrent() {
+        get().last
     }
 }

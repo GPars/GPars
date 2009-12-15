@@ -149,6 +149,44 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testNestedPools() {
+        Parallelizer.doParallel{a->
+            Parallelizer.doParallel{b->
+                Parallelizer.doParallel{c->
+                    Parallelizer.doParallel{d->
+                        assert d != c != b != a
+                        assert Parallelizer.retrieveCurrentPool() == d
+                    }
+                    assert Parallelizer.retrieveCurrentPool() == c
+                }
+                assert Parallelizer.retrieveCurrentPool() == b
+            }
+            assert Parallelizer.retrieveCurrentPool() == a
+        }
+    }
+
+    public void testNestedExistingPools() {
+        final def pool1 = new ForkJoinPool()
+        final def pool2 = new ForkJoinPool()
+        final def pool3 = new ForkJoinPool()
+        Parallelizer.withExistingParallelizer(pool1){a->
+            Parallelizer.withExistingParallelizer(pool2){b->
+                Parallelizer.withExistingParallelizer(pool1){c->
+                    Parallelizer.withExistingParallelizer(pool3){d->
+                        assert d == pool3
+                        assert c == pool1
+                        assert b == pool2
+                        assert a == pool1
+                        assert Parallelizer.retrieveCurrentPool() == pool3
+                    }
+                    assert Parallelizer.retrieveCurrentPool() == pool1
+                }
+                assert Parallelizer.retrieveCurrentPool() == pool2
+            }
+            assert Parallelizer.retrieveCurrentPool() == pool1
+        }
+    }
+
     //todo exception handler doesn't seem to be accepted by the pool
     //todo try setting exception handlers on the thread level in both Parallelizer and Asynchronizer
     //todo consider queue and pool options

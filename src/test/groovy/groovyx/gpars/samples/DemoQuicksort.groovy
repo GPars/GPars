@@ -23,7 +23,6 @@
 
 package groovyx.gpars.samples
 
-import groovyx.gpars.Asynchronizer
 import static groovyx.gpars.Parallelizer.doParallel
 
 def quicksort(list) {
@@ -31,9 +30,7 @@ def quicksort(list) {
     doParallel {
         def groups = list.groupByParallel {it <=> list[list.size().intdiv(2)]}
         if (groups.size() == 1) return list.clone()
-        Asynchronizer.doParallel {
-            (-1..1).collect({quicksort(groups[it] as ArrayList ?: [])}.async())*.get().sumParallel()
-        }
+        (-1..1).collect({quicksort(groups[it] as ArrayList ?: [])}).sumParallel()
     }
 }
 
