@@ -92,7 +92,7 @@ contributor(asynchronizerBody) {
 }
 
 /**
- * Enhances closures within the DataFlowOperator.operator blocks
+ * Enhances closures within the DataFlow.operator blocks
  */
 
 def operatorBody = context(scope: closureScope())
@@ -103,7 +103,7 @@ contributor(operatorBody) {
         def currentMethod = call.bind()
         def clazz = currentMethod?.containingClass
         final def clazzName = clazz?.qualName?.toUpperCase()
-        if (clazzName?.contains("DATAFLOWOPERATOR")) {
+        if (clazzName?.contains("DATAFLOW")) {
             method name: "bindOutput", type: "void", params:[idx:'Integer', value:'Object']
             method name: "bindOutput", type: "void", params:[value:'Object']
         }

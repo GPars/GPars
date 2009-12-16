@@ -16,6 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
+import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 
 /**
@@ -45,7 +46,7 @@ def sites = new DataFlowStream()
  *
  * Downloads received urls passing downloaded content to the output
  */
-operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
+DataFlow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
 
     println "[Downloader] Downloading ${request.site}"
     def content = request.site.toURL().text
@@ -62,9 +63,21 @@ pendingDownloads = [:]
  * Caches sites' contents. Accepts requests for url content, outputs the content. Outputs requests for download
  * if the site is not in cache yet.
  */
-operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
+DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 
-    if (!request.content) {
+    if (request.content) {
+        println "[Cache] Caching ${request.site}"
+        cache[request.site] = request.content
+        bindOutput 1, request
+        def downloads = pendingDownloads[request.site]
+        if (downloads != null) {
+            for (downloadRequest in downloads) {
+                println "[Cache] Waking up"
+                bindOutput 1, [site: downloadRequest.site, word:downloadRequest.word, content: request.content]
+            }
+            pendingDownloads.remove(request.site)
+        }
+    } else {
         println "[Cache] Retrieving ${request.site}"
         def content = cache[request.site]
         if (content) {
@@ -81,18 +94,6 @@ operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
                 bindOutput 0, request
             }
         }
-    } else {
-        println "[Cache] Caching ${request.site}"
-        cache[request.site] = request.content
-        bindOutput 1, request
-        def downloads = pendingDownloads[request.site]
-        if (downloads != null) {
-            for (downloadRequest in downloads) {
-                println "[Cache] Waking up"
-                bindOutput 1, [site: downloadRequest.site, word:downloadRequest.word, content: request.content]
-            }
-            pendingDownloads.remove(request.site)
-        }
     }
 }
 
@@ -106,7 +107,7 @@ def results = new DataFlowStream()
  *
  * Accepts sites' content searching for requested word in them. Sends the result to the results stream.
  */
-def finder = operator(inputs: [sites], outputs: [results]) {request ->
+def finder = DataFlow.operator(inputs: [sites], outputs: [results]) {request ->
     println "[Finder] Searching for ${request.word} in ${request.site}."
     def result = request.content.toUpperCase().contains(request.word.toUpperCase())
     results << "${result ? '' : 'No '}${request.word} in ${request.site}."
@@ -129,4 +130,5 @@ Thread.start {
 //        println "============================================================= Result: " + finder.output.val
 //        println "============================================================= Result: " + finder.outputs[0].val
     }
+    System.exit 0
 }

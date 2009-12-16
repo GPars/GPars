@@ -17,8 +17,8 @@
 package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
+import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
-import groovyx.gpars.dataflow.operator.DataFlowOperator
 import java.awt.Font
 import javax.swing.JFrame
 import javax.swing.JTextArea
@@ -57,7 +57,7 @@ def sites = new DataFlowStream()
 /**
  * Downloads received urls passing downloaded content to the output
  */
-DataFlowOperator.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
+DataFlow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
 
     contentDownloaderArea.report "Downloading ${request.site}"
 //    def content = request.site.toURL().text
@@ -76,9 +76,22 @@ pendingDownloads = [:]
  * Caches sites' contents. Accepts requests for url content, outputs the content. Outputs requests for download
  * if the site is not in cache yet.
  */
-DataFlowOperator.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
+DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 
-    if (!request.content) {
+    if (request.content) {
+        contentCacheArea.report "Caching ${request.site}"
+        Thread.sleep 2000
+        cache[request.site] = request.content
+        bindOutput 1, request
+        def downloads = pendingDownloads[request.site]
+        if (downloads != null) {
+            for (downloadRequest in downloads) {
+                contentCacheArea.report "Waking up"
+                bindOutput 1, [site: downloadRequest.site, content: request.content]
+            }
+            pendingDownloads.remove(request.site)
+        }
+    } else {
         contentCacheArea.report "Retrieving ${request.site}"
         Thread.sleep 2000
         def content = cache[request.site]
@@ -96,27 +109,13 @@ DataFlowOperator.operator(inputs: [urlRequests], outputs: [downloadRequests, sit
                 bindOutput 0, request
             }
         }
-    } else {
-        contentCacheArea.report "Caching ${request.site}"
-        Thread.sleep 2000
-        cache[request.site] = request.content
-        bindOutput 1, request
-        def downloads = pendingDownloads[request.site]
-        if (downloads != null) {
-            for (downloadRequest in downloads) {
-                contentCacheArea.report "Waking up"
-                bindOutput 1, [site: downloadRequest.site, content: request.content]
-            }
-            pendingDownloads.remove(request.site)
-        }
-
     }
 }
 
 /**
  * Accepts sites' content searching for the word Groovy in them, printing results to the UI.
  */
-DataFlowOperator.operator(inputs: [sites], outputs: []) {request ->
+DataFlow.operator(inputs: [sites], outputs: []) {request ->
     def result = request.content.toUpperCase().contains('GROOVY')
     wordFinderArea.report "${result ? '' : 'No '}Groovy in ${request.site}."
 }
