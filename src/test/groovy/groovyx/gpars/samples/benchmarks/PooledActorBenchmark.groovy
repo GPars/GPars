@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.benchmarks
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 public class PooledActorBenchmark implements Benchmark {
 

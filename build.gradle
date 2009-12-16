@@ -57,6 +57,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
+//    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
     docs group: 'org.grails', name: 'grails-docs', version: '1.2.0.BUILD-SNAPSHOT'
     docs group: 'radeox', name: 'radeox', version: '1.0-b2'
     deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"

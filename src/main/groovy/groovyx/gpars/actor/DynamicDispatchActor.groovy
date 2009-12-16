@@ -16,7 +16,6 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import org.codehaus.groovy.runtime.NullObject
 

@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.PooledActorGroup
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 
 final def group = new PooledActorGroup(23)

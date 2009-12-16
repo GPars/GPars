@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import static groovyx.gpars.dataflow.DataFlow.start
 
 /**

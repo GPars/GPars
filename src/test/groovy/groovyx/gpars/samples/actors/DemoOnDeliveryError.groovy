@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CyclicBarrier
 
 /**

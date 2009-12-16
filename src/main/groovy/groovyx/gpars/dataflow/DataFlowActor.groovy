@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 
 /**
  * A parent actor for all actors used in Dataflow Concurrency implementation

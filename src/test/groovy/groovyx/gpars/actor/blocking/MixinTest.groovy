@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean

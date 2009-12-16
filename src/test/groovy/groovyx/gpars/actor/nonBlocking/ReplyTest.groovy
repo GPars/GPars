@@ -16,9 +16,9 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.impl.ActorReplyException
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CountDownLatch

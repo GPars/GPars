@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 import static groovyx.gpars.actor.Actors.actor
 

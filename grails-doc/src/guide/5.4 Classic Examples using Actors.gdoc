@@ -12,7 +12,7 @@ h2. Sleeping Barber
 "Problem description":http://en.wikipedia.org/wiki/Sleeping_barber_problem
 
 {code}import groovyx.gpars.actor.PooledActorGroup
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 
 final def group = new PooledActorGroup()
@@ -124,7 +124,7 @@ h2. Dining Philosophers
 
 "Problem description":http://en.wikipedia.org/wiki/Dining_philosophers_problem
 
-{code}import groovyx.gpars.actor.impl.AbstractPooledActor
+{code}import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actors
 
 Actors.defaultPooledActorGroup.resize 5
@@ -318,7 +318,7 @@ If the number of tasks in the task queue exceeds certain limit, a new worker is 
 
 {code}import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 
 /**
  * Demonstrates work balancing among adaptable set of workers.

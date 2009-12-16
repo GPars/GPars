@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 
 /**
  * Demonstrates a way to do continuation-style loops with Actors.

@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * Demonstrates work balancing among adaptable set of workers.

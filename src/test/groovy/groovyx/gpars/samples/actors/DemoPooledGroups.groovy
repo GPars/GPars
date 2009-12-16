@@ -16,10 +16,10 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * Three pooled actors are created, two of them in a newly created pooled actor group, one in the default pooled actor

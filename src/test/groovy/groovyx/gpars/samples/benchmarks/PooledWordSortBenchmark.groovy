@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.benchmarks
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 
 public class PooledWordSortBenchmark implements Benchmark {

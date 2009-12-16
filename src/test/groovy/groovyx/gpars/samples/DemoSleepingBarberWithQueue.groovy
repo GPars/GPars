@@ -1,6 +1,6 @@
 package groovyx.gpars.samples
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import java.util.concurrent.ArrayBlockingQueue
 
 /*

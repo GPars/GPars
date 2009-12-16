@@ -16,11 +16,11 @@
 
 package groovyx.gpars.actor.groups
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.NonDaemonActorGroup
 import groovyx.gpars.actor.PooledActorGroup
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 
 public class PooledActorGroupTest extends GroovyTestCase {

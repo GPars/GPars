@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 
 /**
  * A guess game. A player actor guesses a number and the master replies with either 'too large', 'too small' or 'guessed'.

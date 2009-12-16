@@ -14,12 +14,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package groovyx.gpars.actor.impl;
+package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
 import groovy.lang.MetaClass;
 import groovy.time.Duration;
-import groovyx.gpars.actor.ActorMessage;
+import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.actor.impl.SequentialProcessingActor;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.ArrayList;

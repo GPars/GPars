@@ -16,8 +16,8 @@
 
 package groovyx.gpars.dataflow.operator
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.ActorGroup
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * Dataflow operators form the basic units in dataflow networks. Operators are typically combined into oriented graphs that transform data.

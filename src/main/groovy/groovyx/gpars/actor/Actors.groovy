@@ -16,7 +16,6 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.scheduler.ResizeablePool
 
 /**
