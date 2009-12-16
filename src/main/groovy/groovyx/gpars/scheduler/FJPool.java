@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 public class FJPool implements Pool {
     protected ForkJoinPool pool;
     private final int configuredPoolSize;
+    private static final long DEFAULT_SHUTDOWN_TIMEOUT = 30L;
 
     /**
      * Creates the pool with default number of threads.
@@ -114,8 +115,8 @@ public class FJPool implements Pool {
     public final void shutdown() {
         pool.shutdown();
         try {
-            pool.awaitTermination(30L, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
+            pool.awaitTermination(DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();  // set the interrupted flag
         }
     }

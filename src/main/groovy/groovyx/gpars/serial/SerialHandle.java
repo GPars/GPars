@@ -66,7 +66,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
      *
      * @param value
      */
-    private SerialHandle(WithSerialId value, UUID id) {
+    private SerialHandle(final WithSerialId value, final UUID id) {
         super(bundle, value);
 
         context = SerialContext.get();
@@ -122,7 +122,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
                 } else {
                     @SuppressWarnings({"unchecked"})
                     final List<SerialContext> list = (List<SerialContext>) subscribers;
-                    for (SerialContext remoteHost : list) {
+                    for (final SerialContext remoteHost : list) {
                         if (remoteHost == context) {
                             return;
                         }
@@ -135,7 +135,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
         }
     }
 
-    public void unsubscribe(SerialContext context) {
+    public void unsubscribe(final SerialContext context) {
         synchronized (this) {
             if (subscribers != null) {
                 if (subscribers instanceof SerialContext) {
@@ -158,7 +158,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
         }
     }
 
-    public static SerialHandle create(WithSerialId obj, UUID id) {
+    public static SerialHandle create(final WithSerialId obj, final UUID id) {
         if (id == null) {
             return new LocalSerialHandle(obj, UUID.randomUUID());
         } else {
@@ -168,13 +168,13 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
 
 
     private static class LocalSerialHandle extends SerialHandle {
-        public LocalSerialHandle(WithSerialId obj, UUID uuid) {
+        public LocalSerialHandle(final WithSerialId obj, final UUID uuid) {
             super(obj, uuid);
         }
     }
 
     private static class RemoteSerialHandle extends SerialHandle {
-        public RemoteSerialHandle(WithSerialId obj, UUID uuid) {
+        private RemoteSerialHandle(final WithSerialId obj, final UUID uuid) {
             super(obj, uuid);
         }
 
@@ -188,12 +188,12 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
             private static final long serialVersionUID = -951052191389868427L;
             private final UUID serialId;
 
-            public ReleaseHandle(UUID serialId) {
+            public ReleaseHandle(final UUID serialId) {
                 this.serialId = serialId;
             }
 
             @Override
-            public void execute(RemoteConnection conn) {
+            public void execute(final RemoteConnection conn) {
                 final RemoteHost remoteHost = conn.getHost();
                 final SerialHandle handle = remoteHost.get(serialId);
                 if (handle instanceof LocalSerialHandle) {

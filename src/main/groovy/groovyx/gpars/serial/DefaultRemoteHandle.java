@@ -35,6 +35,7 @@ public class DefaultRemoteHandle extends RemoteHandle {
         this.klazz = klazz;
     }
 
+    @Override
     protected WithSerialId createObject(final SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
       final Constructor constructor = klazz.getConstructor(RemoteHost.class);
       return (WithSerialId) constructor.newInstance(context);

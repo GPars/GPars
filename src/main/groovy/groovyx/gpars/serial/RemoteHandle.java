@@ -29,7 +29,7 @@ public abstract class RemoteHandle implements Serializable {
     protected final UUID serialId;
     protected final UUID hostId;
 
-    public RemoteHandle(UUID hostId, UUID id) {
+    public RemoteHandle(final UUID hostId, final UUID id) {
         this.hostId = hostId;
         serialId = id;
     }

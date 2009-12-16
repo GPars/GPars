@@ -42,19 +42,19 @@ public abstract class SerialHandles {
         return id;
     }
 
-    public void add(SerialHandle handle) {
+    public void add(final SerialHandle handle) {
         localHandles.put(handle.getSerialId(), handle);
     }
 
-    public void remove(SerialHandle handle) {
+    public void remove(final SerialHandle handle) {
         localHandles.remove(handle.getSerialId());
     }
 
-    public SerialHandle get(UUID id) {
+    public SerialHandle get(final UUID id) {
         return localHandles.get(id);
     }
 
-    public void finalizeHandle(SerialHandle handle) {
+    public void finalizeHandle(final SerialHandle handle) {
         localHandles.remove(handle.getSerialId());
     }
 

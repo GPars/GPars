@@ -2602,9 +2602,6 @@
         <inspection_tool class="ThrowFromFinallyBlockJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ThrowableInstanceNeverThrown" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ThrowablePrintStackTrace" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="ThrownExceptionsPerMethod" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_limit" value="3" />
-        </inspection_tool>
         <inspection_tool class="TimeToString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="TodoComment" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="TooBroadCatch" enabled="true" level="WARNING" enabled_by_default="true">

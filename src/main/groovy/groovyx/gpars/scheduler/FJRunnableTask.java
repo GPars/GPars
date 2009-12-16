@@ -31,6 +31,7 @@ final class FJRunnableTask extends AsyncAction {
         this.runnable = runnable;
     }
 
+    @SuppressWarnings({"CatchGenericClass"})
     @Override protected void compute() {
         try {
             runnable.run();
