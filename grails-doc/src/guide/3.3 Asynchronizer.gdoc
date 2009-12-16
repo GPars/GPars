@@ -1,8 +1,8 @@
-Use of Asynchronizer\- the Java Executors' based background asynchronous processor
+Use of Asynchronizer - the Java Executors' based background asynchronous processor
 
 h2. Usage of Asynchronizer
 
-The _Asynchronizer_ class enables a Java's Executor Service-based DSL on collections and closures. At least Java 1.5 must be used.
+The _Asynchronizer_ class enables a Java's Executor Service-based DSL on collections and closures.
 
 h3. Closures enhancements
 

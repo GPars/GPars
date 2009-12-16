@@ -22,6 +22,6 @@ The jsr-166y library brings a very convenient abstraction called "Parallel Array
  {code}
  It also allows for a more functional style map/reduce collection processing.
  {code}
- def smallestSelfPortrait = images.parallel.findAll{it.contains me}.map{it.resize()}.min{it.sizeInMB}
+ def smallestSelfPortrait = images.parallel.filter{it.contains me}.map{it.resize()}.min{it.sizeInMB}
  {code}
  

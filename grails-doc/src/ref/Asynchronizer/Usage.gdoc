@@ -1,4 +1,4 @@
-Use of Asynchronizer\- the Java Executors' based concurrent collection processor
+Use of Asynchronizer - the Java Executors' based concurrent collection processor
 
 Closures enhancements
 {code}Asynchronizer.doParallel() {
