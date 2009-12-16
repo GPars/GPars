@@ -32,7 +32,7 @@ import java.util.UUID;
 public class BroadcastDiscovery {
     private static InetAddress GROUP;
     private static final int PORT = 4239;
-    private static final int MAGIC = 0x23982391;
+    private static final long MAGIC = 0x23982391L;
     private final UUID uid;
     private final InetSocketAddress address;
     private Thread sendThread;
@@ -78,7 +78,7 @@ public class BroadcastDiscovery {
                 public void run() {
                     while (!stopped) {
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(1000L);
                         } catch (InterruptedException e) {
                         }
 

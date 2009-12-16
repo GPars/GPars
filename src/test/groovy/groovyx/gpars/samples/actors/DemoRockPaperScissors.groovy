@@ -35,7 +35,7 @@ final /*static*/ BEATS = [
         [Move.SCISSORS, Move.PAPER]
 ].asImmutable()
 
-@Immutable class Stroke {
+@Immutable final class Stroke {
     String player;
     Move move
 }

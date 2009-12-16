@@ -3,7 +3,7 @@ package groovyx.gpars.samples.dataflow
 import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.NonDaemonActorGroup
 import groovyx.gpars.dataflow.DataFlowStream
-import static groovyx.gpars.dataflow.operator.DataFlowOperator.operator
+import static groovyx.gpars.dataflow.DataFlow.operator
 
 def getYearEndClosing(String stock, int year) {
     def url = "http://ichart.finance.yahoo.com/table.csv?s=$stock&amp;a=11&amp;b=01&amp;c=$year&amp;d=11&amp;e=31&amp;f=$year&amp;g=m;ignore=.csv"

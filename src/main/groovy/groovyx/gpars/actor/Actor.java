@@ -129,7 +129,7 @@ public abstract class Actor extends ReceivingMessageStream {
      * @throws InterruptedException if interrupted while waiting
      */
     public final void join(final long timeout, final TimeUnit unit) throws InterruptedException {
-        if (timeout > 0) {
+        if (timeout > 0L) {
             joinLatch.getVal(timeout, unit);
         } else {
             joinLatch.getVal();

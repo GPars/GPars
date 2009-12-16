@@ -33,6 +33,7 @@ void ints(int n, int max, DataFlowStream<Integer> stream) {
     }
 }
 
+@SuppressWarnings("GroovyInfiniteRecursion")
 void sum(int s, DataFlowStream<Integer> inStream, DataFlowStream<Integer> outStream) {
     println "Calculating $s"
     outStream << s

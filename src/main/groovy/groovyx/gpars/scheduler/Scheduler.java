@@ -33,7 +33,7 @@ public final class Scheduler implements Pool {
 
     AtomicInteger threadCount = new AtomicInteger();
 
-    volatile long lastTaskPoke = -10;
+    volatile long lastTaskPoke = -10L;
 
     volatile long schedulerTime;
 
@@ -157,10 +157,10 @@ public final class Scheduler implements Pool {
             while (!terminating) {
                 try {
                     schedulerTime++;
-                    if (schedulerTime > lastTaskPoke + 10) {
+                    if (schedulerTime > lastTaskPoke + 10L) {
                         startNewThread();
                     }
-                    Thread.sleep(50);
+                    Thread.sleep(50L);
                 } catch (InterruptedException e) {
                     break;
                 }
