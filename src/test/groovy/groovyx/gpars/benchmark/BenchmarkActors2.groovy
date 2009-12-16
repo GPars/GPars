@@ -8,12 +8,12 @@ package groovyx.gpars.benchmark
 
 import groovyx.gpars.actor.PooledActorGroup
 
-def execute(actorCount) {
+def execute(int actorCount) {
     final long n = 100000000l // 10 times fewer due to speed issues.
     final double delta = 1.0d / n
     final long sliceSize = n / actorCount
     final long startTimeNanos = System.nanoTime()
-    final computors = []
+    final List computors = []
     final group = new PooledActorGroup(actorCount) // Interesting (!) behaviour with the +1 missing.
     final accumulator = group.actor {
         double sum = 0.0d
@@ -33,7 +33,7 @@ def execute(actorCount) {
             }
         }
     }
-    (0l..<actorCount).each {long index ->
+    (0..<actorCount).each {long index ->
         final long start = 1l + index * sliceSize
         final long end = (index + 1l) * sliceSize
         computors.add(
@@ -48,8 +48,6 @@ def execute(actorCount) {
         )
 
     }
-    accumulator.start()
-    for (c in computors) { c.start() }
     accumulator.join()
 }
 

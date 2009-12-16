@@ -36,7 +36,6 @@ class Foo {
         def a1 = group.actor {
             perform(iterations)
         }
-        a1.start()
         a1.join()
 
     }
@@ -53,7 +52,6 @@ class Foo {
 //        a1.join()
 //        a2.start()
 //        a2.join()
-        [a1, a2]*.start()
         [a1, a2]*.join()
 
     }

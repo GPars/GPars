@@ -54,5 +54,5 @@ private void enhance(AbstractPooledActor thread) {
     }
 }
 
-System.in.read()
+Thread.sleep 5000
 System.exit 0 
