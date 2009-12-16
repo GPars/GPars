@@ -27,18 +27,34 @@ import org.gradle.api.file.FileCollection
 
 usePlugin 'groovy'
 usePlugin 'maven'
+usePlugin 'osgi'
 
 defaultTasks 'test'
 
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '0.9'
+bundleVersion = version
 
-manifest.mainAttributes(
-        'Implementation-Title': archivesBaseName,
-        'Implementation-Version': version,
-        'provider': 'Vaclav Pech'
-)
+def theVendor = 'Václav Pech'
+def theTitle = 'GPars: Groovy Parallel Systems'
+configure ( jar.osgi ) {
+  name = 'GPars'
+  instruction 'Bundle-Vendor' , theVendor
+  instruction 'Bundle-Description' , theTitle
+  instruction 'Bundle-DocURL' , 'http://gpars.codehaus.org'
+  instruction 'Built-By' , System.properties.'user.name'
+  instruction 'Extension-Name' , archivesBaseName
+  instruction 'Specification-Title' , theTitle
+  instruction 'Specification-Version' , version
+  instruction 'Specification-Vendor' , theVendor
+  instruction 'Implementation-Title' , theTitle
+  instruction 'Implementation-Version' , version
+  instruction'Implementation-Vendor' , theVendor
+  instruction 'Implementation-Title', archivesBaseName
+  instruction 'Implementation-Version', version
+  instruction 'provider', theVendor
+}
 
 repositories {
     mavenCentral()
@@ -60,7 +76,7 @@ dependencies {
 //    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
     docs group: 'org.grails', name: 'grails-docs', version: '1.2.0.BUILD-SNAPSHOT'
     docs group: 'radeox', name: 'radeox', version: '1.0-b2'
-    deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
+    deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
 }
 
 //  To get the details of the "unchecked" issues.
@@ -78,17 +94,24 @@ task release(dependsOn: ['build']) << {
     println 'We release now'
 }
 
-uploadArchives {
+try {
+  uploadArchives {
     repositories.mavenDeployer {
-        uniqueVersion = false
-        configuration = configurations.deployerJars
-        repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
-            authentication(userName: hasProperty('gpars_repoUserName') ? gpars_repoUserName : '', password: hasProperty('gpars_repoPassword') ? gpars_repoPassword : '')
-        }
-        snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
-            authentication(userName: hasProperty('gpars_repoUserName') ? gpars_repoUserName : '', password: hasProperty('gpars_repoPassword') ? gpars_repoPassword : '')
-        }
+      uniqueVersion = false
+      configuration = configurations.deployerJars
+      repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
+        authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+      }
+      snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
+        authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+      }
     }
+  }
+}
+catch ( Exception e ) {
+  //  It may be that gpars_repoUserName and/or gpars_repoPassword are not defined in which case an exception
+  //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
+  //  care that the uploadArchives specification hasn't completed.
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
