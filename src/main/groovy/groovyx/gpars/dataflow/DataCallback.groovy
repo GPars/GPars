@@ -16,8 +16,8 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.MessageStream
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.impl.MessageStream
 
 /**
  *

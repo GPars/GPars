@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor;
 
-import groovyx.gpars.MessageStream;
+import groovyx.gpars.actor.impl.MessageStream;
 
 import java.io.Serializable;
 

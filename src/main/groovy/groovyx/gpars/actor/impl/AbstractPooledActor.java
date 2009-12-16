@@ -19,8 +19,6 @@ package groovyx.gpars.actor.impl;
 import groovy.lang.Closure;
 import groovy.lang.MetaClass;
 import groovy.time.Duration;
-import groovyx.gpars.MessageStream;
-import groovyx.gpars.SequentialProcessingActor;
 import groovyx.gpars.actor.ActorMessage;
 import org.codehaus.groovy.runtime.InvokerHelper;
 

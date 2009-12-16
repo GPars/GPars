@@ -16,8 +16,8 @@
 package groovyx.gpars.actor;
 
 import groovy.time.BaseDuration;
-import groovyx.gpars.MessageStream;
-import groovyx.gpars.ReceivingMessageStream;
+import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.actor.impl.ReceivingMessageStream;
 import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowVariable;
 import groovyx.gpars.remote.RemoteConnection;

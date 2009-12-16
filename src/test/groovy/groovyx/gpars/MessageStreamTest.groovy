@@ -1,7 +1,8 @@
 package groovyx.gpars
 
-import groovyx.gpars.MessageStream.ResultWaiter
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.impl.MessageStream
+import groovyx.gpars.actor.impl.MessageStream.ResultWaiter
 import java.util.concurrent.TimeUnit
 
 /**

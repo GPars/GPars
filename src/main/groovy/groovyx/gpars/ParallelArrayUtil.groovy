@@ -650,7 +650,7 @@ abstract class AbstractParallelCollection<T> {
      * @param A closure calculating a transformed value from the original one
      * @return A collection holding the new values
      */
-    public final MappedCollection map(Closure cl) {
+    public final AbstractParallelCollection map(Closure cl) {
         new MappedCollection(pa.withMapping({cl(it)} as Mapper))
     }
 
@@ -659,7 +659,7 @@ abstract class AbstractParallelCollection<T> {
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
-    public abstract ParallelCollection filter(Closure cl)
+    public abstract AbstractParallelCollection filter(Closure cl)
 }
 
 /**

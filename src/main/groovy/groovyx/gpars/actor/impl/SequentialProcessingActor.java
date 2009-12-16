@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package groovyx.gpars;
+package groovyx.gpars.actor.impl;
 
 import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;
@@ -23,10 +23,6 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorGroup;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.Actors;
-import groovyx.gpars.actor.impl.ActorContinuationException;
-import groovyx.gpars.actor.impl.ActorStopException;
-import groovyx.gpars.actor.impl.ActorTerminationException;
-import groovyx.gpars.actor.impl.ActorTimeoutException;
 import org.codehaus.groovy.runtime.CurriedClosure;
 import org.codehaus.groovy.runtime.GeneratedClosure;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;

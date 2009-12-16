@@ -25,7 +25,7 @@ import groovyx.gpars.actor.Safe
  */
 class Conference extends Safe {
     
-    def Conference() { super(0L) }
+    def Conference() { super(0) }
 
     private def register(long num) { data += num }
 

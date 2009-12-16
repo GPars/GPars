@@ -14,13 +14,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package groovyx.gpars;
+package groovyx.gpars.actor.impl;
 
 import groovy.lang.Closure;
 import groovy.time.BaseDuration;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
-import groovyx.gpars.actor.impl.ActorReplyException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;

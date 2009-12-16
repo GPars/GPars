@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow;
 
-import groovyx.gpars.MessageStream;
+import groovyx.gpars.actor.impl.MessageStream;
 
 import java.util.ArrayList;
 import java.util.Iterator;
