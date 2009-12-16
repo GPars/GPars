@@ -57,6 +57,7 @@ public class NettyRemoteConnection extends RemoteConnection {
     }
 
     private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
+        private static final long serialVersionUID = -3054880716233778157L;
         public volatile NettyHandler handler;
 
         public void operationComplete(final ChannelFuture future) throws Exception {

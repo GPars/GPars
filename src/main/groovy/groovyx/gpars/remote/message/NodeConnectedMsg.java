@@ -29,6 +29,7 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public class NodeConnectedMsg extends SerialMsg {
+    private static final long serialVersionUID = -2198640646677794254L;
 
     /**
      * Id of node connected

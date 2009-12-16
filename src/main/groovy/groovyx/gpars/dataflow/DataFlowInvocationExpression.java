@@ -24,6 +24,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  * @author Alex Tkachman
  */
 public class DataFlowInvocationExpression extends DataFlowComplexExpression {
+    private static final long serialVersionUID = -678669663648650627L;
     private Object receiver;
     private final String methodName;
 

@@ -29,6 +29,7 @@ import groovyx.gpars.actor.Actors
  * Date: Sep 13, 2009
  */
 final class DataCallback extends MessageStream {
+    private static final long serialVersionUID = 6512046150477794254L;
     private final Closure code
 
     /**

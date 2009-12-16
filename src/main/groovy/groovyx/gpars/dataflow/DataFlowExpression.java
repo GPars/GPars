@@ -94,6 +94,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param <V> The type of the value to bind
      */
     private static class WaitingThread<V> extends AtomicBoolean {
+        private static final long serialVersionUID = 8909974768784947460L;
         private final Thread thread;
         private volatile WaitingThread<V> previous;
         private final MessageStream callback;
@@ -507,6 +508,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * Listener for availability of data flow expressions we depend from
      */
     final class DataFlowExpressionsCollector extends MessageStream {
+        private static final long serialVersionUID = 3414942165521113575L;
         private final AtomicInteger count = new AtomicInteger(1);
 
         @Override public MessageStream send(final Object message) {
@@ -546,6 +548,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     private static class TransformOne<V> extends DataFlowExpression<V> {
+        private static final long serialVersionUID = 6701886501249351047L;
         Object arg;
         private final Closure closure;
 
@@ -565,6 +568,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     private static class TransformMany<V> extends DataFlowComplexExpression<V> {
+        private static final long serialVersionUID = 4115456542358280855L;
         private final Closure closure;
 
         private TransformMany(final Collection collection, final Closure closure) {
@@ -585,6 +589,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * Represents a remote message binding a value to a remoted DataFlowExpression
      */
     public static class BindDataFlow extends SerialMsg {
+        private static final long serialVersionUID = -8674023870562062769L;
         private final DataFlowExpression expr;
         private final Object message;
 

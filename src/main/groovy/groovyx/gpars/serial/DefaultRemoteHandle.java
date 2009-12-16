@@ -26,6 +26,7 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public class DefaultRemoteHandle extends RemoteHandle {
+    private static final long serialVersionUID = 3543416239144672233L;
 
     private final Class klazz;
 

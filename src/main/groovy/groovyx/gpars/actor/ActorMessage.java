@@ -28,6 +28,7 @@ import java.io.Serializable;
  *         Date: Feb 27, 2009
  */
 public class ActorMessage<T> implements Serializable {
+    private static final long serialVersionUID = -2925547808451571430L;
     private T payLoad;
     private MessageStream sender;
     //todo what are the values after deserialization?

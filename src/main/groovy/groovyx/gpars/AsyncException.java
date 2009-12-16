@@ -26,6 +26,7 @@ import java.util.List;
  * @see groovyx.gpars.AsyncInvokerUtil
  */
 public final class AsyncException extends RuntimeException {
+    private static final long serialVersionUID = 1573135643731810717L;
     private final List<Throwable> concurrentExceptions;
 
     @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter"})

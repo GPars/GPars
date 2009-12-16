@@ -28,6 +28,7 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public class NodeDisconnectedMsg extends SerialMsg {
+    private static final long serialVersionUID = 8082827710656359290L;
 
     /**
      * Id of node disconnected

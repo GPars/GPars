@@ -146,6 +146,7 @@ public abstract class MessageStream extends WithSerialId {
      * @param <V> The type of expected reply message
      */
     private static class ResultWaiter<V> extends MessageStream {
+        private static final long serialVersionUID = 6512046150496489148L;
 
         /**
          * Holds a reference to the calling thread, while waiting, and the received reply message, once it has arrived.
@@ -238,6 +239,7 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     public static class RemoteMessageStream extends MessageStream implements RemoteSerialized {
+        private static final long serialVersionUID = 3936054469565089659L;
         private final RemoteHost remoteHost;
 
         public RemoteMessageStream(final RemoteHost host) {
@@ -255,6 +257,7 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     public static class SendTo<T> extends SerialMsg {
+        private static final long serialVersionUID = 1989120447646342520L;
         private final MessageStream to;
         private final ActorMessage<T> message;
 

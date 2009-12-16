@@ -24,6 +24,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  * @author Alex Tkachman
  */
 public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
+    private static final long serialVersionUID = 2984824057556784227L;
     private final DataFlowExpression receiver;
     private final String name;
 

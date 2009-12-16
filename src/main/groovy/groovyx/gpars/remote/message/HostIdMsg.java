@@ -26,6 +26,7 @@ import java.util.UUID;
  * @author Alex Tkachman, Vaclav Pech
  */
 public class HostIdMsg extends SerialMsg {
+    private static final long serialVersionUID = -7805772642034504624L;
 
     /**
      * Construct message representing current state of the transport provider

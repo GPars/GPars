@@ -24,6 +24,7 @@ package groovyx.gpars.actor.impl;
  *         Date: Feb 17, 2009
  */
 public final class ActorContinuationException extends ActorException {
+    private static final long serialVersionUID = -4978264308794524512L;
 
     ActorContinuationException() {
     }

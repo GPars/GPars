@@ -62,6 +62,8 @@ public final class DataFlowStream<T> {
     public void leftShift(final DataFlowExpression<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
         ref.getValAsync(new MessageStream() {
+            private static final long serialVersionUID = -4966523895011173569L;
+
             @Override
             public MessageStream send(final Object message) {
                 originalRef.bind((T) message);

@@ -26,6 +26,7 @@ import java.util.List;
  *         Date: Jun 11, 2009
  */
 public final class ActorReplyException extends RuntimeException {
+    private static final long serialVersionUID = -3877063222143535104L;
     private final List<Exception> issues;
 
     public ActorReplyException(final String message) {

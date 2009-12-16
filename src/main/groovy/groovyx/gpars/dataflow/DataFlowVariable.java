@@ -34,6 +34,8 @@ import groovyx.gpars.serial.RemoteSerialized;
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
 public class DataFlowVariable<T> extends DataFlowExpression<T> {
+    private static final long serialVersionUID = 1340439210749936258L;
+
     /**
      * Creates a new unbound Dataflow Variable
      */
@@ -56,6 +58,8 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
      */
     public void leftShift(final DataFlowExpression<T> ref) {
         ref.getValAsync(new MessageStream() {
+            private static final long serialVersionUID = -458384302762038543L;
+
             @Override public MessageStream send(final Object message) {
                 bind(ref.value);
                 return this;
@@ -69,12 +73,15 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
     }
 
     public static class RemoteDataFlowVariable extends DataFlowVariable implements RemoteSerialized {
+        private static final long serialVersionUID = -420013188758006693L;
         private final RemoteHost remoteHost;
         private boolean disconnected;
 
         public RemoteDataFlowVariable(final RemoteHost host) {
             remoteHost = host;
             getValAsync(new MessageStream() {
+                private static final long serialVersionUID = 7968302123667353660L;
+
                 @Override public MessageStream send(final Object message) {
                     if (!disconnected) {
                         remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));

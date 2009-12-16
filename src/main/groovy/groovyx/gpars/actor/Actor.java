@@ -187,6 +187,7 @@ public abstract class Actor extends ReceivingMessageStream {
 
     public static class MyRemoteHandle extends DefaultRemoteHandle {
         private final DataFlowExpression joinLatch;
+        private static final long serialVersionUID = 3721849638877039035L;
 
         public MyRemoteHandle(final SerialHandle handle, final SerialContext host, final DataFlowExpression joinLatch) {
             super(handle.getSerialId(), host.getHostId(), RemoteActor.class);
@@ -201,6 +202,7 @@ public abstract class Actor extends ReceivingMessageStream {
 
     public static class RemoteActor extends Actor implements RemoteSerialized {
         private final RemoteHost remoteHost;
+        private static final long serialVersionUID = -1375776678860848278L;
 
         public RemoteActor(final SerialContext host, final DataFlowExpression jointLatch) {
             super(jointLatch);
@@ -248,6 +250,7 @@ public abstract class Actor extends ReceivingMessageStream {
 
         public static class StopActorMsg extends SerialMsg {
             private final Actor actor;
+            private static final long serialVersionUID = -927785591952534581L;
 
             public StopActorMsg(final RemoteActor remoteActor) {
                 actor = remoteActor;
@@ -261,6 +264,7 @@ public abstract class Actor extends ReceivingMessageStream {
 
         public static class TerminateActorMsg extends SerialMsg {
             private final Actor actor;
+            private static final long serialVersionUID = -839334644951906974L;
 
             public TerminateActorMsg(final RemoteActor remoteActor) {
                 actor = remoteActor;

@@ -594,6 +594,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * @author Vaclav Pech
      */
     private final class MultiMessageReaction extends Closure implements GeneratedClosure {
+        private static final long serialVersionUID = -4047888721838663324L;
         private final Closure code;
         private final int maxNumberOfParameters;
         private final long timeout;

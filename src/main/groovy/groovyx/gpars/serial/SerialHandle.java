@@ -185,6 +185,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
         }
 
         public static class ReleaseHandle extends SerialMsg {
+            private static final long serialVersionUID = -951052191389868427L;
             private final UUID serialId;
 
             public ReleaseHandle(UUID serialId) {
