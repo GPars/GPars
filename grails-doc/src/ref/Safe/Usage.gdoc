@@ -1,6 +1,6 @@
-Safe implements a Clojure-like Agent concept
+h3. Safe implements a Clojure-like Agent concept
 
-{code}import groovyx.gpars.actors.pooledActors.SafeVariable
+{code}import groovyx.gpars.actor.SafeVariable
 
 def jugMembers = new SafeVariable<List>(['Me'])  //add Me
 

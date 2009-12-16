@@ -8,7 +8,7 @@ The good news is that you can combine actors and Dataflow Concurrency in any way
 {code}
 final DataFlowVariable a = new DataFlowVariable()
 
-final AbstractPooledActor doubler = PooledActors.actor {
+final AbstractPooledActor doubler = Actors.actor {
     react {message->
         a << 2 * message
     }

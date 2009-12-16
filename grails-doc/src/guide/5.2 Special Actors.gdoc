@@ -3,7 +3,7 @@ h3. Dynamic Dispatch Actor
 The _DynamicDispatchActor_ class is a pooled actor allowing for an alternative structure of the message handling code. In general _DynamicDispatchActor_ repeatedly scans for messages and dispatches arrived messages to one of the _onMessage(message)_ methods defined on the actor. The _DynamicDispatchActor_ leverages the Groovy dynamic method dispatch mechanism under the covers.
 
 {code}
-import groovyx.gpars.actors.pooledActors.DynamicDispatchActor
+import groovyx.gpars.actor.DynamicDispatchActor
 
 final class MyActor extends DynamicDispatchActor {
 
@@ -80,10 +80,10 @@ final def actor = new MyActor({
 
 h3. Reactive Actor
 
-The _ReactiveActor_ class, constructed typically by calling _PooledActors.reactor()_ or _PooledActorGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
+The _ReactiveActor_ class, constructed typically by calling _Actors.reactor()_ or _PooledActorGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
 
 {code}
-import groovyx.gpars.actors.pooledActors.PooledActorGroup
+import groovyx.gpars.actor.PooledActorGroup
 
 final def group = new PooledActorGroup()
 
@@ -114,14 +114,14 @@ doubler.join()
 Here's an example of an actor, which submits a batch of numbers to a _ReactiveActor_ for processing and then prints the results gradually as they arrive.
 
 {code}
-import groovyx.gpars.actors.Actor
-import groovyx.gpars.actors.pooledActors.PooledActors
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.dActors
 
-final def doubler = PooledActors.reactor {
+final def doubler = Actors.reactor {
     2 * it
 }.start()
 
-Actor actor = PooledActors.actor {
+Actor actor = Actors.actor {
     (1..10).each {doubler << it}
     int i = 0
     loop {

@@ -3,7 +3,7 @@ Actors share a *pool* of threads, which are dynamically assigned to actors when 
 Here are some examples of how to use actors. This is how you create an actor that prints out all messages that it receives.
 
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 def console = actor {
     loop {
@@ -45,7 +45,7 @@ console.sendAndWait 'Message'
 h3. Creating an asynchronous service
 
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 final def decryptor = actor {
     loop {
@@ -70,7 +70,7 @@ As you can see, you create new actors with the _actor()_ method passing in the a
 Groovy flexible syntax with closures allows our library to offer multiple ways to define actors. For instance, here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates. Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method.
 
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 def me = actor {
     delegate.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
@@ -89,7 +89,7 @@ h2. Simple calculator
 
 A little bit more realistic example of an event-driven actor that receives two numeric messages, sums them up and sends the result to the console actor.
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 //not necessary, just showing that a single-threaded pool can still handle multiple actors
 defaultPooledActorGroup.resize 1
@@ -132,7 +132,7 @@ h3. Concurrent Merge Sort Example
 For comparison I'm also including a more involved example performing a concurrent merge sort of a list of integers using actors. You can see that thanks to flexibility of Groovy we came pretty close to the Scala model, although I still miss Scala pattern matching for message handling.
 
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 Closure createMessageHandler(def parentActor) {
     return {
@@ -225,7 +225,7 @@ h3. Pool management
 
 Note: Describing pools and groups as they work in version 0.8 and later
 
-_Actors_ can be organized into groups and as a default there's always an application-wide pooled actor group available. And just like the _PooledActors_ abstract factory can be used to create actors in the default group, custom groups can be used as abstract factories to create new actors instances belonging to these groups.
+_Actors_ can be organized into groups and as a default there's always an application-wide pooled actor group available. And just like the _Actors_ abstract factory can be used to create actors in the default group, custom groups can be used as abstract factories to create new actors instances belonging to these groups.
 
 {code}
 def myGroup = new PooledActorGroup()
@@ -250,15 +250,15 @@ The thread pool can be manipulated through the appropriate _PooledActorGroup_ cl
 {code}
 ... (n+1 threads in the default pool after startup)
 
-PooledActors.defaultPooledActorGroup.resize 1  //use one-thread pool
+Actors.defaultPooledActorGroup.resize 1  //use one-thread pool
 
 ... (1 thread in the pool)
 
-PooledActors.defaultPooledActorGroup.resetDefaultSize()
+Actors.defaultPooledActorGroup.resetDefaultSize()
 
 ... (n+1 threads in the pool)
 
-PooledActors.defaultPooledActorGroup.shutdown()
+Actors.defaultPooledActorGroup.shutdown()
 {code}
 
 As an alternative to the _PooledActorGroup_, which creates a pool of daemon threads, the _NonDaemonActorGroup_ class can be used when non-daemon threads are required.
@@ -319,7 +319,7 @@ Do not forget to shutdown custom pooled actor groups, once you no longer need th
 h3. Common trap: App terminates while actors do not receive messages
 
 Most likely you're using daemon threads and pools, which is the default setting, and your main thread finishes. Calling _actor.join()_ on any, some or all of your actors would block the main thread until the actor terminates and thus keep all your actors running.
-Alternatively use instances of _NonDaemonThreadActorGroup_ or _NonDaemonActorGroup_ and assign some of your actors to these groups.
+Alternatively use instances of _NonDaemonActorGroup_ and assign some of your actors to these groups.
 {code}
 def nonDaemonGroup = new NonDaemonActorGroup()
 def myActor = nonDaemonGroup.actor {...}

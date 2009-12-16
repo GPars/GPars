@@ -11,9 +11,9 @@ h2. Sleeping Barber
 
 "Problem description":http://en.wikipedia.org/wiki/Sleeping_barber_problem
 
-{code}import groovyx.gpars.actors.pooledActors.PooledActorGroup
-import groovyx.gpars.actors.pooledActors.AbstractPooledActor
-import groovyx.gpars.actors.Actor
+{code}import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 
 final def group = new PooledActorGroup()
 
@@ -124,10 +124,10 @@ h2. Dining Philosophers
 
 "Problem description":http://en.wikipedia.org/wiki/Dining_philosophers_problem
 
-{code}import groovyx.gpars.actors.pooledActors.AbstractPooledActor
-import groovyx.gpars.actors.pooledActors.PooledActors
+{code}import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.Actors
 
-PooledActors.defaultPooledActorGroup.resize 5
+Actors.defaultPooledActorGroup.resize 5
 
 final class Philosopher extends AbstractPooledActor {
     private Random random = new Random()
@@ -316,34 +316,45 @@ Demonstrates work balancing among adaptable set of workers. The load balancer re
 If the load balancer doesn't have any tasks available in the task queue, the worker is stopped.
 If the number of tasks in the task queue exceeds certain limit, a new worker is created to increase size of the worker pool.
 
-{code}import groovyx.gpars.actors.Actor
-import groovyx.gpars.actors.DefaultThreadActor
-import groovyx.gpars.actors.pooledActors.AbstractPooledActor
+{code}import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.impl.AbstractPooledActor
 
-final class LoadBalancer extends DefaultThreadActor {
+/**
+ * Demonstrates work balancing among adaptable set of workers.
+ * The load balancer receives tasks and queues them in a temporary task queue.
+ * When a worker finishes his assignment, it asks the load balancer for a new task.
+ * If the load balancer doesn't have any tasks available in the task queue, the worker is stopped.
+ * If the number of tasks in the task queue exceeds certain limit, a new worker is created
+ * to increase size of the worker pool.
+ */
+
+final class LoadBalancer extends AbstractPooledActor {
     int workers = 0
     List taskQueue = []
     private static final QUEUE_SIZE_TRIGGER = 10
 
     void act() {
-        def message = receive()
-        switch (message) {
-            case NeedMoreWork:
-                if (taskQueue.size()==0) {
-                    println 'No more tasks in the task queue. Terminating the worker.'
-                    message.reply DemoWorker.EXIT
-                    workers -= 1
-                } else message.reply taskQueue.remove(0)
-                break
-            case WorkToDo:
-                taskQueue << message
-                if ((workers==0) || (taskQueue.size()>=QUEUE_SIZE_TRIGGER)) {
-                    println 'Need more workers. Starting one.'
-                    workers += 1
-                    new DemoWorker(this).start()
-                }
+        loop {
+            def message = receive()
+            switch (message) {
+                case NeedMoreWork:
+                    if (taskQueue.size() == 0) {
+                        println 'No more tasks in the task queue. Terminating the worker.'
+                        message.reply DemoWorker.EXIT
+                        workers -= 1
+                    } else message.reply taskQueue.remove(0)
+                    break
+                case WorkToDo:
+                    taskQueue << message
+                    if ((workers == 0) || (taskQueue.size() >= QUEUE_SIZE_TRIGGER)) {
+                        println 'Need more workers. Starting one.'
+                        workers += 1
+                        new DemoWorker(this).start()
+                    }
+            }
+            println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
         }
-        println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
     }
 }
 
@@ -365,7 +376,7 @@ final class DemoWorker extends AbstractPooledActor {
                     case WorkToDo:
                         processMessage(it)
                         break
-                    case EXIT:stop()
+                    case EXIT: stop()
                 }
             }
         }
@@ -373,32 +384,32 @@ final class DemoWorker extends AbstractPooledActor {
     }
 
     private void processMessage(message) {
-        synchronized(random) {
+        synchronized (random) {
             Thread.sleep random.nextInt(5000)
         }
     }
 }
-final class WorkToDo{}
-final class NeedMoreWork{}
+final class WorkToDo {}
+final class NeedMoreWork {}
 
 final Actor balancer = new LoadBalancer().start()
 
 //produce tasks
-for(i in 1..20) {
+for (i in 1..20) {
     Thread.sleep 100
     balancer << new WorkToDo()
 }
 
 //produce tasks in a parallel thread
 Thread.start {
-    for(i in 1..10) {
+    for (i in 1..10) {
         Thread.sleep 1000
         balancer << new WorkToDo()
     }
 }
 
-System.in.read()
+Thread.sleep 35000  //let the queues get empty
 balancer << new WorkToDo()
 balancer << new WorkToDo()
-System.in.read()
+Thread.sleep 10000
 {code}

@@ -43,7 +43,7 @@ h1. Examples
 h2. Shared list of members
 
 The SafeVariable wraps a list of members, who have been added to the jug. To add a new member a message (command to add a member) has to be sent to the _jugMembers_ SafeVariable.
-{code}import groovyx.gpars.actors.pooledActors.SafeVariable
+{code}import groovyx.gpars.actor.SafeVariable
 
 def jugMembers = new SafeVariable<List>(['Me'])  //add Me
 
@@ -69,7 +69,7 @@ jugMembers.stop()
 h2. Shared conference counting number of registrations
 
 The Conference class allows registration and unregistration, however these methods can only be called from the commands sent to the _conference_ SafeVariable.
-{code}import groovyx.gpars.actors.pooledActors.SafeVariable
+{code}import groovyx.gpars.actor.SafeVariable
 
 class Conference extends SafeVariable {
     def Conference() { super(0L) }
@@ -99,7 +99,7 @@ assert 12 == conference.val
 h2. The shopping cart example
 
 {code}
-import groovyx.gpars.actors.pooledActors.Safe
+import groovyx.gpars.actor.Safe
 
 class ShoppingCart {
     private def cartState = new Safe([:])
@@ -171,7 +171,7 @@ private Closure performClear = { it.clear() }
 h2. The printer service example
 
 Another example - a not thread-safe printer service shared by multiple threads. The printer needs to have the document and quality properties set before printing, so obviously a potential for race conditions if not guarded properly. Callers don't want to block until the printer is available, which the fire-and-forget nature of actors solves very elegantly.
-{code}import groovyx.gpars.actors.pooledActors.SafeVariable
+{code}import groovyx.gpars.actor.SafeVariable
 
 class PrinterService {
     String document

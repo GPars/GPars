@@ -10,7 +10,7 @@ Actors can share a relatively small thread pool. This can go as far as having ma
 Actor code is processed in chunks separated by quiet periods of waiting for new events (messages). This can be naturally modeled through _continuations_. As JVM doesn't support continuations directly, they have to be simulated in the actors frameworks, which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
 
 {code}
-import groovyx.gpars.actors.pooledActors.AbstractPooledActor
+import groovyx.gpars.actor.impl.AbstractPooledActor
 
 class GameMaster extends AbstractPooledActor {
     int secretNum
@@ -160,7 +160,7 @@ Actors share a *pool* of threads, which are dynamically assigned to actors when 
 For example, this is how you create an actor that prints out all messages that it receives.
 
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 def console = actor {
     loop {
@@ -176,7 +176,7 @@ Notice the _loop()_ method call, which ensures that the actor doesn't stop after
 Here's an example with a decryptor service, which can decrypt submitted messages and send the decrypted messages back to the originators.
 
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 final def decryptor = actor {
     loop {
@@ -199,7 +199,7 @@ actor {
 Here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates.
 
 {code}
-import static groovyx.gpars.actors.pooledActors.PooledActors.*
+import static groovyx.gpars.actor.Actors.*
 
 def me = actor {
     delegate.metaClass.onTimeout = {-> friend.send('I see, busy as usual. Never mind.')}
@@ -217,7 +217,7 @@ Sometimes messages cannot be delivered to the target actor. When special action 
 
 {code}
 final AbstractPooledActor me
-me = PooledActors.actor {
+me = Actors.actor {
     def message1 = 1
     def message2 = 2
 

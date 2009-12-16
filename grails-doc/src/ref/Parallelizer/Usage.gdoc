@@ -1,6 +1,6 @@
-Enables parallel collection processing and functional style with ap/reduce
+h2. Enables parallel collection processing and functional style with map/reduce
 
-Parallel collection processing
+h3. Parallel collection processing
 
 The following methods are currently supported on all objects in Groovy:
 * eachParallel()
@@ -31,7 +31,7 @@ The following methods are currently supported on all objects in Groovy:
  }
 {code}
 
-Meta-class enhancer
+h3. Meta-class enhancer
 
 {code}import groovyx.gpars.ParallelEnhancer
 
@@ -40,7 +40,7 @@ ParallelEnhancer.enhanceInstance(list)
 println list.collectParallel {it * 2 }
 {code}
 
-Transparently parallel collections
+h3. Transparently parallel collections
 
 {code}
 Parallelizer.doParallel {
@@ -57,7 +57,7 @@ def selectImportantNames(names) {
 }
 {code}
 
-Map/Reduce
+h3. Map/Reduce
 
 Available methods:
 * map()

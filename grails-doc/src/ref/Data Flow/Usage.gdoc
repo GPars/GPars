@@ -1,4 +1,4 @@
-Dataflow Variables
+h3. Dataflow Variables
 
 {code}
 import static groovyx.gpars.dataflow.DataFlow.task
@@ -20,9 +20,8 @@ task {
     y << 5
 }
 {code}
-We start three logical tasks, which can run in parallel and perform their particular tasks. When a task needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another taks or thread (using the '<<' operator). Each _DataFlowVariable_ can be set only once in its lifetime. Notice that you don't have to bother with ordering and synchronizing the tasks or threads and their access to shared variables. The values are magically transferred among threads at the right time without your intervention.
 
-DataFlows
+h3. DataFlows
 
 {code}
 
@@ -44,7 +43,7 @@ task {
 }
 {code}
 
-Dataflow Streams
+h3. Dataflow Streams
 
 {code}import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -62,7 +61,7 @@ task {
 }
 {code}
 
-Bind handlers
+h3. Bind handlers
 
 {code}
 def a = new DataFlowVariable()
@@ -71,7 +70,7 @@ a.whenBound {println "Just to confirm that the variable has been really set to $
 ...
 {code}
 
-Dataflow operators
+h3. Dataflow operators
 
 {code}
 operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
