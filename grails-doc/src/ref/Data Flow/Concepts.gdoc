@@ -1,0 +1,33 @@
+h3. Concepts
+
+h4. Dataflow Concurrency
+
+Dataflow concurrency offers an alternative concurrency model, which is inherently safe and robust.
+It puts emphasis on the data and their flow though your processes instead of the actual processes that manipulate the data.
+Dataflow algorithms relieve developers from dealing with live-locks, race-conditions and make dead-ocks deterministic
+and thus 100% reproducible. If you don't get dead-locks in tests you won't get them in production.
+
+h4. Dataflow Variable
+
+A single-assignment multi-read variable offering a thread-safe data-exchange among threads.
+
+h4. DataFlows class
+
+A virtual infinite map of Dataflow Variables with on-demand creation policy.
+
+h4. Dataflow Stream
+
+A thread-safe unbound blocking queue with a Dataflow Variable-compatible interface.
+
+h4. Dataflow Task
+
+A lightweight thread of execution, which gets assigned a physical thread from a thread pool to execute the body of the task.
+Tasks should typically exchange data using Dataflow Variables and Streams.
+
+h4. Dataflow Operator
+
+A corner stone of a more thorough dataflow concurrency algorithms. Such algorithms typically define a number of operators
+and connect them with channels, represented by Dataflow Streams or Variables.
+Each operator specifies its input and output channels to communicate with other operators.
+Repeatedly, whenever all input channels of a particular operator contain data the operator's body is executed and the produced output
+is sent into the output channels.

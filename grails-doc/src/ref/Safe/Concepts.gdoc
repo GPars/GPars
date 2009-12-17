@@ -1,0 +1,9 @@
+h3. Concepts
+
+h4. Safe
+
+In the Clojure programing language you can find a concept of Agents, which essentially behave like actors accepting code (functions) as messages.
+After reception the received function is run against the internal state of the Agent and the return value of the function is considered to be the new internal state of the Agent.
+Essentially, agents safe-guard mutable values by allowing only a single *agent-managed thread* to make modifications to them. The mutable values are *not directly accessible* from outside,
+but instead *requests have to be sent to the agent* and the agent guarantees to process the requests sequentially on behalf of the callers. Agents guarantee sequential execution of all requests
+and so consistency of the values.

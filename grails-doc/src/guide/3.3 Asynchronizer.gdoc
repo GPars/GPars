@@ -2,7 +2,7 @@ Use of Asynchronizer - the Java Executors' based background asynchronous process
 
 h2. Usage of Asynchronizer
 
-The _Asynchronizer_ class enables a Java's Executor Service-based DSL on collections and closures.
+The _Asynchronizer_ class allows you to easily start tasks in the background to be performed asynchronously and collect the results later.
 
 h3. Closures enhancements
 

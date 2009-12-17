@@ -1,0 +1,6 @@
+h3. Concepts
+
+h4. Asynchronizer
+
+On multi-core systems you can benefit from having some tasks run asynchronously in the background, and so off-load your main thread of execution.
+The _Asynchronizer_ class allows you to easily start tasks in the background to be performed asynchronously and collect the results later.
