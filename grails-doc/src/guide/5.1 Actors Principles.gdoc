@@ -85,6 +85,25 @@ me.join()
 {code}
 Notice the possibility to use Groovy meta-programming to define actor's lifecycle notification methods (e.g. _onTimeout()_ ) dynamically.
 
+h3. Actors guarantee thread-safety for non-thread-safe code
+
+Actors guarantee that always at most one thread processes the actor's body at a time and also under the covers the memory gets synchronized
+each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
+
+{code}
+class MyCounterActor extends AbstractPooledActor {
+    private Integer counter = 0
+
+    protected void act() {
+        loop {
+            react {
+                counter++
+            }
+        }
+    }
+}
+{code}
+
 h2. Simple calculator
 
 A little bit more realistic example of an event-driven actor that receives two numeric messages, sums them up and sends the result to the console actor.
