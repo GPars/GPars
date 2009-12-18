@@ -63,7 +63,7 @@ final class WordSortActor extends AbstractPooledActor {
 //Master actor
 final class SortMaster extends AbstractPooledActor {
 
-    String docRoot = '/'  //set a folder to scan with absolute path
+    String docRoot
     int numActors = 1
 
     List<List<String>> sorted = []
@@ -109,6 +109,7 @@ final class SortMaster extends AbstractPooledActor {
         }
     }
 }
+String docRoot = ''  //set a folder to scan with absolute path
 
 if (docRoot) {
 //start the actors to sort words
