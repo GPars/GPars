@@ -18,6 +18,7 @@
 //  Author: Russel Winder
 //  Author: Dierk König
 //  Author: Hans Dockter
+//  Author: Hamlet D'Arcy - Updated OSGi configuration
 
 import java.text.SimpleDateFormat
 import org.gradle.api.DefaultTask
@@ -36,12 +37,14 @@ group = 'org.codehaus.gpars'
 version = '0.9'
 bundleVersion = version
 
-def theVendor = 'Václav Pech'
+def theVendor = 'Vaclav Pech'
 def theTitle = 'GPars: Groovy Parallel Systems'
 configure ( jar.osgi ) {
   name = 'GPars'
+  version = this.version
+  symbolicName = 'groovy.gpars'
   instruction 'Bundle-Vendor' , theVendor
-  instruction 'Bundle-Description' , theTitle
+  instruction 'Bundle-Description' , group
   instruction 'Bundle-DocURL' , 'http://gpars.codehaus.org'
   instruction 'Built-By' , System.properties.'user.name'
   instruction 'Extension-Name' , archivesBaseName
@@ -50,10 +53,11 @@ configure ( jar.osgi ) {
   instruction 'Specification-Vendor' , theVendor
   instruction 'Implementation-Title' , theTitle
   instruction 'Implementation-Version' , version
-  instruction'Implementation-Vendor' , theVendor
+  instruction 'Implementation-Vendor' , theVendor
   instruction 'Implementation-Title', archivesBaseName
   instruction 'Implementation-Version', version
   instruction 'provider', theVendor
+  instruction 'Export-Package', '*'
 }
 
 repositories {
