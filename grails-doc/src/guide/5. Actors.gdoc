@@ -2,10 +2,14 @@ The actor support in gpars were inspired by the Actors library in Scala but have
 
 Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can help developers avoid issues like deadlocks, live-locks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
 A nice wrap-up of the key "concepts behind actors":http://ruben.savanne.be/articles/concurrency-in-erlang-scala was written recently by Ruben Vermeersch.
-Actors guarantee that always at most one thread processes the actor's body at a time and also under the covers the memory gets synchronized
+Actors guarantee that always *at most one thread processes the actor's body* at a time and also under the covers the memory gets synchronized
 each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
+Ideally actor's code should *never be invoked* directly from outside so all the code of the actor class can only be executed by the thread
+handling the last received message and so all the actor's code is *implicitly thread-safe* .
+If any of the actor's methods is allowed to be called by other objects directly, the thread-safety guarantee for the actor's code and state are *no longer valid* .
 
-Gpars used to come with two types of actors: _thread-bound actors_ and _event-driven actors_. You will find both in 0.8 versions but since 0.9, there is only one type of actor that is not bound to an exclusive thread.
+
+GPars used to come with two types of actors: _thread-bound actors_ and _event-driven actors_. You will find both in 0.8 versions but since 0.9, there is only one type of actor that is not bound to an exclusive thread.
 
 Actors can share a relatively small thread pool. This can go as far as having many concurrent actors that share a single pooled thread. They avoid the threading limitations of the JVM.
 
@@ -87,9 +91,47 @@ h2. Receiving messages
 
 h3. Non-blocking message retrieval
 
+Calling the _react()_ method, optionally with a timeout parameter, from within the actor's code will consume the next message from the actor's inbox,
+potentially waiting, if there is no message to be processed immediately.
+
+{code}
+println 'Waiting for a gift'
+react {gift ->
+    if (myWife.likes gift) reply 'Thank you!'
+}
+{code}
+
+Under the covers the supplied closure is not invoked directly, but scheduled for processing by any thread in the thread pool once
+a message is available. After scheduling the current thread will then be detached from the actor and freed to process any other actor,
+which has received a message already.
+
+To allow detaching actors from the threads the _react()_ method demands the code to be written in a special *Continuation-style*.
+{code}
+loop {
+    println 'Waiting for a gift'
+    react {gift ->
+        if (myWife.likes gift) reply 'Thank you!'
+        else {
+            reply 'Try again, please'
+            react {anotherGift ->
+                if (myChildren.like gift) reply 'Thank you!'
+            }
+            println 'Never reached'
+        }
+    }
+    println 'Never reached'
+}
+println 'Never reached'
+
+{code}
+
+The _react()_ and _loop()_ methods never return normally and any code put after a call to either of the two methods will never be executed.
+The closure supplied to the _react()_ or _loop()_ methods is the code where the computation should *continue* . Thus *continuation style* .
+ 
 h3. Blocking message retrieval
 
-Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message. This allows for a non-continuation style code and also might have positive performance implications in certain scenarios.
+Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message.
+This allows for a *non-continuation style* code and also might have positive performance implications in certain scenarios.
 
 Mixing _react()_ and _receive()_ calls within a single actor is also possible.
 

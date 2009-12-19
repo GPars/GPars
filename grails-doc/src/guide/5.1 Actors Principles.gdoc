@@ -104,6 +104,10 @@ class MyCounterActor extends AbstractPooledActor {
 }
 {code}
 
+Ideally actor's code should *never be invoked* directly from outside so all the code of the actor class can only be executed by the thread
+handling the last received message and so all the actor's code is *implicitly thread-safe* .
+If any of the actor's methods is allowed to be called by other objects directly, the thread-safety guarantee for the actor's code and state are *no longer valid* .
+
 h2. Simple calculator
 
 A little bit more realistic example of an event-driven actor that receives two numeric messages, sums them up and sends the result to the console actor.
@@ -241,8 +245,6 @@ def myActor = actor {
 {code}
 
 h3. Pool management
-
-Note: Describing pools and groups as they work in version 0.8 and later
 
 _Actors_ can be organized into groups and as a default there's always an application-wide pooled actor group available. And just like the _Actors_ abstract factory can be used to create actors in the default group, custom groups can be used as abstract factories to create new actors instances belonging to these groups.
 
