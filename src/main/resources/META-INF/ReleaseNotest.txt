@@ -11,7 +11,6 @@ Project changes
 * Changed the package structure
 * Fully built using Gradle
 * Continually built on JetBrains public TeamCity site (http://teamcity.jetbrains.com/) and on Codehaus Bamboo (http://bamboo.ci.codehaus.org/browse/GPARS-DEF)
-* The GPars jar file now supports OSGi
 
 Parallel collections
 

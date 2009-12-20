@@ -28,7 +28,7 @@ import org.gradle.api.file.FileCollection
 
 usePlugin 'groovy'
 usePlugin 'maven'
-usePlugin 'osgi'
+//usePlugin 'osgi'
 
 defaultTasks 'test'
 
@@ -39,26 +39,26 @@ bundleVersion = version
 
 def theVendor = 'Vaclav Pech'
 def theTitle = 'GPars: Groovy Parallel Systems'
-configure ( jar.osgi ) {
-  name = 'GPars'
-  version = this.version
-  symbolicName = 'groovy.gpars'
-  instruction 'Bundle-Vendor' , theVendor
-  instruction 'Bundle-Description' , group
-  instruction 'Bundle-DocURL' , 'http://gpars.codehaus.org'
-  instruction 'Built-By' , System.properties.'user.name'
-  instruction 'Extension-Name' , archivesBaseName
-  instruction 'Specification-Title' , theTitle
-  instruction 'Specification-Version' , version
-  instruction 'Specification-Vendor' , theVendor
-  instruction 'Implementation-Title' , theTitle
-  instruction 'Implementation-Version' , version
-  instruction 'Implementation-Vendor' , theVendor
-  instruction 'Implementation-Title', archivesBaseName
-  instruction 'Implementation-Version', version
-  instruction 'provider', theVendor
-  instruction 'Export-Package', '*'
-}
+//configure ( jar.osgi ) {
+//  name = 'GPars'
+//  version = this.version
+//  symbolicName = 'groovy.gpars'
+//  instruction 'Bundle-Vendor' , theVendor
+//  instruction 'Bundle-Description' , group
+//  instruction 'Bundle-DocURL' , 'http://gpars.codehaus.org'
+//  instruction 'Built-By' , System.properties.'user.name'
+//  instruction 'Extension-Name' , archivesBaseName
+//  instruction 'Specification-Title' , theTitle
+//  instruction 'Specification-Version' , version
+//  instruction 'Specification-Vendor' , theVendor
+//  instruction 'Implementation-Title' , theTitle
+//  instruction 'Implementation-Version' , version
+//  instruction 'Implementation-Vendor' , theVendor
+//  instruction 'Implementation-Title', archivesBaseName
+//  instruction 'Implementation-Version', version
+//  instruction 'provider', theVendor
+//  instruction 'Export-Package', '*'
+//}
 
 repositories {
     mavenCentral()
