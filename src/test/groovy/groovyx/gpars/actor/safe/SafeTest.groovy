@@ -110,9 +110,11 @@ public class SafeTest extends GroovyTestCase {
         def result = new DataFlowStream()
         Actors.actor {
             counter << {reply 'Explicit reply'; 10}
-            react {a, b ->
-                result << a
-                result << b
+            react {a ->
+                react {b ->
+                    result << a
+                    result << b
+                }
             }
         }
 

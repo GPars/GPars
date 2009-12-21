@@ -140,13 +140,15 @@ final class Philosopher extends AbstractPooledActor {
         loop {
             think()
             forks*.send new Take()
-            react {a, b ->
-                if ([a, b].any {Rejected.isCase it}) {
-                    println "$name: \tOops, can't get my forks! Giving up."
-                    [a, b].find {Accepted.isCase it}?.reply new Finished()
-                } else {
-                    eat()
-                    reply new Finished()
+            react {a ->
+                react {b ->
+                    if ([a, b].any {Rejected.isCase it}) {
+                        println "$name: \tOops, can't get my forks! Giving up."
+                        [a, b].find {Accepted.isCase it}?.reply new Finished()
+                    } else {
+                        eat()
+                        reply new Finished()
+                    }
                 }
             }
         }

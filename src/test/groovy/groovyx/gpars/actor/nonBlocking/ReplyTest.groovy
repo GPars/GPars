@@ -19,7 +19,6 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.ActorReplyException
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
@@ -266,9 +265,11 @@ public class ReplyTest extends GroovyTestCase {
             react {
                 reply 'Message2'
                 it.reply 'Message3'
-                react {a, b ->
-                    reply 'Message6'
-                    latch.await()
+                react {a ->
+                    react {b ->
+                        [a, b]*.reply 'Message6'
+                        latch.await()
+                    }
                 }
             }
         }
@@ -279,9 +280,11 @@ public class ReplyTest extends GroovyTestCase {
                 it.reply 'Message4'
                 react {
                     reply 'Message5'
-                    react {a, b ->
-                        result = a + b
-                        latch.countDown()
+                    react {a ->
+                        react {b ->
+                            result = a + b
+                            latch.countDown()
+                        }
                     }
                 }
             }
@@ -319,21 +322,31 @@ public class ReplyTest extends GroovyTestCase {
 
     public void testMultipleClientsWithReply() {
         final List<CountDownLatch> latches = [new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(2)]
-        def volatile issues
+        def volatile issues = []
 
         final def bouncer = actor {
             latches[0].await()
-            react {a, b, c ->
-                replyIfExists 4
-                latches[1].countDown()
+            react {a ->
+                react {b ->
+                    react {c ->
+                        [a, b, c]*.replyIfExists 4
+                        latches[1].countDown()
 
-                latches[2].await()
-                react {x, y, z ->
-                    try {
-                        reply 8
-                    } catch (ActorReplyException e) {
-                        issues = e.issues
-                        latches[3].countDown()
+                        latches[2].await()
+                        react {x ->
+                            react {y ->
+                                react {z ->
+                                    [z, x, y].each {message ->
+                                        try {
+                                            message.reply 8
+                                        } catch (IllegalStateException e) {
+                                            issues << e
+                                            latches[3].countDown()
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -374,8 +387,7 @@ public class ReplyTest extends GroovyTestCase {
         bouncer << 7
         latches[3].await()
         assertEquals 2, issues.size()
-        assert (issues[0] instanceof IllegalArgumentException) || (issues[1] instanceof IllegalArgumentException)
-        assert (issues[0] instanceof IllegalStateException) || (issues[1] instanceof IllegalStateException)
+        assert (issues[0] instanceof IllegalStateException) && (issues[1] instanceof IllegalStateException)
     }
 
     public void testOriginatorDetection() {
