@@ -88,9 +88,11 @@ import java.util.concurrent.TimeUnit;
  * if the original message wasn't sent by an actor nor if the original sender actor is no longer running.
  * The reply() and replyIfExists() methods are also dynamically added to the processed messages.
  * <pre>
- * react {a, b ->
- *     reply 'message'  //sent to senders of a as well as b
- *     a.reply 'private message'  //sent to the sender of a only
+ * react {a ->
+ *     react {b ->
+ *         reply 'message'  //sent to senders of a as well as b
+ *         a.reply 'private message'  //sent to the sender of a only
+ *     }
  * }
  * </pre>
  * <p/>
