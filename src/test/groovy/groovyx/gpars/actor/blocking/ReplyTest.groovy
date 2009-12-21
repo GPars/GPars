@@ -333,6 +333,7 @@ public class ReplyTest extends GroovyTestCase {
                     reply 8
                 } catch (ActorReplyException e) {
                     issues = e.issues
+                } finally {
                     latches[3].countDown()
                 }
             }

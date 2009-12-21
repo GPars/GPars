@@ -336,13 +336,16 @@ public class ReplyTest extends GroovyTestCase {
                         react {x ->
                             react {y ->
                                 react {z ->
-                                    [z, x, y].each {message ->
-                                        try {
-                                            message.reply 8
-                                        } catch (IllegalStateException e) {
-                                            issues << e
-                                            latches[3].countDown()
+                                    try {
+                                        [z, x, y].each {message ->
+                                            try {
+                                                message.reply 8
+                                            } catch (IllegalStateException e) {
+                                                issues << e
+                                            }
                                         }
+                                    } finally {
+                                        latches[3].countDown()
                                     }
                                 }
                             }
