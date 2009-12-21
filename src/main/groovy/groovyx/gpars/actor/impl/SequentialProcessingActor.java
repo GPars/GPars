@@ -29,7 +29,6 @@ import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -566,7 +565,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         code.setDelegate(this);
 
         if (maxNumberOfParameters > 1) {
-            this.react(timeout, new MultiMessageReaction(code, maxNumberOfParameters, timeout, new ArrayList<MessageStream>()));
+            throw new IllegalArgumentException("Actor cannot process a multi-argument closures passed to react().");
+//            this.react(timeout, new MultiMessageReaction(code, maxNumberOfParameters, timeout, new ArrayList<MessageStream>()));
         } else {
             assert reaction == null;
             assert maxNumberOfParameters <= 1;

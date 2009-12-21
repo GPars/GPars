@@ -40,7 +40,7 @@ final AbstractPooledActor actor = group.actor {
         react {offerB ->
             reply Messages.REPLY  //sent to all senders
             react {offerC ->
-                reply Messages.REPLY  //sent to all senders
+                [offerA, offerB, offerC]*.reply Messages.REPLY  //sent to all senders
                 def winnerOffer = [offerA, offerB, offerC].min {it.price}
                 winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
                 ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the losers only

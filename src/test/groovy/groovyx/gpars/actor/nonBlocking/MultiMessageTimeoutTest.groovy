@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
-public class MultiMessageTimeoutTest extends GroovyTestCase {
+public abstract class MultiMessageTimeoutTest extends GroovyTestCase {
     public void testReact() {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0

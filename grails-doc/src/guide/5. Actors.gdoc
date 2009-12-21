@@ -149,19 +149,22 @@ Actors.actor {
 
 h2. Sending replies
 
-The _reply/replyIfExists_ methods are not only defined on the actors themselves, but also on the messages upon their reception, which is particularly handy when accepting multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed messages, whereas _reply()_ called on messages sends a reply to the author of the particular message only.
+The _reply/replyIfExists_ methods are not only defined on the actors themselves, but also on the messages upon their reception, which is particularly handy when handling multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed message (the last one), whereas _reply()_ called on messages sends a reply to the author of the particular message only.
 
 {code}
-react {offerA, offerB, offerC ->
+react {offerA ->
+    react {offerB ->
+        react {offerC ->
+            //sent to each of the senders
+            [offerA, offerB, offerC]*.reply 'Received your kind offer. Now processing it and comparing with others.'
 
-    //sent to each of the senders
-    reply 'Received your kind offer. Now processing it and comparing with others.'
+            offerA.reply 'You were the fastest'  //sent to the author of offerA only
 
-    offerA.reply 'You were the fastest'  //sent to the author of offerA only
-
-    def winnerOffer = [offerA, offerB, offerC].min {it.price}
-    winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
-    ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the loosers only
+            def winnerOffer = [offerA, offerB, offerC].min {it.price}
+            winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
+            ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the loosers only
+        }
+    }
 }
 {code}
 
