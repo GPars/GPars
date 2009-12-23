@@ -17,9 +17,13 @@
 package groovyx.gpars
 
 import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicReference
-import org.codehaus.groovy.runtime.InvokerInvocationException
-import java.util.concurrent.*
 
 /**
  * @author Vaclav Pech
@@ -78,8 +82,7 @@ public class AsynchronizerExceptionTest extends GroovyTestCase {
             future.get()
         } catch (Exception e) {
             assert e instanceof ExecutionException
-            assert e.cause instanceof InvokerInvocationException
-            assert e.cause.cause instanceof RuntimeException
+            assert e.cause instanceof RuntimeException
         }
         pool.shutdown()
     }

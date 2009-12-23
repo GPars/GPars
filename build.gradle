@@ -73,7 +73,7 @@ configurations {
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.6.7'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.7.0'
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
