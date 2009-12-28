@@ -131,6 +131,17 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assertEquals 'aaaaabbbbccccc', s.sumParallel()
     }
 
+    public void testCount() {
+        assertEquals 1, ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).countParallel(3)
+        assertEquals 5, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(3)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(6)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([]).countParallel(6)
+        assertEquals 1, ParallelEnhancer.enhanceInstance('abc3').countParallel('a')
+        assertEquals 3, ParallelEnhancer.enhanceInstance('abcaa3').countParallel('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance('ebc3').countParallel('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance(' '.trim()).countParallel('a')
+    }
+
     public void testReduce() {
         final List list = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance list

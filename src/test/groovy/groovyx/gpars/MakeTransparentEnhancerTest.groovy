@@ -210,6 +210,17 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         assertEquals 15, items.makeTransparent().sum()
     }
 
+    public void testTransparentCount() {
+        assertEquals 1, ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent().count(3)
+        assertEquals 5, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeTransparent().count(3)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeTransparent().count(6)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([]).makeTransparent().count(6)
+        assertEquals 1, ParallelEnhancer.enhanceInstance('abc2').makeTransparent().count('a')
+        assertEquals 3, ParallelEnhancer.enhanceInstance('abcaa2').makeTransparent().count('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance('ebc2').makeTransparent().count('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance('     '.trim()).makeTransparent().count('a')
+    }
+
     public void testTransparentReduce() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()

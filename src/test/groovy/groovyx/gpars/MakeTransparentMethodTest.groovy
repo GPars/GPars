@@ -187,6 +187,20 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         }
     }
 
+    public void testCount() {
+        Parallelizer.doParallel(5) {
+            assertEquals 1, [1, 2, 3, 4, 5].makeTransparent().count(3)
+            assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].makeTransparent().count(3)
+            assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].makeTransparent().count(6)
+            assertEquals 0, [].makeTransparent().count(6)
+            assertEquals 1, 'abc1'.makeTransparent().count('a')
+            assertEquals 3, 'abcaa1'.makeTransparent().count('a')
+            assertEquals 0, 'ebc1'.makeTransparent().count('a')
+            assertEquals 0, '  '.trim().makeTransparent().count('a')
+        }
+    }
+
+
     public void testTransparentReduce() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()

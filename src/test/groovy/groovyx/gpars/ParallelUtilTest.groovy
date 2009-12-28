@@ -256,6 +256,19 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testCount() {
+        Parallelizer.doParallel(5) {
+            assertEquals 1, [1, 2, 3, 4, 5].countParallel(3)
+            assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(3)
+            assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(6)
+            assertEquals 0, [].countParallel(6)
+            assertEquals 1, 'abc'.countParallel('a')
+            assertEquals 3, 'abcaa'.countParallel('a')
+            assertEquals 0, 'ebc'.countParallel('a')
+            assertEquals 0, ''.countParallel('a')
+        }
+    }
+
     public void testReduce() {
         Parallelizer.doParallel(5) {
             assertEquals 15, [1, 2, 3, 4, 5].foldParallel() {a, b -> a + b}
