@@ -65,6 +65,35 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testSplit() {
+        Parallelizer.withParallelizer(5) {
+            def result = [1, 2, 3, 4, 5].splitParallel{it > 2}
+            assert [3, 4, 5] as Set == result[0] as Set
+            assert [1, 2] as Set == result[1] as Set
+            assertEquals 2, result.size()
+            assert  [[], []] == [].splitParallel{it > 2}
+            result = [3].splitParallel{it > 2}
+            assert [[3], []] == result
+            result = [1].splitParallel{it > 2}
+            assert [[], [1]] == result
+        }
+    }
+
+    public void testSplitOnString() {
+        Parallelizer.withParallelizer(5) {
+            def result = 'abc'.splitParallel{it == 'b'}
+            assert ['b'] as Set == result[0] as Set
+            assert ['a', 'c'] as Set == result[1] as Set
+            assertEquals 2, result.size()
+            result = ''.splitParallel{it == 'b'}
+            assert  [[], []] == result
+            result = 'b'.splitParallel{it == 'b'}
+            assert [['b'], []] == result
+            result = 'a'.splitParallel{it == 'b'}
+            assert [[], ['a']] == result
+        }
+    }
+
     public void testGrep() {
         Parallelizer.withParallelizer(5) {
             final List result = ParallelArrayUtil.grepParallel([1, 2, 3, 4, 5], 3..6)
@@ -194,11 +223,6 @@ public class ParallelUtilTest extends GroovyTestCase {
             assert Parallelizer.retrieveCurrentPool() == pool1
         }
     }
-
-    //todo exception handler doesn't seem to be accepted by the pool
-    //todo try setting exception handlers on the thread level in both Parallelizer and Asynchronizer
-    //todo consider queue and pool options
-    //todo consider rejection policy
 
     public void testExceptionHandler() {
         final AtomicInteger exceptionCount = new AtomicInteger(0)

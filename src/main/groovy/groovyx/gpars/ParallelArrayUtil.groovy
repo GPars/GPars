@@ -279,6 +279,42 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
+     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].splitParallel(it > 3)
+     *            assert [3, 4, 5] as Set == result[0] as Set
+     *            assert [1, 2] as Set == result[1] as Set
+
+     *}*/
+    public static <T> Collection<T> splitParallel(Collection<T> collection, filter) {
+        final def groups = groupByParallel(collection, filter)
+        return [groups[true] ?: [], groups[false] ?: []]
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * rule as the filter predicate.
+     * The filter will be effectively used concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].splitParallel(4..6)
+     *            assert [3, 4, 5] as Set == result[0] as Set
+     *            assert [1, 2] as Set == result[1] as Set
+     *}*/
+    public static Object splitParallel(Object collection, filter) {
+        return splitParallel(createCollection(collection), filter)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * rule as the filter predicate.
+     * The filter will be effectively used concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
      * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].countParallel(4)
      *     assertEquals(1, result)
      *}*/

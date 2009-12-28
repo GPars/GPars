@@ -34,6 +34,7 @@ final class TransparentParallel {
     public def final find(Closure yield) { this.findParallel(yield)}
     public def final findAll(Closure yield) { this.findAllParallel(yield).makeTransparent()}
     public def final grep(filter) { this.grepParallel(filter).makeTransparent()}
+    public def final split(Closure yield) { this.splitParallel(yield).makeTransparent()}
     public def final count(filter) { this.countParallel(filter).makeTransparent()}
     public def final every(Closure yield) { this.everyParallel(yield)}
     public def final any(Closure yield) { this.anyParallel(yield)}

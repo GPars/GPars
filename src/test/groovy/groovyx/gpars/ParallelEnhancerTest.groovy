@@ -142,6 +142,31 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assertEquals 0, ParallelEnhancer.enhanceInstance(' '.trim()).countParallel('a')
     }
 
+    public void testSplit() {
+        def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).splitParallel {it > 2}
+        assert [3, 4, 5] as Set == result[0] as Set
+        assert [1, 2] as Set == result[1] as Set
+        assertEquals 2, result.size()
+        assert [[], []] == ParallelEnhancer.enhanceInstance([]).splitParallel {it > 2}
+        result = ParallelEnhancer.enhanceInstance([3]).splitParallel {it > 2}
+        assert [[3], []] == result
+        result = ParallelEnhancer.enhanceInstance([1]).splitParallel {it > 2}
+        assert [[], [1]] == result
+    }
+
+    public void testSplitOnString() {
+        def result = ParallelEnhancer.enhanceInstance(new String('abc')).splitParallel {it == 'b'}
+        assert ['b'] as Set == result[0] as Set
+        assert ['a', 'c'] as Set == result[1] as Set
+        assertEquals 2, result.size()
+        result = ParallelEnhancer.enhanceInstance('').splitParallel {it == 'b'}
+        assert [[], []] == result
+        result = ParallelEnhancer.enhanceInstance('b').splitParallel {it == 'b'}
+        assert [['b'], []] == result
+        result = ParallelEnhancer.enhanceInstance('a').splitParallel {it == 'b'}
+        assert [[], ['a']] == result
+    }
+
     public void testReduce() {
         final List list = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance list

@@ -98,6 +98,19 @@ final class Parallel {
     }
 
     /**
+     * Performs the <i>split()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
+     */
+    public def splitParallel(Closure cl) {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            enhance(ParallelArrayUtil.splitParallel(mixedIn[Object], cl))
+        }
+    }
+
+    /**
      * Performs the <i>count()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.

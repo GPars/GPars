@@ -200,6 +200,34 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         }
     }
 
+    public void testSplit() {
+        Parallelizer.withParallelizer(5) {
+            def result = [1, 2, 3, 4, 5].makeTransparent().split{it > 2}
+            assert [3, 4, 5] as Set == result[0] as Set
+            assert [1, 2] as Set == result[1] as Set
+            assertEquals 2, result.size()
+            assert  [[], []] == [].makeTransparent().split{it > 2}
+            result = [3].makeTransparent().split{it > 2}
+            assert [[3], []] == result
+            result = [1].makeTransparent().split{it > 2}
+            assert [[], [1]] == result
+        }
+    }
+
+    public void testSplitOnString() {
+        Parallelizer.withParallelizer(5) {
+            def result = new String('abc').makeTransparent().split{it == 'b'}
+            assert ['b'] as Set == result[0] as Set
+            assert ['a', 'c'] as Set == result[1] as Set
+            assertEquals 2, result.size()
+            result = ''.makeTransparent().split{it == 'b'}
+            assert  [[], []] == result
+            result = 'b'.makeTransparent().split{it == 'b'}
+            assert [['b'], []] == result
+            result = 'a'.makeTransparent().split{it == 'b'}
+            assert [[], ['a']] == result
+        }
+    }
 
     public void testTransparentReduce() {
         def items = [1, 2, 3, 4, 5]

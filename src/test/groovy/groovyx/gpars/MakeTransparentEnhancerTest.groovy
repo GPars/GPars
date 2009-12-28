@@ -221,6 +221,31 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         assertEquals 0, ParallelEnhancer.enhanceInstance('     '.trim()).makeTransparent().count('a')
     }
 
+    public void testSplit() {
+        def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent().split {it > 2}
+        assert [3, 4, 5] as Set == result[0] as Set
+        assert [1, 2] as Set == result[1] as Set
+        assertEquals 2, result.size()
+        assert [[], []] == ParallelEnhancer.enhanceInstance([]).makeTransparent().split {it > 2}
+        result = ParallelEnhancer.enhanceInstance([3]).makeTransparent().split {it > 2}
+        assert [[3], []] == result
+        result = ParallelEnhancer.enhanceInstance([1]).makeTransparent().split {it > 2}
+        assert [[], [1]] == result
+    }
+
+    public void testSplitOnString() {
+        def result = ParallelEnhancer.enhanceInstance(new String('abc')).makeTransparent().split {it == 'b'}
+        assert ['b'] as Set == result[0] as Set
+        assert ['a', 'c'] as Set == result[1] as Set
+        assertEquals 2, result.size()
+        result = ParallelEnhancer.enhanceInstance('').makeTransparent().split {it == 'b'}
+        assert [[], []] == result
+        result = ParallelEnhancer.enhanceInstance('b').makeTransparent().split {it == 'b'}
+        assert [['b'], []] == result
+        result = ParallelEnhancer.enhanceInstance('a').makeTransparent().split {it == 'b'}
+        assert [[], ['a']] == result
+    }
+
     public void testTransparentReduce() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
