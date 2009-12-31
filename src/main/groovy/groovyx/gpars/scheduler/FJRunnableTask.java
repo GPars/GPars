@@ -19,10 +19,10 @@ package groovyx.gpars.scheduler;
 import jsr166y.forkjoin.AsyncAction;
 
 /**
- * Adapts Runnables to the Fork Join framework.
+ * Adapts Runnable instances to the Fork Join framework.
  *
  * @author Vaclav Pech
- * Date: Jun 16, 2009
+ *         Date: Jun 16, 2009
  */
 final class FJRunnableTask extends AsyncAction {
     private final Runnable runnable;
@@ -31,6 +31,7 @@ final class FJRunnableTask extends AsyncAction {
         this.runnable = runnable;
     }
 
+    @SuppressWarnings({"CatchGenericClass"})
     @Override protected void compute() {
         try {
             runnable.run();

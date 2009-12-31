@@ -1,0 +1,48 @@
+The Dataflow Concurrency in GPars builds on top of its actor support. All of the dataflow tasks share a thread pool and so the number threads created through _DataFlow.task()_ factory method don't need to correspond to the number of physical threads required from the system.
+The _DataFlow.task()_ factory method takes an optional actorGroup parameter to specify a group to which the task should belong. Since each group defines its own thread pool, you can easily organize tasks around different thread pools just like you do with actors.
+
+h3. Combining actors and Dataflow Concurrency
+
+The good news is that you can combine actors and Dataflow Concurrency in any way you feel fit for your particular problem at hands. You can freely you use Dataflow Variables from actors.
+
+{code}
+final DataFlowVariable a = new DataFlowVariable()
+
+final AbstractPooledActor doubler = Actors.actor {
+    react {message->
+        a << 2 * message
+    }
+}
+
+final AbstractPooledActor fakingDoubler = actor {
+    react {
+        doubler.send it  //send a number to the doubler
+        println "Result ${a.val}"  //wait for the result to be bound to 'a'
+    }
+}
+
+fakingDoubler << 10
+{code}
+
+In the example you see the "fakingDoubler" using both messages and a _DataFlowVariable_ to communicate with the _doubler_ actor.
+
+h3. Using plain java threads
+
+The _DataFlowVariable_ as well as the _DataFlowStream_ classes can obviously be used from any thread of your application, not only from the tasks created by _DataFlow.task()_ . Consider the following example:
+{code}import groovyx.gpars.dataflow.DataFlowVariable
+
+final DataFlowVariable a = new DataFlowVariable<String>()
+final DataFlowVariable b = new DataFlowVariable<String>()
+
+Thread.start {
+    println "Received: $a.val"
+    Thread.sleep 2000
+    b << 'Thank you'
+}
+
+Thread.start {
+    Thread.sleep 2000
+    a << 'An important message from the second thread'
+    println "Reply: $b.val"
+}
+{code}We're creating two plain _java.lang.Thread_ instances, which exchange data using the two data flow variables. Obviously, neither the actor lifecycle methods, nor the send/react functionality or thread pooling take effect in such scenarios.

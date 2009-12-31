@@ -16,12 +16,12 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import static groovyx.gpars.dataflow.DataFlow.start
 
 /**
- * Demonstrates the way to handle lifecycle events on the thread.
- * Threads are essentially pooled actors and so they have identical lifecycle methods.
+ * Demonstrates the way to handle lifecycle events on a dataflow thread.
+ * Dataflow threads are essentially pooled actors and so they have identical lifecycle methods.
  */
 def throwException = true
 
@@ -54,5 +54,5 @@ private void enhance(AbstractPooledActor thread) {
     }
 }
 
-System.in.read()
+Thread.sleep 5000
 System.exit 0 

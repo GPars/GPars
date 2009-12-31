@@ -45,8 +45,9 @@ public abstract class SerialContext {
      * Enter to the context
      */
     public final void enter() {
-        if (threadContext.get() != null)
+        if (threadContext.get() != null) {
             throw new IllegalStateException("Serialization context already defined");
+        }
 
         threadContext.set(this);
     }
@@ -55,8 +56,9 @@ public abstract class SerialContext {
      * Leave this context
      */
     public final void leave() {
-        if (threadContext.get() != this)
+        if (threadContext.get() != this) {
             throw new IllegalStateException("Wrong serialization context");
+        }
 
         threadContext.set(null);
     }

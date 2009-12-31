@@ -17,11 +17,11 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * Demonstrates three threads calculating a sum of numbers within a given interval using shared dataflow variables.
- * 
+ *
  */
 List<Integer> ints(int n, int max) {
     if (n == max) return []
@@ -39,6 +39,6 @@ List<Integer> sum(int s, List<Integer> stream) {
 def x = new DataFlowVariable<List<Integer>>()
 def y = new DataFlowVariable<List<Integer>>()
 
-start { x << ints(0, 1000) }
-start { y << sum(0, x.val) }
-start { println("List of sums: " + y.val); System.exit(0) }
+task { x << ints(0, 500) }
+task { y << sum(0, x.val) }
+task { println("List of sums: " + y.val); System.exit(0) }

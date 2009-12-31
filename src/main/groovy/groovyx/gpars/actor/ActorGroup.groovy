@@ -16,20 +16,19 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.scheduler.Pool
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
+import groovyx.gpars.scheduler.Pool
 
 /**
- * Provides a common super class fo pooled actor's groups.
+ * Provides a common super class of pooled actor groups.
  *
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  * Date: May 8, 2009
  */
 public abstract class ActorGroup {
 
     /**
-     * Stored the group actors' thread pool
+     * Stores the group actors' thread pool
      */
     private @Delegate Pool threadPool
 
@@ -49,8 +48,9 @@ public abstract class ActorGroup {
      * @return A newly created instance of the AbstractPooledActor class
      */
     public final AbstractPooledActor actor(Runnable handler) {
-        final AbstractPooledActor actor = new RunnableBackedPooledActor (handler)
+        final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
         actor.actorGroup = this
+        actor.start()
         return actor
     }
 
@@ -62,6 +62,20 @@ public abstract class ActorGroup {
      * @return A new instance of ReactiveEventBasedThread
      */
     public final AbstractPooledActor reactor(final Closure code) {
-        new ReactiveActor(code)
+        final def actor = new ReactiveActor(code)
+        actor.actorGroup = this
+        actor.start()
+        actor
+    }
+
+    /**
+     * Creates an instance of DynamicDispatchActor.
+     * @param code The closure specifying individual message handlers.
+     */
+    public final AbstractPooledActor messageHandler(final Closure code) {
+        final def actor = new DynamicDispatchActor(code)
+        actor.actorGroup = this
+        actor.start()
+        actor
     }
 }

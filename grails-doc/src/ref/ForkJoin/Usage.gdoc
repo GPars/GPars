@@ -1,0 +1,29 @@
+h3. Fork/Join convenience
+
+{code}
+public final class FileCounter extends AbstractForkJoinWorker<Long> {
+    private final File file;
+
+    def FileCounter(final File file) {
+        this.file = file
+    }
+
+    protected void compute() {
+        long count = 0;
+        file.eachFile {
+            if (it.isDirectory()) {
+                println "Forking a thread for $it"
+                forkOffChild(new FileCounter(it))           //fork a child task
+            } else {
+                count++
+            }
+        }
+        setResult(count + ((childrenResults)?.sum() ?: 0))  //use results of children tasks to calculate and store own result
+    }
+}
+
+doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
+    println "Number of files: ${orchestrate(new FileCounter(new File("..")))}"
+}
+
+{code}

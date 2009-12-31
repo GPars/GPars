@@ -1,0 +1,10 @@
+h3. Concepts
+
+h4. Fork / Join
+
+Fork/Join or Divide and Conquer is a very powerful abstraction to solve hierarchical problems.
+When talking about hierarchical problems, think about quick sort, merge sort, file system or general tree navigation and such.
+
+* Fork / Join algorithms essentially split a problem at hands into several smaller sub-problems and recursively apply the same algorithm to each of the sub-problems.
+* Once the sub-problem is small enough, it is solved directly.
+* The solutions of all sub-problems are combined to solve their parent problem, which in turn helps solve its own parent problem.

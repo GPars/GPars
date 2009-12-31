@@ -19,24 +19,24 @@ package groovyx.gpars.samples
 import groovyx.gpars.Asynchronizer
 
 /**
- * Demonstrates asynchronous collection processing using Executor services through the Asynchronizer class.
+ * Demonstrates parallel collection processing using Executor services through the Asynchronizer class.
  */
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-Asynchronizer.withAsynchronizer {
-    println list.collectAsync {it * 2 }
+Asynchronizer.doParallel {
+    println list.collectParallel {it * 2 }
 
-    list.iterator().eachAsync {
+    list.iterator().eachParallel {
         println it
     }
-    
-    if (list.allAsync{it < 10 }) println 'The list contains only small numbers.'
+
+    if (list.everyParallel {it < 10 }) println 'The list contains only small numbers.'
 
     final String text = 'want to be big'
-    println((text.collectAsync {it.toUpperCase()}).join())
+    println((text.collectParallel {it.toUpperCase()}).join())
 
     def animals = ['dog', 'ant', 'cat', 'whale']
-    println (animals.anyAsync {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
-    println (animals.allAsync {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+    println(animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+    println(animals.everyParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 }

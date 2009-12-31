@@ -16,8 +16,6 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
-
 /**
  * Default non-abstract AbstractPooledActor subclass for use in e.g. mixins.
  *

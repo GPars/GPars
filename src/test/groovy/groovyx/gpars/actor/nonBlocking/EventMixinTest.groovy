@@ -16,10 +16,10 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.DefaultPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import groovyx.gpars.actor.DefaultPooledActor
 
 /**
  *
@@ -29,9 +29,10 @@ import groovyx.gpars.actor.DefaultPooledActor
 public class EventMixinTest extends GroovyTestCase {
 
     public void testSomething() {}
-    
+
+    //todo enable or remove the test
     public void _testClassMixin() {
-        volatile def result=null
+        volatile def result = null
         final CountDownLatch latch = new CountDownLatch(1)
         final CountDownLatch stopLatch = new CountDownLatch(1)
         final AtomicBoolean stopFlag = new AtomicBoolean(false)
@@ -57,20 +58,20 @@ public class EventMixinTest extends GroovyTestCase {
 
         company.start()
         company.send("Message")
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         company.stop()
         assertEquals('Message', result)
-        stopLatch.await(30, TimeUnit.SECONDS)
+        stopLatch.await(90, TimeUnit.SECONDS)
         assert stopFlag.get()
     }
 
     public void _testInstanceMixin() {
-        volatile def result=null
+        volatile def result = null
         final CountDownLatch latch = new CountDownLatch(1)
         final CountDownLatch stopLatch = new CountDownLatch(1)
         final AtomicBoolean stopFlag = new AtomicBoolean(false)
 
-        final TestCorporation corp   = new TestCorporation(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
+        final TestCorporation corp = new TestCorporation(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
         corp.metaClass {
             mixin DefaultPooledActor
 
@@ -89,10 +90,10 @@ public class EventMixinTest extends GroovyTestCase {
 
         corp.start()
         corp.send("Message")
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         corp.stop()
         assertEquals('Message', result)
-        stopLatch.await(30, TimeUnit.SECONDS)
+        stopLatch.await(90, TimeUnit.SECONDS)
         assert stopFlag.get()
     }
 }

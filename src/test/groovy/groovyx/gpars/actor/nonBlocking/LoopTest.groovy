@@ -16,11 +16,12 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.actor.PooledActorGroup
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -30,9 +31,14 @@ import static groovyx.gpars.actor.Actors.actor
  */
 public class LoopTest extends GroovyTestCase {
 
+    ActorGroup group
+
     protected void setUp() {
-        super.setUp();
-        Actors.defaultPooledActorGroup.resize(10)
+        group = new PooledActorGroup(10)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
     }
 
     public void testLoop() {
@@ -51,7 +57,7 @@ public class LoopTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         Thread.sleep 1000
         assertEquals 0, counter.intValue()
@@ -61,7 +67,7 @@ public class LoopTest extends GroovyTestCase {
             barrier.await()
             assertEquals it, counter.intValue()
         }
-        actor.stop()
+        actor.stop().join()
     }
 
     public void testLoopStop() {
@@ -77,7 +83,7 @@ public class LoopTest extends GroovyTestCase {
                     counter.incrementAndGet()
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -88,7 +94,7 @@ public class LoopTest extends GroovyTestCase {
 
         barrier.await()
         actor.send 'message'
-        actor.stop()
+        actor.terminate()
         afterStopBarrier.await()
         assertEquals 0, counter.intValue()
     }
@@ -108,7 +114,7 @@ public class LoopTest extends GroovyTestCase {
                     Thread.sleep 10000
                 }
             }
-        }.start()
+        }
 
         actor.metaClass {
             afterStop = {List messages ->
@@ -122,7 +128,7 @@ public class LoopTest extends GroovyTestCase {
         barrier.await()
         actor.send 'message'
         barrier.await()
-        actor.stop()
+        actor.terminate()
 
         afterBarrier.await()
         assertEquals 1, counter.intValue()
@@ -137,14 +143,13 @@ public class LoopTest extends GroovyTestCase {
             loop {
                 counter.incrementAndGet()
             }
-        }.start()
+        }
 
-        actor.metaClass { onInterrupt ={} }
+        actor.metaClass { onInterrupt = {} }
 
         actor.send 'message'
-        actor.stop()
+        actor.terminate().join()
 
-        Thread.sleep 1000
         assertEquals 0, counter.intValue()
     }
 }

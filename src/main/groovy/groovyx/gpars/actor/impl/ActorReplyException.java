@@ -20,12 +20,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Indicates problems sending replies to actors. Holds a list of exceptions that occured during reply dispatch.
+ * Indicates problems sending replies to actors. Holds a list of exceptions that occurred during reply dispatch.
  *
  * @author Vaclav Pech
- * Date: Jun 11, 2009
+ *         Date: Jun 11, 2009
  */
 public final class ActorReplyException extends RuntimeException {
+    private static final long serialVersionUID = -3877063222143535104L;
     private final List<Exception> issues;
 
     public ActorReplyException(final String message) {
@@ -44,11 +45,12 @@ public final class ActorReplyException extends RuntimeException {
     }
 
     @Override public String toString() {
-        return super.toString() + getIssues();
+        return super.toString() + issues;
     }
 
+    @SuppressWarnings({"CallToPrintStackTrace"})
     @Override public void printStackTrace() {
         super.printStackTrace();
-        for(Exception e : issues) e.printStackTrace();
+        for (final Exception e : issues) e.printStackTrace();
     }
 }

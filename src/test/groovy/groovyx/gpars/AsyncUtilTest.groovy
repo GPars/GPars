@@ -18,6 +18,7 @@ package groovyx.gpars
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -29,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger
 public class AsyncUtilTest extends GroovyTestCase {
 
     public void testAsyncClosure() {
-        Asynchronizer.doAsync(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def result = Collections.synchronizedSet(new HashSet())
             final CountDownLatch latch = new CountDownLatch(5);
             final Closure cl = {Number number -> result.add(number * 10); latch.countDown()}
@@ -39,30 +40,30 @@ public class AsyncUtilTest extends GroovyTestCase {
         }
     }
 
-    public void testCallAsync() {
-        Asynchronizer.doAsync(5) {ExecutorService service ->
-            def resultA=0, resultB=0
+    public void testCallParallel() {
+        Asynchronizer.doParallel(5) {ExecutorService service ->
+            def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
-            AsyncInvokerUtil.callAsync({number -> resultA=number;latch.countDown()}, 2)
-            AsyncInvokerUtil.callAsync({number -> resultB=number;latch.countDown()}, 3)
+            AsyncInvokerUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
+            AsyncInvokerUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
             latch.await()
             assertEquals 2, resultA
             assertEquals 3, resultB
         }
     }
 
-    public void testCallAsyncWithResult() {
-        Asynchronizer.doAsync(5) {ExecutorService service ->
+    public void testCallParallelWithResult() {
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             assertEquals 6, AsyncInvokerUtil.callAsync({it * 2}, 3).get()
         }
     }
 
     public void testAsync() {
-        Asynchronizer.doAsync(5) {ExecutorService service ->
-            def resultA=0, resultB=0
+        Asynchronizer.doParallel(5) {ExecutorService service ->
+            def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2);
-            AsyncInvokerUtil.async({int number -> resultA=number;latch.countDown()}).call(2);
-            AsyncInvokerUtil.async({int number -> resultB=number;latch.countDown()}).call(3);
+            AsyncInvokerUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
+            AsyncInvokerUtil.async({int number -> resultB = number; latch.countDown()}).call(3);
             latch.await()
             assertEquals 2, resultA
             assertEquals 3, resultB
@@ -70,23 +71,23 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testAsyncWithResult() {
-        Asynchronizer.doAsync(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             assertEquals 6, AsyncInvokerUtil.async({it * 2}).call(3).get()
         }
     }
 
     public void testInvalidPoolSize() {
         shouldFail(IllegalArgumentException.class) {
-                Asynchronizer.doAsync(0) {}
+            Asynchronizer.doParallel(0) {}
         }
         shouldFail(IllegalArgumentException.class) {
-                Asynchronizer.doAsync(-10) {}
+            Asynchronizer.doParallel(-10) {}
         }
     }
 
     public void testMissingThreadFactory() {
         shouldFail(IllegalArgumentException.class) {
-                Asynchronizer.doAsync (5, null) {}
+            Asynchronizer.doParallel(5, null) {}
         }
     }
 
@@ -101,21 +102,59 @@ public class AsyncUtilTest extends GroovyTestCase {
     public void testLeftShift() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final Semaphore semaphore = new Semaphore(0)
-        Asynchronizer.doAsync(5) {ExecutorService service ->
-            service << {flag.set(true);semaphore.release(); }
+        Asynchronizer.doParallel(5) {ExecutorService service ->
+            service << {flag.set(true); semaphore.release(); }
             semaphore.acquire()
             assert flag.get()
         }
     }
 
     public testNestedCalls() {
-        Asynchronizer.doAsync(5) {pool ->
-            def result = ['abc', '123', 'xyz'].findAllAsync {word ->
-                Asynchronizer.doAsync(pool) {
-                    word.anyAsync {it in ['a', 'y', '5']}
+        Asynchronizer.doParallel(5) {pool ->
+            def result = ['abc', '123', 'xyz'].findAllParallel {word ->
+                Asynchronizer.withExistingAsynchronizer(pool) {
+                    word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
             assertEquals(['abc', 'xyz'], result)
+        }
+    }
+
+    public void testNestedPools() {
+        Asynchronizer.doParallel{a->
+            Asynchronizer.doParallel{b->
+                Asynchronizer.doParallel{c->
+                    Asynchronizer.doParallel{d->
+                        assert d != c != b != a
+                        assert Asynchronizer.retrieveCurrentPool() == d
+                    }
+                    assert Asynchronizer.retrieveCurrentPool() == c
+                }
+                assert Asynchronizer.retrieveCurrentPool() == b
+            }
+            assert Asynchronizer.retrieveCurrentPool() == a
+        }
+    }
+
+    public void testNestedExistingPools() {
+        final def pool1 = Executors.newFixedThreadPool(1)
+        final def pool2 = Executors.newFixedThreadPool(1)
+        final def pool3 = Executors.newFixedThreadPool(1)
+        Asynchronizer.withExistingAsynchronizer(pool1){a->
+            Asynchronizer.withExistingAsynchronizer(pool2){b->
+                Asynchronizer.withExistingAsynchronizer(pool1){c->
+                    Asynchronizer.withExistingAsynchronizer(pool3){d->
+                        assert d == pool3
+                        assert c == pool1
+                        assert b == pool2
+                        assert a == pool1
+                        assert Asynchronizer.retrieveCurrentPool() == pool3
+                    }
+                    assert Asynchronizer.retrieveCurrentPool() == pool1
+                }
+                assert Asynchronizer.retrieveCurrentPool() == pool2
+            }
+            assert Asynchronizer.retrieveCurrentPool() == pool1
         }
     }
 }

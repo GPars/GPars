@@ -30,38 +30,42 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Alex Tkachman
  */
 public class NettyRemoteConnection extends RemoteConnection {
-    private NettyHandler handler;
+    private final NettyHandler handler;
     private final MyChannelFutureListener writeListener = new MyChannelFutureListener();
 
-    public NettyRemoteConnection(NettyTransportProvider provider, NettyHandler netHandler) {
+    public NettyRemoteConnection(final NettyTransportProvider provider, final NettyHandler netHandler) {
         super(provider);
         this.handler = netHandler;
     }
 
-    public void write(SerialMsg msg) {
+    @Override
+    public void write(final SerialMsg msg) {
         if (handler.getChannel().isConnected() && handler.getChannel().isOpen()) {
             writeListener.incrementAndGet();
             handler.getChannel().write(msg).addListener(writeListener);
         }
     }
 
+    @Override
     public void disconnect() {
         writeListener.incrementAndGet();
         writeListener.handler = handler;
         try {
             writeListener.operationComplete(null);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
     private static class MyChannelFutureListener extends AtomicInteger implements ChannelFutureListener {
+        private static final long serialVersionUID = -3054880716233778157L;
         public volatile NettyHandler handler;
 
-        public void operationComplete(ChannelFuture future) throws Exception {
+        public void operationComplete(final ChannelFuture future) throws Exception {
             if (decrementAndGet() == 0 && handler != null) {
                 final CountDownLatch cdl = new CountDownLatch(1);
                 handler.getChannel().close().addListener(new ChannelFutureListener() {
-                    public void operationComplete(ChannelFuture future) throws Exception {
+                    @SuppressWarnings({"AnonymousClassVariableHidesContainingMethodVariable"})
+                    public void operationComplete(final ChannelFuture future) throws Exception {
                         cdl.countDown();
                     }
                 });

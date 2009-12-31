@@ -16,11 +16,11 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.actor.PooledActorGroup
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
-import static groovyx.gpars.actor.Actors.actor
 
 /**
  *
@@ -28,16 +28,21 @@ import static groovyx.gpars.actor.Actors.actor
  * Date: Feb 20, 2009
  */
 public class MessagingTest extends GroovyTestCase {
+    ActorGroup group
+
     protected void setUp() {
-        super.setUp();
-        Actors.defaultPooledActorGroup.resize(10)
+        group = new PooledActorGroup(5)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
     }
 
     public void testReact() {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
+        final AbstractPooledActor actor = group.actor {
             counter.incrementAndGet()
             barrier.await()
             react {
@@ -48,7 +53,7 @@ public class MessagingTest extends GroovyTestCase {
                     barrier.await()
                 }
             }
-        }.start()
+        }
 
         barrier.await()
         assertEquals 1, counter.intValue()
@@ -66,7 +71,7 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
+        final AbstractPooledActor actor = group.actor {
             counter.incrementAndGet()
             barrier.await()
             react {
@@ -77,7 +82,7 @@ public class MessagingTest extends GroovyTestCase {
                     barrier.await()
                 }
             }
-        }.start()
+        }
 
         barrier.await()
         assertEquals 1, counter.intValue()
@@ -95,7 +100,7 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
+        final AbstractPooledActor actor = group.actor {
             barrier.await()
             react {
                 counter.incrementAndGet()
@@ -111,7 +116,7 @@ public class MessagingTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor.send('message')
         actor.send('message')
@@ -133,12 +138,12 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
+        final AbstractPooledActor actor = group.actor {
             react {
                 counter.incrementAndGet()
                 barrier.await()
             }
-        }.start()
+        }
 
         Thread.sleep(1000)
         actor.send('message')

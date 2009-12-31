@@ -1,0 +1,182 @@
+h3. Structuring actor's code
+When extending the _AbstractPooledActor_ class, you can call any actor's methods from within the _act()_ method and use the _react()_ or _loop()_ methods in them.
+{code}
+class MyActor extends AbstractPooledActor {
+
+    protected void act() {
+        handleA()
+    }
+
+    private void handleA() {
+        react {a ->
+            handleB(a)
+        }
+    }
+
+    private void handleB(int a) {
+        react {b ->
+            println a + b
+            reply a + b
+        }
+    }
+}
+{code}
+
+Bear in mind that the methods _handleA()_ and _handleB()_ in all our examples never return, since they call _react()_, which itself never returns.
+
+Alternatively, when using the _actor()_ factory method, you can add event-handling code through the meta class as closures.
+{code}
+Actor actor2 = actor {
+    handleA()
+}
+
+actor2.metaClass {
+    handleA = {->
+        react {a ->
+            handleB(a)
+        }
+    }
+
+    handleB = {a ->
+        react {b ->
+            println a + b
+            reply a + b
+        }
+    }
+}
+{code}
+
+Closures, which have the actor set as their delegate can also be used to structure event-handling code.
+
+{code}
+Closure handleB = {a ->
+    react {b ->
+        println a + b
+        reply a + b
+    }
+}
+
+Closure handleA = {->
+    react {a ->
+        handleB(a)
+    }
+}
+
+Actor actor3 = actor {
+    handleA()
+}
+handleA.delegate = actor3
+handleB.delegate = actor3
+{code}
+h3. Event-driven loops
+When coding event-driven actors you have to have in mind that calls to _react()_ and _loop()_ methods never return. This becomes a bit of a challenge once you try to implement any types of loops in your actors.
+On the other hand, if you leverage the fact that _react()_ never returns, you may call methods recursively without fear to fill up the stack. Look at the examples below, which respectively use the three described techniques for structuring actor's code.
+
+A subclass of _AbstractPooledActor_
+{code}
+class MyLoopActor extends AbstractPooledActor {
+
+    protected void act() {
+        outerLoop()
+    }
+
+    private void outerLoop() {
+        react {a ->
+            println 'Outer: ' + a
+            if (a!=0) innerLoop()
+            else println 'Done'
+        }
+    }
+
+    private void innerLoop() {
+        react {b ->
+            println 'Inner ' + b
+            if (b == 0) outerLoop()
+            else innerLoop()
+        }
+    }
+}
+{code}
+
+Enhancing the actor's metaClass
+
+{code}
+Actor actor = actor {
+    outerLoop()
+}
+
+actor.metaClass {
+    outerLoop = {->
+        react {a ->
+            println 'Outer: ' + a
+            if (a!=0) innerLoop()
+            else println 'Done'
+        }
+    }
+
+    innerLoop = {->
+        react {b ->
+            println 'Inner ' + b
+            if (b==0) outerLoop()
+            else innerLoop()
+        }
+    }
+}
+{code}
+
+Using Groovy closures
+
+{code}
+Closure innerLoop
+
+Closure outerLoop = {->
+    react {a ->
+        println 'Outer: ' + a
+        if (a!=0) innerLoop()
+        else println 'Done'
+    }
+}
+
+innerLoop = {->
+    react {b ->
+        println 'Inner ' + b
+        if (b==0) outerLoop()
+        else innerLoop()
+    }
+}
+
+Actor actor = actor {
+    outerLoop()
+}
+outerLoop.delegate = actor
+innerLoop.delegate = actor
+{code}
+
+Plus don't forget about the possibility to use the actor's _loop()_ method to create a loop that never stops before the actor terminates.
+
+{code}
+class MyLoopActor extends AbstractPooledActor {
+
+    protected void act() {
+        loop {
+            outerLoop()
+        }
+    }
+
+    private void outerLoop() {
+        react {a ->
+            println 'Outer: ' + a
+            if (a!=0) innerLoop()
+            else println 'Done for now, but will loop again'
+        }
+    }
+
+    private void innerLoop() {
+        react {b ->
+            println 'Inner ' + b
+            if (b == 0) outerLoop()
+            else innerLoop()
+        }
+    }
+}
+{code}

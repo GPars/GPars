@@ -37,13 +37,13 @@ public class DataFlowTest extends GroovyTestCase {
         }
 
         start {
-          x << 40
+            x << 40
         }
         start {
-          y << 2
+            y << 2
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 42, result
     }
 
@@ -74,7 +74,7 @@ public class DataFlowTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals([0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45], result)
     }
 
@@ -86,9 +86,9 @@ public class DataFlowTest extends GroovyTestCase {
         volatile def result = 0
         final def latch = new CountDownLatch(1)
 
-        z >> { res ->
-          result = res
-          latch.countDown()
+        z >> {res ->
+            result = res
+            latch.countDown()
         }
 
         start {
@@ -98,34 +98,34 @@ public class DataFlowTest extends GroovyTestCase {
         start {x << 40}
         start {y << 2}
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals 42, result
     }
 
-    void testMethodSyntax () {
-      def df = new DataFlows ()
+    void testMethodSyntax() {
+        def df = new DataFlows()
 
-      volatile def result = 0
-      final def latch = new CountDownLatch(1)
+        volatile def result = 0
+        final def latch = new CountDownLatch(1)
 
-      df.z { res ->
-        result = res
-        latch.countDown()
-      }
+        df.z {res ->
+            result = res
+            latch.countDown()
+        }
 
-      start {
-          def v = df.x + df.y
-          df.z = v
-      }
+        start {
+            def v = df.x + df.y
+            df.z = v
+        }
 
-      start {
-        df.x = 40
-      }
-      start {
-        df.y = 2
-      }
+        start {
+            df.x = 40
+        }
+        start {
+            df.y = 2
+        }
 
-      latch.await(30, TimeUnit.SECONDS)
-      assertEquals 42, result
+        latch.await(90, TimeUnit.SECONDS)
+        assertEquals 42, result
     }
 }

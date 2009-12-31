@@ -16,60 +16,60 @@
 
 package groovyx.gpars.actor.groups
 
-import java.util.concurrent.CountDownLatch
-import groovyx.gpars.actor.impl.*
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.NonDaemonActorGroup
 import groovyx.gpars.actor.PooledActorGroup
+import java.util.concurrent.CountDownLatch
 
 public class PooledActorGroupTest extends GroovyTestCase {
 
-  public void testDefaultGroupDaemon() {
-    volatile boolean daemon = false;
-    final CountDownLatch latch = new CountDownLatch(1)
+    public void testDefaultGroupDaemon() {
+        volatile boolean daemon = false;
+        final CountDownLatch latch = new CountDownLatch(1)
 
-    def actor = Actors.actor {
-      daemon = Thread.currentThread().isDaemon()
-      latch.countDown()
-    }.start()
+        def actor = Actors.actor {
+            daemon = Thread.currentThread().isDaemon()
+            latch.countDown()
+        }
 
-    assertEquals Actors.defaultPooledActorGroup, actor.actorGroup
-    latch.await()
-    assert daemon
-  }
+        assertEquals Actors.defaultPooledActorGroup, actor.actorGroup
+        latch.await()
+        assert daemon
+    }
 
-  public void testGroupDaemonFlag() {
-    volatile boolean daemon = false;
-    final CountDownLatch latch1 = new CountDownLatch(1)
-    final CountDownLatch latch2 = new CountDownLatch(1)
+    public void testGroupDaemonFlag() {
+        volatile boolean daemon = false;
+        final CountDownLatch latch1 = new CountDownLatch(1)
+        final CountDownLatch latch2 = new CountDownLatch(1)
 
-    final PooledActorGroup daemonGroup = new PooledActorGroup()
-    final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final PooledActorGroup daemonGroup = new PooledActorGroup()
+        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
 
-    def actor1 = daemonGroup.actor {
-      daemon = Thread.currentThread().isDaemon()
-      latch1.countDown()
-    }.start()
+        def actor1 = daemonGroup.actor {
+            daemon = Thread.currentThread().isDaemon()
+            latch1.countDown()
+        }
 
-    assertEquals daemonGroup, actor1.actorGroup
-    latch1.await()
-    assert daemon
+        assertEquals daemonGroup, actor1.actorGroup
+        latch1.await()
+        assert daemon
 
-    def actor2 = nonDaemonGroup.actor {
-      daemon = Thread.currentThread().isDaemon()
-      latch2.countDown()
-    }.start()
+        def actor2 = nonDaemonGroup.actor {
+            daemon = Thread.currentThread().isDaemon()
+            latch2.countDown()
+        }
 
-    assertEquals nonDaemonGroup, actor2.actorGroup
-    latch2.await()
-    assertFalse daemon
+        assertEquals nonDaemonGroup, actor2.actorGroup
+        latch2.await()
+        assertFalse daemon
 
-    daemonGroup.shutdown()
-    nonDaemonGroup.shutdown()
-  }
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
+    }
 
-  public void testGroupsWithActorInheritance() {
+    public void testGroupsWithActorInheritance() {
 //        volatile boolean daemon = false;
 //        final CountDownLatch latch1 = new CountDownLatch(1)
 //        final CountDownLatch latch2 = new CountDownLatch(1)
@@ -100,58 +100,58 @@ public class PooledActorGroupTest extends GroovyTestCase {
 //        assertFalse daemon
 //        daemonGroup.shutdown()
 //        nonDaemonGroup.shutdown()
-  }
-
-  public void testValidGroupReset() {
-    final PooledActorGroup daemonGroup = new PooledActorGroup()
-    final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
-    final GroupTestActor actor = new GroupTestActor(daemonGroup)
-
-    assertEquals daemonGroup, actor.actorGroup
-    actor.actorGroup = nonDaemonGroup
-    assertEquals nonDaemonGroup, actor.actorGroup
-
-    daemonGroup.shutdown()
-    nonDaemonGroup.shutdown()
-  }
-
-  public void testInvalidGroupReset() {
-    final PooledActorGroup daemonGroup = new PooledActorGroup()
-    final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
-    final GroupTestActor actor = new GroupTestActor(daemonGroup)
-    actor.start()
-    assertEquals daemonGroup, actor.actorGroup
-    shouldFail {
-      actor.actorGroup = nonDaemonGroup
     }
-    daemonGroup.shutdown()
-    nonDaemonGroup.shutdown()
-  }
 
-  @SuppressWarnings ("GroovyMethodWithMoreThanThreeNegations")
-  public void testDifferentPools() {
-    final PooledActorGroup daemonGroup1 = new PooledActorGroup()
-    final PooledActorGroup daemonGroup2 = new PooledActorGroup()
-    final NonDaemonActorGroup nonDaemonGroup1 = new NonDaemonActorGroup()
-    final NonDaemonActorGroup nonDaemonGroup2 = new NonDaemonActorGroup()
-    final PooledActorGroup defaultGroup = Actors.defaultPooledActorGroup
+    public void testValidGroupReset() {
+        final PooledActorGroup daemonGroup = new PooledActorGroup()
+        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final GroupTestActor actor = new GroupTestActor(daemonGroup)
 
-    assert daemonGroup1.threadPool != daemonGroup2.threadPool
-    assert daemonGroup1.threadPool != nonDaemonGroup1.threadPool
-    assert daemonGroup1.threadPool != defaultGroup.threadPool
+        assertEquals daemonGroup, actor.actorGroup
+        actor.actorGroup = nonDaemonGroup
+        assertEquals nonDaemonGroup, actor.actorGroup
 
-    assert nonDaemonGroup1.threadPool != daemonGroup2.threadPool
-    assert nonDaemonGroup1.threadPool != nonDaemonGroup2.threadPool
-    assert nonDaemonGroup1.threadPool != defaultGroup.threadPool
-  }
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
+    }
+
+    public void testInvalidGroupReset() {
+        final PooledActorGroup daemonGroup = new PooledActorGroup()
+        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final GroupTestActor actor = new GroupTestActor(daemonGroup)
+        actor.start()
+        assertEquals daemonGroup, actor.actorGroup
+        shouldFail(IllegalStateException) {
+            actor.actorGroup = nonDaemonGroup
+        }
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
+    }
+
+    @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
+    public void testDifferentPools() {
+        final PooledActorGroup daemonGroup1 = new PooledActorGroup()
+        final PooledActorGroup daemonGroup2 = new PooledActorGroup()
+        final NonDaemonActorGroup nonDaemonGroup1 = new NonDaemonActorGroup()
+        final NonDaemonActorGroup nonDaemonGroup2 = new NonDaemonActorGroup()
+        final PooledActorGroup defaultGroup = Actors.defaultPooledActorGroup
+
+        assert daemonGroup1.threadPool != daemonGroup2.threadPool
+        assert daemonGroup1.threadPool != nonDaemonGroup1.threadPool
+        assert daemonGroup1.threadPool != defaultGroup.threadPool
+
+        assert nonDaemonGroup1.threadPool != daemonGroup2.threadPool
+        assert nonDaemonGroup1.threadPool != nonDaemonGroup2.threadPool
+        assert nonDaemonGroup1.threadPool != defaultGroup.threadPool
+    }
 }
 
 class GroupTestActor extends AbstractPooledActor {
 
-  def GroupTestActor(ActorGroup group) {
-    actorGroup = group
-  }
+    def GroupTestActor(ActorGroup group) {
+        actorGroup = group
+    }
 
-  protected void act() {
-  }
+    protected void act() {
+    }
 }

@@ -17,22 +17,29 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlows
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
+
+/**
+ * Demonstrates the use of the DataFlows class to exchange values among threads or tasks.
+ *
+ * @author Vaclav Pech, Dierk Koenig
+ */
 
 final df = new DataFlows()
 
-start { df.result = df.x + df.y }
+task { df.result = df.x + df.y }
 
-start { df.x = 10 }
+task { df.x = 10 }
 
-start { df.y = 5 }
+task { df.y = 5 }
 
 assert 15 == df.result
 
-start { df [0] = df[2] + df[1] }
+task { df[0] = df[2] + df[1] }
 
-start { df [1] = 10 }
+task { df[1] = 10 }
 
-start { df [2] = 5 }
+task { df[2] = 5 }
 
 assert 15 == df[0]
+System.exit 0

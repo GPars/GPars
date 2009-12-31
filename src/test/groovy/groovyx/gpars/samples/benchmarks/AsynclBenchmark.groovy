@@ -37,7 +37,7 @@ meassureParallelizer(numOfWarmupIterations, items)
 time = meassureParallelizer(numOfIterations, items)
 println "Parallelizer $time"
 
-long meassureSequential(iterations, List list) {
+long measureSequential(iterations, List list) {
     final long t1 = System.currentTimeMillis()
     for (i in iterations) {
         int result
@@ -49,13 +49,13 @@ long meassureSequential(iterations, List list) {
     return t2 - t1
 }
 
-long meassureAsynchronizer(iterations, List list) {
+long measureAsynchronizer(iterations, List list) {
     final long t1 = System.currentTimeMillis()
     Asynchronizer.withAsynchronizer(30) {
         for (i in iterations) {
             int result
-            list.eachAsync {result = it}
-            def elements = list.collectAsync {it}
+            list.eachParallel {result = it}
+            def elements = list.collectParallel {it}
             result = elements[-1]
         }
     }
@@ -63,13 +63,13 @@ long meassureAsynchronizer(iterations, List list) {
     return t2 - t1
 }
 
-long meassureParallelizer(iterations, List list) {
+long measureParallelizer(iterations, List list) {
     final long t1 = System.currentTimeMillis()
     Parallelizer.withParallelizer(30) {
         for (i in iterations) {
             int result
-            list.eachAsync {result = it}
-            def elements = list.collectAsync {it}
+            list.eachParallel {result = it}
+            def elements = list.collectParallel {it}
             result = elements[-1]
         }
     }

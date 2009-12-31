@@ -16,10 +16,10 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.PooledActorGroup
+import java.util.concurrent.CountDownLatch
 
 final Random random = new Random(System.currentTimeMillis())
 
@@ -34,14 +34,14 @@ for (i in 0..10000) {
         receive {
             reply it
         }
-    }.start()
+    }
 
     group.actor {
         actor << 'Message'
         receive {
             latch.countDown()
         }
-    }.start()
+    }
     latch.await()
     group.shutdown()
 }

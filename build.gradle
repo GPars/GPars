@@ -14,75 +14,108 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-//  Author:  Václav Pech
+//  Author: Václav Pech
 //  Author: Russel Winder
+//  Author: Dierk König
+//  Author: Hans Dockter
+//  Author: Hamlet D'Arcy - Updated OSGi configuration
 
 import java.text.SimpleDateFormat
+import org.gradle.api.DefaultTask
 
-ant.property(file: 'local.build.properties')
-ant.property(file: 'build.properties')
+// gradle imports these by default, but IDEA doesn't know
+import org.gradle.api.file.FileCollection
 
 usePlugin 'groovy'
 usePlugin 'maven'
+usePlugin 'osgi'
 
 defaultTasks 'test'
 
 archivesBaseName = 'gpars'
-group = 'groovyx.gpars'
-version = '0.9-beta-1'
+group = 'org.codehaus.gpars'
+version = '0.10-beta-1'
+bundleVersion = version
 
-manifest.mainAttributes(
-        'Implementation-Title': 'gpars',
-        'Implementation-Version': version,
-        'provider': 'Vaclav Pech'
-)
+def theVendor = 'gpars.org'
+def theTitle = 'GPars: Groovy Parallel Systems'
+configure ( jar.osgi ) {
+  name = 'gpars'
+  version = this.version
+  symbolicName = 'gpars.org'
+  instruction 'Bundle-Vendor' , theVendor
+  instruction 'Bundle-Description' , group
+  instruction 'Bundle-DocURL' , 'http://gpars.codehaus.org'
+  instruction 'Built-By' , System.properties.'user.name'
+  instruction 'Extension-Name' , archivesBaseName
+  instruction 'Specification-Title' , theTitle
+  instruction 'Specification-Version' , version
+  instruction 'Specification-Vendor' , theVendor
+  instruction 'Implementation-Title' , theTitle
+  instruction 'Implementation-Version' , version
+  instruction 'Implementation-Vendor' , theVendor
+  instruction 'Implementation-Title', archivesBaseName
+  instruction 'Implementation-Version', version
+  instruction 'provider', theVendor
+  instruction 'Export-Package', '*'
+}
 
 repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
-    mavenRepo urls: ['file://' + System.properties.'user.home' + '/.m2/repository']
-//    flatDir name: 'localRepository', dirs: 'lib'
+    mavenRepo urls: ["http://snapshots.repository.codehaus.org"]
+    mavenRepo urls: ["http://repository.codehaus.org"]
 }
 
 configurations {
     deployerJars
+    docs
 }
 
 dependencies {
-//    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: ant.project.properties.groovyVersion
-    groovy files('lib/groovy-all-1.6.5.jar')
-//    testCompile group: 'junit', name: 'junit', version: hasProperty('groovyVersion') ? groovyVersion : '4.7'
-    testCompile group: 'junit', name: 'junit', version: ant.project.properties.junitVersion
-    compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: ant.project.properties.jsr166yVersion
-    compile group: 'org.jboss.netty', name: 'netty', version: ant.project.properties.nettyVersion
-    deployerJars group: 'org.jvnet.wagon-svn', name: 'wagon-svn', version: ant.project.properties.wagonSvnVersion
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.6.7'
+    testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.7'
+    compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
+    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
+//    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
+    docs group: 'org.grails', name: 'grails-docs', version: '1.2.0.BUILD-SNAPSHOT'
+    docs group: 'radeox', name: 'radeox', version: '1.0-b2'
+    deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
 }
-
-//todo alter properties
-//todo disable distributed tests when no network is available
-//todo sort out repositories
 
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
 
+[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '256M')
+
 gradle.taskGraph.whenReady {taskGraph ->
-    if (!taskGraph.hasTask(':release')) {
-        final Date date = new Date()
-        version += '-SNAPSHOT' + new SimpleDateFormat('yyMMddHHmmssZ').format(date)
-    }
+   if (!taskGraph.hasTask(':release')) {
+       version += '-SNAPSHOT'
+   }
 }
 
 task release(dependsOn: ['build']) << {
     println 'We release now'
 }
 
-uploadArchives {
+try {
+  uploadArchives {
     repositories.mavenDeployer {
-        uniqueVersion = false
-        configuration = configurations.deployerJars
-        repository(url: 'java-net:/maven2-repository/trunk/repository/') {
-        }
+      uniqueVersion = false
+      configuration = configurations.deployerJars
+      repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
+        authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+      }
+      snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
+        authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+      }
     }
+  }
+}
+catch ( Exception e ) {
+  //  It may be that gpars_repoUserName and/or gpars_repoPassword are not defined in which case an exception
+  //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
+  //  care that the uploadArchives specification hasn't completed.
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
@@ -113,16 +146,20 @@ groovydoc {
     docTitle = packageTitle
     header = packageTitle
     footer = copyrightString
-    packageNames = ['groovyx.gpars.*']
-//    description = 'Create the GroovyDoc API documentation.'
+    include 'groovyx/gpars/**'
     overview = 'overview.html'
 }
 
-task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
+task documentation(dependsOn: ['javadoc', 'groovydoc', 'docs'], description: 'Create the API documentation.')
+
+task docs << {
+  ant.taskdef (name: 'docs', classname : 'grails.doc.ant.DocPublisherTask' , classpath : configurations.docs.asPath)
+  ant.docs(src:"grails-doc/src", dest:"build/docs/guide", properties:"grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir : new File('grails-doc/resources/css'), imagesDir : new File('grails-doc/resources/img') )
+}
 
 task zipDoc(type: Zip, dependsOn: documentation) {
     appendix = 'docs'
-    fileSet(dir: docsDir)
+    from(docsDir)
 }
 
 task zipSrc(type: Zip) {
@@ -130,16 +167,79 @@ task zipSrc(type: Zip) {
     from sourceSets.main.allSource
 }
 
+//task zipSamples(dependsOn: 'demo', type: Zip) {
 task zipSamples(type: Zip) {
     appendix = 'samples'
-    from sourceSets.test.allSource.matching{
+    from sourceSets.test.allSource.matching {
         include 'groovyx/gpars/samples/**'
     }
 }
 
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
-    gradleVersion = '0.8'
+    gradleVersion = '0.9-20091111095904+0100-maven_webdav'
+}
+
+task demo(type: DemoTask, dependsOn: 'compileGroovy') {
+    excludedDemos = [
+            'DemoPotentialDeadlock',                      // may deadlock (on purpose)
+            'DemoNonDeterministicDeadlockWithDataFlows',  // may deadlock (on purpose)
+            'DemoDeadLock',                               // deadlock (on purpose)
+            'DemoRemote',                                 // doesn't work in an automated environment
+            'DemoSwing',                                  // maybe we don't want these to run on the CI ..
+            'DemoSwingMashup',                            // but they can be run locally
+            'DemoSwingCollectionProcessing',                            
+            'DemoSwingActors',                            
+            'DemoSwingDataFlowOperators',
+            'DemoMapReduce',                              //Replies on internet connection
+    ]
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    demoFiles = sourceSets.test.allGroovy.matching {
+        include '**/*Demo*.groovy'
+        exclude excludedDemos.collect {name -> "**/${name}.groovy" }
+    }
+}
+
+class DemoTask extends DefaultTask {
+    @org.gradle.api.tasks.InputFiles
+    FileCollection classpath
+
+    @org.gradle.api.tasks.InputFiles
+    FileCollection demoFiles
+
+    List excludedDemos
+
+    @org.gradle.api.tasks.TaskAction
+    def runDemos() {
+        def shell = createShell()
+        def failed = []
+        def ok = 0
+        demoFiles.files.each {File file ->
+            println "*** starting demo $file.name"
+            try {
+                shell.evaluate(file)
+                ok += 1
+            } catch (Exception ex) {
+                failed << [file: file, exception: ex]
+            }
+            println "*** done"
+        }
+        println "=== demos: $ok ok, ${failed.size()} failed"
+        failed.each { println "${it.file}\n    ${it.exception}" }
+    }
+
+    private GroovyShell createShell() {
+        URLClassLoader classloader = new URLClassLoader(
+                classpath.files.collect {File classpathElement -> classpathElement.toURL()} as URL[],
+                Thread.currentThread().contextClassLoader
+
+        )
+        System.metaClass.static.exit = {int returnCode -> println ">>> System.exit($returnCode) suppressed." }
+        System.in.metaClass.read = {-> println ">>> System.in.read() suppressed"; 'Automated build' }
+        new GroovyShell(classloader)
+    }
 }
 
 //todo test fork frequency in gradle 0.9

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 
 /**
  * A parent actor for all actors used in Dataflow Concurrency implementation
@@ -27,12 +27,7 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
 abstract class DataFlowActor extends AbstractPooledActor {
 
     /**
-     * The actor group used by all Dataflow Concurrency actors by default.
-     */
-    public static final DataFlowActorGroup DATA_FLOW_GROUP = new DataFlowActorGroup(1)
-
-    /**
      * Sets the default Dataflow Concurrency actor group on the actor.
      */
-    def DataFlowActor() { this.actorGroup = DATA_FLOW_GROUP }
+    def DataFlowActor() { this.actorGroup = DataFlow.DATA_FLOW_GROUP }
 }

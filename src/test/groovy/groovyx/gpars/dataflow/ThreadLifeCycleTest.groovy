@@ -16,18 +16,19 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import static groovyx.gpars.dataflow.DataFlow.start
 
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
     public void testActorGroup() {
-        final AbstractPooledActor actor = start {
+        final Actor actor = start {
             react {}
         }
-        assertEquals DataFlowActor.DATA_FLOW_GROUP, actor.actorGroup
+        assertEquals DataFlow.DATA_FLOW_GROUP, actor.actorGroup
         actor << 'Message'
     }
 
@@ -55,6 +56,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         latch.await()
         assertEquals 3, counter.get()
     }
+
     public void testTimeoutLifeCycle() {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
@@ -62,7 +64,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         final def thread = start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
-                react(10.milliseconds) {}  //will timeout
+            react(10.milliseconds) {}  //will timeout
         }
         latch.await()
         assertEquals 3, counter.get()

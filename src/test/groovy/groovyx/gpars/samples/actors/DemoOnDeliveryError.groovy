@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.actors
 
-import java.util.concurrent.CyclicBarrier
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CyclicBarrier
 
 /**
  * Shows possibilities to handle message delivery errors.
@@ -34,7 +34,7 @@ final AbstractPooledActor actor = Actors.actor {
     react {
         stop()
     }
-}.start()
+}
 
 final AbstractPooledActor me
 me = Actors.actor {
@@ -53,17 +53,17 @@ me = Actors.actor {
     actor << message1
     actor << message2
     actor << message3
-    Thread.sleep 1000 
+    Thread.sleep 1000
     barrier.await()
 
-    react {a->
+    react {a ->
         println a
         react {b ->
             println b
-            System.exit 0 
+            System.exit 0
         }
     }
 
-}.start()
+}
 
 System.in.read()

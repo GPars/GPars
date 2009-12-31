@@ -17,7 +17,7 @@
 package groovyx.gpars.issues
 
 class Parent {
-    private String myPrivateProperty="secret"
+    private String myPrivateProperty = "secret"
 
     public void foo() {
         Thread.start {

@@ -16,13 +16,13 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
-import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.PooledActorGroup
 
 /**
- * Three pooled actors are created, two of them in a newly created pooled actor group, one in the fefault pooled actor
+ * Three pooled actors are created, two of them in a newly created pooled actor group, one in the default pooled actor
  * group using the factory method of the Actors class.
  * @author Vaclav Pech
  */
@@ -34,15 +34,15 @@ println "Default group ${Actors.defaultPooledActorGroup}"
 println ""
 
 sampleGroup.actor {
-    println ((actorGroup==Actors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
-}.start()
+    println((actorGroup == Actors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
+}
 
 Thread.sleep 1000
 
 class GroupSamplePooledActor extends AbstractPooledActor {
 
     protected void act() {
-        println ((actorGroup==Actors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
+        println((actorGroup == Actors.defaultPooledActorGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
     }
 }
 

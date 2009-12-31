@@ -39,6 +39,6 @@ C.metaClass {
     mixin B
 }
 
-def c= new C()
+def c = new C()
 c.foo()
 

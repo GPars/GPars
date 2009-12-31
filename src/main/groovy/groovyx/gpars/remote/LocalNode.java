@@ -28,7 +28,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Representation of local node
@@ -42,8 +47,6 @@ public class LocalNode {
 
     private final Actor mainActor;
 
-    private final ActorGroup actorGroup;
-
     private final UUID id = UUID.randomUUID();
 
     private LocalHost localHost;
@@ -52,27 +55,27 @@ public class LocalNode {
         this(null, null);
     }
 
-    public LocalNode(Runnable runnable) {
+    public LocalNode(final Runnable runnable) {
         this(null, runnable);
     }
 
-    public LocalNode(LocalHost provider) {
+    public LocalNode(final LocalHost provider) {
         this(provider, null);
     }
 
-    public LocalNode(LocalHost provider, Runnable runnable) {
+    public LocalNode(final LocalHost provider, final Runnable runnable) {
         this.scheduler = new ThreadPoolExecutor(1, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(100),
                 new ThreadFactory() {
                     ThreadFactory threadFactory = Executors.defaultThreadFactory();
 
-                    public Thread newThread(Runnable r) {
+                    public Thread newThread(final Runnable r) {
                         final Thread thread = threadFactory.newThread(r);
                         thread.setDaemon(true);
                         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                             public void uncaughtException(final Thread t, final Throwable e) {
-                                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
+                                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                                 e.printStackTrace(System.err);
                             }
                         });
@@ -80,7 +83,7 @@ public class LocalNode {
                     }
                 });
 
-        actorGroup = new PooledActorGroup(new DefaultPool(scheduler));
+        final ActorGroup actorGroup=new PooledActorGroup(new DefaultPool(scheduler));
 
         if (runnable != null) {
             if (runnable instanceof Closure) {
@@ -88,7 +91,6 @@ public class LocalNode {
                 ((Closure) runnable).setResolveStrategy(Closure.DELEGATE_FIRST);
             }
             mainActor = actorGroup.actor(runnable);
-            mainActor.start();
         } else {
             mainActor = null;
         }
@@ -100,10 +102,11 @@ public class LocalNode {
     }
 
     public void connect() {
-        if (localHost != null)
+        if (localHost != null) {
             connect(localHost);
-        else
+        } else {
             LocalHostRegistry.connect(this);
+        }
     }
 
     public void connect(final LocalHost provider) {
@@ -115,47 +118,51 @@ public class LocalNode {
     }
 
     public void disconnect() {
-        if (mainActor != null && mainActor.isActive())
+        if (mainActor != null && mainActor.isActive()) {
             mainActor.stop();
+        }
 
-        if (localHost == null)
+        if (localHost == null) {
             LocalHostRegistry.disconnect(this);
-        else
+        } else {
             scheduler.execute(new Runnable() {
                 public void run() {
                     localHost.disconnect(LocalNode.this);
                 }
             });
+        }
     }
 
-    public void addDiscoveryListener(RemoteNodeDiscoveryListener l) {
-        listeners.add(l);
+    public void addDiscoveryListener(final RemoteNodeDiscoveryListener listener) {
+        listeners.add(listener);
     }
 
-    public void addDiscoveryListener(final Closure l) {
-        listeners.add(new RemoteNodeDiscoveryListener.RemoteNodeDiscoveryListenerClosure(l));
+    public void addDiscoveryListener(final Closure listener) {
+        listeners.add(new RemoteNodeDiscoveryListener.RemoteNodeDiscoveryListenerClosure(listener));
     }
 
-    public void removeDiscoveryListener(RemoteNodeDiscoveryListener l) {
-        listeners.remove(l);
+    public void removeDiscoveryListener(final RemoteNodeDiscoveryListener listener) {
+        listeners.remove(listener);
     }
 
     public void onConnect(final RemoteNode node) {
-        for (final RemoteNodeDiscoveryListener l : listeners)
+        for (final RemoteNodeDiscoveryListener listener : listeners) {
             scheduler.execute(new Runnable() {
                 public void run() {
-                    l.onConnect(node);
+                    listener.onConnect(node);
                 }
             });
+        }
     }
 
     public void onDisconnect(final RemoteNode node) {
-        for (final RemoteNodeDiscoveryListener l : listeners)
+        for (final RemoteNodeDiscoveryListener listener : listeners) {
             scheduler.execute(new Runnable() {
                 public void run() {
-                    l.onDisconnect(node);
+                    listener.onDisconnect(node);
                 }
             });
+        }
     }
 
     public Actor getMainActor() {
@@ -172,7 +179,7 @@ public class LocalNode {
 
     @Override
     public String toString() {
-        return getId().toString();
+        return id.toString();
     }
 
     public SerialHandles getLocalHost() {

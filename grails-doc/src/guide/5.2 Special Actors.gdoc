@@ -1,0 +1,157 @@
+h3. Dynamic Dispatch Actor
+
+The _DynamicDispatchActor_ class is a pooled actor allowing for an alternative structure of the message handling code. In general _DynamicDispatchActor_ repeatedly scans for messages and dispatches arrived messages to one of the _onMessage(message)_ methods defined on the actor. The _DynamicDispatchActor_ leverages the Groovy dynamic method dispatch mechanism under the covers.
+
+{code}
+import groovyx.gpars.actor.DynamicDispatchActor
+
+final class MyActor extends DynamicDispatchActor {
+
+    void onMessage(String message) {
+        println 'Received string'
+    }
+
+    void onMessage(Integer message) {
+        println 'Received integer'
+    }
+
+    void onMessage(Object message) {
+        println 'Received object'
+    }
+
+    void onMessage(List message) {
+        println 'Received list'
+        stop()
+    }
+}
+
+final def actor = new MyActor().start()
+
+actor  << 1
+actor  << ''
+actor  << 1.0
+actor  << new ArrayList()
+
+actor.join()
+{code}
+
+In some scenarios, typically when no implicit conversation-history-dependent state needs to be preserved for the actor, the dynamic dispatch code structure may be more intuitive than the traditional one using nested _loop_ and _react_ statements.
+
+The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamicaly at actor construction time using the _when_ handlers:
+
+{code}
+final Actor actor = new DynamicDispatchActor({
+    when {String msg -> println 'A String'; reply 'Thanks'}
+    when {Double msg -> println 'A Double'; reply 'Thanks'}
+    when {msg -> println 'A something ...'; reply 'What was that?'}
+})
+actor.start()
+{code}
+
+Obviously the two approaches can be combined:
+{code}
+final class MyActor extends DynamicDispatchActor {
+
+    def MyActor(final closure) { super(closure); }
+
+    void onMessage(String message) {
+        println 'Received string'
+    }
+
+    void onMessage(Integer message) {
+        println 'Received integer'
+    }
+
+    void onMessage(Object message) {
+        println 'Received object'
+    }
+
+    void onMessage(List message) {
+        println 'Received list'
+        stop()
+    }
+}
+
+final def actor = new MyActor({
+    when {BigDecimal num -> println 'Received BigDecimal'}
+    if (needHandleFloats) when {Float num -> println 'Got a float'}
+}).start()
+{code}
+
+h3. Reactive Actor
+
+The _ReactiveActor_ class, constructed typically by calling _Actors.reactor()_ or _PooledActorGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
+
+{code}
+import groovyx.gpars.actor.PooledActorGroup
+
+final def group = new PooledActorGroup()
+
+final def doubler = group.reactor {
+    2 * it
+}.start()
+
+group.actor {
+    println 'Double of 10 = ' + doubler.sendAndWait(10)
+}.start()
+
+group.actor {
+    println 'Double of 20 = ' + doubler.sendAndWait(20)
+}.start()
+
+group.actor {
+    println 'Double of 30 = ' + doubler.sendAndWait(30)
+}.start()
+
+for(i in (1..10)) {
+    println "Double of $i = ${doubler.sendAndWait(i)}"
+}
+
+doubler.stop()
+doubler.join()
+{code}
+
+Here's an example of an actor, which submits a batch of numbers to a _ReactiveActor_ for processing and then prints the results gradually as they arrive.
+
+{code}
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.dActors
+
+final def doubler = Actors.reactor {
+    2 * it
+}.start()
+
+Actor actor = Actors.actor {
+    (1..10).each {doubler << it}
+    int i = 0
+    loop {
+        i += 1
+        if (i > 10) stop()
+        else {
+            react {message ->
+                println "Double of $i = $message"
+            }
+        }
+    }
+}.start()
+
+actor.join()
+doubler.stop()
+doubler.join()
+{code}
+
+Essentially reactive actors provide a convenience shortcut for an actor that would wait for messages in a loop, process them and send back the result. This is schematically how the reactive actor looks inside:
+
+{code}
+public class ReactiveActor extends AbstractPooledActor {
+    Closure body
+
+    void act() {
+        loop {
+            react {message ->
+                reply body(message)
+            }
+        }
+    }
+}
+{code}

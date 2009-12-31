@@ -1,0 +1,4 @@
+There are several ways to add GPars to your project. Either download and add all the jar files manually, specify a dependency in Maven, Ivy or Gradle build files or use Grape.
+If you're building a Grails or a Griffon application, you can leverage the appropriate plugins to fetch the jar files for you.
+
+Please visit the "Integration page":http://gpars.codehaus.org/Integration of the project for details.

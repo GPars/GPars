@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.PooledActorGroup
 
 /**
@@ -40,7 +40,7 @@ final def barber = group.reactor {message ->
             println "Barber: No customers. Going to have a sleep"
             break
     }
-}.start()
+}
 
 private def doTheHaircut(Random random) {
     Thread.sleep(random.nextInt(10) * 1000)
@@ -81,7 +81,7 @@ waitingRoom = group.actor {
         }
     }
 
-}.start()
+}
 
 class Customer extends AbstractPooledActor {
     String name
@@ -104,6 +104,7 @@ class Customer extends AbstractPooledActor {
                         break
                     case Done:
                         println "Customer: $name: I have been served."
+                        stop()
                         break
 
                 }
@@ -121,10 +122,15 @@ class Next {}
 class Start {}
 class Done {}
 
-new Customer(name: 'Joe', localBarbers: waitingRoom).start()
-new Customer(name: 'Dave', localBarbers: waitingRoom).start()
-new Customer(name: 'Alice', localBarbers: waitingRoom).start()
+def customers = []
+customers << new Customer(name: 'Joe', localBarbers: waitingRoom).start()
+customers << new Customer(name: 'Dave', localBarbers: waitingRoom).start()
+customers << new Customer(name: 'Alice', localBarbers: waitingRoom).start()
 
 System.in.read()
-new Customer(name: 'James', localBarbers: waitingRoom).start()
+customers << new Customer(name: 'James', localBarbers: waitingRoom).start()
 System.in.read()
+customers*.join()
+barber.stop()
+waitingRoom.stop()
+

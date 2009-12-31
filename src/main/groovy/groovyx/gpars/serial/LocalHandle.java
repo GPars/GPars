@@ -24,6 +24,7 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public final class LocalHandle implements Serializable {
+    private static final long serialVersionUID = -8206894167996286304L;
     private final UUID id;
 
     public LocalHandle(final UUID id) {

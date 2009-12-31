@@ -28,32 +28,32 @@ import static groovyx.gpars.Asynchronizer.withExistingAsynchronizer
 public class AsynchronizerDSLTest extends GroovyTestCase {
     public void testDSLInitialization() {
         withAsynchronizer {
-            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-            assert [1, 2, 3, 4, 5].allAsync {it > 0}
-            assert [1, 2, 3, 4, 5].findAsync{Number number -> number > 2} in [3, 4, 5]
+            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
+            assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
         withAsynchronizer(5) {
-            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-            assert [1, 2, 3, 4, 5].allAsync {it > 0}
-            assert [1, 2, 3, 4, 5].findAsync{Number number -> number > 2} in [3, 4, 5]
+            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
+            assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
 
-        def threadFactory={Runnable runnable ->
+        def threadFactory = {Runnable runnable ->
             Thread t = new Thread(runnable)
-            t.daemon=false
+            t.daemon = false
             return t
         } as ThreadFactory
-        
+
         withAsynchronizer(5, threadFactory) {
-            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-            assert [1, 2, 3, 4, 5].allAsync {it > 0}
-            assert [1, 2, 3, 4, 5].findAsync{Number number -> number > 2} in [3, 4, 5]
+            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
+            assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
 
         withExistingAsynchronizer(Executors.newFixedThreadPool(5)) {
-            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectAsync {it * 2})
-            assert [1, 2, 3, 4, 5].allAsync {it > 0}
-            assert [1, 2, 3, 4, 5].findAsync{Number number -> number > 2} in [3, 4, 5]
+            assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
+            assert [1, 2, 3, 4, 5].everyParallel {it > 0}
+            assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
     }
 }

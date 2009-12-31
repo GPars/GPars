@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * An example showing multiple threads calculating different parts of a complex physical calculation
@@ -36,7 +36,7 @@ final def deceleration = new DataFlowVariable()
 final def distance = new DataFlowVariable()
 final def author = new DataFlowVariable()
 
-start {
+task {
     println """
 Calculating distance required to stop a moving ball.
 ====================================================
@@ -55,36 +55,36 @@ Author: ${author.val}
     System.exit 0
 }
 
-start {
+task {
     mass << volume.val * density.val
 }
 
-start {
+task {
     volume << Math.PI * (radius.val ** 3)
 }
 
-start {
+task {
     radius << 2.5
-    density << 	998.2071  //water
+    density << 998.2071  //water
     acceleration << 9.80665 //free fall
     decelerationForce << 900
 }
 
-start {
+task {
     println 'Enter your name:'
     def name = new InputStreamReader(System.in).readLine()
-    author << (name?.trim()?.size()>0 ? name : 'anonymous')
+    author << (name?.trim()?.size() > 0 ? name : 'anonymous')
 }
 
-start {
+task {
     time << 10
     velocity << acceleration.val * time.val
 }
 
-start {
+task {
     deceleration << decelerationForce.val / mass.val
 }
 
-start {
-    distance << deceleration.val * ((velocity.val/deceleration.val) ** 2) * 0.5
+task {
+    distance << deceleration.val * ((velocity.val / deceleration.val) ** 2) * 0.5
 }

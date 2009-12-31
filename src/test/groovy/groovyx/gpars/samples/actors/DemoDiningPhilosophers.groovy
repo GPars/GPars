@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actors
 
 /**
@@ -36,13 +36,15 @@ final class Philosopher extends AbstractPooledActor {
         loop {
             think()
             forks*.send new Take()
-            react {a, b ->
-                if ([a, b].any {Rejected.isCase it}) {
-                    println "$name: \tOops, can't get my forks! Giving up."
-                    [a, b].find {Accepted.isCase it}?.reply new Finished()
-                } else {
-                    eat()
-                    reply new Finished()
+            react {a ->
+                react {b ->
+                    if ([a, b].any {Rejected.isCase it}) {
+                        println "$name: \tOops, can't get my forks! Giving up."
+                        [a, b].find {Accepted.isCase it}?.reply new Finished()
+                    } else {
+                        eat()
+                        reply new Finished()
+                    }
                 }
             }
         }
@@ -93,22 +95,27 @@ final class Rejected {}
 final class Finished {}
 
 def forks = [
-        new Fork(name:'Fork 1'),
-        new Fork(name:'Fork 2'),
-        new Fork(name:'Fork 3'),
-        new Fork(name:'Fork 4'),
-        new Fork(name:'Fork 5')
+        new Fork(name: 'Fork 1'),
+        new Fork(name: 'Fork 2'),
+        new Fork(name: 'Fork 3'),
+        new Fork(name: 'Fork 4'),
+        new Fork(name: 'Fork 5')
 ]
 
 def philosophers = [
-        new Philosopher(name:'Joe', forks:[forks[0], forks[1]]),
-        new Philosopher(name:'Dave', forks:[forks[1], forks[2]]),
-        new Philosopher(name:'Alice', forks:[forks[2], forks[3]]),
-        new Philosopher(name:'James', forks:[forks[3], forks[4]]),
-        new Philosopher(name:'Phil', forks:[forks[4], forks[0]]),
+        new Philosopher(name: 'Joe', forks: [forks[0], forks[1]]),
+        new Philosopher(name: 'Dave', forks: [forks[1], forks[2]]),
+        new Philosopher(name: 'Alice', forks: [forks[2], forks[3]]),
+        new Philosopher(name: 'James', forks: [forks[3], forks[4]]),
+        new Philosopher(name: 'Phil', forks: [forks[4], forks[0]]),
 ]
 
 forks*.start()
 philosophers*.start()
 
-System.in.read()
+Thread.sleep 10000
+
+forks*.stop()
+forks*.join()
+philosophers*.stop()
+philosophers*.join()

@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * Shows threads manipulating mutually dependant 4 variables.
@@ -28,7 +28,7 @@ DataFlowVariable<Integer> y = new DataFlowVariable<Integer>()
 DataFlowVariable<Integer> z = new DataFlowVariable<Integer>()
 DataFlowVariable<Integer> v = new DataFlowVariable<Integer>()
 
-start {
+task {
     println 'Thread main'
 
     x << 1
@@ -43,16 +43,16 @@ start {
         z << y
         println("'z' set to 'y': " + z.val)
     }
- }
+}
 
-start {
+task {
     println("Thread 'setY', sleeping...")
     Thread.sleep(5000)
     y << 2
     println("'y' set to: " + y.val)
 }
 
-start {
+task {
     println("Thread 'setV'")
     v << y
     println("'v' set to 'y': " + v.val)

@@ -18,7 +18,7 @@ package groovyx.gpars.benchmark
 
 import groovyx.gpars.samples.dataflow.BenchmarkManyDataFlowVariables
 
-long measure (int limit, Script worker) {
+long measure(int limit, Script worker) {
     print "running ${worker.class.name} with limit $limit ... "
     worker.binding = new Binding([limit: limit])
     def begin = System.nanoTime()
@@ -30,10 +30,10 @@ long measure (int limit, Script worker) {
 
 def dfv = new BenchmarkManyDataFlowVariables()
 def limits = [1, 10, 100, 1000, 10000, 100000, 200000, 500000, 1000000, 2500000] * 3
-def times = limits.sort().collect { sleep 100; measure (it, dfv) }
+def times = limits.sort().collect { sleep 100; measure(it, dfv) }
 
 for (i in 0..<limits.size()) {
-    printf "%7d: %5.3f\n", limits[i], times[i]/1000
+    printf "%7d: %5.3f\n", limits[i], times[i] / 1000
 }
 
 /* measures 6.9.09, Java 1.5 -Xmx512M, Groovy 1.6, MacBookPro Core 2 Duo 2.8 GHz

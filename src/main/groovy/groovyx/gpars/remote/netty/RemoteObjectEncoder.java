@@ -16,17 +16,16 @@
 
 package groovyx.gpars.remote.netty;
 
-import org.jboss.netty.channel.ChannelPipelineCoverage;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
-import static org.jboss.netty.buffer.ChannelBuffers.dynamicBuffer;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelPipelineCoverage;
+import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 
 @ChannelPipelineCoverage("one")
 public class RemoteObjectEncoder extends ObjectEncoder {
-    private RemoteConnection connection;
+    private final RemoteConnection connection;
 
     /**
      * Creates a new encoder.
@@ -42,14 +41,16 @@ public class RemoteObjectEncoder extends ObjectEncoder {
     protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
         RemoteHost remoteHost = connection.getHost();
 
-        if (remoteHost != null)
-           remoteHost.enter();
+        if (remoteHost != null) {
+            remoteHost.enter();
+        }
         try {
             return super.encode(ctx, channel, msg);
         }
         finally {
-            if (remoteHost != null)
-               remoteHost.leave();
+            if (remoteHost != null) {
+                remoteHost.leave();
+            }
         }
     }
 }

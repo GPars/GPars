@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.dataflow
 
-import java.util.concurrent.CyclicBarrier
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
+import java.util.concurrent.CyclicBarrier
 
 /**
  * This demo shows the ways to work with DataFlowStream.
@@ -28,12 +28,9 @@ import groovyx.gpars.dataflow.DataFlowStream
 final CyclicBarrier barrier = new CyclicBarrier(2)
 
 final DataFlowStream stream = new DataFlowStream()
-DataFlow.start {
+DataFlow.task {
     (0..10).each {stream << it}
     barrier.await()
-    react {
-        stream << 11
-    }
 }
 
 barrier.await()

@@ -15,14 +15,20 @@
 //  limitations under the License.
 package groovyx.gpars.actor;
 
-import groovy.time.Duration;
-import groovyx.gpars.MessageStream;
-import groovyx.gpars.ReceivingMessageStream;
+import groovy.time.BaseDuration;
+import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.actor.impl.ReceivingMessageStream;
 import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowVariable;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
-import groovyx.gpars.serial.*;
+import groovyx.gpars.serial.DefaultRemoteHandle;
+import groovyx.gpars.serial.RemoteHandle;
+import groovyx.gpars.serial.RemoteSerialized;
+import groovyx.gpars.serial.SerialContext;
+import groovyx.gpars.serial.SerialHandle;
+import groovyx.gpars.serial.SerialMsg;
+import groovyx.gpars.serial.WithSerialId;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
@@ -51,26 +57,36 @@ public abstract class Actor extends ReceivingMessageStream {
     /**
      * Constructor to be used by deserialization
      *
-     * @param joinLatch
+     * @param joinLatch The instance of DataFlowExpression to use for join operation
      */
-    protected Actor(DataFlowExpression joinLatch) {
+    protected Actor(final DataFlowExpression joinLatch) {
         this.joinLatch = joinLatch;
     }
 
     /**
-     * Starts the Actor. No messages can be send or received before an Actor is started.
+     * Starts the Actor. No messages can be sent or received before an Actor is started.
      *
      * @return same actor
      */
     public abstract Actor start();
 
     /**
-     * Stops the Actor. Unprocessed messages will be passed to the afterStop method, if exists.
+     * Send message to stop to the Actor. All messages already in queue will be processed first.
+     * No new messages will be accepted since that point.
      * Has no effect if the Actor is not started.
      *
      * @return same actor
      */
     public abstract Actor stop();
+
+    /**
+     * Terminates the Actor. Unprocessed messages will be passed to the afterStop method, if exists.
+     * No new messages will be accepted since that point.
+     * Has no effect if the Actor is not started.
+     *
+     * @return same actor
+     */
+    public abstract Actor terminate();
 
     /**
      * Checks the current status of the Actor.
@@ -80,9 +96,9 @@ public abstract class Actor extends ReceivingMessageStream {
     public abstract boolean isActive();
 
     /**
-     * Checks whether the current thread is the actor's current thread.
+     * Checks whether the current thread is the actor's worker thread.
      *
-     * @return whether the current thread is the actor's current thread
+     * @return whether the current thread is the actor's worker thread
      */
     public abstract boolean isActorThread();
 
@@ -113,10 +129,11 @@ public abstract class Actor extends ReceivingMessageStream {
      * @throws InterruptedException if interrupted while waiting
      */
     public final void join(final long timeout, final TimeUnit unit) throws InterruptedException {
-        if (timeout > 0)
+        if (timeout > 0L) {
             joinLatch.getVal(timeout, unit);
-        else
+        } else {
             joinLatch.getVal();
+        }
     }
 
     /**
@@ -125,14 +142,14 @@ public abstract class Actor extends ReceivingMessageStream {
      * @param duration timeout to wait
      * @throws InterruptedException if interrupted while waiting
      */
-    public final void join(final Duration duration) throws InterruptedException {
+    public final void join(final BaseDuration duration) throws InterruptedException {
         join(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
     /**
      * Join-point for this actor
      *
-     * @return
+     * @return The DataFlowExpression instance, which is used to join this actor
      */
     public DataFlowExpression getJoinLatch() {
         return joinLatch;
@@ -164,49 +181,57 @@ public abstract class Actor extends ReceivingMessageStream {
     }
 
     @Override
-    protected RemoteHandle createRemoteHandle(SerialHandle handle, SerialContext host) {
+    protected RemoteHandle createRemoteHandle(final SerialHandle handle, final SerialContext host) {
         return new MyRemoteHandle(handle, host, joinLatch);
     }
 
     public static class MyRemoteHandle extends DefaultRemoteHandle {
         private final DataFlowExpression joinLatch;
+        private static final long serialVersionUID = 3721849638877039035L;
 
-        public MyRemoteHandle(SerialHandle handle, SerialContext host, DataFlowExpression joinLatch) {
+        public MyRemoteHandle(final SerialHandle handle, final SerialContext host, final DataFlowExpression joinLatch) {
             super(handle.getSerialId(), host.getHostId(), RemoteActor.class);
             this.joinLatch = joinLatch;
         }
 
         @Override
-        protected WithSerialId createObject(SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        protected WithSerialId createObject(final SerialContext context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
             return new RemoteActor(context, joinLatch);
         }
     }
 
     public static class RemoteActor extends Actor implements RemoteSerialized {
         private final RemoteHost remoteHost;
+        private static final long serialVersionUID = -1375776678860848278L;
 
-        public RemoteActor(SerialContext host, DataFlowExpression jointLatch) {
+        public RemoteActor(final SerialContext host, final DataFlowExpression jointLatch) {
             super(jointLatch);
             remoteHost = (RemoteHost) host;
         }
 
-        public Actor start() {
+        @Override public Actor start() {
             throw new UnsupportedOperationException();
         }
 
-        public Actor stop() {
+        @Override public Actor stop() {
             remoteHost.write(new StopActorMsg(this));
             return this;
         }
 
-        public boolean isActive() {
+        @Override public Actor terminate() {
+            remoteHost.write(new TerminateActorMsg(this));
+            return this;
+        }
+
+        @Override public boolean isActive() {
             throw new UnsupportedOperationException();
         }
 
-        public boolean isActorThread() {
+        @Override public boolean isActorThread() {
             return false;
         }
 
+        @SuppressWarnings({"AssignmentToMethodParameter"}) @Override
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
                 message = new ActorMessage<Object>(message, threadBoundActor());
@@ -215,24 +240,39 @@ public abstract class Actor extends ReceivingMessageStream {
             return this;
         }
 
-        protected Object receiveImpl() throws InterruptedException {
+        @Override protected Object receiveImpl() throws InterruptedException {
             throw new UnsupportedOperationException();
         }
 
-        protected Object receiveImpl(long timeout, TimeUnit units) throws InterruptedException {
+        @Override protected Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
             throw new UnsupportedOperationException();
         }
 
         public static class StopActorMsg extends SerialMsg {
             private final Actor actor;
+            private static final long serialVersionUID = -927785591952534581L;
 
-            public StopActorMsg(RemoteActor remoteActor) {
+            public StopActorMsg(final RemoteActor remoteActor) {
                 actor = remoteActor;
             }
 
             @Override
-            public void execute(RemoteConnection conn) {
+            public void execute(final RemoteConnection conn) {
                 actor.stop();
+            }
+        }
+
+        public static class TerminateActorMsg extends SerialMsg {
+            private final Actor actor;
+            private static final long serialVersionUID = -839334644951906974L;
+
+            public TerminateActorMsg(final RemoteActor remoteActor) {
+                actor = remoteActor;
+            }
+
+            @Override
+            public void execute(final RemoteConnection conn) {
+                actor.terminate();
             }
         }
     }

@@ -16,12 +16,12 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.CyclicBarrier
-import java.util.concurrent.TimeUnit
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 public class SendAndWaitTest extends GroovyTestCase {
 
@@ -29,16 +29,14 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.afterStop = {
+                latch.countDown()
+            }
+
             receive() {
                 reply 2
             }
         }
-
-        actor.metaClass.afterStop = {
-            latch.countDown()
-        }
-
-        actor.start()
 
         def result = actor.sendAndWait(1)
 
@@ -50,15 +48,13 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.afterStop = {
+                barrier.await()
+            }
+
             receive()
             reply 2
         }
-
-        actor.metaClass.afterStop = {
-            barrier.await()
-        }
-
-        actor.start()
 
         def result = actor.sendAndWait(1)
         barrier.await()
@@ -74,17 +70,15 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.afterStop = {
+                latch.countDown()
+            }
+
             receive()
             reply 2
             barrier.await()
             Thread.sleep 3000  //give the second message time to hit the queue
         }
-
-        actor.metaClass.afterStop = {
-            latch.countDown()
-        }
-
-        actor.start()
 
         def result = actor.sendAndWait(1)
         barrier.await()
@@ -101,21 +95,19 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass {
+                onException = {}
+                afterStop = {
+                    latch.countDown()
+                }
+            }
+
             receive()
             reply 2
             barrier.await()
             Thread.sleep 3000  //give the second message time to hit the queue
             throw new RuntimeException('test')
         }
-
-        actor.metaClass {
-            onException = {}
-            afterStop = {
-                latch.countDown()
-            }
-        }
-
-        actor.start()
 
         def result = actor.sendAndWait(1)
         barrier.await()
@@ -132,6 +124,10 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.afterStop = {
+                latch.countDown()
+            }
+
             barrier.await()
             Thread.sleep 1000
             receive() {
@@ -141,15 +137,9 @@ public class SendAndWaitTest extends GroovyTestCase {
             }
         }
 
-        actor.metaClass.afterStop = {
-            latch.countDown()
-        }
-
-        actor.start()
-
         barrier.await()
-        def result1 = actor.sendAndWait(5, TimeUnit.SECONDS, 1)
-        def result2 = actor.sendAndWait(5, TimeUnit.SECONDS, 3)
+        def result1 = actor.sendAndWait(1, 30, TimeUnit.SECONDS)
+        def result2 = actor.sendAndWait(3, 30, TimeUnit.SECONDS)
 
         latch.await()
         assertEquals 2, result1
@@ -161,19 +151,17 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.afterStop = {
+                latch.countDown()
+            }
+
             barrier.await()
             receive()
             barrier.await()
         }
 
-        actor.metaClass.afterStop = {
-            latch.countDown()
-        }
-
-        actor.start()
-
         barrier.await()
-        def result = actor.sendAndWait(2, TimeUnit.SECONDS, 1)
+        def result = actor.sendAndWait(1, 2, TimeUnit.SECONDS)
         barrier.await()
 
         latch.await()
@@ -185,18 +173,16 @@ public class SendAndWaitTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.afterStop = {
+                latch.countDown()
+            }
+
             barrier.await()
             receive()
         }
 
-        actor.metaClass.afterStop = {
-            latch.countDown()
-        }
-
-        actor.start()
-
         barrier.await()
-        def result = actor.sendAndWait(2, TimeUnit.SECONDS, 1)
+        def result = actor.sendAndWait(1, 2, TimeUnit.SECONDS)
 
         latch.await()
         assertNull result
@@ -212,14 +198,13 @@ public class SendAndWaitTest extends GroovyTestCase {
                 reply 2
             }
         }
-        actor.start()
 
         volatile def result
 
         group.actor {
             result = actor.sendAndWait(1)
             latch.countDown()
-        }.start()
+        }
 
         latch.await()
         assertEquals 2, result

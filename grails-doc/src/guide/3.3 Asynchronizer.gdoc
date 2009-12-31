@@ -1,0 +1,117 @@
+Use of Asynchronizer - the Java Executors' based background asynchronous processor
+
+h2. Usage of Asynchronizer
+
+The _Asynchronizer_ class allows you to easily start tasks in the background to be performed asynchronously and collect the results later.
+
+h3. Closures enhancements
+
+The following methods are added to closures inside the _Asynchronizer.doParallel()_ blocks:
+* async() - Creates an asynchronous variant of the supplied closure, which when invoked returns a future for the potential return value
+* callAsync() - Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
+
+Examples:
+{code}Asynchronizer.doParallel() {
+    Closure longLastingCalculation = {calculate()}
+    Closure fastCalculation = longLastingCalculation.async()  //create a new closure, which starts the original closure on a thread pool
+    Future result=fastCalculation()                           //returns almost immediately
+    //do stuff while calculation performs ...
+    println result.get()
+}
+{code}
+
+{code}
+Asynchronizer.doParallel() {
+    /**
+     * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
+     * It will return a Future for the result value.
+     */
+    assert 6 == {it * 2}.call(3).get()
+    assert 6 == {it * 2}.callAsync(3).get()
+}
+{code}
+h3. Executor Service enhancements
+
+The ExecutorService class is enhanced with the << (leftShift) operator to submit tasks to it returning a _Future_ for the result. It wraps the _submit()_ method call on the service.
+
+Example:
+{code}Asynchronizer.doParallel {ExecutorService executorService ->
+    executorService << {println 'Inside parallel task'}
+}
+{code}
+
+h3. Parallelizing closures
+
+The _Asynchronizer_ class also provides handy methods _doInParallel()_ , _executeInParallel()_ and _startInParallel()_ to easily run multiple closures asynchronously.
+
+Example:
+{code}
+Asynchronizer.doParallel {
+    assertEquals([10, 20], AsyncInvokerUtil.doInParallel({calculateA()}, {calculateB()}))         //waits for results
+    assertEquals([10, 20], AsyncInvokerUtil.executeAsync({calculateA()}, {calculateB()})*.get())  //returns Futures instead and doesn't wait for results to be calculated
+}
+{code}
+
+h3. Parallel collection processing
+
+The _Asynchronizer_ class can be also used as a pure-JDK-based collection parallel processor. Unlike the _Parallelizer_ class, _Asynchronizer_ doesn't require jsr-166y jar file, but leverages the standard JDK executor services to parallelize closures processing a collections or an object iteratively.
+It needs to be states, however, that _Parallelizer_ performs typically much better than _Asynchronizer_ does.
+
+Examples of use:
+{code} //multiply numbers asynchronously
+ Asynchronizer.doParallel {
+     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel{it * 10}
+     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
+ }
+
+ //multiply numbers asynchronously using an asynchronous closure
+ Asynchronizer.doParallel {
+     def closure={it * 10}
+     def asyncClosure=closure.async()
+     Collection<Future> result = [1, 2, 3, 4, 5].collect(asyncClosure)
+     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
+ }
+{code}
+The passed-in closure takes an instance of a ExecutorService as a parameter, which can be then used freely inside the closure.
+{code} //find an element meeting specified criteria
+ Asynchronizer.doParallel(5) {ExecutorService service ->
+     service.submit({performLongCalculation()} as Runnable)
+ }
+{code}The _Asynchronizer.doParallel()_ method takes optional parameters for number of threads in the created pool and a thread factory. The _Asynchronizer.withExistingAsynchronizer()_ takes an already existing executor service to reuse. The DSL is valid only within the associated block of code and only for the thread that has called the _doParallel()_ or _withExistingAsynchronizer()_ method. The _doParallel()_ method returns only after all the worker threads have finished their tasks and the executor service has been destroyed, returning back the return value of the associated block of code. The _withExistingAsynchronizer()_ method doesn't wait for the executor service threads to finish.
+
+Alternatively, the _Asynchronizer_ class can be statically imported _import static groovyx.gpars.Asynchronizer.`*`_, which will allow omitting the _Asynchronizer_ class name.
+{code} doParallel {
+     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}
+     assert result in [3, 4, 5]
+ }
+{code}
+The following methods on all objects, which support iterations in Groovy, are currently supported:
+* eachParallel()
+* eachWithIndexParallel()
+* collectParallel()
+* findAllParallel()
+* findParallel()
+* allParallel()
+* anyParallel()
+* grepParallel()
+* groupByParallel()
+
+h3. Meta-class enhancer
+
+As an alternative you can use the _AsyncEnhancer_ class to enhance meta-classes for any classes or individual instances with asynchronous methods.
+{code}import groovyx.gpars.AsyncEnhancer
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+AsyncEnhancer.enhanceInstance(list)
+println list.collectParallel {it * 2 }
+
+def animals = ['dog', 'ant', 'cat', 'whale']
+AsyncEnhancer.enhanceInstance animals
+println (animals.anyParallel {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
+println (animals.allParallel {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
+{code}
+If exceptions are thrown while processing any of the passed-in closures, an instance of _AsyncException_ wrapping all the original exceptions gets re-thrown from the xxxParallel methods.
+
+h2. Avoid side-effects in functions
+
+Once again and the last time we need to warn you about using closures with side-effects effecting objects beyond the scope of the single currently processed element or closures which keep state. Don't do that! It is dangerous to pass them to any of the _xxxParallel()_ methods.

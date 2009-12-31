@@ -16,12 +16,12 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.CyclicBarrier
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
 
-public class DeliveryErrorTest  extends GroovyTestCase {
+public class DeliveryErrorTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
@@ -39,9 +39,6 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         actor.metaClass.afterStop = {
             latch.countDown()
         }
-
-        actor.start()
-
         def message = 1
         message.metaClass.onDeliveryError = {->
             flag = true
@@ -68,8 +65,6 @@ public class DeliveryErrorTest  extends GroovyTestCase {
             latch.countDown()
         }
 
-        actor.start()
-
         def message1 = 1
         message1.metaClass.onDeliveryError = {->
             flag1 = true
@@ -95,18 +90,19 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final Actor actor = Actors.actor {
+            delegate.metaClass.onException = {}
+            delegate.metaClass.afterStop = {
+                latch.countDown()
+            }
+
+            barrier.await()
             react {
                 barrier.await()
                 if (true) throw new RuntimeException('test')
             }
         }
 
-        actor.metaClass.onException = {}
-        actor.metaClass.afterStop = {
-            latch.countDown()
-        }
-
-        actor.start()
+        barrier.await()
 
         def message1 = 1
         message1.metaClass.onDeliveryError = {->
@@ -133,7 +129,6 @@ public class DeliveryErrorTest  extends GroovyTestCase {
         final Actor actor = Actors.actor {
             latch.await()
         }
-        actor.start()
 
         def message = 1
         message.metaClass.onDeliveryError = {->
@@ -153,7 +148,6 @@ public class DeliveryErrorTest  extends GroovyTestCase {
             latch.await()
             stop()
         }
-        actor.start()
 
         def message = 1
         message.metaClass.onDeliveryError = {->

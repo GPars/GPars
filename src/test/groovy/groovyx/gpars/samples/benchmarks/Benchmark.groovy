@@ -17,5 +17,5 @@
 package groovyx.gpars.samples.benchmarks
 
 public interface Benchmark {
-    long perform(int numberOfIterations);
+    long perform(int numberOfIterations)
 }

@@ -16,24 +16,23 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.dataflow.DataFlowVariable
 
 public class NestedClosureTest extends GroovyTestCase {
-  public void testNestedClosures() {
-    final def result = new DataFlowVariable<Integer>()
+    public void testNestedClosures() {
+        final def result = new DataFlowVariable<Integer>()
 
-    final def group = new PooledActorGroup(20)
+        final def group = new PooledActorGroup(20)
 
-    final def actor = group.actor {
-      final def nestedActor = group.actor {
-        react {
-          reply 20
+        final def actor = group.actor {
+            final def nestedActor = group.actor {
+                react {
+                    reply 20
+                }
+            }
+            result << nestedActor.sendAndWait(10)
         }
-      }.start()
-      result << nestedActor.sendAndWait(10)
+        assertEquals 20, result.val
     }
-    actor.start()
-    assertEquals 20, result.val
-  }
 }

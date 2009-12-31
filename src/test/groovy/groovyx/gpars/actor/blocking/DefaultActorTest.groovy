@@ -16,10 +16,10 @@
 
 package groovyx.gpars.actor.blocking
 
+import groovyx.gpars.actor.AbstractPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * @author Vaclav Pech, Dierk Koenig
@@ -30,7 +30,7 @@ public class DefaultActorTest extends GroovyTestCase {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
         actor.send "Message"
-        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
+        actor.receiveCallsOutstanding.await(90, TimeUnit.SECONDS)
         assert actor.receiveWasCalled.get()
     }
 
@@ -38,7 +38,7 @@ public class DefaultActorTest extends GroovyTestCase {
         DefaultTestActor actor = new DefaultTestActor()
         actor.start()
         actor << ''
-        actor.receiveCallsOutstanding.await(30, TimeUnit.SECONDS)
+        actor.receiveCallsOutstanding.await(90, TimeUnit.SECONDS)
 
         assert actor.threadName.startsWith("Actor Thread ")
         actor.stop()
@@ -54,7 +54,6 @@ class DefaultTestActor extends AbstractPooledActor {
 
     @Override protected void act() {
         threadName = Thread.currentThread().name
-        println threadName
         receive {
             receiveWasCalled.set true
             receiveCallsOutstanding.countDown()

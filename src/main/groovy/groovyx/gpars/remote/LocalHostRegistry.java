@@ -29,13 +29,13 @@ public class LocalHostRegistry {
     public static final Set<LocalHost> localHosts
             = Collections.synchronizedSet(new HashSet<LocalHost>());
 
-    public synchronized static void connect(final LocalNode node) {
+    public static synchronized void connect(final LocalNode node) {
         for (final LocalHost transportProvider : localHosts) {
             node.connect(transportProvider);
         }
     }
 
-    public synchronized static void disconnect(final LocalNode node) {
+    public static synchronized void disconnect(final LocalNode node) {
         for (final LocalHost transportProvider : localHosts) {
             node.getScheduler().execute(new Runnable() {
                 public void run() {

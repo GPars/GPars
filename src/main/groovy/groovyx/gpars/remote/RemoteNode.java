@@ -32,22 +32,22 @@ public final class RemoteNode<T extends LocalHost> {
     private final SerialContext remoteHost;
     private final Actor mainActor;
 
-    public RemoteNode(UUID id, SerialContext remoteHost, Actor mainActor) {
+    public RemoteNode(final UUID id, final SerialContext remoteHost, final Actor mainActor) {
         this.id = id;
         this.remoteHost = remoteHost;
         this.mainActor = mainActor;
     }
 
-    public final UUID getId() {
+    public UUID getId() {
         return id;
     }
 
     @Override
     public String toString() {
-        return getId().toString();
+        return id.toString();
     }
 
-    public final Actor getMainActor() {
+    public Actor getMainActor() {
         return mainActor;
     }
 

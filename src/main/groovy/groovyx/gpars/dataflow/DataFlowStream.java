@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow;
 
-import groovyx.gpars.MessageStream;
+import groovyx.gpars.actor.impl.MessageStream;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,7 +31,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * They register the request to read a value and will send a message to the actor or operator once the value is available.
  *
  * @author Vaclav Pech
- * Date: Jun 5, 2009
+ *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"LawOfDemeter", "MethodReturnOfConcreteClass", "AnonymousInnerClass", "AnonymousInnerClassWithTooManyMethods"})
 public final class DataFlowStream<T> {
@@ -53,14 +53,17 @@ public final class DataFlowStream<T> {
 
     /**
      * Adds a DataFlowVariable to the buffer.
-     * Implementation detail - in fact another DFV is added to the buffer and an asynchronous 'whenbound' handler
-     * is registered with the supplied DFV to update the one stired in the buffer.
+     * Implementation detail - in fact another DFV is added to the buffer and an asynchronous 'whenBound' handler
+     * is registered with the supplied DFV to update the one stored in the buffer.
+     *
      * @param ref The DFV to add to the stream
      */
     @SuppressWarnings("unchecked")
     public void leftShift(final DataFlowExpression<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
         ref.getValAsync(new MessageStream() {
+            private static final long serialVersionUID = -4966523895011173569L;
+
             @Override
             public MessageStream send(final Object message) {
                 originalRef.bind((T) message);
@@ -71,6 +74,7 @@ public final class DataFlowStream<T> {
 
     /**
      * Adds a DataFlowVariable representing the passed in value to the buffer.
+     *
      * @param value The value to bind to the head of the stream
      */
     public void leftShift(final T value) {
@@ -79,7 +83,8 @@ public final class DataFlowStream<T> {
 
     /**
      * Takes the first unsatisfied value request and binds a value on it.
-     * If there are no unsatisfies value requests, a new DFV is stored in the queue.
+     * If there are no unsatisfied value requests, a new DFV is stored in the queue.
+     *
      * @return The DFV to bind the value on
      */
     private DataFlowVariable<T> retrieveForBind() {
@@ -96,6 +101,7 @@ public final class DataFlowStream<T> {
 
     /**
      * Retrieves the value at the head of the buffer. Blocks until a value is available.
+     *
      * @return The value bound to the DFV at the head of the stream
      * @throws InterruptedException If the current thread is interrupted
      */
@@ -108,6 +114,7 @@ public final class DataFlowStream<T> {
      * back the the supplied actor once the value has been bound.
      * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
+     *
      * @param messageStream The actor to notify when a value is bound
      */
     public void getValAsync(final MessageStream messageStream) {
@@ -120,7 +127,8 @@ public final class DataFlowStream<T> {
      * the 'result' key once the value has been bound.
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
-     * @param attachment An arbitrary value to identify operator channels and so match requests and replies
+     *
+     * @param attachment    An arbitrary value to identify operator channels and so match requests and replies
      * @param messageStream The actor / operator to notify when a value is bound
      */
     public void getValAsync(final Object attachment, final MessageStream messageStream) {
@@ -128,15 +136,16 @@ public final class DataFlowStream<T> {
     }
 
     /**
-     * Checks whether there's a DFV waiting in the queue and retrieves it. If not, a new unmatch value request, represented
+     * Checks whether there's a DFV waiting in the queue and retrieves it. If not, a new unmatched value request, represented
      * by a new DFV, is added to the requests queue.
+     *
      * @return The DFV to wait for value on
      */
     private DataFlowVariable<T> retrieveOrCreateVariable() {
         DataFlowVariable<T> dataFlowVariable;
         synchronized (queueLock) {
             dataFlowVariable = queue.poll();
-            if (dataFlowVariable==null) {
+            if (dataFlowVariable == null) {
                 dataFlowVariable = new DataFlowVariable<T>();
                 requests.offer(dataFlowVariable);
             }
@@ -146,6 +155,7 @@ public final class DataFlowStream<T> {
 
     /**
      * Returns the current size of the buffer
+     *
      * @return Number of DFVs in the queue
      */
     public int length() {
@@ -155,6 +165,7 @@ public final class DataFlowStream<T> {
     /**
      * Returns an iterator over a current snapshot of the buffer's content. The next() method returns actual values
      * not the DataFlowVariables.
+     *
      * @return AN iterator over all DFVs in the queue
      */
     public Iterator<T> iterator() {

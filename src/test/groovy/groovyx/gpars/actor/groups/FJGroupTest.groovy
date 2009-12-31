@@ -16,12 +16,12 @@
 
 package groovyx.gpars.actor.groups
 
-import java.util.concurrent.CountDownLatch
-import jsr166y.forkjoin.ForkJoinWorkerThread
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.PooledActorGroup
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.FJPool
-import groovyx.gpars.actor.PooledActorGroup
+import java.util.concurrent.CountDownLatch
+import jsr166y.forkjoin.ForkJoinWorkerThread
 
 public class FJGroupTest extends GroovyTestCase {
     public void testFJGroup() {
@@ -33,7 +33,7 @@ public class FJGroupTest extends GroovyTestCase {
         group.actor {
             result = Thread.currentThread() instanceof ForkJoinWorkerThread
             latch.countDown()
-        }.start()
+        }
 
         latch.await()
         assert result
@@ -48,7 +48,7 @@ public class FJGroupTest extends GroovyTestCase {
         group.actor {
             result = Thread.currentThread() instanceof ForkJoinWorkerThread
             latch.countDown()
-        }.start()
+        }
 
         latch.await()
         assertFalse result
@@ -66,7 +66,6 @@ public class FJGroupTest extends GroovyTestCase {
                 reply it + 5
             }
         }
-        actor1.start()
 
         final Actor actor2 = group2.actor {
             react {
@@ -77,7 +76,6 @@ public class FJGroupTest extends GroovyTestCase {
                 }
             }
         }
-        actor2.start()
 
         actor2 << 10
         latch.await()

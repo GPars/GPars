@@ -1,0 +1,35 @@
+The Map/Reduce DSL gives GPars a more functional flavor. In general, the Map/Reduce DSL may be used for the same purpose as the _xxxParallel()_ family methods and has very similar semantics.
+On the other hand, Map/Reduce can perform considerably faster if you need to chain multiple methods to process a single collection in multiple steps:
+{code}
+    println 'Number of occurrences of the word GROOVY today: ' + urls.parallel
+            .map {it.toURL().text.toUpperCase()}
+            .filter {it.contains('GROOVY')}
+            .map{it.split()}
+            .map{it.findAll{word -> word.contains 'GROOVY'}.size()}
+            .sum()
+{code}
+
+The _xxxParallel()_ methods have to follow the contract of their non-parallel peers. So a _collectParallel()_ method must return a legal collection of items, which you can again treat as a Groovy collection.
+Internally the parallel collect method builds an efficient parallel structure (Parallel Array), performs the required operation concurrently and before returning destroys the Paralle Array building the collection of results to return to you.
+A potential call to let say _findAllParallel()_ on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers.
+
+With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly.
+Invoking the _parallel_ property on a collection will build a Parallel Array for the collection and return a thin wrapper around the Parallel Array instance.
+Then you can chain all required methods like:
+* map()
+* reduce()
+* filter()
+* size()
+* sum()
+* min()
+* max()
+
+Returning back to a plain Groovy collection instance is always just a matter of retrieving the _collection_ property.
+
+{code}
+def myNumbers = (1..1000).parallel.filter{it % 2 == 0}.map{Math.sqrt it}.collection
+{code}
+
+h2. Avoid side-effects in functions
+
+Once again we need to warn you. To avoid nasty surprises, please, keep your closures, which you pass to the Map/Reduce functions, stateless and clean from side-effects.

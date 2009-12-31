@@ -16,8 +16,8 @@
 
 package groovyx.gpars.remote;
 
-import groovyx.gpars.remote.messages.NodeConnectedMsg;
-import groovyx.gpars.remote.messages.NodeDisconnectedMsg;
+import groovyx.gpars.remote.message.NodeConnectedMsg;
+import groovyx.gpars.remote.message.NodeDisconnectedMsg;
 import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialMsg;
 

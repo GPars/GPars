@@ -29,7 +29,7 @@ public class DataFlowExpressionTest extends GroovyTestCase {
         def d = a * b + c + 1
 
         shouldFail(MissingMethodException) {
-          def e = 1 + a * b + c
+            def e = 1 + a * b + c
         }
 
         DataFlow.start { c << 40 }
@@ -39,45 +39,45 @@ public class DataFlowExpressionTest extends GroovyTestCase {
         assertEquals 141, d.val
     }
 
-    public void testProperty () {
-      final DataFlowVariable a = new DataFlowVariable()
-      final DataFlowVariable b = new DataFlowVariable()
+    public void testProperty() {
+        final DataFlowVariable a = new DataFlowVariable()
+        final DataFlowVariable b = new DataFlowVariable()
 
-      def prod = a.x * b.x + a.y * b.y + a.z *b.z
+        def prod = a.x * b.x + a.y * b.y + a.z * b.z
 
-      DataFlow.start {
-        a << [x:3, y:2, z:1]
-        b << [x:1, y:2, z:3]
-      }
+        DataFlow.start {
+            a << [x: 3, y: 2, z: 1]
+            b << [x: 1, y: 2, z: 3]
+        }
 
-      assertEquals 11, (prod + 1).val
+        assertEquals 11, (prod + 1).val
     }
 
-    public void testTransform () {
-      final DataFlowVariable a = new DataFlowVariable()
-      final DataFlowVariable b = new DataFlowVariable()
+    public void testTransform() {
+        final DataFlowVariable a = new DataFlowVariable()
+        final DataFlowVariable b = new DataFlowVariable()
 
-      def prod = DataFlowExpression.transform([a, b]) {x, y ->
-        x + y
-      }
+        def prod = DataFlowExpression.transform([a, b]) {x, y ->
+            x + y
+        }
 
-      DataFlow.start {
-        a << 5
-        b << 7
-      }
+        DataFlow.start {
+            a << 5
+            b << 7
+        }
 
-      assertEquals (13, (prod + 1).val)
+        assertEquals(13, (prod + 1).val)
 
-      shouldFail(IllegalArgumentException) {
-        DataFlowExpression.transform([a]) {x, y ->}
-      }
+        shouldFail(IllegalArgumentException) {
+            DataFlowExpression.transform([a]) {x, y ->}
+        }
 
-      shouldFail(IllegalArgumentException) {
-        DataFlowExpression.transform([a, b, null]) { x, y ->}
-      }
+        shouldFail(IllegalArgumentException) {
+            DataFlowExpression.transform([a, b, null]) {x, y ->}
+        }
 
-      shouldFail(IllegalArgumentException) {
-        DataFlowExpression.transform([a])  {->}
-      }
+        shouldFail(IllegalArgumentException) {
+            DataFlowExpression.transform([a]) {->}
+        }
     }
 }

@@ -16,10 +16,9 @@
 
 package groovyx.gpars.samples.actors
 
-import java.util.concurrent.CountDownLatch
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
-import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -47,28 +46,29 @@ class MyPooledActor extends AbstractPooledActor {
         }
     }
 }
-testActor(new MyPooledActor())
+testActor(new MyPooledActor().start())
 
 
 Actor actor2 = actor {
+    delegate.metaClass {
+        handleA = {->
+            react {a ->
+                replyIfExists "Done"
+                handleB(a)
+            }
+        }
+
+        handleB = {a ->
+            react {b ->
+                println a + b
+                LifeCycleHelper.latch.countDown()
+            }
+        }
+    }
+
     handleA()
 }
 
-actor2.metaClass {
-    handleA = {->
-        react {a ->
-            replyIfExists "Done"
-            handleB(a)
-        }
-    }
-
-    handleB = {a ->
-        react {b ->
-            println a + b
-            LifeCycleHelper.latch.countDown()
-        }
-    }
-}
 testActor(actor2)
 
 
@@ -95,15 +95,13 @@ testActor(actor3)
 
 
 LifeCycleHelper.latch.await()
-Actors.defaultPooledActorGroup.shutdown()
 
 
 class LifeCycleHelper {
     static CountDownLatch latch = new CountDownLatch(3)
 }
 
-private def testActor(AbstractPooledActor actor) {
-    actor.start()
+private def testActor(Actor actor) {
     actor.send 2
     actor.send 3
 }

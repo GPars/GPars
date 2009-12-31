@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow;
 
-import groovyx.gpars.MessageStream;
+import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.RemoteSerialized;
 
@@ -34,11 +34,12 @@ import groovyx.gpars.serial.RemoteSerialized;
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
 public class DataFlowVariable<T> extends DataFlowExpression<T> {
+    private static final long serialVersionUID = 1340439210749936258L;
+
     /**
      * Creates a new unbound Dataflow Variable
      */
-    public DataFlowVariable() {
-    }
+    public DataFlowVariable() { }
 
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
@@ -54,11 +55,12 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
      * Can only be invoked once on each instance of DataFlowVariable
      *
      * @param ref The DataFlowVariable instance the value of which to bind
-     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     public void leftShift(final DataFlowExpression<T> ref) {
         ref.getValAsync(new MessageStream() {
-            public MessageStream send(Object message) {
+            private static final long serialVersionUID = -458384302762038543L;
+
+            @Override public MessageStream send(final Object message) {
                 bind(ref.value);
                 return this;
             }
@@ -71,15 +73,19 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
     }
 
     public static class RemoteDataFlowVariable extends DataFlowVariable implements RemoteSerialized {
+        private static final long serialVersionUID = -420013188758006693L;
         private final RemoteHost remoteHost;
         private boolean disconnected;
 
-        public RemoteDataFlowVariable(RemoteHost host) {
+        public RemoteDataFlowVariable(final RemoteHost host) {
             remoteHost = host;
             getValAsync(new MessageStream() {
-                public MessageStream send(Object message) {
-                    if (!disconnected)
+                private static final long serialVersionUID = 7968302123667353660L;
+
+                @Override public MessageStream send(final Object message) {
+                    if (!disconnected) {
                         remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));
+                    }
                     return this;
                 }
             });

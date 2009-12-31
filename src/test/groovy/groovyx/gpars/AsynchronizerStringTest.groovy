@@ -24,47 +24,54 @@ import java.util.concurrent.ExecutorService
  */
 public class AsynchronizerStringTest extends GroovyTestCase {
 
-    public void testEachAsyncWithString() {
-      def result = Collections.synchronizedSet(new HashSet())
+    public void testEachParallelWithString() {
+        def result = Collections.synchronizedSet(new HashSet())
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            'abc'.eachAsync {result.add(it.toUpperCase())}
+            'abc'.eachParallel {result.add(it.toUpperCase())}
             assertEquals(new HashSet(['A', 'B', 'C']), result)
         }
     }
 
-    public void testCollectAsyncWithString() {
+    public void testCollectParallelWithString() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def result = 'abc'.collectAsync{it.toUpperCase()}
+            def result = 'abc'.collectParallel {it.toUpperCase()}
             assertEquals(['A', 'B', 'C'], result)
         }
     }
 
-    public void testFindAllAsyncWithString() {
+    public void testFindAllParallelWithString() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def result = 'aBC'.findAllAsync{it == it.toUpperCase()}
+            def result = 'aBC'.findAllParallel {it == it.toUpperCase()}
             assertEquals(['B', 'C'], result)
         }
     }
 
-    public void testFindAsyncWithString() {
+    public void testFindParallelWithString() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def result = 'aBC'.findAsync{it == it.toUpperCase()}
+            def result = 'aBC'.findParallel {it == it.toUpperCase()}
             assert result in ['B', 'C']
         }
     }
 
-    public void testAllAsyncWithString() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assert 'ABC'.allAsync{it == it.toUpperCase()}
-            assert !'aBC'.allAsync{it == it.toUpperCase()}
+    public void testGrepParallelWithThreadPoolAndString() {
+        Asynchronizer.withAsynchronizer(5) {
+            def result = 'aBC'.grepParallel('B')
+            assertEquals (['B'], result)
         }
     }
 
-    public void testAnyAsyncWithString() {
+    public void testAllParallelWithString() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assert 'aBc'.anyAsync{it == it.toUpperCase()}
-            assert 'aBC'.anyAsync{it == it.toUpperCase()}
-            assert !'abc'.anyAsync{it == it.toUpperCase()}
+            assert 'ABC'.everyParallel {it == it.toUpperCase()}
+            assert !'aBC'.everyParallel {it == it.toUpperCase()}
+        }
+    }
+
+    public void testAnyParallelWithString() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            assert 'aBc'.anyParallel {it == it.toUpperCase()}
+            assert 'aBC'.anyParallel {it == it.toUpperCase()}
+            assert !'abc'.anyParallel {it == it.toUpperCase()}
         }
     }
 }

@@ -1,0 +1,301 @@
+The actor support in gpars were inspired by the Actors library in Scala but have meanwhile gone beyond that.
+
+Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can help developers avoid issues like deadlocks, live-locks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
+A nice wrap-up of the key "concepts behind actors":http://ruben.savanne.be/articles/concurrency-in-erlang-scala was written recently by Ruben Vermeersch.
+Actors guarantee that always *at most one thread processes the actor's body* at a time and also under the covers the memory gets synchronized
+each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
+Ideally actor's code should *never be invoked* directly from outside so all the code of the actor class can only be executed by the thread
+handling the last received message and so all the actor's code is *implicitly thread-safe* .
+If any of the actor's methods is allowed to be called by other objects directly, the thread-safety guarantee for the actor's code and state are *no longer valid* .
+
+
+GPars used to come with two types of actors: _thread-bound actors_ and _event-driven actors_. You will find both in 0.8 versions but since 0.9, there is only one type of actor that is not bound to an exclusive thread.
+
+Actors can share a relatively small thread pool. This can go as far as having many concurrent actors that share a single pooled thread. They avoid the threading limitations of the JVM.
+
+Actor code is processed in chunks separated by quiet periods of waiting for new events (messages). This can be naturally modeled through _continuations_. As JVM doesn't support continuations directly, they have to be simulated in the actors frameworks, which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
+
+{code}
+import groovyx.gpars.actor.AbstractPooledActor
+
+class GameMaster extends AbstractPooledActor {
+    int secretNum
+
+    void afterStart() {
+        secretNum = new Random().nextInt(10)
+    }
+
+    void act() {
+        loop {
+            react { int num ->
+                if ( num > secretNum )
+                    reply 'too large'
+                else if ( num < secretNum )
+                    reply 'too small'
+                else {
+                    reply 'you win'
+                    stop()
+                    System.exit 0
+}   }   }   }   }
+
+class Player extends AbstractPooledActor {
+    String              name
+    AbstractPooledActor server
+    int                 myNum
+
+    void act() {
+        loop {
+            myNum = new Random().nextInt(10)
+            server.send myNum
+            react {
+                switch( it ) {
+                    case 'too large': println "$name: $myNum was too large"; break
+                    case 'too small': println "$name: $myNum was too small"; break
+                    case 'you win':   println "$name: I won $myNum"; stop(); break
+}   }   }   }   }
+
+def master = new GameMaster().start()
+new Player( name: 'Player', server: master ).start()
+
+[master, player]*.join()
+{code}
+example by _Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàlisi, MAiA Facultat de Matemàtiques, Universitat de Barcelona_
+
+h1. Usage of Actors
+
+Gpars provides consistent Actor APIs and DSLs. Actors in principal perform three specific operations - send messages, receive messages and create new actors. Althought not specifically enforced by *GPars*
+messages should be immutable or at least follow the *hands-off* policy when the sender never touches the messages after the message has been sent off.
+
+h2. Sending messages
+
+Messages can be sent to actors using the _send()_ method. Alternatively, the _<<_ operator can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available.
+The _reply_ is returned from the _sendAndWait()_ method as a return value.
+The _sendAndWait()_ methods may also return after a timeout expires or in case of termination of the called actor.
+{code}
+actor << 'Message'
+actor.send 'Message'
+def reply1 = actor.sendAndWait('Message')
+def reply2 = actor.sendAndWait(10, TimeUnit.SECONDS, 'Message')
+def reply3 = actor.sendAndWait(10.seconds, 'Message')
+{code}
+
+The _sendAndContinue()_ method allows the caller to continue its processing while the supplied closure is waiting for a reply from the actor.
+{code}
+friend.sendAndContinue 'I need money!', {money -> pocket money}
+println 'I can continue while my friend is collecting money for me'
+{code}
+
+All _send()_, _sendAndWait()_ or _sendAndContinue()_ methods will throw an exception if invoked on a non-active actor.
+
+h2. Receiving messages
+
+h3. Non-blocking message retrieval
+
+Calling the _react()_ method, optionally with a timeout parameter, from within the actor's code will consume the next message from the actor's inbox,
+potentially waiting, if there is no message to be processed immediately.
+
+{code}
+println 'Waiting for a gift'
+react {gift ->
+    if (myWife.likes gift) reply 'Thank you!'
+}
+{code}
+
+Under the covers the supplied closure is not invoked directly, but scheduled for processing by any thread in the thread pool once
+a message is available. After scheduling the current thread will then be detached from the actor and freed to process any other actor,
+which has received a message already.
+
+To allow detaching actors from the threads the _react()_ method demands the code to be written in a special *Continuation-style*.
+{code}
+loop {
+    println 'Waiting for a gift'
+    react {gift ->
+        if (myWife.likes gift) reply 'Thank you!'
+        else {
+            reply 'Try again, please'
+            react {anotherGift ->
+                if (myChildren.like gift) reply 'Thank you!'
+            }
+            println 'Never reached'
+        }
+    }
+    println 'Never reached'
+}
+println 'Never reached'
+
+{code}
+
+The _react()_ and _loop()_ methods never return normally and any code put after a call to either of the two methods will never be executed.
+The closure supplied to the _react()_ or _loop()_ methods is the code where the computation should *continue* . Thus *continuation style* .
+ 
+h3. Blocking message retrieval
+
+Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message.
+This allows for a *non-continuation style* code and also might have positive performance implications in certain scenarios.
+
+Mixing _react()_ and _receive()_ calls within a single actor is also possible.
+
+{code}
+Actors.actor {
+    def msg1 = receive()
+    receive {msg2, msg3 ->
+        [msg1, msg2, msg3]*.reply 'Hi!'
+    }
+    react {msg4 ->
+        msg4.reply 'You're the last today!'
+    }
+}.start()
+{code}
+
+h2. Sending replies
+
+The _reply/replyIfExists_ methods are not only defined on the actors themselves, but also on the messages upon their reception, which is particularly handy when handling multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed message (the last one), whereas _reply()_ called on messages sends a reply to the author of the particular message only.
+
+{code}
+react {offerA ->
+    react {offerB ->
+        react {offerC ->
+            //sent to each of the senders
+            [offerA, offerB, offerC]*.reply 'Received your kind offer. Now processing it and comparing with others.'
+
+            offerA.reply 'You were the fastest'  //sent to the author of offerA only
+
+            def winnerOffer = [offerA, offerB, offerC].min {it.price}
+            winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
+            ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the loosers only
+        }
+    }
+}
+{code}
+
+h3. The sender property
+
+Messages upon retrieval offer the sender property to identify the originator of the message
+{code}
+react {tweet ->
+    if (isSpam(tweet)) ignoreTweetsFrom tweet.sender
+}
+{code}
+
+h3. Forwarding
+
+When sending a message a different actor can be specified as the sender so that potential replies to the message will be forwarded to the specified actor and not to the actual originator.
+
+{code}
+def decryptor = actor {
+    react {message ->
+        reply message.reverse()
+//        message.reply message.reverse()  //Alternatives to send replies
+//        message.sender.send message.reverse()
+    }
+}
+
+def console = actor {  //This actor will print out decrypted messages, since the replies are forwarded to it
+    react {
+        println 'Decrypted message: ' + it
+    }
+}
+
+decryptor.send 'lellarap si yvoorG', console  //Specify an actor to send replies to
+
+{code}
+
+h2. Creating Actors
+
+Actors share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned to back the pool once a message has been processed and the actor is idle waiting for some more messages to arrive.
+
+For example, this is how you create an actor that prints out all messages that it receives.
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def console = actor {
+    loop {
+        react {
+            println it
+        }
+    }
+}
+{code}
+
+Notice the _loop()_ method call, which ensures that the actor doesn't stop after having processed the first message.
+
+Here's an example with a decryptor service, which can decrypt submitted messages and send the decrypted messages back to the originators.
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+final def decryptor = actor {
+    loop {
+        react {String message->
+            if ('stopService' == message) stop()
+            else reply message.reverse()
+        }
+    }
+}
+
+actor {
+    decryptor.send 'lellarap si yvoorG'
+    react {
+        println 'Decrypted message: ' + it
+        decryptor.send 'stopService'
+    }
+}
+{code}
+
+Here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates.
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def me = actor {
+    delegate.metaClass.onTimeout = {-> friend.send('I see, busy as usual. Never mind.')}
+
+    friend.send('Hi')
+    react(30.seconds) {
+        //continue conversation
+    }
+}
+{code}
+
+h2. Undelivered messages
+
+Sometimes messages cannot be delivered to the target actor. When special action needs to be taken for undelivered messages, at actor termination all unprocessed messages from its queue have their _onDeliveryError()_ method called. The _onDeliveryError()_ method or closure defined on the message can, for example, send a notification back to the original sender of the message.
+
+{code}
+final AbstractPooledActor me
+me = Actors.actor {
+    def message1 = 1
+    def message2 = 2
+
+    message1.metaClass.onDeliveryError = {->
+        me << "Could not deliver $delegate"
+    }
+
+    message2.metaClass.onDeliveryError = {->
+        me << "Could not deliver $delegate"
+    }
+
+    actor1 << message1
+    actor2 << message1
+    ...
+}
+{code}
+
+h2. Joining actors
+
+Actors provide a _join()_ method to allow callers to wait for the actor to terminate. A variant accepting a timeout is also available. The Groovy _spread-dot_ operator comes in handy when joining multiple actors at a time.
+
+{code}
+def master = new GameMaster().start()
+def player = new Player(name: 'Player', server: master).start()
+
+[master, player]*.join()
+{code}
+
+h2. Custom schedulers
+
+Actors leverage the standard JDK concurrency library by default.  To provide a custom thread scheduler use the appropriate constructor parameter when creating an actor group. The supplied scheduler will orchestrate threads in the group's thread pool.
+
+
+Please also see the numerous Actor [Demos].

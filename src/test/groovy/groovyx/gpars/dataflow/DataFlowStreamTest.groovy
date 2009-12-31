@@ -16,9 +16,9 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.Actor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 public class DataFlowStreamTest extends GroovyTestCase {
 
@@ -26,7 +26,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.start {
+        final Actor thread = DataFlow.start {
             stream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
@@ -49,7 +49,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.start {
+        final Actor thread = DataFlow.start {
             stream << null
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
@@ -72,7 +72,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.start {
+        final Actor thread = DataFlow.start {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
@@ -93,7 +93,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DataFlowStream stream = new DataFlowStream()
-        final AbstractPooledActor thread = DataFlow.start {
+        final Actor thread = DataFlow.start {
             (0..10).each {stream << it}
             barrier.await()
             react {
@@ -109,7 +109,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
 
         thread << 'Proceed'
         barrier.await()
-        assertEquals 12, stream.length()  //todo sometimes fails
+        assertEquals 12, stream.length()
         (0..10).each {
             assertEquals it, stream.val
         }
@@ -129,7 +129,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         stream.each {assertNull it }
         assertEquals 11, stream.length()
 
-        for(i in (0..10)) { assertNull stream.val }
+        for (i in (0..10)) { assertNull stream.val }
     }
 
     public void testToString() {

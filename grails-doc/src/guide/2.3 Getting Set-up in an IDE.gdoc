@@ -1,0 +1,7 @@
+Adding the GPars jar files to your project or defining the appropriate dependencies in pom.xml should be enough to get you started with GPars in your IDE.
+
+h3. GPars DSL recognition
+
+*IntelliJ IDEA* in both the free _Community Edition_ and the commercial _Ultimate Edition_ will recognize the GPars domain specific languages,
+complete methods like _eachParallel()_ , _reduce()_ or _callAsync()_ and validate them. GPars uses the "GroovyDSL":http://www.jetbrains.net/confluence/display/GRVY/Scripting+IDE+for+DSL+awareness
+mechanism, which teaches IntelliJ IDEA the DSLs as soon as the GPars jar file is added to the project.

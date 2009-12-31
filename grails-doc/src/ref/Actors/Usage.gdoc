@@ -1,0 +1,98 @@
+h3. Creating an actor using a factory method
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def console = actor {
+    loop {
+        react {
+            println it
+        }
+    }
+{code}
+h3. Sub-classing the _AbstractPooledActor_ class
+{code}
+class CustomActor extends AbstractPooledActor {
+    @Override protected void act() {
+        loop {
+            react {
+                println it
+            }
+        }
+    }
+}
+
+def console=new CustomActor()
+console.start()
+{code}
+
+h3. Sending messages
+
+{code}
+console.send('Message')
+console << 'Message'
+console.sendAndContinue 'Message', {reply -> println "I received reply: $reply"}
+console.sendAndWait 'Message'
+{code}
+
+h3. Timeouts
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def me = actor {
+    delegate.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
+
+    friend.send('Hi')
+    react(10.seconds) {
+        //continue conversation
+    }
+}
+
+me.join()
+{code}
+
+h3. Actor groups
+{code}
+def coreActors = new NonDaemonActorGroup(5)  //5 non-daemon threads pool
+def helperActors = new PooledActorGroup(1)  //1 daemon thread pool
+
+def priceCalculator = coreActors.actor {
+...
+}
+
+def paymentProcessor = coreActors.actor {
+...
+}
+
+def emailNotifier = helperActors.actor {
+...
+}
+
+def cleanupActor = helperActors.actor {
+...
+}
+
+//increase size of the core actor group
+coreActors.resize 6
+
+//shutdown the group's pool once you no longer need the group to release resources
+helperActors.shutdown()
+{code}
+
+h3. DynamicDispatchActor
+{code}
+final Actor actor = new DynamicDispatchActor({
+    when {String msg -> println 'A String'; reply 'Thanks'}
+    when {Double msg -> println 'A Double'; reply 'Thanks'}
+    when {msg -> println 'A something ...'; reply 'What was that?'}
+})
+actor.start()
+{code}
+
+h3. Reactor
+{code}
+import groovyx.gpars.actor.Actors
+
+final def doubler = Actors.reactor {
+    2 * it
+}.start()
+{code}

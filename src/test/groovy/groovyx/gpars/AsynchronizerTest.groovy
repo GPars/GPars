@@ -28,9 +28,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 public class AsynchronizerTest extends GroovyTestCase {
     public void testStartInParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def resultA=0, resultB=0
+            def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
-            AsyncInvokerUtil.startInParallel({resultA=1;latch.countDown()}, {resultB=1;latch.countDown()})
+            Asynchronizer.startInParallel({resultA = 1; latch.countDown()}, {resultB = 1; latch.countDown()})
             latch.await()
             assertEquals 1, resultA
             assertEquals 1, resultB
@@ -38,132 +38,151 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testDoInParallel() {
-        assertEquals([10, 20], AsyncInvokerUtil.doInParallel({10}, {20}))
+        assertEquals([10, 20], Asynchronizer.doInParallel({10}, {20}))
     }
 
     public void testExecuteInParallel() {
-        assertEquals([10, 20], AsyncInvokerUtil.executeInParallel({10}, {20})*.get())
+        assertEquals([10, 20], Asynchronizer.executeAsync({10}, {20})*.get())
     }
 
     public void testAsyncWithCollectionAndResult() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             Collection<Future> result = [1, 2, 3, 4, 5].collect({it * 10}.async())
-            assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
+            assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result*.get()))
         }
     }
 
-    public void testEachAsync() {
-      def result = Collections.synchronizedSet(new HashSet())
+    public void testEachParallel() {
+        def result = Collections.synchronizedSet(new HashSet())
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            [1, 2, 3, 4, 5].eachAsync{Number number -> result.add(number * 10)}
+            [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
             assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
         }
     }
 
-    public void testEachAsyncOnsingleElementCollections() {
+    public void testEachParallelOnSingleElementCollections() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            [1].eachAsync{}
-            [1].eachAsync{}
-            [1].eachAsync{}
-            'a'.eachAsync{}
-            [1].iterator().eachAsync{}
-            'a'.iterator().eachAsync{}
+            [1].eachParallel {}
+            [1].eachParallel {}
+            [1].eachParallel {}
+            'a'.eachParallel {}
+            [1].iterator().eachParallel {}
+            'a'.iterator().eachParallel {}
         }
     }
 
-    public void testEachAsyncOnEmpty() {
+    public void testEachParallelOnEmpty() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            [].eachAsync{throw new RuntimeException('Should not be thrown')}
-            [].eachAsync{throw new RuntimeException('Should not be thrown')}
-            [].eachAsync{throw new RuntimeException('Should not be thrown')}
-            ''.eachAsync{throw new RuntimeException('Should not be thrown')}
-            [].iterator().eachAsync{throw new RuntimeException('Should not be thrown')}
-            ''.iterator().eachAsync{throw new RuntimeException('Should not be thrown')}
+            [].eachParallel {throw new RuntimeException('Should not be thrown')}
+            [].eachParallel {throw new RuntimeException('Should not be thrown')}
+            [].eachParallel {throw new RuntimeException('Should not be thrown')}
+            ''.eachParallel {throw new RuntimeException('Should not be thrown')}
+            [].iterator().eachParallel {throw new RuntimeException('Should not be thrown')}
+            ''.iterator().eachParallel {throw new RuntimeException('Should not be thrown')}
         }
     }
 
-    public void testEachWithIndexAsync() {
-      def result = Collections.synchronizedSet(new HashSet())
+    public void testEachWithIndexParallel() {
+        def result = Collections.synchronizedSet(new HashSet())
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            [1, 2, 3, 4, 5].eachWithIndexAsync{Number number, int index -> result.add(number * index)}
+            [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * index)}
             assertEquals(new HashSet([0, 2, 6, 12, 20]), result)
         }
     }
 
-    public void testEachWithIndexAsyncOnsingleElementCollections() {
+    public void testEachWithIndexParallelOnSingleElementCollections() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            [1].eachWithIndexAsync{e, i ->}
-            [1].eachWithIndexAsync{e, i ->}
-            [1].eachWithIndexAsync{e, i ->}
-            'a'.eachWithIndexAsync{e, i ->}
-            [1].iterator().eachWithIndexAsync{e, i ->}
-            'a'.iterator().eachWithIndexAsync{e, i ->}
+            [1].eachWithIndexParallel {e, i ->}
+            [1].eachWithIndexParallel {e, i ->}
+            [1].eachWithIndexParallel {e, i ->}
+            'a'.eachWithIndexParallel {e, i ->}
+            [1].iterator().eachWithIndexParallel {e, i ->}
+            'a'.iterator().eachWithIndexParallel {e, i ->}
         }
     }
 
-    public void testEachWithIndexAsyncOnEmpty() {
+    public void testEachWithIndexParallelOnEmpty() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            [].eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
-            [].eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
-            [].eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
-            ''.eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
-            [].iterator().eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
-            ''.iterator().eachWithIndexAsync{e, i -> throw new RuntimeException('Should not be thrown')}
+            [].eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
+            [].eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
+            [].eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
+            ''.eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
+            [].iterator().eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
+            ''.iterator().eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
         }
     }
 
-    public void testCollectAsync() {
+    public void testCollectParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def result = [1, 2, 3, 4, 5].collectAsync{Number number -> number * 10}
-            assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result))
+            def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}
+            assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result))
         }
     }
 
-    public void testFindAllAsync() {
+    public void testCollectParallelOnRange() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def result = [1, 2, 3, 4, 5].findAllAsync{Number number -> number > 2}
-            assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
+            def result = (1..5).collectParallel {Number number -> number * 10}
+            assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result))
         }
     }
 
-    public void testGrepAsync() {
+    public void testFindAllParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def result = [1, 2, 3, 4, 5].grepAsync(3..6)
-            assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
+            def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 2}
+            assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection) result))
         }
     }
 
-    public void testFindAsync() {
+    public void testGrepParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            def result = [1, 2, 3, 4, 5].findAsync{Number number -> number > 2}
+            def result = [1, 2, 3, 4, 5].grepParallel(3..6)
+            assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection) result))
+        }
+    }
+
+    public void testFindParallel() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 2}
             assert result in [3, 4, 5]
         }
     }
 
-    public void testAllAsync() {
+    public void testAllParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assert [1, 2, 3, 4, 5].allAsync{Number number -> number > 0}
-            assert ![1, 2, 3, 4, 5].allAsync{Number number -> number > 2}
+            assert [1, 2, 3, 4, 5].everyParallel {Number number -> number > 0}
+            assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 2}
         }
     }
 
-    public void testAnyAsync() {
+    public void testAnyParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assert [1, 2, 3, 4, 5].anyAsync{Number number -> number > 0}
-            assert [1, 2, 3, 4, 5].anyAsync{Number number -> number > 2}
-            assert ![1, 2, 3, 4, 5].anyAsync{Number number -> number > 6}
+            assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 0}
+            assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 2}
+            assert ![1, 2, 3, 4, 5].anyParallel {Number number -> number > 6}
         }
     }
 
     @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
-    public void testGroupByAsync() {
+    public void testGroupByParallel() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-            assert ([1, 2, 3, 4, 5].groupByAsync{Number number -> 1}).size() == 1
-            assert ([1, 2, 3, 4, 5].groupByAsync{Number number -> number}).size() == 5
-            final def groups = [1, 2, 3, 4, 5].groupByAsync {Number number -> number % 2}
+            assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> 1}).size() == 1
+            assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number}).size() == 5
+            final def groups = [1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}
             assert groups.size() == 2
             assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
             assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
+        }
+    }
+
+    private def qsort(list) {
+        if (!list) return []
+        def bucket = list.groupByParallel { it <=> list.first() }
+        [* qsort(bucket[-1]), * bucket[0], * qsort(bucket[1])]
+    }
+
+    public void testQuicksort() {
+        Asynchronizer.withAsynchronizer {
+            assertEquals([0, 1, 2, 3], qsort([0, 3, 1, 2]))
         }
     }
 

@@ -20,13 +20,13 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 
 /**
- * Demonstrates use of reactor - a specialized actor responding to incomming messages with result of running its body
+ * Demonstrates use of reactor - a specialized actor responding to incoming messages with result of running its body
  * on the message.
  */
 
 final def doubler = Actors.reactor {
     2 * it
-}.start()
+}
 
 Actor actor = Actors.actor {
     (1..10).each {doubler << it}
@@ -40,7 +40,7 @@ Actor actor = Actors.actor {
             }
         }
     }
-}.start()
+}
 
 actor.join()
 doubler.stop()

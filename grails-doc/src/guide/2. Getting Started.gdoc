@@ -1,0 +1,7 @@
+Let's make several assumptions before we really start.
+# You know and love Groovy. Otherwise you'd hardly invest your valuable time into studying a Groovy concurrency library.
+# You target multi-core hardware with your code
+# You use or want to use Groovy to write concurrent code.
+# You have at least some understanding that in concurrent code some things can happen at any time in any order and often more of them at the same time.
+
+That's about it. Let's roll the ball forward.

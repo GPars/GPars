@@ -17,7 +17,6 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -26,28 +25,26 @@ import static groovyx.gpars.actor.Actors.actor
  */
 
 Actor actor = actor {
+    delegate.metaClass {
+        outerLoop = {->
+            react {a ->
+                println 'Outer: ' + a
+                innerLoop()
+            }
+        }
+
+        innerLoop = {->
+            react {b ->
+                println 'Inner ' + b
+                if (b == 0) outerLoop()
+                else innerLoop()
+            }
+        }
+    }
+
     outerLoop()
 }
 
-actor.metaClass {
-    outerLoop = {->
-        react {a ->
-            println 'Outer: ' + a
-            innerLoop()
-        }
-    }
-
-    innerLoop = {->
-        react {b ->
-            println 'Inner ' + b
-            if (b==0) outerLoop()
-            else innerLoop()
-        }
-    }
-}
-
-actor.start()
-
 actor.send 1
 actor.send 1
 actor.send 1
@@ -65,6 +62,6 @@ actor.send 3
 actor.send 3
 actor.send 3
 
-Thread.sleep 5000
-Actors.defaultPooledActorGroup.shutdown()
+Thread.sleep 2000
+actor.stop()
 

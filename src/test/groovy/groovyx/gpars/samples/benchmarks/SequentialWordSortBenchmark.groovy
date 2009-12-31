@@ -34,11 +34,11 @@ public class SequentialWordSortBenchmark implements Benchmark {
         sorted = null
         System.gc()
         Thread.sleep 3000
-        
+
         return (t2 - t1)
     }
 
-     private List<String> sortedWords(String fileName) {
+    private List<String> sortedWords(String fileName) {
         parseFile(fileName).sort {it.toLowerCase()}
     }
 

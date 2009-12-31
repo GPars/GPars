@@ -1,0 +1,27 @@
+Dealing with data frequently involves manipulating collections. Lists, arrays, sets, maps, iterators, strings and lot of other data types can be viewed as collections of items.
+The common pattern to process such collections is to take elements sequentially, one-by-one, and make an action for each of the items in row.
+
+Take, for example, the _min()_ function, which is supposed to return the smallest element of a collection. When you call the _min()_ method on a collection of numbers,
+the caller thread will create an _accumulator_ or _so-far-the-smallest-value_ initialized to the minimum value of the given type, let say to zero. And then the thread will iterate through the elements of the collection
+and compare them with the value in the _accumulator_ . Once all elements have been processed, the minimum value is stored in the _accumulator_ .
+
+This algorithm, however simple, is *totally wrong* on multi-core hardware. Running the _min()_ function on a dual-core chip can leverage *at most 50%* of the computing power of the chip.
+On a quad-core it would be only 25%. Correct, this algorithm effectively *wastes 75% of the computing power* of the chip.
+
+Tree-like structures proved to be more appropriate for parallel processing. The _min()_ function in our example doesn't need to iterate through all the elements in row and compare their values with the _accumulator_ .
+What it can do instead is relying on the multi-core nature of your hardware. A _parallel_min()_ function could, for example, compare pairs (or tuples of certain size) of neighboring values
+in the collection and promote the smallest value from the tuple into a next round of comparison. Searching for minimum in different tuples can safely happen in parallel and so tuples in the same round
+can be processed by different cores at the same time without races or contention among threads.
+
+h3. Meet Parallel Arrays
+
+The jsr-166y library brings a very convenient abstraction called "Parallel Arrays":http://groovy.dzone.com/articles/parallelize-your-arrays-with-j . GPars leverages the Parallel Arrays implementation
+ in several ways. The *Parallelizer* class provides parallel variants of the common Groovy iteration methods like _each()_ , _collect()_ , _findAll()_ and such.
+ {code}
+ def selfPortraits = images.findAllParallel{it.contains me}.collectParallel {it.resize()}
+ {code}
+ It also allows for a more functional style map/reduce collection processing.
+ {code}
+ def smallestSelfPortrait = images.parallel.filter{it.contains me}.map{it.resize()}.min{it.sizeInMB}
+ {code}
+ 

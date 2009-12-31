@@ -1,0 +1,12 @@
+The world of mainstream computing is changing rapidly these days. If you open the hood and look under the covers of your computer, you'll most likely see a dual-core processor there. Or a quad-core, if you're lucky enough.
+We all run our software on multi-processors. The code we write today and tomorrow will probably never run on a single processor system. Parallel hardware has become common-place.
+Not so with the software though, at least not yet. People still create single-threaded code, although it will never be able to leverage the full power of future hardware. Some experiment with low-level concurrency primitives, like threads, locks or synchronized blocks,
+however, it has become obvious that the common shared-memory multithreading causes more troubles than it solves. Low-level concurrency handling is usually hard to get right. And it's not much fun either.
+With such a radical change in hardware, software inevitably has to change dramatically too. Higher-level concurrency concepts like map/reduce, fork/join, actors or dataflow will provide natural abstractions for different types of problem domains while leveraging the multi-core hardware underneath.
+
+Meet "GPars":http://gpars.codehaus.org - an open-source concurrency library for Groovy that aims to give you multiple high-level abstractions for writing concurrent code in Groovy - map/reduce, fork/join, asynchronous closures, actors, agents, dataflow concurrency and other concepts, which aim to make your Groovy code concurrent with little effort.
+With GPars your Groovy code can easily utilize all the available processors on the target system. You can run multiple calculations at the same time, request network resources in parallel,
+safely solve hierarchical divide-and-conquer problems, perform functional style map/reduce collection processing or build your applications around the actor model.
+
+The project is open sourced under the "Apache 2 License":http://gpars.codehaus.org/License . If you're working on a commercial, open-source, educational or any other type of software project in Groovy,
+download the binaries or integrate them from the maven repository and get going. The way to witting highly concurrent Groovy code is wide open. Enjoy!

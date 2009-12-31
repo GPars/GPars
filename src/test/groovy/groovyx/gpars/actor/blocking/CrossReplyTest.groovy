@@ -16,9 +16,9 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CyclicBarrier
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CyclicBarrier
 
 public class CrossReplyTest extends GroovyTestCase {
 
@@ -31,7 +31,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -40,10 +39,8 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
-        incrementor.stop()
         assertEquals 3, result
     }
 
@@ -56,7 +53,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 it.reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -65,7 +61,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
         assertEquals 3, result
@@ -80,7 +75,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -89,10 +83,8 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
-        incrementor.stop()
         assertEquals 3, result
     }
 
@@ -105,7 +97,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 it.reply it + 1
             }
         }
-        incrementor.start()
 
         Actor actor = Actors.actor {
             incrementor.send 2
@@ -114,7 +105,6 @@ public class CrossReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-        actor.start()
 
         barrier.await()
         assertEquals 3, result

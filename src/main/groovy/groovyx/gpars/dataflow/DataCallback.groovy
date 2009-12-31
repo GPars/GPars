@@ -16,9 +16,9 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.MessageStream
+import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.impl.MessageStream
 
-//todo update doc
 /**
  *
  * A helper class enabling the 'whenBound()' functionality of a DataFlowVariable.
@@ -29,33 +29,25 @@ import groovyx.gpars.MessageStream
  * Date: Sep 13, 2009
  */
 final class DataCallback extends MessageStream {
-  private final Closure code
+    private static final long serialVersionUID = 6512046150477794254L;
+    private final Closure code
 
-  /**
-   * @param code The closure to run
-   * @param df The DFV to wait for
-   */
-  DataCallback(final Closure code) {
-    this.code = code
-  }
+    /**
+     * @param code The closure to run
+     */
+    DataCallback(final Closure code) {
+        this.code = code
+    }
 
-  /**
-   * @param code The code to run. An object responding to 'perform(Object value)' is expected
-   * @param df The DFV to wait for
-   */
-  DataCallback(final Object code) {
-    this.code = {code.perform(it)}
-  }
-
-  /**
-   * Sends a message back to the DataCallback.
-   * Will schedule processing the internal closure with the thread pool
-   */
-  @Override
-  public MessageStream send(Object message) {
-    DataFlowActor.DATA_FLOW_GROUP.threadPool.execute {
-      code.call message
-    };
-    return this;
-  }
+    /**
+     * Sends a message back to the DataCallback.
+     * Will schedule processing the internal closure with the thread pool
+     */
+    @Override
+    public MessageStream send(Object message) {
+        Actors.defaultPooledActorGroup.threadPool.execute {
+            code.call message
+        };
+        return this;
+    }
 }

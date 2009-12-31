@@ -16,10 +16,12 @@
 
 package groovyx.gpars
 
-import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.Callable
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
+import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
-import org.codehaus.groovy.runtime.InvokerInvocationException
-import java.util.concurrent.*
 
 /**
  * This class forms the core of the DSL initialized by <i>Asynchronizer</i>. The static methods of <i>AsyncInvokerUtil</i>
@@ -34,7 +36,7 @@ public class AsyncInvokerUtil {
     /**
      * schedules the supplied closure for processing in the underlying thread pool.
      */
-    private static Future callAsync(Closure task) {
+    private static Future callParallel(Closure task) {
         final ExecutorService pool = Asynchronizer.retrieveCurrentPool()
         if (!pool) throw new IllegalStateException("No ExecutorService available for the current thread.")
         return pool.submit(task as Callable)
@@ -44,12 +46,12 @@ public class AsyncInvokerUtil {
      * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
      */
     public static Future callAsync(final Closure cl, final Object ... args) {
-        callAsync {-> cl(* args)}
+        callParallel {-> cl(* args)}
     }
 
     /**
      * Submits the task for asynchronous processing returning the Future received from the executor service.
-     * Allows for the followitn syntax:
+     * Allows for the following syntax:
      * <pre>
      * executorService << {println 'Inside parallel task'}* </pre>
      */
@@ -65,63 +67,6 @@ public class AsyncInvokerUtil {
     }
 
     /**
-     * Starts multiple closures in separate threads, collecting their return values
-     * If an exception is thrown from the closure when called on any of the collection's elements,
-     * it will be rethrown in the calling thread when it calls the Future.get() method.
-     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     */
-    public static List<Object> doInParallel(Closure ... closures) {
-        return processResult(executeInParallel(closures))
-    }
-
-    /**
-     * Starts multiple closures in separate threads, collecting Futures for their return values
-     * If an exception is thrown from the closure when called on any of the collection's elements,
-     * it will be rethrown in the calling thread when it calls the Future.get() method.
-     */
-    public static List<Future<Object>> executeInParallel(Closure ... closures) {
-        Asynchronizer.withAsynchronizer(closures.size()) {ExecutorService executorService ->
-            List<Future<Object>> result = closures.collect {cl ->
-                executorService.submit({
-                    cl.call()
-                } as Callable<Object>)
-            }
-            result
-        }
-    }
-
-    /**
-     * Starts multiple closures in separate threads, using a new thread for the startup.
-     * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported using System.err.
-     * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     */
-    public static void startInParallel(Closure ... closures) {
-        startInParallel(createDefaultUncaughtExceptionHandler(), closures)
-    }
-
-    /**
-     * Starts multiple closures in separate threads, using a new thread for the startup.
-     * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported to the supplied instance of UncaughtExceptionHandler.
-     * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     * Unwraps potential InvokerInvocationException before control is passed to the UncaughtExceptionHandler instance.
-     * @return The thread that submits the closures to the thread executor service so that the caller can take ownership of it and e.g. call <i>join()</i> on it to wait for all the closures to finish processing.
-     */
-    public static Thread startInParallel(java.lang.Thread.UncaughtExceptionHandler uncaughtExceptionHandler, Closure ... closures) {
-        final Thread thread = new Thread({
-            doInParallel(closures)
-        } as Runnable)
-        thread.daemon = false
-        thread.uncaughtExceptionHandler = {Thread t, Throwable throwable ->
-            if (throwable instanceof InvokerInvocationException)
-                uncaughtExceptionHandler.uncaughtException(t, throwable.cause)
-            else
-                uncaughtExceptionHandler.uncaughtException(t, throwable)
-        } as UncaughtExceptionHandler
-        thread.start()
-        return thread
-    }
-
-    /**
      * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure
      * to evaluate each collection's element. A Semaphore is used to make the calling thread wait for all the results.
      * After this method returns, all the closures have been finished and all the potential shared resources have been updated
@@ -130,16 +75,16 @@ public class AsyncInvokerUtil {
      * Example:
      *      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *          def result = Collections.synchronizedSet(new HashSet())
-     *          service.eachAsync([1, 2, 3, 4, 5]) {Number number -> result.add(number * 10)}*          assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *          service.eachParallel([1, 2, 3, 4, 5]) {Number number -> result.add(number * 10)}*          assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>eachAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>eachParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      *    Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *         def result = Collections.synchronizedSet(new HashSet())
-     *        [1, 2, 3, 4, 5].eachAsync { Number number -> result.add(number * 10) }*         assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *        [1, 2, 3, 4, 5].eachParallel { Number number -> result.add(number * 10) }*         assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def eachAsync(Object collection, Closure cl) {
+    public static def eachParallel(Object collection, Closure cl) {
         final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
         final Semaphore semaphore = new Semaphore(0)
         Closure code = async({Object ... args ->
@@ -170,16 +115,16 @@ public class AsyncInvokerUtil {
      * Example:
      *      Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *          def result = Collections.synchronizedSet(new HashSet())
-     *          service.eachWithIndexAsync([1, 2, 3, 4, 5]) {Number number -> result.add(number * 10)}*          assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *          service.eachWithIndexParallel([1, 2, 3, 4, 5]) {Number number -> result.add(number * 10)}*          assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>eachAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>eachParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      *    Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *         def result = Collections.synchronizedSet(new HashSet())
-     *        [1, 2, 3, 4, 5].eachWithIndexAsync { Number number, int index -> result.add(number * 10) }*         assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *        [1, 2, 3, 4, 5].eachWithIndexParallel { Number number, int index -> result.add(number * 10) }*         assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def eachWithIndexAsync(Object collection, Closure cl) {
+    public static def eachWithIndexParallel(Object collection, Closure cl) {
         final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
         final Semaphore semaphore = new Semaphore(0)
         Closure code = async({Object element, int index ->
@@ -207,15 +152,15 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      *     Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *         def result = service.collectAsync([1, 2, 3, 4, 5]){Number number -> number * 10}*         assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result))
+     *         def result = service.collectParallel([1, 2, 3, 4, 5]){Number number -> number * 10}*         assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result))
      *}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>collectAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      *     Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *         def result = [1, 2, 3, 4, 5].collectAsync{Number number -> number * 10}*         assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result))
+     *         def result = [1, 2, 3, 4, 5].collectParallel{Number number -> number * 10}*         assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result))
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def collectAsync(Object collection, Closure cl) {
+    public static def collectParallel(Object collection, Closure cl) {
         return processResult(collection.collect(async(cl)))
     }
 
@@ -225,16 +170,16 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     def result = service.findAllAsync([1, 2, 3, 4, 5]){Number number -> number > 2}*     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
+     *     def result = service.findAllParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
      *}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>findAllAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     def result = [1, 2, 3, 4, 5].findAllAsync{Number number -> number > 2}*     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
+     *     def result = [1, 2, 3, 4, 5].findAllParallel{Number number -> number > 2}*     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def findAllAsync(Object collection, Closure cl) {
-        collectAsync(collection, {if (cl(it)) return it else return null}).findAll {it != null}
+    public static def findAllParallel(Object collection, Closure cl) {
+        collectParallel(collection, {if (cl(it)) return it else return null}).findAll {it != null}
     }
 
     /**
@@ -243,18 +188,18 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     def result = service.grepAsync([1, 2, 3, 4, 5])(3..6)
+     *     def result = service.grepParallel([1, 2, 3, 4, 5])(3..6)
      *     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
      *}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>findAllAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     def result = [1, 2, 3, 4, 5].grepAsync(3..6)
+     *     def result = [1, 2, 3, 4, 5].grepParallel(3..6)
      *     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def grepAsync(Object collection, filter) {
-        collectAsync(collection, {if (filter.isCase(it)) return it else return null}).findAll {it != null}
+    public static def grepParallel(Object collection, filter) {
+        collectParallel(collection, {if (filter.isCase(it)) return it else return null}).findAll {it != null}
     }
 
     /**
@@ -263,16 +208,16 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     def result = service.findAsync([1, 2, 3, 4, 5]){Number number -> number > 2}*     assert result in [3, 4, 5]
+     *     def result = service.findParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*     assert result in [3, 4, 5]
      *}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>findAllAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     def result = [1, 2, 3, 4, 5].findAsync{Number number -> number > 2}*     assert result in [3, 4, 5]
+     *     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}*     assert result in [3, 4, 5]
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def findAsync(Object collection, Closure cl) {
-        collectAsync(collection, {if (cl(it)) return it else return null}).find {it != null}
+    public static def findParallel(Object collection, Closure cl) {
+        collectParallel(collection, {if (cl(it)) return it else return null}).find {it != null}
     }
 
     /**
@@ -281,15 +226,15 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert service.allAsync([1, 2, 3, 4, 5]){Number number -> number > 0}*     assert !service.allAsync([1, 2, 3, 4, 5]){Number number -> number > 2}*}*
+     *     assert service.everyParallel([1, 2, 3, 4, 5]){Number number -> number > 0}*     assert !service.everyParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>findAllAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert [1, 2, 3, 4, 5].allAsync{Number number -> number > 0}*     assert ![1, 2, 3, 4, 5].allAsync{Number number -> number > 2}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     *     assert [1, 2, 3, 4, 5].everyParallel{Number number -> number > 0}*     assert ![1, 2, 3, 4, 5].everyParallel{Number number -> number > 2}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static boolean allAsync(Object collection, Closure cl) {
+    public static boolean everyParallel(Object collection, Closure cl) {
         final AtomicBoolean flag = new AtomicBoolean(true)
-        eachAsync(collection, {value -> if (!cl(value)) flag.set(false)})
+        eachParallel(collection, {value -> if (!cl(value)) flag.set(false)})
         return flag.get()
     }
 
@@ -299,15 +244,15 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert service.anyAsync([1, 2, 3, 4, 5]){Number number -> number > 2}*     assert !service.anyAsync([1, 2, 3, 4, 5]){Number number -> number > 6}*}*
+     *     assert service.anyParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*     assert !service.anyParallel([1, 2, 3, 4, 5]){Number number -> number > 6}*}*
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>anyAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert [1, 2, 3, 4, 5].anyAsync{Number number -> number > 2}*     assert ![1, 2, 3, 4, 5].anyAsync{Number number -> number > 6}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     *     assert [1, 2, 3, 4, 5].anyParallel{Number number -> number > 2}*     assert ![1, 2, 3, 4, 5].anyParallel{Number number -> number > 6}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static boolean anyAsync(Object collection, Closure cl) {
+    public static boolean anyParallel(Object collection, Closure cl) {
         final AtomicBoolean flag = new AtomicBoolean(false)
-        eachAsync(collection, {if (cl(it)) flag.set(true)})
+        eachParallel(collection, {if (cl(it)) flag.set(true)})
         return flag.get()
     }
 
@@ -317,24 +262,24 @@ public class AsyncInvokerUtil {
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert service.groupByAsync(([1, 2, 3, 4, 5]){Number number -> number % 2}).size() == 2
+     *     assert service.groupByParallel(([1, 2, 3, 4, 5]){Number number -> number % 2}).size() == 2
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
-     * have a new <i>groupByAsync(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * have a new <i>groupByParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     assert ([1, 2, 3, 4, 5].groupByAsync{Number number -> number % 2}).size() == 2
+     *     assert ([1, 2, 3, 4, 5].groupByParallel{Number number -> number % 2}).size() == 2
      */
-    public static Collection groupByAsync(Object collection, Closure cl) {
+    public static Map groupByParallel(Object collection, Closure cl) {
         final def map = new ConcurrentHashMap()
-        eachAsync(collection, {
+        eachParallel(collection, {
             def result = cl(it)
             final def myList = [it].asSynchronized()
             def list = map.putIfAbsent(result, myList)
             if (list != null) list.add(it)
         })
-        return map.values().asList()
+        return map
     }
 
-    private static List<Object> processResult(List<Future<Object>> futures) {
+    static List<Object> processResult(List<Future<Object>> futures) {
         final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
 
         final List<Object> result = futures.collect {
@@ -348,12 +293,5 @@ public class AsyncInvokerUtil {
 
         if (exceptions.empty) return result
         else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
-    }
-
-    private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {
-        return {Thread failedThread, Throwable throwable ->
-            System.err.println "Error processing background thread ${failedThread.name}: ${throwable.message}"
-            throwable.printStackTrace(System.err)
-        } as UncaughtExceptionHandler
     }
 }

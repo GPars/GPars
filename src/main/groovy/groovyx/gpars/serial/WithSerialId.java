@@ -50,19 +50,20 @@ public abstract class WithSerialId implements Serializable {
      * @return serial handle for the object
      */
     public final SerialHandle getOrCreateSerialHandle() {
-        if (serialHandle == null)
+        if (serialHandle == null) {
             synchronized (this) {
                 if (serialHandle == null) {
                     serialHandle = SerialHandle.create(this, null);
                 }
             }
+        }
         return serialHandle;
     }
 
     /**
      * Class of remote object to be created
      *
-     * @return
+     * @return Throws UnsupportedOperationException
      */
     public <T extends RemoteSerialized> Class<T> getRemoteClass() {
         throw new UnsupportedOperationException();
@@ -72,7 +73,7 @@ public abstract class WithSerialId implements Serializable {
      * Replace object by handle for serialization
      *
      * @return handle to serialize
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException If the object cannot be serialized
      */
     @SuppressWarnings({"UnusedDeclaration"})
     protected final Object writeReplace() throws ObjectStreamException {
@@ -86,7 +87,7 @@ public abstract class WithSerialId implements Serializable {
         return createRemoteHandle(handle, host);
     }
 
-    protected RemoteHandle createRemoteHandle(SerialHandle handle, SerialContext host) {
+    protected RemoteHandle createRemoteHandle(final SerialHandle handle, final SerialContext host) {
         return new DefaultRemoteHandle(handle.getSerialId(), host.getHostId(), getRemoteClass());
     }
 }

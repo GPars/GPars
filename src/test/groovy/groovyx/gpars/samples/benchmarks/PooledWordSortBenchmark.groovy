@@ -16,110 +16,110 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import java.util.concurrent.CountDownLatch
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
 
 public class PooledWordSortBenchmark implements Benchmark {
 
-  public long perform(final int numberOfIterations) {
-    Actors.defaultPooledActorGroup.resize 23
+    public long perform(final int numberOfIterations) {
+        Actors.defaultPooledActorGroup.resize 23
 
-    final long t1 = System.currentTimeMillis()
-    final SortMaster master = new SortMaster(numActors: 10, docRoot: 'C:/dev/TeamCity/logs/')
-    master.start()
-    master.waitUntilDone()
-    final long t2 = System.currentTimeMillis()
-    master.stopAll()
-    Actors.defaultPooledActorGroup.resetDefaultSize()
+        final long t1 = System.currentTimeMillis()
+        final SortMaster master = new SortMaster(numActors: 10, docRoot: 'C:/dev/TeamCity/logs/')
+        master.start()
+        master.waitUntilDone()
+        final long t2 = System.currentTimeMillis()
+        master.stopAll()
+        Actors.defaultPooledActorGroup.resetDefaultSize()
 
-    return (t2 - t1)
-  }
+        return (t2 - t1)
+    }
 }
 private final class FileToSort {
-  String fileName
+    String fileName
 }
 private final class SortResult {
-  String fileName;
-  List<String> words
+    String fileName;
+    List<String> words
 }
 
 class WordSortActor extends AbstractPooledActor {
-  private List<String> sortedWords(String fileName) {
-    parseFile(fileName).sort {it.toLowerCase()}
-  }
-
-  private List<String> parseFile(String fileName) {
-    List<String> words = []
-    new File(fileName).splitEachLine(' ') {words.addAll(it)}
-    return words
-  }
-
-  void act() {
-    loop {
-      react {message ->
-        switch (message) {
-          case FileToSort:
-            reply new SortResult(fileName: message.fileName, words: sortedWords(message.fileName))
-        }
-      }
+    private List<String> sortedWords(String fileName) {
+        parseFile(fileName).sort {it.toLowerCase()}
     }
-  }
+
+    private List<String> parseFile(String fileName) {
+        List<String> words = []
+        new File(fileName).splitEachLine(' ') {words.addAll(it)}
+        return words
+    }
+
+    void act() {
+        loop {
+            react {message ->
+                switch (message) {
+                    case FileToSort:
+                        reply new SortResult(fileName: message.fileName, words: sortedWords(message.fileName))
+                }
+            }
+        }
+    }
 }
 
 final class SortMaster extends AbstractPooledActor {
 
-  String docRoot = '/'
-  int numActors = 1
+    String docRoot = '/'
+    int numActors = 1
 
-  List<List<String>> sorted = []
-  private CountDownLatch startupLatch = new CountDownLatch(1)
-  private CountDownLatch doneLatch
-  private List<Actor> workers
+    List<List<String>> sorted = []
+    private CountDownLatch startupLatch = new CountDownLatch(1)
+    private CountDownLatch doneLatch
+    private List<Actor> workers
 
-  private void beginSorting() {
-    workers = createWorkers()
-    int cnt = sendTasksToWorkers()
-    doneLatch = new CountDownLatch(cnt)
-    startupLatch.countDown()
-  }
-
-  private List createWorkers() {
-    return (1..numActors).collect {new WordSortActor().start()}
-  }
-
-  private int sendTasksToWorkers() {
-    int cnt = 0
-    new File(docRoot).eachFile {
-      workers[cnt % numActors] << new FileToSort(fileName: it)
-      cnt += 1
+    private void beginSorting() {
+        workers = createWorkers()
+        int cnt = sendTasksToWorkers()
+        doneLatch = new CountDownLatch(cnt)
+        startupLatch.countDown()
     }
-    return cnt
-  }
 
-  public void waitUntilDone() {
-    startupLatch.await()
-    doneLatch.await()
-  }
+    private List createWorkers() {
+        return (1..numActors).collect {new WordSortActor().start()}
+    }
 
-  void act() {
-    beginSorting()
-    loop {
-      react {
-        switch (it) {
-          case SortResult:
-            sorted << it.words
-            doneLatch.countDown()
+    private int sendTasksToWorkers() {
+        int cnt = 0
+        new File(docRoot).eachFile {
+            workers[cnt % numActors] << new FileToSort(fileName: it)
+            cnt += 1
         }
-      }
+        return cnt
     }
-  }
 
-  public void stopAll() {
-    workers.each {it.stop()}
-    stop()
-    sorted = null
-    workers = null
-  }
+    public void waitUntilDone() {
+        startupLatch.await()
+        doneLatch.await()
+    }
+
+    void act() {
+        beginSorting()
+        loop {
+            react {
+                switch (it) {
+                    case SortResult:
+                        sorted << it.words
+                        doneLatch.countDown()
+                }
+            }
+        }
+    }
+
+    public void stopAll() {
+        workers.each {it.stop()}
+        stop()
+        sorted = null
+        workers = null
+    }
 }

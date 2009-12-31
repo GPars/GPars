@@ -16,12 +16,12 @@
 
 package groovyx.gpars.serial;
 
+import groovyx.gpars.remote.RemoteConnection;
+import groovyx.gpars.remote.RemoteHost;
 import org.codehaus.groovy.util.ManagedReference;
 import org.codehaus.groovy.util.ReferenceBundle;
 import org.codehaus.groovy.util.ReferenceManager;
 import org.codehaus.groovy.util.ReferenceType;
-import groovyx.gpars.remote.RemoteConnection;
-import groovyx.gpars.remote.RemoteHost;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
@@ -38,11 +38,11 @@ import java.util.UUID;
  */
 public class SerialHandle extends ManagedReference<WithSerialId> {
 
-    private final static ReferenceQueue queue = new ReferenceQueue();
+    private static final ReferenceQueue queue = new ReferenceQueue();
 
-    private final static ReferenceManager manager = ReferenceManager.createThreadedManager(queue);
+    private static final ReferenceManager manager = ReferenceManager.createThreadedManager(queue);
 
-    private final static ReferenceBundle bundle = new ReferenceBundle(manager, ReferenceType.WEAK);
+    private static final ReferenceBundle bundle = new ReferenceBundle(manager, ReferenceType.WEAK);
 
     /**
      * serial id of the object
@@ -66,7 +66,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
      *
      * @param value
      */
-    private SerialHandle(WithSerialId value, UUID id) {
+    private SerialHandle(final WithSerialId value, final UUID id) {
         super(bundle, value);
 
         context = SerialContext.get();
@@ -81,7 +81,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     /**
      * Serial id of the object
      *
-     * @return
+     * @return The serial id
      */
     public UUID getSerialId() {
         return serialId;
@@ -96,7 +96,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     /**
      * Getter for subscribers
      *
-     * @return
+     * @return The current subscribers
      */
     public Object getSubscribers() {
         return subscribers;
@@ -107,7 +107,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
      *
      * @param context
      */
-    public void subscribe(SerialContext context) {
+    public void subscribe(final SerialContext context) {
         synchronized (this) {
             if (subscribers == null) {
                 subscribers = context;
@@ -115,16 +115,17 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
                 if (subscribers instanceof SerialContext) {
                     if (subscribers != context) {
                         final ArrayList<SerialContext> list = new ArrayList<SerialContext>(2);
-                        list.add((RemoteHost) subscribers);
+                        list.add((SerialContext) subscribers);
                         list.add(context);
                         subscribers = list;
                     }
                 } else {
                     @SuppressWarnings({"unchecked"})
                     final List<SerialContext> list = (List<SerialContext>) subscribers;
-                    for (SerialContext remoteHost : list) {
-                        if (remoteHost == context)
+                    for (final SerialContext remoteHost : list) {
+                        if (remoteHost == context) {
                             return;
+                        }
                     }
                     list.add(context);
                 }
@@ -134,7 +135,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
         }
     }
 
-    public void unsubscribe(SerialContext context) {
+    public void unsubscribe(final SerialContext context) {
         synchronized (this) {
             if (subscribers != null) {
                 if (subscribers instanceof SerialContext) {
@@ -145,8 +146,9 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
                     @SuppressWarnings({"unchecked"})
                     final List<SerialContext> list = (List<SerialContext>) subscribers;
                     list.remove(context);
-                    if (list.size() == 1)
+                    if (list.size() == 1) {
                         subscribers = list.get(0);
+                    }
                 }
             }
 
@@ -156,22 +158,23 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
         }
     }
 
-    public static SerialHandle create(WithSerialId obj, UUID id) {
-        if (id == null)
+    public static SerialHandle create(final WithSerialId obj, final UUID id) {
+        if (id == null) {
             return new LocalSerialHandle(obj, UUID.randomUUID());
-        else
+        } else {
             return new RemoteSerialHandle(obj, id);
+        }
     }
 
 
     private static class LocalSerialHandle extends SerialHandle {
-        public LocalSerialHandle(WithSerialId obj, UUID uuid) {
+        public LocalSerialHandle(final WithSerialId obj, final UUID uuid) {
             super(obj, uuid);
         }
     }
 
     private static class RemoteSerialHandle extends SerialHandle {
-        public RemoteSerialHandle(WithSerialId obj, UUID uuid) {
+        private RemoteSerialHandle(final WithSerialId obj, final UUID uuid) {
             super(obj, uuid);
         }
 
@@ -182,14 +185,15 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
         }
 
         public static class ReleaseHandle extends SerialMsg {
+            private static final long serialVersionUID = -951052191389868427L;
             private final UUID serialId;
 
-            public ReleaseHandle(UUID serialId) {
+            public ReleaseHandle(final UUID serialId) {
                 this.serialId = serialId;
             }
 
             @Override
-            public void execute(RemoteConnection conn) {
+            public void execute(final RemoteConnection conn) {
                 final RemoteHost remoteHost = conn.getHost();
                 final SerialHandle handle = remoteHost.get(serialId);
                 if (handle instanceof LocalSerialHandle) {

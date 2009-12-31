@@ -18,11 +18,11 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * A producer-consumer demo using the DataFlowStream class. Producer downloads web content from a list of urls,
- * the concumenr then counts number of sites refering Groovy. 
+ * the consumer then counts number of sites referring Groovy. 
  */
 
 def buffer = new DataFlowStream()
@@ -33,17 +33,17 @@ final def urls = [
         'http://www.theserverside.com'
 ]
 
-start {
-    for(url in urls) {
+task {
+    for (url in urls) {
         final def site = new DataFlowVariable()
         buffer << site
         site << url.toURL().text
     }
 }
 
-start {
+task {
     int count = 0
-    0.upto(urls.size()-1) {
+    0.upto(urls.size() - 1) {
         def content = buffer.val
         if (content.contains('groovy')) count++
     }

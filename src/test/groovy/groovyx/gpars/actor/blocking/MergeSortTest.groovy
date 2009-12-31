@@ -16,11 +16,11 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.PooledActorGroup
-import groovyx.gpars.scheduler.ResizablePool
+import groovyx.gpars.scheduler.ResizeablePool
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -52,7 +52,7 @@ public class MergeSortTest extends GroovyTestCase {
         return result
     }
 
-    def group = new PooledActorGroup(new ResizablePool(false, 50))
+    def group = new PooledActorGroup(new ResizeablePool(false, 50))
 
     Closure createMessageHandler(def parentActor) {
         return {
@@ -72,8 +72,8 @@ public class MergeSortTest extends GroovyTestCase {
 
                         def child1 = group.actor(createMessageHandler(delegate))
                         def child2 = group.actor(createMessageHandler(delegate))
-                        child1.start().send(splitList[0])
-                        child2.start().send(splitList[1])
+                        child1.send(splitList[0])
+                        child2.send(splitList[1])
 
                         parentActor.send merge(receive(), receive())
                 }
@@ -89,12 +89,12 @@ public class MergeSortTest extends GroovyTestCase {
         def resultActor = Actors.actor {
             result = receive(30, TimeUnit.SECONDS)
             latch.countDown()
-        }.start()
+        }
 
         def sorter = Actors.actor(createMessageHandler(resultActor))
-        sorter.start().send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+        sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
-        latch.await(30, TimeUnit.SECONDS)
+        latch.await(90, TimeUnit.SECONDS)
         assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
     }
 }

@@ -21,7 +21,7 @@ import groovyx.gpars.scheduler.Pool
 
 /**
  * AsyncEnhancer allows classes or instances to be enhanced with asynchronous variants of iterative methods,
- * like eachAsync(), collectAsync(), findAllAsync() and others. These operations split processing into multiple
+ * like eachParallel(), collectParallel(), findAllParallel() and others. These operations split processing into multiple
  * concurrently executable tasks and perform them on the underlying instance of an ExecutorService.
  * The pool itself is stored in a final property threadPool and can be managed through static methods
  * on the AsyncEnhancer class.
@@ -68,9 +68,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public def eachAsync(Closure cl) {
+    public def eachParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.eachAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.eachParallel(mixedIn[Object], cl)
         }
     }
 
@@ -82,9 +82,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public def eachWithIndexAsync(Closure cl) {
+    public def eachWithIndexParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.eachWithIndexAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.eachWithIndexParallel(mixedIn[Object], cl)
         }
     }
 
@@ -95,9 +95,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public def collectAsync(Closure cl) {
+    public def collectParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.collectAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.collectParallel(mixedIn[Object], cl)
         }
     }
 
@@ -108,9 +108,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public def findAllAsync(Closure cl) {
+    public def findAllParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.findAllAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.findAllParallel(mixedIn[Object], cl)
         }
     }
 
@@ -121,9 +121,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public def grepAsync(Closure cl) {
+    public def grepParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.grepAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.grepParallel(mixedIn[Object], cl)
         }
     }
 
@@ -134,9 +134,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public def findAsync(Closure cl) {
+    public def findParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.findAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.findParallel(mixedIn[Object], cl)
         }
     }
 
@@ -147,9 +147,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public boolean allAsync(Closure cl) {
+    public boolean everyParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.allAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.everyParallel(mixedIn[Object], cl)
         }
     }
 
@@ -160,9 +160,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public boolean anyAsync(Closure cl) {
+    public boolean anyParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.anyAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.anyParallel(mixedIn[Object], cl)
         }
     }
 
@@ -173,9 +173,9 @@ public final class AsyncEnhancer {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public def groupByAsync(Closure cl) {
+    public def groupByParallel(Closure cl) {
         Asynchronizer.withExistingAsynchronizer(threadPool.executorService) {
-            AsyncInvokerUtil.groupByAsync(mixedIn[Object], cl)
+            AsyncInvokerUtil.groupByParallel(mixedIn[Object], cl)
         }
     }
 }

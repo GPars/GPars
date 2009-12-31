@@ -16,22 +16,20 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.scheduler.ResizeablePool
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
  * Use static import to be able to call Actors methods without the need to prepend them with the Actors identifier.
  * <pre>
- * import static org.gpars.actors.Actors.*
+ * import static org.gpars.actor.Actors.*
  *
  * Actors.defaultPooledActorGroup.resize 1
  *
- * def actor = actor {
- *     react {message ->
+ * def actor = actor {*     react {message ->
  *         println message
- *     }
- *     //this line will never be reached
- * }.start()
+ *}*     //this line will never be reached
+ *}.start()
  *
  * actor.send 'Hi!'
  * </pre>
@@ -40,7 +38,7 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
  * on daemon threads.
  * The PooledActorGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
  * threads are to be used.
- * @author Vaclav Pech
+ * @author Vaclav Pech, Alex Tkachman
  * Date: Feb 18, 2009
  */
 public abstract class Actors {
@@ -48,7 +46,7 @@ public abstract class Actors {
     /**
      * The default actor group to share by all actors created through the Actors class.
      */
-    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup()
+    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(new ResizeablePool(true))
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
@@ -56,7 +54,7 @@ public abstract class Actors {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the AbstractPooledActor class
      */
-    public static AbstractPooledActor actor(Closure handler) {
+    public static AbstractPooledActor actor(Runnable handler) {
         return defaultPooledActorGroup.actor(handler)
     }
 
@@ -70,5 +68,13 @@ public abstract class Actors {
      */
     public static AbstractPooledActor reactor(final Closure code) {
         return defaultPooledActorGroup.reactor(code)
+    }
+
+    /**
+     * Creates an instance of DynamicDispatchActor.
+     * @param code The closure specifying individual message handlers.
+     */
+    public static AbstractPooledActor messageHandler(final Closure code) {
+        return defaultPooledActorGroup.messageHandler(code)
     }
 }

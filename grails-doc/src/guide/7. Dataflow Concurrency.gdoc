@@ -1,0 +1,129 @@
+Dataflow concurrency offers an alternative concurrency model, which is inherently safe and robust.
+
+h2. Introduction
+
+Check out the small example written in Groovy using GPars, which sums results of calculations performed by three concurrently run tasks:
+{code}
+import static groovyx.gpars.dataflow.DataFlow.task
+
+final def x = new DataFlowVariable()
+final def y = new DataFlowVariable()
+final def z = new DataFlowVariable()
+
+task {
+    z << x.val + y.val
+    println "Result: ${z.val}"
+}
+
+task {
+    x << 10
+}
+
+task {
+    y << 5
+}
+{code}
+
+Or the same algorithm rewriten using the _DataFlows_ class.
+
+{code}
+
+import static groovyx.gpars.dataflow.DataFlow.task
+
+final def df = new DataFlows()
+
+task {
+    df.z = df.x + df.y
+    println "Result: ${df.z}"
+}
+
+task {
+    df.x = 10
+}
+
+task {
+    df.y = 5
+}
+{code}
+
+We start three logical tasks, which can run in parallel and perform their particular activities. The tasks need to exchange data and they do so using *Dataflow Variables*.
+Think of Dataflow Variables as one-shot channels safely and reliably tranferring data from producers to their consumers.
+
+The Dataflow Variables have a pretty straightforward semantics. When a task needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another taks or thread (using the '<<' operator). Each _DataFlowVariable_ can be set *only once* in its lifetime. Notice that you don't have to bother with ordering and synchronizing the tasks or threads and their access to shared variables. The values are magically transferred among tasks at the right time without your intervention.
+The data flow seamlessly among tasks / threads without your intervention or care.
+
+*Implementation detail:* The three tasks in the example *do not necessarily need to be mapped to three physical threads*. Tasks represent so-called "green" or "logical" threads and can be mapped under the covers to any number of physical threads. The actual mapping depends on the scheduler, but the outcome of dataflow algorithms doesn't depend on the actual scheduling.
+
+h2. Benefits
+
+Here's what you gain by using Dataflow Concurrency (by "Jonas Bonér":http://www.jonasboner.com ):
+
+* No race-conditions
+* No live-locks
+* Deterministic deadlocks
+* Completely deterministic programs
+* BEAUTIFUL code.
+
+This doesn't sound bad, does it?
+
+h1. Concepts
+
+h2. Dataflow programming
+
+_Quoting Wikipedia_
+
+Operations (in Dataflow programs) consist of "black boxes" with inputs and outputs, all of which are always explicitly defined. They run as soon as all of their inputs become valid, as opposed to when the program encounters them. Whereas a traditional program essentially consists of a series of statements saying "do this, now do this", a dataflow program is more like a series of workers on an assembly line, who will do their assigned task as soon as the materials arrive. This is why dataflow languages are inherently parallel; the operations have no hidden state to keep track of, and the operations are all "ready" at the same time.
+
+h2. Principles
+
+With Dataflow Concurrency you can safely share variables across tasks. These variables (in Groovy instances of the _DataFlowVariable_ class) can only be assigned (using the '<<' operator) a value once in their lifetime. The values of the variables, on the other hand, can be read multiple times (in Groovy through the val property), even before the value has been assigned. In such cases the reading task is suspended until the value is set by another task.
+So you can simply write your code for each task sequentially using Dataflow Variables and the underlying mechanics will make sure you get all the values you need in a thread-safe manner.
+
+In brief, you generally perform three operations with Dataflow variables:
+* Create a dataflow variable
+* Wait for the variable to be bound (read it)
+* Bind the variable (write to it)
+
+And these are the three essential rules your programs have to follow:
+* When the program encounters an unbound variable it waits for a value.
+* It is not possible to change the value of a dataflow variable once it is bound.
+* Dataflow variables makes it easy to create concurrent stream agents.
+
+h2. Dataflow Streams
+
+Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams to have a full picture of Dataflow Concurrency. Except for dataflow variables there's also a concept of _DataFlowStreams_ that you can leverage. You may think of them as thread-safe buffers or queues. Check out a typical producer-consumer demo:
+
+{code}import static groovyx.gpars.dataflow.DataFlow.task
+
+def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']
+final def buffer = new DataFlowStream()
+
+task {
+    for (word in words) {
+        buffer << word.toUpperCase()  //add to the buffer
+    }
+}
+
+task {
+    while(true) println buffer.val  //read from the buffer in a loop
+}
+{code}
+
+h2. Bind handlers
+
+{code}
+def a = new DataFlowVariable()
+a >> {println "The variable has just been bound to $it"}
+a.whenBound {println "Just to confirm that the variable has been really set to $it"}
+...
+{code}
+
+A bound handlers can be registered on Dataflow Variables either using the >> operator or the _whenBound()_ method. They will be run once a value is bound to the variable.
+
+h2. Further reading
+
+"Scala Dataflow library":http://github.com/jboner/scala-dataflow/tree/f9a38992f5abed4df0b12f6a5293f703aa04dc33/src by Jonas Bonér
+
+"JVM concurrency presentation slides":http://jonasboner.com/talks/state_youre_doing_it_wrong/html/all.html by Jonas Bonér
+
+"Dataflow Concurrency library for Ruby":http://github.com/larrytheliquid/dataflow/tree/master

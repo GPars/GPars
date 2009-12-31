@@ -17,29 +17,28 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * A producer consumer sample, where the producer generates numbers into the DataFlowStream and the consumer
  * takes a snapshot of the DataFlowStream using the collect() method to calculate summary of the numbers in the stream.
  */
-
 void ints(int n, int max, DataFlowStream<Integer> stream) {
     if (n != max) {
         println "Generating int: $n"
         stream << n
-        ints(n+1, max, stream)
+        ints(n + 1, max, stream)
     }
 }
 
 final def producer = new DataFlowStream<Integer>()
 
-start {
+task {
     ints(0, 1000, producer)
 }
 
-start {
+task {
     Thread.sleep(1000)
-    println "Sum: ${producer.collect{it * it}.inject(0){sum, x -> sum + x}}"
+    println "Sum: ${producer.collect {it * it}.inject(0) {sum, x -> sum + x}}"
     System.exit 0
 }

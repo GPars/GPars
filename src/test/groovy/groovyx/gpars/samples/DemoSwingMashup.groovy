@@ -18,7 +18,6 @@ package groovyx.gpars.samples
 
 import groovy.swing.SwingBuilder
 import javax.swing.JFrame
-import static groovyx.gpars.Parallelizer.withParallelizer
 
 /**
  * A simple mashup sample, downloads content of three websites and checks how many of them refer to Groovy.
@@ -37,18 +36,24 @@ final def threadPoolSize = 2  //feel free to play around with various values
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
     vbox() {
-        label 'Sites:'
+        panel() {
+            gridLayout()
+            label 'Sites:'
+        }
         scrollPane() {
             textArea(columns: 80, rows: 20, id: 'result')
         }
-        label 'Log:'
+        panel() {
+            gridLayout()
+            label 'Log:'
+        }
         scrollPane() {
             textArea(columns: 80, rows: 25, id: 'logMessages')
         }
-        button('Click', actionPerformed: {
-            doOutside {
-                withParallelizer(threadPoolSize) {
-                    urls.eachAsync {url ->
+        hbox {
+            button('Search for Groovy', mnemonic: 'S', actionPerformed: {
+                doOutside {
+                    urls.each {url ->
                         edt {logMessages.text += "Started downloading from $url \n"}
                         def content = url.toURL().text
                         edt {logMessages.text += "Done downloading from $url \n"}
@@ -58,8 +63,8 @@ final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation:
                             }
                     }
                 }
-            }
-        })
+            })
+        }
     }
 }
 

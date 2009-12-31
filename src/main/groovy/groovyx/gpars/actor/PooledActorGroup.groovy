@@ -16,8 +16,8 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.Pool
 
 /**
  * Provides logical grouping for pooled actors. Each group has an underlying thread pool, which will perform actions
@@ -29,11 +29,9 @@ import groovyx.gpars.scheduler.DefaultPool
  * def group = new PooledActorGroup()
  * group.resize 1
  *
- * def actor = group.actor {
- *     react {message ->
+ * def actor = group.actor {*     react {message ->
  *         println message
- *     }
- * }.start()
+ *}*}.start()
  *
  * actor.send 'Hi!'
  * ...
@@ -67,7 +65,6 @@ public final class PooledActorGroup extends ActorGroup {
     public def PooledActorGroup(final Pool threadPool) {
         super(threadPool)
     }
-
 
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.

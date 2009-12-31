@@ -8,11 +8,11 @@ package groovyx.gpars.issues
  * To change this template use File | Settings | File Templates.
  */
 
- class FailingA {
-     protected void act() {
-         throw new UnsupportedOperationException()
-     }
- }
+class FailingA {
+    protected void act() {
+        throw new UnsupportedOperationException()
+    }
+}
 
 //@Immutable
 final class FailingB extends FailingA {

@@ -1,0 +1,57 @@
+h3. Creating an actor using a factory method
+{code}
+Actors.actor {
+    println "actor1 has started"
+
+    delegate.metaClass {
+        afterStop = {List undeliveredMessages ->
+            println "actor1 has stopped"
+        }
+
+        onInterrupt = {InterruptedException e ->
+            println "actor1 has been interrupted"
+        }
+
+        onTimeout = {->
+            println "actor1 has timed out"
+        }
+
+        onException = {Exception e ->
+            println "actor1 threw an exception"
+        }
+    }
+    println("Running actor1")
+    ...
+}
+{code}
+
+h3. Sub-classing the _AbstractPooledActor_ class
+{code}
+class PooledLifeCycleSampleActor extends AbstractPooledActor {
+
+    protected void act() {
+        println("Running actor2")
+        ...
+    }
+
+    private void afterStart() {
+        println "actor2 has started"
+    }
+
+    private void afterStop(List undeliveredMessages) {
+        println "actor2 has stopped"
+    }
+
+    private void onInterrupt(InterruptedException e) {
+        println "actor2 has been interrupted"
+    }
+
+    private void onTimeout() {
+        println "actor2 has timed out"
+    }
+
+    private void onException(Exception e) {
+        println "actor2 threw an exception"
+    }
+}
+{code}

@@ -1,0 +1,80 @@
+h3. Dataflow Variables
+
+{code}
+import static groovyx.gpars.dataflow.DataFlow.task
+
+final def x = new DataFlowVariable()
+final def y = new DataFlowVariable()
+final def z = new DataFlowVariable()
+
+task {
+    z << x.val + y.val
+    println "Result: ${z.val}"
+}
+
+task {
+    x << 10
+}
+
+task {
+    y << 5
+}
+{code}
+
+h3. DataFlows
+
+{code}
+
+import static groovyx.gpars.dataflow.DataFlow.task
+
+final def df = new DataFlows()
+
+task {
+    df.z = df.x + df.y
+    println "Result: ${df.z}"
+}
+
+task {
+    df.x = 10
+}
+
+task {
+    df.y = 5
+}
+{code}
+
+h3. Dataflow Streams
+
+{code}import static groovyx.gpars.dataflow.DataFlow.task
+
+def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']
+final def buffer = new DataFlowStream()
+
+task {
+    for (word in words) {
+        buffer << word.toUpperCase()  //add to the buffer
+    }
+}
+
+task {
+    while(true) println buffer.val  //read from the buffer in a loop
+}
+{code}
+
+h3. Bind handlers
+
+{code}
+def a = new DataFlowVariable()
+a >> {println "The variable has just been bound to $it"}
+a.whenBound {println "Just to confirm that the variable has been really set to $it"}
+...
+{code}
+
+h3. Dataflow operators
+
+{code}
+operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+    ...
+    bindOutput 0, x + y + z
+}
+{code}

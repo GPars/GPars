@@ -16,29 +16,31 @@
 
 package groovyx.gpars
 
+import java.util.concurrent.ConcurrentHashMap
+
 public class ParallelEnhancerTest extends GroovyTestCase {
     public void testInstanceEnhancement() {
         final List list = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance list
-        assert list.allAsync {it > 0}
-        assertEquals 1, list.findAsync {it < 2}
-        assertEquals([1, 2], list.findAllAsync {it < 3})
-        assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
+        assert list.everyParallel {it > 0}
+        assertEquals 1, list.findParallel {it < 2}
+        assertEquals([1, 2], list.findAllParallel {it < 3})
+        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
         def result = Collections.synchronizedSet(new HashSet())
-        list.eachAsync {result << 2 * it}
+        list.eachParallel {result << 2 * it}
         assertEquals(new HashSet([2, 4, 6, 8, 10]), result)
     }
 
     public void testClassEnhancement() {
         ParallelEnhancer.enhanceClass LinkedList
         final List list = new LinkedList([1, 2, 3, 4, 5])
-        assert list.anyAsync {it > 4}
-        assert list.allAsync {it > 0}
-        assertEquals 1, list.findAsync {it < 2}
-        assertEquals([1, 2], list.findAllAsync {it < 3})
-        assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
+        assert list.anyParallel {it > 4}
+        assert list.everyParallel {it > 0}
+        assertEquals 1, list.findParallel {it < 2}
+        assertEquals([1, 2], list.findAllParallel {it < 3})
+        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
         def result = Collections.synchronizedSet(new HashSet())
-        list.eachAsync {result << 2 * it}
+        list.eachParallel {result << 2 * it}
         assertEquals(5, result.size())
         assertEquals(new HashSet([2, 4, 6, 8, 10]), result)
     }
@@ -46,15 +48,15 @@ public class ParallelEnhancerTest extends GroovyTestCase {
     public void testMapInstanceEnhancement() {
         final Map map = [1: 1, 2: 2, 3: 3, 4: 4, 5: 5]
         ParallelEnhancer.enhanceInstance map
-        assert map.anyAsync {it.key > 4}
-        assert map.allAsync {it.value > 0}
+        assert map.anyParallel {it.key > 4}
+        assert map.everyParallel {it.value > 0}
     }
 
     public void testMapClassEnhancement() {
         ParallelEnhancer.enhanceClass HashMap
         final Map map = new HashMap([1: 1, 2: 2, 3: 3, 4: 4, 5: 5])
-        assert map.anyAsync {it.key > 4}
-        assert map.allAsync {it.value > 0}
+        assert map.anyParallel {it.key > 4}
+        assert map.everyParallel {it.value > 0}
     }
 
     public void testInstanceEnhancementException() {
@@ -71,20 +73,119 @@ public class ParallelEnhancerTest extends GroovyTestCase {
     public void testDualEnhancement() {
         ParallelEnhancer.enhanceClass LinkedList
         final List list = new LinkedList([1, 2, 3, 4, 5])
-        assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
+        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
 
         ParallelEnhancer.enhanceInstance list
-        assertEquals([2, 4, 6, 8, 10], list.collectAsync {2 * it})
+        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
 
-        assertEquals([2, 4, 6, 8, 10], new LinkedList([1, 2, 3, 4, 5]).collectAsync {2 * it})
+        assertEquals([2, 4, 6, 8, 10], new LinkedList([1, 2, 3, 4, 5]).collectParallel {2 * it})
     }
 
     private String performExceptionCheck(List list) {
-        shouldFail(IllegalArgumentException) {list.anyAsync {if (it > 4) throw new IllegalArgumentException('test') else false}}
-        shouldFail(IllegalArgumentException) {list.allAsync {if (it > 4) throw new IllegalArgumentException('test') else true}}
-        shouldFail(IllegalArgumentException) {list.findAsync {if (it > 4) throw new IllegalArgumentException('test') else false}}
-        shouldFail(IllegalArgumentException) {list.findAllAsync {if (it > 4) throw new IllegalArgumentException('test') else true}}
-        shouldFail(IllegalArgumentException) {list.collectAsync {if (it > 4) throw new IllegalArgumentException('test') else 1}}
-        shouldFail(IllegalArgumentException) {list.eachAsync {if (it > 4) throw new IllegalArgumentException('test')}}
+        shouldFail(IllegalArgumentException) {list.anyParallel {if (it > 4) throw new IllegalArgumentException('test') else false}}
+        shouldFail(IllegalArgumentException) {list.everyParallel {if (it > 4) throw new IllegalArgumentException('test') else true}}
+        shouldFail(IllegalArgumentException) {list.findParallel {if (it > 4) throw new IllegalArgumentException('test') else false}}
+        shouldFail(IllegalArgumentException) {list.findAllParallel {if (it > 4) throw new IllegalArgumentException('test') else true}}
+        shouldFail(IllegalArgumentException) {list.collectParallel {if (it > 4) throw new IllegalArgumentException('test') else 1}}
+        shouldFail(IllegalArgumentException) {list.eachParallel {if (it > 4) throw new IllegalArgumentException('test')}}
+    }
+
+    public void testEnhancementPropagationToResults() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        ParallelEnhancer.enhanceInstance items
+        items.collectParallel {it * 2}.findAllParallel {it > 1}.eachParallel {
+            Thread.sleep 500
+            map[Thread.currentThread()] = ''
+        }
+        assert map.keys().size() > 2
+    }
+
+    public void testMin() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+        assertEquals 1, list.minParallel {a, b -> a - b}
+        assertEquals 1, list.minParallel {it}
+        assertEquals 5, list.minParallel {a, b -> b - a}
+        assertEquals 1, list.minParallel()
+    }
+
+    public void testMax() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 5, list.maxParallel {a, b -> a - b}
+        assertEquals 5, list.maxParallel {it}
+        assertEquals 1, list.maxParallel {a, b -> b - a}
+        assertEquals 5, list.maxParallel()
+    }
+
+    public void testSum() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 15, list.sumParallel()
+
+        def s = 'aaaaabbbbccccc'
+        ParallelEnhancer.enhanceInstance s
+        assertEquals 'aaaaabbbbccccc', s.sumParallel()
+    }
+
+    public void testCount() {
+        assertEquals 1, ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).countParallel(3)
+        assertEquals 5, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(3)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(6)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([]).countParallel(6)
+        assertEquals 1, ParallelEnhancer.enhanceInstance('abc3').countParallel('a')
+        assertEquals 3, ParallelEnhancer.enhanceInstance('abcaa3').countParallel('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance('ebc3').countParallel('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance(' '.trim()).countParallel('a')
+    }
+
+    public void testSplit() {
+        def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).splitParallel {it > 2}
+        assert [3, 4, 5] as Set == result[0] as Set
+        assert [1, 2] as Set == result[1] as Set
+        assertEquals 2, result.size()
+        assert [[], []] == ParallelEnhancer.enhanceInstance([]).splitParallel {it > 2}
+        result = ParallelEnhancer.enhanceInstance([3]).splitParallel {it > 2}
+        assert [[3], []] == result
+        result = ParallelEnhancer.enhanceInstance([1]).splitParallel {it > 2}
+        assert [[], [1]] == result
+    }
+
+    public void testSplitOnString() {
+        def result = ParallelEnhancer.enhanceInstance(new String('abc')).splitParallel {it == 'b'}
+        assert ['b'] as Set == result[0] as Set
+        assert ['a', 'c'] as Set == result[1] as Set
+        assertEquals 2, result.size()
+        result = ParallelEnhancer.enhanceInstance('').splitParallel {it == 'b'}
+        assert [[], []] == result
+        result = ParallelEnhancer.enhanceInstance('b').splitParallel {it == 'b'}
+        assert [['b'], []] == result
+        result = ParallelEnhancer.enhanceInstance('a').splitParallel {it == 'b'}
+        assert [[], ['a']] == result
+    }
+
+    public void testReduce() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 15, list.foldParallel() {a, b -> a + b}
+        assertEquals 55, list.collectParallel {it ** 2}.foldParallel {a, b -> a + b}
+    }
+
+    public void testReduceThreads() {
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 15, list.foldParallel {a, b ->
+            Thread.sleep 200
+            map[Thread.currentThread()] = ''
+            a + b
+        }
+        assert map.keys().size() > 1
     }
 }

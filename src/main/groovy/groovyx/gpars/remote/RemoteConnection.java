@@ -1,6 +1,6 @@
 package groovyx.gpars.remote;
 
-import groovyx.gpars.remote.messages.HostIdMsg;
+import groovyx.gpars.remote.message.HostIdMsg;
 import groovyx.gpars.serial.SerialMsg;
 
 /**
@@ -21,8 +21,9 @@ public abstract class RemoteConnection {
         if (host == null) {
             final HostIdMsg idMsg = (HostIdMsg) msg;
             host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
-        } else
+        } else {
             throw new IllegalStateException("Unexpected message: " + msg);
+        }
     }
 
     public void onException(Throwable cause) {

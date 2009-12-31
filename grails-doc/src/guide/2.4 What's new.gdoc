@@ -1,0 +1,51 @@
+The GPars 0.9 release introduces a lot of changes and additions compared to the previous GParallelizer 0.8.4 release.
+
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=15702
+
+h3. Project changes
+
+* Moved to "Codehaus":http://gpars.codehaus.org
+* Provided a "User Guide":http://www.gpars.org/guide/index.html
+* Changed the package structure
+* Fully built using Gradle
+* Continually built on "JetBrains public TeamCity site":http://teamcity.jetbrains.com/ and on "Codehaus Bamboo":http://bamboo.ci.codehaus.org/browse/GPARS-DEF
+* Experimental OSGi support
+
+h3. Parallel collections
+
+* Map/Reduce
+* Transparently parallel methods added allowing to change the sequential semantics of the usual each(), collect() and such methods to a concurrent one
+* Parallel methods renamed from xxxAsync to xxxParallel to better capture the nature of the methods. E. g. eachAsync() is now eachParallel().
+* New parallel methods added - groupByParallel(), minParallel(), maxParallel(), sumParallel(), foldParallel(), grepParallel()
+* The allParallel() method renamed to everyParallel()
+* The withParallelizer() and withAsynchronizer() methods have been renamed to doParallel()
+
+h3. Actors
+
+* No need to start actors explicitly after calling the _actor()_ factory method
+* Enabled receive() for blocking message read in event-driven actors
+* Removed thread-bound actors
+* Created a DSL to add message handlers to DynamicDispatchActor at construction time
+* The sendAndContinue() method
+* Performance improvements
+* Reorganized daemon and non-daemon actor groups
+* Resizeable thread-pool used by the default actor group
+* Modified the reply mechanism
+* The message sender property has been added to messages
+
+h3. Dataflow
+
+* Lightweight Dataflow Tasks added
+* Full-blown Dataflow Operators created
+* The DataFlows class added to provide a convenient container for dataflow variables indexed by either a name or a number
+* Bound handlers through the >> operator - register closures, which will get invoked once the dataflow variable gets bound to a value
+
+h3. Safe
+
+* An await() method added to allow callers to synchronize with the agent
+* Higher reader priority supported
+
+h3. Other
+
+* Levering "GroovyDSL API in IntelliJ IDEA":http://jetbrains.dzone.com/articles/custom-groovy-dsl-support to get IDE support for GPars DSLs
+* Added Fork / Join convenience abstraction layer for hierarchical (divide and conquer) tasks

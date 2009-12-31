@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /**
  * Demonstrates work balancing among adaptable set of workers.
@@ -107,7 +107,7 @@ Thread.start {
     }
 }
 
-System.in.read()
+Thread.sleep 35000
 balancer << new WorkToDo()
 balancer << new WorkToDo()
-System.in.read()
+Thread.sleep 10000

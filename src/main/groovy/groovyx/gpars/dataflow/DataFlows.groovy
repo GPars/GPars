@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentMap
 /**
  * Convenience class that makes working with DataFlowVariables more comfortable.
  *
- * See the implementation of {@link groovyx.gpars.samples.dataflow.DemoDataFlows} for a full example.
+ * See the implementation of   {@link groovyx.gpars.samples.dataflow.DemoDataFlows}   for a full example.
  *
  * A DataFlows instance is a bean with properties of type DataFlowVariable.
  * Property access is relayed to the access methods of DataFlowVariable.
@@ -33,11 +33,11 @@ import java.util.concurrent.ConcurrentMap
  * This allows a rather compact usage of DataFlowVariables like
  *
  * <pre>
-final df = new DataFlows()
-start { df[0] = df.x + df.y }
-start { df.x = 10 }
-start { df.y = 5 }
-assert 15 == df[0]
+ final df = new DataFlows()
+ start { df[0] = df.x + df.y }
+ start { df.x = 10 }
+ start { df.y = 5 }
+ assert 15 == df[0]
  * </pre>
  *
  * @author Vaclav Pech, Dierk Koenig, Alex Tkachman
@@ -52,10 +52,10 @@ public final class DataFlows {
     private ConcurrentMap variables = null
 
     // copy from ConcurrentHashMap for jdk 1.5 backwards compatibility
-    static final int    DEFAULT_INITIAL_CAPACITY = 16
-    static final float  DEFAULT_LOAD_FACTOR = 0.75f
-    static final int    DEFAULT_CONCURRENCY_LEVEL = 16
-    static final int    MAX_SEGMENTS = 1 << 16;
+    static final int DEFAULT_INITIAL_CAPACITY = 16
+    static final float DEFAULT_LOAD_FACTOR = 0.75f
+    static final int DEFAULT_CONCURRENCY_LEVEL = 16
+    static final int MAX_SEGMENTS = 1 << 16;
 
     /**
      * Constructor that supports the various constructors of the underlying
@@ -63,9 +63,9 @@ public final class DataFlows {
      * @see java.util.concurrent.ConcurrentHashMap
      */
     DataFlows(
-            int initialCapacity = DEFAULT_INITIAL_CAPACITY,
-            float loadFactor    = DEFAULT_LOAD_FACTOR,
-            int concurrencyLevel= DEFAULT_CONCURRENCY_LEVEL) {
+    int initialCapacity = DEFAULT_INITIAL_CAPACITY,
+    float loadFactor = DEFAULT_LOAD_FACTOR,
+    int concurrencyLevel = DEFAULT_CONCURRENCY_LEVEL) {
         variables = new ConcurrentHashMap(initialCapacity, loadFactor, concurrencyLevel)
     }
 
@@ -92,10 +92,8 @@ public final class DataFlows {
      * Allows for invoking whenBound() on the dataflow variables.
      * <pre>
      * def df = new DataFlows()
-     * df.var {
-     *     println "Variable bound to $it"
-     * }
-     * </pre>
+     * df.var {*     println "Variable bound to $it"
+     *}* </pre>
      *
      * @param name the name of the method to call (the variable name)
      * @param args the arguments to use for the method call (a closure to invoke when a value is bound)
@@ -110,56 +108,56 @@ public final class DataFlows {
             throw new MissingMethodException(name, DataFlows, args)
     }
 
-  /**
-   * @return the value of the DataFlowVariable associated with the property "name".
-   * May block if the value is not scalar.
-   * @see DataFlowVariable#getVal
-   */
-    def getAt (index) {
-      ensureToContainVariable(index).val
+    /**
+     * @return the value of the DataFlowVariable associated with the property "name".
+     * May block if the value is not scalar.
+     * @see DataFlowVariable#getVal
+     */
+    def getAt(index) {
+        ensureToContainVariable(index).val
     }
 
-  /**
-   * Binds the value to the DataFlowVariable that is associated with the property "index".
-   * @param value a scalar or a DataFlowVariable that may block on value access
-   * @see DataFlowVariable#bind
-   */
-    void putAt (index,value) {
-      ensureToContainVariable(index) << value
+    /**
+     * Binds the value to the DataFlowVariable that is associated with the property "index".
+     * @param value a scalar or a DataFlowVariable that may block on value access
+     * @see DataFlowVariable#bind
+     */
+    void putAt(index, value) {
+        ensureToContainVariable(index) << value
     }
 
-   /**
-    * The idea is following:
-    * - we try to putIfAbsent dummy DFV in to map
-    * - if something real already there we are done
-    * - if not we obtain lock and put new DFV with double check
-    *
-    * Unfortunately we have to sync on this as there is no better option (God forbid to sync on name)
-    *
-    * @return DataFlowVariable corresponding to name
-    */
+    /**
+     * The idea is following:
+     * - we try to putIfAbsent dummy DFV in to map
+     * - if something real already there we are done
+     * - if not we obtain lock and put new DFV with double check
+     *
+     * Unfortunately we have to sync on this as there is no better option (God forbid to sync on name)
+     *
+     * @return DataFlowVariable corresponding to name
+     */
     private def ensureToContainVariable(name) {
-	    def df = variables.putIfAbsent(name, DUMMY)
+        def df = variables.putIfAbsent(name, DUMMY)
         if (!df || df == DUMMY) {
-          df = putNewUnderLock(name)
+            df = putNewUnderLock(name)
         }
         df
-	}
+    }
 
-  /**
-   * Utility method extracted just to help JIT
-   *
-   * @return DFV
-   */
+    /**
+     * Utility method extracted just to help JIT
+     *
+     * @return DFV
+     */
     private def putNewUnderLock(name) {
-      synchronized (lock) {
-        def df = variables[name]
-        if (!df || (df == DUMMY)) {
-          df = new DF()
-          variables[name] = df;
+        synchronized (lock) {
+            def df = variables[name]
+            if (!df || (df == DUMMY)) {
+                df = new DF()
+                variables[name] = df;
+            }
+            return df
         }
-        return df
-      }
     }
 
     /**
@@ -167,23 +165,22 @@ public final class DataFlows {
      * @param name The name of the DFV to remove.
      */
     public def remove(name) {
-        synchronized(lock) {
+        synchronized (lock) {
             def df = variables.remove(name)
             if (df) df.bindSafely(null)
         }
     }
 
     /**
-     * Checks whether a certain key is contained in the map. Doesn't chack, whether the variable has already been bound.
+     * Checks whether a certain key is contained in the map. Doesn't check, whether the variable has already been bound.
      * @param name The name of the DFV to check.
      */
-    //todo test
     public def contains(name) {
         variables.containsKey(name)
     }
 
     /**
-     * Convenience method to play nicely with Groovy's object iteration methods.
+     * Convenience method to play nicely with Groovy object iteration methods.
      * The iteration restrictions of ConcurrentHashMap concerning parallel access and
      * ConcurrentModificationException apply.
      * @return iterator over the stored key:DataFlowVariable value pairs

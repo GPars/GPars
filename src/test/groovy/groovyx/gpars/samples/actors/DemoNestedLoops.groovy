@@ -16,8 +16,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
-import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.AbstractPooledActor
 
 /**
  * Demonstrates a way to do continuation-style loops with Actors.
@@ -34,7 +33,7 @@ class MyLoopActor extends AbstractPooledActor {
     private void outerLoop() {
         react {a ->
             println 'Outer: ' + a
-            if (a!=0) innerLoop()
+            if (a != 0) innerLoop()
             else println 'Done'
         }
     }
@@ -73,9 +72,8 @@ actor.send 0
 
 
 
-Thread.sleep 3000
+Thread.sleep 2000
 actor.send 4
-Thread.sleep 3000
-
-Actors.defaultPooledActorGroup.shutdown()
+Thread.sleep 1000
+actor.stop()
 

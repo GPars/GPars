@@ -106,21 +106,21 @@ public class DataFlowsTest extends GroovyTestCase {
         assertEquals 10, result
     }
 
-      public void testIndexes() {
-          final DataFlows data = new DataFlows()
+    public void testIndexes() {
+        final DataFlows data = new DataFlows()
 
-          DataFlow.start {
+        DataFlow.start {
             //noinspection GroovyAssignmentCanBeOperatorAssignment
-              data[2] = data [0] - data [1]
-          }
-          DataFlow.start {
-            data [1] = 5
-          }
-          DataFlow.start {
-            data [0] = 7
-          }
-          assertEquals 2, data[2]
-      }
+            data[2] = data[0] - data[1]
+        }
+        DataFlow.start {
+            data[1] = 5
+        }
+        DataFlow.start {
+            data[0] = 7
+        }
+        assertEquals 2, data[2]
+    }
 
     public void testValueRemoval() {
         final DataFlows data = new DataFlows()
@@ -156,7 +156,7 @@ public class DataFlowsTest extends GroovyTestCase {
         final def y = data.y
         assertNull y
 
-        y=data.y  //retry
+        y = data.y  //retry
         assert y instanceof String
         assertEquals 'value', y
         assertEquals 'value', data.y
@@ -231,7 +231,7 @@ public class DataFlowsTest extends GroovyTestCase {
         data.x = 0
         data.y = 1
         def log = []
-        data.each { entry ->
+        data.each {entry ->
             log << entry.key
             log << entry.value
         }
@@ -249,6 +249,6 @@ public class DataFlowsTest extends GroovyTestCase {
         assertEquals 'y', data.find { it.value.val == 1 }.key
         assertEquals 2, data.findAll { it.key.size() == 1 }.size()
         assert data.every { it.key.size() == 1 }
-        assert data.any  { it.key.size() == 1 }
+        assert data.any { it.key.size() == 1 }
     }
 }

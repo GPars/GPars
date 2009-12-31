@@ -17,7 +17,6 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -37,7 +36,7 @@ Closure outerLoop = {->
 innerLoop = {->
     react {b ->
         println 'Inner ' + b
-        if (b==0) outerLoop()
+        if (b == 0) outerLoop()
         else innerLoop()
     }
 }
@@ -48,8 +47,6 @@ Actor actor = actor {
 outerLoop.delegate = actor
 innerLoop.delegate = actor
 
-actor.start()
-
 actor.send 1
 actor.send 1
 actor.send 1
@@ -67,6 +64,6 @@ actor.send 3
 actor.send 3
 actor.send 3
 
-Thread.sleep 5000
-Actors.defaultPooledActorGroup.shutdown()
+Thread.sleep 2000
+actor.stop()
 

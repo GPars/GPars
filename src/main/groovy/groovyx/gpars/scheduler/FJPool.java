@@ -16,6 +16,7 @@
 
 package groovyx.gpars.scheduler;
 
+import groovyx.gpars.util.PoolUtils;
 import jsr166y.forkjoin.ForkJoinPool;
 
 import java.util.concurrent.TimeUnit;
@@ -23,29 +24,31 @@ import java.util.concurrent.TimeUnit;
 /**
  * Represents the actors' thread pool, which performs tasks on behalf of the actors. Uses a ForkJoinPool from JSR-166y
  * The actors' thread pool size defaults to the n + 1, where n is the number of processors/cores available on the machine.
- * The VM parameter -Dgparallelizer.poolsize can be used the configure the default size of the actors' thread pool.
+ * The VM parameter -Dgpars.poolsize can be used the configure the default size of the actors' thread pool.
  * The resize() and resetDefaultSize() methods can be used to configure size of the thread pool at runtime.
  *
  * @author Vaclav Pech
- * Date: Feb 27, 2009
+ *         Date: Feb 27, 2009
  */
 public class FJPool implements Pool {
     protected ForkJoinPool pool;
     private final int configuredPoolSize;
+    private static final long DEFAULT_SHUTDOWN_TIMEOUT = 30L;
 
     /**
      * Creates the pool with default number of threads.
      */
     public FJPool() {
-        this(FJPool.retrieveDefaultPoolSize());
+        this(PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
      * Creates the pool with specified number of threads.
+     *
      * @param configuredPoolSize The required size of the pool
      */
     public FJPool(final int configuredPoolSize) {
-        if (configuredPoolSize <0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        if (configuredPoolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         this.configuredPoolSize = configuredPoolSize;
         pool = createPool(configuredPoolSize);
     }
@@ -53,16 +56,18 @@ public class FJPool implements Pool {
     /**
      * Creates a fork/join pool of given size. Each thread will have the uncaught exception handler set
      * to print the unhandled exception to standard error output.
+     *
      * @param poolSize The required pool size  @return The created thread pool
      * @return The newly created thread pool
      */
     private static ForkJoinPool createPool(final int poolSize) {
         assert poolSize > 0;
 
-        final ForkJoinPool pool =  new ForkJoinPool(poolSize);
+        final ForkJoinPool pool = new ForkJoinPool(poolSize);
         pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
             public void uncaughtException(final Thread t, final Throwable e) {
-                System.err.println(UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
+                System.err.println(UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                 e.printStackTrace(System.err);
             }
         });
@@ -71,10 +76,11 @@ public class FJPool implements Pool {
 
     /**
      * Resizes the thread pool to the specified value
+     *
      * @param poolSize The new pool size
      */
     public final void resize(final int poolSize) {
-        if (poolSize<0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         pool.setPoolSize(poolSize);
     }
 
@@ -82,11 +88,12 @@ public class FJPool implements Pool {
      * Sets the pool size to the default
      */
     public final void resetDefaultSize() {
-        resize(FJPool.retrieveDefaultPoolSize());
+        resize(PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
      * schedules a new task for processing with the pool
+     *
      * @param task The task to schedule
      */
     public void execute(final Runnable task) {
@@ -95,6 +102,7 @@ public class FJPool implements Pool {
 
     /**
      * Retrieves the internal executor service.
+     *
      * @return The underlying thread pool
      */
     public final ForkJoinPool getForkJoinPool() {
@@ -107,20 +115,13 @@ public class FJPool implements Pool {
     public final void shutdown() {
         pool.shutdown();
         try {
-            pool.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
+            pool.awaitTermination(DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();  // set the interrupted flag
         }
     }
 
-    private static int retrieveDefaultPoolSize() {
-        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
-        try {
-            return Integer.parseInt(poolSizeValue);
-        } catch (NumberFormatException e) {
-            return Runtime.getRuntime().availableProcessors() + 1;
-        }
+    protected final int getConfiguredPoolSize() {
+        return configuredPoolSize;
     }
-
-    protected final int getConfiguredPoolSize() { return configuredPoolSize; }
 }

@@ -1,7 +1,7 @@
 package groovyx.gpars.samples
 
+import groovyx.gpars.actor.AbstractPooledActor
 import java.util.concurrent.ArrayBlockingQueue
-import groovyx.gpars.actor.impl.AbstractPooledActor
 
 /*
 Demo for solving the classic sleeping barber problem with the help
@@ -13,12 +13,12 @@ are placeholders for business operations.
 @author Dierk Koenig, Vaclav Pech
 */
 
-/** The constants that define the world context of the barber shop.*/
+/** The constants that define the world context of the barber shop.  */
 class Shop {
-    static final shaveTime   = 100
-    static final seatCount   = 3
-    static final fairAccess  = true
-    static final seats       = new ArrayBlockingQueue(seatCount, fairAccess)
+    static final shaveTime = 100
+    static final seatCount = 3
+    static final fairAccess = true
+    static final seats = new ArrayBlockingQueue(seatCount, fairAccess)
 }
 
 /** The active element that makes sure that all actions happen in proper
@@ -47,15 +47,15 @@ class Customer extends AbstractPooledActor {
  */
 def barber = Thread.startDaemon {
     final NO_MESSAGE = null
-	while(true) {
+    while (true) {
         // here is a gotcha if a customer enters the shop after the empty check but before the println!
-		if (Shop.seats.empty) println "sleeping"
-		println Shop.seats.take().sendAndWait(NO_MESSAGE)
-	}
+        if (Shop.seats.empty) println "sleeping"
+        println Shop.seats.take().sendAndWait(NO_MESSAGE)
+    }
 }
 
 // start 15 customer actors with some delay to get the simulation running.
-def customers = (1..15).collect { new Customer(id:it) }
+def customers = (1..15).collect { new Customer(id: it) }
 def random = new Random()
 for (customer in customers) {
     customer.start()

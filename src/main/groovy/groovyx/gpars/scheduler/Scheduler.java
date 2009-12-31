@@ -16,8 +16,6 @@
 
 package groovyx.gpars.scheduler;
 
-import groovyx.gpars.scheduler.Pool;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +33,7 @@ public final class Scheduler implements Pool {
 
     AtomicInteger threadCount = new AtomicInteger();
 
-    volatile long lastTaskPoke = -10;
+    volatile long lastTaskPoke = -10L;
 
     volatile long schedulerTime;
 
@@ -104,7 +102,9 @@ public final class Scheduler implements Pool {
         for (int i = 0; i != count; ++i) {
             try {
                 queue.put(new Runnable() {
-                    public void run() { throw TERMINATE; }
+                    public void run() {
+                        throw TERMINATE;
+                    }
                 });
             } catch (InterruptedException ignored) { //
                 Thread.currentThread().interrupt();
@@ -133,7 +133,7 @@ public final class Scheduler implements Pool {
                         }
                         catch (Throwable t) {
                             if (TERMINATE != t) {
-                                //todo allow for a plugable handler
+                                //todo allow for a customizable handler
                                 t.printStackTrace();
                             }
                         }
@@ -157,10 +157,10 @@ public final class Scheduler implements Pool {
             while (!terminating) {
                 try {
                     schedulerTime++;
-                    if (schedulerTime > lastTaskPoke + 10) {
+                    if (schedulerTime > lastTaskPoke + 10L) {
                         startNewThread();
                     }
-                    Thread.sleep(50);
+                    Thread.sleep(50L);
                 } catch (InterruptedException e) {
                     break;
                 }

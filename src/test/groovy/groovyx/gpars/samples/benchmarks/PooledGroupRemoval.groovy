@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import java.util.concurrent.CountDownLatch
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.PooledActorGroup
+import java.util.concurrent.CountDownLatch
 
 final Random random = new Random(System.currentTimeMillis())
 
@@ -37,21 +37,21 @@ for (i in 0..10000) {
                 latch.countDown()
             }
         }
-    }.start()
+    }
 
     group.actor {
         actor << 'Message'
         react {
             latch.countDown()
         }
-    }.start()
+    }
     latch.await()
     group.shutdown()
 }
 cleanMemory()
 println 'Threads at finish: ' + Thread.threads.length
 final long memory2 = Runtime.runtime.freeMemory()
-println ((memory2 - memory1)/1000000)
+println((memory2 - memory1) / 1000000)
 assert memory2 - memory1 < 3000000
 
 private def cleanMemory() {

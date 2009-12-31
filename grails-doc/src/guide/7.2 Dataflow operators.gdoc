@@ -1,0 +1,53 @@
+Dataflow Operators provide a full Dataflow implementation with all the usual ceremony.
+
+h3. Concepts
+
+{code}
+operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+    ...
+    bindOutput 0, x + y + z
+}
+{code}
+
+{code}
+/**
+ * CACHE
+ *
+ * Caches sites' contents. Accepts requests for url content, outputs the content. Outputs requests for download
+ * if the site is not in cache yet.
+ */
+operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
+
+    if (!request.content) {
+        println "[Cache] Retrieving ${request.site}"
+        def content = cache[request.site]
+        if (content) {
+            println "[Cache] Found in cache"
+            bindOutput 1, [site: request.site, word:request.word, content: content]
+        } else {
+            def downloads = pendingDownloads[request.site]
+            if (downloads != null) {
+                println "[Cache] Awaiting download"
+                downloads << request
+            } else {
+                pendingDownloads[request.site] = []
+                println "[Cache] Asking for download"
+                bindOutput 0, request
+            }
+        }
+    } else {
+        println "[Cache] Caching ${request.site}"
+        cache[request.site] = request.content
+        bindOutput 1, request
+        def downloads = pendingDownloads[request.site]
+        if (downloads != null) {
+            for (downloadRequest in downloads) {
+                println "[Cache] Waking up"
+                bindOutput 1, [site: downloadRequest.site, word:downloadRequest.word, content: request.content]
+            }
+            pendingDownloads.remove(request.site)
+        }
+    }
+}
+{code}
+

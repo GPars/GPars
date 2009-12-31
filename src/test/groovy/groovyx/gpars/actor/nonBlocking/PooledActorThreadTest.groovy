@@ -16,9 +16,9 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import java.util.concurrent.CountDownLatch
 
 public class PooledActorThreadTest extends GroovyTestCase {
     public void testActorThread() {
@@ -28,13 +28,13 @@ public class PooledActorThreadTest extends GroovyTestCase {
 
         final Actor actor
         actor = Actors.actor {
-            flag1=isActorThread()
+            flag1 = isActorThread()
             react {
-                flag2=isActorThread()
+                flag2 = isActorThread()
                 latch.countDown()
             }
 
-        }.start()
+        }
 
         assertFalse actor.isActorThread()
         actor.send 'Message'

@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module relativePaths="true" type="JAVA_MODULE" version="4">
-  <component name="BuildJarSettings">
-    <containerInfo>
-      <containerElement type="module" name="Parallelizer">
-        <attribute name="method" value="1" />
-      </containerElement>
-    </containerInfo>
-    <setting name="jarUrl" value="file://$MODULE_DIR$/GParallelizer-0.6.1.jar" />
-    <setting name="buildJar" value="true" />
-    <setting name="mainClass" value="" />
-  </component>
-  <component name="FacetManager">
-    <facet type="Groovy" name="Groovy">
-      <configuration compile="true" />
-    </facet>
-  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -23,19 +8,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/groovy" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/antbuild" />
+      <excludeFolder url="file://$MODULE_DIR$/artwork" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/junit-4.5.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -56,7 +34,12 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="groovy-1.6.5" level="application" />
+    <orderEntry type="library" name="Groovy-1.6.7" level="application" />
+  </component>
+  <component name="copyright">
+    <Base>
+      <setting name="state" value="2" />
+    </Base>
   </component>
 </module>
 

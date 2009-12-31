@@ -1,0 +1,117 @@
+Fork/Join or Divide and Conquer is a very powerful abstraction to solve hierarchical problems. 
+
+h2. The abstraction
+
+When talking about hierarchical problems, think about quick sort, merge sort, file system or general tree navigation and such.
+
+ * Fork / Join algorithms essentially split a problem at hands into several smaller sub-problems and recursively apply the same algorithm to each of the sub-problems.
+ * Once the sub-problem is small enough, it is solved directly.
+ * The solutions of all sub-problems are combined to solve their parent problem, which in turn helps solve its own parent problem.
+
+The mighty *JSR-166y* library solves Fork / Join orchestration pretty nicely for us, but leaves a couple of rough edges, which can hurt you, if you don't pay attention enough. You still deal
+with threads, pools and synchronization barriers.
+
+h3. The GPars abstraction convenience layer
+
+GPars can hide the complexities of dealing with threads, pools, barriers and RecursiveActions from you, yet let you leverage the powerful Fork/Join implementation in jsr166y.
+
+{code}
+public final class FileCounter extends AbstractForkJoinWorker<Long> {
+    private final File file;
+
+    def FileCounter(final File file) {
+        this.file = file
+    }
+
+    protected void compute() {
+        long count = 0;
+        file.eachFile {
+            if (it.isDirectory()) {
+                println "Forking a thread for $it"
+                forkOffChild(new FileCounter(it))           //fork a child task
+            } else {
+                count++
+            }
+        }
+        setResult(count + ((childrenResults)?.sum() ?: 0))  //use results of children tasks to calculate and store own result
+    }
+}
+
+doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
+    println "Number of files: ${orchestrate(new FileCounter(new File("..")))}"
+}
+
+{code}
+
+h3. Fork / Join saves your resources
+
+Fork/Join operations can be safely run with small number of threads thanks to internally using the TaskBarrier class to synchronize the threads. While a thread is blocked inside an algorithm waiting for its sub-problems to be calculated, the thread is silently returned to the pool to take on any of the available sub-problems from the task queue and process them.
+Although the algorithm creates as many tasks as there are sub-directories and tasks wait for the sub-directory tasks to complete, as few as one thread is enough to keep the computation going and eventually calculate a valid result.
+
+h3. Mergesort example
+
+{code}
+public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
+    private final List numbers
+
+    def SortWorker(final List<Integer> numbers) {
+        this.numbers = numbers.asImmutable()
+    }
+
+    /**
+     * Splits a list of numbers in half
+     */
+    def split(List<Integer> list) {
+        int listSize = list.size()
+        int middleIndex = listSize / 2
+        def list1 = list[0..<middleIndex]
+        def list2 = list[middleIndex..listSize - 1]
+        return [list1, list2]
+    }
+
+    /**
+     * Merges two sorted lists into one
+     */
+    List<Integer> merge(List<Integer> a, List<Integer> b) {
+        int i = 0, j = 0
+        final int newSize = a.size() + b.size()
+        List<Integer> result = new ArrayList<Integer>(newSize)
+
+        while ((i < a.size()) && (j < b.size())) {
+            if (a[i] <= b[j]) result << a[i++]
+            else result << b[j++]
+        }
+
+        if (i < a.size()) result.addAll(a[i..-1])
+        else result.addAll(b[j..-1])
+        return result
+    }
+
+    /**
+     * Sorts a small list or delegates to two children, if the list contains more than two elements.
+     */
+    protected void compute() {
+        println "Thread ${Thread.currentThread().name[-1]}: Sorting $numbers"
+        switch (numbers.size()) {
+            case 0..1:
+                setResult numbers                                   //store own result
+                break
+            case 2:
+                if (numbers[0] <= numbers[1]) setResult numbers     //store own result
+                else setResult numbers[-1..0]                       //store own result
+                break
+            default:
+                def splitList = split(numbers)
+                [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each{forkOffChild it}  //fork a child task
+                setResult merge(* childrenResults)      //use results of children tasks to calculate and store own result
+        }
+    }
+}
+
+final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
+
+doParallel(1) {  //feel free to experiment with the number of fork/join threads in the pool
+    println "Sorted numbers: ${orchestrate(new SortWorker(numbers))}"
+}
+
+{code}

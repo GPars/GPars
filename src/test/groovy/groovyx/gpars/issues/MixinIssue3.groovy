@@ -35,6 +35,6 @@ C3.metaClass {
     mixin B3
 }
 
-def c= new C3()
+def c = new C3()
 c.foo()
 

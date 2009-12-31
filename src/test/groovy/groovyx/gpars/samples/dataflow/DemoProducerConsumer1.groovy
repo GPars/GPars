@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * A simple producer consumer sample showing use of the DataFlowStream class. 
@@ -25,14 +25,14 @@ import static groovyx.gpars.dataflow.DataFlow.start
 def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GParallelizer', 'data', 'flow']
 final def buffer = new DataFlowStream()
 
-start {
+task {
     for (word in words) {
         buffer << word.toUpperCase()
     }
 }
 
-start {
-    while(true) println buffer.val
+task {
+    while (true) println buffer.val
 }
 
 System.in.read()

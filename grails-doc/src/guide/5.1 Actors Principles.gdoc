@@ -1,0 +1,364 @@
+Actors share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned back to the pool once a message has been processed and the actor is idle waiting for some more messages to arrive. Actors become detached from the underlying threads and so a relatively small thread pool can serve potentially unlimited number of actors. Virtually unlimited scalability in number of actors is the main advantage of _event-based actors_, which are detached from the underlying physical threads.
+
+Here are some examples of how to use actors. This is how you create an actor that prints out all messages that it receives.
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def console = actor {
+    loop {
+        react {
+            println it
+        }
+    }
+{code}
+
+Notice the _loop()_ method call, which ensures that the actor doesn't stop after having processed the first message.
+
+As an alternative you can extend the AbstractPooledActor class and override the _act()_ method. Once you instantiate the actor, you need to start it so that it attaches itself to the thread pool and can start accepting messages.
+The _actor()_ factory method will take care of starting the actor.
+
+{code}
+class CustomActor extends AbstractPooledActor {
+    @Override protected void act() {
+        loop {
+            react {
+                println it
+            }
+        }
+    }
+}
+
+def console=new CustomActor()
+console.start()
+{code}
+
+Messages can be sent to the actor using multiple methods
+
+{code}
+console.send('Message')
+console << 'Message'
+console.sendAndContinue 'Message', {reply -> println "I received reply: $reply"}
+console.sendAndWait 'Message'
+{code}
+
+h3. Creating an asynchronous service
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+final def decryptor = actor {
+    loop {
+        react {String message->
+            reply message.reverse()
+        }
+    }
+}
+
+def console = actor {
+    decryptor.send 'lellarap si yvoorG'
+    react {
+        println 'Decrypted message: ' + it
+    }
+}
+
+console.join()
+{code}
+
+As you can see, you create new actors with the _actor()_ method passing in the actor's body as a closure parameter. Inside the actor's body you can use _loop()_ to iterate, _react()_ to receive messages and _reply()_ to send a message to the actor, which has sent the currently processed message. When the decryptor actor doesn't find a message in its message queue, the _react()_ method gives up the thread and returns it back to the thread pool for other actors to pick up. Only after a new message arrives to the actor's message queue, the closure of the _react()_ method gets scheduled for processing with the pool. Event-based actors internally simulate continuations - actor's work is split into sequentially run chunks, which get invoked once a message is available in the inbox. Each chunk for a single actor can be performed by different thread from the thread pool.
+
+Groovy flexible syntax with closures allows our library to offer multiple ways to define actors. For instance, here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates. Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method.
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def me = actor {
+    delegate.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
+
+    friend.send('Hi')
+    react(10.seconds) {
+        //continue conversation
+    }
+}
+
+me.join()
+{code}
+Notice the possibility to use Groovy meta-programming to define actor's lifecycle notification methods (e.g. _onTimeout()_ ) dynamically.
+
+h3. Actors guarantee thread-safety for non-thread-safe code
+
+Actors guarantee that always at most one thread processes the actor's body at a time and also under the covers the memory gets synchronized
+each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
+
+{code}
+class MyCounterActor extends AbstractPooledActor {
+    private Integer counter = 0
+
+    protected void act() {
+        loop {
+            react {
+                counter++
+            }
+        }
+    }
+}
+{code}
+
+Ideally actor's code should *never be invoked* directly from outside so all the code of the actor class can only be executed by the thread
+handling the last received message and so all the actor's code is *implicitly thread-safe* .
+If any of the actor's methods is allowed to be called by other objects directly, the thread-safety guarantee for the actor's code and state are *no longer valid* .
+
+h2. Simple calculator
+
+A little bit more realistic example of an event-driven actor that receives two numeric messages, sums them up and sends the result to the console actor.
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+//not necessary, just showing that a single-threaded pool can still handle multiple actors
+defaultPooledActorGroup.resize 1
+
+final def console = actor {
+    loop {
+        react {
+            println 'Result: ' + it
+        }
+    }
+}
+
+final def calculator = actor {
+    react {a ->
+        react {b ->
+            console.send(a + b)
+        }
+    }
+}
+
+calculator.send 2
+calculator.send 3
+
+calculator.join()
+{code}
+
+You can group reception of multiple messages in a single _react()_ call.
+
+{code}
+final def calculator = actor {
+    react {a, b ->
+        console.send(a + b)
+    }
+}
+{code}
+Notice that event-driven actors require special care regarding the _react()_ method. Since _event_driven actors_ need to split the code into independent chunks assignable to different threads sequentially and *continuations* are not natively supported on JVM, the chunks are created artificially with tasks and exceptions. As a result the _react()_ and _loop()_ methods never return normally and actors' code must be structured accordingly. Again, this is in line with what Scala actors do.
+
+h3. Concurrent Merge Sort Example
+
+For comparison I'm also including a more involved example performing a concurrent merge sort of a list of integers using actors. You can see that thanks to flexibility of Groovy we came pretty close to the Scala model, although I still miss Scala pattern matching for message handling.
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+Closure createMessageHandler(def parentActor) {
+    return {
+        react {List<Integer> message ->
+            assert message != null
+            switch (message.size()) {
+                case 0..1:
+                    parentActor.send(message)
+                    break
+                case 2:
+                    if (message[0] <= message[1]) parentActor.send(message)
+                    else parentActor.send(message[-1..0])
+                    break
+                default:
+                    def splitList = split(message)
+
+                    def child1 = actor(createMessageHandler(delegate))
+                    def child2 = actor(createMessageHandler(delegate))
+                    child1.send(splitList[0])
+                    child2.send(splitList[1])
+
+                    react {message1 ->
+                        react {message2 ->
+                            parentActor.send merge(message1, message2)
+                        }
+                    }
+            }
+        }
+    }
+}
+
+def console = new PooledActorGroup(1).actor {
+    react {
+        println "Sorted array:\t${it}"
+        System.exit 0
+    }
+}
+
+def sorter = actor(createMessageHandler(console))
+sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
+console.join()
+{code}
+
+Since _actors_ reuse threads from a pool, the script will work with virtually *any size of a thread pool*, no matter how many actors are created along the way.
+
+For brevity I didn't include the two helper methods split() and merge() in the code snippet. You can find them below.
+{code}
+def split(List<Integer> list) {
+    int listSize = list.size()
+    int middleIndex = listSize / 2
+    def list1 = list[0..<middleIndex]
+    def list2 = list[middleIndex..listSize - 1]
+    return [list1, list2]
+}
+
+List<Integer> merge(List<Integer> a, List<Integer> b) {
+    int i = 0, j = 0
+    final int newSize = a.size() + b.size()
+    List<Integer> result = new ArrayList<Integer>(newSize)
+
+    while ((i < a.size()) && (j < b.size())) {
+        if (a[i] <= b[j]) result << a[i++]
+        else result << b[j++]
+    }
+
+    if (i < a.size()) result.addAll(a[i..-1])
+    else result.addAll(b[j..-1])
+    return result
+}
+{code}
+
+h3. Actor lifecycle methods
+Each Actor can define lifecycle observing methods, which will be called whenever a certain lifecycle event occurs.
+  * afterStop(List undeliveredMessages) - called right after the actor is stopped, passing in all the unprocessed messages from the queue.
+  * onInterrupt(InterruptedException e) - called when the actor's thread gets interrupted. Thread interruption will result in the stopping the actor in any case.
+  * onTimeout() - called when no messages are sent to the actor within the timeout specified for the currently blocking react method. Timeout will result in stopping the actor.
+  * onException(Throwable e) - called when an exception occurs in the actor's event handler. Actor will stop after return from this method.
+
+You can either define the methods statically in your Actor class or add them dynamically to the actor's metaclass:
+{code}
+def myActor = actor {
+    delegate.metaClass.onException = {
+        log.error('Exception occurred', it)
+    }
+
+...
+}
+
+{code}
+
+h3. Pool management
+
+_Actors_ can be organized into groups and as a default there's always an application-wide pooled actor group available. And just like the _Actors_ abstract factory can be used to create actors in the default group, custom groups can be used as abstract factories to create new actors instances belonging to these groups.
+
+{code}
+def myGroup = new PooledActorGroup()
+
+def actor1 = myGroup.actor {
+...
+}
+
+def actor2 = myGroup.actor {
+...
+}
+{code}
+
+The actors belonging to the same group share the *underlying thread pool* of that group. The pool by default contains *n + 1 threads*, where *n* stands for the number of *CPUs* detected by the JVM. The *pool size* can be set *explicitly* either by setting the _gpars.poolsize_ system property or individually for each actor group by specifying the appropriate constructor parameter.
+
+{code}
+def myGroup = new PooledActorGroup(10)  //the pool will contain 10 threads
+{code}
+
+The thread pool can be manipulated through the appropriate _PooledActorGroup_ class, which *delegates* to the _Pool_ interface of the thread pool. For example, the _resize()_ method allows you to change the pool size any time and the _resetDefaultSize()_ sets it back to the default value. The _shutdown()_ method can be called when you need to safely finish all tasks, destroy the pool and stop all the threads in order to exit JVM in an organized manner.
+
+{code}
+... (n+1 threads in the default pool after startup)
+
+Actors.defaultPooledActorGroup.resize 1  //use one-thread pool
+
+... (1 thread in the pool)
+
+Actors.defaultPooledActorGroup.resetDefaultSize()
+
+... (n+1 threads in the pool)
+
+Actors.defaultPooledActorGroup.shutdown()
+{code}
+
+As an alternative to the _PooledActorGroup_, which creates a pool of daemon threads, the _NonDaemonActorGroup_ class can be used when non-daemon threads are required.
+
+{code}
+def daemonGroup = new PooledActorGroup()
+
+def actor1 = daemonGroup.actor {
+...
+}
+
+def nonDaemonGroup = new NonDaemonActorGroup()
+
+def actor2 = nonDaemonGroup.actor {
+...
+}
+
+class MyActor {
+    def MyActor() {
+        this.actorGroup = nonDaemonGroup
+    }
+
+    void act() {...}
+}
+{code}
+
+Actors belonging to the same group share the *underlying thread pool*. With pooled actor groups you can split your actors to leverage multiple thread pools of different sizes and so assign resources to different components of your system and tune their performance.
+
+{code}
+def coreActors = new NonDaemonActorGroup(5)  //5 non-daemon threads pool
+def helperActors = new PooledActorGroup(1)  //1 daemon thread pool
+
+def priceCalculator = coreActors.actor {
+...
+}
+
+def paymentProcessor = coreActors.actor {
+...
+}
+
+def emailNotifier = helperActors.actor {
+...
+}
+
+def cleanupActor = helperActors.actor {
+...
+}
+
+//increase size of the core actor group
+coreActors.resize 6
+
+//shutdown the group's pool once you no longer need the group to release resources
+helperActors.shutdown()
+{code}
+
+Do not forget to shutdown custom pooled actor groups, once you no longer need them and their actors, to preserve system resources.
+
+h3. Common trap: App terminates while actors do not receive messages
+
+Most likely you're using daemon threads and pools, which is the default setting, and your main thread finishes. Calling _actor.join()_ on any, some or all of your actors would block the main thread until the actor terminates and thus keep all your actors running.
+Alternatively use instances of _NonDaemonActorGroup_ and assign some of your actors to these groups.
+{code}
+def nonDaemonGroup = new NonDaemonActorGroup()
+def myActor = nonDaemonGroup.actor {...}
+{code}
+
+alternatively
+{code}
+def nonDaemonGroup = new NonDaemonActorGroup()
+
+class MyActor extends AbstractPooledActor {
+    def MyActor() {
+        this.actorGroup = nonDaemonGroup
+    }
+
+    void act() {...}
+}
+
+def myActor = new MyActor()
+{code}

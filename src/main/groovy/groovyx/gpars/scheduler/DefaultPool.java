@@ -16,17 +16,23 @@
 
 package groovyx.gpars.scheduler;
 
-import java.util.concurrent.*;
+import groovyx.gpars.util.PoolUtils;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Represents the actors' thread pool, which performs tasks on behalf of the actors.
  * The actors' thread pool size defaults to the n + 1, where n is the number of processors/cores available on the machine.
- * The VM parameter -Dgparallelizer.poolsize can be used the configure the default size of the actors' thread pool.
+ * The VM parameter -Dgpars.poolsize can be used the configure the default size of the actors' thread pool.
  * The resize() and resetDefaultSize() methods can be used to configure size of the thread pool at runtime.
  *
  * @author Vaclav Pech
- * Date: Feb 27, 2009
+ *         Date: Feb 27, 2009
  */
 public class DefaultPool implements Pool {
     private ThreadPoolExecutor pool;
@@ -41,24 +47,27 @@ public class DefaultPool implements Pool {
 
     /**
      * Creates the pool with default number of threads.
+     *
      * @param daemon Sets the daemon flag of threads in the pool.
      */
     public DefaultPool(final boolean daemon) {
-        this(daemon, DefaultPool.retrieveDefaultPoolSize());
+        this(daemon, PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
      * Creates the pool with specified number of threads.
-     * @param daemon Sets the daemon flag of threads in the pool.
+     *
+     * @param daemon   Sets the daemon flag of threads in the pool.
      * @param poolSize The required size of the pool
      */
     public DefaultPool(final boolean daemon, final int poolSize) {
-        if (poolSize<0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
-        pool = createPool(daemon, poolSize);
+        if (poolSize < 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        this.pool = DefaultPool.createPool(daemon, poolSize);
     }
 
     /**
      * Creates the pool around the given executor service
+     *
      * @param pool The executor service to use
      */
     public DefaultPool(final ThreadPoolExecutor pool) {
@@ -68,7 +77,8 @@ public class DefaultPool implements Pool {
     /**
      * Creates a fixed-thread pool of given size. Each thread will have the uncaught exception handler set
      * to print the unhandled exception to standard error output.
-     * @param daemon Sets the daemon flag of threads in the pool.
+     *
+     * @param daemon   Sets the daemon flag of threads in the pool.
      * @param poolSize The required pool size  @return The created thread pool
      * @return The newly created thread pool
      */
@@ -76,11 +86,12 @@ public class DefaultPool implements Pool {
         assert poolSize > 0;
         return (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
             public Thread newThread(final Runnable r) {
-                final Thread thread = new Thread(r, createThreadName());
+                final Thread thread = new Thread(r, DefaultPool.createThreadName());
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
                     public void uncaughtException(final Thread t, final Throwable e) {
-                        System.err.println(UNCAUGHT_EXCEPTION_OCCURED_IN_ACTOR_POOL + t.getName());
+                        System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                         e.printStackTrace(System.err);
                     }
                 });
@@ -91,6 +102,7 @@ public class DefaultPool implements Pool {
 
     /**
      * Created a JVM-unique name for Actors' threads.
+     *
      * @return The name prefix
      */
     protected static String createThreadName() {
@@ -104,10 +116,11 @@ public class DefaultPool implements Pool {
 
     /**
      * Resizes the thread pool to the specified value
+     *
      * @param poolSize The new pool size
      */
     public final void resize(final int poolSize) {
-        if (poolSize<0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        if (poolSize < 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
         pool.setCorePoolSize(poolSize);
     }
 
@@ -115,11 +128,12 @@ public class DefaultPool implements Pool {
      * Sets the pool size to the default
      */
     public final void resetDefaultSize() {
-        resize(DefaultPool.retrieveDefaultPoolSize());
+        resize(PoolUtils.retrieveDefaultPoolSize());
     }
 
     /**
      * schedules a new task for processing with the pool
+     *
      * @param task The task to schedule
      */
     public final void execute(final Runnable task) {
@@ -128,10 +142,11 @@ public class DefaultPool implements Pool {
 
     /**
      * Retrieves the internal executor service.
+     *
      * @return The underlying thread pool
      */
     public final ExecutorService getExecutorService() {
-        return pool;
+        return this.pool;
     }
 
     /**
@@ -140,18 +155,9 @@ public class DefaultPool implements Pool {
     public final void shutdown() {
         pool.shutdown();
         try {
-            pool.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+            pool.awaitTermination(DefaultPool.SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();  // set the interrupted flag
-        }
-    }
-
-    private static int retrieveDefaultPoolSize() {
-        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
-        try {
-            return Integer.parseInt(poolSizeValue);
-        } catch (NumberFormatException ignored) {
-            return Runtime.getRuntime().availableProcessors() + 1;
         }
     }
 }

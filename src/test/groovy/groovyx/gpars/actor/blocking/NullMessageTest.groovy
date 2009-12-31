@@ -16,13 +16,13 @@
 
 package groovyx.gpars.actor.blocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
+import java.util.concurrent.CountDownLatch
 
-public class NullMessageTest extends GroovyTestCase{
-    public void testNullMesage() {
+public class NullMessageTest extends GroovyTestCase {
+    public void testNullMessage() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
         final Actor actor = Actors.actor {
@@ -30,13 +30,13 @@ public class NullMessageTest extends GroovyTestCase{
                 result = it
                 latch.countDown()
             }
-        }.start()
+        }
         actor << null
         latch.await()
         assertNull result
     }
 
-    public void testNullMesageFromActor() {
+    public void testNullMessageFromActor() {
         Actors.defaultPooledActorGroup.resize(100)
         volatile def result = ''
         final def latch = new CountDownLatch(1)
@@ -45,28 +45,28 @@ public class NullMessageTest extends GroovyTestCase{
                 result = it
                 latch.countDown()
             }
-        }.start()
+        }
         Actors.actor {
             actor << null
             latch.await()
-        }.start()
+        }
         latch.await()
         assertNull result
     }
 
-    public void testNullMesageFromActorWithReply() {
+    public void testNullMessageFromActorWithReply() {
         final def result = new DataFlowVariable()
         final Actor actor = Actors.actor {
             receive {
                 reply 10
             }
-        }.start()
+        }
         Actors.actor {
             actor << null
             receive {
                 result << it
             }
-        }.start()
+        }
         assertEquals 10, result.val
     }
 }

@@ -16,7 +16,9 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.impl.AbstractPooledActor
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.dataflow.operator.DataFlowOperator
 
 /**
  * Contains factory methods to create dataflow actors and starting them.
@@ -27,13 +29,60 @@ import groovyx.gpars.actor.impl.AbstractPooledActor
 public abstract class DataFlow {
 
     /**
-     * Creates a new instance of SingleRunActor to run the supplied code.
+     * The actor group used by all Dataflow Concurrency actors by default.
      */
-    public static AbstractPooledActor start(final Closure code) {
+    public static final DataFlowActorGroup DATA_FLOW_GROUP = new DataFlowActorGroup(1)
+
+    /**
+     * Tasks need no channels
+     */
+    private static def taskChannels = [inputs:[], outputs:[]]
+
+    /**
+     * Creates a new instance of SingleRunActor to run the supplied code.
+     * @deprecated Use task() instead
+     */
+    public static Actor start(final Closure code) {
         new SingleRunActor(body: code).start()
     }
 
-    public static DataFlowExpression invoke (Object receiver, String methodName, Object... args) {
-      return new DataFlowInvocationExpression(receiver, methodName, args);
+    /**
+     * Creates a new task assigned to a thread from the default dataflow actor group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * @param code The task body to run
+     */
+    public static void task(final Closure code) {
+        task DataFlow.DATA_FLOW_GROUP, code
+    }
+
+    /**
+     * Creates a new task assigned to a thread from the supplied actor group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * @param group The actor group to use threads of
+     * @param code The task body to run
+     */
+    public static void task(final ActorGroup group, final Closure code) {
+        group.threadPool.execute code
+    }
+
+    /**
+     * Creates an operator using the default operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowOperator operator(final Map channels, final Closure code) {
+        return new DataFlowOperator(channels, code).start(DataFlow.DATA_FLOW_GROUP)
+    }
+
+    /**
+     * Creates an operator using the specified operator actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param group The operator actor group to use with the operator
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowOperator operator(final Map channels, final ActorGroup group, final Closure code) {
+        return new DataFlowOperator(channels, code).start(group)
     }
 }

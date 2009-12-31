@@ -1,3 +1,19 @@
+//  GPars (formerly GParallelizer)
+//
+//  Copyright © 2008-9  The original author or authors
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
 package groovyx.gpars.samples.actors
 
 import static groovyx.gpars.actor.Actors.actor
@@ -8,9 +24,9 @@ def getYearEndClosing(String symbol, int year) {
         def data = url.toURL().text
         def price = data.split("\n")[1].split(",")[4].toDouble()
         Thread.sleep(1000)      // slow down internet
-        return [symbol:symbol, price:price]
+        return [symbol: symbol, price: price]
     } catch (Exception e) {
-        return [symbol:symbol, exception:e]
+        return [symbol: symbol, exception: e]
     }
 }
 
@@ -18,8 +34,8 @@ def symbols = ['AAPL', 'GOOG', 'IBM', 'JAVA', 'GROOVY', 'SCALA', 'MSFT']
 
 def observer = actor {
     def start = System.nanoTime()
-    symbols.each {stock -> actor { owner << getYearEndClosing(stock, 2008) }.start() }
-    def top = [symbol:"", price:0.0]
+    symbols.each {stock -> actor { owner << getYearEndClosing(stock, 2008) } }
+    def top = [symbol: "", price: 0.0]
     def quoteNum = 0
     loop {
         quoteNum += 1
@@ -39,6 +55,6 @@ def observer = actor {
             stop()
         }
     }
-}.start()
+}
 
 observer.join()

@@ -23,11 +23,12 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  *
  * @author Alex Tkachman
  */
-public class DataFlowInvocationExpression extends DataFlowComplexExpression{
+public class DataFlowInvocationExpression extends DataFlowComplexExpression {
+    private static final long serialVersionUID = -678669663648650627L;
     private Object receiver;
     private final String methodName;
 
-    public DataFlowInvocationExpression(final Object receiver, final String methodName, final Object [] args) {
+    public DataFlowInvocationExpression(final Object receiver, final String methodName, final Object[] args) {
         super(args);
         this.receiver = receiver;
         this.methodName = methodName;
@@ -36,18 +37,20 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression{
 
     @Override
     protected Object evaluate() {
-        if (receiver instanceof DataFlowExpression)
-            receiver = ((DataFlowExpression)receiver).value;
+        if (receiver instanceof DataFlowExpression) {
+            receiver = ((DataFlowExpression) receiver).value;
+        }
 
         super.evaluate();
-        
+
         return InvokerHelper.invokeMethod(receiver, methodName, args);
     }
 
     @Override
     protected void subscribe(final DataFlowExpressionsCollector listener) {
-        if (receiver instanceof DataFlowExpression)
+        if (receiver instanceof DataFlowExpression) {
             receiver = listener.subscribe(receiver);
+        }
 
         super.subscribe(listener);
     }

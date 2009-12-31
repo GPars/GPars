@@ -16,10 +16,9 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.CountDownLatch
 import groovyx.gpars.actor.Actor
-import static groovyx.gpars.actor.Actors.actor
-import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.PooledActorGroup
+import java.util.concurrent.CountDownLatch
 
 public class SharedMemoryTest extends GroovyTestCase {
 
@@ -28,10 +27,10 @@ public class SharedMemoryTest extends GroovyTestCase {
     public void testSharedAccess() {
         long counter = 0
 
-        Actors.defaultPooledActorGroup.resize 2
+        def group = new PooledActorGroup(2)
         def latch = new CountDownLatch(1)
 
-        Actor actor1 = actor {
+        Actor actor1 = group.actor {
             loop {
                 react {
                     assert it == counter * 2
@@ -39,15 +38,15 @@ public class SharedMemoryTest extends GroovyTestCase {
                     it.reply counter.longValue() * 2
                 }
             }
-        }.start()
+        }
 
-        Actor actor2 = actor {
+        Actor actor2 = group.actor {
             loop {
                 if (counter < MAX_COUNTER) actor1.send counter.longValue() * 2
                 else {
                     actor1.stop()
-                    stop()
                     latch.countDown()
+                    terminate()
                 }
                 react {
                     assert it == counter * 2
@@ -55,11 +54,11 @@ public class SharedMemoryTest extends GroovyTestCase {
                 }
             }
         }
-        actor2.start()
 
 
         latch.await()
-        Actors.defaultPooledActorGroup.resize(5)
+        [actor1, actor2]*.join()
+        group.shutdown()
         assertEquals MAX_COUNTER, counter
     }
 }

@@ -1,8 +1,8 @@
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlows
 import java.util.concurrent.CyclicBarrier
-import groovyx.gpars.actor.Actors
 
 /**
  * @author Vaclav Pech
@@ -21,7 +21,7 @@ public class ReceiveTest extends GroovyTestCase {
             react {
                 df.result3 = it
             }
-        }.start()
+        }
 
         actor << 'message1'
         actor << 'message2'
@@ -41,7 +41,7 @@ public class ReceiveTest extends GroovyTestCase {
                         receive {msg1 ->
                             df.result1 = msg1
                             df.result2 = receive()
-                            receive { msg2 ->
+                            receive {msg2 ->
                                 df.result3 = msg2
                                 react {msg3 ->
                                     df.result4 = msg3
@@ -54,7 +54,7 @@ public class ReceiveTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor << 'message'
         actor << 'message'
@@ -76,8 +76,7 @@ public class ReceiveTest extends GroovyTestCase {
         def actor = Actors.actor {
             loop {
                 if (df.contains('result1')) {
-                    stop()
-                    return
+                    terminate()
                 }
                 df.result1 = receive()
                 receive {
@@ -85,7 +84,7 @@ public class ReceiveTest extends GroovyTestCase {
                 }
                 barrier.await()
             }
-        }.start()
+        }
 
         actor << 'message1'
         actor << 'message2'

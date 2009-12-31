@@ -16,13 +16,13 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.Actors
+import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
-import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.impl.AbstractPooledActor
-import groovyx.gpars.actor.impl.ActorReplyException
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -50,7 +50,7 @@ public class ReplyTest extends GroovyTestCase {
                     barrier.await()
                 }
             }
-        }.start()
+        }
 
         Thread.sleep 1000
 
@@ -68,7 +68,7 @@ public class ReplyTest extends GroovyTestCase {
                     completedBarrier.await()
                 }
             }
-        }.start()
+        }
 
         actor {
             bouncer.send 10
@@ -84,7 +84,7 @@ public class ReplyTest extends GroovyTestCase {
                     completedBarrier.await()
                 }
             }
-        }.start()
+        }
 
         completedBarrier.await()
         bouncer.stop()
@@ -103,13 +103,13 @@ public class ReplyTest extends GroovyTestCase {
             loop {
                 react { reply it + 1 }
             }
-        }.start()
+        }
 
         final def decrementor = actor {
             loop {
                 react { reply it - 1 }
             }
-        }.start()
+        }
 
         actor {
             barrier.await()
@@ -130,7 +130,7 @@ public class ReplyTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         actor {
             barrier.await()
@@ -151,7 +151,7 @@ public class ReplyTest extends GroovyTestCase {
                     }
                 }
             }
-        }.start()
+        }
 
         completedBarrier.await()
         incrementor.stop()
@@ -167,19 +167,17 @@ public class ReplyTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final AbstractPooledActor actor = actor {
+            delegate.metaClass {
+                onException = {
+                    flag.set(true)
+                    barrier.await()
+                }
+            }
+
             react {
                 reply it
             }
         }
-
-        actor.metaClass {
-            onException = {
-                flag.set(true)
-                barrier.await()
-            }
-        }
-
-        actor.start()
 
         actor.send 'messsage'
         barrier.await()
@@ -197,15 +195,13 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        receiver.start()
-
         actor {
             receiver.send 'messsage'
             react {
                 flag.set(true)
                 barrier.await()
             }
-        }.start()
+        }
 
         barrier.await()
 
@@ -223,8 +219,6 @@ public class ReplyTest extends GroovyTestCase {
                 barrier.await()
             }
         }
-
-        actor.start()
 
         actor.send 'messsage'
         barrier.await()
@@ -246,19 +240,15 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        replier.start()
-
         final AbstractPooledActor sender = actor {
+            delegate.metaClass {
+                afterStop = {
+                    latch.countDown()
+                }
+            }
+
             replier.send 'messsage'
         }
-
-        sender.metaClass {
-            afterStop = {
-                latch.countDown()
-            }
-        }
-
-        sender.start()
 
         latch.await()
         barrier.await()
@@ -275,12 +265,14 @@ public class ReplyTest extends GroovyTestCase {
             react {
                 reply 'Message2'
                 it.reply 'Message3'
-                react {a, b->
-                    reply 'Message6'
-                    latch.await()
+                react {a ->
+                    react {b ->
+                        [a, b]*.reply 'Message6'
+                        latch.await()
+                    }
                 }
             }
-        }.start()
+        }
 
         Actors.actor {
             actor.send 'Message1'
@@ -288,14 +280,16 @@ public class ReplyTest extends GroovyTestCase {
                 it.reply 'Message4'
                 react {
                     reply 'Message5'
-                    react {a, b ->
-                        result = a+b
-                        latch.countDown()
+                    react {a ->
+                        react {b ->
+                            result = a + b
+                            latch.countDown()
+                        }
                     }
                 }
             }
 
-        }.start()
+        }
 
         latch.await()
         assertEquals 'Message6Message6', result
@@ -310,7 +304,7 @@ public class ReplyTest extends GroovyTestCase {
             react {->
                 reply 'Message2'
             }
-        }.start()
+        }
 
         Actors.actor {
             actor.send 'Message1'
@@ -319,7 +313,7 @@ public class ReplyTest extends GroovyTestCase {
                 latch.countDown()
             }
 
-        }.start()
+        }
 
         latch.await()
         assertEquals 'Message2', result
@@ -328,46 +322,57 @@ public class ReplyTest extends GroovyTestCase {
 
     public void testMultipleClientsWithReply() {
         final List<CountDownLatch> latches = [new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(2)]
-        def volatile issues
+        def volatile issues = []
 
         final def bouncer = actor {
             latches[0].await()
-            react {a, b, c ->
-                replyIfExists 4
-                latches[1].countDown()
+            react {a ->
+                react {b ->
+                    react {c ->
+                        [a, b, c]*.replyIfExists 4
+                        latches[1].countDown()
 
-                latches[2].await()
-                react {x, y, z ->
-                    try {
-                        reply 8
-                    } catch (ActorReplyException e) {
-                        issues = e.issues
-                        latches[3].countDown()
+                        latches[2].await()
+                        react {x ->
+                            react {y ->
+                                react {z ->
+                                    try {
+                                        [z, x, y].each {message ->
+                                            try {
+                                                message.reply 8
+                                            } catch (IllegalStateException e) {
+                                                issues << e
+                                            }
+                                        }
+                                    } finally {
+                                        latches[3].countDown()
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }.start()
+        }
 
         //send and terminate
         final AbstractPooledActor actor1 = actor {
+            delegate.metaClass.afterStop = {
+                latches[0].countDown()
+            }
+
             bouncer << 1
-            stop()
         }
-        actor1.metaClass.afterStop = {
-            latches[0].countDown()
-        }
-        actor1.start()
 
         //wait, send and terminate
         final AbstractPooledActor actor2 = actor {
+            delegate.metaClass.afterStop = {
+                latches[2].countDown()
+            }
+
             latches[1].await()
             bouncer << 5
-            stop()
         }
-        actor2.metaClass.afterStop = {
-            latches[2].countDown()
-        }
-        actor2.start()
 
         //keep conversation going
         actor {
@@ -378,14 +383,49 @@ public class ReplyTest extends GroovyTestCase {
                     latches[3].countDown()
                 }
             }
-        }.start()
+        }
 
         bouncer << 3
         latches[2].await()
         bouncer << 7
         latches[3].await()
         assertEquals 2, issues.size()
-        assert (issues[0] instanceof IllegalArgumentException) || (issues[1] instanceof IllegalArgumentException)
-        assert (issues[0] instanceof IllegalStateException) || (issues[1] instanceof IllegalStateException)
+        assert (issues[0] instanceof IllegalStateException) && (issues[1] instanceof IllegalStateException)
+    }
+
+    public void testOriginatorDetection() {
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
+        final DataFlowVariable originator1 = new DataFlowVariable()
+        final DataFlowVariable originator2 = new DataFlowVariable()
+        final DataFlowVariable originator3 = new DataFlowVariable()
+
+        final def bouncer = actor {
+            react {msg1 ->
+                originator1 << msg1.sender
+                react {msg2 ->
+                    originator2 << msg2.sender
+                    react {msg3 ->
+                        originator3 << msg3.sender
+                    }
+                }
+            }
+        }
+
+        final def actor1 = actor {
+            bouncer << 'msg1'
+        }
+
+        assert actor1 == originator1.val
+
+        final def actor2 = actor {
+            bouncer << 'msg2'
+        }
+
+        assert actor2 == originator2.val
+
+        bouncer << 'msg3'
+
+        assertNull originator3.val
     }
 }

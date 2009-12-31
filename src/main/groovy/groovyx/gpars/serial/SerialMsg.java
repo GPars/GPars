@@ -24,15 +24,19 @@ import java.util.UUID;
 /**
  * Base class for all messages
  *
- * @author Alex Tkachman
+ * @author Alex Tkachman, Vaclav Pech
  */
 public abstract class SerialMsg implements Serializable {
     public UUID hostId;
 
-    public SerialMsg() {
+    protected SerialMsg() {
     }
 
-    public void execute(RemoteConnection conn) {
+    protected SerialMsg(final UUID hostId) {
+        this.hostId = hostId;
+    }
+
+    public void execute(final RemoteConnection conn) {
         conn.onMessage(this);
     }
 }
