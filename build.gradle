@@ -201,6 +201,9 @@ task zipDist(dependsOn: ['jar', 'copyThirdPartyLibs', 'copyLibs', 'copyDists', '
     appendix = 'all'
     from '/build/dist'
 }
+zipDist << {
+    ant.delete(dir:file('/build/dist'), failonerror:true)
+}
 
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
