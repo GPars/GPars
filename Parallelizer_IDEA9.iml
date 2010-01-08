@@ -25,11 +25,11 @@
     <orderEntry type="module-library">
       <library name="netty">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/netty-3.1.3.GA.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/netty-3.1.5.GA.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/netty-3.1.3.GA-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/netty-3.1.5.GA-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

@@ -30,16 +30,16 @@ public class RemoteObjectEncoder extends ObjectEncoder {
     /**
      * Creates a new encoder.
      *
-     * @param connection
+     * @param connection connection handling serialization details
      */
-    public RemoteObjectEncoder(RemoteConnection connection) {
+    public RemoteObjectEncoder(final RemoteConnection connection) {
         super();
         this.connection = connection;
     }
 
     @Override
-    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
-        RemoteHost remoteHost = connection.getHost();
+    protected Object encode(final ChannelHandlerContext ctx, final Channel channel, final Object msg) throws Exception {
+        final RemoteHost remoteHost = connection.getHost();
 
         if (remoteHost != null) {
             remoteHost.enter();
