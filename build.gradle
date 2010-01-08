@@ -157,7 +157,7 @@ task docs << {
   ant.docs(src:"grails-doc/src", dest:"build/docs/guide", properties:"grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir : new File('grails-doc/resources/css'), imagesDir : new File('grails-doc/resources/img') )
 }
 
-task zipDoc(type: Zip, dependsOn: documentation) {
+task zipDoc(type: Zip, dependsOn: 'documentation') {
     appendix = 'docs'
     from(docsDir)
 }
@@ -173,6 +173,33 @@ task zipSamples(type: Zip) {
     from sourceSets.test.allSource.matching {
         include 'groovyx/gpars/samples/**'
     }
+}
+
+task copyThirdPartyLibs(type: Copy) {
+    from('/lib')
+    into('/build/dist')
+    exclude('junit-4.7.jar', 'netty-3.1.5.GA-sources.jar')
+}
+
+task copyLibs(type: Copy) {
+    from('/build/libs')
+    into('/build/dist')
+}
+
+task copyDists(type: Copy) {
+    from('/build/distributions')
+    into('/build/dist')
+}
+
+task copyLicense(type: Copy) {
+    from('/src/main/resources/META-INF/')
+    into('/build/dist')
+    include('LICENSE.txt', 'NOTICE')
+}
+
+task zipDist(dependsOn: ['jar', 'copyThirdPartyLibs', 'copyLibs', 'copyDists', 'copyLicense'], type: Zip) {
+    appendix = 'all'
+    from '/build/dist'
 }
 
 task wrapper(type: Wrapper) {
