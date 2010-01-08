@@ -1,6 +1,6 @@
 GPars (formerly GParallelizer)
 
-0.9-beta1
+0.9
 
 Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=15702
 
