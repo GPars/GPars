@@ -155,7 +155,6 @@
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/message/NodeDisconnectedMsg.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/netty" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/scheduler" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/transformations" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/META-INF" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/test" charset="UTF-8" />
   </component>
@@ -3861,7 +3860,7 @@
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="svn" />
+    <mapping directory="" vcs="Git" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
   <component name="copyright">
