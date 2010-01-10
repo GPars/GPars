@@ -23,9 +23,9 @@
 // gradle imports these by default, but IDEA doesn't know
 
 
-usePlugin 'groovy'
-usePlugin 'maven'
-usePlugin 'osgi'
+apply id : 'groovy'
+apply id : 'maven'
+apply id : 'osgi'
 
 defaultTasks 'test'
 
@@ -204,7 +204,7 @@ zipDist << {
 
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
-    gradleVersion = '0.9-20091111095904+0100-maven_webdav'
+    gradleVersion = '0.9-20100107150027+1100'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
