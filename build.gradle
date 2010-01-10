@@ -173,33 +173,33 @@ task zipSamples(type: Zip) {
 }
 
 task copyThirdPartyLibs(type: Copy) {
-    from('/lib')
-    into('/build/dist')
+    from('lib')
+    into('build/dist')
     exclude('junit-4.7.jar', 'netty-3.1.5.GA-sources.jar')
 }
 
 task copyLibs(type: Copy) {
-    from('/build/libs')
-    into('/build/dist')
+    from('build/libs')
+    into('build/dist')
 }
 
 task copyDists(type: Copy) {
-    from('/build/distributions')
-    into('/build/dist')
+    from('build/distributions')
+    into('build/dist')
 }
 
 task copyLicense(type: Copy) {
-    from('/src/main/resources/META-INF/')
-    into('/build/dist')
+    from('src/main/resources/META-INF/')
+    into('build/dist')
     include('LICENSE.txt', 'NOTICE.txt')
 }
 
 task zipDist(dependsOn: ['jar', 'copyThirdPartyLibs', 'copyLibs', 'copyDists', 'copyLicense'], type: Zip) {
     appendix = 'all'
-    from '/build/dist'
+    from 'build/dist'
 }
 zipDist << {
-    ant.delete(dir:file('/build/dist'), failonerror:true)
+    ant.delete(dir:file('build/dist'), failonerror:true)
 }
 
 task wrapper(type: Wrapper) {
