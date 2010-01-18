@@ -42,9 +42,4 @@ public final class NonDaemonActorGroup extends ActorGroup {
     def NonDaemonActorGroup(final int poolSize) {
         super(new DefaultPool(false, poolSize))
     }
-
-    /**
-     * Fork/Join not used by this group
-     */
-    boolean getUsedForkJoin() { false }
 }
