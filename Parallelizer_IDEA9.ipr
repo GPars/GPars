@@ -3489,7 +3489,7 @@
         <inspection_tool class="WaitWithoutCorrespondingNotify" enabled="true" level="WARNING" enabled_by_default="true" />
       </profile>
     </profiles>
-    <option name="PROJECT_PROFILE" value="Spellcheck" />
+    <option name="PROJECT_PROFILE" value="ServerInspections" />
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
     <list size="5">
