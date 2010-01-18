@@ -19,6 +19,7 @@ package groovyx.gpars.samples.dataflow
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.TimeUnit
 import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * Demonstrates that deadlocks are deterministic in dataflow concurrency model. The deadlock appears reliably every time
@@ -43,12 +44,12 @@ final def actor = start {
     }
 }
 
-start {
+task {
     b << 20 + a.val
     actor.send b.val
 }
 
-start {
+task {
     a << 10 + b.val
     actor.send a.val
 }
