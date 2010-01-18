@@ -16,6 +16,8 @@
 
 package groovyx.gpars.util;
 
+import groovyx.gpars.scheduler.Pool;
+
 /**
  * Provides a couple of utility methods to pools and schedulers.
  *
@@ -35,5 +37,9 @@ public final class PoolUtils {
         } catch (NumberFormatException ignored) {
             return Runtime.getRuntime().availableProcessors() + 1;
         }
+    }
+
+    public static void checkValidPoolSize(final int poolSize) {
+        if (poolSize <= 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_POSITIVE_NUMBER);
     }
 }

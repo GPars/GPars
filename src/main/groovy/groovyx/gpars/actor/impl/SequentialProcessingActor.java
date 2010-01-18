@@ -238,9 +238,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         if (endTime == 0L) LockSupport.park();
         else LockSupport.parkNanos(endTime - System.nanoTime());
-        if (Thread.currentThread().isInterrupted()) {
-            throw new InterruptedException();
-        }
+        MessageStream.reInterrupt();
         return null;
     }
 

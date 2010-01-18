@@ -48,7 +48,7 @@ public class FJPool implements Pool {
      * @param configuredPoolSize The required size of the pool
      */
     public FJPool(final int configuredPoolSize) {
-        if (configuredPoolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        PoolUtils.checkValidPoolSize(configuredPoolSize);
         this.configuredPoolSize = configuredPoolSize;
         pool = createPool(configuredPoolSize);
     }
@@ -65,6 +65,7 @@ public class FJPool implements Pool {
 
         final ForkJoinPool pool = new ForkJoinPool(poolSize);
         pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
             @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
             public void uncaughtException(final Thread t, final Throwable e) {
                 System.err.println(UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
@@ -79,14 +80,16 @@ public class FJPool implements Pool {
      *
      * @param poolSize The new pool size
      */
+    @Override
     public final void resize(final int poolSize) {
-        if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        PoolUtils.checkValidPoolSize(poolSize);
         pool.setPoolSize(poolSize);
     }
 
     /**
      * Sets the pool size to the default
      */
+    @Override
     public final void resetDefaultSize() {
         resize(PoolUtils.retrieveDefaultPoolSize());
     }
@@ -96,6 +99,7 @@ public class FJPool implements Pool {
      *
      * @param task The task to schedule
      */
+    @Override
     public void execute(final Runnable task) {
         pool.submit(new FJRunnableTask(task));
     }
@@ -112,6 +116,7 @@ public class FJPool implements Pool {
     /**
      * Gently stops the pool
      */
+    @Override
     public final void shutdown() {
         pool.shutdown();
         try {

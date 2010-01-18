@@ -126,12 +126,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
      */
     protected final Object receive() throws InterruptedException {
         final Object msg = receiveImpl();
-        if (msg instanceof ActorMessage) {
-            final ActorMessage messageAndReply = (ActorMessage) msg;
-            return messageAndReply.getPayLoad();
-        } else {
-            return msg;
-        }
+        return unwrapMessage(msg);
     }
 
     /**
@@ -144,9 +139,13 @@ public abstract class ReceivingMessageStream extends MessageStream {
      */
     protected final Object receive(final long timeout, final TimeUnit units) throws InterruptedException {
         final Object msg = receiveImpl(timeout, units);
+        return unwrapMessage(msg);
+    }
+
+    private static Object unwrapMessage(final Object msg) {
+        //more a double-check here, since all current implementations of the receiveImpl() method do unwrap already
         if (msg instanceof ActorMessage) {
-            final ActorMessage messageAndReply = (ActorMessage) msg;
-            return messageAndReply.getPayLoad();
+            return ((ActorMessage) msg).getPayLoad();
         } else {
             return msg;
         }

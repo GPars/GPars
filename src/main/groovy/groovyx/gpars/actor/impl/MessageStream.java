@@ -140,6 +140,12 @@ public abstract class MessageStream extends WithSerialId {
         return RemoteMessageStream.class;
     }
 
+    static void reInterrupt() throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+    }
+
     /**
      * Represents a pending request for a reply from an actor.
      *
@@ -212,9 +218,7 @@ public abstract class MessageStream extends WithSerialId {
                     return null;
                 }
                 LockSupport.parkNanos(toWait);
-                if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException();
-                }
+                reInterrupt();
             }
             rethrowException();
             return value;
