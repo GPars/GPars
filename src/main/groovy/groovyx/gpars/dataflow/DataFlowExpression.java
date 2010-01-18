@@ -343,6 +343,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     private void notifyRemote(final UUID hostId) {
         if (serialHandle != null) {
             Actors.defaultPooledActorGroup.getThreadPool().execute(new Runnable() {
+                @Override
                 public void run() {
                     final Object sub = serialHandle.getSubscribers();
                     if (sub instanceof RemoteHost) {
@@ -465,6 +466,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         listener.subscribe(this);
     }
 
+    @Override
     public Object invokeMethod(final String name, final Object args) {
         if (getMetaClass().respondsTo(this, name).isEmpty()) {
             return new DataFlowInvocationExpression(this, name, (Object[]) args);
@@ -480,6 +482,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param propertyName The name of the property to retrieve
      * @return The property value, instance of DataFlowGetPropertyExpression
      */
+    @Override
     public Object getProperty(final String propertyName) {
         final MetaProperty metaProperty = getMetaClass().hasProperty(this, propertyName);
         if (metaProperty != null) {
@@ -489,14 +492,17 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         return new DataFlowGetPropertyExpression(this, propertyName);
     }
 
+    @Override
     public void setMetaClass(final MetaClass metaClass) {
         this.metaClass = metaClass;
     }
 
+    @Override
     public void setProperty(final String propertyName, final Object newValue) {
         metaClass.setProperty(this, propertyName, newValue);
     }
 
+    @Override
     public MetaClass getMetaClass() {
         return metaClass;
     }
