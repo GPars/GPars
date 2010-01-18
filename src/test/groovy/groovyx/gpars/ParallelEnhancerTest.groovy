@@ -98,7 +98,7 @@ public class ParallelEnhancerTest extends GroovyTestCase {
             Thread.sleep 2000
             map[Thread.currentThread()] = ''
         }
-        assert map.keys().size() > 2
+        assert map.keys().size() > 1
     }
 
     public void testMin() {
