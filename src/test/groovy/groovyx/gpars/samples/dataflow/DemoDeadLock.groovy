@@ -36,8 +36,10 @@ final def actor = start {
         System.exit 0
     }
 
-    react(5, TimeUnit.SECONDS) {x, y ->
-        println "Got replies: a:${x} b:${b}"
+    react(5, TimeUnit.SECONDS) {x ->
+        react(5, TimeUnit.SECONDS) {y ->
+            println "Got replies: a:${x} b:${b}"
+        }
     }
 }
 
