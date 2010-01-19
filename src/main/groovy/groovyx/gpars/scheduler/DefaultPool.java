@@ -85,12 +85,10 @@ public class DefaultPool implements Pool {
     private static ThreadPoolExecutor createPool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
         return (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
-            @Override
             public Thread newThread(final Runnable r) {
                 final Thread thread = new Thread(r, DefaultPool.createThreadName());
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                    @Override
                     @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
                     public void uncaughtException(final Thread t, final Throwable e) {
                         System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
@@ -121,7 +119,6 @@ public class DefaultPool implements Pool {
      *
      * @param poolSize The new pool size
      */
-    @Override
     public final void resize(final int poolSize) {
         PoolUtils.checkValidPoolSize(poolSize);
         pool.setCorePoolSize(poolSize);
@@ -130,7 +127,6 @@ public class DefaultPool implements Pool {
     /**
      * Sets the pool size to the default
      */
-    @Override
     public final void resetDefaultSize() {
         resize(PoolUtils.retrieveDefaultPoolSize());
     }
@@ -140,7 +136,6 @@ public class DefaultPool implements Pool {
      *
      * @param task The task to schedule
      */
-    @Override
     public final void execute(final Runnable task) {
         pool.execute(task);
     }
@@ -157,7 +152,6 @@ public class DefaultPool implements Pool {
     /**
      * Gently stops the pool
      */
-    @Override
     public final void shutdown() {
         pool.shutdown();
         try {
