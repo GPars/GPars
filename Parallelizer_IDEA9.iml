@@ -33,7 +33,16 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Groovy-1.6.7" level="application" />
+    <orderEntry type="module-library">
+      <library name="Groovy">
+        <CLASSES>
+          <root url="file://$GROOVY_HOME$/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$GROOVY_HOME$/lib" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
   <component name="copyright">
     <Base>
