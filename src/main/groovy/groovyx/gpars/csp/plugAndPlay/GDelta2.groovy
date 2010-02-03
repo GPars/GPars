@@ -24,9 +24,9 @@ import org.jcsp.plugNplay.ProcessWrite
 
 class GDelta2 implements CSProcess {
 
-    def ChannelInput inChannel
-    def ChannelOutput outChannel0
-    def ChannelOutput outChannel1
+    ChannelInput inChannel
+    ChannelOutput outChannel0
+    ChannelOutput outChannel1
 
     def void run() {
         def write0 = new ProcessWrite(outChannel0)

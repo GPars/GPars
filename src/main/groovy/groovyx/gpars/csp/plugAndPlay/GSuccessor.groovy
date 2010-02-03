@@ -22,8 +22,8 @@ import org.jcsp.lang.ChannelOutput
 
 class GSuccessor implements CSProcess {
 
-    def ChannelInput inChannel
-    def ChannelOutput outChannel
+    ChannelInput inChannel
+    ChannelOutput outChannel
 
     void run() {
         while (true) {

@@ -24,9 +24,9 @@ import org.jcsp.lang.ChannelOutput
 
 class TimedMultiplex implements CSProcess {
 
-    def ChannelInputList inChannels
-    def ChannelOutput outChannel
-    def long timeout      // period during which process will run
+    ChannelInputList inChannels
+    ChannelOutput outChannel
+    long timeout      // period during which process will run
 
     def void run() {
         def timer = new CSTimer()

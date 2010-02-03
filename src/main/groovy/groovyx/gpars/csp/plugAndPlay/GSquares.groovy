@@ -24,7 +24,7 @@ import org.jcsp.lang.One2OneChannel
 
 class GSquares implements CSProcess {
 
-    def ChannelOutput outChannel
+    ChannelOutput outChannel
 
     void run() {
 

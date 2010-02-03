@@ -22,8 +22,8 @@ import org.jcsp.lang.ChannelOutput
 
 class GIdentity implements CSProcess {
 
-    def ChannelOutput outChannel
-    def ChannelInput inChannel
+    ChannelOutput outChannel
+    ChannelInput inChannel
 
     void run() {
         while (true) {

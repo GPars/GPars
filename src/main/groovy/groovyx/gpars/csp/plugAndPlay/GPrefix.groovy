@@ -22,9 +22,9 @@ import org.jcsp.lang.ChannelOutput
 
 class GPrefix implements CSProcess {
 
-    def int prefixValue = 0
-    def ChannelInput inChannel
-    def ChannelOutput outChannel
+    int prefixValue = 0
+    ChannelInput inChannel
+    ChannelOutput outChannel
 
     void run() {
         outChannel.write(prefixValue)

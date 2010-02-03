@@ -23,8 +23,8 @@ import org.jcsp.lang.ChannelOutput
 
 class FairMultiplex implements CSProcess {
 
-    def ChannelInputList inChannels
-    def ChannelOutput outChannel
+    ChannelInputList inChannels
+    ChannelOutput outChannel
 
     def void run() {
         def alt = new ALT(inChannels)

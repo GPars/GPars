@@ -23,8 +23,8 @@ import org.jcsp.lang.ChannelOutput
 
 class Multiplexer implements CSProcess {
 
-    def ChannelInputList inChannels
-    def ChannelOutput outChannel
+    ChannelInputList inChannels
+    ChannelOutput outChannel
 
     void run() {
         def alt = new ALT(inChannels)

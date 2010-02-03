@@ -25,8 +25,8 @@ import org.jcsp.lang.One2OneChannel
 
 class GPairs implements CSProcess {
 
-    def ChannelOutput outChannel
-    def ChannelInput inChannel
+    ChannelOutput outChannel
+    ChannelInput inChannel
 
     void run() {
 

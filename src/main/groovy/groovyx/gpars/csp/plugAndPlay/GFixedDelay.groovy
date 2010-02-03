@@ -23,9 +23,9 @@ import org.jcsp.lang.ChannelOutput
 
 class GFixedDelay implements CSProcess {
 
-    def ChannelInput inChannel
-    def ChannelOutput outChannel
-    def delay = 0
+    ChannelInput inChannel
+    ChannelOutput outChannel
+    long delay = 0
 
     void run() {
         def timer = new CSTimer()

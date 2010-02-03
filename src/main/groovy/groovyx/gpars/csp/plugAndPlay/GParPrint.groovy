@@ -24,9 +24,9 @@ import org.jcsp.plugNplay.ProcessRead
 
 class GParPrint implements CSProcess {
 
-    def ChannelInputList inChannels
-    def List headings
-    def long delay = 200
+    ChannelInputList inChannels
+    List headings
+    long delay = 200
 
     void run() {
         def inSize = inChannels.size()

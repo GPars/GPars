@@ -22,9 +22,9 @@ import org.jcsp.lang.ChannelInput
 
 class GPrint implements CSProcess {
 
-    def ChannelInput inChannel
-    def String heading = "No Heading Provided"
-    def long delay = 200
+    ChannelInput inChannel
+    String heading = "No Heading Provided"
+    long delay = 200
 
     def void run() {
         def timer = new CSTimer()

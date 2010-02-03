@@ -24,9 +24,9 @@ import org.jcsp.plugNplay.ProcessRead
 
 class GPlus implements CSProcess {
 
-    def ChannelOutput outChannel
-    def ChannelInput inChannel0
-    def ChannelInput inChannel1
+    ChannelOutput outChannel
+    ChannelInput inChannel0
+    ChannelInput inChannel1
 
     void run() {
 

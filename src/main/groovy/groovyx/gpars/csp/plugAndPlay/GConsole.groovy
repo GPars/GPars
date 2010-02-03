@@ -31,10 +31,10 @@ import org.jcsp.lang.ChannelOutput
 
 class GConsole implements CSProcess {
 
-    def ChannelInput toConsole
-    def ChannelOutput fromConsole
-    def ChannelInput clearInputArea
-    def String frameLabel = "Groovy Eclipse Console"
+    ChannelInput toConsole
+    ChannelOutput fromConsole
+    ChannelInput clearInputArea
+    String frameLabel = "Groovy Eclipse Console"
 
     def void run() {
         def main = new ActiveClosingFrame(frameLabel)
