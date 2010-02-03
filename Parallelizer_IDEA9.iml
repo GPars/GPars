@@ -43,6 +43,15 @@
         <jarDirectory url="file://$GROOVY_HOME$/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jcsp">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jcsp.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
   <component name="copyright">
     <Base>
