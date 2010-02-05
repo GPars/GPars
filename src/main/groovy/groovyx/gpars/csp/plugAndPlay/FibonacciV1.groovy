@@ -33,17 +33,11 @@ class FibonacciV1 implements CSProcess {
         One2OneChannel c = Channel.createOne2One()
         One2OneChannel d = Channel.createOne2One()
 
-        def testList = [new GPrefix(prefixValue: 0,
-                inChannel: d.in(),
-                outChannel: a.out()),
-                new GPrefix(prefixValue: 1,
-                        inChannel: c.in(),
-                        outChannel: d.out()),
-                new GPCopy(inChannel: a.in(),
-                        outChannel0: b.out(),
-                        outChannel1: outChannel),
-                new GStatePairs(inChannel: b.in(),
-                        outChannel: c.out()),
+        def testList = [
+                new GPrefix(prefixValue: 0, inChannel: d.in(), outChannel: a.out()),
+                new GPrefix(prefixValue: 1, inChannel: c.in(), outChannel: d.out()),
+                new GPCopy(inChannel: a.in(), outChannel0: b.out(), outChannel1: outChannel),
+                new GStatePairs(inChannel: b.in(), outChannel: c.out()),
         ]
         new PAR(testList).run()
     }
