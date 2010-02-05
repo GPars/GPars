@@ -14,14 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.csp
+package groovyx.gpars.samples.csp.resetexamples
 
-//import org.jcsp.net.mobile.*
+import org.jcsp.lang.CSProcess
+import org.jcsp.lang.ChannelInput
+import org.jcsp.lang.ChannelOutput
 
-abstract class GroovyMobileProcess {//todo extends MobileProcess implements Serializable{
+class ResetUser implements CSProcess {
 
-    abstract connect(x)
+    ChannelOutput resetValue
+    ChannelOutput toConsole
+    ChannelInput fromConverter
+    ChannelOutput toClearOutput
 
-    abstract disconnect()
-
+    void run() {
+        toConsole.write("Please input reset values\n")
+        while (true) {
+            def v = fromConverter.read()
+            toClearOutput.write("\n")
+            resetValue.write(v)
+        }
+    }
 }

@@ -21,8 +21,12 @@ import org.jcsp.lang.Guard
 
 /**
  * ALT is used to create an <code>Alternative</code> object
- * */
-
+ *
+ * <p>Company: Napier University</p>
+ * @author Jon Kerridge, Ken Barclay, John Savage
+ * @version 1.0
+ * @version 1.1    takes account of jsr03 requirements
+ */
 class ALT extends Alternative {
 
 /**
@@ -30,14 +34,12 @@ class ALT extends Alternative {
  * ALT takes a list of <code>Guards</code> as its constructor parameter
  * and converts them to an array of <code>Guards</code>
  * as required by <code>Alternative</code>
- * */
+ */
     ALT(ChannelInputList channelList) {
         super((Guard[]) channelList.toArray())
-
     }
 
     ALT(List guardList) {
         super((Guard[]) guardList.toArray())
     }
-
 }

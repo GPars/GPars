@@ -20,7 +20,13 @@ import org.jcsp.lang.Parallel
 
 /**
  * PAR is used to create a <code>Parallel</code> object
- * */
+ *
+ * <p>Company: Napier University</p>
+ *
+ * @author Jon Kerridge, Ken Barclay, John Savage
+ * @version 1.0
+ * @version 1.1 modified to compile under groovy jsr03
+ */
 
 class PAR extends Parallel {
 

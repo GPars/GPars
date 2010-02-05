@@ -34,7 +34,12 @@ public interface JCSPCopy {
      * a copy as the <code>object</code> has to implement <code>Serializable</code> and a copy
      * is made by the underlying system.  A processor cannot access the memory space of
      * another processor.
-     * */
+     * <p>Company: Napier University</p>
+     *
+     * @author Jon Kerridge, Ken Barclay, John Savage
+     * @version 1.0
+     *
+     */
     public abstract copy()
 }
 

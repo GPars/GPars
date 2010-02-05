@@ -31,7 +31,15 @@ class ChannelInputList {
  * ChannelInputList uses the <code>ArrayList</code> class of java
  * This ChannelInputList takes an array of <code>One2OneChannels</code> as its
  * constructor parameter and converts them to a list of <code>ChannelInputEnds</code>
- * */
+ *
+ * <p>Company: Napier University</p>
+ * @author Jon Kerridge, Ken Barclay, John Savage
+ * @version 1.0
+ *
+ * @version 1.1 included the empty  constructor to enable
+ * easier <code>NetChannelOUTPUT</code> list creation (Jon Kerridge)
+ * and changes to comply with Groovy-jsr03
+ */
     ChannelInputList(channelArray) {
         cList = (Arrays.asList(Channel.getInputArray(channelArray)))
     }
