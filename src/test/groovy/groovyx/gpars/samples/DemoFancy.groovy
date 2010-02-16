@@ -27,7 +27,6 @@ import groovy.swing.SwingBuilder
 import groovyx.gpars.Parallelizer
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlows
-import java.awt.Color
 import static javax.swing.BorderFactory.*
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE
 
@@ -52,23 +51,15 @@ builder.build {
     frame.pack()
 }
 
-def update = { view, text, color ->
-    builder.edt {
-        view.text = text
-        view.background = color
-    }
-}
-
 DataFlow.task {
     def result = ''
     values.eachWithIndex { value, index ->
-        def view = labels[index]
-        update view, 'Waiting', Color.red
+        builder.edt { labels[index].text = 'Waiting' }
         def part = retrieved[index]
-        update view, 'Appending ' + part, Color.blue
+        builder.edt { labels[index].text = 'Appending ' + part}
         sleep 1000
         result += part
-        update view, result, Color.green
+        builder.edt { labels[index].text = result }
     }
 }
 
