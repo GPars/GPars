@@ -39,9 +39,8 @@ builder.build {
     final JFrame frame = builder.frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE, visible: true) {
         panel(layout: new GridLayout(values.size(), 2)) {
             values.eachWithIndex {value, index ->
-                button('Undefined', enabled: false, id: 'x' + index)
-                button('Accumulated summary not known', enabled: false, id: 'y' + index)
-
+                button('Undefined', opaque:true, id: 'x' + index)
+                button('Accumulated summary not known', opaque:true, id: 'y' + index)
             }
         }
     }
