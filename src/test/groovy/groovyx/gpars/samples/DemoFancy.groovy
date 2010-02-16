@@ -14,6 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
+Visual demo of DataFlows that need to processed in a given order -
+like for appending - while retrieving the several parts concurrently.
+@author Vaclav Pech
+@author Dierk Koenig
+*/
+
 package groovyx.gpars.samples
 
 import groovy.swing.SwingBuilder
@@ -21,72 +28,56 @@ import groovyx.gpars.Parallelizer
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlows
 import java.awt.Color
-import java.awt.GridLayout
-import javax.swing.JFrame
+import static javax.swing.BorderFactory.*
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE
 
-def values = [1, 2, 3, 4, 5]
-final DataFlows df = new DataFlows()
+def rand = new Random()
+def values = (1..5).collect { 1 + rand.nextInt(15) }
+
+final DataFlows retrieved = new DataFlows()
+def bars = []
+def labels = []
 
 final SwingBuilder builder = new SwingBuilder()
-
 builder.build {
-    final JFrame frame = builder.frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE, visible: true) {
-        panel(layout: new GridLayout(values.size(), 2)) {
+    def frame = builder.frame(title: 'Demo', defaultCloseOperation: EXIT_ON_CLOSE, visible: true, location: [80, 80]) {
+        panel(border: createEmptyBorder(10, 10, 10, 10)) {
+            gridLayout rows: values.size(), columns: 2, hgap: 10, vgap: 10
             values.eachWithIndex {value, index ->
-                button('Undefined', enabled: false, id: 'x' + index)
-                button('Unknown', enabled: false, id: 'y' + index)
-
+                bars[index] = progressBar(string: value, minimum: 0, maximum: value, stringPainted: true)
+                labels[index] = label()
             }
         }
-
     }
-
     frame.pack()
 }
 
+def update = { view, text, color ->
+    builder.edt {
+        view.text = text
+        view.background = color
+    }
+}
+
 DataFlow.task {
-    values.eachWithIndex {value, index ->
-        builder.edt {
-            builder."y$index".text = 'Waiting'
-            builder."y$index".background = Color.red
-        }
-        def result = df."$index"
-        builder.edt {
-            builder."y$index".text = 'Processing ' + result
-            builder."y$index".background = Color.blue
-        }
+    def result = ''
+    values.eachWithIndex { value, index ->
+        def view = labels[index]
+        update view, 'Waiting', Color.red
+        def part = retrieved[index]
+        update view, 'Appending ' + part, Color.blue
         sleep 1000
-        builder.edt {
-            builder."y$index".text = 'Done'
-            builder."y$index".background = Color.green
-        }
+        result += part
+        update view, result, Color.green
     }
 }
 
-values.eachWithIndex {value, index ->
-    df."$index" {newValue ->
-        builder.edt {
-            builder."x$index".text = newValue
-            builder."x$index".background = Color.green
+Parallelizer.doParallel() {
+    values.eachWithIndexParallel { value, index ->
+        for (progress in 1..value) {
+            sleep 1000
+            builder.edt { bars[index].value = progress }
         }
+        retrieved[index] = value + " "
     }
 }
-
-random = new Random()
-
-Parallelizer.doParallel(3) {
-    values.eachWithIndexParallel {value, index ->
-        builder.edt {
-            builder."x$index".text = 'Calculating'
-            builder."x$index".background = Color.blue
-        }
-
-        df."$index" = func(value)
-    }
-}
-
-private def func(value) {
-    sleep random.nextInt(15000)
-    value
-}
-
