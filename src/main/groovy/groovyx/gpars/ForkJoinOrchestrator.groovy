@@ -36,7 +36,7 @@ import jsr166y.forkjoin.TaskBarrier
  * Author: Vaclav Pech
  * Date: Nov 1, 2009
  */
-public final class ForkJoinOrchestrator<T> extends RecursiveAction {
+final class ForkJoinOrchestrator<T> extends RecursiveAction {
     private final DataFlowVariable<T> result = new DataFlowVariable<T>()
     private final AbstractForkJoinWorker<T> rootWorker
 
@@ -44,7 +44,7 @@ public final class ForkJoinOrchestrator<T> extends RecursiveAction {
      * Creates a new instance with the given root worker.
      * @param rootWorker The root worker, which will be eventually invoked to start the whole algorithm
      */
-    public def ForkJoinOrchestrator(final rootWorker) {
+    def ForkJoinOrchestrator(final rootWorker) {
         this.rootWorker = rootWorker;
     }
 
@@ -52,7 +52,7 @@ public final class ForkJoinOrchestrator<T> extends RecursiveAction {
      * Starts the algorithm.
      * The ForkJoinOrchestrator relies on being invoked inside the Parallelizer.doParallel() block.
      */
-    public ForkJoinOrchestrator<T> start() {
+    ForkJoinOrchestrator<T> start() {
         def pool = Parallelizer.retrieveCurrentPool()
         if (pool==null) throw new IllegalStateException("Cannot start an ForkJoinOrchestrator. The pool has not been set. Perhaps, we're no inside a Parallelizer.doParallel() block.")
         pool.execute(this)
@@ -65,7 +65,7 @@ public final class ForkJoinOrchestrator<T> extends RecursiveAction {
      * The ForkJoinOrchestrator relies on being invoked inside the Parallelizer.doParallel() block.
      * @return The result returned by the root worker.
      */
-    public T perform() {
+    T perform() {
         start().getResult()
     }
 
@@ -85,7 +85,7 @@ public final class ForkJoinOrchestrator<T> extends RecursiveAction {
      * Blocks until a result is available.
      * @return The result returned by the root worker.
      */
-    public T getResult() {
+    T getResult() {
         result.val
     }
 }

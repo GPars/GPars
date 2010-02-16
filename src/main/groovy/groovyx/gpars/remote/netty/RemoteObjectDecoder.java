@@ -33,14 +33,14 @@ public class RemoteObjectDecoder extends ObjectDecoder {
      *
      * @param connection connection handling serialization details
      */
-    public RemoteObjectDecoder(RemoteConnection connection) {
+    public RemoteObjectDecoder(final RemoteConnection connection) {
         super();
         this.connection = connection;
     }
 
     @Override
-    protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
-        RemoteHost remoteHost = connection.getHost();
+    protected Object decode(final ChannelHandlerContext ctx, final Channel channel, final ChannelBuffer buffer) throws Exception {
+        final RemoteHost remoteHost = connection.getHost();
 
         if (remoteHost != null) {
             remoteHost.enter();

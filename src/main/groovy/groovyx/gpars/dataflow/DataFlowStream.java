@@ -88,12 +88,16 @@ public final class DataFlowStream<T> {
      * @return The DFV to bind the value on
      */
     private DataFlowVariable<T> retrieveForBind() {
+        return copyDFV(requests, queue);
+    }
+
+    private DataFlowVariable<T> copyDFV(final LinkedBlockingQueue<DataFlowVariable<T>> from, final LinkedBlockingQueue<DataFlowVariable<T>> to) {
         DataFlowVariable<T> ref;
         synchronized (queueLock) {
-            ref = requests.poll();
+            ref = from.poll();
             if (ref == null) {
                 ref = new DataFlowVariable<T>();
-                queue.offer(ref);
+                to.offer(ref);
             }
         }
         return ref;
@@ -142,15 +146,7 @@ public final class DataFlowStream<T> {
      * @return The DFV to wait for value on
      */
     private DataFlowVariable<T> retrieveOrCreateVariable() {
-        DataFlowVariable<T> dataFlowVariable;
-        synchronized (queueLock) {
-            dataFlowVariable = queue.poll();
-            if (dataFlowVariable == null) {
-                dataFlowVariable = new DataFlowVariable<T>();
-                requests.offer(dataFlowVariable);
-            }
-        }
-        return dataFlowVariable;
+        return copyDFV(queue, requests);
     }
 
     /**

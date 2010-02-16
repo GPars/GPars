@@ -61,7 +61,7 @@ public class DefaultPool implements Pool {
      * @param poolSize The required size of the pool
      */
     public DefaultPool(final boolean daemon, final int poolSize) {
-        if (poolSize < 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        PoolUtils.checkValidPoolSize(poolSize);
         this.pool = DefaultPool.createPool(daemon, poolSize);
     }
 
@@ -120,7 +120,7 @@ public class DefaultPool implements Pool {
      * @param poolSize The new pool size
      */
     public final void resize(final int poolSize) {
-        if (poolSize < 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        PoolUtils.checkValidPoolSize(poolSize);
         pool.setCorePoolSize(poolSize);
     }
 

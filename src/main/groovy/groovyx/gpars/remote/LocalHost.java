@@ -21,6 +21,7 @@ import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandles;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -167,15 +168,13 @@ public class LocalHost extends SerialHandles {
 
         if (node != null) {
             synchronized (localNodes) {
-                for (final LocalNode localNode : localNodes.values()) {
-                    localNode.onDisconnect(node);
-                }
+                onDisconnectForLocalNodes(node);
             }
         }
     }
 
     public void onDisconnect(final SerialContext host) {
-        final ArrayList<RemoteNode> toRemove = new ArrayList<RemoteNode>();
+        final Collection<RemoteNode> toRemove = new ArrayList<RemoteNode>();
         synchronized (remoteNodes) {
             for (final RemoteNode t : remoteNodes.values()) {
                 if (t.getRemoteHost() == host) {
@@ -187,12 +186,16 @@ public class LocalHost extends SerialHandles {
             }
         }
 
-        synchronized (localNodes) {
+        synchronized (localNodes) {  //todo consider moving the synchronized block inside the onDisconnectForLocalNodes() method
             for (final RemoteNode t : toRemove) {
-                for (final LocalNode localNode : localNodes.values()) {
-                    localNode.onDisconnect(t);
-                }
+                onDisconnectForLocalNodes(t);
             }
+        }
+    }
+
+    private void onDisconnectForLocalNodes(final RemoteNode t) {
+        for (final LocalNode localNode : localNodes.values()) {
+            localNode.onDisconnect(t);
         }
     }
 }

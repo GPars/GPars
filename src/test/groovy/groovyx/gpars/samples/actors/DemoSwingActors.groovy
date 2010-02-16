@@ -65,8 +65,8 @@ def contentDownloader = Actors.reactor {
     contentDownloaderArea.report "Downloading ${it.site}"
 //    def content = it.site.toURL().text
     def content = defaultSites[it.site]
-    Thread.sleep 2000
-    if (it.site.contains('info')) Thread.sleep 10000
+    sleep 2000
+    if (it.site.contains('info')) sleep 10000
 
     contentDownloaderArea.report "Downloaded"
     new WordFindResponse(content, it)
@@ -81,7 +81,7 @@ def contentCache = Actors.actor {
             switch (it) {
                 case WordFindRequest:
                     contentCacheArea.report "Retrieving ${it.site}"
-                    Thread.sleep 2000
+                    sleep 2000
                     def content = cache[it.site]
                     if (content) {
                         contentCacheArea.report "Found in cache"
@@ -100,7 +100,7 @@ def contentCache = Actors.actor {
                     break
                 case WordFindResponse:
                     contentCacheArea.report "Caching ${it.request.site}"
-                    Thread.sleep 2000
+                    sleep 2000
                     cache[it.request.site] = it.content
                     wordFinder << it
                     def downloads = pendingDownloads[it.site]
@@ -122,7 +122,7 @@ wordFinder = Actors.actor {
             switch (it) {
                 case Map:
                     wordFinderArea.report "${it.site} requested"
-                    Thread.sleep 2000
+                    sleep 2000
                     contentCache << new WordFindRequest(it.site, it.word)
                     break
                 case WordFindResponse:

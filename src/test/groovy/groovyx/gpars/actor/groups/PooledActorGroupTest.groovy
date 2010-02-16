@@ -131,9 +131,9 @@ public class PooledActorGroupTest extends GroovyTestCase {
     @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
     public void testDifferentPools() {
         final PooledActorGroup daemonGroup1 = new PooledActorGroup()
-        final PooledActorGroup daemonGroup2 = new PooledActorGroup()
+        final PooledActorGroup daemonGroup2 = new PooledActorGroup(3)
         final NonDaemonActorGroup nonDaemonGroup1 = new NonDaemonActorGroup()
-        final NonDaemonActorGroup nonDaemonGroup2 = new NonDaemonActorGroup()
+        final NonDaemonActorGroup nonDaemonGroup2 = new NonDaemonActorGroup(3)
         final PooledActorGroup defaultGroup = Actors.defaultPooledActorGroup
 
         assert daemonGroup1.threadPool != daemonGroup2.threadPool

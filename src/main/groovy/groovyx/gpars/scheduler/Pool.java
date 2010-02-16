@@ -23,7 +23,7 @@ package groovyx.gpars.scheduler;
  *         Date: Feb 27, 2009
  */
 public interface Pool {
-    String POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER = "Pool size must be a non-negative number.";
+    String POOL_SIZE_MUST_BE_A_POSITIVE_NUMBER = "Pool size must be a positive number.";
     String UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL = "Uncaught exception occurred in actor pool ";
 
     /**

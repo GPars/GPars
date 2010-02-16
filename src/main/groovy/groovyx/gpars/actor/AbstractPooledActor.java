@@ -173,20 +173,10 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      */
     @Override
     protected final Object receiveImpl() throws InterruptedException {
-        if (stopFlag == S_NOT_STARTED) {
-            throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
-        }
-
-        if (stopFlag == S_STOPPED) {
-            throw new IllegalStateException(THE_ACTOR_HAS_BEEN_STOPPED);
-        }
+        checkStoppedFlags();
 
         final ActorMessage message = takeMessage();
-        enhanceReplies(Arrays.asList(message));
-        if (message == null) {
-            return null;
-        }
-        return message.getPayLoad();
+        return enhanceAndUnwrap(message);
     }
 
     /**
@@ -199,20 +189,23 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      */
     @Override
     protected final Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
-        if (stopFlag == S_NOT_STARTED) {
-            throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
-        }
-
-        if (stopFlag == S_STOPPED) {
-            throw new IllegalStateException(THE_ACTOR_HAS_BEEN_STOPPED);
-        }
+        checkStoppedFlags();
 
         final ActorMessage message = takeMessage(timeout, units);
+        return enhanceAndUnwrap(message);
+    }
+
+    private Object enhanceAndUnwrap(final ActorMessage message) {
         enhanceReplies(Arrays.asList(message));
         if (message == null) {
             return null;
         }
         return message.getPayLoad();
+    }
+
+    private void checkStoppedFlags() {
+        if (stopFlag == S_NOT_STARTED) throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
+        if (stopFlag == S_STOPPED) throw new IllegalStateException(THE_ACTOR_HAS_BEEN_STOPPED);
     }
 
     /**

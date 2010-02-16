@@ -20,15 +20,12 @@
 //  Author: Hans Dockter
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
-import java.text.SimpleDateFormat
-import org.gradle.api.DefaultTask
-
 // gradle imports these by default, but IDEA doesn't know
-import org.gradle.api.file.FileCollection
 
-usePlugin 'groovy'
-usePlugin 'maven'
-usePlugin 'osgi'
+
+apply id : 'groovy'
+apply id : 'maven'
+apply id : 'osgi'
 
 defaultTasks 'test'
 
@@ -157,7 +154,7 @@ task docs << {
   ant.docs(src:"grails-doc/src", dest:"build/docs/guide", properties:"grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir : new File('grails-doc/resources/css'), imagesDir : new File('grails-doc/resources/img') )
 }
 
-task zipDoc(type: Zip, dependsOn: documentation) {
+task zipDoc(type: Zip, dependsOn: 'documentation') {
     appendix = 'docs'
     from(docsDir)
 }
@@ -175,9 +172,39 @@ task zipSamples(type: Zip) {
     }
 }
 
+task copyThirdPartyLibs(type: Copy) {
+    from('lib')
+    into('build/dist')
+    exclude('junit-4.7.jar', 'netty-3.1.5.GA-sources.jar')
+}
+
+task copyLibs(type: Copy) {
+    from('build/libs')
+    into('build/dist')
+}
+
+task copyDists(type: Copy) {
+    from('build/distributions')
+    into('build/dist')
+}
+
+task copyLicense(type: Copy) {
+    from('src/main/resources/META-INF/')
+    into('build/dist')
+    include('LICENSE.txt', 'NOTICE.txt')
+}
+
+task zipDist(dependsOn: ['jar', 'copyThirdPartyLibs', 'copyLibs', 'copyDists', 'copyLicense'], type: Zip) {
+    appendix = 'all'
+    from 'build/dist'
+}
+zipDist << {
+    ant.delete(dir:file('build/dist'), failonerror:true)
+}
+
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
-    gradleVersion = '0.9-20091111095904+0100-maven_webdav'
+    gradleVersion = '0.9-20100121145940+1100'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {

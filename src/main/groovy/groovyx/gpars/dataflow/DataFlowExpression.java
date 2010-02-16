@@ -212,11 +212,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                 // ok, we are in the queue, so writer is responsible to process us
                 while (state != S_INITIALIZED) {
                     LockSupport.park();
-                    if (Thread.currentThread().isInterrupted()) {
-                        newWaiting.set(true); // don't unpark please
-                        throw new InterruptedException();
-                    }
-                }
+                    if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting); }
                 break;
             }
         }
@@ -257,16 +253,17 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                     }
 
                     LockSupport.parkNanos(toWait);
-                    if (Thread.currentThread().isInterrupted()) {
-                        newWaiting.set(true); // don't unpark please
-                        throw new InterruptedException();
-                    }
-                }
+                    if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting); }
                 break;
             }
         }
 
         return value;
+    }
+
+    private static void handleInterruption(final AtomicBoolean newWaiting) throws InterruptedException {
+        newWaiting.set(true); // don't unpark please
+        throw new InterruptedException();
     }
 
     /**

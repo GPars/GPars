@@ -48,7 +48,7 @@ public class FJPool implements Pool {
      * @param configuredPoolSize The required size of the pool
      */
     public FJPool(final int configuredPoolSize) {
-        if (configuredPoolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        PoolUtils.checkValidPoolSize(configuredPoolSize);
         this.configuredPoolSize = configuredPoolSize;
         pool = createPool(configuredPoolSize);
     }
@@ -80,7 +80,7 @@ public class FJPool implements Pool {
      * @param poolSize The new pool size
      */
     public final void resize(final int poolSize) {
-        if (poolSize < 0) throw new IllegalStateException(POOL_SIZE_MUST_BE_A_NON_NEGATIVE_NUMBER);
+        PoolUtils.checkValidPoolSize(poolSize);
         pool.setPoolSize(poolSize);
     }
 

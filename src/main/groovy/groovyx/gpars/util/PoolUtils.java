@@ -1,20 +1,22 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-9  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.util;
+
+import groovyx.gpars.scheduler.Pool;
 
 /**
  * Provides a couple of utility methods to pools and schedulers.
@@ -35,5 +37,9 @@ public final class PoolUtils {
         } catch (NumberFormatException ignored) {
             return Runtime.getRuntime().availableProcessors() + 1;
         }
+    }
+
+    public static void checkValidPoolSize(final int poolSize) {
+        if (poolSize <= 0) throw new IllegalStateException(Pool.POOL_SIZE_MUST_BE_A_POSITIVE_NUMBER);
     }
 }
