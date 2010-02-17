@@ -218,9 +218,9 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoSwingCollectionProcessing',
             'DemoSwingActors',
             'DemoSwingDataFlowOperators',
-            'DemoSwingFancyDataFlow',                     //Shows UI
-            'DemoFancy',                                  //Shows UI
-            'DemoMapReduce',                              //Replies on internet connection
+            'DemoSwingFancyDataFlow',                     // Shows UI
+            'DemoSwingDataFlowProgress',                  // Shows UI
+            'DemoMapReduce',                              // Relies on internet connection
     ]
 
     classpath = sourceSets.main.runtimeClasspath

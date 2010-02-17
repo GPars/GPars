@@ -21,7 +21,7 @@ like for appending - while retrieving the several parts concurrently.
 @author Dierk Koenig
 */
 
-package groovyx.gpars.samples
+package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
 import groovyx.gpars.Parallelizer
@@ -58,7 +58,7 @@ DataFlow.task {
         def part = retrieved[index]
         builder.edt { labels[index].text = 'Appending ' + part}
         sleep 1000
-        result += part
+        result <<= part
         builder.edt { labels[index].text = result }
     }
 }
