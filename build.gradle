@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-9  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 //  Author: Václav Pech
 //  Author: Russel Winder
@@ -23,9 +23,9 @@
 // gradle imports these by default, but IDEA doesn't know
 
 
-apply id : 'groovy'
-apply id : 'maven'
-apply id : 'osgi'
+apply id: 'groovy'
+apply id: 'maven'
+apply id: 'osgi'
 
 defaultTasks 'test'
 
@@ -36,25 +36,25 @@ bundleVersion = version
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
-configure ( jar.osgi ) {
-  name = 'gpars'
-  version = this.version
-  symbolicName = 'gpars.org'
-  instruction 'Bundle-Vendor' , theVendor
-  instruction 'Bundle-Description' , group
-  instruction 'Bundle-DocURL' , 'http://gpars.codehaus.org'
-  instruction 'Built-By' , System.properties.'user.name'
-  instruction 'Extension-Name' , archivesBaseName
-  instruction 'Specification-Title' , theTitle
-  instruction 'Specification-Version' , version
-  instruction 'Specification-Vendor' , theVendor
-  instruction 'Implementation-Title' , theTitle
-  instruction 'Implementation-Version' , version
-  instruction 'Implementation-Vendor' , theVendor
-  instruction 'Implementation-Title', archivesBaseName
-  instruction 'Implementation-Version', version
-  instruction 'provider', theVendor
-  instruction 'Export-Package', '*'
+configure(jar.osgi) {
+    name = 'gpars'
+    version = this.version
+    symbolicName = 'gpars.org'
+    instruction 'Bundle-Vendor', theVendor
+    instruction 'Bundle-Description', group
+    instruction 'Bundle-DocURL', 'http://gpars.codehaus.org'
+    instruction 'Built-By', System.properties.'user.name'
+    instruction 'Extension-Name', archivesBaseName
+    instruction 'Specification-Title', theTitle
+    instruction 'Specification-Version', version
+    instruction 'Specification-Vendor', theVendor
+    instruction 'Implementation-Title', theTitle
+    instruction 'Implementation-Version', version
+    instruction 'Implementation-Vendor', theVendor
+    instruction 'Implementation-Title', archivesBaseName
+    instruction 'Implementation-Version', version
+    instruction 'provider', theVendor
+    instruction 'Export-Package', '*'
 }
 
 repositories {
@@ -86,9 +86,9 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '256M')
 
 gradle.taskGraph.whenReady {taskGraph ->
-   if (!taskGraph.hasTask(':release')) {
-       version += '-SNAPSHOT'
-   }
+    if (!taskGraph.hasTask(':release')) {
+        version += '-SNAPSHOT'
+    }
 }
 
 task release(dependsOn: ['build']) << {
@@ -96,23 +96,23 @@ task release(dependsOn: ['build']) << {
 }
 
 try {
-  uploadArchives {
-    repositories.mavenDeployer {
-      uniqueVersion = false
-      configuration = configurations.deployerJars
-      repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
-        authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
-      }
-      snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
-        authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
-      }
+    uploadArchives {
+        repositories.mavenDeployer {
+            uniqueVersion = false
+            configuration = configurations.deployerJars
+            repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
+                authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+            }
+            snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
+                authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+            }
+        }
     }
-  }
 }
-catch ( Exception e ) {
-  //  It may be that gpars_repoUserName and/or gpars_repoPassword are not defined in which case an exception
-  //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
-  //  care that the uploadArchives specification hasn't completed.
+catch (Exception e) {
+    //  It may be that gpars_repoUserName and/or gpars_repoPassword are not defined in which case an exception
+    //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
+    //  care that the uploadArchives specification hasn't completed.
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
@@ -150,8 +150,8 @@ groovydoc {
 task documentation(dependsOn: ['javadoc', 'groovydoc', 'docs'], description: 'Create the API documentation.')
 
 task docs << {
-  ant.taskdef (name: 'docs', classname : 'grails.doc.ant.DocPublisherTask' , classpath : configurations.docs.asPath)
-  ant.docs(src:"grails-doc/src", dest:"build/docs/guide", properties:"grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir : new File('grails-doc/resources/css'), imagesDir : new File('grails-doc/resources/img') )
+    ant.taskdef(name: 'docs', classname: 'grails.doc.ant.DocPublisherTask', classpath: configurations.docs.asPath)
+    ant.docs(src: "grails-doc/src", dest: "build/docs/guide", properties: "grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir: new File('grails-doc/resources/css'), imagesDir: new File('grails-doc/resources/img'))
 }
 
 task zipDoc(type: Zip, dependsOn: 'documentation') {
@@ -199,7 +199,7 @@ task zipDist(dependsOn: ['jar', 'copyThirdPartyLibs', 'copyLibs', 'copyDists', '
     from 'build/dist'
 }
 zipDist << {
-    ant.delete(dir:file('build/dist'), failonerror:true)
+    ant.delete(dir: file('build/dist'), failonerror: true)
 }
 
 task wrapper(type: Wrapper) {
@@ -215,10 +215,12 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoRemote',                                 // doesn't work in an automated environment
             'DemoSwing',                                  // maybe we don't want these to run on the CI ..
             'DemoSwingMashup',                            // but they can be run locally
-            'DemoSwingCollectionProcessing',                            
-            'DemoSwingActors',                            
+            'DemoSwingCollectionProcessing',
+            'DemoSwingActors',
             'DemoSwingDataFlowOperators',
-            'DemoMapReduce',                              //Replies on internet connection
+            'DemoSwingFancyDataFlow',                     // Shows UI
+            'DemoSwingDataFlowProgress',                  // Shows UI
+            'DemoMapReduce',                              // Relies on internet connection
     ]
 
     classpath = sourceSets.main.runtimeClasspath
