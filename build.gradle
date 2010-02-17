@@ -218,7 +218,8 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoSwingCollectionProcessing',
             'DemoSwingActors',
             'DemoSwingDataFlowOperators',
-            'DemoSwingFancyDataFlow',
+            'DemoSwingFancyDataFlow',                     //Shows UI
+            'DemoFancy',                                  //Shows UI
             'DemoMapReduce',                              //Replies on internet connection
     ]
 
