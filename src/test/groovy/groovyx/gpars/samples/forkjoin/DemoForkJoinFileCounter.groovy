@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-9  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.samples.forkjoin
 
@@ -34,9 +34,11 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
         this.file = file
     }
 
-    protected void compute() {
-        long count = 0;
+    protected void computeTask() {
+        long count = 0
         file.eachFile {
+            if (file.name.contains('fork')) throw new RuntimeException('test')
+
             if (it.isDirectory()) {
                 println "Forking a thread for $it"
                 forkOffChild(new FileCounter(it))           //fork a child task
@@ -44,7 +46,8 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
                 count++
             }
         }
-        setResult(count + ((childrenResults)?.sum() ?: 0))  //use results of children tasks to calculate and store own result
+        setResult(count + ((childrenResults)?.sum() ?: 0))
+        //use results of children tasks to calculate and store own result
     }
 }
 
