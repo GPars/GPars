@@ -37,8 +37,6 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
     protected void computeTask() {
         long count = 0
         file.eachFile {
-            if (file.name.contains('fork')) throw new RuntimeException('test')
-
             if (it.isDirectory()) {
                 println "Forking a thread for $it"
                 forkOffChild(new FileCounter(it))           //fork a child task
