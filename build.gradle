@@ -22,7 +22,6 @@
 
 // gradle imports these by default, but IDEA doesn't know
 
-
 apply id: 'groovy'
 apply id: 'maven'
 apply id: 'osgi'
@@ -67,6 +66,7 @@ repositories {
 configurations {
     deployerJars
     docs
+    cover
 }
 
 dependencies {
@@ -78,6 +78,7 @@ dependencies {
     docs group: 'org.grails', name: 'grails-docs', version: '1.2.0.BUILD-SNAPSHOT'
     docs group: 'radeox', name: 'radeox', version: '1.0-b2'
     deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
+    cover 'net.sourceforge.cobertura:cobertura:1.9.3'
 }
 
 //  To get the details of the "unchecked" issues.
@@ -93,6 +94,19 @@ gradle.taskGraph.whenReady {taskGraph ->
 
 task release(dependsOn: ['build']) << {
     println 'We release now'
+}
+
+task instrument << {
+    ant.taskdef resource: 'tasks.properties', classpath: configurations.cover.asPath
+    ant.'cobertura-instrument'(todir: 'build/classes/instrumented') {
+        fileset dir: 'build/classes/main'
+    }
+}
+
+task coverage << {
+    ant.'cobertura-report'(destdir: 'build/reports/coverage') {
+        fileset dir: 'src/main/groovy'
+    }
 }
 
 try {
