@@ -116,7 +116,7 @@ catch (Exception e) {
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
-def copyrightString = 'Copyright &#169; 2008&#8211;2009  V&#225;clav Pech.  All Rights Reserved.'
+def copyrightString = 'Copyright &#169; 2008&#8211;2010  V&#225;clav Pech.  All Rights Reserved.'
 def packageTitle = group
 
 javadoc {
