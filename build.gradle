@@ -79,6 +79,7 @@ dependencies {
     docs group: 'radeox', name: 'radeox', version: '1.0-b2'
     deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
     cover 'net.sourceforge.cobertura:cobertura:1.9.3'
+    testRuntime 'net.sourceforge.cobertura:cobertura:1.9.3'
 }
 
 //  To get the details of the "unchecked" issues.
@@ -86,9 +87,12 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '256M')
 
-gradle.taskGraph.whenReady {taskGraph ->
+gradle.taskGraph.whenReady { taskGraph ->
     if (!taskGraph.hasTask(':release')) {
         version += '-SNAPSHOT'
+    }
+    if (taskGraph.hasTask(':test') && taskGraph.hasTask(':withCoverage')) {
+        setupForCoverage()
     }
 }
 
@@ -96,16 +100,43 @@ task release(dependsOn: ['build']) << {
     println 'We release now'
 }
 
-task instrument << {
+def instrument(saveDir, workDir) {
     ant.taskdef resource: 'tasks.properties', classpath: configurations.cover.asPath
-    ant.'cobertura-instrument'(todir: 'build/classes/instrumented') {
+    println "before instrumenting, save pristine classes"
+    ant.delete file:saveDir, failonerror:false
+    ant.copy (todir:saveDir) { fileset dir:workDir }
+    println "instrument the class files for measuring code coverage"
+    ant.'cobertura-instrument' {
         fileset dir: 'build/classes/main'
     }
+    ant.delete file:'cobertura.ser'
+    println "instrumenting done."
 }
 
-task coverage << {
+def coverageReport(saveDir, workDir) {
+    println "generate the code coverage report"
     ant.'cobertura-report'(destdir: 'build/reports/coverage') {
         fileset dir: 'src/main/groovy'
+    }
+    println "after generating coverage report, restore pristine classes"
+    ant.delete file:workDir, failonerror:false
+    ant.mkdir dir:workDir
+    ant.move (todir:workDir) { fileset dir:saveDir }
+}
+
+task withCoverage {
+    description = "prepare the test task to use code coverage if needed"
+}
+
+def setupForCoverage() {
+    println "preparing for test coverage"
+    String saveDir = 'build/classes/plain'
+    String workDir = 'build/classes/main'
+    test.doFirst {
+        instrument saveDir, workDir
+    }
+    test.doLast {
+        coverageReport saveDir, workDir
     }
 }
 
