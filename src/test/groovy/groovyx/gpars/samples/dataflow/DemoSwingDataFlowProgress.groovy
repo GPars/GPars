@@ -1,6 +1,6 @@
 // GPars (formerly GParallelizer)
 //
-// Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import groovy.swing.SwingBuilder
 import groovyx.gpars.Parallelizer
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlows
-import static javax.swing.BorderFactory.*
+import static javax.swing.BorderFactory.createEmptyBorder
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE
 
 def rand = new Random()
@@ -53,7 +53,7 @@ builder.build {
 
 DataFlow.task {
     def result = ''
-    values.eachWithIndex { value, index ->
+    values.eachWithIndex {value, index ->
         builder.edt { labels[index].text = 'Waiting' }
         def part = retrieved[index]
         builder.edt { labels[index].text = 'Appending ' + part}
@@ -64,7 +64,7 @@ DataFlow.task {
 }
 
 Parallelizer.doParallel() {
-    values.eachWithIndexParallel { value, index ->
+    values.eachWithIndexParallel {value, index ->
         for (progress in 1..value) {
             sleep 1000
             builder.edt { bars[index].value = progress }
