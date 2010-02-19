@@ -1,6 +1,6 @@
 // GPars (formerly GParallelizer)
 //
-// Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ catch (Exception e) {
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
-def copyrightString = 'Copyright &#169; 2008&#8211;2009  V&#225;clav Pech.  All Rights Reserved.'
+def copyrightString = 'Copyright &#169; 2008&#8211;2010  V&#225;clav Pech.  All Rights Reserved.'
 def packageTitle = group
 
 javadoc {
