@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-9  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * A parallel quicksort implementation based on Dierk Koenig's sample code kata.
@@ -38,14 +38,14 @@ class Sorter extends AbstractForkJoinWorker {
         this.list = list
     }
 
-    protected void compute() {
-        def groups = list.groupBy{it <=> list[list.size().intdiv(2)]}
+    @Override protected void computeTask() {
+        def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
         if ((list.size() < 2) || (groups.size() == 1)) {
-            setResult([index:index, list:list.clone()])
+            setResult([index: index, list: list.clone()])
             return
         }
-        (-1..1).each{forkOffChild new Sorter(it, groups[it]?:[])}
-        setResult([index:index, list:childrenResults.sort{it.index}.sum{it.list}])
+        (-1..1).each {forkOffChild new Sorter(it, groups[it] ?: [])}
+        setResult([index: index, list: childrenResults.sort {it.index}.sum {it.list}])
     }
 }
 

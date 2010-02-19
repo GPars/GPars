@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-9  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.samples.forkjoin
 
@@ -66,7 +66,7 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
     /**
      * Sorts a small list or delegates to two children, if the list contains more than two elements.
      */
-    protected void compute() {
+    @Override protected void computeTask() {
         println "Thread ${Thread.currentThread().name[-1]}: Sorting $numbers"
         switch (numbers.size()) {
             case 0..1:
@@ -78,7 +78,7 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
                 break
             default:
                 def splitList = split(numbers)
-                [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each{forkOffChild it}  //fork a child task
+                [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each {forkOffChild it}  //fork a child task
                 setResult merge(* childrenResults)      //use results of children tasks to calculate and store own result
         }
     }
