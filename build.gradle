@@ -92,7 +92,7 @@ gradle.taskGraph.whenReady { taskGraph ->
         version += '-SNAPSHOT'
     }
     if (taskGraph.hasTask(':test') && taskGraph.hasTask(':withCoverage')) {
-        setupForCoverage()
+        new Coverage(this).setup()
     }
 }
 
@@ -100,45 +100,8 @@ task release(dependsOn: ['build']) << {
     println 'We release now'
 }
 
-def instrument(saveDir, workDir) {
-    ant.taskdef resource: 'tasks.properties', classpath: configurations.cover.asPath
-    println "before instrumenting, save pristine classes"
-    ant.delete file:saveDir, failonerror:false
-    ant.copy (todir:saveDir) { fileset dir:workDir }
-    println "instrument the class files for measuring code coverage"
-    ant.'cobertura-instrument' {
-        fileset dir: 'build/classes/main'
-    }
-    ant.delete file:'cobertura.ser'
-    println "done."
-}
-
-def coverageReport(saveDir, workDir) {
-    println "generate the code coverage report"
-    ant.'cobertura-report'(destdir: 'build/reports/coverage') {
-        fileset dir: 'src/main/groovy', includes:'**/*.java'
-        fileset dir: 'src/main/groovy', includes:'**/*.groovy'
-    }
-    println "after generating coverage report, restore pristine classes"
-    ant.delete file:workDir, failonerror:false
-    ant.mkdir dir:workDir
-    ant.move (todir:workDir) { fileset dir:saveDir }
-}
-
-task withCoverage {
+task withCoverage { // only here such that it can be put on the command line for enabling coverage
     description = "prepare the test task to use code coverage if needed"
-}
-
-def setupForCoverage() {
-    println "preparing for test coverage"
-    String saveDir = 'build/classes/plain'
-    String workDir = 'build/classes/main'
-    test.doFirst {
-        instrument saveDir, workDir
-    }
-    test.doLast {
-        coverageReport saveDir, workDir
-    }
 }
 
 try {

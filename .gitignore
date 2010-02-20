@@ -1,3 +1,7 @@
 build
 out
 .gradle
+gradle-app.setting
+cobertura.ser
+buildSrc/.gradle
+buildSrc/build
