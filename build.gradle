@@ -110,13 +110,14 @@ def instrument(saveDir, workDir) {
         fileset dir: 'build/classes/main'
     }
     ant.delete file:'cobertura.ser'
-    println "instrumenting done."
+    println "done."
 }
 
 def coverageReport(saveDir, workDir) {
     println "generate the code coverage report"
     ant.'cobertura-report'(destdir: 'build/reports/coverage') {
-        fileset dir: 'src/main/groovy'
+        fileset dir: 'src/main/groovy', includes:'**/*.java'
+        fileset dir: 'src/main/groovy', includes:'**/*.groovy'
     }
     println "after generating coverage report, restore pristine classes"
     ant.delete file:workDir, failonerror:false
