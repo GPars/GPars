@@ -43,6 +43,9 @@ doParallel(1) {pool ->  //feel free to experiment with the number of fork/join t
 
 {code}
 
+The AbstractForkJoinWorker subclasses can be written both in Java or Groovy, giving you the option to easily optimize
+for execution speed, if row performance of the worker becomes a bottleneck.
+
 h3. Fork / Join saves your resources
 
 Fork/Join operations can be safely run with small number of threads thanks to internally using the TaskBarrier class to synchronize the threads. While a thread is blocked inside an algorithm waiting for its sub-problems to be calculated, the thread is silently returned to the pool to take on any of the available sub-problems from the task queue and process them.
