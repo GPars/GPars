@@ -29,26 +29,26 @@ class Coverage {
         test = context.test
         cp = context.configurations.cover.asPath
         logger = context.logger
+        context.test { options.fork() }
     }
 
-    def instrument(saveDir, workDir) {
+    def instrument() {
         ant.taskdef resource: 'tasks.properties', classpath: cp
         log "before instrumenting, save pristine classes"
         ant.delete file: saveDir, failonerror: false
         ant.copy(todir: saveDir) { fileset dir: workDir }
         log "instrument the class files for measuring code coverage"
+        ant.delete file: 'cobertura.ser'
         ant.'cobertura-instrument' {
             fileset dir: 'build/classes/main'
         }
-        ant.delete file: 'cobertura.ser'
         log "done."
     }
 
-    def coverageReport(saveDir, workDir) {
+    def coverageReport() {
         log "generate the code coverage report"
         ant.'cobertura-report'(destdir: 'build/reports/coverage') {
-            fileset dir: 'src/main/groovy', includes: '**/*.java'
-            fileset dir: 'src/main/groovy', includes: '**/*.groovy'
+            fileset dir: 'src/main/groovy'
         }
         log "after generating coverage report, restore pristine classes"
         ant.delete file: workDir, failonerror: false
@@ -58,12 +58,8 @@ class Coverage {
 
     def setup() {
         log "preparing for test coverage"
-        test.doFirst {
-            instrument saveDir, workDir
-        }
-        test.doLast {
-            coverageReport saveDir, workDir
-        }
+        test.doFirst { instrument() }
+        test.doLast  { coverageReport() }
     }
 
     void log(message) {
