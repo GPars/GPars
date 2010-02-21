@@ -16,13 +16,13 @@
 
 package groovyx.gpars;
 
-import groovyx.gpars.dataflow.DataFlowVariable;
 import jsr166y.forkjoin.RecursiveAction;
 import jsr166y.forkjoin.TaskBarrier;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Implements the contract between the ForkJoinOrchestrator and the task workers.
@@ -38,7 +38,8 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
     /**
      * Stores the result of the worker
      */
-    private final DataFlowVariable<T> value = new DataFlowVariable<T>();
+    private T value = null;
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     /**
      * The barrier obtained from the parent worker
@@ -81,7 +82,8 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
     public final T getResult() throws InterruptedException {
         if (getException() != null)
             throw new IllegalStateException("Exception while processing the Fork Join task", getException());
-        return value.getVal();
+        latch.await();
+        return value;
     }
 
     /**
@@ -90,7 +92,9 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
      * @param value The result to store and report to the parent worker
      */
     protected final void setResult(final T value) {
-        this.value.bind(value);
+        assert this.value == null : "The result of the current Fork Join Worker has been set already.";
+        this.value = value;
+        latch.countDown();
     }
 
     /**
