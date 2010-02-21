@@ -52,6 +52,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="buildSrc" />
   </component>
   <component name="copyright">
     <Base>
@@ -59,4 +60,3 @@
     </Base>
   </component>
 </module>
-

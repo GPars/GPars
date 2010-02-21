@@ -22,7 +22,6 @@
 
 // gradle imports these by default, but IDEA doesn't know
 
-
 apply id: 'groovy'
 apply id: 'maven'
 apply id: 'osgi'
@@ -67,6 +66,7 @@ repositories {
 configurations {
     deployerJars
     docs
+    cover
 }
 
 dependencies {
@@ -81,6 +81,8 @@ dependencies {
     docs group: 'radeox', name: 'radeox', version: '1.0-b2'
 
     deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
+    cover 'net.sourceforge.cobertura:cobertura:1.9.3'
+    testRuntime 'net.sourceforge.cobertura:cobertura:1.9.3'
 }
 
 //  To get the details of the "unchecked" issues.
@@ -88,14 +90,21 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '256M')
 
-gradle.taskGraph.whenReady {taskGraph ->
+gradle.taskGraph.whenReady { taskGraph ->
     if (!taskGraph.hasTask(':release')) {
         version += '-SNAPSHOT'
+    }
+    if (taskGraph.hasTask(':test') && taskGraph.hasTask(':withCoverage')) {
+        new Coverage(this).setup()
     }
 }
 
 task release(dependsOn: ['build']) << {
     println 'We release now'
+}
+
+task withCoverage { // only here such that it can be put on the command line for enabling coverage
+    description = "prepare the test task to use code coverage if needed"
 }
 
 try {

@@ -74,11 +74,11 @@ final class ForkJoinOrchestrator<T> extends RecursiveAction {
      * Starts the root worker, waits for the calculation to finish and retrieves the result from the root worker.
      */
     void compute() {
-        final TaskBarrier taskBarrier = new TaskBarrier(1)
-        rootWorker.taskBarrier = taskBarrier
-        rootWorker.fork()
-        taskBarrier.arriveAndAwait()
         try {
+            final TaskBarrier taskBarrier = new TaskBarrier(1)
+            rootWorker.taskBarrier = taskBarrier
+            rootWorker.fork()
+            taskBarrier.arriveAndAwait()
             result << rootWorker.result
         } catch (Throwable e) {
             result << e
@@ -91,7 +91,8 @@ final class ForkJoinOrchestrator<T> extends RecursiveAction {
      * @return The result returned by the root worker.
      */
     T getResult() {
-        if (result.val in Throwable) throw result.val
-        else return result.val
+        final Object result = result.val
+        if (result in Throwable) throw result
+        else return result
     }
 }
