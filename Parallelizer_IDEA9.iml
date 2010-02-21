@@ -43,6 +43,7 @@
         <jarDirectory url="file://$GROOVY_HOME$/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="buildSrc" />
   </component>
   <component name="copyright">
     <Base>
