@@ -17,11 +17,9 @@
 package groovyx.gpars.samples.forkjoin
 
 /**
- * Created by IntelliJ IDEA.
- * User: vaclav
+ *
+ * @author Vaclav Pech
  * Date: Feb 19, 2010
- * Time: 6:28:56 PM
- * To change this template use File | Settings | File Templates.
  */
 
 import groovyx.gpars.AbstractForkJoinWorker

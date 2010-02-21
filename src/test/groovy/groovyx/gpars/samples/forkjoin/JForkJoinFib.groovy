@@ -23,7 +23,6 @@ import groovyx.gpars.AbstractForkJoinWorker
  *
  * @author Vaclav Pech
  * Date: Feb 19, 2010
- * Time: 7:36:40 PM
  */
 public class JForkJoinFib extends AbstractForkJoinWorker {
 
