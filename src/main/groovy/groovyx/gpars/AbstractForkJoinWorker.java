@@ -22,7 +22,6 @@ import jsr166y.forkjoin.TaskBarrier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Implements the contract between the ForkJoinOrchestrator and the task workers.
@@ -38,8 +37,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
     /**
      * Stores the result of the worker
      */
-    private T value = null;
-    private final CountDownLatch latch = new CountDownLatch(1);
+    private volatile T value = null;
 
     /**
      * The barrier obtained from the parent worker
@@ -79,10 +77,10 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
      * @throws java.lang.InterruptedException If interrupted while waiting for the result
      */
     @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
-    public final T getResult() throws InterruptedException {
-        if (getException() != null)
+    T getResult() throws InterruptedException {
+        if (getException() != null) {
             throw new IllegalStateException("Exception while processing the Fork Join task", getException());
-        latch.await();
+        }
         return value;
     }
 
@@ -94,7 +92,6 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
     protected final void setResult(final T value) {
         assert this.value == null : "The result of the current Fork Join Worker has been set already.";
         this.value = value;
-        latch.countDown();
     }
 
     /**
@@ -120,15 +117,6 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
     protected abstract void computeTask();
 
     /**
-     * Blocks until all children finish their calculations, releasing the physical thread temporarily to the thread pool
-     * to do some work stealing. It is not usually necessary to call the awaitChildren() method directly
-     * since the getChildrenResults() method calls it itself before returning the children results.
-     */
-    protected final void awaitChildren() {
-        childTaskBarrier.arriveAndAwait();
-    }
-
-    /**
      * Forks a child task. Makes sure it has a means to indicate back completion.
      * The worker is stored in the internal list of workers for evidence and easy result retrieval through getChildrenResults().
      *
@@ -139,15 +127,6 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
         assert taskBarrier != null;
         child.setTaskBarrier(childTaskBarrier);
         child.fork();
-    }
-
-    /**
-     * Retrieves the unmodifiable list of workers.
-     *
-     * @return All workers forked through the forkOff() method.
-     */
-    protected final List<AbstractForkJoinWorker<T>> getChildren() {
-        return Collections.unmodifiableList(children);
     }
 
     /**
@@ -163,5 +142,23 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveAction {
             results.add(worker.getResult());
         }
         return results;
+    }
+
+    /**
+     * Blocks until all children finish their calculations, releasing the physical thread temporarily to the thread pool
+     * to do some work stealing. It is not usually necessary to call the awaitChildren() method directly
+     * since the getChildrenResults() method calls it itself before returning the children results.
+     */
+    private void awaitChildren() {
+        childTaskBarrier.arriveAndAwait();
+    }
+
+    /**
+     * Retrieves the unmodifiable list of workers.
+     *
+     * @return All workers forked through the forkOff() method.
+     */
+    private Iterable<AbstractForkJoinWorker<T>> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 }

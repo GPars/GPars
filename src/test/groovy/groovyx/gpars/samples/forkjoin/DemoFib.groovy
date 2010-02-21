@@ -48,30 +48,26 @@ class ForkJoinFib extends AbstractForkJoinWorker {
     }
 }
 
+doParallel(2) {
 
-long t1 = System.currentTimeMillis()
-try {
-    doParallel(2) {
+    final long t1 = System.currentTimeMillis()
+    try {
         assert orchestrate(new ForkJoinFib(number: 30)) == 832040
         assert orchestrate(new ForkJoinFib(number: 36)) == 14930352
 
         assert ForkJoinFib.seqfib(37) == 24157817
-//        assert JForkJoinFib.seqfib(37) == 24157817
 
-        //Never returns and freezes my groovyConsole:
-//        assert orchestrate(new ForkJoinFib(number: 37)) == 24157817
-//        println orchestrate(new ForkJoinFib(number: 37))
-//        println orchestrate(new JForkJoinFib(37))
-//        println '4'
+        assert orchestrate(new ForkJoinFib(number: 37)) == 24157817
 
         try {
             orchestrate(new ForkJoinFib(number: -1))
         } catch (RuntimeException ignore) {
             println "We've correctly received an exception. That's what we deserve for calculating a negative Fibbonacci number."
         }
+    } catch (Throwable e) {
+        e.printStackTrace()
     }
-} catch (Throwable e) {
-    e.printStackTrace()
+    final long t2 = System.currentTimeMillis()
+    println t2 - t1
 }
-long t2 = System.currentTimeMillis()
-println t2 - t1
+
