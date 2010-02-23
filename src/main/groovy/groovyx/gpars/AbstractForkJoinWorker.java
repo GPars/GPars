@@ -36,7 +36,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
     /**
      * Stores the child workers
      */
-    private final Collection<AbstractForkJoinWorker<T>> children = new ArrayList<AbstractForkJoinWorker<T>>();
+    private Collection<AbstractForkJoinWorker<T>> children = new ArrayList<AbstractForkJoinWorker<T>>();
 
     protected AbstractForkJoinWorker() {
     }
@@ -59,10 +59,11 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
      * @return A list of results returned from the child tasks
      */
     protected final List<T> getChildrenResults() {
-        final List<T> results = new ArrayList<T>();
+        final List<T> results = new ArrayList<T>(children.size());
         for (final AbstractForkJoinWorker<T> worker : children) {
             results.add(worker.join());
         }
+        children = null;
         return results;
     }
 }
