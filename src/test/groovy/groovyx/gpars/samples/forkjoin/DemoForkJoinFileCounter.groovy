@@ -1,6 +1,6 @@
 // GPars (formerly GParallelizer)
 //
-// Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
         this.file = file
     }
 
-    protected void computeTask() {
+    protected Long compute() {
         long count = 0
         file.eachFile {
             if (it.isDirectory()) {
@@ -44,7 +44,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
                 count++
             }
         }
-        setResult(count + ((childrenResults)?.sum() ?: 0))
+        return count + ((childrenResults)?.sum() ?: 0)
         //use results of children tasks to calculate and store own result
     }
 }

@@ -1,25 +1,23 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.Parallelizer
-import groovyx.gpars.dataflow.DataFlowVariable
-import jsr166y.forkjoin.RecursiveAction
-import jsr166y.forkjoin.TaskBarrier
+import jsr166y.forkjoin.RecursiveTask
 
 /**
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.
@@ -28,47 +26,28 @@ import jsr166y.forkjoin.TaskBarrier
  * Date: Jul 16, 2008
  */
 
-public class FJFileCounter extends RecursiveAction {
+public class FJFileCounter extends RecursiveTask<Long> {
     private final File file;
-    private final TaskBarrier taskBarrier;
 
-    long count = 0;
-
-    def FJFileCounter(final File file, final TaskBarrier taskBarrier) {
+    def FJFileCounter(final File file) {
         this.file = file
-        this.taskBarrier = taskBarrier
-        this.taskBarrier.register()
     }
 
-    protected void compute() {
-        final TaskBarrier childTaskBarrier = new TaskBarrier(1)
+    protected Long compute() {
         def fileCounters = []
+        long count = 0
         file.eachFile {
             if (it.isDirectory()) {
                 println "Forking a thread for $it"
-                def childCounter = new FJFileCounter(it, childTaskBarrier)
+                def childCounter = new FJFileCounter(it)
                 childCounter.fork()
                 fileCounters << childCounter
             } else {
                 count++
             }
         }
-        childTaskBarrier.arriveAndAwait()
-        this.count += (fileCounters*.count)?.sum() ?: 0
-        taskBarrier.arriveAndDeregister()
-    }
-}
-
-class Orchestrator extends RecursiveAction {
-    String dir
-    DataFlowVariable result
-
-    protected void compute() {
-        final TaskBarrier taskBarrier = new TaskBarrier(1)
-        final def counter = new FJFileCounter(new File(dir), taskBarrier)
-        counter.fork()
-        taskBarrier.arriveAndAwait()
-        result << counter.count
+        count += (fileCounters*.join())?.sum() ?: 0
+        return count
     }
 }
 
@@ -77,10 +56,7 @@ class Orchestrator extends RecursiveAction {
  Although the algorithm creates as many tasks as there are sub-directories and tasks wait for the sub-directory tasks to complete,
  as few as one thread is enough to keep the computation going.
  */
-
 Parallelizer.doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    final DataFlowVariable result = new DataFlowVariable()
-    final String dir = ".."
-    pool.execute(new Orchestrator(dir:dir, result:result))
-    println "Number of files: ${result.val}"
+    def result = pool.submit(new FJFileCounter(new File('..'))).get()
+    println "Number of files: ${result}"
 }

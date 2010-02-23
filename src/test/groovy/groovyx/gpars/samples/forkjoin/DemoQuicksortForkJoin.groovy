@@ -1,6 +1,6 @@
 // GPars (formerly GParallelizer)
 //
-// Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ import groovyx.gpars.AbstractForkJoinWorker
 import groovyx.gpars.Parallelizer
 import static groovyx.gpars.Parallelizer.doParallel
 
-@SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
-class Sorter extends AbstractForkJoinWorker {
+class Sorter extends AbstractForkJoinWorker<Map> {
 
     def index
     def list
@@ -38,14 +37,13 @@ class Sorter extends AbstractForkJoinWorker {
         this.list = list
     }
 
-    @Override protected void computeTask() {
+    @Override protected Map compute() {
         def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
         if ((list.size() < 2) || (groups.size() == 1)) {
-            setResult([index: index, list: list.clone()])
-            return
+            return [index: index, list: list.clone()]
         }
         (-1..1).each {forkOffChild new Sorter(it, groups[it] ?: [])}
-        setResult([index: index, list: childrenResults.sort {it.index}.sum {it.list}])
+        return [index: index, list: childrenResults.sort {it.index}.sum {it.list}]
     }
 }
 

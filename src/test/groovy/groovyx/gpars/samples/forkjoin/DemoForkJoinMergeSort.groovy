@@ -1,6 +1,6 @@
 // GPars (formerly GParallelizer)
 //
-// Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,20 +66,18 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
     /**
      * Sorts a small list or delegates to two children, if the list contains more than two elements.
      */
-    @Override protected void computeTask() {
+    @Override protected List<Integer> compute() {
         println "Thread ${Thread.currentThread().name[-1]}: Sorting $numbers"
         switch (numbers.size()) {
             case 0..1:
-                setResult numbers                                   //store own result
-                break
+                return numbers                                   //store own result
             case 2:
-                if (numbers[0] <= numbers[1]) setResult numbers     //store own result
-                else setResult numbers[-1..0]                       //store own result
-                break
+                if (numbers[0] <= numbers[1]) return numbers     //store own result
+                else return numbers[-1..0]                       //store own result
             default:
                 def splitList = split(numbers)
                 [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each {forkOffChild it}  //fork a child task
-                setResult merge(* childrenResults)      //use results of children tasks to calculate and store own result
+                return merge(* childrenResults)      //use results of children tasks to calculate and store own result
         }
     }
 }
