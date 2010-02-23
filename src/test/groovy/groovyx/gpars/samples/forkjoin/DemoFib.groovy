@@ -54,11 +54,8 @@ doParallel(2) {
     final long t1 = System.currentTimeMillis()
     try {
         assert orchestrate(new ForkJoinFib(number: 30)) == 832040
-        assert orchestrate(new ForkJoinFib(number: 36)) == 14930352
 
-        assert ForkJoinFib.seqfib(37) == 24157817
-
-        assert orchestrate(new ForkJoinFib(number: 37)) == 24157817
+        assert ForkJoinFib.seqfib(31) == orchestrate(new ForkJoinFib(number: 31))
 
         try {
             orchestrate(new ForkJoinFib(number: -1))
