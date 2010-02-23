@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Implements the ForkJoin worker contract.
  * Subclasses need to implement the compute() to perform the actual Fork/Join algorithm leveraging the options
- * provided by the AbstractForkJoinWorker class. The AnstractForjJoinWorker class takes care of the child sub-processes.
+ * provided by the AbstractForkJoinWorker class. The AbstractForJoinWorker class takes care of the child sub-processes.
  * <p/>
  * Author: Vaclav Pech
  * Date: Nov 1, 2009
