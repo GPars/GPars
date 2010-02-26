@@ -115,6 +115,13 @@ try {
             snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
                 authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
             }
+            pom.whenConfigured { pom ->
+               pom.dependencies { dependency ->
+                  if (false) {
+                     dependency.optional = true
+                  }
+               }
+            }
         }
     }
 }
