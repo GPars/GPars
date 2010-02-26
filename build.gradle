@@ -118,8 +118,8 @@ try {
             // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
             pom.whenConfigured {pom ->
                 // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
-                pom.dependencies {dependency ->
-                    def optionalDependencies = ['jetty', 'jcsp']
+                pom.dependencies.each {dependency ->
+                    def optionalDependencies = ['netty', 'jcsp']
                     if (dependency.artifactId in optionalDependencies) {
                         dependency.optional = true
                     }
