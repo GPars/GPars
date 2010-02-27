@@ -23,6 +23,7 @@ package groovyx.gpars.samples.forkjoin
  */
 
 import groovyx.gpars.AbstractForkJoinWorker
+import java.util.concurrent.ExecutionException
 import static groovyx.gpars.Parallelizer.doParallel
 import static groovyx.gpars.Parallelizer.orchestrate
 
@@ -30,16 +31,16 @@ class ForkJoinFib extends AbstractForkJoinWorker {
 
     def number
 
-    protected void computeTask() {
+    protected Integer compute() {
         if (number < 0) {
             throw new RuntimeException("No fib below 0!")
         }
         if (number <= 13) {
-            result = seqfib(number)
-            return
+            return seqfib(number)
         }
-        [new ForkJoinFib(number: (number - 1)), new ForkJoinFib(number: (number - 2))].each { forkOffChild it }
-        result = childrenResults.sum()
+        forkOffChild new ForkJoinFib(number: (number - 1))
+        forkOffChild new ForkJoinFib(number: (number - 2))
+        return (Integer) childrenResults.sum()
     }
 
     static int seqfib(int n) {
@@ -53,15 +54,12 @@ doParallel(2) {
     final long t1 = System.currentTimeMillis()
     try {
         assert orchestrate(new ForkJoinFib(number: 30)) == 832040
-        assert orchestrate(new ForkJoinFib(number: 36)) == 14930352
 
-        assert ForkJoinFib.seqfib(37) == 24157817
-
-        assert orchestrate(new ForkJoinFib(number: 37)) == 24157817
+        assert ForkJoinFib.seqfib(31) == orchestrate(new ForkJoinFib(number: 31))
 
         try {
             orchestrate(new ForkJoinFib(number: -1))
-        } catch (RuntimeException ignore) {
+        } catch (ExecutionException ignore) {
             println "We've correctly received an exception. That's what we deserve for calculating a negative Fibbonacci number."
         }
     } catch (Throwable e) {

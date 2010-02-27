@@ -9,11 +9,11 @@ When talking about hierarchical problems, think about quick sort, merge sort, fi
  * The solutions of all sub-problems are combined to solve their parent problem, which in turn helps solve its own parent problem.
 
 The mighty *JSR-166y* library solves Fork / Join orchestration pretty nicely for us, but leaves a couple of rough edges, which can hurt you, if you don't pay attention enough. You still deal
-with threads, pools and synchronization barriers.
+with threads, pools or synchronization barriers.
 
 h3. The GPars abstraction convenience layer
 
-GPars can hide the complexities of dealing with threads, pools, barriers and RecursiveActions from you, yet let you leverage the powerful Fork/Join implementation in jsr166y.
+GPars can hide the complexities of dealing with threads, pools and recursive tasks from you, yet let you leverage the powerful Fork/Join implementation in jsr166y.
 
 {code}
 public final class FileCounter extends AbstractForkJoinWorker<Long> {
@@ -23,7 +23,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
         this.file = file
     }
 
-    protected void computeTask() {
+    protected Long compute() {
         long count = 0;
         file.eachFile {
             if (it.isDirectory()) {
@@ -33,7 +33,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
                 count++
             }
         }
-        setResult(count + ((childrenResults)?.sum() ?: 0))  //use results of children tasks to calculate and store own result
+        return count + ((childrenResults)?.sum() ?: 0)  //use results of children tasks to calculate and store own result
     }
 }
 
@@ -93,20 +93,18 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
     /**
      * Sorts a small list or delegates to two children, if the list contains more than two elements.
      */
-    protected void computeTask() {
+    protected List<Integer> compute() {
         println "Thread ${Thread.currentThread().name[-1]}: Sorting $numbers"
         switch (numbers.size()) {
             case 0..1:
-                setResult numbers                                   //store own result
-                break
+                return numbers                                   //store own result
             case 2:
-                if (numbers[0] <= numbers[1]) setResult numbers     //store own result
-                else setResult numbers[-1..0]                       //store own result
-                break
+                if (numbers[0] <= numbers[1]) return numbers     //store own result
+                else return numbers[-1..0]                       //store own result
             default:
                 def splitList = split(numbers)
                 [new SortWorker(splitList[0]), new SortWorker(splitList[1])].each{forkOffChild it}  //fork a child task
-                setResult merge(* childrenResults)      //use results of children tasks to calculate and store own result
+                return merge(* childrenResults)      //use results of children tasks to calculate and store own result
         }
     }
 }

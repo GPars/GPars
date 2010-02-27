@@ -90,7 +90,7 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '256M')
 
-gradle.taskGraph.whenReady { taskGraph ->
+gradle.taskGraph.whenReady {taskGraph ->
     if (!taskGraph.hasTask(':release')) {
         version += '-SNAPSHOT'
     }
@@ -117,6 +117,16 @@ try {
             }
             snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
                 authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+            }
+            // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
+            pom.whenConfigured {pom ->
+                // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
+                pom.dependencies.each {dependency ->
+                    def optionalDependencies = ['netty', 'jcsp']
+                    if (dependency.artifactId in optionalDependencies) {
+                        dependency.optional = true
+                    }
+                }
             }
         }
     }
