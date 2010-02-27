@@ -29,7 +29,7 @@ import groovyx.gpars.scheduler.Pool
 public final class NonDaemonActorGroup extends ActorGroup {
 
     /**
-     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
      */
     def NonDaemonActorGroup(final Pool threadPool) {
         super(threadPool)

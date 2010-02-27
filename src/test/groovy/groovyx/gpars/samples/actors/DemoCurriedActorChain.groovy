@@ -19,7 +19,7 @@ package groovyx.gpars.samples.actors
 import groovyx.gpars.actor.Actors
 
 /**
- * Creates a list of actors, which pass a message
+ * Creates a chain of actors, which pass a message from one end of the chain to the other one.
  */
 
 def intermediaries = []
