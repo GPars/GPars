@@ -89,7 +89,7 @@ public final class TestSortWorker extends AbstractForkJoinWorker<List<Integer>> 
     /**
      * Sorts a small list or delegates to two children, if the list contains more than two elements.
      */
-    @Override protected List<Integer> compute() {
+    @Override protected List<Integer> computeTask() {
         switch (numbers.size()) {
             case 0..1:
                 return numbers                                   //store own result

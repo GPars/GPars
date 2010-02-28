@@ -37,7 +37,7 @@ class Sorter extends AbstractForkJoinWorker<Map> {
         this.list = list
     }
 
-    @Override protected Map compute() {
+    @Override protected Map computeTask() {
         def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
         if ((list.size() < 2) || (groups.size() == 1)) {
             return [index: index, list: list.clone()]

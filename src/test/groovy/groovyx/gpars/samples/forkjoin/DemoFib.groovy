@@ -31,7 +31,8 @@ class ForkJoinFib extends AbstractForkJoinWorker {
 
     def number
 
-    protected Integer compute() {
+    @Override
+    protected Integer computeTask() {
         if (number < 0) {
             throw new RuntimeException("No fib below 0!")
         }
