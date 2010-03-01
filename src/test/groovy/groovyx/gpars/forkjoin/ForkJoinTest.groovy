@@ -35,18 +35,32 @@ class ForkJoinTest extends GroovyTestCase {
             assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), orchestrate(new TestSortWorker(numbers)).toArray())
         }
         doParallel(1) {
-            assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), orchestrate(new TestSortWorker(numbers)).toArray())
+            final TestSortWorker worker = new TestSortWorker(numbers)
+            assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), orchestrate(worker).toArray())
+            assert [] == worker.getChildrenResults()
         }
     }
 
     public void testMergeSortWithException() {
         final def numbers = [1, 5, 2, 4, 'abc', 8, 6, 7, 3, 4, 5]
 
+        final TestSortWorker worker = new TestSortWorker(numbers)
         doParallel(3) {
             shouldFail(ExecutionException) {
-                orchestrate(new TestSortWorker(numbers))
+                orchestrate(worker)
             }
         }
+        assert [] == worker.getChildrenResults()
+    }
+
+    public void testChildrenCollection() {
+        TestSortWorker worker = new TestSortWorker([] as List<Integer>)
+        assert [] == worker.getChildrenResults()
+        assert [] == worker.compute()
+        assert [] == worker.getChildrenResults()
+
+        worker = new TestSortWorker([1, 2, 3, 4, 5] as List<Integer>)
+        assert [] == worker.getChildrenResults()
     }
 }
 
@@ -100,6 +114,8 @@ public final class TestSortWorker extends AbstractForkJoinWorker<List<Integer>> 
             default:
                 def splitList = split(numbers)
                 [new TestSortWorker(splitList[0]), new TestSortWorker(splitList[1])].each {forkOffChild it}  //fork a child task
+                getChildrenResults()  //to test re-entrance capability of the children results collection
+                if (getChildrenResults().size() != 2) throw new IllegalStateException("Number of children results ${getChildrenResults().size()} is invalid.")
                 return merge(* childrenResults)      //use results of children tasks to calculate and store own result
         }
     }

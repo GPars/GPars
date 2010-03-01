@@ -23,7 +23,8 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
         this.file = file
     }
 
-    protected Long compute() {
+    @Override
+    protected Long computeTask() {
         long count = 0;
         file.eachFile {
             if (it.isDirectory()) {
@@ -93,7 +94,8 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
     /**
      * Sorts a small list or delegates to two children, if the list contains more than two elements.
      */
-    protected List<Integer> compute() {
+    @Override
+    protected List<Integer> computeTask() {
         println "Thread ${Thread.currentThread().name[-1]}: Sorting $numbers"
         switch (numbers.size()) {
             case 0..1:
