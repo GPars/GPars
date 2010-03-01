@@ -10,7 +10,7 @@ On the other hand, Map/Reduce can perform considerably faster if you need to cha
 {code}
 
 The _xxxParallel()_ methods have to follow the contract of their non-parallel peers. So a _collectParallel()_ method must return a legal collection of items, which you can again treat as a Groovy collection.
-Internally the parallel collect method builds an efficient parallel structure (Parallel Array), performs the required operation concurrently and before returning destroys the Paralle Array building the collection of results to return to you.
+Internally the parallel collect method builds an efficient parallel structure, called parallel array, performs the required operation concurrently and before returning destroys the Parallel Array building the collection of results to return to you.
 A potential call to let say _findAllParallel()_ on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers.
 
 With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly.

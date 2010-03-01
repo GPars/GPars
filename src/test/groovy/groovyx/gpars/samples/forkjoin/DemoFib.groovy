@@ -37,16 +37,16 @@ class ForkJoinFib extends AbstractForkJoinWorker {
             throw new RuntimeException("No fib below 0!")
         }
         if (number <= 13) {
-            return seqfib(number)
+            return sequentialFib(number)
         }
         forkOffChild new ForkJoinFib(number: (number - 1))
         forkOffChild new ForkJoinFib(number: (number - 2))
         return (Integer) childrenResults.sum()
     }
 
-    static int seqfib(int n) {
+    static int sequentialFib(int n) {
         if (n <= 1) return n;
-        else return seqfib(n - 1) + seqfib(n - 2);
+        else return sequentialFib(n - 1) + sequentialFib(n - 2);
     }
 }
 
@@ -56,7 +56,7 @@ doParallel(2) {
     try {
         assert orchestrate(new ForkJoinFib(number: 30)) == 832040
 
-        assert ForkJoinFib.seqfib(31) == orchestrate(new ForkJoinFib(number: 31))
+        assert ForkJoinFib.sequentialFib(31) == orchestrate(new ForkJoinFib(number: 31))
 
         try {
             orchestrate(new ForkJoinFib(number: -1))
