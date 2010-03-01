@@ -39,8 +39,6 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
      */
     private Collection<AbstractForkJoinWorker<T>> children = null;
 
-    //todo test - proper children size
-
     protected AbstractForkJoinWorker() {
     }
 
