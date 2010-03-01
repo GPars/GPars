@@ -20,6 +20,7 @@ import jsr166y.forkjoin.RecursiveTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,11 +37,21 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
     /**
      * Stores the child workers
      */
-    private Collection<AbstractForkJoinWorker<T>> children = new ArrayList<AbstractForkJoinWorker<T>>();
+    private Collection<AbstractForkJoinWorker<T>> children = null;
 
     protected AbstractForkJoinWorker() {
     }
 
+    @Override
+    protected final T compute() {
+        try {
+            return computeTask();
+        } finally {
+            children = null;
+        }
+    }
+
+    protected abstract T computeTask();
 
     /**
      * Forks a child task. Makes sure it has a means to indicate back completion.
@@ -49,6 +60,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
      * @param child The child task
      */
     protected final void forkOffChild(final AbstractForkJoinWorker<T> child) {
+        if (children == null) children = new ArrayList<AbstractForkJoinWorker<T>>();
         children.add(child);
         child.fork();
     }
@@ -59,11 +71,11 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
      * @return A list of results returned from the child tasks
      */
     protected final List<T> getChildrenResults() {
+        if (children == null) return Collections.emptyList();
         final List<T> results = new ArrayList<T>(children.size());
         for (final AbstractForkJoinWorker<T> worker : children) {
             results.add(worker.join());
         }
-        children = null;
         return results;
     }
 }

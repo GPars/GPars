@@ -34,7 +34,8 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
         this.file = file
     }
 
-    protected Long compute() {
+    @Override
+    protected Long computeTask() {
         long count = 0
         file.eachFile {
             if (it.isDirectory()) {
