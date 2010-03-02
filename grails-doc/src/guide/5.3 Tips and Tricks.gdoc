@@ -27,22 +27,22 @@ Bear in mind that the methods _handleA()_ and _handleB()_ in all our examples ne
 Alternatively, when using the _actor()_ factory method, you can add event-handling code through the meta class as closures.
 {code}
 Actor actor2 = actor {
+    delegate.metaClass {
+        handleA = {->
+            react {a ->
+                 handleB(a)
+            }
+        }
+
+        handleB = {a ->
+            react {b ->
+                println a + b
+                reply a + b
+            }
+        }
+    }
+
     handleA()
-}
-
-actor2.metaClass {
-    handleA = {->
-        react {a ->
-            handleB(a)
-        }
-    }
-
-    handleB = {a ->
-        react {b ->
-            println a + b
-            reply a + b
-        }
-    }
 }
 {code}
 
