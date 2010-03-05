@@ -4,7 +4,7 @@ h4. Dataflow Concurrency
 
 Dataflow concurrency offers an alternative concurrency model, which is inherently safe and robust.
 It puts emphasis on the data and their flow though your processes instead of the actual processes that manipulate the data.
-Dataflow algorithms relieve developers from dealing with live-locks, race-conditions and make dead-ocks deterministic
+Dataflow algorithms relieve developers from dealing with live-locks, race-conditions and make dead-locks deterministic
 and thus 100% reproducible. If you don't get dead-locks in tests you won't get them in production.
 
 h4. Dataflow Variable
