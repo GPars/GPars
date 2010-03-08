@@ -31,7 +31,8 @@ import jsr166y.forkjoin.ParallelArray
  * @see groovyx.gpars.Parallelizer
  *
  * @author Vaclav Pech
- * Date: Oct 23, 2008
+*  @author Robert Fischer
+ * Date: Mar 10, 2010
  */
 public class ParallelArrayUtil {
 
