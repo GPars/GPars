@@ -313,4 +313,20 @@ public class ParallelUtilTest extends GroovyTestCase {
             assert map.keys().size() > 1
         }
     }
+
+    public void testNonBooleanParallelMethods() {
+      def methods = [
+        "findAll":[1,3], 
+        "find":1, 
+        "any":true, 
+        "every":false
+      ]
+      def x = [1,2,3]
+      methods.each { method, expected ->
+        Parallelizer.doParallel {
+          // Really just making sure it doesn't explode, but what the Hell...
+          assertEquals "Surprise when processing parallel version of $method", expected, x."${method}Parallel"({ it % 2 })
+        }
+      }
+    }
 }
