@@ -22,9 +22,9 @@
 
 // gradle imports these by default, but IDEA doesn't know
 
-apply id: 'groovy'
-apply id: 'maven'
-apply id: 'osgi'
+usePlugin 'groovy'
+usePlugin 'maven'
+usePlugin 'osgi'
 
 defaultTasks 'test'
 
@@ -163,7 +163,7 @@ groovydoc {
     header = packageTitle
     footer = copyrightString
     include 'groovyx/gpars/**'
-    overview = 'overview.html'
+    overview = new File('overview.html')
 }
 
 task documentation(dependsOn: ['javadoc', 'groovydoc', 'docs'], description: 'Create the API documentation.')
