@@ -274,8 +274,19 @@ class Asynchronizer {
      * @return The result values of all closures
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static List<Object> doInParallel(Closure ... closures) {
+    public static List<Object> doInParallel(Closure... closures) {
         return AsyncInvokerUtil.processResult(executeAsync(closures))
+    }
+
+    /**
+     * Starts multiple closures in separate threads, collecting their return values
+     * If an exception is thrown from the closure when called on any of the collection's elements,
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
+     * @return The result values of all closures
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public static List<Object> doInParallel(List<Closure> closures) {
+      return doInParallel(*closures)
     }
 
     /**
@@ -284,7 +295,7 @@ class Asynchronizer {
      * it will be re-thrown in the calling thread when it calls the Future.get() method.
      * @return Futures for the result values or exceptions of all closures
     */
-    public static List<Future<Object>> executeAsync(Closure ... closures) {
+    public static List<Future<Object>> executeAsync(Closure... closures) {
         Asynchronizer.withAsynchronizer(closures.size()) {ExecutorService executorService ->
             List<Future<Object>> result = closures.collect {cl ->
                 executorService.submit({
@@ -293,6 +304,16 @@ class Asynchronizer {
             }
             result
         }
+    }
+
+    /**
+     * Starts multiple closures in separate threads, collecting Futures for their return values
+     * If an exception is thrown from the closure when called on any of the collection's elements,
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
+     * @return Futures for the result values or exceptions of all closures
+    */
+    public static List<Future<Object>> executeAsync(List<Closure> closures) {
+      return executeAsync(*closures)
     }
 
     /**
