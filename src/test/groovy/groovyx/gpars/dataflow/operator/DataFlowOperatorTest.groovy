@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright � 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.dataflow.operator
 
@@ -177,14 +177,14 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
         def op1 = operator(inputs: [a], outputs: [b, c], group) {
             println delegate
-            flag = (output==b) && (outputs[0]==b) && (outputs[1]==c)
+            flag = (output == b) && (outputs[0] == b) && (outputs[1] == c)
             stop()
         }
         a << null
         op1.join()
         assert flag
-        assert (op1.output==b) && (op1.outputs[0]==b) && (op1.outputs[1]==c)
-        assert (op1.getOutput()==b) && (op1.getOutputs(0)==b) && (op1.getOutputs(1)==c)
+        assert (op1.output == b) && (op1.outputs[0] == b) && (op1.outputs[1] == c)
+        assert (op1.getOutput() == b) && (op1.getOutputs(0) == b) && (op1.getOutputs(1) == c)
     }
 
     public void testEmptyOutputs() {
@@ -193,7 +193,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         volatile boolean flag = false
 
         def op1 = operator(inputs: [b], outputs: [], group) {
-            flag = (output==null)
+            flag = (output == null)
             stop()
         }
         b << null
@@ -263,5 +263,32 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         shouldFail(IllegalArgumentException) {
             def op1 = operator([:], group) {v -> }
         }
+    }
+
+    public void testException() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlowVariable a = new DataFlowVariable()
+
+        def op = operator(inputs: [stream], outputs: []) {
+            throw new RuntimeException('test')
+        }
+        op.metaClass.reportError = {Throwable e ->
+            a << e
+            stop()
+        }
+        stream << 'value'
+        assert a.val instanceof RuntimeException
+    }
+
+    public void testExceptionWithDefaultHandler() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlowVariable a = new DataFlowVariable()
+
+        def op = operator(inputs: [stream], outputs: []) {
+            if (it == 'invalidValue') throw new RuntimeException('test')
+        }
+        stream << 'value'
+        stream << 'invalidValue'
+        op.join()
     }
 }
