@@ -28,8 +28,6 @@ import static groovyx.gpars.dataflow.DataFlow.operator
  */
 
 public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
-    //todo handle exceptions
-    //todo document the new API
     //todo add samples
 
     public void testOneForkOperator() {

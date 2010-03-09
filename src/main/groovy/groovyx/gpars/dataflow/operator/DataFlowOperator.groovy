@@ -112,7 +112,7 @@ public final class DataFlowOperator {
      * Is invoked in case the actor throws an exception.
      */
     protected void reportError(Throwable e) {
-        println "The dataflow operator experienced an exception and is about to terminate. $e"
+        System.err.println "The dataflow operator experienced an exception and is about to terminate. $e"
         stop()
     }
 }
