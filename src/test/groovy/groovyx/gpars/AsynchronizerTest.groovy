@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars
 
@@ -198,6 +198,22 @@ public class AsynchronizerTest extends GroovyTestCase {
 
             latch.await()
             assert flag.get()
+        }
+    }
+
+    public void testNonBooleanParallelMethods() {
+        def methods = [
+                "findAll": [1, 3],
+                "find": 1,
+                "any": true,
+                "every": false
+        ]
+        def x = [1, 2, 3]
+        methods.each {method, expected ->
+            Asynchronizer.doParallel {
+                // Really just making sure it doesn't explode, but what the Hell...
+                assertEquals "Surprise when processing parallel version of $method", expected, x."${method}Parallel"({ it % 2 })
+            }
         }
     }
 }
