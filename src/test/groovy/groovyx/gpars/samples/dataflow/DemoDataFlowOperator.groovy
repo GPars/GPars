@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.samples.dataflow
 
@@ -46,7 +46,7 @@ def sites = new DataFlowStream()
  *
  * Downloads received urls passing downloaded content to the output
  */
-DataFlow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
+def downloader = DataFlow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
 
     println "[Downloader] Downloading ${request.site}"
     def content = request.site.toURL().text
@@ -63,7 +63,7 @@ pendingDownloads = [:]
  * Caches sites' contents. Accepts requests for url content, outputs the content. Outputs requests for download
  * if the site is not in cache yet.
  */
-DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
+def cache = DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 
     if (request.content) {
         println "[Cache] Caching ${request.site}"
@@ -73,7 +73,7 @@ DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {re
         if (downloads != null) {
             for (downloadRequest in downloads) {
                 println "[Cache] Waking up"
-                bindOutput 1, [site: downloadRequest.site, word:downloadRequest.word, content: request.content]
+                bindOutput 1, [site: downloadRequest.site, word: downloadRequest.word, content: request.content]
             }
             pendingDownloads.remove(request.site)
         }
@@ -82,7 +82,7 @@ DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {re
         def content = cache[request.site]
         if (content) {
             println "[Cache] Found in cache"
-            bindOutput 1, [site: request.site, word:request.word, content: content]
+            bindOutput 1, [site: request.site, word: request.word, content: content]
         } else {
             def downloads = pendingDownloads[request.site]
             if (downloads != null) {
@@ -113,15 +113,15 @@ def finder = DataFlow.operator(inputs: [sites], outputs: [results]) {request ->
     results << "${result ? '' : 'No '}${request.word} in ${request.site}."
 }
 
-urlRequests << [site:'http://www.dzone.com', word:'groovy']
-urlRequests << [site:'http://www.dzone.com', word:'java']
-urlRequests << [site:'http://www.infoq.com', word:'groovy']
-urlRequests << [site:'http://www.infoq.com', word:'java']
-urlRequests << [site:'http://www.dzone.com', word:'scala']
-urlRequests << [site:'http://www.infoq.com', word:'scala']
-urlRequests << [site:'http://www.theserverside.com', word:'scala']
-urlRequests << [site:'http://www.theserverside.com', word:'java']
-urlRequests << [site:'http://www.theserverside.com', word:'groovy']
+urlRequests << [site: 'http://www.dzone.com', word: 'groovy']
+urlRequests << [site: 'http://www.dzone.com', word: 'java']
+urlRequests << [site: 'http://www.infoq.com', word: 'groovy']
+urlRequests << [site: 'http://www.infoq.com', word: 'java']
+urlRequests << [site: 'http://www.dzone.com', word: 'scala']
+urlRequests << [site: 'http://www.infoq.com', word: 'scala']
+urlRequests << [site: 'http://www.theserverside.com', word: 'scala']
+urlRequests << [site: 'http://www.theserverside.com', word: 'java']
+urlRequests << [site: 'http://www.theserverside.com', word: 'groovy']
 
 Thread.start {
     1.upto 9, {
@@ -130,5 +130,7 @@ Thread.start {
 //        println "============================================================= Result: " + finder.output.val
 //        println "============================================================= Result: " + finder.outputs[0].val
     }
-    System.exit 0
+    finder.stop()
+    cache.stop()
+    downloader.stop()
 }

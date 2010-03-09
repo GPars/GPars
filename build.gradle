@@ -274,6 +274,8 @@ class DemoTask extends DefaultTask {
             }
             println "*** done"
         }
+        println "*** cleaning up"
+        shell.evaluate("groovyx.gpars.dataflow.DataFlow.DATA_FLOW_GROUP.shutdown()")
         println "=== demos: $ok ok, ${failed.size()} failed"
         failed.each { println "${it.file}\n    ${it.exception}" }
     }
@@ -286,6 +288,7 @@ class DemoTask extends DefaultTask {
         )
         System.metaClass.static.exit = {int returnCode -> println ">>> System.exit($returnCode) suppressed." }
         System.in.metaClass.read = {-> println ">>> System.in.read() suppressed"; 'Automated build' }
+        System.in.metaClass.readLines = {-> println ">>> System.in.read() suppressed"; ['Automated build'] }
         new GroovyShell(classloader)
     }
 }
