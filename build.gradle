@@ -22,9 +22,9 @@
 
 // gradle imports these by default, but IDEA doesn't know
 
-usePlugin 'groovy'
-usePlugin 'maven'
-usePlugin 'osgi'
+apply id: 'groovy'
+apply id: 'maven'
+apply id: 'osgi'
 
 defaultTasks 'test'
 
