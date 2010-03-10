@@ -204,16 +204,23 @@ public class AsynchronizerTest extends GroovyTestCase {
     public void testNonBooleanParallelMethods() {
         def methods = [
                 "findAll": [1, 3],
-                "find": 1,
                 "any": true,
                 "every": false
         ]
         def x = [1, 2, 3]
-        methods.each {method, expected ->
-            Asynchronizer.doParallel {
+        Asynchronizer.doParallel {
+            methods.each {method, expected ->
                 // Really just making sure it doesn't explode, but what the Hell...
                 assertEquals "Surprise when processing parallel version of $method", expected, x."${method}Parallel"({ it % 2 })
             }
+        }
+    }
+
+    public void testNonBooleanParallelFind() {
+        def x = [1, 2, 3]
+        Asynchronizer.doParallel {
+            // Really just making sure it doesn't explode, but what the Hell...
+            assert "Surprise when processing parallel version of find", x.findParallel({ it % 2 }) in [1, 3]
         }
     }
 }
