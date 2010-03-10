@@ -223,7 +223,7 @@ zipDist << {
 
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
-    gradleVersion = '0.9-20100226145830+1100'
+    gradleVersion = '0.9-20100309203241+0100'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
