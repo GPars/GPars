@@ -241,6 +241,21 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         op1.stop()
     }
 
+    public void testOutputNumber() {
+        final PooledActorGroup group = new PooledActorGroup(1)
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        operator(inputs: [a], outputs: [], group) {v -> stop()}
+        operator(inputs: [a], group) {v -> stop()}
+        operator(inputs: [a], mistypedOutputs: [d], group) {v -> stop()}
+
+        a << 'value'
+        a << 'value'
+        a << 'value'
+    }
+
     public void testMissingChannels() {
         final PooledActorGroup group = new PooledActorGroup(1)
         final DataFlowStream a = new DataFlowStream()
@@ -252,13 +267,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
             def op1 = operator(inputs1: [a], outputs: [d], group) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = operator(inputs: [a], outputs2: [d], group) {v -> }
-        }
-        shouldFail(IllegalArgumentException) {
             def op1 = operator(outputs: [d], group) {v -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            def op1 = operator(inputs: [d], group) {v -> }
         }
         shouldFail(IllegalArgumentException) {
             def op1 = operator([:], group) {v -> }

@@ -28,7 +28,6 @@ import static groovyx.gpars.dataflow.DataFlow.operator
  */
 
 public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
-    //todo add samples
 
     public void testOneForkOperator() {
         final DataFlowVariable a = new DataFlowVariable()
@@ -125,6 +124,21 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         }
     }
 
+    public void testOutputNumber() {
+        final PooledActorGroup group = new PooledActorGroup(1)
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        operator(inputs: [a], outputs: [], maxForks: 2, group) {v -> stop()}
+        operator(inputs: [a], maxForks: 2, group) {v -> stop()}
+        operator(inputs: [a], mistypedOutputs: [d], maxForks: 2, group) {v -> stop()}
+
+        a << 'value'
+        a << 'value'
+        a << 'value'
+    }
+
     public void testMissingChannels() {
         final PooledActorGroup group = new PooledActorGroup(1)
         final DataFlowStream a = new DataFlowStream()
@@ -136,13 +150,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
             def op1 = operator(inputs1: [a], outputs: [d], maxForks: 2, group) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = operator(inputs: [a], outputs2: [d], maxForks: 2, group) {v -> }
-        }
-        shouldFail(IllegalArgumentException) {
             def op1 = operator(outputs: [d], maxForks: 2, group) {v -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            def op1 = operator(inputs: [d], maxForks: 2, group) {v -> }
         }
         shouldFail(IllegalArgumentException) {
             def op1 = operator([maxForks: 2], group) {v -> }
