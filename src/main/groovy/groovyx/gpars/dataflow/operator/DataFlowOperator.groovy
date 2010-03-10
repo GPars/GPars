@@ -49,15 +49,15 @@ public final class DataFlowOperator {
      */
     private def DataFlowOperator(final Map channels, final Closure code) {
         final int parameters = code.maximumNumberOfParameters
-        if (!channels || (channels.inputs == null) || (channels.outputs == null) || (parameters != channels.inputs.size()))
+        if (!channels || (channels.inputs == null) || (parameters != channels.inputs.size()))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
 
         code.delegate = this
         if (channels.maxForks != null && channels.maxForks != 1) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
-            this.actor = new ForkingDataFlowOperatorActor(this, channels.outputs.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
+            this.actor = new ForkingDataFlowOperatorActor(this, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
         } else {
-            this.actor = new DataFlowOperatorActor(this, channels.outputs.asImmutable(), channels.inputs.asImmutable(), code.clone())
+            this.actor = new DataFlowOperatorActor(this, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
         }
     }
 
