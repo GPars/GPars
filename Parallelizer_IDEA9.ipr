@@ -206,7 +206,7 @@
     </autodetection-disabled>
   </component>
   <component name="GradleSettings">
-    <option name="SDK_HOME" value="C:/dev/gradle-0.8" />
+    <option name="SDK_HOME" value="C:/dev/gradle-0.9-20100309203241+0100" />
   </component>
   <component name="IdProvider" IDEtalkID="798405833E980F6DBFE0C8BDAEEB0CA9" />
   <component name="InspectionProjectProfileManager">
