@@ -45,6 +45,14 @@ public class AsynchronizerTest extends GroovyTestCase {
         assertEquals([10, 20], Asynchronizer.executeAsync({10}, {20})*.get())
     }
 
+    public void testDoInParallelList() {
+        assertEquals([10, 20], Asynchronizer.doInParallel([{10}, {20}]))
+    }
+
+    public void testExecutAsyncList() {
+        assertEquals([10, 20], Asynchronizer.executeAsync([{10}, {20}])*.get())
+    }
+
     public void testAsyncWithCollectionAndResult() {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             Collection<Future> result = [1, 2, 3, 4, 5].collect({it * 10}.async())
