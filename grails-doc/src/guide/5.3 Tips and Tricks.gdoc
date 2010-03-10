@@ -63,10 +63,12 @@ Closure handleA = {->
 }
 
 Actor actor3 = actor {
+    handleA.delegate = delegate
+    handleB.delegate = delegate
+
     handleA()
 }
-handleA.delegate = actor3
-handleB.delegate = actor3
+
 {code}
 h3. Event-driven loops
 When coding event-driven actors you have to have in mind that calls to _react()_ and _loop()_ methods never return. This becomes a bit of a challenge once you try to implement any types of loops in your actors.

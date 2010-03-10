@@ -132,18 +132,12 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
     private static final String AFTER_START = "afterStart";
 
-    protected AbstractPooledActor() {
-    }
-
     /**
      * This method represents the body of the actor. It is called upon actor's start and can exit either normally
      * by return or due to actor being stopped through the stop() method, which cancels the current actor action.
      * Provides an extension point for subclasses to provide their custom Actor's message handling code.
-     * The default implementation throws UnsupportedOperationException.
      */
-    protected void act() {
-        throw new UnsupportedOperationException("The act() method must be overridden");
-    }
+    protected abstract void act();
 
     /**
      * Adds reply() and replyIfExists() methods to the currentActor and the message.

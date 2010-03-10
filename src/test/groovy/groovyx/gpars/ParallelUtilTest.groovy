@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars
 
@@ -67,29 +67,29 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     public void testSplit() {
         Parallelizer.withParallelizer(5) {
-            def result = [1, 2, 3, 4, 5].splitParallel{it > 2}
+            def result = [1, 2, 3, 4, 5].splitParallel {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
             assertEquals 2, result.size()
-            assert  [[], []] == [].splitParallel{it > 2}
-            result = [3].splitParallel{it > 2}
+            assert [[], []] == [].splitParallel {it > 2}
+            result = [3].splitParallel {it > 2}
             assert [[3], []] == result
-            result = [1].splitParallel{it > 2}
+            result = [1].splitParallel {it > 2}
             assert [[], [1]] == result
         }
     }
 
     public void testSplitOnString() {
         Parallelizer.withParallelizer(5) {
-            def result = 'abc'.splitParallel{it == 'b'}
+            def result = 'abc'.splitParallel {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
             assertEquals 2, result.size()
-            result = ''.splitParallel{it == 'b'}
-            assert  [[], []] == result
-            result = 'b'.splitParallel{it == 'b'}
+            result = ''.splitParallel {it == 'b'}
+            assert [[], []] == result
+            result = 'b'.splitParallel {it == 'b'}
             assert [['b'], []] == result
-            result = 'a'.splitParallel{it == 'b'}
+            result = 'a'.splitParallel {it == 'b'}
             assert [[], ['a']] == result
         }
     }
@@ -187,10 +187,10 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testNestedPools() {
-        Parallelizer.doParallel{a->
-            Parallelizer.doParallel{b->
-                Parallelizer.doParallel{c->
-                    Parallelizer.doParallel{d->
+        Parallelizer.doParallel {a ->
+            Parallelizer.doParallel {b ->
+                Parallelizer.doParallel {c ->
+                    Parallelizer.doParallel {d ->
                         assert d != c != b != a
                         assert Parallelizer.retrieveCurrentPool() == d
                     }
@@ -206,10 +206,10 @@ public class ParallelUtilTest extends GroovyTestCase {
         final def pool1 = new ForkJoinPool()
         final def pool2 = new ForkJoinPool()
         final def pool3 = new ForkJoinPool()
-        Parallelizer.withExistingParallelizer(pool1){a->
-            Parallelizer.withExistingParallelizer(pool2){b->
-                Parallelizer.withExistingParallelizer(pool1){c->
-                    Parallelizer.withExistingParallelizer(pool3){d->
+        Parallelizer.withExistingParallelizer(pool1) {a ->
+            Parallelizer.withExistingParallelizer(pool2) {b ->
+                Parallelizer.withExistingParallelizer(pool1) {c ->
+                    Parallelizer.withExistingParallelizer(pool3) {d ->
                         assert d == pool3
                         assert c == pool1
                         assert b == pool2
@@ -311,6 +311,28 @@ public class ParallelUtilTest extends GroovyTestCase {
                 a + b
             }
             assert map.keys().size() > 1
+        }
+    }
+
+    public void testNonBooleanParallelMethods() {
+        def methods = [
+                "findAll": [1, 3],
+                "any": true,
+                "every": false
+        ]
+        def x = [1, 2, 3]
+        Parallelizer.doParallel {
+            methods.each {method, expected ->
+                assertEquals "Surprise when processing parallel version of $method", expected, x."${method}Parallel"({ it % 2 })
+            }
+        }
+    }
+
+    public void testNonBooleanParallelFind() {
+        def x = [1, 2, 3]
+        Parallelizer.doParallel {
+            // Really just making sure it doesn't explode, but what the Hell...
+            assert "Surprise when processing parallel version of find", x.findParallel({ it % 2 }) in [1, 3]
         }
     }
 }

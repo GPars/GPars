@@ -51,3 +51,31 @@ operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 }
 {code}
 
+The standard error handling will print out an error message to standard error output and stop the operator in case an uncaught
+exception is thrown from withing the operator's body. To alter the behavior, you can redefine the _reportError()_ method
+on the operator:
+
+{code}
+    op.metaClass.reportError = {Throwable e ->
+        //handle the exception
+        stop()  //You can also stop the operator
+    }
+{code}
+
+h4. Parallelize operators
+
+By default an operator's body is processed by a single thread at a time. While this is a safe setting allowing the operator's
+body to be written in a non-thread-safe manner, once an operator becomes "hot" and data start to accumulate in the operator's
+input queues, you might consider allowing multiple threads to run the operator's body concurrently. Bear in mind that in such a case
+you need to avoid or protect shared resources from multi-threaded access.
+To enable multiple threads to run the operator's body concurrently, pass an extra _maxForks_ parameter when creating an operator:
+
+{code}
+    def op = operator(inputs: [a, b, c], outputs: [d, e], maxForks: 2) {x, y, z ->
+        bindOutput 0, x + y + z
+        bindOutput 1, x * y * z
+    }
+{code}
+
+The value of the _maxForks_ parameter indicates the maximum of threads running the operator concurrently. Only positive
+numbers are allowed with value 1 being the default.

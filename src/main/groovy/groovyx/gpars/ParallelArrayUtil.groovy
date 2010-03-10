@@ -31,7 +31,8 @@ import jsr166y.forkjoin.ParallelArray
  * @see groovyx.gpars.Parallelizer
  *
  * @author Vaclav Pech
- * Date: Oct 23, 2008
+*  @author Robert Fischer
+ * Date: Mar 10, 2010
  */
 public class ParallelArrayUtil {
 
@@ -190,7 +191,7 @@ public class ParallelArrayUtil {
      * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <T> Collection<T> findAllParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).all().asList()
+        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().asList()
     }
 
     /**
@@ -220,7 +221,7 @@ public class ParallelArrayUtil {
      * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <T> Object findParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).any()
+        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any()
     }
 
     /**
@@ -350,7 +351,7 @@ public class ParallelArrayUtil {
      * Example:
      * Parallelizer.withParallelizer {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static <T> boolean anyParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).any() != null
+        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
     }
 
     /**
@@ -380,7 +381,7 @@ public class ParallelArrayUtil {
      * Example:
      * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static <T> boolean everyParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it)} as Predicate).all().size() == collection.size()
+        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().size() == collection.size()
     }
 
     /**

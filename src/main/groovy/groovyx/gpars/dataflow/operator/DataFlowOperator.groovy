@@ -1,23 +1,24 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.ActorGroup
+import java.util.concurrent.Semaphore
 
 /**
  * Dataflow operators form the basic units in dataflow networks. Operators are typically combined into oriented graphs that transform data.
@@ -48,11 +49,16 @@ public final class DataFlowOperator {
      */
     private def DataFlowOperator(final Map channels, final Closure code) {
         final int parameters = code.maximumNumberOfParameters
-        if (!channels || (channels.inputs==null) || (channels.outputs==null) || (parameters != channels.inputs.size()))
+        if (!channels || (channels.inputs == null) || (channels.outputs == null) || (parameters != channels.inputs.size()))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
 
         code.delegate = this
-        this.actor = new DataFlowOperatorActor(channels.outputs.asImmutable(), channels.inputs.asImmutable(), code.clone())
+        if (channels.maxForks != null && channels.maxForks != 1) {
+            if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
+            this.actor = new ForkingDataFlowOperatorActor(this, channels.outputs.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
+        } else {
+            this.actor = new DataFlowOperatorActor(this, channels.outputs.asImmutable(), channels.inputs.asImmutable(), code.clone())
+        }
     }
 
     /**
@@ -101,23 +107,33 @@ public final class DataFlowOperator {
      * The operator's first / only output channel
      */
     public getOutput() { actor.outputs[0] }
+
+    /**
+     * Is invoked in case the actor throws an exception.
+     */
+    protected void reportError(Throwable e) {
+        System.err.println "The dataflow operator experienced an exception and is about to terminate. $e"
+        stop()
+    }
 }
 
 /**
  * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
  */
-private final class DataFlowOperatorActor extends AbstractPooledActor {
+private class DataFlowOperatorActor extends AbstractPooledActor {
     final List inputs
     final List outputs
     final Closure code
+    final def owningOperator
 
-    def DataFlowOperatorActor(outputs, inputs, code) {
+    def DataFlowOperatorActor(owningOperator, outputs, inputs, code) {
+        this.owningOperator = owningOperator
         this.outputs = outputs
         this.inputs = inputs
         this.code = code
     }
 
-    protected void act() {
+    protected final void act() {
         loop {
             inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
             def values = [:]
@@ -129,7 +145,7 @@ private final class DataFlowOperatorActor extends AbstractPooledActor {
      * Calls itself recursively within a react() call, if more input values are still needed.
      * Once all required inputs are available (received as messages), the operator's body is run.
      */
-    private void handleValueMessage(Map values, count) {
+    final void handleValueMessage(Map values, count) {
         if (values.size() < count) {
             react {
                 values[it.attachment] = it.result
@@ -137,7 +153,46 @@ private final class DataFlowOperatorActor extends AbstractPooledActor {
             }
         } else {
             def results = values.sort {it.key}.values() as List
+            startTask(results)
+        }
+    }
+
+    def startTask(results) {
+        try {
             code.call(* results)
+        } catch (Throwable e) {
+            reportException(e)
+        }
+    }
+
+    final reportException(Throwable e) {
+        owningOperator.reportError(e)
+    }
+}
+
+/**
+ * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
+ * The operator's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
+ * The maxForks property guards the maximum number or concurrently run copies.
+ */
+private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
+    final Semaphore semaphore
+
+    def ForkingDataFlowOperatorActor(owningOperator, outputs, inputs, code, maxForks) {
+        super(owningOperator, outputs, inputs, code)
+        this.semaphore = new Semaphore(5)
+    }
+
+    def startTask(results) {
+        semaphore.acquire()
+        actorGroup.threadPool.execute {
+            try {
+                code.call(* results)
+            } catch (Throwable e) {
+                reportException(e)
+            } finally {
+                semaphore.release()
+            }
         }
     }
 }
