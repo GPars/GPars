@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars
 
@@ -137,6 +137,22 @@ final class Parallel {
     }
 
     /**
+     * Performs the <i>find()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element.
+     * Unlike with the <i>find</i> method, findAnyParallel() does not guarantee
+     * that the a matching element with the lowest index is returned.
+     * The findAnyParallel() method evaluates elements lazily and stops processing further elements of the collection once a match has been found.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
+     */
+    public def findAnyParallel(Closure cl) {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.findAnyParallel(mixedIn[Object], cl)
+        }
+    }
+
+    /**
      * Performs the <i>all()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
@@ -152,6 +168,8 @@ final class Parallel {
     /**
      * Performs the <i>any()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
+     * The anyParallel() method is lazy and once a positive answer has been given by at least one element, it avoids running
+     * the supplied closure on subsequent elements.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
@@ -202,7 +220,7 @@ final class Parallel {
      */
     public def minParallel() {
         Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-        ParallelArrayUtil.minParallel(mixedIn[Object])
+            ParallelArrayUtil.minParallel(mixedIn[Object])
         }
     }
 

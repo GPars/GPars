@@ -115,14 +115,38 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     public void testFind() {
         Parallelizer.withParallelizer(5) {
-            final int result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 2})
+            final def result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 2})
             assert result in [3, 4, 5]
+            assertEquals 3, result
         }
     }
 
     public void testEmptyFind() {
         Parallelizer.withParallelizer(5) {
-            final int result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 6})
+            final def result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 6})
+            assertNull result
+        }
+    }
+
+    public void testFindAny() {
+        Parallelizer.withParallelizer(5) {
+            final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 2})
+            assert result in [3, 4, 5]
+        }
+    }
+
+    public void testLazyFindAny() {
+        Parallelizer.withParallelizer(2) {
+            final AtomicInteger counter = new AtomicInteger(0)
+            final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
+            assert result in [1, 2, 3, 4, 5]
+            assert counter.get() <= 2
+        }
+    }
+
+    public void testEmptyFindAny() {
+        Parallelizer.withParallelizer(5) {
+            final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 6})
             assertNull result
         }
     }
@@ -132,6 +156,14 @@ public class ParallelUtilTest extends GroovyTestCase {
             assert ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {it > 2})
             assert !ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {it > 6})
         }
+    }
+
+    public void testLazyAny() {
+        def counter = new AtomicInteger(0)
+        Parallelizer.withParallelizer(2) {
+            assert ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
+        }
+        assert counter.get() <= 2
     }
 
     public void testAll() {
@@ -317,6 +349,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     public void testNonBooleanParallelMethods() {
         def methods = [
                 "findAll": [1, 3],
+                "find": 1,
                 "any": true,
                 "every": false
         ]
@@ -328,11 +361,11 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
-    public void testNonBooleanParallelFind() {
+    public void testNonBooleanParallelFindAny() {
         def x = [1, 2, 3]
         Parallelizer.doParallel {
             // Really just making sure it doesn't explode, but what the Hell...
-            assert "Surprise when processing parallel version of find", x.findParallel({ it % 2 }) in [1, 3]
+            assert "Surprise when processing parallel version of find", x.findAnyParallel({ it % 2 }) in [1, 3]
         }
     }
 }

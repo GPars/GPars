@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 
 package groovyx.gpars
@@ -81,6 +81,19 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final ConcurrentHashMap map = new ConcurrentHashMap()
         Parallelizer.doParallel(5) {
             items.makeTransparent().find {
+                Thread.sleep 100
+                map[Thread.currentThread()] = ''
+                return false
+            }
+        }
+        assert map.keys().size() > 1
+    }
+
+    public void testTransparentFindAny() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        Parallelizer.doParallel(5) {
+            items.makeTransparent().findAny {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
@@ -202,29 +215,29 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testSplit() {
         Parallelizer.withParallelizer(5) {
-            def result = [1, 2, 3, 4, 5].makeTransparent().split{it > 2}
+            def result = [1, 2, 3, 4, 5].makeTransparent().split {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
             assertEquals 2, result.size()
-            assert  [[], []] == [].makeTransparent().split{it > 2}
-            result = [3].makeTransparent().split{it > 2}
+            assert [[], []] == [].makeTransparent().split {it > 2}
+            result = [3].makeTransparent().split {it > 2}
             assert [[3], []] == result
-            result = [1].makeTransparent().split{it > 2}
+            result = [1].makeTransparent().split {it > 2}
             assert [[], [1]] == result
         }
     }
 
     public void testSplitOnString() {
         Parallelizer.withParallelizer(5) {
-            def result = new String('abc').makeTransparent().split{it == 'b'}
+            def result = new String('abc').makeTransparent().split {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
             assertEquals 2, result.size()
-            result = ''.makeTransparent().split{it == 'b'}
-            assert  [[], []] == result
-            result = 'b'.makeTransparent().split{it == 'b'}
+            result = ''.makeTransparent().split {it == 'b'}
+            assert [[], []] == result
+            result = 'b'.makeTransparent().split {it == 'b'}
             assert [['b'], []] == result
-            result = 'a'.makeTransparent().split{it == 'b'}
+            result = 'a'.makeTransparent().split {it == 'b'}
             assert [[], ['a']] == result
         }
     }

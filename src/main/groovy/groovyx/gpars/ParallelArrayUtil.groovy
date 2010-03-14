@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars
 
@@ -31,7 +31,7 @@ import jsr166y.forkjoin.ParallelArray
  * @see groovyx.gpars.Parallelizer
  *
  * @author Vaclav Pech
-*  @author Robert Fischer
+ * @author Robert Fischer
  * Date: Mar 10, 2010
  */
 public class ParallelArrayUtil {
@@ -70,7 +70,7 @@ public class ParallelArrayUtil {
      * Indicates whether the iterative methods like each() or collect() work have been altered to work concurrently.
      */
     public static boolean isTransparent(Object collection) { false }
-    
+
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the transformation operation.
@@ -123,7 +123,7 @@ public class ParallelArrayUtil {
     public static <T> Collection<T> eachWithIndexParallel(Collection<T> collection, Closure cl) {
         def indexedCollection = []
         int index = 0
-        for(element in collection) {
+        for (element in collection) {
             indexedCollection << [element, index]
             index++
         }
@@ -213,7 +213,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a random value from the resulting Parallel Array.
+     * After all the elements have been processed, the method returns a value from the resulting Parallel Array with the minimum index.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
@@ -221,12 +221,32 @@ public class ParallelArrayUtil {
      * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <T> Object findParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any()
+        final ParallelArray found = createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all()
+        if (found.size() > 0) found.get(0)
+        else return null
     }
 
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a value from the resulting Parallel Array with the minimum index.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     *}*/
+    public static Object findParallel(Object collection, Closure cl) {
+        return findParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * Unlike with the <i>find</i> method, findAnyParallel() does not guarantee
+     * that the a matching element with the lowest index is returned.
+     * The findAnyParallel() method evaluates elements lazily and stops processing further elements of the collection once a match has been found.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a random value from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
@@ -235,7 +255,25 @@ public class ParallelArrayUtil {
      * Example:
      * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
-    public static Object findParallel(Object collection, Closure cl) {
+    public static <T> Object findAnyParallel(Collection<T> collection, Closure cl) {
+        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any()
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * Unlike with the <i>find</i> method, findAnyParallel() does not guarantee
+     * that the a matching element with the lowest index is returned.
+     * The findAnyParallel() method evaluates elements lazily and stops processing further elements of the collection once a match has been found.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a random value from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Example:
+     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     *}*/
+    public static Object findAnyParallel(Object collection, Closure cl) {
         return findParallel(createCollection(collection), cl)
     }
 
@@ -343,6 +381,8 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
+     * The anyParallel() method is lazy and once a positive answer has been given by at least one element, it avoids running
+     * the supplied closure on subsequent elements.
      * After all the elements have been processed, the method returns a boolean value indicating, whether at least
      * one element of the collection meets the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
@@ -358,6 +398,8 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
+     * The anyParallel() method is lazy and once a positive answer has been given by at least one element, it avoids running
+     * the supplied closure on subsequent elements.
      * After all the elements have been processed, the method returns a boolean value indicating, whether at least
      * one element of the collection meets the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
@@ -398,7 +440,7 @@ public class ParallelArrayUtil {
     public static boolean everyParallel(Object collection, Closure cl) {
         return everyParallel(createCollection(collection), cl)
     }
-    
+
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the mapping predicate.
@@ -664,7 +706,7 @@ abstract class AbstractParallelCollection<T> {
      * @return The summary od all elements in the collection
      */
     public final T sum() {
-        reduce{a, b -> a + b}
+        reduce {a, b -> a + b}
     }
 
     /**
