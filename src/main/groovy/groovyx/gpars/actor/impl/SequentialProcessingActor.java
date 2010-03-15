@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.actor.impl;
 
@@ -492,7 +492,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                     currentThread.interrupt();
                 } else {
                     // just to make sure that scheduled
-                    send(terminateMessage);
+                    try {
+                        send(terminateMessage);
+                    } catch (IllegalStateException ignore) {
+                    }
                 }
                 break;
             }
@@ -569,7 +572,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             assert reaction == null;
             assert maxNumberOfParameters <= 1;
 
-            final Reaction reactCode = new Reaction(this, maxNumberOfParameters==1, code);
+            final Reaction reactCode = new Reaction(this, maxNumberOfParameters == 1, code);
             if (timeout >= 0L) {
                 reactCode.setTimeout(timeout);
             }
@@ -603,10 +606,14 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
 
         @Override
-        public int getMaximumNumberOfParameters() { return 1; }
+        public int getMaximumNumberOfParameters() {
+            return 1;
+        }
 
         @Override
-        public Class[] getParameterTypes() { return new Class[]{Object.class}; }
+        public Class[] getParameterTypes() {
+            return new Class[]{Object.class};
+        }
 
         public Object doCall(final Object args) {
             localSenders.add((MessageStream) InvokerHelper.invokeMethod(args, "getSender", null));
@@ -615,7 +622,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 SequentialProcessingActor.this.getSenders().clear();
                 SequentialProcessingActor.this.getSenders().addAll(localSenders);
                 InvokerHelper.invokeClosure(code.curry(new Object[]{args}), null);
-            } else SequentialProcessingActor.this.react(timeout, new MultiMessageReaction(code.curry(new Object[]{args}), newNumberOfParameters, timeout, localSenders));
+            } else
+                SequentialProcessingActor.this.react(timeout, new MultiMessageReaction(code.curry(new Object[]{args}), newNumberOfParameters, timeout, localSenders));
             return null;
         }
     }
@@ -670,9 +678,9 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
                 throw new IllegalStateException("Unexpected message " + toProcess);
             } catch (GroovyRuntimeException gre) {
-                    throw ScriptBytecodeAdapter.unwrap(gre);
+                throw ScriptBytecodeAdapter.unwrap(gre);
             }
-            
+
         } catch (ActorContinuationException continuation) {
             if (Thread.currentThread().isInterrupted()) {
                 shouldTerminate = true;
@@ -810,9 +818,9 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         /**
          * Creates a new instance.
          *
-         * @param actor                    actor
+         * @param actor             actor
          * @param codeNeedsArgument Indicates, whether the provided code expects an argument
-         * @param code                     code to execute
+         * @param code              code to execute
          */
         Reaction(final SequentialProcessingActor actor, final boolean codeNeedsArgument, final Closure code) {
             this.actor = actor;
@@ -826,7 +834,9 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
          * @return True, if the next continuation can start.
          */
         @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
-        public boolean isReady() { return isReady.get(); }
+        public boolean isReady() {
+            return isReady.get();
+        }
 
         public void offer(final ActorMessage actorMessage) {
             final boolean readyFlag = isReady.getAndSet(true);
