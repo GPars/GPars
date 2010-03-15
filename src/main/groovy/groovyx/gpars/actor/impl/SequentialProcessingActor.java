@@ -76,6 +76,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     private Node outputQueue;
 
+    private AtomicBoolean ongoingThreadTermination = new AtomicBoolean(false);
+
     /**
      * Counter of messages in the queues
      */
@@ -488,15 +490,22 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                     throw TERMINATE;
                 }
 
-                if (currentThread != null) {
-                    currentThread.interrupt();
-                } else {
-                    // just to make sure that scheduled
-                    try {
-                        send(terminateMessage);
-                    } catch (IllegalStateException ignore) {
+                try {
+                    while (!ongoingThreadTermination.compareAndSet(false, true)) //noinspection CallToThreadYield
+                        Thread.yield();
+                    if (currentThread != null) {
+                        currentThread.interrupt();
+                    } else {
+                        // just to make sure that scheduled
+                        try {
+                            send(terminateMessage);
+                        } catch (IllegalStateException ignore) {
+                        }
                     }
+                } finally {
+                    ongoingThreadTermination.set(false);
                 }
+
                 break;
             }
         }
@@ -721,12 +730,15 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             stopFlag = S_TERMINATING;
             handleException(e);
         } finally {
-            Thread.interrupted();
             try {
+                while (!ongoingThreadTermination.compareAndSet(false, true)) //noinspection CallToThreadYield
+                    Thread.yield();
+                Thread.interrupted();
                 if (shouldTerminate) handleTermination();
             } finally {
                 deregisterCurrentActorWithThread();
                 currentThread = null;
+                ongoingThreadTermination.set(false);
                 final int cnt = countUpdater.decrementAndGet(this);
                 if (cnt > 0 && isActive()) {
                     schedule();
