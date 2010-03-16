@@ -23,15 +23,11 @@ import jsr166y.forkjoin.ForkJoinPool
  * Shows lazy nature of the anyParallel() method. Once a positive result is obtained no more elements are going to be processed.
  */
 
-def n = ["sleep 15", "sleep 4", "sleep 3", "sleep 4", "sleep 10"]
+def n = [15, 4, 3, 4, 10]
 Parallelizer.doParallel(3) {ForkJoinPool pool ->
     def k = n.anyParallel {t ->
         println "$t started"
-
-        Process k = t.execute()
-        k.consumeProcessOutput(System.out, System.err)
-        k.waitFor()
-        k.destroy()
+        sleep t * 1000
         println "$t ended"
         true
     }
