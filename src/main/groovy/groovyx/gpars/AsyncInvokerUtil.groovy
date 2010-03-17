@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars
 
@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * This class forms the core of the DSL initialized by <i>Asynchronizer</i>. The static methods of <i>AsyncInvokerUtil</i>
@@ -221,6 +222,27 @@ public class AsyncInvokerUtil {
     }
 
     /**
+     * Performs the <i>find()</i> operation using an asynchronous variant of the supplied closure
+     * to evaluate each collection's/object's element. Unlike with the <i>find</i> method, findAnyParallel() does not guarantee
+     * that the a matching element with the lowest index is returned.
+     * The findAnyParallel() method evaluates elements lazily and stops processing further elements of the collection once a match has been found.
+     * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *     def result = service.findParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*     assert result in [3, 4, 5]
+     *}*
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withAsynchronizer</i> block
+     * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>AsyncInvokerUtil</i> class.
+     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     *     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}*     assert result in [3, 4, 5]
+     *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public static def findAnyParallel(Object collection, Closure cl) {
+        final AtomicReference result = new AtomicReference(null)
+        collectParallel(collection, {if ((result.get() == null) && cl(it)) {result.set(it); return it} else return null}).find {it != null}
+    }
+
+    /**
      * Performs the <i>all()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
@@ -242,6 +264,8 @@ public class AsyncInvokerUtil {
      * Performs the <i>any()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
+     * The anyParallel() method is lazy and once a positive answer has been given by at least one element, it avoids running
+     * the supplied closure on subsequent elements.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
      *     assert service.anyParallel([1, 2, 3, 4, 5]){Number number -> number > 2}*     assert !service.anyParallel([1, 2, 3, 4, 5]){Number number -> number > 6}*}*
@@ -252,7 +276,7 @@ public class AsyncInvokerUtil {
      */
     public static boolean anyParallel(Object collection, Closure cl) {
         final AtomicBoolean flag = new AtomicBoolean(false)
-        eachParallel(collection, {if (cl(it)) flag.set(true)})
+        eachParallel(collection, {if ((!flag.get()) && cl(it)) flag.set(true)})
         return flag.get()
     }
 

@@ -20,6 +20,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @author Vaclav Pech
@@ -152,6 +153,23 @@ public class AsynchronizerTest extends GroovyTestCase {
         Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 2}
             assert result in [3, 4, 5]
+            assertEquals 3, result
+        }
+    }
+
+    public void testFindAnyParallel() {
+        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+            def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 2}
+            assert result in [3, 4, 5]
+        }
+    }
+
+    public void testLazyFindAnyParallel() {
+        Asynchronizer.withAsynchronizer(2) {ExecutorService service ->
+            final AtomicInteger counter = new AtomicInteger(0)
+            def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> counter.incrementAndGet(); number > 0}
+            assert result in [1, 2, 3, 4, 5]
+            assert counter.get() <= 2
         }
     }
 
@@ -167,6 +185,14 @@ public class AsynchronizerTest extends GroovyTestCase {
             assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 0}
             assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 2}
             assert ![1, 2, 3, 4, 5].anyParallel {Number number -> number > 6}
+        }
+    }
+
+    public void testLazyAnyParallel() {
+        Asynchronizer.withAsynchronizer(2) {ExecutorService service ->
+            def counter = new AtomicInteger(0)
+            assert [1, 2, 3, 4, 5].anyParallel {Number number -> counter.incrementAndGet(); number > 0}
+            assert counter.get() <= 2
         }
     }
 
@@ -212,6 +238,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     public void testNonBooleanParallelMethods() {
         def methods = [
                 "findAll": [1, 3],
+                "find": 1,
                 "any": true,
                 "every": false
         ]
@@ -224,11 +251,11 @@ public class AsynchronizerTest extends GroovyTestCase {
         }
     }
 
-    public void testNonBooleanParallelFind() {
+    public void testNonBooleanParallelFindAny() {
         def x = [1, 2, 3]
         Asynchronizer.doParallel {
             // Really just making sure it doesn't explode, but what the Hell...
-            assert "Surprise when processing parallel version of find", x.findParallel({ it % 2 }) in [1, 3]
+            assert "Surprise when processing parallel version of find", x.findAnyParallel({ it % 2 }) in [1, 3]
         }
     }
 }
