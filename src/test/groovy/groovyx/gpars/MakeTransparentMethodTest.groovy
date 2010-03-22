@@ -254,4 +254,17 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         }
         assert map.keys().size() > 1
     }
+
+    public void testTransparentSeededReduce() {
+        def items = [1, 2, 3, 4, 5]
+        final ConcurrentHashMap map = new ConcurrentHashMap()
+        Parallelizer.doParallel(5) {
+            items.makeTransparent().fold(10) {a, b ->
+                Thread.sleep 100
+                map[Thread.currentThread()] = ''
+                return a + b
+            }
+        }
+        assert map.keys().size() > 1
+    }
 }

@@ -175,6 +175,14 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assertEquals 55, list.collectParallel {it ** 2}.foldParallel {a, b -> a + b}
     }
 
+    public void testSeededReduce() {
+        final List list = [1, 2, 3, 4, 5]
+        ParallelEnhancer.enhanceInstance list
+
+        assertEquals 15, list.foldParallel(0) {a, b -> a + b}
+        assertEquals 25, list.foldParallel(10) {a, b -> a + b}
+    }
+
     public void testReduceThreads() {
         final ConcurrentHashMap map = new ConcurrentHashMap()
 

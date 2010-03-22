@@ -640,6 +640,34 @@ public class ParallelArrayUtil {
     }
 
     /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * @param seed A seed value to initialize the operation
+     */
+    public static <T> T foldParallel(Collection<T> collection, seed, Closure cl) {
+        createPA(collection.plus(seed), retrievePool()).reduce(cl as Reducer, null)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * @param seed A seed value to initialize the operation
+     */
+    public static Object foldParallel(Object collection, seed, Closure cl) {
+        return foldParallel(createCollection(collection), seed, cl)
+    }
+
+    /**
      * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
@@ -699,6 +727,17 @@ abstract class AbstractParallelCollection<T> {
      */
     public final T reduce(Closure cl) {
         pa.reduce(cl as Reducer, null)
+    }
+
+    /**
+     * Performs a parallel reduce operation. It will use the supplied two-argument closure to gradually reduce two elements into one.
+     * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
+     * @return The product of reduction
+     */
+    public final T reduce(seed, Closure cl) {
+        final def newPA = pa.all()
+        newPA.appendElement(seed)
+        newPA.reduce(cl as Reducer, null)
     }
 
     /**
