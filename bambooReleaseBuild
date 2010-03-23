@@ -4,4 +4,4 @@
 #
 #  Use the -i option on grdlew so that the log has extra information in by default.
 
-./gradlew -i clean build
+./gradlew -i clean release
