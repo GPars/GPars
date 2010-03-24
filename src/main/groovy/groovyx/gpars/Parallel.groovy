@@ -285,6 +285,22 @@ final class Parallel {
     }
 
     /**
+     * Creates a Parallel Array out of the supplied collection/object and invokes its reduce() method using the supplied
+     * closure as the reduction operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * @param seed A seed value to initialize the operation
+     */
+    public def foldParallel(seed, Closure cl) {
+        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            ParallelArrayUtil.foldParallel(mixedIn[Object], seed, cl)
+        }
+    }
+
+    /**
      * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.

@@ -333,6 +333,15 @@ public class ParallelUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testSeededReduce() {
+        Parallelizer.doParallel(5) {
+            assertEquals 15, [1, 2, 3, 4, 5].foldParallel(0) {a, b -> a + b}
+            assertEquals 25, [1, 2, 3, 4, 5].foldParallel(10) {a, b -> a + b}
+            assertEquals 'abc', 'abc'.foldParallel('') {a, b -> a + b}
+            assertEquals 'abcd', 'abc'.foldParallel('d') {a, b -> a + b}
+        }
+    }
+
     public void testReduceThreads() {
         final ConcurrentHashMap map = new ConcurrentHashMap()
 

@@ -64,6 +64,8 @@ final class TransparentParallel {
 
     public def final fold(Closure yield) { this.foldParallel(yield)}
 
+    public def final fold(seed, Closure yield) { this.foldParallel(seed, yield)}
+
     /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.
      */

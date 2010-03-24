@@ -30,14 +30,15 @@ def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 Parallelizer.doParallel {
     assert 15 == [1, 2, 3, 4, 5].parallel.reduce {a, b -> a + b}                                        //summarize
+    assert 25 == [1, 2, 3, 4, 5].parallel.reduce(10) {a, b -> a + b}                                        //summarize with a seed value
     assert 55 == [1, 2, 3, 4, 5].parallel.map {it ** 2}.reduce {a, b -> a + b}                          //summarize squares
     assert 20 == [1, 2, 3, 4, 5].parallel.filter {it % 2 == 0}.map {it ** 2}.reduce {a, b -> a + b}     //summarize squares of even numbers
     assert 20 == (1..5).parallel.filter {it % 2 == 0}.map {it ** 2}.sum()                               //summarize squares of even numbers using sum
     def n = 10
-    println ((1..n).parallel.reduce{a, b -> a * b})
+    println((1..n).parallel.reduce {a, b -> a * b})
 
-    final def bitSizes = [4, 6, 8, 1, 4, 2, 4, 5, 7, 6, 7, 3, 2, 4, 5, 6, 7, 2 ,1, 2]
-    assert 256 == bitSizes.parallel.map{2**it}.max()                                                    //find max value range
+    final def bitSizes = [4, 6, 8, 1, 4, 2, 4, 5, 7, 6, 7, 3, 2, 4, 5, 6, 7, 2, 1, 2]
+    assert 256 == bitSizes.parallel.map {2 ** it}.max()                                                    //find max value range
 
 
     assert 'abc' == 'abc'.parallel.reduce {a, b -> a + b}                                               //concatenate
@@ -55,26 +56,14 @@ Parallelizer.doParallel {
     //Number of sites mentioning Groovy
     println 'Number of groovy sites today: ' + urls.parallel.map {it.toURL().text.toUpperCase()}.filter {it.contains('GROOVY')}.collection.size()
 
-    println 'Number of words on the longest groovy site today: ' + urls.parallel
-            .map {it.toURL().text.toUpperCase()}
-            .filter {it.contains('GROOVY')}
-            .map{it.split().size()}
-            .max()
+    println 'Number of words on the longest groovy site today: ' + urls.parallel.map {it.toURL().text.toUpperCase()}.filter {it.contains('GROOVY')}.map {it.split().size()}.max()
 
-    println 'Number of occurencies of the word GROOVY today: ' + urls.parallel
-            .map {it.toURL().text.toUpperCase()}
-            .filter {it.contains('GROOVY')}
-            .map{it.split()}
-            .map{it.findAll{word -> word.contains 'GROOVY'}.size()}
-            .sum()
+    println 'Number of occurencies of the word GROOVY today: ' + urls.parallel.map {it.toURL().text.toUpperCase()}.filter {it.contains('GROOVY')}.map {it.split()}.map {it.findAll {word -> word.contains 'GROOVY'}.size()}.sum()
 
     /**
      * Passing a map around to remember the original url along the way
      */
-    final def shortestSite = urls.parallel.map {[url: it, content: it.toURL().text.toUpperCase()]}
-            .filter {it.content.contains('GROOVY')}
-            .map {[url: it.url, length: it.content.split().size()]}
-            .min {it.length}
+    final def shortestSite = urls.parallel.map {[url: it, content: it.toURL().text.toUpperCase()]}.filter {it.content.contains('GROOVY')}.map {[url: it.url, length: it.content.split().size()]}.min {it.length}
     println "The shortest groovy site today: $shortestSite.url has $shortestSite.length tokens"
 
     /**
