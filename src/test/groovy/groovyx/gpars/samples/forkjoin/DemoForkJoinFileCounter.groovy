@@ -45,7 +45,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
                 count++
             }
         }
-        return count + ((childrenResults)?.sum() ?: 0)
+        return count + (childrenResults.sum(0))
         //use results of children tasks to calculate and store own result
     }
 }
