@@ -22,9 +22,9 @@
 
 // gradle imports these by default, but IDEA doesn't know
 
-apply id: 'groovy'
-apply id: 'maven'
-apply id: 'osgi'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'osgi'
 
 defaultTasks 'test'
 
@@ -35,7 +35,8 @@ bundleVersion = version
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
-configure(jar.osgi) {
+jar {
+  manifest {
     name = 'gpars'
     version = this.version
     symbolicName = 'gpars.org'
@@ -54,6 +55,7 @@ configure(jar.osgi) {
     instruction 'Implementation-Version', version
     instruction 'provider', theVendor
     instruction 'Export-Package', '*'
+  }
 }
 
 repositories {
@@ -226,7 +228,7 @@ zipDist << {
 
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
-    gradleVersion = '0.9-20100309203241+0100'
+    gradleVersion = '0.9-20100327141517+1100'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
