@@ -16,28 +16,29 @@
 
 package groovyx.gpars.csp.util
 
+@SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
 abstract class TestUtilities {
 
-    public static boolean listContains(list1, list2) {
+    public static boolean listContains(firstList, secondList) {
 
-        if (list1.size != list2.size) {
+        if (firstList.size != secondList.size) {
             return false
         }
         else {
-            list1.sort()
-            list2.sort()
-            return (list1 == list2)
+            firstList.sort()
+            secondList.sort()
+            return (firstList == secondList)
         }
     } // end listContains
 
-    public static boolean list1GEList2(list1, list2) {
+    public static boolean list1GEList2(firstList, secondList) {
 
-        if (list1.size != list2.size) {
+        if (firstList.size != secondList.size) {
             return false
         }
         else {
-            for (i in 0..<list1.size) {
-                if (list1[i] < list2[i]) {
+            for (i in 0..<firstList.size) {
+                if (firstList[i] < secondList[i]) {
                     return false
                 }
             }

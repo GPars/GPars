@@ -31,7 +31,7 @@ class TimedMultiplex implements CSProcess {
     def void run() {
         def timer = new CSTimer()
         def timerIndex = inChannels.size()
-        def alt = new ALT(inChannels + timer)
+        def alt = new ALT((List)(inChannels + timer))
         timer.alarm = timer.read() + timeout
         def running = true
         while (running) {
