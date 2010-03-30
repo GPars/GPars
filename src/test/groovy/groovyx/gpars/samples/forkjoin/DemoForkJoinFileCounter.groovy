@@ -39,8 +39,11 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
         long count = 0
         file.eachFile {
             if (it.isDirectory()) {
-                println "Forking a child task for $it"
-                forkOffChild(new FileCounter(it))           //fork a child task
+                if (it.name != '..') {
+                    println "Forking a child task for $it"
+                    forkOffChild(new FileCounter(it))
+                }
+                           //fork a child task
             } else {
                 count++
             }
@@ -57,5 +60,5 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
  */
 
 doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    println "Number of files: ${orchestrate(new FileCounter(new File(".")))}"
+    println "Number of files: ${orchestrate(new FileCounter(new File("./src")))}"
 }
