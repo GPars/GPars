@@ -57,5 +57,5 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
  */
 
 doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    println "Number of files: ${orchestrate(new FileCounter(new File("..")))}"
+    println "Number of files: ${orchestrate(new FileCounter(new File(".")))}"
 }
