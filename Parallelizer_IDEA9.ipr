@@ -15,7 +15,6 @@
     <option name="PER_PROJECT_SETTINGS">
       <value>
         <option name="USE_SAME_INDENTS" value="true" />
-        <option name="LINE_SEPARATOR" value="&#10;" />
         <option name="GENERATE_FINAL_LOCALS" value="true" />
         <option name="GENERATE_FINAL_PARAMETERS" value="true" />
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="50" />
@@ -1221,7 +1220,9 @@
         </inspection_tool>
         <inspection_tool class="HashCodeUsesNonFinalVariable" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="HibernateResource" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoredTypesString" value="java.io.ByteArrayOutputStream,java.io.ByteArrayInputStream,java.io.StringBufferInputStream,java.io.CharArrayWriter,java.io.CharArrayReader,java.io.StringWriter,java.io.StringReader" />
+        </inspection_tool>
         <inspection_tool class="IfStatementWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="IfStatementWithTooManyBranches" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="3" />
@@ -4435,7 +4436,6 @@
     <option name="projectName" value="Parallelizer" />
   </component>
   <component name="ProjectDictionaryState">
-    <dictionary name="dierkkonig" />
     <dictionary name="vaclav">
       <words>
         <w>accessors</w>
@@ -4604,6 +4604,7 @@
         <w>yyyy</w>
       </words>
     </dictionary>
+    <dictionary name="dierkkonig" />
   </component>
   <component name="ProjectKey">
     <option name="state" value="https://gparallelizer.googlecode.com/svn/trunk/Parallelizer_IDEA9.ipr" />
