@@ -39,11 +39,8 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
         long count = 0
         file.eachFile {
             if (it.isDirectory()) {
-                if (it.name != '..') {
-                    println "Forking a child task for $it"
-                    forkOffChild(new FileCounter(it))
-                }
-                           //fork a child task
+                println "Forking a child task for $it"
+                forkOffChild(new FileCounter(it))           //fork a child task
             } else {
                 count++
             }

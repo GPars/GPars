@@ -57,6 +57,6 @@ public class FJFileCounter extends RecursiveTask<Long> {
  as few as one thread is enough to keep the computation going.
  */
 Parallelizer.doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    def result = pool.submit(new FJFileCounter(new File('..'))).get()
+    def result = pool.submit(new FJFileCounter(new File('./src'))).get()
     println "Number of files: ${result}"
 }
