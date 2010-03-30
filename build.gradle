@@ -246,6 +246,8 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoSwingDataFlowProgress',                  // Shows UI
             'DemoMapReduce',                              // Relies on internet connection
             'DemoNumbers',                                //Never stops
+            'FibonacciV1',                                //Never stops
+            'FibonacciV2',                                //Never stops
             'RunReset',                                   //Starts UI
     ]
 

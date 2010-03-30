@@ -24,8 +24,9 @@ import org.jcsp.lang.One2OneChannel
 import groovyx.gpars.csp.plugAndPlay.GPrefix
 import groovyx.gpars.csp.plugAndPlay.GPCopy
 import groovyx.gpars.csp.plugAndPlay.GStatePairs
+import groovyx.gpars.csp.plugAndPlay.GPrint
 
-class FibonacciV1 implements CSProcess {
+class FibonacciV1Process implements CSProcess {
 
     ChannelOutput outChannel
 
@@ -45,3 +46,13 @@ class FibonacciV1 implements CSProcess {
         new PAR(testList).run()
     }
 }
+
+One2OneChannel N2P = Channel.createOne2One()
+
+def testList = [
+        new FibonacciV1Process(outChannel: N2P.out()),
+        new GPrint(inChannel: N2P.in(), heading: "Fibonacci Numbers")
+]
+
+final def par = new PAR(testList)
+par.run()
