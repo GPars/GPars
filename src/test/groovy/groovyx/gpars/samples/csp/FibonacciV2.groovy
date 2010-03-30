@@ -14,13 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.csp.plugAndPlay
+package groovyx.gpars.samples.csp
 
 import groovyx.gpars.csp.PAR
 import org.jcsp.lang.CSProcess
 import org.jcsp.lang.Channel
 import org.jcsp.lang.ChannelOutput
 import org.jcsp.lang.One2OneChannel
+import groovyx.gpars.csp.plugAndPlay.GPrefix
+import groovyx.gpars.csp.plugAndPlay.GPCopy
+import groovyx.gpars.csp.plugAndPlay.GPairs
 
 class FibonacciV2 implements CSProcess {
 
