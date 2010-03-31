@@ -25,10 +25,10 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  */
 public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
     private static final long serialVersionUID = 2984824057556784227L;
-    private final DataFlowExpression receiver;
+    private final DataFlowExpression<T> receiver;
     private final String name;
 
-    public DataFlowGetPropertyExpression(final DataFlowExpression expression, final String name) {
+    public DataFlowGetPropertyExpression(final DataFlowExpression<T> expression, final String name) {
         this.receiver = expression;
         this.name = name;
         subscribe();

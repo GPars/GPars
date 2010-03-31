@@ -79,7 +79,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * Points to the head of the chain of requests waiting for a value to be bound
      */
-    private volatile WaitingThread<T> waiting;
+    private volatile WaitingThread waiting;
 
     /**
      * Possible states
@@ -93,10 +93,10 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param <V> The type of the value to bind
      */
-    private static class WaitingThread<V> extends AtomicBoolean {
+    private static class WaitingThread extends AtomicBoolean {
         private static final long serialVersionUID = 8909974768784947460L;
         private final Thread thread;
-        private volatile WaitingThread<V> previous;
+        private volatile WaitingThread previous;
         private final MessageStream callback;
         private final Object attachment;
 
@@ -108,7 +108,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
          * @param attachment An arbitrary object closely identifying the request for the caller
          * @param callback   An actor or operator to send a message to once a value is bound
          */
-        private WaitingThread(final Thread thread, final WaitingThread<V> previous, final Object attachment, final MessageStream callback) {
+        private WaitingThread(final Thread thread, final WaitingThread previous, final Object attachment, final MessageStream callback) {
             this.callback = callback;
             this.attachment = attachment;
             this.thread = thread;
@@ -119,7 +119,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * A request chain terminator
      */
-    private static final WaitingThread dummyWaitingThread = new WaitingThread<Object>(null, null, null, null);
+    private static final WaitingThread dummyWaitingThread = new WaitingThread(null, null, null, null);
 
     /**
      * Creates a new unbound Dataflow Expression
@@ -166,13 +166,13 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
             throw new NullPointerException();
         }
 
-        WaitingThread<T> newWaiting = null;
+        WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
             if (newWaiting == null) {
-                newWaiting = new WaitingThread<T>(null, null, attachment, callback);
+                newWaiting = new WaitingThread(null, null, attachment, callback);
             }
 
-            final WaitingThread<T> previous = waiting;
+            final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
@@ -195,13 +195,13 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     public T getVal() throws InterruptedException {
-        WaitingThread<T> newWaiting = null;
+        WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
             if (newWaiting == null) {
-                newWaiting = new WaitingThread<T>(Thread.currentThread(), null, null, null);
+                newWaiting = new WaitingThread(Thread.currentThread(), null, null, null);
             }
 
-            final WaitingThread<T> previous = waiting;
+            final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
@@ -230,13 +230,13 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      */
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final long endNano = System.nanoTime() + units.toNanos(timeout);
-        WaitingThread<T> newWaiting = null;
+        WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
             if (newWaiting == null) {
-                newWaiting = new WaitingThread<T>(Thread.currentThread(), null, null, null);
+                newWaiting = new WaitingThread(Thread.currentThread(), null, null, null);
             }
 
-            final WaitingThread<T> previous = waiting;
+            final WaitingThread previous = waiting;
             // it means that writer already started processing queue, so value is already in place
             if (previous == dummyWaitingThread) {
                 break;
@@ -307,10 +307,10 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         state = S_INITIALIZED;
 
         @SuppressWarnings({"unchecked"})
-        final WaitingThread<T> waitingQueue = waitingUpdater.getAndSet(this, dummyWaitingThread);
+        final WaitingThread waitingQueue = waitingUpdater.getAndSet(this, dummyWaitingThread);
 
         // no more new waiting threads since that point
-        for (WaitingThread<T> currentWaiting = waitingQueue; currentWaiting != null; currentWaiting = currentWaiting.previous) {
+        for (WaitingThread currentWaiting = waitingQueue; currentWaiting != null; currentWaiting = currentWaiting.previous) {
             // maybe currentWaiting thread canceled or was interrupted
             if (currentWaiting.compareAndSet(false, true)) {
                 if (currentWaiting.thread != null) {

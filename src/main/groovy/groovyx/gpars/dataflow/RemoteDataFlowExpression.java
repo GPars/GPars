@@ -24,7 +24,7 @@ import groovyx.gpars.serial.SerialContext;
 /**
  * @author Alex Tkachman
  */
-public class RemoteDataFlowExpression extends DataFlowExpression implements RemoteSerialized {
+public class RemoteDataFlowExpression<T> extends DataFlowExpression<T> implements RemoteSerialized {
     private static final long serialVersionUID = -3166182949181062129L;
     private final RemoteHost remoteHost;
 
@@ -40,11 +40,11 @@ public class RemoteDataFlowExpression extends DataFlowExpression implements Remo
         });
     }
 
-    protected Object evaluate() {
+    protected T evaluate() {
         return value;
     }
 
-    protected void subscribe(DataFlowExpression.DataFlowExpressionsCollector listener) {
+    protected void subscribe(DataFlowExpression<T>.DataFlowExpressionsCollector listener) {
         listener.subscribe(this);
     }
 }

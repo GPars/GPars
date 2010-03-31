@@ -65,7 +65,7 @@ public class ActorMessage<T> implements Serializable {
      * @param payLoad The original message
      * @return The newly created message
      */
-    public static <T> ActorMessage build(final T payLoad) {
+    public static <T> ActorMessage<T> build(final T payLoad) {
         return new ActorMessage<T>(payLoad, Actor.threadBoundActor());
     }
 

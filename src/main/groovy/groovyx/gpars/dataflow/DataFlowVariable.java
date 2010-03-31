@@ -72,7 +72,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
         return RemoteDataFlowVariable.class;
     }
 
-    public static class RemoteDataFlowVariable extends DataFlowVariable implements RemoteSerialized {
+    public static class RemoteDataFlowVariable<T> extends DataFlowVariable<T> implements RemoteSerialized {
         private static final long serialVersionUID = -420013188758006693L;
         private final RemoteHost remoteHost;
         private boolean disconnected;

@@ -48,7 +48,7 @@ public abstract class Actor extends ReceivingMessageStream {
      */
     private static final ThreadLocal<Actor> currentActorPerThread = new ThreadLocal<Actor>();
 
-    private final DataFlowExpression joinLatch;
+    private final DataFlowExpression<Object> joinLatch;
 
     protected Actor() {
         this(new DataFlowVariable());
@@ -59,7 +59,7 @@ public abstract class Actor extends ReceivingMessageStream {
      *
      * @param joinLatch The instance of DataFlowExpression to use for join operation
      */
-    protected Actor(final DataFlowExpression joinLatch) {
+    protected Actor(final DataFlowExpression<Object> joinLatch) {
         this.joinLatch = joinLatch;
     }
 
@@ -151,7 +151,7 @@ public abstract class Actor extends ReceivingMessageStream {
      *
      * @return The DataFlowExpression instance, which is used to join this actor
      */
-    public DataFlowExpression getJoinLatch() {
+    public DataFlowExpression<Object> getJoinLatch() {
         return joinLatch;
     }
 
@@ -186,10 +186,10 @@ public abstract class Actor extends ReceivingMessageStream {
     }
 
     public static class MyRemoteHandle extends DefaultRemoteHandle {
-        private final DataFlowExpression joinLatch;
+        private final DataFlowExpression<Object> joinLatch;
         private static final long serialVersionUID = 3721849638877039035L;
 
-        public MyRemoteHandle(final SerialHandle handle, final SerialContext host, final DataFlowExpression joinLatch) {
+        public MyRemoteHandle(final SerialHandle handle, final SerialContext host, final DataFlowExpression<Object> joinLatch) {
             super(handle.getSerialId(), host.getHostId(), RemoteActor.class);
             this.joinLatch = joinLatch;
         }
@@ -204,7 +204,7 @@ public abstract class Actor extends ReceivingMessageStream {
         private final RemoteHost remoteHost;
         private static final long serialVersionUID = -1375776678860848278L;
 
-        public RemoteActor(final SerialContext host, final DataFlowExpression jointLatch) {
+        public RemoteActor(final SerialContext host, final DataFlowExpression<Object> jointLatch) {
             super(jointLatch);
             remoteHost = (RemoteHost) host;
         }
@@ -236,7 +236,7 @@ public abstract class Actor extends ReceivingMessageStream {
             if (!(message instanceof ActorMessage)) {
                 message = new ActorMessage<Object>(message, threadBoundActor());
             }
-            remoteHost.write(new SendTo(this, (ActorMessage) message));
+            remoteHost.write(new SendTo(this, (ActorMessage<?>) message));
             return this;
         }
 

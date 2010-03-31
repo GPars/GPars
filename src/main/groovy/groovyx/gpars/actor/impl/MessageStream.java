@@ -117,7 +117,7 @@ public abstract class MessageStream extends WithSerialId {
      * @throws InterruptedException if interrupted while waiting
      */
     public final <T> Object sendAndWait(final T message, final long timeout, final TimeUnit units) throws InterruptedException {
-        final ResultWaiter to = new ResultWaiter();
+        final ResultWaiter<Object> to = new ResultWaiter<Object>();
         send(new ActorMessage<T>(message, to));
         return to.getResult(timeout, units);
     }
@@ -175,7 +175,7 @@ public abstract class MessageStream extends WithSerialId {
         public MessageStream send(final Object message) {
             final Thread thread = (Thread) this.value;
             if (message instanceof ActorMessage) {
-                this.value = ((ActorMessage) message).getPayLoad();
+                this.value = ((ActorMessage<?>) message).getPayLoad();
             } else {
                 this.value = message;
             }
@@ -255,7 +255,7 @@ public abstract class MessageStream extends WithSerialId {
             if (!(message instanceof ActorMessage)) {
                 message = new ActorMessage<Object>(message, Actor.threadBoundActor());
             }
-            remoteHost.write(new SendTo(this, (ActorMessage) message));
+            remoteHost.write(new SendTo(this, (ActorMessage<?>) message));
             return this;
         }
     }

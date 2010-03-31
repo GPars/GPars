@@ -23,7 +23,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  *
  * @author Alex Tkachman
  */
-public class DataFlowInvocationExpression extends DataFlowComplexExpression {
+public class DataFlowInvocationExpression extends DataFlowComplexExpression<Object> {
     private static final long serialVersionUID = -678669663648650627L;
     private Object receiver;
     private final String methodName;
@@ -38,7 +38,7 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression {
     @Override
     protected Object evaluate() {
         if (receiver instanceof DataFlowExpression) {
-            receiver = ((DataFlowExpression) receiver).value;
+            receiver = ((DataFlowExpression<Object>) receiver).value;
         }
 
         super.evaluate();

@@ -38,7 +38,7 @@ import java.util.UUID;
  */
 public class SerialHandle extends ManagedReference<WithSerialId> {
 
-    private static final ReferenceQueue queue = new ReferenceQueue();
+    private static final ReferenceQueue<WithSerialId> queue = new ReferenceQueue();
 
     private static final ReferenceManager manager = ReferenceManager.createThreadedManager(queue);
 

@@ -26,7 +26,7 @@ import java.util.UUID;
  *
  * @author Alex Tkachman
  */
-public final class RemoteNode<T extends LocalHost> {
+public final class RemoteNode {
     private final UUID id;
 
     private final SerialContext remoteHost;
