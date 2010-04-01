@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
-import static groovyx.gpars.Parallelizer.doParallel
+
 import static groovyx.gpars.Parallelizer.orchestrate
 
 /**
@@ -90,6 +90,6 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
 
 final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
 
-doParallel(3) {  //feel free to experiment with the number of fork/join threads in the pool
+withPool(3) {  //feel free to experiment with the number of fork/join threads in the pool
     println "Sorted numbers: ${orchestrate(new SortWorker(numbers))}"
 }

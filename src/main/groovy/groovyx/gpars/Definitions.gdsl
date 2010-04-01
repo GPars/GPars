@@ -83,7 +83,7 @@ contributor(actorBody) {
 def asynchronizerBody = context(ctype: "groovy.lang.Closure", scope: closureScope())
 
 contributor(asynchronizerBody) {
-    def call = enclosingCall("doParallel")
+    def call = enclosingCall("withPool")
     if (call) {
         def currentMethod = call.bind()
         def clazz = currentMethod?.containingClass

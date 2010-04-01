@@ -24,7 +24,7 @@ import jsr166y.forkjoin.ForkJoinPool
  */
 
 def n = [15, 4, 3, 4, 10]
-Parallelizer.doParallel(3) {ForkJoinPool pool ->
+Parallelizer.withPool(3) {ForkJoinPool pool ->
     def k = n.anyParallel {t ->
         println "$t started"
         sleep t * 1000

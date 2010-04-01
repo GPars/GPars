@@ -22,7 +22,7 @@ import groovyx.gpars.Asynchronizer
  * Demonstrates asynchronous processing using the Asynchronizer class.
  */
 
-Asynchronizer.doParallel {
+Asynchronizer.withPool {
     /**
      * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
      * It will return a Future for the result value.

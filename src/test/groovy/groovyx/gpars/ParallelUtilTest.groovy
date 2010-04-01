@@ -30,7 +30,7 @@ import jsr166y.forkjoin.ForkJoinPool
 public class ParallelUtilTest extends GroovyTestCase {
 
     public void testEach() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final AtomicInteger result = new AtomicInteger(0)
             ParallelArrayUtil.eachParallel([1, 2, 3, 4, 5], {result.addAndGet(it)})
             assertEquals 15, result
@@ -38,7 +38,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testEachWithIndex() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final AtomicInteger result = new AtomicInteger(0)
             ParallelArrayUtil.eachWithIndexParallel([1, 2, 3, 4, 5], {element, int index -> result.addAndGet(element * index)})
             assertEquals 40, result
@@ -46,7 +46,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testCollect() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final List result = ParallelArrayUtil.collectParallel([1, 2, 3, 4, 5], {it * 2})
             assert ([2, 4, 6, 8, 10].equals(result))
             assert !([2, 41, 6, 8, 10].equals(result))
@@ -54,7 +54,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testFindAll() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final List result = ParallelArrayUtil.findAllParallel([1, 2, 3, 4, 5], {it > 2})
             assert !(1 in result)
             assert !(1 in result)
@@ -66,7 +66,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSplit() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             def result = [1, 2, 3, 4, 5].splitParallel {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
@@ -80,7 +80,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSplitOnString() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             def result = 'abc'.splitParallel {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
@@ -95,7 +95,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testGrep() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final List result = ParallelArrayUtil.grepParallel([1, 2, 3, 4, 5], 3..6)
             assert !(1 in result)
             assert !(1 in result)
@@ -107,14 +107,14 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testEmptyFindAll() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final List<Integer> result = ParallelArrayUtil.findAllParallel([1, 2, 3, 4, 5], {it > 6})
             assertEquals 0, result.size()
         }
     }
 
     public void testFind() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final def result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 2})
             assert result in [3, 4, 5]
             assertEquals 3, result
@@ -122,21 +122,21 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testEmptyFind() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final def result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 6})
             assertNull result
         }
     }
 
     public void testFindAny() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 2})
             assert result in [3, 4, 5]
         }
     }
 
     public void testLazyFindAny() {
-        Parallelizer.doParallel(2) {
+        Parallelizer.withPool(2) {
             final AtomicInteger counter = new AtomicInteger(0)
             final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
             assert result in [1, 2, 3, 4, 5]
@@ -145,14 +145,14 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testEmptyFindAny() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 6})
             assertNull result
         }
     }
 
     public void testAny() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assert ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {it > 2})
             assert !ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {it > 6})
         }
@@ -160,14 +160,14 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     public void testLazyAny() {
         def counter = new AtomicInteger(0)
-        Parallelizer.doParallel(2) {
+        Parallelizer.withPool(2) {
             assert ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
         }
         assert counter.get() <= 2
     }
 
     public void testAll() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assert ParallelArrayUtil.everyParallel([1, 2, 3, 4, 5], {it > 0})
             assert !ParallelArrayUtil.everyParallel([1, 2, 3, 4, 5], {it > 1})
         }
@@ -175,7 +175,7 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
     public void testGroupBy() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assert ParallelArrayUtil.groupByParallel([1, 2, 3, 4, 5], {it > 2})
             assert ParallelArrayUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> 1}).size() == 1
             assert ParallelArrayUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> number}).size() == 5
@@ -193,7 +193,7 @@ public class ParallelUtilTest extends GroovyTestCase {
         final CyclicBarrier barrier2 = new CyclicBarrier(2)
 
         def thread = new Thread({
-            Parallelizer.doParallel(2) {
+            Parallelizer.withPool(2) {
                 final ForkJoinPool pool2 = Parallelizer.retrieveCurrentPool()
                 reference.set pool2
                 barrier1.await()
@@ -201,7 +201,7 @@ public class ParallelUtilTest extends GroovyTestCase {
             }
         } as Runnable)
         thread.start()
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final ForkJoinPool pool1 = Parallelizer.retrieveCurrentPool()
             barrier1.await()
             final ForkJoinPool nestedPool = reference.get() as ForkJoinPool
@@ -219,10 +219,10 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testNestedPools() {
-        Parallelizer.doParallel {a ->
-            Parallelizer.doParallel {b ->
-                Parallelizer.doParallel {c ->
-                    Parallelizer.doParallel {d ->
+        Parallelizer.withPool {a ->
+            Parallelizer.withPool {b ->
+                Parallelizer.withPool {c ->
+                    Parallelizer.withPool {d ->
                         assert d != c != b != a
                         assert Parallelizer.retrieveCurrentPool() == d
                     }
@@ -263,7 +263,7 @@ public class ParallelUtilTest extends GroovyTestCase {
         } as UncaughtExceptionHandler
 
         shouldFail(RuntimeException.class) {
-            Parallelizer.doParallel(5, handler) {ForkJoinPool pool ->
+            Parallelizer.withPool(5, handler) {ForkJoinPool pool ->
                 'abc'.eachParallel {throw new RuntimeException('test')}
             }
         }
@@ -271,7 +271,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public testNestedCalls() {
-        Parallelizer.doParallel(5) {pool ->
+        Parallelizer.withPool(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
                 Parallelizer.withExistingPool(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
@@ -282,7 +282,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testMin() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 1, [1, 2, 3, 4, 5].minParallel {a, b -> a - b}
             assertEquals 5, [1, 2, 3, 4, 5].minParallel {a, b -> b - a}
             assertEquals 1, [1, 2, 3, 4, 5].minParallel {it}
@@ -294,7 +294,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testMax() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 5, [1, 2, 3, 4, 5].maxParallel {a, b -> a - b}
             assertEquals 1, [1, 2, 3, 4, 5].maxParallel {a, b -> b - a}
             assertEquals 5, [1, 2, 3, 4, 5].maxParallel {it}
@@ -306,14 +306,14 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSum() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].sumParallel()
             assertEquals 'abc', 'abc'.sumParallel()
         }
     }
 
     public void testCount() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 1, [1, 2, 3, 4, 5].countParallel(3)
             assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(3)
             assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(6)
@@ -326,7 +326,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testReduce() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].foldParallel() {a, b -> a + b}
             assertEquals 'abc', 'abc'.foldParallel {a, b -> a + b}
             assertEquals 55, [1, 2, 3, 4, 5].collectParallel {it ** 2}.foldParallel {a, b -> a + b}
@@ -334,7 +334,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSeededReduce() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].foldParallel(0) {a, b -> a + b}
             assertEquals 25, [1, 2, 3, 4, 5].foldParallel(10) {a, b -> a + b}
             assertEquals 'abc', 'abc'.foldParallel('') {a, b -> a + b}
@@ -345,7 +345,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     public void testReduceThreads() {
         final ConcurrentHashMap map = new ConcurrentHashMap()
 
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].foldParallel {a, b ->
                 Thread.sleep 200
                 map[Thread.currentThread()] = ''
@@ -363,7 +363,7 @@ public class ParallelUtilTest extends GroovyTestCase {
                 "every": false
         ]
         def x = [1, 2, 3]
-        Parallelizer.doParallel {
+        Parallelizer.withPool {
             methods.each {method, expected ->
                 assertEquals "Surprise when processing parallel version of $method", expected, x."${method}Parallel"({ it % 2 })
             }
@@ -372,7 +372,7 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     public void testNonBooleanParallelFindAny() {
         def x = [1, 2, 3]
-        Parallelizer.doParallel {
+        Parallelizer.withPool {
             // Really just making sure it doesn't explode, but what the Hell...
             assert "Surprise when processing parallel version of find", x.findAnyParallel({ it % 2 }) in [1, 3]
         }

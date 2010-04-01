@@ -25,7 +25,7 @@ package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
 import groovyx.gpars.Parallelizer
-import static groovyx.gpars.Parallelizer.doParallel
+import static groovyx.gpars.Parallelizer.withPool
 
 class Sorter extends AbstractForkJoinWorker<Map> {
 
@@ -48,7 +48,7 @@ class Sorter extends AbstractForkJoinWorker<Map> {
 }
 
 def quicksort(list) {
-    doParallel {
+    withPool {
         Parallelizer.orchestrate(new Sorter(0, list)).list
     }
 }

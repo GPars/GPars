@@ -85,7 +85,7 @@ final JFrame frame = new SwingBuilder().frame(title: 'Parallelizer Demo', defaul
                                         it.perform()
                                     }
                                 } else {
-                                    Parallelizer.doParallel {
+                                    Parallelizer.withPool {
                                         processors.eachParallel {
                                             it.perform()
                                         }

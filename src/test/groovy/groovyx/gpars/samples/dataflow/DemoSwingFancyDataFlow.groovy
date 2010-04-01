@@ -79,7 +79,7 @@ values.eachWithIndex {value, index ->
 
 random = new Random()
 
-Parallelizer.doParallel(3) {
+Parallelizer.withPool(3) {
     values.eachWithIndexParallel {value, index ->
         builder.edt {
             builder."x$index".text = 'Calculating'

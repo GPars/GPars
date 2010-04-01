@@ -199,7 +199,7 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
@@ -215,7 +215,7 @@ final class Parallel {
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def minParallel() {
@@ -230,7 +230,7 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
@@ -246,7 +246,7 @@ final class Parallel {
      * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def maxParallel() {
@@ -260,7 +260,7 @@ final class Parallel {
      * method with the + operator and the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the sum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def sumParallel() {
@@ -275,7 +275,7 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def foldParallel(Closure cl) {
@@ -290,7 +290,7 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * @param seed A seed value to initialize the operation
      */

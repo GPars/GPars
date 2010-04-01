@@ -18,7 +18,7 @@ package groovyx.gpars
 
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
-import static groovyx.gpars.Asynchronizer.doParallel
+import static groovyx.gpars.Asynchronizer.withPool
 import static groovyx.gpars.Asynchronizer.withExistingPool
 
 /**
@@ -27,12 +27,12 @@ import static groovyx.gpars.Asynchronizer.withExistingPool
  */
 public class AsynchronizerDSLTest extends GroovyTestCase {
     public void testDSLInitialization() {
-        doParallel {
+        withPool {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
-        doParallel(5) {
+        withPool(5) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
@@ -44,7 +44,7 @@ public class AsynchronizerDSLTest extends GroovyTestCase {
             return t
         } as ThreadFactory
 
-        doParallel(5, threadFactory) {
+        withPool(5, threadFactory) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]

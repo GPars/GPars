@@ -47,7 +47,7 @@ task {
 }
 
 task {
-    Parallelizer.doParallel {
+    Parallelizer.withPool {
         println "Number of Groovy sites today: " +
                 ([dzone, jroller, theserverside].findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'

@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 /**
- * Holds a thread-local stack of pools to allow for nested calls to Parallelizer.doParallel() or Asynchronizer.doParallel()
+ * Holds a thread-local stack of pools to allow for nested calls to Parallelizer.withPool() or Asynchronizer.withPool()
  *
  * @author Vaclav Pech
  * Date: Dec 15, 2009

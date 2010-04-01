@@ -63,7 +63,7 @@ DataFlow.task {
     }
 }
 
-Parallelizer.doParallel() {
+Parallelizer.withPool() {
     values.eachWithIndexParallel {value, index ->
         for (progress in 1..value) {
             sleep 1000

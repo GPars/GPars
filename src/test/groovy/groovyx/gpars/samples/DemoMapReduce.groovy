@@ -28,7 +28,7 @@ import groovyx.gpars.Parallelizer
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-Parallelizer.doParallel {
+Parallelizer.withPool {
     assert 15 == [1, 2, 3, 4, 5].parallel.reduce {a, b -> a + b}                                        //summarize
     assert 25 == [1, 2, 3, 4, 5].parallel.reduce(10) {a, b -> a + b}                                        //summarize with a seed value
     assert 55 == [1, 2, 3, 4, 5].parallel.map {it ** 2}.reduce {a, b -> a + b}                          //summarize squares

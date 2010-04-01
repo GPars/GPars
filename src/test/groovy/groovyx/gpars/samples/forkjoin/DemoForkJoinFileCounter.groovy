@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
-import static groovyx.gpars.Parallelizer.doParallel
+
 import static groovyx.gpars.Parallelizer.orchestrate
 
 /**
@@ -56,6 +56,6 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
  as few as one thread is enough to keep the computation going.
  */
 
-doParallel(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
+withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
     println "Number of files: ${orchestrate(new FileCounter(new File("./src")))}"
 }

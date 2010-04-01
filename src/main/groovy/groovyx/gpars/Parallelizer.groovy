@@ -89,14 +89,14 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.doParallel {ForkJoinPool pool ->
+     * Parallelizer.withPool {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param cl The block of code to invoke with the DSL enabled
      */
-    public static doParallel(Closure cl) {
-        return doParallel(defaultPoolSize, cl)
+    public static withPool(Closure cl) {
+        return withPool(defaultPoolSize, cl)
     }
 
     /**
@@ -110,15 +110,15 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.doParallel(5) {ForkJoinPool pool ->
+     * Parallelizer.withPool(5) {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
      * @param cl The block of code to invoke with the DSL enabled
      */
-    public static doParallel(int numberOfThreads, Closure cl) {
-        return doParallel(numberOfThreads, createDefaultUncaughtExceptionHandler(), cl)
+    public static withPool(int numberOfThreads, Closure cl) {
+        return withPool(numberOfThreads, createDefaultUncaughtExceptionHandler(), cl)
     }
 
     /**
@@ -132,7 +132,7 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.doParallel(5, handler) {ForkJoinPool pool ->
+     * Parallelizer.withPool(5, handler) {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -140,7 +140,7 @@ public class Parallelizer {
      * @param handler Handler for uncaught exceptions raised in code performed by the pooled threads
      * @param cl The block of code to invoke with the DSL enabled
      */
-    public static doParallel(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
+    public static withPool(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
         final ForkJoinPool pool = createPool(numberOfThreads, handler)
         try {
             return withExistingPool(pool, cl)
@@ -160,14 +160,14 @@ public class Parallelizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
 //     * <pre>
-//     * Parallelizer.doParallel {ForkJoinPool pool ->
+//     * Parallelizer.withPool {ForkJoinPool pool ->
 //     *     def result = Collections.synchronizedSet(new HashSet())
 //     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
 //     * @param cl The block of code to invoke with the DSL enabled
 //     */
-//    public static doParallel(Closure cl) {
-//        return doParallel(defaultPoolSize, cl)
+//    public static withPool(Closure cl) {
+//        return withPool(defaultPoolSize, cl)
 //    }
 //
 //    /**
@@ -181,15 +181,15 @@ public class Parallelizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
 //     * <pre>
-//     * Parallelizer.doParallel(5) {ForkJoinPool pool ->
+//     * Parallelizer.withPool(5) {ForkJoinPool pool ->
 //     *     def result = Collections.synchronizedSet(new HashSet())
 //     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
 //     * @param numberOfThreads Number of threads in the newly created thread pool
 //     * @param cl The block of code to invoke with the DSL enabled
 //     */
-//    public static doParallel(int numberOfThreads, Closure cl) {
-//        return doParallel(numberOfThreads, createDefaultUncaughtExceptionHandler(), cl)
+//    public static withPool(int numberOfThreads, Closure cl) {
+//        return withPool(numberOfThreads, createDefaultUncaughtExceptionHandler(), cl)
 //    }
 //
 //    /**
@@ -203,7 +203,7 @@ public class Parallelizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
 //     * <pre>
-//     * Parallelizer.doParallel(5, handler) {ForkJoinPool pool ->
+//     * Parallelizer.withPool(5, handler) {ForkJoinPool pool ->
 //     *     def result = Collections.synchronizedSet(new HashSet())
 //     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
@@ -211,7 +211,7 @@ public class Parallelizer {
 //     * @param handler Handler for uncaught exceptions raised in code performed by the pooled threads
 //     * @param cl The block of code to invoke with the DSL enabled
 //     */
-//    public static doParallel(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
+//    public static withPool(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
 //        final ForkJoinPool pool = createPool(numberOfThreads, handler)
 //        try {
 //            return withExistingPool(pool, cl)
@@ -271,7 +271,7 @@ public class Parallelizer {
      */
     public static <T> T orchestrate(final AbstractForkJoinWorker<T> rootWorker) {
         def pool = Parallelizer.retrieveCurrentPool()
-        if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a Parallelizer.doParallel() block.")
+        if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a Parallelizer.withPool() block.")
         return pool.submit(rootWorker).get()
     }
 }

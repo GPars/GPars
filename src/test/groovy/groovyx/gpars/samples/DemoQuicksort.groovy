@@ -23,11 +23,11 @@
 
 package groovyx.gpars.samples
 
-import static groovyx.gpars.Parallelizer.doParallel
+import static groovyx.gpars.Parallelizer.withPool
 
 def quicksort(list) {
     if (list.size() < 2) return list.clone()
-    doParallel {
+    withPool {
         def groups = list.groupByParallel {it <=> list[list.size().intdiv(2)]}
         if (groups.size() == 1) return list.clone()
         (-1..1).collect({quicksort(groups[it] as ArrayList ?: [])}).sumParallel()

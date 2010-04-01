@@ -18,7 +18,8 @@ package groovyx.gpars.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
-import static groovyx.gpars.Parallelizer.doParallel
+
+import static groovyx.gpars.Parallelizer.withPool
 import static groovyx.gpars.Parallelizer.orchestrate
 
 /**
@@ -31,10 +32,10 @@ class ForkJoinTest extends GroovyTestCase {
     public void testMergeSort() {
         final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
 
-        doParallel(3) {
+        withPool(3) {
             assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), orchestrate(new TestSortWorker(numbers)).toArray())
         }
-        doParallel(1) {
+        withPool(1) {
             final TestSortWorker worker = new TestSortWorker(numbers)
             assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), orchestrate(worker).toArray())
             assert [] == worker.getChildrenResults()
@@ -45,7 +46,7 @@ class ForkJoinTest extends GroovyTestCase {
         final def numbers = [1, 5, 2, 4, 'abc', 8, 6, 7, 3, 4, 5]
 
         final TestSortWorker worker = new TestSortWorker(numbers)
-        doParallel(3) {
+        withPool(3) {
             shouldFail(ExecutionException) {
                 orchestrate(worker)
             }

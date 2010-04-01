@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger
 public class AsyncUtilTest extends GroovyTestCase {
 
     public void testAsyncClosure() {
-        Asynchronizer.doParallel(5) {ExecutorService service ->
+        Asynchronizer.withPool(5) {ExecutorService service ->
             def result = Collections.synchronizedSet(new HashSet())
             final CountDownLatch latch = new CountDownLatch(5);
             final Closure cl = {Number number -> result.add(number * 10); latch.countDown()}
@@ -41,7 +41,7 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testCallParallel() {
-        Asynchronizer.doParallel(5) {ExecutorService service ->
+        Asynchronizer.withPool(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
             AsyncInvokerUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
@@ -53,13 +53,13 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testCallParallelWithResult() {
-        Asynchronizer.doParallel(5) {ExecutorService service ->
+        Asynchronizer.withPool(5) {ExecutorService service ->
             assertEquals 6, AsyncInvokerUtil.callAsync({it * 2}, 3).get()
         }
     }
 
     public void testAsync() {
-        Asynchronizer.doParallel(5) {ExecutorService service ->
+        Asynchronizer.withPool(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2);
             AsyncInvokerUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
@@ -71,23 +71,23 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testAsyncWithResult() {
-        Asynchronizer.doParallel(5) {ExecutorService service ->
+        Asynchronizer.withPool(5) {ExecutorService service ->
             assertEquals 6, AsyncInvokerUtil.async({it * 2}).call(3).get()
         }
     }
 
     public void testInvalidPoolSize() {
         shouldFail(IllegalArgumentException.class) {
-            Asynchronizer.doParallel(0) {}
+            Asynchronizer.withPool(0) {}
         }
         shouldFail(IllegalArgumentException.class) {
-            Asynchronizer.doParallel(-10) {}
+            Asynchronizer.withPool(-10) {}
         }
     }
 
     public void testMissingThreadFactory() {
         shouldFail(IllegalArgumentException.class) {
-            Asynchronizer.doParallel(5, null) {}
+            Asynchronizer.withPool(5, null) {}
         }
     }
 
@@ -102,7 +102,7 @@ public class AsyncUtilTest extends GroovyTestCase {
     public void testLeftShift() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final Semaphore semaphore = new Semaphore(0)
-        Asynchronizer.doParallel(5) {ExecutorService service ->
+        Asynchronizer.withPool(5) {ExecutorService service ->
             service << {flag.set(true); semaphore.release(); }
             semaphore.acquire()
             assert flag.get()
@@ -110,7 +110,7 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public testNestedCalls() {
-        Asynchronizer.doParallel(5) {pool ->
+        Asynchronizer.withPool(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
                 Asynchronizer.withExistingPool(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
@@ -121,10 +121,10 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testNestedPools() {
-        Asynchronizer.doParallel{a->
-            Asynchronizer.doParallel{b->
-                Asynchronizer.doParallel{c->
-                    Asynchronizer.doParallel{d->
+        Asynchronizer.withPool{a->
+            Asynchronizer.withPool{b->
+                Asynchronizer.withPool{c->
+                    Asynchronizer.withPool{d->
                         assert d != c != b != a
                         assert Asynchronizer.retrieveCurrentPool() == d
                     }

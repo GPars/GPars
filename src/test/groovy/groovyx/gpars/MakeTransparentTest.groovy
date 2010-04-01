@@ -38,7 +38,7 @@ class MakeTransparentTest extends GroovyTestCase {
             items.makeTransparent()
         }
 
-        Parallelizer.doParallel {
+        Parallelizer.withPool {
             assertNotNull([1].makeTransparent())
             assertNotNull('abcde'.makeTransparent())
             assertTrue items == items.makeTransparent()
@@ -58,14 +58,14 @@ class MakeTransparentTest extends GroovyTestCase {
     }
 
     public void testMakeTransparentTypeCompatibility() {
-        Parallelizer.doParallel {
+        Parallelizer.withPool {
             Collection c = [1, 2, 3, 4, 5].makeTransparent()
             String s = 'abcde'.makeTransparent()
         }
     }
 
     public void testNonTransparentAfterClone() {
-        Parallelizer.doParallel {
+        Parallelizer.withPool {
             Collection c = [1, 2, 3, 4, 5].makeTransparent()
             assert c.isTransparent()
             assertFalse c.clone().isTransparent()
@@ -80,7 +80,7 @@ class MakeTransparentTest extends GroovyTestCase {
         shouldFail(IllegalStateException) {
             ParallelArrayUtil.makeTransparent(items)
         }
-        Parallelizer.doParallel {
+        Parallelizer.withPool {
             assertFalse items.isTransparent()
             assertFalse 'abc'.isTransparent()
             assertTrue items.makeTransparent().isTransparent()
@@ -102,7 +102,7 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testIdempotenceOfNestingMakeTransparent() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             items.makeTransparent().makeTransparent().each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
@@ -114,7 +114,7 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testMakeTransparentPropagationToResults() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
@@ -126,7 +126,7 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testNoMakeTransparentPropagationToResultsWithGroupBy() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             items.makeTransparent().groupBy {it % 2}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
@@ -138,7 +138,7 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testMakeTransparentPropagationToResultsWithString() {
         def items = 'abcde'
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             items.makeTransparent().collect {it * 2}.findAll {it.size() > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
@@ -150,7 +150,7 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testMakeTransparentPropagationToResultsWithIterator() {
         def items = [1, 2, 3, 4, 5].iterator()
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
@@ -163,7 +163,7 @@ class MakeTransparentTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         assertEquals 1, foo(items).keys().size()
 
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 1, foo(items).keys().size()
             assert foo(items.makeTransparent()).keys().size() > 3
         }

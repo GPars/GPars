@@ -24,7 +24,7 @@ package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
-import static groovyx.gpars.Parallelizer.doParallel
+
 import static groovyx.gpars.Parallelizer.orchestrate
 
 class ForkJoinFib extends AbstractForkJoinWorker {
@@ -50,7 +50,7 @@ class ForkJoinFib extends AbstractForkJoinWorker {
     }
 }
 
-doParallel(2) {
+withPool(2) {
 
     final long t1 = System.currentTimeMillis()
     try {

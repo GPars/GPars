@@ -20,7 +20,7 @@ public class AsynchronizerIteratorTest extends GroovyTestCase {
     public void testIteratorEach() {
         def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-        Asynchronizer.doParallel {
+        Asynchronizer.withPool {
             def result = Collections.synchronizedSet(new HashSet())
             list.iterator().eachParallel {
                 result << it
@@ -32,7 +32,7 @@ public class AsynchronizerIteratorTest extends GroovyTestCase {
     public void testIteratorCollect() {
         def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-        Asynchronizer.doParallel {
+        Asynchronizer.withPool {
             def result = list.iterator().collectParallel { 2 * it }
             assertEquals 9, result.size()
             assert result.any {it == 12}
@@ -42,7 +42,7 @@ public class AsynchronizerIteratorTest extends GroovyTestCase {
     public void testIterator() {
         def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-        Asynchronizer.doParallel {
+        Asynchronizer.withPool {
             assert list.iterator().anyParallel { it == 6 }
             assert list.iterator().everyParallel { it < 10 }
             assertEquals 8, list.iterator().findParallel { it == 8 }

@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap
 public class MapReduceTest extends GroovyTestCase {
 
     public void testReduce() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].parallel.map {it}.reduce {a, b -> a + b}
             assertEquals 'abc', 'abc'.parallel.map {it}.reduce {a, b -> a + b}
             assertEquals 55, [1, 2, 3, 4, 5].parallel.map {it ** 2}.reduce {a, b -> a + b}
@@ -36,7 +36,7 @@ public class MapReduceTest extends GroovyTestCase {
     }
 
     public void testSeededReduce() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].parallel.map {it}.reduce(0) {a, b -> a + b}
             assertEquals 25, [1, 2, 3, 4, 5].parallel.map {it}.reduce(10) {a, b -> a + b}
             assertEquals 'abc', 'abc'.parallel.map {it}.reduce('') {a, b -> a + b}
@@ -45,20 +45,20 @@ public class MapReduceTest extends GroovyTestCase {
     }
 
     public void testNestedMap() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 65, [1, 2, 3, 4, 5].parallel.map {it}.map {it + 10}.reduce {a, b -> a + b}
         }
     }
 
     public void testMapFilter() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assert ([4, 5].containsAll([1, 2, 3, 4, 5].parallel.map {it}.filter {it > 3}.collection))
             assertEquals 9, [1, 2, 3, 4, 5].parallel.map {it}.filter { it > 3 }.map {it}.reduce {a, b -> a + b }
         }
     }
 
     public void testFilterMap() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 9, [1, 2, 3, 4, 5].parallel.filter {it > 3}.map {it}.reduce {a, b -> a + b}
         }
     }
@@ -66,7 +66,7 @@ public class MapReduceTest extends GroovyTestCase {
     public void testReduceThreads() {
         final ConcurrentHashMap map = new ConcurrentHashMap()
 
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].parallel.map {it}.reduce {a, b ->
                 Thread.sleep 200
                 map[Thread.currentThread()] = ''
@@ -77,7 +77,7 @@ public class MapReduceTest extends GroovyTestCase {
     }
 
     public void testMinMax() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 1, [1, 2, 3, 4, 5].parallel.map {it}.min {a, b -> a - b}
             assertEquals 1, [1, 2, 3, 4, 5].parallel.map {it}.min {it}
             assertEquals 1, [1, 2, 3, 4, 5].parallel.map {it}.min()
@@ -90,14 +90,14 @@ public class MapReduceTest extends GroovyTestCase {
     }
 
     public void testSum() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].parallel.sum()
             assertEquals 'aabbccddee', 'abcde'.parallel.map {it * 2}.sum()
         }
     }
 
     public void testCollectionProperty() {
-        Parallelizer.doParallel(5) {
+        Parallelizer.withPool(5) {
             final def original = [1, 2, 3, 4, 5]
             final def collection = original.parallel.collection
             assertEquals original, collection

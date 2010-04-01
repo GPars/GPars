@@ -23,7 +23,7 @@
 
 package groovyx.gpars.samples
 
-import static groovyx.gpars.Parallelizer.doParallel
+import static groovyx.gpars.Parallelizer.withPool
 
 @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
 def quicksort(list) {
@@ -37,7 +37,7 @@ private def filterByIndex(groups, index) {
     groups.filter {it.index == index}.map {it.value}
 }
 
-doParallel {
+withPool {
     assert quicksort([]) == []
     assert quicksort([1]) == [1]
     assert quicksort([1, 2, 3]) == [1, 2, 3]

@@ -27,7 +27,7 @@ def getYearEndClosing(String stock, int year) {
 def stocks = ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT']
 def price = new DataFlows() // key: stock name, value: price
 
-Asynchronizer.doParallel {
+Asynchronizer.withPool {
     // spawn a thread per stock that stores the result in its DataFlow
     stocks.each({stock ->
         price[stock] = getYearEndClosing(stock, 2008)

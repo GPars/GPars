@@ -27,7 +27,7 @@ final List urls = ['http://www.dzone.com', 'http://www.jroller.com', 'http://www
 
 task {
     def pages = urls.collect { downloadPage(it) }
-    Parallelizer.doParallel {
+    Parallelizer.withPool {
         println "Number of Groovy sites today: " +
                 (pages.findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'

@@ -25,7 +25,7 @@ import groovyx.gpars.Asynchronizer
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-Asynchronizer.doParallel {
+Asynchronizer.withPool {
     println list.collectParallel {it * 2 }
 
     list.iterator().eachParallel {
