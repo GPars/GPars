@@ -19,7 +19,7 @@ package groovyx.gpars
 import java.lang.Thread.UncaughtExceptionHandler
 import jsr166y.forkjoin.ForkJoinPool
 import static groovyx.gpars.Parallelizer.withExistingParallelizer
-import static groovyx.gpars.Parallelizer.withParallelizer
+import static groovyx.gpars.Parallelizer.doParallel
 
 /**
  * @author Vaclav Pech
@@ -27,12 +27,12 @@ import static groovyx.gpars.Parallelizer.withParallelizer
  */
 public class ParallelizerDSLTest extends GroovyTestCase {
     public void testDSLInitialization() {
-        withParallelizer {
+        doParallel {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
-        withParallelizer(5) {
+        doParallel(5) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
@@ -42,7 +42,7 @@ public class ParallelizerDSLTest extends GroovyTestCase {
             throwable.printStackTrace(System.err)
         } as UncaughtExceptionHandler
 
-        withParallelizer(5, handler) {
+        doParallel(5, handler) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]

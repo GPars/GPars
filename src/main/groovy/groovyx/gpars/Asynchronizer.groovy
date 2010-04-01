@@ -29,11 +29,11 @@ import org.codehaus.groovy.runtime.InvokerInvocationException
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
  * E.g.
- * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+ * Asynchronizer.doParallel(5) {ExecutorService service ->
  *     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel({it * 10}.async())
  *     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
  *}*
- * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+ * Asynchronizer.doParallel(5) {ExecutorService service ->
  *     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}*     assert result in [3, 4, 5]
  *}*
  * @author Vaclav Pech
@@ -89,7 +89,7 @@ class Asynchronizer {
     /**
      * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
      * and runs the supplied closure.
-     * It is an identical alternative for withAsynchronizer() with a shorter name.
+     * It is an identical alternative for doParallel() with a shorter name.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
      * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
@@ -111,7 +111,7 @@ class Asynchronizer {
     /**
      * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
      * and runs the supplied closure.
-     * It is an identical alternative for withAsynchronizer() with a shorter name.
+     * It is an identical alternative for doParallel() with a shorter name.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
      * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
@@ -134,7 +134,7 @@ class Asynchronizer {
     /**
      * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
      * and runs the supplied closure.
-     * It is an identical alternative for withAsynchronizer() with a shorter name.
+     * It is an identical alternative for doParallel() with a shorter name.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
      * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
@@ -174,82 +174,7 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withAsynchronizer {ExecutorService service ->
-     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-     *}* </pre>
-     * @param cl The block of code to invoke with the DSL enabled
-     * @deprecated Use doParallel() instead
-     */
-    public static withAsynchronizer(Closure cl) {
-        return withAsynchronizer(3, cl)
-    }
-
-    /**
-     * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
-     * and runs the supplied closure.
-     * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
-     * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
-     * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
-     * for processing in the pool.
-     * Calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
-     * operation on each image in the <i>images</i> collection in parallel.
-     * <pre>
-     * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-     *}* </pre>
-     * @param numberOfThreads Number of threads in the newly created thread pool
-     * @param cl The block of code to invoke with the DSL enabled
-     * @deprecated Use doParallel() instead
-     */
-    public static withAsynchronizer(int numberOfThreads, Closure cl) {
-        return withAsynchronizer(numberOfThreads, createDefaultThreadFactory(), cl)
-    }
-
-    /**
-     * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
-     * and runs the supplied closure.
-     * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
-     * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
-     * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
-     * for processing in the pool.
-     * Calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
-     * operation on each image in the <i>images</i> collection in parallel.
-     * <pre>
-     * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
-     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-     *}* </pre>
-     * @param numberOfThreads Number of threads in the newly created thread pool
-     * @param threadFactory Factory for threads in the pool
-     * @param cl The block of code to invoke with the DSL enabled
-     * @deprecated Use doParallel() instead
-     */
-    public static withAsynchronizer(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
-        final ExecutorService pool = createPool(numberOfThreads, threadFactory)
-        try {
-            return withExistingAsynchronizer(pool, cl)
-        } finally {
-            pool.shutdown()
-            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
-        }
-    }
-
-    /**
-     * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
-     * and runs the supplied closure.
-     * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
-     * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
-     * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
-     * for processing in the pool.
-     * Calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
-     * operation on each image in the <i>images</i> collection in parallel.
-     * <pre>
-     * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+     * Asynchronizer.doParallel(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param pool The <i>ExecutorService</i> to use, the service will not be shutdown after this method returns
@@ -296,7 +221,7 @@ class Asynchronizer {
      * @return Futures for the result values or exceptions of all closures
     */
     public static List<Future<Object>> executeAsync(Closure... closures) {
-        Asynchronizer.withAsynchronizer(closures.size()) {ExecutorService executorService ->
+        Asynchronizer.doParallel(closures.size()) {ExecutorService executorService ->
             List<Future<Object>> result = closures.collect {cl ->
                 executorService.submit({
                     cl.call()

@@ -95,7 +95,7 @@ public class ParallelizerTest extends GroovyTestCase {
 
     @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
     public void testGroupBy() {
-        Parallelizer.withParallelizer(5) {
+        Parallelizer.doParallel(5) {
             assert [1, 2, 3, 4, 5].groupByParallel {it > 2}
             assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> 1}).size() == 1
             assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number}).size() == 5
@@ -114,7 +114,7 @@ public class ParallelizerTest extends GroovyTestCase {
     }
 
     public void testQuicksort() {
-        Parallelizer.withParallelizer {
+        Parallelizer.doParallel {
             assertEquals([0, 1, 2, 3], qsort([0, 3, 1, 2]))
         }
     }

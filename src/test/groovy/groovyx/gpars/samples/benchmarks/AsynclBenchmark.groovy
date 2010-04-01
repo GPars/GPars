@@ -51,7 +51,7 @@ long measureSequential(iterations, List list) {
 
 long measureAsynchronizer(iterations, List list) {
     final long t1 = System.currentTimeMillis()
-    Asynchronizer.withAsynchronizer(30) {
+    Asynchronizer.doParallel(30) {
         for (i in iterations) {
             int result
             list.eachParallel {result = it}
@@ -65,7 +65,7 @@ long measureAsynchronizer(iterations, List list) {
 
 long measureParallelizer(iterations, List list) {
     final long t1 = System.currentTimeMillis()
-    Parallelizer.withParallelizer(30) {
+    Parallelizer.doParallel(30) {
         for (i in iterations) {
             int result
             list.eachParallel {result = it}

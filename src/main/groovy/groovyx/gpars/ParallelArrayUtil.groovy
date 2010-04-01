@@ -77,10 +77,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>eachParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = new ConcurrentSkipListSet()
+     * Parallelizer.doParallel {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -95,10 +95,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>eachParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = new ConcurrentSkipListSet()
+     * Parallelizer.doParallel {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -113,10 +113,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>eachWithIndexParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = new ConcurrentSkipListSet()
+     * Parallelizer.doParallel {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -137,10 +137,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>eachWithIndexParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = new ConcurrentSkipListSet()
+     * Parallelizer.doParallel {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -155,10 +155,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static <T> Collection<T> collectParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withMapping({cl(it)} as Mapper).all().asList()
@@ -170,10 +170,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static Collection<Object> collectParallel(Object collection, Closure cl) {
         return collectParallel(createCollection(collection), cl)
@@ -185,10 +185,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <T> Collection<T> findAllParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().asList()
@@ -200,10 +200,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static Collection<Object> findAllParallel(Object collection, Closure cl) {
         return findAllParallel(createCollection(collection), cl)
@@ -215,10 +215,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a value from the resulting Parallel Array with the minimum index.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <T> Object findParallel(Collection<T> collection, Closure cl) {
         final ParallelArray found = createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all()
@@ -232,10 +232,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a value from the resulting Parallel Array with the minimum index.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findParallel(Object collection, Closure cl) {
         return findParallel(createCollection(collection), cl)
@@ -250,10 +250,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a random value from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <T> Object findAnyParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any()
@@ -268,10 +268,10 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a random value from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findAnyParallel(Object collection, Closure cl) {
         return findParallel(createCollection(collection), cl)
@@ -283,10 +283,10 @@ public class ParallelArrayUtil {
      * The filter will be effectively used concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
      *     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <T> Collection<T> grepParallel(Collection<T> collection, filter) {
@@ -299,10 +299,10 @@ public class ParallelArrayUtil {
      * The filter will be effectively used concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
      *     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static Object grepParallel(Object collection, filter) {
@@ -315,10 +315,10 @@ public class ParallelArrayUtil {
      * The filter will be effectively used concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].splitParallel(it > 3)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].splitParallel(it > 3)
      *            assert [3, 4, 5] as Set == result[0] as Set
      *            assert [1, 2] as Set == result[1] as Set
 
@@ -334,10 +334,10 @@ public class ParallelArrayUtil {
      * The filter will be effectively used concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].splitParallel(4..6)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].splitParallel(4..6)
      *            assert [3, 4, 5] as Set == result[0] as Set
      *            assert [1, 2] as Set == result[1] as Set
      *}*/
@@ -351,10 +351,10 @@ public class ParallelArrayUtil {
      * The filter will be effectively used concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].countParallel(4)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].countParallel(4)
      *     assertEquals(1, result)
      *}*/
     public static <T> int countParallel(Collection<T> collection, filter) {
@@ -367,10 +367,10 @@ public class ParallelArrayUtil {
      * The filter will be effectively used concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     def result = [1, 2, 3, 4, 5].countParallel(4)
+     * Parallelizer.doParallel {*     def result = [1, 2, 3, 4, 5].countParallel(4)
      *     assertEquals(1, result)
      *}*/
     public static int countParallel(Object collection, filter) {
@@ -386,10 +386,10 @@ public class ParallelArrayUtil {
      * After all the elements have been processed, the method returns a boolean value indicating, whether at least
      * one element of the collection meets the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
+     * Parallelizer.doParallel {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static <T> boolean anyParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
     }
@@ -403,10 +403,10 @@ public class ParallelArrayUtil {
      * After all the elements have been processed, the method returns a boolean value indicating, whether at least
      * one element of the collection meets the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
+     * Parallelizer.doParallel {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static boolean anyParallel(Object collection, Closure cl) {
         return anyParallel(createCollection(collection), cl)
     }
@@ -418,10 +418,10 @@ public class ParallelArrayUtil {
      * After all the elements have been processed, the method returns a boolean value indicating, whether all the elements
      * of the collection meet the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
+     * Parallelizer.doParallel(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static <T> boolean everyParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().size() == collection.size()
     }
@@ -433,10 +433,10 @@ public class ParallelArrayUtil {
      * After all the elements have been processed, the method returns a boolean value indicating, whether all the elements
      * of the collection meet the predicate.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
+     * Parallelizer.doParallel(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static boolean everyParallel(Object collection, Closure cl) {
         return everyParallel(createCollection(collection), cl)
     }
@@ -448,10 +448,10 @@ public class ParallelArrayUtil {
      * After all the elements have been processed, the method returns a list of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>groupByParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
+     * Parallelizer.doParallel {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      *}*/
     public static <T> Map groupByParallel(Collection<T> collection, Closure cl) {
         final def map = new ConcurrentHashMap()
@@ -472,10 +472,10 @@ public class ParallelArrayUtil {
      * After all the elements have been processed, the method returns a list of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>groupByParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * Parallelizer.withParallelizer {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
+     * Parallelizer.doParallel {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      *}*/
     public static Map groupByParallel(Object collection, Closure cl) {
         return groupByParallel(createCollection(collection), cl)
@@ -487,7 +487,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
@@ -503,7 +503,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
@@ -517,7 +517,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static <T> T minParallel(Collection<T> collection) {
@@ -528,7 +528,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static Object minParallel(Object collection) {
@@ -541,7 +541,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
@@ -557,7 +557,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
@@ -571,7 +571,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static <T> T maxParallel(Collection<T> collection) {
@@ -582,7 +582,7 @@ public class ParallelArrayUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static Object maxParallel(Object collection) {
@@ -594,7 +594,7 @@ public class ParallelArrayUtil {
      * method with the + operator and the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the sum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static <T> T sumParallel(Collection<T> collection) {
@@ -606,7 +606,7 @@ public class ParallelArrayUtil {
      * method with the + operator and the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the sum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static Object sumParallel(Object collection) {
@@ -619,7 +619,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static <T> T foldParallel(Collection<T> collection, Closure cl) {
@@ -632,7 +632,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public static Object foldParallel(Object collection, Closure cl) {
@@ -645,7 +645,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * @param seed A seed value to initialize the operation
      */
@@ -659,7 +659,7 @@ public class ParallelArrayUtil {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>doParallel</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * @param seed A seed value to initialize the operation
      */

@@ -214,7 +214,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
     }
 
     public void testSplit() {
-        Parallelizer.withParallelizer(5) {
+        Parallelizer.doParallel(5) {
             def result = [1, 2, 3, 4, 5].makeTransparent().split {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
@@ -228,7 +228,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
     }
 
     public void testSplitOnString() {
-        Parallelizer.withParallelizer(5) {
+        Parallelizer.doParallel(5) {
             def result = new String('abc').makeTransparent().split {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 public class AsynchronizerTest extends GroovyTestCase {
     public void testStartInParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
             Asynchronizer.startInParallel({resultA = 1; latch.countDown()}, {resultB = 1; latch.countDown()})
@@ -55,7 +55,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testAsyncWithCollectionAndResult() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             Collection<Future> result = [1, 2, 3, 4, 5].collect({it * 10}.async())
             assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result*.get()))
         }
@@ -63,14 +63,14 @@ public class AsynchronizerTest extends GroovyTestCase {
 
     public void testEachParallel() {
         def result = Collections.synchronizedSet(new HashSet())
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
             assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
         }
     }
 
     public void testEachParallelOnSingleElementCollections() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             [1].eachParallel {}
             [1].eachParallel {}
             [1].eachParallel {}
@@ -81,7 +81,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testEachParallelOnEmpty() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             [].eachParallel {throw new RuntimeException('Should not be thrown')}
             [].eachParallel {throw new RuntimeException('Should not be thrown')}
             [].eachParallel {throw new RuntimeException('Should not be thrown')}
@@ -93,14 +93,14 @@ public class AsynchronizerTest extends GroovyTestCase {
 
     public void testEachWithIndexParallel() {
         def result = Collections.synchronizedSet(new HashSet())
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * index)}
             assertEquals(new HashSet([0, 2, 6, 12, 20]), result)
         }
     }
 
     public void testEachWithIndexParallelOnSingleElementCollections() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             [1].eachWithIndexParallel {e, i ->}
             [1].eachWithIndexParallel {e, i ->}
             [1].eachWithIndexParallel {e, i ->}
@@ -111,7 +111,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testEachWithIndexParallelOnEmpty() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             [].eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
             [].eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
             [].eachWithIndexParallel {e, i -> throw new RuntimeException('Should not be thrown')}
@@ -122,35 +122,35 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testCollectParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}
             assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result))
         }
     }
 
     public void testCollectParallelOnRange() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def result = (1..5).collectParallel {Number number -> number * 10}
             assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result))
         }
     }
 
     public void testFindAllParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 2}
             assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection) result))
         }
     }
 
     public void testGrepParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].grepParallel(3..6)
             assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection) result))
         }
     }
 
     public void testFindParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 2}
             assert result in [3, 4, 5]
             assertEquals 3, result
@@ -158,14 +158,14 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testFindAnyParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 2}
             assert result in [3, 4, 5]
         }
     }
 
     public void testLazyFindAnyParallel() {
-        Asynchronizer.withAsynchronizer(2) {ExecutorService service ->
+        Asynchronizer.doParallel(2) {ExecutorService service ->
             final AtomicInteger counter = new AtomicInteger(0)
             def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> counter.incrementAndGet(); number > 0}
             assert result in [1, 2, 3, 4, 5]
@@ -174,14 +174,14 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testAllParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             assert [1, 2, 3, 4, 5].everyParallel {Number number -> number > 0}
             assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 2}
         }
     }
 
     public void testAnyParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 0}
             assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 2}
             assert ![1, 2, 3, 4, 5].anyParallel {Number number -> number > 6}
@@ -189,7 +189,7 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testLazyAnyParallel() {
-        Asynchronizer.withAsynchronizer(2) {ExecutorService service ->
+        Asynchronizer.doParallel(2) {ExecutorService service ->
             def counter = new AtomicInteger(0)
             assert [1, 2, 3, 4, 5].anyParallel {Number number -> counter.incrementAndGet(); number > 0}
             assert counter.get() <= 2
@@ -198,7 +198,7 @@ public class AsynchronizerTest extends GroovyTestCase {
 
     @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
     public void testGroupByParallel() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> 1}).size() == 1
             assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number}).size() == 5
             final def groups = [1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}
@@ -215,13 +215,13 @@ public class AsynchronizerTest extends GroovyTestCase {
     }
 
     public void testQuicksort() {
-        Asynchronizer.withAsynchronizer {
+        Asynchronizer.doParallel {
             assertEquals([0, 1, 2, 3], qsort([0, 3, 1, 2]))
         }
     }
 
     public void testAsyncTask() {
-        Asynchronizer.withAsynchronizer(5) {ExecutorService service ->
+        Asynchronizer.doParallel(5) {ExecutorService service ->
             final AtomicBoolean flag = new AtomicBoolean(false)
             final CountDownLatch latch = new CountDownLatch(1)
 
