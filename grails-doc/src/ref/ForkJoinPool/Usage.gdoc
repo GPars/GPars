@@ -18,14 +18,14 @@ The following methods are currently supported on all objects in Groovy:
 * sumParallel()
 
 {code} //summarize numbers concurrently
- Parallelizer.doParallel {
+ ForkJoinPool.withPool {
      final AtomicInteger result = new AtomicInteger(0)
      [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
      assertEquals 15, result
  }
 
  //multiply numbers asynchronously
- Parallelizer.doParallel {
+ ForkJoinPool.withPool {
      final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}
      assert ([2, 4, 6, 8, 10].equals(result))
  }
@@ -43,7 +43,7 @@ println list.collectParallel {it * 2 }
 h3. Transparently parallel collections
 
 {code}
-Parallelizer.doParallel {
+ForkJoinPool.withPool {
 
     //The selectImportantNames() will process the name collections concurrently
     assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeTransparent())

@@ -1,6 +1,6 @@
 h3. Concepts
 
-h4. Parallelizer
+h4. ForkJoinPool
 
 Dealing with data frequently involves manipulating collections. Lists, arrays, sets, maps, iterators, strings and lot of other
 data types can be viewed as collections of items. The common pattern to process such collections is to take elements sequentially,
