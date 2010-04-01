@@ -50,7 +50,7 @@ public class ThreadPoolTest extends GroovyTestCase {
         assertEquals([10, 20], ThreadPool.doInParallel([{10}, {20}]))
     }
 
-    public void testExecutAsyncList() {
+    public void testExecuteAsyncList() {
         assertEquals([10, 20], ThreadPool.executeAsync([{10}, {20}])*.get())
     }
 
