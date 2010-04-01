@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars
 
@@ -29,17 +29,17 @@ import org.codehaus.groovy.runtime.InvokerInvocationException
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
  * E.g.
- * Asynchronizer.withPool(5) {ExecutorService service ->
+ * ThreadPool.withPool(5) {ExecutorService service ->
  *     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel({it * 10}.async())
  *     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
  *}*
- * Asynchronizer.withPool(5) {ExecutorService service ->
+ * ThreadPool.withPool(5) {ExecutorService service ->
  *     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}*     assert result in [3, 4, 5]
  *}*
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-class Asynchronizer {
+class ThreadPool {
 
     /**
      * Maps threads to their appropriate thread pools
@@ -99,7 +99,7 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withPool {ExecutorService service ->
+     * ThreadPool.withPool {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param cl The block of code to invoke with the DSL enabled
@@ -121,7 +121,7 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withPool(5) {ExecutorService service ->
+     * ThreadPool.withPool(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
@@ -144,7 +144,7 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withPool(5) {ExecutorService service ->
+     * ThreadPool.withPool(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
@@ -174,7 +174,7 @@ class Asynchronizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * <pre>
 //     * def result = new ConcurrentSkipListSet()
-//     * Asynchronizer.withPool {ExecutorService service ->
+//     * ThreadPool.withPool {ExecutorService service ->
 //     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
 //     * @param cl The block of code to invoke with the DSL enabled
@@ -196,7 +196,7 @@ class Asynchronizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * <pre>
 //     * def result = new ConcurrentSkipListSet()
-//     * Asynchronizer.withPool(5) {ExecutorService service ->
+//     * ThreadPool.withPool(5) {ExecutorService service ->
 //     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
 //     * @param numberOfThreads Number of threads in the newly created thread pool
@@ -219,7 +219,7 @@ class Asynchronizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * <pre>
 //     * def result = new ConcurrentSkipListSet()
-//     * Asynchronizer.withPool(5) {ExecutorService service ->
+//     * ThreadPool.withPool(5) {ExecutorService service ->
 //     *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
 //     * @param numberOfThreads Number of threads in the newly created thread pool
@@ -249,7 +249,7 @@ class Asynchronizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * Asynchronizer.withPool(5) {ExecutorService service ->
+     * ThreadPool.withPool(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param pool The <i>ExecutorService</i> to use, the service will not be shutdown after this method returns
@@ -286,7 +286,7 @@ class Asynchronizer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static List<Object> doInParallel(List<Closure> closures) {
-      return doInParallel(*closures)
+        return doInParallel(* closures)
     }
 
     /**
@@ -294,9 +294,9 @@ class Asynchronizer {
      * If an exception is thrown from the closure when called on any of the collection's elements,
      * it will be re-thrown in the calling thread when it calls the Future.get() method.
      * @return Futures for the result values or exceptions of all closures
-    */
+     */
     public static List<Future<Object>> executeAsync(Closure... closures) {
-        Asynchronizer.withPool(closures.size()) {ExecutorService executorService ->
+        ThreadPool.withPool(closures.size()) {ExecutorService executorService ->
             List<Future<Object>> result = closures.collect {cl ->
                 executorService.submit({
                     cl.call()
@@ -311,9 +311,9 @@ class Asynchronizer {
      * If an exception is thrown from the closure when called on any of the collection's elements,
      * it will be re-thrown in the calling thread when it calls the Future.get() method.
      * @return Futures for the result values or exceptions of all closures
-    */
+     */
     public static List<Future<Object>> executeAsync(List<Closure> closures) {
-      return executeAsync(*closures)
+        return executeAsync(* closures)
     }
 
     /**
@@ -321,7 +321,7 @@ class Asynchronizer {
      * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported using System.err.
      * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static void startInParallel(Closure ... closures) {
+    public static void startInParallel(Closure... closures) {
         startInParallel(createDefaultUncaughtExceptionHandler(), closures)
     }
 
@@ -332,7 +332,7 @@ class Asynchronizer {
      * Unwraps potential InvokerInvocationException before control is passed to the UncaughtExceptionHandler instance.
      * @return The thread that submits the closures to the thread executor service so that the caller can take ownership of it and e.g. call <i>join()</i> on it to wait for all the closures to finish processing.
      */
-    public static Thread startInParallel(java.lang.Thread.UncaughtExceptionHandler uncaughtExceptionHandler, Closure ... closures) {
+    public static Thread startInParallel(java.lang.Thread.UncaughtExceptionHandler uncaughtExceptionHandler, Closure... closures) {
         final Thread thread = new Thread({
             doInParallel(closures)
         } as Runnable)

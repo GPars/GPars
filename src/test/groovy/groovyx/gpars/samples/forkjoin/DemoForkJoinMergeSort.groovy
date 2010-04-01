@@ -17,8 +17,7 @@
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
-
-import static groovyx.gpars.Parallelizer.orchestrate
+import static groovyx.gpars.ForkJoinPool.orchestrate
 
 /**
  * Shows use of the ForkJoin mechanics to implement merge sort.

@@ -1,42 +1,42 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
- * Demonstrates parallel collection processing using ParallelArrays through the Parallelizer class.
+ * Demonstrates parallel collection processing using ParallelArrays through the ForkJoinPool class.
  * Requires the jsr166y jar on the class path.
  */
 
 package groovyx.gpars.samples
 
-import groovyx.gpars.Parallelizer
+import groovyx.gpars.ForkJoinPool
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-Parallelizer.withPool {
+ForkJoinPool.withPool {
     println list.collectParallel {it * 2 }
 
     list.iterator().eachParallel {
         println it
     }
     println "Minimum: ${list.minParallel()}"
-    println "Minimum: ${list.minParallel{a, b -> a - b}}"   //Using a comparator closure
+    println "Minimum: ${list.minParallel {a, b -> a - b}}"   //Using a comparator closure
     println "Maximum: ${list.maxParallel()}"
-    println "Maximum: ${list.maxParallel{it * 3}}"          //Using a value retrieval closure
+    println "Maximum: ${list.maxParallel {it * 3}}"          //Using a value retrieval closure
     println "Sum: ${list.sumParallel()}"
-    println "Product: ${list.foldParallel{a, b -> a * b}}"
+    println "Product: ${list.foldParallel {a, b -> a * b}}"
 
     final String text = 'want to be big'
     println((text.collectParallel {it.toUpperCase()}).join())
@@ -47,6 +47,6 @@ Parallelizer.withPool {
 
     //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
     // here use parallel implementation under the covers
-    println animals.makeTransparent().collect{it.toUpperCase()}.groupBy{it.contains 'A'}
+    println animals.makeTransparent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
 }
 

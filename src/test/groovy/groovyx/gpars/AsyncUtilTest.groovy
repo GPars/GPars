@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars
 
@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger
 public class AsyncUtilTest extends GroovyTestCase {
 
     public void testAsyncClosure() {
-        Asynchronizer.withPool(5) {ExecutorService service ->
+        ThreadPool.withPool(5) {ExecutorService service ->
             def result = Collections.synchronizedSet(new HashSet())
             final CountDownLatch latch = new CountDownLatch(5);
             final Closure cl = {Number number -> result.add(number * 10); latch.countDown()}
@@ -41,7 +41,7 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testCallParallel() {
-        Asynchronizer.withPool(5) {ExecutorService service ->
+        ThreadPool.withPool(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
             AsyncInvokerUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
@@ -53,13 +53,13 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testCallParallelWithResult() {
-        Asynchronizer.withPool(5) {ExecutorService service ->
+        ThreadPool.withPool(5) {ExecutorService service ->
             assertEquals 6, AsyncInvokerUtil.callAsync({it * 2}, 3).get()
         }
     }
 
     public void testAsync() {
-        Asynchronizer.withPool(5) {ExecutorService service ->
+        ThreadPool.withPool(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2);
             AsyncInvokerUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
@@ -71,27 +71,27 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testAsyncWithResult() {
-        Asynchronizer.withPool(5) {ExecutorService service ->
+        ThreadPool.withPool(5) {ExecutorService service ->
             assertEquals 6, AsyncInvokerUtil.async({it * 2}).call(3).get()
         }
     }
 
     public void testInvalidPoolSize() {
         shouldFail(IllegalArgumentException.class) {
-            Asynchronizer.withPool(0) {}
+            ThreadPool.withPool(0) {}
         }
         shouldFail(IllegalArgumentException.class) {
-            Asynchronizer.withPool(-10) {}
+            ThreadPool.withPool(-10) {}
         }
     }
 
     public void testMissingThreadFactory() {
         shouldFail(IllegalArgumentException.class) {
-            Asynchronizer.withPool(5, null) {}
+            ThreadPool.withPool(5, null) {}
         }
     }
 
-    public void testMissingAsynchronizer() {
+    public void testMissingThreadPool() {
         final AtomicInteger counter = new AtomicInteger(0)
         shouldFail(IllegalStateException.class) {
             AsyncInvokerUtil.callAsync({counter.set it}, 1)
@@ -102,7 +102,7 @@ public class AsyncUtilTest extends GroovyTestCase {
     public void testLeftShift() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final Semaphore semaphore = new Semaphore(0)
-        Asynchronizer.withPool(5) {ExecutorService service ->
+        ThreadPool.withPool(5) {ExecutorService service ->
             service << {flag.set(true); semaphore.release(); }
             semaphore.acquire()
             assert flag.get()
@@ -110,9 +110,9 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public testNestedCalls() {
-        Asynchronizer.withPool(5) {pool ->
+        ThreadPool.withPool(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
-                Asynchronizer.withExistingPool(pool) {
+                ThreadPool.withExistingPool(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
@@ -121,18 +121,18 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testNestedPools() {
-        Asynchronizer.withPool{a->
-            Asynchronizer.withPool{b->
-                Asynchronizer.withPool{c->
-                    Asynchronizer.withPool{d->
+        ThreadPool.withPool {a ->
+            ThreadPool.withPool {b ->
+                ThreadPool.withPool {c ->
+                    ThreadPool.withPool {d ->
                         assert d != c != b != a
-                        assert Asynchronizer.retrieveCurrentPool() == d
+                        assert ThreadPool.retrieveCurrentPool() == d
                     }
-                    assert Asynchronizer.retrieveCurrentPool() == c
+                    assert ThreadPool.retrieveCurrentPool() == c
                 }
-                assert Asynchronizer.retrieveCurrentPool() == b
+                assert ThreadPool.retrieveCurrentPool() == b
             }
-            assert Asynchronizer.retrieveCurrentPool() == a
+            assert ThreadPool.retrieveCurrentPool() == a
         }
     }
 
@@ -140,21 +140,21 @@ public class AsyncUtilTest extends GroovyTestCase {
         final def pool1 = Executors.newFixedThreadPool(1)
         final def pool2 = Executors.newFixedThreadPool(1)
         final def pool3 = Executors.newFixedThreadPool(1)
-        Asynchronizer.withExistingPool(pool1){a->
-            Asynchronizer.withExistingPool(pool2){b->
-                Asynchronizer.withExistingPool(pool1){c->
-                    Asynchronizer.withExistingPool(pool3){d->
+        ThreadPool.withExistingPool(pool1) {a ->
+            ThreadPool.withExistingPool(pool2) {b ->
+                ThreadPool.withExistingPool(pool1) {c ->
+                    ThreadPool.withExistingPool(pool3) {d ->
                         assert d == pool3
                         assert c == pool1
                         assert b == pool2
                         assert a == pool1
-                        assert Asynchronizer.retrieveCurrentPool() == pool3
+                        assert ThreadPool.retrieveCurrentPool() == pool3
                     }
-                    assert Asynchronizer.retrieveCurrentPool() == pool1
+                    assert ThreadPool.retrieveCurrentPool() == pool1
                 }
-                assert Asynchronizer.retrieveCurrentPool() == pool2
+                assert ThreadPool.retrieveCurrentPool() == pool2
             }
-            assert Asynchronizer.retrieveCurrentPool() == pool1
+            assert ThreadPool.retrieveCurrentPool() == pool1
         }
     }
 }

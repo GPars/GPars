@@ -19,19 +19,18 @@ package groovyx.gpars
 import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.TimeUnit
-import jsr166y.forkjoin.ForkJoinPool
 
 /**
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
- * shows to be much faster (10 - 20 times) compared to the executor service implementation in Asynchronizer.
+ * shows to be much faster (10 - 20 times) compared to the executor service implementation in ThreadPool.
  * E.g.
  <pre>
- Parallelizer.withParallelizer(5) {final AtomicInteger result = new AtomicInteger(0)
- [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}assertEquals 15, result}Parallelizer.withParallelizer(5) {final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}assert ([2, 4, 6, 8, 10].equals(result))}Parallelizer.withParallelizer(5) {assert [1, 2, 3, 4, 5].everyParallel {it > 0}assert ![1, 2, 3, 4, 5].everyParallel {it > 1}}</pre>
+ ForkJoinPool.withPool(5) {final AtomicInteger result = new AtomicInteger(0)
+ [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}assertEquals 15, result}ForkJoinPool.withPool(5) {final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}assert ([2, 4, 6, 8, 10].equals(result))}ForkJoinPool.withPool(5) {assert [1, 2, 3, 4, 5].everyParallel {it > 0}assert ![1, 2, 3, 4, 5].everyParallel {it > 1}}</pre>
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class Parallelizer {
+public class ForkJoinPool {
 
     /**
      * Maps threads to their appropriate thread pools
@@ -66,7 +65,7 @@ public class Parallelizer {
 
     private static createPool(int poolSize, UncaughtExceptionHandler handler) {
         if (!(poolSize in 1..Integer.MAX_VALUE)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
-        final ForkJoinPool pool = new ForkJoinPool(poolSize)
+        final jsr166y.forkjoin.ForkJoinPool pool = new jsr166y.forkjoin.ForkJoinPool(poolSize)
         pool.uncaughtExceptionHandler = handler
         return pool
     }
@@ -81,7 +80,6 @@ public class Parallelizer {
     /**
      * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
-     * It is an identical alternative for withParallelizer() with a shorter name.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
      * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
      * category class.
@@ -89,7 +87,7 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.withPool {ForkJoinPool pool ->
+     * ForkJoinPool.withPool {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -102,7 +100,6 @@ public class Parallelizer {
     /**
      * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
-     * It is an identical alternative for withParallelizer() with a shorter name.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
      * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
      * category class.
@@ -110,7 +107,7 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.withPool(5) {ForkJoinPool pool ->
+     * ForkJoinPool.withPool(5) {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -124,7 +121,6 @@ public class Parallelizer {
     /**
      * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
-     * It is an identical alternative for withParallelizer() with a shorter name.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
      * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
      * category class.
@@ -132,7 +128,7 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.withPool(5, handler) {ForkJoinPool pool ->
+     * ForkJoinPool.withPool(5, handler) {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -141,7 +137,7 @@ public class Parallelizer {
      * @param cl The block of code to invoke with the DSL enabled
      */
     public static withPool(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
-        final ForkJoinPool pool = createPool(numberOfThreads, handler)
+        final jsr166y.forkjoin.ForkJoinPool pool = createPool(numberOfThreads, handler)
         try {
             return withExistingPool(pool, cl)
         } finally {
@@ -152,7 +148,6 @@ public class Parallelizer {
 //    /**
 //     * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
 //     * and runs the supplied closure.
-//     * It is an identical alternative for withParallelizer() with a shorter name.
 //     * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
 //     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
 //     * category class.
@@ -160,7 +155,7 @@ public class Parallelizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
 //     * <pre>
-//     * Parallelizer.withPool {ForkJoinPool pool ->
+//     * ForkJoinPool.withPool {ForkJoinPool pool ->
 //     *     def result = Collections.synchronizedSet(new HashSet())
 //     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
@@ -173,7 +168,6 @@ public class Parallelizer {
 //    /**
 //     * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
 //     * and runs the supplied closure.
-//     * It is an identical alternative for withParallelizer() with a shorter name.
 //     * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
 //     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
 //     * category class.
@@ -181,7 +175,7 @@ public class Parallelizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
 //     * <pre>
-//     * Parallelizer.withPool(5) {ForkJoinPool pool ->
+//     * ForkJoinPool.withPool(5) {ForkJoinPool pool ->
 //     *     def result = Collections.synchronizedSet(new HashSet())
 //     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
@@ -195,7 +189,6 @@ public class Parallelizer {
 //    /**
 //     * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
 //     * and runs the supplied closure.
-//     * It is an identical alternative for withParallelizer() with a shorter name.
 //     * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
 //     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
 //     * category class.
@@ -203,7 +196,7 @@ public class Parallelizer {
 //     * operation on each image in the <i>images</i> collection in parallel.
 //     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
 //     * <pre>
-//     * Parallelizer.withPool(5, handler) {ForkJoinPool pool ->
+//     * ForkJoinPool.withPool(5, handler) {ForkJoinPool pool ->
 //     *     def result = Collections.synchronizedSet(new HashSet())
 //     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
 //     *}* </pre>
@@ -231,13 +224,13 @@ public class Parallelizer {
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * Parallelizer.withExistingPool(anotherPool) {ForkJoinPool pool ->
+     * ForkJoinPool.withExistingPool(anotherPool) {ForkJoinPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*  </pre>
      * @param pool The thread pool to use, the pool will not be shutdown after this method returns
      */
-    public static withExistingPool(ForkJoinPool pool, Closure cl) {
+    public static withExistingPool(jsr166y.forkjoin.ForkJoinPool pool, Closure cl) {
 
         currentPoolStack << pool
         def result = null
@@ -255,7 +248,7 @@ public class Parallelizer {
      * Just like withExistingPool() registers a thread pool, but doesn't install the ParallelArrayUtil category.
      * Used by ParallelEnhancer's Parallel mixins. 
      */
-    static ensurePool(final ForkJoinPool pool, final Closure cl) {
+    static ensurePool(final jsr166y.forkjoin.ForkJoinPool pool, final Closure cl) {
         currentPoolStack << pool
         try {
             return cl(pool)
@@ -270,8 +263,8 @@ public class Parallelizer {
      * @return The result of the whole calculation
      */
     public static <T> T orchestrate(final AbstractForkJoinWorker<T> rootWorker) {
-        def pool = Parallelizer.retrieveCurrentPool()
-        if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a Parallelizer.withPool() block.")
+        def pool = ForkJoinPool.retrieveCurrentPool()
+        if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a ForkJoinPool.withPool() block.")
         return pool.submit(rootWorker).get()
     }
 }

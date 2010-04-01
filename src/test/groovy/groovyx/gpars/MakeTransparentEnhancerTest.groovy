@@ -82,7 +82,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     }
 
     public void testNonTransparentAfterClone() {
-        Parallelizer.withPool {
+        ForkJoinPool.withPool {
             Collection c = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent()
             assert c.isTransparent()
             assertFalse c.clone().isTransparent()
