@@ -145,7 +145,7 @@ public abstract class ReceivingMessageStream extends MessageStream {
     private static Object unwrapMessage(final Object msg) {
         //more a double-check here, since all current implementations of the receiveImpl() method do unwrap already
         if (msg instanceof ActorMessage) {
-            return ((ActorMessage<Object>) msg).getPayLoad();
+            return ((ActorMessage) msg).getPayLoad();
         } else {
             return msg;
         }

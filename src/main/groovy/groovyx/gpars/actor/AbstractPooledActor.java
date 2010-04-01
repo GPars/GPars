@@ -149,10 +149,10 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param messages List of ActorMessage wrapping the sender actor, who we need to be able to respond to,
      *                 plus the original message
      */
-    private void enhanceReplies(final Iterable<ActorMessage<?>> messages) {
+    private void enhanceReplies(final Iterable<ActorMessage> messages) {
         final List<MessageStream> senders = getSenders();
         senders.clear();
-        for (final ActorMessage<?> message : messages) {
+        for (final ActorMessage message : messages) {
             senders.add(message == null ? null : message.getSender());
             if (message != null) {
                 obj2Sender.put(message.getPayLoad(), message.getSender());
@@ -170,7 +170,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     protected final Object receiveImpl() throws InterruptedException {
         checkStoppedFlags();
 
-        final ActorMessage<?> message = takeMessage();
+        final ActorMessage message = takeMessage();
         return enhanceAndUnwrap(message);
     }
 
@@ -186,12 +186,12 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     protected final Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
         checkStoppedFlags();
 
-        final ActorMessage<?> message = takeMessage(timeout, units);
+        final ActorMessage message = takeMessage(timeout, units);
         return enhanceAndUnwrap(message);
     }
 
-    private Object enhanceAndUnwrap(final ActorMessage<?> message) {
-        enhanceReplies(Arrays.<ActorMessage<?>>asList(message));
+    private Object enhanceAndUnwrap(final ActorMessage message) {
+        enhanceReplies(Arrays.<ActorMessage>asList(message));
         if (message == null) {
             return null;
         }
@@ -215,7 +215,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         handler.setResolveStrategy(Closure.DELEGATE_FIRST);
         handler.setDelegate(this);
 
-        final List<ActorMessage<?>> messages = new ArrayList<ActorMessage<?>>();
+        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
         final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
         final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
 
@@ -238,7 +238,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         }
     }
 
-    private void collectRequiredMessages(final Collection<ActorMessage<?>> messages, final int toReceive) throws InterruptedException {
+    private void collectRequiredMessages(final Collection<ActorMessage> messages, final int toReceive) throws InterruptedException {
         for (int i = 0; i != toReceive; ++i) {
             checkStopTerminate();
             messages.add(takeMessage());
@@ -265,7 +265,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         final long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
 
         boolean nullAppeared = false;  //Ignore further potential messages once a null is retrieved (due to a timeout)
-        final List<ActorMessage<?>> messages = new ArrayList<ActorMessage<?>>();
+        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
         for (int i = 0; i != toReceive; ++i) {
             if (nullAppeared) {
                 messages.add(null);
@@ -273,7 +273,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
                 if (stopFlag != S_RUNNING) {
                     throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
                 }
-                final ActorMessage<?> message =
+                final ActorMessage message =
                         takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0L), TimeUnit.MILLISECONDS);
                 nullAppeared = message == null;
                 messages.add(message);
@@ -295,10 +295,10 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         }
     }
 
-    private static Object[] retrievePayloadOfMessages(final List<ActorMessage<?>> messages) {
+    private static Object[] retrievePayloadOfMessages(final List<ActorMessage> messages) {
         final Object[] args = new Object[messages.size()];
         for (int i = 0; i < args.length; i++) {
-            final ActorMessage<?> am = messages.get(i);
+            final ActorMessage am = messages.get(i);
             args[i] = am == null ? am : am.getPayLoad();
         }
         return args;
@@ -323,10 +323,10 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      *
      * @return The messages stored in the queue
      */
-    final List<ActorMessage<?>> sweepQueue() {
-        final List<ActorMessage<?>> messages = new ArrayList<ActorMessage<?>>();
+    final List<ActorMessage> sweepQueue() {
+        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
 
-        ActorMessage<?> message = pollMessage();
+        ActorMessage message = pollMessage();
         while (message != null) {
             final Object payloadList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
             if (payloadList != null && !((Collection<Object>) payloadList).isEmpty()) {
