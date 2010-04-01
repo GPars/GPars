@@ -154,7 +154,7 @@ class Asynchronizer {
     public static doParallel(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
         final ExecutorService pool = createPool(numberOfThreads, threadFactory)
         try {
-            return withExistingAsynchronizer(pool, cl)
+            return withExistingPool(pool, cl)
         } finally {
             pool.shutdown()
             pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
@@ -179,7 +179,7 @@ class Asynchronizer {
      *}* </pre>
      * @param pool The <i>ExecutorService</i> to use, the service will not be shutdown after this method returns
      */
-    public static withExistingAsynchronizer(ExecutorService pool, Closure cl) {
+    public static withExistingPool(ExecutorService pool, Closure cl) {
         currentPoolStack << pool
         def result = null
         try {

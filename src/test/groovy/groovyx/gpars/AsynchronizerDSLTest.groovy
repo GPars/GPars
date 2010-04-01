@@ -19,7 +19,7 @@ package groovyx.gpars
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import static groovyx.gpars.Asynchronizer.doParallel
-import static groovyx.gpars.Asynchronizer.withExistingAsynchronizer
+import static groovyx.gpars.Asynchronizer.withExistingPool
 
 /**
  * @author Vaclav Pech
@@ -50,7 +50,7 @@ public class AsynchronizerDSLTest extends GroovyTestCase {
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
 
-        withExistingAsynchronizer(Executors.newFixedThreadPool(5)) {
+        withExistingPool(Executors.newFixedThreadPool(5)) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]

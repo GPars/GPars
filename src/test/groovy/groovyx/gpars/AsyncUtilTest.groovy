@@ -112,7 +112,7 @@ public class AsyncUtilTest extends GroovyTestCase {
     public testNestedCalls() {
         Asynchronizer.doParallel(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
-                Asynchronizer.withExistingAsynchronizer(pool) {
+                Asynchronizer.withExistingPool(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
@@ -140,10 +140,10 @@ public class AsyncUtilTest extends GroovyTestCase {
         final def pool1 = Executors.newFixedThreadPool(1)
         final def pool2 = Executors.newFixedThreadPool(1)
         final def pool3 = Executors.newFixedThreadPool(1)
-        Asynchronizer.withExistingAsynchronizer(pool1){a->
-            Asynchronizer.withExistingAsynchronizer(pool2){b->
-                Asynchronizer.withExistingAsynchronizer(pool1){c->
-                    Asynchronizer.withExistingAsynchronizer(pool3){d->
+        Asynchronizer.withExistingPool(pool1){a->
+            Asynchronizer.withExistingPool(pool2){b->
+                Asynchronizer.withExistingPool(pool1){c->
+                    Asynchronizer.withExistingPool(pool3){d->
                         assert d == pool3
                         assert c == pool1
                         assert b == pool2

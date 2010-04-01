@@ -238,10 +238,10 @@ public class ParallelUtilTest extends GroovyTestCase {
         final def pool1 = new ForkJoinPool()
         final def pool2 = new ForkJoinPool()
         final def pool3 = new ForkJoinPool()
-        Parallelizer.withExistingParallelizer(pool1) {a ->
-            Parallelizer.withExistingParallelizer(pool2) {b ->
-                Parallelizer.withExistingParallelizer(pool1) {c ->
-                    Parallelizer.withExistingParallelizer(pool3) {d ->
+        Parallelizer.withExistingPool(pool1) {a ->
+            Parallelizer.withExistingPool(pool2) {b ->
+                Parallelizer.withExistingPool(pool1) {c ->
+                    Parallelizer.withExistingPool(pool3) {d ->
                         assert d == pool3
                         assert c == pool1
                         assert b == pool2
@@ -273,7 +273,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     public testNestedCalls() {
         Parallelizer.doParallel(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
-                Parallelizer.withExistingParallelizer(pool) {
+                Parallelizer.withExistingPool(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
