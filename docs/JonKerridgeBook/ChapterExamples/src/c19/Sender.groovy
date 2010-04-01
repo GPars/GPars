@@ -30,7 +30,7 @@ class Sender implements CSProcess {
     def List clients
 
     void run() {
-        // create the no service curently available mobile client
+        // create the no service currently available mobile client
         //serviceUnavailable = new NoServiceClient()
         def serviceUnavailable = new NoServiceClientProcess()
         // determine the number of clients and create the list of available clients

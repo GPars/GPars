@@ -27,7 +27,7 @@ class ParticleManager implements CSProcess {
     def ChannelInput fromParticles
     def ChannelOutput toParticles
     def DisplayList toUI
-    def int CANVASSIZE
+    def int CANVAS_SIZE
     def int PARTICLES
     def int CENTRE
     def int START_TEMP
@@ -44,7 +44,7 @@ class ParticleManager implements CSProcess {
 
         GraphicsCommand[] particleGraphics = new GraphicsCommand[1 + (PARTICLES * 2)]
 
-        particleGraphics[0] = new GraphicsCommand.ClearRect(0, 0, CANVASSIZE, CANVASSIZE)
+        particleGraphics[0] = new GraphicsCommand.ClearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
         GraphicsCommand[] initialGraphic = new GraphicsCommand[2]
 
@@ -108,8 +108,8 @@ class ParticleManager implements CSProcess {
             else {    // index is 1 particle movement
                 def p = (Position) fromParticles.read()
                 // make sure particle stays within bounds of canvas by bouncing off the boundary of the canvas
-                if (p.lx > CANVASSIZE) { p.lx = (2 * CANVASSIZE) - p.lx }
-                if (p.ly > CANVASSIZE) { p.ly = (2 * CANVASSIZE) - p.ly }
+                if (p.lx > CANVAS_SIZE) { p.lx = (2 * CANVAS_SIZE) - p.lx }
+                if (p.ly > CANVAS_SIZE) { p.ly = (2 * CANVAS_SIZE) - p.ly }
                 if (p.lx < 0) { p.lx = 0 - p.lx }
                 if (p.ly < 0) { p.ly = 0 - p.ly }
                 // now change positionGraphic

@@ -26,7 +26,7 @@ import phw.util.*
 //CNS_IP = "146.176.163.83" // napier network jon's PC
 //CNS_IP = "169.254.171.140" // jon's laptop
 def CNS_IP = Ask.string("Enter IP address of CNS: ")
-//CNS_IP = ""  // a defualt CNS somewhere on a connected network
+//CNS_IP = ""  // a default CNS somewhere on a connected network
 //String CNS_IP = null                   // Default IP of CNS running on a connected network
 // Initialise Mobile package
 if (CNS_IP == null) {

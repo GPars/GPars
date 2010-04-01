@@ -214,7 +214,7 @@ class RingAgentElement implements CSProcess {
                     // receiver has restarted
                     def state = fromStateManager.read()
                     if (state == "STOP") {
-                        //will write the stopper agent when an empty packet is recieved
+                        //will write the stopper agent when an empty packet is received
                         stopping = true
                         restarting = false
                     }
