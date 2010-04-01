@@ -752,7 +752,7 @@ abstract class AbstractParallelCollection<T> {
      * Size of the collection
      * @return The number of elements in the collection
      */
-    public final T size() {
+    public final int size() {
         pa.size()
     }
 
