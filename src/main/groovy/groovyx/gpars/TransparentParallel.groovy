@@ -44,7 +44,7 @@ final class TransparentParallel {
 
     public def final split(Closure yield) { this.splitParallel(yield).makeTransparent()}
 
-    public def final count(filter) { this.countParallel(filter).makeTransparent()}
+    public def final count(filter) { this.countParallel(filter) }
 
     public def final every(Closure yield) { this.everyParallel(yield)}
 
