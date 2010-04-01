@@ -145,74 +145,33 @@ public class ForkJoinPool {
             pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
         }
     }
-//    /**
-//     * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
-//     * and runs the supplied closure.
-//     * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-//     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
-//     * category class.
-//     * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
-//     * operation on each image in the <i>images</i> collection in parallel.
-//     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
-//     * <pre>
-//     * ForkJoinPool.withPool {ForkJoinPool pool ->
-//     *     def result = Collections.synchronizedSet(new HashSet())
-//     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-//     *}* </pre>
-//     * @param cl The block of code to invoke with the DSL enabled
-//     */
-//    public static withPool(Closure cl) {
-//        return withPool(defaultPoolSize, cl)
-//    }
-//
-//    /**
-//     * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
-//     * and runs the supplied closure.
-//     * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-//     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
-//     * category class.
-//     * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
-//     * operation on each image in the <i>images</i> collection in parallel.
-//     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
-//     * <pre>
-//     * ForkJoinPool.withPool(5) {ForkJoinPool pool ->
-//     *     def result = Collections.synchronizedSet(new HashSet())
-//     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-//     *}* </pre>
-//     * @param numberOfThreads Number of threads in the newly created thread pool
-//     * @param cl The block of code to invoke with the DSL enabled
-//     */
-//    public static withPool(int numberOfThreads, Closure cl) {
-//        return withPool(numberOfThreads, createDefaultUncaughtExceptionHandler(), cl)
-//    }
-//
-//    /**
-//     * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
-//     * and runs the supplied closure.
-//     * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-//     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
-//     * category class.
-//     * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
-//     * operation on each image in the <i>images</i> collection in parallel.
-//     * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
-//     * <pre>
-//     * ForkJoinPool.withPool(5, handler) {ForkJoinPool pool ->
-//     *     def result = Collections.synchronizedSet(new HashSet())
-//     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
-//     *}* </pre>
-//     * @param numberOfThreads Number of threads in the newly created thread pool
-//     * @param handler Handler for uncaught exceptions raised in code performed by the pooled threads
-//     * @param cl The block of code to invoke with the DSL enabled
-//     */
-//    public static withPool(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
-//        final ForkJoinPool pool = createPool(numberOfThreads, handler)
-//        try {
-//            return withExistingPool(pool, cl)
-//        } finally {
-//            pool.shutdown()
-//            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
-//        }
-//    }
+
+    /**
+     * @deprecated
+     */
+    public static doParallel(Closure cl) {
+        return withPool(defaultPoolSize, cl)
+    }
+
+    /**
+     * @deprecated
+     */
+    public static doParallel(int numberOfThreads, Closure cl) {
+        return withPool(numberOfThreads, createDefaultUncaughtExceptionHandler(), cl)
+    }
+
+    /**
+     * @deprecated
+     */
+    public static doParallel(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
+        final ForkJoinPool pool = createPool(numberOfThreads, handler)
+        try {
+            return withExistingPool(pool, cl)
+        } finally {
+            pool.shutdown()
+            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
+        }
+    }
 
     /**
      * Reuses an instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
