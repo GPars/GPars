@@ -301,11 +301,11 @@ final class Parallel {
     }
 
     /**
-     * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
+     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
-    public ParallelCollection getParallel() {
+    public PAWrapper getParallel() {
         ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.getParallel(mixedIn[Object])
         }

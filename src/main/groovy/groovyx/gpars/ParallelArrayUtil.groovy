@@ -668,16 +668,16 @@ public class ParallelArrayUtil {
     }
 
     /**
-     * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
+     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
-    public static <T> ParallelCollection<T> getParallel(Collection<T> collection) {
-        new ParallelCollection(createPA(collection, retrievePool()))
+    public static <T> PAWrapper<T> getParallel(Collection<T> collection) {
+        new PAWrapper(createPA(collection, retrievePool()))
     }
 
     /**
-     * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
+     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
@@ -698,7 +698,7 @@ public class ParallelArrayUtil {
 /**
  * Wraps a ParallelArray instance in map/reduce operation chains.
  */
-abstract class AbstractParallelCollection<T> {
+abstract class AbstractPAWrapper<T> {
 
     /**
      * The wrapper ParallelArray instance
@@ -708,7 +708,7 @@ abstract class AbstractParallelCollection<T> {
     /**
      * Creates an instance wrapping the supplied instance of ParallelArray
      */
-    def AbstractParallelCollection(final pa) {
+    def AbstractPAWrapper(final pa) {
         this.pa = pa
     }
 
@@ -800,8 +800,8 @@ abstract class AbstractParallelCollection<T> {
      * @param A closure calculating a transformed value from the original one
      * @return A collection holding the new values
      */
-    public final AbstractParallelCollection map(Closure cl) {
-        new MappedCollection(pa.withMapping({cl(it)} as Mapper))
+    public final AbstractPAWrapper map(Closure cl) {
+        new MappedPAWrapper(pa.withMapping({cl(it)} as Mapper))
     }
 
     /**
@@ -809,15 +809,15 @@ abstract class AbstractParallelCollection<T> {
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
-    public abstract AbstractParallelCollection filter(Closure cl)
+    public abstract AbstractPAWrapper filter(Closure cl)
 }
 
 /**
  * The default ParallelArray wrapper class
  */
-final class ParallelCollection<T> extends AbstractParallelCollection {
+final class PAWrapper<T> extends AbstractPAWrapper {
 
-    def ParallelCollection(final pa) {
+    def PAWrapper(final pa) {
         super(pa)
     }
 
@@ -826,18 +826,17 @@ final class ParallelCollection<T> extends AbstractParallelCollection {
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
-    public ParallelCollection filter(Closure cl) {
-        //We have to do it this way since WithFilter doesn't allow all of the operations we may need later
-        pa.withFilter({cl(it)} as Predicate).all().parallel
+    public PAWrapper filter(Closure cl) {
+        new PAWrapper(pa.withFilter({cl(it)} as Predicate).all())
     }
 }
 
 /**
  * The ParallelArray wrapper used after the map() operation
  */
-final class MappedCollection<T> extends AbstractParallelCollection {
+final class MappedPAWrapper<T> extends AbstractPAWrapper {
 
-    def MappedCollection(final ParallelArray.WithMapping pa) {
+    def MappedPAWrapper(final ParallelArray.WithMapping pa) {
         super(pa)
     }
 
@@ -846,8 +845,7 @@ final class MappedCollection<T> extends AbstractParallelCollection {
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
-    public ParallelCollection filter(Closure cl) {
-        //We have to do it this suboptimal way since WithMapper doesn't support filter()
-        collection.parallel.filter(cl)
+    public PAWrapper filter(Closure cl) {
+        new PAWrapper(pa.all().withFilter({cl(it)} as Predicate).all())
     }
 }
