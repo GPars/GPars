@@ -233,19 +233,22 @@ public class ForkJoinPool {
      * @return The result of the whole calculation
      */
     public static <T> T orchestrate(final Object... args) {
-        //todo test number of arguments
+        if (args.size() == 0) throw new IllegalArgumentException("No arguments specified to the orchestrate() method.")
+        if (!(args[-1] instanceof Closure)) throw new IllegalArgumentException("A closure to run implementing the requested Fork/Join algorithm must be specified as the last argument passed to the orchestrate() method.")
+        Closure code = args[-1] as Closure
+        if (args.size() - 1 != code.maximumNumberOfParameters) throw new IllegalArgumentException("The supplied Fork/Join closure expects ${code.maximumNumberOfParameters} arguments while only ${args.size()} arguments have been supplied to the orchestrate() method.")
         return orchestrate(new FJWorker<T>(args))
     }
 }
 
 final class FJWorker<T> extends AbstractForkJoinWorker<T> {
-    private Closure code
-    private Object[] args
+    private final Closure code
+    private final Object[] args
 
     def FJWorker(final Object... args) {
-        //todo assert arguments
+        assert args.size() > 0
         //todo performance comparison
-        //todo samples
+        //todo guide
         this.args = args[0..-2];
         this.code = args[-1].clone();
         this.code.delegate = this

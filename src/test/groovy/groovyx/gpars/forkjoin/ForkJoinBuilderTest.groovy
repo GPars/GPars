@@ -110,4 +110,38 @@ class ForkJoinBuilderTest extends GroovyTestCase {
             }.toArray())
         }
     }
+
+    public void testIllegalArguments() {
+        final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
+
+        withPool(3) {
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate()
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3)
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {}
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {->}
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate(1) {->}
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {a ->}
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {a, b ->}
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate() {a, b ->}
+            }
+            shouldFail(IllegalArgumentException) {
+                groovyx.gpars.ForkJoinPool.orchestrate(1) {a, b ->}
+            }
+        }
+    }
 }
