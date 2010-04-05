@@ -226,4 +226,36 @@ public class ForkJoinPool {
         if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a ForkJoinPool.withPool() block.")
         return pool.submit(rootWorker).get()
     }
+
+    /**
+     * Starts a ForkJoin calculation with the supplied root worker and waits for the result.
+     * @param rootWorker The worker that calculates the root of the Fork/Join problem
+     * @return The result of the whole calculation
+     */
+    public static <T> T orchestrate(final Object... args) {
+        //todo test number of arguments
+        return orchestrate(new FJWorker<T>(args))
+    }
+}
+
+final class FJWorker<T> extends AbstractForkJoinWorker<T> {
+    private Closure code
+    private Object[] args
+
+    def FJWorker(final Object... args) {
+        //todo assert arguments
+        //todo performance comparison
+        //todo samples
+        this.args = args[0..-2];
+        this.code = args[-1].clone();
+        this.code.delegate = this
+    }
+
+    protected void forkOffChild(Object... childArgs) {
+        forkOffChild new FJWorker(* childArgs, code)
+    }
+
+    protected T computeTask() {
+        return code.call(* args)
+    }
 }
