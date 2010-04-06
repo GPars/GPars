@@ -246,15 +246,15 @@ final class FJWorker<T> extends AbstractForkJoinWorker<T> {
     private final Object[] args
 
     def FJWorker(final Object... args) {
-        assert args.size() > 0
-        //todo performance comparison
-        //todo guide
-        this.args = args[0..-2];
+        final def size = args.size()
+        assert size > 0
+        this.args = size > 1 ? args[0..-2] : ([] as Object[])
         this.code = args[-1].clone();
         this.code.delegate = this
     }
 
     protected void forkOffChild(Object... childArgs) {
+        if (childArgs.size() != args.size()) throw new IllegalArgumentException("The forkOffChild() method requires ${args.size()} arguments, but received ${childArgs.size()} parameters.")
         forkOffChild new FJWorker(* childArgs, code)
     }
 

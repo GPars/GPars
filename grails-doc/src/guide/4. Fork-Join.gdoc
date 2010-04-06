@@ -16,6 +16,54 @@ h3. The GPars abstraction convenience layer
 GPars can hide the complexities of dealing with threads, pools and recursive tasks from you, yet let you leverage the powerful Fork/Join implementation in jsr166y.
 
 {code}
+import static groovyx.gpars.ForkJoinPool.orchestrate
+import static groovyx.gpars.ForkJoinPool.withPool
+
+withPool() {
+    println """Number of files: ${
+        orchestrate(new File("./src")) {file ->
+            long count = 0
+            file.eachFile {
+                if (it.isDirectory()) {
+                    println "Forking a child task for $it"
+                    forkOffChild(it)           //fork a child task
+                } else {
+                    count++
+                }
+            }
+            return count + (childrenResults.sum(0))
+            //use results of children tasks to calculate and store own result
+        }
+    }"""
+}
+{code}
+
+The _orchestrate()_ factory method will use the supplied recursive code together with the provided values and build a hierarchical Fork/Join
+calculation. The number of values passed to the _orchestrate()_ method must match the number of expected parameters of the closure as well as
+the number of arguments passed into the _forkOffChild()_ method.
+
+{code}
+def quicksort(numbers) {
+    withPool {
+        groovyx.gpars.ForkJoinPool.orchestrate(0, numbers) {index, list ->
+            def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
+            if ((list.size() < 2) || (groups.size() == 1)) {
+                return [index: index, list: list.clone()]
+            }
+            (-1..1).each {forkOffChild(it, groups[it] ?: [])}
+            return [index: index, list: childrenResults.sort {it.index}.sum {it.list}]
+        }.list
+    }
+}
+{code}
+
+.h4 Alternative approach
+
+Alternatively, the underlying mechanism of nested Fork/Join worker tasks can be used directly. Custom-tailored workers can
+eliminate the performance overhead associated with parameter spreading imposed when using the generic workers. Also, custom
+workers can be implemented in Java and so further increase the performance of the algorithm.
+
+{code}
 public final class FileCounter extends AbstractForkJoinWorker<Long> {
     private final File file;
 
@@ -44,7 +92,7 @@ withPool(1) {pool ->  //feel free to experiment with the number of fork/join thr
 
 {code}
 
-The AbstractForkJoinWorker subclasses can be written both in Java or Groovy, giving you the option to easily optimize
+The AbstractForkJoinWorker subclasses may be written both in Java or Groovy, giving you the option to easily optimize
 for execution speed, if row performance of the worker becomes a bottleneck.
 
 h3. Fork / Join saves your resources
@@ -53,6 +101,62 @@ Fork/Join operations can be safely run with small number of threads thanks to in
 Although the algorithm creates as many tasks as there are sub-directories and tasks wait for the sub-directory tasks to complete, as few as one thread is enough to keep the computation going and eventually calculate a valid result.
 
 h3. Mergesort example
+
+{code}
+import static groovyx.gpars.ForkJoinPool.orchestrate
+import static groovyx.gpars.ForkJoinPool.withPool
+
+/**
+ * Splits a list of numbers in half
+ */
+def split(List<Integer> list) {
+    int listSize = list.size()
+    int middleIndex = listSize / 2
+    def list1 = list[0..<middleIndex]
+    def list2 = list[middleIndex..listSize - 1]
+    return [list1, list2]
+}
+
+/**
+ * Merges two sorted lists into one
+ */
+List<Integer> merge(List<Integer> a, List<Integer> b) {
+    int i = 0, j = 0
+    final int newSize = a.size() + b.size()
+    List<Integer> result = new ArrayList<Integer>(newSize)
+
+    while ((i < a.size()) && (j < b.size())) {
+        if (a[i] <= b[j]) result << a[i++]
+        else result << b[j++]
+    }
+
+    if (i < a.size()) result.addAll(a[i..-1])
+    else result.addAll(b[j..-1])
+    return result
+}
+
+final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
+
+withPool(3) {  //feel free to experiment with the number of fork/join threads in the pool
+    println """Sorted numbers: ${
+        orchestrate(numbers) {nums ->
+            println "Thread ${Thread.currentThread().name[-1]}: Sorting $nums"
+            switch (nums.size()) {
+                case 0..1:
+                    return nums                                   //store own result
+                case 2:
+                    if (nums[0] <= nums[1]) return nums     //store own result
+                    else return nums[-1..0]                       //store own result
+                default:
+                    def splitList = split(nums)
+                    [splitList[0], splitList[1]].each {forkOffChild it}  //fork a child task
+                    return merge(* childrenResults)      //use results of children tasks to calculate and store own result
+            }
+        }
+    }"""
+}
+{code}
+h3. Mergesort example using custom-tailored worker
 
 {code}
 public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
@@ -116,5 +220,4 @@ final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1,
 withPool(1) {  //feel free to experiment with the number of fork/join threads in the pool
     println "Sorted numbers: ${orchestrate(new SortWorker(numbers))}"
 }
-
 {code}

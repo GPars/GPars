@@ -16,6 +16,7 @@
 
 package groovyx.gpars.forkjoin
 
+import groovyx.gpars.dataflow.DataFlows
 import java.util.concurrent.ExecutionException
 import static groovyx.gpars.ForkJoinPool.orchestrate
 import static groovyx.gpars.ForkJoinPool.withPool
@@ -142,6 +143,46 @@ class ForkJoinBuilderTest extends GroovyTestCase {
             shouldFail(IllegalArgumentException) {
                 groovyx.gpars.ForkJoinPool.orchestrate(1) {a, b ->}
             }
+        }
+    }
+
+    public void testForkOffChildIllegalArguments() {
+        final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
+        final DataFlows df = new DataFlows()
+
+        withPool(3) {
+            groovyx.gpars.ForkJoinPool.orchestrate(1, 2) {a, b ->
+                try {
+                    forkOffChild(5)
+                } catch (Throwable t) {
+                    df.e1 = t
+                }
+            }
+            groovyx.gpars.ForkJoinPool.orchestrate(1, 2) {a, b ->
+                try {
+                    forkOffChild(5, 2, 4)
+                } catch (Throwable t) {
+                    df.e2 = t
+                }
+            }
+            groovyx.gpars.ForkJoinPool.orchestrate() {->
+                try {
+                    forkOffChild(5)
+                } catch (Throwable t) {
+                    df.e3 = t
+                }
+            }
+            groovyx.gpars.ForkJoinPool.orchestrate(1, 2) {a, b ->
+                try {
+                    forkOffChild()
+                } catch (Throwable t) {
+                    df.e4 = t
+                }
+            }
+            assert df.e1 instanceof IllegalArgumentException
+            assert df.e2 instanceof IllegalArgumentException
+            assert df.e3 instanceof IllegalArgumentException
+            assert df.e4 instanceof IllegalArgumentException
         }
     }
 }

@@ -57,7 +57,6 @@ withPool(2) {
         assert orchestrate(new ForkJoinFib(number: 30)) == 832040
 
         assert ForkJoinFib.sequentialFib(31) == orchestrate(new ForkJoinFib(number: 31))
-        orchestrate(new ForkJoinFib(number: 39))
 
         try {
             orchestrate(new ForkJoinFib(number: -1))

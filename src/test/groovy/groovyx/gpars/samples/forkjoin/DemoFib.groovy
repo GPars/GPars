@@ -50,7 +50,6 @@ withPool(2) {
         assert orchestrate(30, fib) == 832040
 
         assert sequentialFib(31) == orchestrate(31, fib)
-        orchestrate(39, fib)
 
         try {
             orchestrate(-1, fib)
