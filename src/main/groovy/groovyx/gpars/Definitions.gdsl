@@ -88,7 +88,9 @@ contributor(ThreadPoolBody) {
         def currentMethod = call.bind()
         def clazz = currentMethod?.containingClass
         final def clazzName = clazz?.qualName?.toUpperCase()
-        if (clazzName?.contains("THREADPOOL")) {
+        if (clazzName?.contains("POOL")) {
+            property name: "async", type: "groovy.lang.Closure"
+
             method name: "async", type: "groovy.lang.Closure"
             method name: "callAsync", type: "java.util.concurrent.Future"
             method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')

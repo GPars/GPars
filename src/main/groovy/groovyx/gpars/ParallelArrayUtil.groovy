@@ -17,12 +17,14 @@
 package groovyx.gpars
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Future
 import jsr166y.forkjoin.ForkJoinExecutor
 import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.Ops.Mapper
 import jsr166y.forkjoin.Ops.Predicate
 import jsr166y.forkjoin.Ops.Reducer
 import jsr166y.forkjoin.ParallelArray
+import jsr166y.forkjoin.RecursiveTask
 
 /**
  * This class forms the core of the DSL initialized by <i>ForkJoinPool</i>. The static methods of <i>ParallelArrayUtil</i>
@@ -40,6 +42,39 @@ public class ParallelArrayUtil {
         final ForkJoinPool pool = groovyx.gpars.ForkJoinPool.retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("No ForkJoinPool available for the current thread")
         return pool
+    }
+
+    /**
+     * schedules the supplied closure for processing in the underlying thread pool.
+     */
+    private static Future callParallel(Closure task) {
+        final ForkJoinPool pool = groovyx.gpars.ForkJoinPool.retrieveCurrentPool()
+        if (!pool) throw new IllegalStateException("No ExecutorService available for the current thread.")
+        return pool.submit([compute: task] as RecursiveTask)
+    }
+
+    /**
+     * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
+     */
+    public static Future callAsync(final Closure cl, final Object... args) {
+        callParallel {-> cl(* args)}
+    }
+
+    /**
+     * Submits the task for asynchronous processing returning the Future received from the executor service.
+     * Allows for the following syntax:
+     * <pre>
+     * executorService << {println 'Inside parallel task'}* </pre>
+     */
+    public static Future leftShift(ForkJoinPool pool, Closure task) {
+        return pool.submit([compute: task] as RecursiveTask)
+    }
+
+    /**
+     * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
+     */
+    public static Closure async(Closure cl) {
+        return {Object... args -> callAsync(cl, * args)}
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {

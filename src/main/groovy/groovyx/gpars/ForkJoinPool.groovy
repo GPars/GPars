@@ -18,7 +18,9 @@ package groovyx.gpars
 
 import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
+import jsr166y.forkjoin.RecursiveTask
 
 /**
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
@@ -68,13 +70,6 @@ public class ForkJoinPool {
         final jsr166y.forkjoin.ForkJoinPool pool = new jsr166y.forkjoin.ForkJoinPool(poolSize)
         pool.uncaughtExceptionHandler = handler
         return pool
-    }
-
-    private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {
-        return {Thread failedThread, Throwable throwable ->
-            System.err.println "Error processing background thread ${failedThread.name}: ${throwable.message}"
-            throwable.printStackTrace(System.err)
-        } as UncaughtExceptionHandler
     }
 
     /**
@@ -225,5 +220,59 @@ public class ForkJoinPool {
         def pool = ForkJoinPool.retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a ForkJoinPool.withPool() block.")
         return pool.submit(rootWorker).get()
+    }
+
+    /**
+     * Starts multiple closures in separate threads, collecting their return values
+     * If an exception is thrown from the closure when called on any of the collection's elements,
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
+     * @return The result values of all closures
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public static List<Object> doInParallel(Closure... closures) {
+        return AsyncInvokerUtil.processResult(executeAsync(closures))
+    }
+
+    /**
+     * Starts multiple closures in separate threads, collecting their return values
+     * If an exception is thrown from the closure when called on any of the collection's elements,
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
+     * @return The result values of all closures
+     * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
+     */
+    public static List<Object> doInParallel(List<Closure> closures) {
+        return doInParallel(* closures)
+    }
+
+    /**
+     * Starts multiple closures in separate threads, collecting Futures for their return values
+     * If an exception is thrown from the closure when called on any of the collection's elements,
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
+     * @return Futures for the result values or exceptions of all closures
+     */
+    public static List<Future<Object>> executeAsync(Closure... closures) {
+        jsr166y.forkjoin.ForkJoinPool pool = retrieveCurrentPool()
+        if (pool == null) throw new IllegalStateException("No active Fork/Join thread pool available to execute closures asynchronously.")
+        List<Future<Object>> result = closures.collect {cl ->
+            pool.submit([compute: { cl.call() }] as RecursiveTask)
+        }
+        result
+    }
+
+    /**
+     * Starts multiple closures in separate threads, collecting Futures for their return values
+     * If an exception is thrown from the closure when called on any of the collection's elements,
+     * it will be re-thrown in the calling thread when it calls the Future.get() method.
+     * @return Futures for the result values or exceptions of all closures
+     */
+    public static List<Future<Object>> executeAsync(List<Closure> closures) {
+        return executeAsync(* closures)
+    }
+
+    private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {
+        return {Thread failedThread, Throwable throwable ->
+            System.err.println "Error processing background thread ${failedThread.name}: ${throwable.message}"
+            throwable.printStackTrace(System.err)
+        } as UncaughtExceptionHandler
     }
 }

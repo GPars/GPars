@@ -31,7 +31,7 @@ groovyx.gpars.ThreadPool.withPool {
      * An asynchronous variant of a closure is created using the async() method.
      * When invoked, it will returned a Future for the calculated value.
      */
-    def asyncDoubler = {it * 2}.async()
+    def asyncDoubler = {it * 2}.async1;
     assert 20 == asyncDoubler(10).get()
     assert [2, 4, 6] == [1, 2, 3].collect(asyncDoubler)*.get()
 
