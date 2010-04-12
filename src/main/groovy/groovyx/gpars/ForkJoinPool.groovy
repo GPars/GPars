@@ -275,4 +275,38 @@ public class ForkJoinPool {
             throwable.printStackTrace(System.err)
         } as UncaughtExceptionHandler
     }
+    /**
+     * Starts a ForkJoin calculation with the supplied root worker and waits for the result.
+     * @param rootWorker The worker that calculates the root of the Fork/Join problem
+     * @return The result of the whole calculation
+     */
+    public static <T> T orchestrate(final Object... args) {
+        if (args.size() == 0) throw new IllegalArgumentException("No arguments specified to the orchestrate() method.")
+        if (!(args[-1] instanceof Closure)) throw new IllegalArgumentException("A closure to run implementing the requested Fork/Join algorithm must be specified as the last argument passed to the orchestrate() method.")
+        Closure code = args[-1] as Closure
+        if (args.size() - 1 != code.maximumNumberOfParameters) throw new IllegalArgumentException("The supplied Fork/Join closure expects ${code.maximumNumberOfParameters} arguments while only ${args.size()} arguments have been supplied to the orchestrate() method.")
+        return orchestrate(new FJWorker<T>(args))
+    }
+}
+
+final class FJWorker<T> extends AbstractForkJoinWorker<T> {
+    private final Closure code
+    private final Object[] args
+
+    def FJWorker(final Object... args) {
+        final def size = args.size()
+        assert size > 0
+        this.args = size > 1 ? args[0..-2] : ([] as Object[])
+        this.code = args[-1].clone();
+        this.code.delegate = this
+    }
+
+    protected void forkOffChild(Object... childArgs) {
+        if (childArgs.size() != args.size()) throw new IllegalArgumentException("The forkOffChild() method requires ${args.size()} arguments, but received ${childArgs.size()} parameters.")
+        forkOffChild new FJWorker(* childArgs, code)
+    }
+
+    protected T computeTask() {
+        return code.call(* args)
+    }
 }
