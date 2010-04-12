@@ -1,17 +1,8 @@
-Use of GParsPool, the JSR-166y based concurrent collection processor, for parallel collection processing
+Use of _GParsPool_ - the JSR-166y based concurrent collection processor
 
 h2. Usage of GParsPool
 
 The _GParsPool_ class enables a ParallelArray-based (from JSR-166y) concurrency DSL for collections and objects.
-
-The "jsr166y-070108.jar":http://repo1.maven.org/maven2/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108.jar must be on the classpath.
-
-{code}<dependency>
-    <groupId>org.coconut.forkjoin</groupId>
-    <artifactId>jsr166y</artifactId>
-    <version>070108</version>
-</dependency>
-{code}
 
 Examples of use:
 
@@ -34,7 +25,14 @@ Examples of use:
      assert [1, 2, 3, 4, 5].everyParallel {it > 0}
      assert ![1, 2, 3, 4, 5].everyParallel {it > 1}
  }
-{code}The _GParsPool.withPool()_ method takes optional parameters for number of threads in the created pool and unhandled exception handler. The _GParsPool.withExistingPool()_ takes an already existing thread ForkJoinPool instance to reuse.
+{code}
+The _GParsPool.withPool()_ method takes optional parameters for number of threads in the created pool and an unhandled exception handler.
+{code}
+withPool(10) {...}
+withPool(20, exceptionHandler) {...}
+{code}
+
+The _GParsPool.withExistingPool()_ takes an already existing ForkJoinPool instance to reuse.
 The DSL is valid only within the associated block of code and only for the thread that has called the _withPool()_ or _withExistingPool()_ methods. The _withPool()_ method returns only after all the worker threads have finished their tasks and the pool has been destroyed, returning back the return value of the associated block of code. The _withExistingPool()_ method doesn't wait for the pool threads to finish.
 
 Alternatively, the _GParsPool_ class can be statically imported _import static groovyx.gpars.GParsPool.`*`_ , which will allow omitting the _GParsPool_ class name.
@@ -118,6 +116,17 @@ ParallelEnhancer.enhanceInstance(names)
 //The selectImportantNames() will process the name collections concurrently
 assert ['ALICE', 'JASON'] == selectImportantNames(names.makeTransparent())
 
+{code}
+
+h3. Dependency resolution
+
+For the _GParsPool_ class to work, the "jsr166y-070108.jar":http://repo1.maven.org/maven2/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108.jar must be on the classpath.
+
+{code}<dependency>
+    <groupId>org.coconut.forkjoin</groupId>
+    <artifactId>jsr166y</artifactId>
+    <version>070108</version>
+</dependency>
 {code}
 
 h2. Avoid side-effects in functions

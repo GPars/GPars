@@ -5,7 +5,7 @@ and collect the results once they're needed.
 
 h2. Usage of GParsPool and GParsExecutorsPool asynchronous processing facilities
 
-Both GParsPool and GParsExecutorsPool provide almost identical services in this domain, although they leverage different
+Both _GParsPool_ and _GParsExecutorsPool_ provide almost identical services in this domain, although they leverage different
 underlying machinery, based on which of the two classes the user chooses.
 
 h3. Closures enhancements

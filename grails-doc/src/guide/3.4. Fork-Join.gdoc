@@ -57,7 +57,7 @@ def quicksort(numbers) {
 }
 {code}
 
-.h4 Alternative approach
+h4. Alternative approach
 
 Alternatively, the underlying mechanism of nested Fork/Join worker tasks can be used directly. Custom-tailored workers can
 eliminate the performance overhead associated with parameter spreading imposed when using the generic workers. Also, custom
@@ -156,7 +156,7 @@ withPool(3) {  //feel free to experiment with the number of fork/join threads in
     }"""
 }
 {code}
-h3. Mergesort example using custom-tailored worker
+h3. Mergesort example using a custom-tailored worker class
 
 {code}
 public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
