@@ -17,7 +17,7 @@
 package groovyx.gpars.samples
 
 import groovy.swing.SwingBuilder
-import groovyx.gpars.ParallelCollections
+import groovyx.gpars.GParsPool
 import javax.swing.JFrame
 import javax.swing.JSlider
 import javax.swing.SwingConstants
@@ -51,7 +51,7 @@ def processors = (1..10).collect {
     new FileProcessor(name: 'File' + it, slider: slider)
 }
 
-final JFrame frame = new SwingBuilder().frame(title: 'ParallelCollections Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
+final JFrame frame = new SwingBuilder().frame(title: 'GParsPool Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
     vbox() {
         panel {
             vbox() {
@@ -85,7 +85,7 @@ final JFrame frame = new SwingBuilder().frame(title: 'ParallelCollections Demo',
                                         it.perform()
                                     }
                                 } else {
-                                    ParallelCollections.withPool {
+                                    GParsPool.withPool {
                                         processors.eachParallel {
                                             it.perform()
                                         }

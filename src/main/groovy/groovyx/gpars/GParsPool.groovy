@@ -25,15 +25,15 @@ import jsr166y.forkjoin.RecursiveTask
 
 /**
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
- * shows to be much faster (10 - 20 times) compared to the executor service implementation in ThreadPool.
+ * shows to be much faster (10 - 20 times) compared to the executor service implementation in GParsExecutorsPool.
  * E.g.
  <pre>
- ParallelCollections.withPool(5) {final AtomicInteger result = new AtomicInteger(0)
- [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}assertEquals 15, result}ParallelCollections.withPool(5) {final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}assert ([2, 4, 6, 8, 10].equals(result))}ParallelCollections.withPool(5) {assert [1, 2, 3, 4, 5].everyParallel {it > 0}assert ![1, 2, 3, 4, 5].everyParallel {it > 1}}</pre>
+ GParsPool.withPool(5) {final AtomicInteger result = new AtomicInteger(0)
+ [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}assertEquals 15, result}GParsPool.withPool(5) {final List result = [1, 2, 3, 4, 5].collectParallel {it * 2}assert ([2, 4, 6, 8, 10].equals(result))}GParsPool.withPool(5) {assert [1, 2, 3, 4, 5].everyParallel {it > 0}assert ![1, 2, 3, 4, 5].everyParallel {it > 1}}</pre>
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class ParallelCollections {
+public class GParsPool {
 
     /**
      * Maps threads to their appropriate thread pools
@@ -77,13 +77,13 @@ public class ParallelCollections {
      * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsPoolUtil</i>
      * category class.
      * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * ParallelCollections.withPool {ParallelCollections pool ->
+     * GParsPool.withPool {GParsPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -97,13 +97,13 @@ public class ParallelCollections {
      * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsPoolUtil</i>
      * category class.
      * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * ParallelCollections.withPool(5) {ParallelCollections pool ->
+     * GParsPool.withPool(5) {GParsPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -118,13 +118,13 @@ public class ParallelCollections {
      * Creates a new instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsPoolUtil</i>
      * category class.
      * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * ParallelCollections.withPool(5, handler) {ParallelCollections pool ->
+     * GParsPool.withPool(5, handler) {GParsPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
@@ -173,13 +173,13 @@ public class ParallelCollections {
      * Reuses an instance of <i>ForkJoinPool</i>, binds it to the current thread, enables the ParallelArray DSL
      * and runs the supplied closure.
      * Within the supplied code block the <i>ForkJoinPool</i> is available as the only parameter, collections have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>ParallelArrayUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsPoolUtil</i>
      * category class.
      * E.g. calling <i>images.eachParallel{processImage(it}}</i> will call the potentially long-lasting <i>processImage()</i>
      * operation on each image in the <i>images</i> collection in parallel.
      * Be sure to synchronize all modifiable state shared by the asynchronously running closures.
      * <pre>
-     * ParallelCollections.withExistingPool(anotherPool) {ParallelCollections pool ->
+     * GParsPool.withExistingPool(anotherPool) {GParsPool pool ->
      *     def result = Collections.synchronizedSet(new HashSet())
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*  </pre>
@@ -190,7 +190,7 @@ public class ParallelCollections {
         currentPoolStack << pool
         def result = null
         try {
-            use(ParallelArrayUtil) {
+            use(GParsPoolUtil) {
                 result = cl(pool)
             }
         } finally {
@@ -200,7 +200,7 @@ public class ParallelCollections {
     }
 
     /**
-     * Just like withExistingPool() registers a thread pool, but doesn't install the ParallelArrayUtil category.
+     * Just like withExistingPool() registers a thread pool, but doesn't install the GParsPoolUtil category.
      * Used by ParallelEnhancer's Parallel mixins. 
      */
     static ensurePool(final jsr166y.forkjoin.ForkJoinPool pool, final Closure cl) {
@@ -221,7 +221,7 @@ public class ParallelCollections {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static List<Object> executeAsyncAndWait(Closure... closures) {
-        return AsyncInvokerUtil.processResult(executeAsync(closures))
+        return GParsExecutorsPoolUtil.processResult(executeAsync(closures))
     }
 
     /**
@@ -276,8 +276,8 @@ public class ParallelCollections {
      * @return The result of the whole calculation
      */
     public static <T> T runForkJoin(final AbstractForkJoinWorker<T> rootWorker) {
-        def pool = ParallelCollections.retrieveCurrentPool()
-        if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a ParallelCollections.withPool() block.")
+        def pool = GParsPool.retrieveCurrentPool()
+        if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a GParsPool.withPool() block.")
         return pool.submit(rootWorker).get()
     }
 

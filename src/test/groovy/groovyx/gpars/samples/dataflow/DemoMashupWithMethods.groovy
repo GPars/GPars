@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.ParallelCollections
+import groovyx.gpars.GParsPool
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -27,7 +27,7 @@ final List urls = ['http://www.dzone.com', 'http://www.jroller.com', 'http://www
 
 task {
     def pages = urls.collect { downloadPage(it) }
-    ParallelCollections.withPool {
+    GParsPool.withPool {
         println "Number of Groovy sites today: " +
                 (pages.findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'

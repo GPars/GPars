@@ -18,8 +18,8 @@ package groovyx.gpars.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
-import static groovyx.gpars.ParallelCollections.runForkJoin
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.runForkJoin
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  *

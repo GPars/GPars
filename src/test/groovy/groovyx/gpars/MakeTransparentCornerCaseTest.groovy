@@ -29,7 +29,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
     public void testUsingNonTransparentEachInTransparentContext() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             items.makeTransparent().eachParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
@@ -41,7 +41,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
     public void testUsingNonTransparentCollectInTransparentContextWithString() {
         def items = 'abcdefg1'
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             def result = items.makeTransparent().collectParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
@@ -55,7 +55,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
     public void testUsingNonTransparentFindAllInTransparentContextWithString() {
         def items = 'abcdefg1'
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             def result = items.makeTransparent().findAllParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
@@ -69,7 +69,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
     public void testUsingNonTransparentGroupByInTransparentContextWithString() {
         def items = 'abcdefg1'
         final ConcurrentHashMap map = new ConcurrentHashMap()
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             items.makeTransparent().groupByParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''

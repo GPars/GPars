@@ -18,8 +18,8 @@ package groovyx.gpars
 
 import java.lang.Thread.UncaughtExceptionHandler
 import jsr166y.forkjoin.ForkJoinPool
-import static groovyx.gpars.ParallelCollections.withExistingPool
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.withExistingPool
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * @author Vaclav Pech

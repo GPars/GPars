@@ -16,10 +16,10 @@
 
 package groovyx.gpars.samples
 
-import groovyx.gpars.ThreadPool
+import groovyx.gpars.GParsExecutorsPool
 
 /**
- * Demonstrates asynchronous processing using the ThreadPool class.
+ * Demonstrates asynchronous processing using the GParsExecutorsPool class.
  */
 
 final Closure doubler = {it * 2}
@@ -27,15 +27,15 @@ final Closure doubler = {it * 2}
 /**
  * Using the dedicated methods to run multiple functions in parallel
  */
-println groovyx.gpars.ThreadPool.executeAsyncAndWait({it * 2}.curry(10), {doubler(10)}, doubler.curry(10), {doubler.call(10)}, {{num -> num * 2}.call(10)})
+println groovyx.gpars.GParsExecutorsPool.executeAsyncAndWait({it * 2}.curry(10), {doubler(10)}, doubler.curry(10), {doubler.call(10)}, {{num -> num * 2}.call(10)})
 
 /**
  * The same thing, but without waiting for the results. Use the Future.get() method, once you need the result.
  */
-println groovyx.gpars.ThreadPool.executeAsync({it * 2}.curry(10), {doubler(10)}, doubler.curry(10), {doubler.call(10)}, {{num -> num * 2}.call(10)})*.get()
+println groovyx.gpars.GParsExecutorsPool.executeAsync({it * 2}.curry(10), {doubler(10)}, doubler.curry(10), {doubler.call(10)}, {{num -> num * 2}.call(10)})*.get()
 
 final List names = [].asSynchronized()
-ThreadPool.executeAsyncAndWait({storeName(names, 'Joe')}, {storeName(names, 'Dave')}, {storeName(names, 'Alice')}, {storeName(names, 'Jason')}, {storeName(names, 'George')}, {storeName(names, 'Susan')})
+GParsExecutorsPool.executeAsyncAndWait({storeName(names, 'Joe')}, {storeName(names, 'Dave')}, {storeName(names, 'Alice')}, {storeName(names, 'Jason')}, {storeName(names, 'George')}, {storeName(names, 'Susan')})
 println 'Done name storage'
 
 private def storeName(List names, name) {

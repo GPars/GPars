@@ -26,49 +26,49 @@ public class ThreadPoolStringTest extends GroovyTestCase {
 
     public void testEachParallelWithString() {
         def result = Collections.synchronizedSet(new HashSet())
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             'abc'.eachParallel {result.add(it.toUpperCase())}
             assertEquals(new HashSet(['A', 'B', 'C']), result)
         }
     }
 
     public void testCollectParallelWithString() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def result = 'abc'.collectParallel {it.toUpperCase()}
             assertEquals(['A', 'B', 'C'], result)
         }
     }
 
     public void testFindAllParallelWithString() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def result = 'aBC'.findAllParallel {it == it.toUpperCase()}
             assertEquals(['B', 'C'], result)
         }
     }
 
     public void testFindParallelWithString() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def result = 'aBC'.findParallel {it == it.toUpperCase()}
             assert result in ['B', 'C']
         }
     }
 
     public void testGrepParallelWithThreadPoolAndString() {
-        ThreadPool.withPool(5) {
+        GParsExecutorsPool.withPool(5) {
             def result = 'aBC'.grepParallel('B')
             assertEquals(['B'], result)
         }
     }
 
     public void testAllParallelWithString() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             assert 'ABC'.everyParallel {it == it.toUpperCase()}
             assert !'aBC'.everyParallel {it == it.toUpperCase()}
         }
     }
 
     public void testAnyParallelWithString() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             assert 'aBc'.anyParallel {it == it.toUpperCase()}
             assert 'aBC'.anyParallel {it == it.toUpperCase()}
             assert !'abc'.anyParallel {it == it.toUpperCase()}

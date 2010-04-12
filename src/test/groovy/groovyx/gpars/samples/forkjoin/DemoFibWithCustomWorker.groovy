@@ -24,7 +24,7 @@ package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.withPool
 
 class ForkJoinFib extends AbstractForkJoinWorker {
 

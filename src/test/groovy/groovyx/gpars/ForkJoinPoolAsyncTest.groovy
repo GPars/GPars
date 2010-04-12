@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger
 public class ForkJoinPoolAsyncTest extends GroovyTestCase {
 
     public void testAsyncClosure() {
-        ParallelCollections.withPool(5) {service ->
+        GParsPool.withPool(5) {service ->
             def result = Collections.synchronizedSet(new HashSet())
             final CountDownLatch latch = new CountDownLatch(5);
             final Closure cl = {Number number -> result.add(number * 10); latch.countDown()}
@@ -41,11 +41,11 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
     }
 
     public void testCallParallel() {
-        ParallelCollections.withPool(5) {service ->
+        GParsPool.withPool(5) {service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
-            ParallelArrayUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
-            ParallelArrayUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
+            GParsPoolUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
+            GParsPoolUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
             latch.await()
             assertEquals 2, resultA
             assertEquals 3, resultB
@@ -53,17 +53,17 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
     }
 
     public void testCallParallelWithResult() {
-        ParallelCollections.withPool(5) {service ->
-            assertEquals 6, ParallelArrayUtil.callAsync({it * 2}, 3).get()
+        GParsPool.withPool(5) {service ->
+            assertEquals 6, GParsPoolUtil.callAsync({it * 2}, 3).get()
         }
     }
 
     public void testAsync() {
-        ParallelCollections.withPool(5) {service ->
+        GParsPool.withPool(5) {service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2);
-            ParallelArrayUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
-            ParallelArrayUtil.async({int number -> resultB = number; latch.countDown()}).call(3);
+            GParsPoolUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
+            GParsPoolUtil.async({int number -> resultB = number; latch.countDown()}).call(3);
             latch.await()
             assertEquals 2, resultA
             assertEquals 3, resultB
@@ -71,24 +71,24 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
     }
 
     public void testAsyncWithResult() {
-        ParallelCollections.withPool(5) {service ->
-            assertEquals 6, ParallelArrayUtil.async({it * 2}).call(3).get()
+        GParsPool.withPool(5) {service ->
+            assertEquals 6, GParsPoolUtil.async({it * 2}).call(3).get()
         }
     }
 
     public void testInvalidPoolSize() {
         shouldFail(IllegalArgumentException.class) {
-            ParallelCollections.withPool(0) {}
+            GParsPool.withPool(0) {}
         }
         shouldFail(IllegalArgumentException.class) {
-            ParallelCollections.withPool(-10) {}
+            GParsPool.withPool(-10) {}
         }
     }
 
     public void testMissingThreadPool() {
         final AtomicInteger counter = new AtomicInteger(0)
         shouldFail(IllegalStateException.class) {
-            ParallelArrayUtil.callAsync({counter.set it}, 1)
+            GParsPoolUtil.callAsync({counter.set it}, 1)
         }
         assertEquals 0, counter.get()
     }
@@ -96,7 +96,7 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
     public void testLeftShift() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final Semaphore semaphore = new Semaphore(0)
-        ParallelCollections.withPool(5) {service ->
+        GParsPool.withPool(5) {service ->
             service << {flag.set(true); semaphore.release(); }
             semaphore.acquire()
             assert flag.get()
@@ -104,31 +104,31 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
     }
 
     public void testDoInParallel() {
-        ParallelCollections.withPool {
-            assertEquals([10, 20], ParallelCollections.executeAsyncAndWait({10}, {20}))
+        GParsPool.withPool {
+            assertEquals([10, 20], GParsPool.executeAsyncAndWait({10}, {20}))
         }
     }
 
     public void testExecuteInParallel() {
-        ParallelCollections.withPool {
-            assertEquals([10, 20], ParallelCollections.executeAsync({10}, {20})*.get())
+        GParsPool.withPool {
+            assertEquals([10, 20], GParsPool.executeAsync({10}, {20})*.get())
         }
     }
 
     public void testDoInParallelList() {
-        ParallelCollections.withPool {
-            assertEquals([10, 20], ParallelCollections.executeAsyncAndWait([{10}, {20}]))
+        GParsPool.withPool {
+            assertEquals([10, 20], GParsPool.executeAsyncAndWait([{10}, {20}]))
         }
     }
 
     public void testExecuteAsyncList() {
-        ParallelCollections.withPool {
-            assertEquals([10, 20], ParallelCollections.executeAsync([{10}, {20}])*.get())
+        GParsPool.withPool {
+            assertEquals([10, 20], GParsPool.executeAsync([{10}, {20}])*.get())
         }
     }
 
     public void testAsyncWithCollectionAndResult() {
-        ParallelCollections.withPool(5) {service ->
+        GParsPool.withPool(5) {service ->
             Collection<Future> result = [1, 2, 3, 4, 5].collect({it * 10}.async())
             assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result*.get()))
         }

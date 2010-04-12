@@ -23,7 +23,7 @@
 
 package groovyx.gpars.samples
 
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.withPool
 
 def quicksort(list) {
     if (list.size() < 2) return list.clone()

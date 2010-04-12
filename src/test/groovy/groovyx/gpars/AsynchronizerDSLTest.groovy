@@ -18,8 +18,8 @@ package groovyx.gpars
 
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
-import static groovyx.gpars.ThreadPool.withExistingPool
-import static groovyx.gpars.ThreadPool.withPool
+import static groovyx.gpars.GParsExecutorsPool.withExistingPool
+import static groovyx.gpars.GParsExecutorsPool.withPool
 
 /**
  * @author Vaclav Pech

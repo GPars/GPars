@@ -20,17 +20,17 @@ import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.Pool
 
 /**
- * AsyncEnhancer allows classes or instances to be enhanced with asynchronous variants of iterative methods,
+ * GParsExecutorsPoolEnhancer allows classes or instances to be enhanced with asynchronous variants of iterative methods,
  * like eachParallel(), collectParallel(), findAllParallel() and others. These operations split processing into multiple
  * concurrently executable tasks and perform them on the underlying instance of an ExecutorService.
  * The pool itself is stored in a final property threadPool and can be managed through static methods
- * on the AsyncEnhancer class.
+ * on the GParsExecutorsPoolEnhancer class.
  * All enhanced classes and instances will share the underlying pool.
  *
  * @author Vaclav Pech
  * Date: Jun 15, 2009
  */
-public final class AsyncEnhancer {
+public final class GParsExecutorsPoolEnhancer {
 
     /**
      * Holds the internal ExecutorService instance wrapped into a DefaultPool
@@ -39,20 +39,20 @@ public final class AsyncEnhancer {
     private final static DefaultPool threadPool = new DefaultPool(true)
 
     /**
-     * Enhances a single instance by mixing-in an instance of AsyncEnhancer.
+     * Enhances a single instance by mixing-in an instance of GParsExecutorsPoolEnhancer.
      */
     public static void enhanceInstance(Object collection) {
         //noinspection GroovyGetterCallCanBePropertyAccess
-        collection.getMetaClass().mixin AsyncEnhancer
+        collection.getMetaClass().mixin GParsExecutorsPoolEnhancer
     }
 
     /**
-     * Enhances a class and so all instances created in the future by mixing-in an instance of AsyncEnhancer.
+     * Enhances a class and so all instances created in the future by mixing-in an instance of GParsExecutorsPoolEnhancer.
      * Enhancing classes needs to be done with caution, since it may have impact in unrelated parts of the application.
      */
     public static void enhanceClass(Class clazz) {
         //noinspection GroovyGetterCallCanBePropertyAccess
-        clazz.getMetaClass().mixin AsyncEnhancer
+        clazz.getMetaClass().mixin GParsExecutorsPoolEnhancer
     }
 
     /**
@@ -69,8 +69,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public def eachParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.eachParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.eachParallel(mixedIn[Object], cl)
         }
     }
 
@@ -83,8 +83,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public def eachWithIndexParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.eachWithIndexParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.eachWithIndexParallel(mixedIn[Object], cl)
         }
     }
 
@@ -96,8 +96,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public def collectParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.collectParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.collectParallel(mixedIn[Object], cl)
         }
     }
 
@@ -109,8 +109,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public def findAllParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.findAllParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.findAllParallel(mixedIn[Object], cl)
         }
     }
 
@@ -122,8 +122,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public def grepParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.grepParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.grepParallel(mixedIn[Object], cl)
         }
     }
 
@@ -135,8 +135,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public def findParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.findParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.findParallel(mixedIn[Object], cl)
         }
     }
 
@@ -148,8 +148,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public boolean everyParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.everyParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.everyParallel(mixedIn[Object], cl)
         }
     }
 
@@ -161,8 +161,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public boolean anyParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.anyParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.anyParallel(mixedIn[Object], cl)
         }
     }
 
@@ -174,8 +174,8 @@ public final class AsyncEnhancer {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public def groupByParallel(Closure cl) {
-        groovyx.gpars.ThreadPool.withExistingPool(threadPool.executorService) {
-            AsyncInvokerUtil.groupByParallel(mixedIn[Object], cl)
+        groovyx.gpars.GParsExecutorsPool.withExistingPool(threadPool.executorService) {
+            GParsExecutorsPoolUtil.groupByParallel(mixedIn[Object], cl)
         }
     }
 }

@@ -16,15 +16,15 @@
 
 package groovyx.gpars.samples
 
-import groovyx.gpars.ThreadPool
+import groovyx.gpars.GParsExecutorsPool
 
 /**
- * Demonstrates parallel collection processing using Executor services through the ThreadPool class.
+ * Demonstrates parallel collection processing using Executor services through the GParsExecutorsPool class.
  */
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-ThreadPool.withPool {
+GParsExecutorsPool.withPool {
     println list.collectParallel {it * 2 }
 
     list.iterator().eachParallel {

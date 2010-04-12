@@ -22,7 +22,7 @@ package groovyx.gpars
  */
 public class ForkJoinPoolStringTest extends GroovyTestCase {
     public void testEachParallelWithThreadPoolAndString() {
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             def result = Collections.synchronizedSet(new HashSet())
             'abc'.eachParallel {result.add(it.toUpperCase())}
             assertEquals(new HashSet(['A', 'B', 'C']), result)
@@ -30,42 +30,42 @@ public class ForkJoinPoolStringTest extends GroovyTestCase {
     }
 
     public void testCollectParallelWithThreadPoolAndString() {
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             def result = 'abc'.collectParallel {it.toUpperCase()}
             assertEquals(['A', 'B', 'C'], result)
         }
     }
 
     public void testFindAllParallelWithThreadPoolAndString() {
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             def result = 'aBC'.findAllParallel {it == it.toUpperCase()}
             assertEquals(['B', 'C'], result)
         }
     }
 
     public void testFindParallelWithThreadPoolAndString() {
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             def result = 'aBC'.findParallel {it == it.toUpperCase()}
             assert (result in ['B', 'C'])
         }
     }
 
     public void testGrepParallelWithThreadPoolAndString() {
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             def result = 'aBC'.grepParallel('B')
             assertEquals(['B'], result)
         }
     }
 
     public void testAnyParallelWithThreadPoolAndString() {
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             assert 'aBc'.anyParallel {it == it.toUpperCase()}
             assert !'abc'.anyParallel {it == it.toUpperCase()}
         }
     }
 
     public void testAllParallelWithThreadPoolAndString() {
-        ParallelCollections.withPool(5) {
+        GParsPool.withPool(5) {
             assert !'aBC'.everyParallel {it == it.toUpperCase()}
             assert 'ABC'.everyParallel() {it == it.toUpperCase()}
         }

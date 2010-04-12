@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import static groovyx.gpars.ParallelCollections.runForkJoin
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.runForkJoin
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * Shows use of the ForkJoin mechanics to implement merge sort.

@@ -23,7 +23,7 @@
 
 package groovyx.gpars.samples
 
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.withPool
 
 @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
 def quicksort(list) {

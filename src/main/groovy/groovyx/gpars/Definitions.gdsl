@@ -77,7 +77,7 @@ contributor(actorBody) {
 }
 
 /**
- * Enhances closures within the ThreadPool blocks with async() and callAsync() methods
+ * Enhances closures within the GParsExecutorsPool blocks with async() and callAsync() methods
  */
 
 def ThreadPoolBody = context(ctype: "groovy.lang.Closure", scope: closureScope())

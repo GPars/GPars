@@ -17,7 +17,7 @@ GPars can hide the complexities of dealing with threads, pools and recursive tas
 
 {code}
 import static runForkJoin
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.withPool
 
 withPool() {
     println """Number of files: ${
@@ -104,7 +104,7 @@ h3. Mergesort example
 
 {code}
 import static runForkJoin
-import static groovyx.gpars.ParallelCollections.withPool
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * Splits a list of numbers in half
@@ -221,3 +221,7 @@ withPool(1) {  //feel free to experiment with the number of fork/join threads in
     println "Sorted numbers: ${orchestrate(new SortWorker(numbers))}"
 }
 {code}
+
+h3. Availability
+
+This feature is only available when using in the Fork/Join-based _GParsPool_ , not in _GParsExecutorsPool_ .

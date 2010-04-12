@@ -27,17 +27,17 @@ import java.util.concurrent.TimeUnit
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
  * E.g.
- * ThreadPool.withPool(5) {ExecutorService service ->
+ * GParsExecutorsPool.withPool(5) {ExecutorService service ->
  *     Collection<Future> result = [1, 2, 3, 4, 5].collectParallel({it * 10}.async())
  *     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
  *}*
- * ThreadPool.withPool(5) {ExecutorService service ->
+ * GParsExecutorsPool.withPool(5) {ExecutorService service ->
  *     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}*     assert result in [3, 4, 5]
  *}*
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-class ThreadPool {
+class GParsExecutorsPool {
 
     /**
      * Maps threads to their appropriate thread pools
@@ -89,7 +89,7 @@ class ThreadPool {
      * and runs the supplied closure.
      * It is an identical alternative for withPool() with a shorter name.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsExecutorsPoolUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
      * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
      * for processing in the pool.
@@ -97,7 +97,7 @@ class ThreadPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * ThreadPool.withPool {ExecutorService service ->
+     * GParsExecutorsPool.withPool {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param cl The block of code to invoke with the DSL enabled
@@ -111,7 +111,7 @@ class ThreadPool {
      * and runs the supplied closure.
      * It is an identical alternative for withPool() with a shorter name.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsExecutorsPoolUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
      * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
      * for processing in the pool.
@@ -119,7 +119,7 @@ class ThreadPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * ThreadPool.withPool(5) {ExecutorService service ->
+     * GParsExecutorsPool.withPool(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
@@ -134,7 +134,7 @@ class ThreadPool {
      * and runs the supplied closure.
      * It is an identical alternative for withPool() with a shorter name.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsExecutorsPoolUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
      * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
      * for processing in the pool.
@@ -142,7 +142,7 @@ class ThreadPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * ThreadPool.withPool(5) {ExecutorService service ->
+     * GParsExecutorsPool.withPool(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param numberOfThreads Number of threads in the newly created thread pool
@@ -192,7 +192,7 @@ class ThreadPool {
      * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
      * and runs the supplied closure.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
-     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>AsyncInvokerUtil</i>
+     * enhanced with the <i>eachParallel()</i>, <i>collectParallel()</i> and other methods from the <i>GParsExecutorsPoolUtil</i>
      * category class as well as closures can be turned into asynchronous ones by calling the <i>async()</i> method on them.
      * E.g. <i>closure,async</i> returns a new closure, which, when run will schedule the original closure
      * for processing in the pool.
@@ -200,7 +200,7 @@ class ThreadPool {
      * operation on each image in the <i>images</i> collection in parallel.
      * <pre>
      * def result = new ConcurrentSkipListSet()
-     * ThreadPool.withPool(5) {ExecutorService service ->
+     * GParsExecutorsPool.withPool(5) {ExecutorService service ->
      *     [1, 2, 3, 4, 5].eachParallel{Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* </pre>
      * @param pool The <i>ExecutorService</i> to use, the service will not be shutdown after this method returns
@@ -209,7 +209,7 @@ class ThreadPool {
         currentPoolStack << pool
         def result = null
         try {
-            use(AsyncInvokerUtil) {
+            use(GParsExecutorsPoolUtil) {
                 result = cl(pool)
             }
         } finally {
@@ -226,7 +226,7 @@ class ThreadPool {
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static List<Object> executeAsyncAndWait(Closure... closures) {
-        return AsyncInvokerUtil.processResult(executeAsync(closures))
+        return GParsExecutorsPoolUtil.processResult(executeAsync(closures))
     }
 
     /**
@@ -247,7 +247,7 @@ class ThreadPool {
      * @return Futures for the result values or exceptions of all closures
      */
     public static List<Future<Object>> executeAsync(Closure... closures) {
-        ThreadPool.withPool(closures.size()) {ExecutorService executorService ->
+        GParsExecutorsPool.withPool(closures.size()) {ExecutorService executorService ->
             List<Future<Object>> result = closures.collect {cl ->
                 executorService.submit({
                     cl.call()
