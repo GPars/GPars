@@ -27,10 +27,10 @@ import jsr166y.forkjoin.ParallelArray
 import jsr166y.forkjoin.RecursiveTask
 
 /**
- * This class forms the core of the DSL initialized by <i>ForkJoinPool</i>. The static methods of <i>ParallelArrayUtil</i>
+ * This class forms the core of the DSL initialized by <i>ParallelCollections</i>. The static methods of <i>ParallelArrayUtil</i>
  * get attached to their first arguments (the Groovy Category mechanism) and can be then invoked as if they were part of
  * the argument classes.
- * @see groovyx.gpars.ForkJoinPool
+ * @see groovyx.gpars.ParallelCollections
  *
  * @author Vaclav Pech
  * @author Robert Fischer
@@ -39,7 +39,7 @@ import jsr166y.forkjoin.RecursiveTask
 public class ParallelArrayUtil {
 
     private static ForkJoinPool retrievePool() {
-        final ForkJoinPool pool = groovyx.gpars.ForkJoinPool.retrieveCurrentPool()
+        final ForkJoinPool pool = groovyx.gpars.ParallelCollections.retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("No ForkJoinPool available for the current thread")
         return pool
     }
@@ -48,7 +48,7 @@ public class ParallelArrayUtil {
      * schedules the supplied closure for processing in the underlying thread pool.
      */
     private static Future callParallel(Closure task) {
-        final ForkJoinPool pool = groovyx.gpars.ForkJoinPool.retrieveCurrentPool()
+        final ForkJoinPool pool = groovyx.gpars.ParallelCollections.retrieveCurrentPool()
         if (!pool) throw new IllegalStateException("No ExecutorService available for the current thread.")
         return pool.submit([compute: task] as RecursiveTask)
     }
@@ -96,7 +96,7 @@ public class ParallelArrayUtil {
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
     public static Object makeTransparent(Object collection) {
-        if (!(collection.respondsTo('isTransparent'))) throw new IllegalStateException("Cannot make the object transparently parallel. Apparently we're not inside a ForkJoinPool.withPool() block nor the collection hasn't been enhanced with ParallelEnhancer.enhance().")
+        if (!(collection.respondsTo('isTransparent'))) throw new IllegalStateException("Cannot make the object transparently parallel. Apparently we're not inside a ParallelCollections.withPool() block nor the collection hasn't been enhanced with ParallelEnhancer.enhance().")
         if (!collection.isTransparent()) collection.metaClass.mixin(TransparentParallel)
         return collection
     }
@@ -115,7 +115,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>eachParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = new ConcurrentSkipListSet()
+     * ParallelCollections.withPool {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -133,7 +133,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>eachParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = new ConcurrentSkipListSet()
+     * ParallelCollections.withPool {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -151,7 +151,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>eachWithIndexParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = new ConcurrentSkipListSet()
+     * ParallelCollections.withPool {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -175,7 +175,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>eachWithIndexParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = new ConcurrentSkipListSet()
+     * ParallelCollections.withPool {*     def result = new ConcurrentSkipListSet()
      *     [1, 2, 3, 4, 5].eachWithIndexParallel {Number number, int index -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
@@ -193,7 +193,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static <T> Collection<T> collectParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withMapping({cl(it)} as Mapper).all().asList()
@@ -208,7 +208,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static Collection<Object> collectParallel(Object collection, Closure cl) {
         return collectParallel(createCollection(collection), cl)
@@ -223,7 +223,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <T> Collection<T> findAllParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().asList()
@@ -238,7 +238,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static Collection<Object> findAllParallel(Object collection, Closure cl) {
         return findAllParallel(createCollection(collection), cl)
@@ -253,7 +253,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <T> Object findParallel(Collection<T> collection, Closure cl) {
         final ParallelArray found = createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all()
@@ -270,7 +270,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findParallel(Object collection, Closure cl) {
         return findParallel(createCollection(collection), cl)
@@ -288,7 +288,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <T> Object findAnyParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any()
@@ -306,7 +306,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findAnyParallel(Object collection, Closure cl) {
         return findParallel(createCollection(collection), cl)
@@ -321,7 +321,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
      *     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <T> Collection<T> grepParallel(Collection<T> collection, filter) {
@@ -337,7 +337,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
      *     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static Object grepParallel(Object collection, filter) {
@@ -353,7 +353,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].splitParallel(it > 3)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].splitParallel(it > 3)
      *            assert [3, 4, 5] as Set == result[0] as Set
      *            assert [1, 2] as Set == result[1] as Set
 
@@ -372,7 +372,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].splitParallel(4..6)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].splitParallel(4..6)
      *            assert [3, 4, 5] as Set == result[0] as Set
      *            assert [1, 2] as Set == result[1] as Set
      *}*/
@@ -389,7 +389,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].countParallel(4)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].countParallel(4)
      *     assertEquals(1, result)
      *}*/
     public static <T> int countParallel(Collection<T> collection, filter) {
@@ -405,7 +405,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     def result = [1, 2, 3, 4, 5].countParallel(4)
+     * ParallelCollections.withPool {*     def result = [1, 2, 3, 4, 5].countParallel(4)
      *     assertEquals(1, result)
      *}*/
     public static int countParallel(Object collection, filter) {
@@ -424,7 +424,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
+     * ParallelCollections.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static <T> boolean anyParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
     }
@@ -441,7 +441,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
+     * ParallelCollections.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static boolean anyParallel(Object collection, Closure cl) {
         return anyParallel(createCollection(collection), cl)
     }
@@ -456,7 +456,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
+     * ParallelCollections.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static <T> boolean everyParallel(Collection<T> collection, Closure cl) {
         createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().size() == collection.size()
     }
@@ -471,7 +471,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
+     * ParallelCollections.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static boolean everyParallel(Object collection, Closure cl) {
         return everyParallel(createCollection(collection), cl)
     }
@@ -486,7 +486,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>groupByParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
+     * ParallelCollections.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      *}*/
     public static <T> Map groupByParallel(Collection<T> collection, Closure cl) {
         final def map = new ConcurrentHashMap()
@@ -510,7 +510,7 @@ public class ParallelArrayUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>groupByParallel(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      * Example:
-     * ForkJoinPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
+     * ParallelCollections.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      *}*/
     public static Map groupByParallel(Object collection, Closure cl) {
         return groupByParallel(createCollection(collection), cl)

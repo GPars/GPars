@@ -15,17 +15,17 @@
 // limitations under the License.
 
 /**
- * Demonstrates parallel collection processing using ParallelArrays through the ForkJoinPool class.
+ * Demonstrates parallel collection processing using ParallelArrays through the ParallelCollections class.
  * Requires the jsr166y jar on the class path.
  */
 
 package groovyx.gpars.samples
 
-import groovyx.gpars.ForkJoinPool
+import groovyx.gpars.ParallelCollections
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-ForkJoinPool.withPool {
+ParallelCollections.withPool {
     println list.collectParallel {it * 2 }
 
     list.iterator().eachParallel {

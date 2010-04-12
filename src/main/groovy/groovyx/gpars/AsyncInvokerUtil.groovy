@@ -18,6 +18,7 @@ package groovyx.gpars
 
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
@@ -304,7 +305,7 @@ public class AsyncInvokerUtil {
     }
 
     static List<Object> processResult(List<Future<Object>> futures) {
-        final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
+        final Collection<Throwable> exceptions = new ConcurrentLinkedQueue<Throwable>()
 
         final List<Object> result = futures.collect {
             try {
@@ -316,6 +317,6 @@ public class AsyncInvokerUtil {
         }
 
         if (exceptions.empty) return result
-        else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", exceptions)
+        else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", new ArrayList(exceptions))
     }
 }

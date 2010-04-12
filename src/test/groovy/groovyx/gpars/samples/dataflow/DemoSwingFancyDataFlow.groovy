@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
-import groovyx.gpars.ForkJoinPool
+import groovyx.gpars.ParallelCollections
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlows
 import java.awt.Color
@@ -79,7 +79,7 @@ values.eachWithIndex {value, index ->
 
 random = new Random()
 
-ForkJoinPool.withPool(3) {
+ParallelCollections.withPool(3) {
     values.eachWithIndexParallel {value, index ->
         builder.edt {
             builder."x$index".text = 'Calculating'

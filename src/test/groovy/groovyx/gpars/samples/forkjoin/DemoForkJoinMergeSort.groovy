@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import static groovyx.gpars.ForkJoinPool.orchestrate
-import static groovyx.gpars.ForkJoinPool.withPool
+import static groovyx.gpars.ParallelCollections.runForkJoin
+import static groovyx.gpars.ParallelCollections.withPool
 
 /**
  * Shows use of the ForkJoin mechanics to implement merge sort.
@@ -65,7 +65,7 @@ final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1,
 
 withPool(3) {  //feel free to experiment with the number of fork/join threads in the pool
     println """Sorted numbers: ${
-        orchestrate(numbers) {nums ->
+        runForkJoin(numbers) {nums ->
             println "Thread ${Thread.currentThread().name[-1]}: Sorting $nums"
             switch (nums.size()) {
                 case 0..1:

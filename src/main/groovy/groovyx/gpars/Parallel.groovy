@@ -39,7 +39,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def eachParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.eachParallel(mixedIn[Object], cl)
         }
     }
@@ -53,7 +53,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def eachWithIndexParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.eachWithIndexParallel(mixedIn[Object], cl)
         }
     }
@@ -66,7 +66,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      * */
     public def collectParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             enhance(ParallelArrayUtil.collectParallel(mixedIn[Object], cl))
         }
     }
@@ -79,7 +79,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findAllParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             enhance(ParallelArrayUtil.findAllParallel(mixedIn[Object], cl))
         }
     }
@@ -92,7 +92,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def grepParallel(Object filter) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             enhance(ParallelArrayUtil.grepParallel(mixedIn[Object], filter))
         }
     }
@@ -105,7 +105,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def splitParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             enhance(ParallelArrayUtil.splitParallel(mixedIn[Object], cl))
         }
     }
@@ -118,7 +118,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def countParallel(Object filter) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             enhance(ParallelArrayUtil.countParallel(mixedIn[Object], filter))
         }
     }
@@ -131,7 +131,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.findParallel(mixedIn[Object], cl)
         }
     }
@@ -147,7 +147,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findAnyParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.findAnyParallel(mixedIn[Object], cl)
         }
     }
@@ -160,7 +160,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public boolean everyParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.everyParallel(mixedIn[Object], cl)
         }
     }
@@ -175,7 +175,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public boolean anyParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.anyParallel(mixedIn[Object], cl)
         }
     }
@@ -188,7 +188,7 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def groupByParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.groupByParallel(mixedIn[Object], cl)
         }
     }
@@ -206,7 +206,7 @@ final class Parallel {
      * @param cl A one or two-argument closure
      */
     public def minParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.minParallel(mixedIn[Object], cl)
         }
     }
@@ -219,7 +219,7 @@ final class Parallel {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def minParallel() {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.minParallel(mixedIn[Object])
         }
     }
@@ -237,7 +237,7 @@ final class Parallel {
      * @param cl A one or two-argument closure
      */
     public def maxParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.maxParallel(mixedIn[Object], cl)
         }
     }
@@ -250,7 +250,7 @@ final class Parallel {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def maxParallel() {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.maxParallel(mixedIn[Object])
         }
     }
@@ -264,7 +264,7 @@ final class Parallel {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def sumParallel() {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.sumParallel(mixedIn[Object])
         }
     }
@@ -279,7 +279,7 @@ final class Parallel {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
      */
     public def foldParallel(Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.foldParallel(mixedIn[Object], cl)
         }
     }
@@ -295,7 +295,7 @@ final class Parallel {
      * @param seed A seed value to initialize the operation
      */
     public def foldParallel(seed, Closure cl) {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.foldParallel(mixedIn[Object], seed, cl)
         }
     }
@@ -306,7 +306,7 @@ final class Parallel {
      * ParallelArray implementation.
      */
     public PAWrapper getParallel() {
-        ForkJoinPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+        ParallelCollections.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
             ParallelArrayUtil.getParallel(mixedIn[Object])
         }
     }

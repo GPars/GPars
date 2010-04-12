@@ -23,11 +23,11 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import static groovyx.gpars.ForkJoinPool.withPool
+import static groovyx.gpars.ParallelCollections.withPool
 
 def quicksort(numbers) {
     withPool {
-        groovyx.gpars.ForkJoinPool.orchestrate(0, numbers) {index, list ->
+        groovyx.gpars.ParallelCollections.runForkJoin(0, numbers) {index, list ->
             def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
             if ((list.size() < 2) || (groups.size() == 1)) {
                 return [index: index, list: list.clone()]

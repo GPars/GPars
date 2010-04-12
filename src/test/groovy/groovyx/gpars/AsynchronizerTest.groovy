@@ -27,19 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger
  * Date: Oct 23, 2008
  */
 public class ThreadPoolTest extends GroovyTestCase {
-    public void testStartInParallel() {
-        ThreadPool.withPool(5) {ExecutorService service ->
-            def resultA = 0, resultB = 0
-            final CountDownLatch latch = new CountDownLatch(2)
-            ThreadPool.startInParallel({resultA = 1; latch.countDown()}, {resultB = 1; latch.countDown()})
-            latch.await()
-            assertEquals 1, resultA
-            assertEquals 1, resultB
-        }
-    }
 
     public void testDoInParallel() {
-        assertEquals([10, 20], ThreadPool.doInParallel({10}, {20}))
+        assertEquals([10, 20], ThreadPool.executeAsyncAndWait({10}, {20}))
     }
 
     public void testExecuteInParallel() {
@@ -47,7 +37,7 @@ public class ThreadPoolTest extends GroovyTestCase {
     }
 
     public void testDoInParallelList() {
-        assertEquals([10, 20], ThreadPool.doInParallel([{10}, {20}]))
+        assertEquals([10, 20], ThreadPool.executeAsyncAndWait([{10}, {20}]))
     }
 
     public void testExecuteAsyncList() {

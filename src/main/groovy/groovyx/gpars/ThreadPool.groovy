@@ -17,14 +17,12 @@
 package groovyx.gpars
 
 import groovyx.gpars.util.PoolUtils
-import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
-import org.codehaus.groovy.runtime.InvokerInvocationException
 
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
@@ -227,7 +225,7 @@ class ThreadPool {
      * @return The result values of all closures
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static List<Object> doInParallel(Closure... closures) {
+    public static List<Object> executeAsyncAndWait(Closure... closures) {
         return AsyncInvokerUtil.processResult(executeAsync(closures))
     }
 
@@ -238,8 +236,8 @@ class ThreadPool {
      * @return The result values of all closures
      * @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static List<Object> doInParallel(List<Closure> closures) {
-        return doInParallel(* closures)
+    public static List<Object> executeAsyncAndWait(List<Closure> closures) {
+        return executeAsyncAndWait(* closures)
     }
 
     /**
@@ -267,43 +265,5 @@ class ThreadPool {
      */
     public static List<Future<Object>> executeAsync(List<Closure> closures) {
         return executeAsync(* closures)
-    }
-
-    /**
-     * Starts multiple closures in separate threads, using a new thread for the startup.
-     * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported using System.err.
-     * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     */
-    public static void startInParallel(Closure... closures) {
-        startInParallel(createDefaultUncaughtExceptionHandler(), closures)
-    }
-
-    /**
-     * Starts multiple closures in separate threads, using a new thread for the startup.
-     * If any of the collection's elements causes the closure to throw an exception, an AsyncException is reported to the supplied instance of UncaughtExceptionHandler.
-     * The original exceptions will be stored in the AsyncException's concurrentExceptions field.
-     * Unwraps potential InvokerInvocationException before control is passed to the UncaughtExceptionHandler instance.
-     * @return The thread that submits the closures to the thread executor service so that the caller can take ownership of it and e.g. call <i>join()</i> on it to wait for all the closures to finish processing.
-     */
-    public static Thread startInParallel(java.lang.Thread.UncaughtExceptionHandler uncaughtExceptionHandler, Closure... closures) {
-        final Thread thread = new Thread({
-            doInParallel(closures)
-        } as Runnable)
-        thread.daemon = false
-        thread.uncaughtExceptionHandler = {Thread t, Throwable throwable ->
-            if (throwable instanceof InvokerInvocationException)
-                uncaughtExceptionHandler.uncaughtException(t, throwable.cause)
-            else
-                uncaughtExceptionHandler.uncaughtException(t, throwable)
-        } as UncaughtExceptionHandler
-        thread.start()
-        return thread
-    }
-
-    private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {
-        return {Thread failedThread, Throwable throwable ->
-            System.err.println "Error processing background thread ${failedThread.name}: ${throwable.message}"
-            throwable.printStackTrace(System.err)
-        } as UncaughtExceptionHandler
     }
 }

@@ -23,7 +23,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.ThreadFactory
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author Vaclav Pech
@@ -32,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference
 public class ThreadPoolExceptionTest extends GroovyTestCase {
     public void testDoInParralelWithException() {
         shouldFail {
-            AsyncInvokerUtil.doInParallel({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+            AsyncInvokerUtil.executeAsyncAndWait({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
         }
     }
 
@@ -41,23 +40,6 @@ public class ThreadPoolExceptionTest extends GroovyTestCase {
         shouldFail {
             result*.get()
         }
-    }
-
-    public void testStartInParralelWithException() {
-        final AtomicReference<Throwable> thrownException = new AtomicReference<Throwable>()
-        final CountDownLatch latch = new CountDownLatch(4)
-        UncaughtExceptionHandler handler = {thread, throwable -> thrownException.set(throwable)} as UncaughtExceptionHandler
-
-        Thread thread = ThreadPool.startInParallel(
-                handler,
-                {latch.countDown()},
-                {latch.countDown(); throw new RuntimeException('test1')},
-                {latch.countDown(); throw new RuntimeException('test2')},
-                {latch.countDown()})
-
-        latch.await()
-        thread.join()
-        assert thrownException.get() instanceof AsyncException
     }
 
     public void testThreadException() {

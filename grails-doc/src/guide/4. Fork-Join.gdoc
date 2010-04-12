@@ -16,8 +16,8 @@ h3. The GPars abstraction convenience layer
 GPars can hide the complexities of dealing with threads, pools and recursive tasks from you, yet let you leverage the powerful Fork/Join implementation in jsr166y.
 
 {code}
-import static groovyx.gpars.ForkJoinPool.orchestrate
-import static groovyx.gpars.ForkJoinPool.withPool
+import static runForkJoin
+import static groovyx.gpars.ParallelCollections.withPool
 
 withPool() {
     println """Number of files: ${
@@ -45,7 +45,7 @@ the number of arguments passed into the _forkOffChild()_ method.
 {code}
 def quicksort(numbers) {
     withPool {
-        groovyx.gpars.ForkJoinPool.orchestrate(0, numbers) {index, list ->
+        runForkJoin(0, numbers) {index, list ->
             def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
             if ((list.size() < 2) || (groups.size() == 1)) {
                 return [index: index, list: list.clone()]
@@ -103,8 +103,8 @@ Although the algorithm creates as many tasks as there are sub-directories and ta
 h3. Mergesort example
 
 {code}
-import static groovyx.gpars.ForkJoinPool.orchestrate
-import static groovyx.gpars.ForkJoinPool.withPool
+import static runForkJoin
+import static groovyx.gpars.ParallelCollections.withPool
 
 /**
  * Splits a list of numbers in half

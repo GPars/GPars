@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.ForkJoinPool
+import groovyx.gpars.ParallelCollections
 
 List items = []
 for (i in 1..100000) {items << i}
@@ -64,7 +64,7 @@ long measureThreadPool(iterations, List list) {
 
 long meassureForkJoinPool(iterations, List list) {
     final long t1 = System.currentTimeMillis()
-    ForkJoinPool.withPool(30) {
+    ParallelCollections.withPool(30) {
         for (i in iterations) {
             int result
             list.eachParallel {result = it}

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import groovyx.gpars.ForkJoinPool
+import groovyx.gpars.ParallelCollections
 import jsr166y.forkjoin.RecursiveTask
 
 /**
@@ -56,7 +56,7 @@ public class FJFileCounter extends RecursiveTask<Long> {
  Although the algorithm creates as many tasks as there are sub-directories and tasks wait for the sub-directory tasks to complete,
  as few as one thread is enough to keep the computation going.
  */
-ForkJoinPool.withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
+ParallelCollections.withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
     def result = pool.submit(new FJFileCounter(new File('./src'))).get()
     println "Number of files: ${result}"
 }

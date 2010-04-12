@@ -42,7 +42,7 @@ Example:
 
 h3. Parallelizing closures
 
-The _ThreadPool_ class also provides handy methods _doInParallel()_ , _executeInParallel()_ and _startInParallel()_ to easily run multiple closures asynchronously.
+The _ThreadPool_ class also provides handy methods _executeAsync()_ and _executeAsyncAndWait()_ to easily run multiple closures asynchronously.
 
 Example:
 {code}
