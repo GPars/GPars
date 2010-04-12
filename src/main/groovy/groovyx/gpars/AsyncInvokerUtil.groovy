@@ -68,13 +68,6 @@ public class AsyncInvokerUtil {
     }
 
     /**
-     * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
-     */
-    public static Closure getAsync1(Object cl) {
-        return async(cl)
-    }
-
-    /**
      * Iterates over a collection/object with the <i>each()</i> method using an asynchronous variant of the supplied closure
      * to evaluate each collection's element. A Semaphore is used to make the calling thread wait for all the results.
      * After this method returns, all the closures have been finished and all the potential shared resources have been updated
