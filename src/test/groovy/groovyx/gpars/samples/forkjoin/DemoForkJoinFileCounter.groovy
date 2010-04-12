@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import groovyx.gpars.AbstractForkJoinWorker
 import static groovyx.gpars.ForkJoinPool.orchestrate
+import static groovyx.gpars.ForkJoinPool.withPool
 
 /**
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.
@@ -26,29 +26,6 @@ import static groovyx.gpars.ForkJoinPool.orchestrate
  * Date: Nov 1, 2008
  */
 
-public final class FileCounter extends AbstractForkJoinWorker<Long> {
-    private final File file;
-
-    def FileCounter(final File file) {
-        this.file = file
-    }
-
-    @Override
-    protected Long computeTask() {
-        long count = 0
-        file.eachFile {
-            if (it.isDirectory()) {
-                println "Forking a child task for $it"
-                forkOffChild(new FileCounter(it))           //fork a child task
-            } else {
-                count++
-            }
-        }
-        return count + (childrenResults.sum(0))
-        //use results of children tasks to calculate and store own result
-    }
-}
-
 /**
  Fork/Join operations can be safely run with small number of threads thanks to using the TaskBarrier class to synchronize the threads.
  Although the algorithm creates as many tasks as there are sub-directories and tasks wait for the sub-directory tasks to complete,
@@ -56,5 +33,19 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
  */
 
 withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    println "Number of files: ${orchestrate(new FileCounter(new File("./src")))}"
+    println """Number of files: ${
+        orchestrate(new File("./src")) {file ->
+            long count = 0
+            file.eachFile {
+                if (it.isDirectory()) {
+                    println "Forking a child task for $it"
+                    forkOffChild(it)           //fork a child task
+                } else {
+                    count++
+                }
+            }
+            return count + (childrenResults.sum(0))
+            //use results of children tasks to calculate and store own result
+        }
+    }"""
 }
