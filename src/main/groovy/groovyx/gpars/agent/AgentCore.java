@@ -40,12 +40,25 @@ public abstract class AgentCore {
      */
     private static final ExecutorService pool = Executors.newFixedThreadPool(PoolUtils.retrieveDefaultPoolSize(), new AgentThreadFactory());
 
+    /**
+     * The thread pool to use with this agent
+     */
     private ExecutorService threadPool = pool;
 
+    /**
+     * Retrieves the thread pool used by the agent
+     *
+     * @return The thread pool
+     */
     public final ExecutorService getThreadPool() {
         return threadPool;
     }
 
+    /**
+     * Sets a new thread pool to be used by the agent
+     *
+     * @param threadPool The thread pool to use
+     */
     public final void attachToThreadPool(final ExecutorService threadPool) {
         this.threadPool = threadPool;
     }
