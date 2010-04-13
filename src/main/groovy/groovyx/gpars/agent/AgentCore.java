@@ -47,6 +47,8 @@ public abstract class AgentCore {
 
     /**
      * Adds the message to the agent\s message queue
+     *
+     * @param message A value or a closure
      */
     public final void send(final Object message) {
         queue.add(message);
@@ -55,7 +57,10 @@ public abstract class AgentCore {
 
     /**
      * Adds the message to the agent\s message queue
+     *
+     * @param message A value or a closure
      */
+    @SuppressWarnings({"UnusedDeclaration"})
     public final void leftShift(final Object message) {
         send(message);
     }
@@ -75,6 +80,8 @@ public abstract class AgentCore {
 
     /**
      * Dynamically dispatches the method call
+     *
+     * @param message A value or a closure
      */
     abstract void handleMessage(final Object message);
 
@@ -84,10 +91,11 @@ public abstract class AgentCore {
     void schedule() {
         if (!queue.isEmpty() && active.compareAndSet(false, true)) {
             pool.submit(new Runnable() {
+                @SuppressWarnings({"CatchGenericClass"})
                 public void run() {
                     try {
                         AgentCore.this.perform();
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
