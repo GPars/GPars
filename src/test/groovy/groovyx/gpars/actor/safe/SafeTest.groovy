@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.actor.safe
 
@@ -27,6 +27,8 @@ public class SafeTest extends GroovyTestCase {
         def jugMembers = new Safe<List>(['Me'])  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
+        jugMembers.await()
+        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
 
         final Thread t1 = Thread.start {
             jugMembers.send {it.add 'Joe'}  //add Joe
@@ -104,7 +106,7 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 5, result.val
     }
 
-    public void testExplicitReply() {
+    public void _testExplicitReply() {
         final Safe counter = new Safe<Long>(0L)
 
         def result = new DataFlowStream()
@@ -122,7 +124,7 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 10, result.val
     }
 
-    public void testDirectMessage() {
+    public void _testDirectMessage() {
         final Safe counter = new Safe<Long>(0L)
 
         counter << null
@@ -139,7 +141,7 @@ public class SafeTest extends GroovyTestCase {
 
     }
 
-    public void testDirectMessageOnNullInitialValue() {
+    public void _testDirectMessageOnNullInitialValue() {
         final Safe counter = new Safe<Long>()
 
         counter << 10
@@ -154,7 +156,7 @@ public class SafeTest extends GroovyTestCase {
         assertNull result.val
     }
 
-    public void testReplies() {
+    public void _testReplies() {
         final Safe counter = new Safe<Long>(0L)
 
         def result = new DataFlowVariable()
@@ -233,7 +235,7 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 'test', result.val
     }
 
-    public void testException() {
+    public void _testException() {
         final Safe counter = new Safe<Long>(0L)
         final DataFlowVariable result = new DataFlowVariable()
         counter.metaClass.onException = {result << it}
