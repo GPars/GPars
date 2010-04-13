@@ -106,7 +106,7 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 5, result.val
     }
 
-    public void _testExplicitReply() {
+    public void testExplicitReply() {
         final Safe counter = new Safe<Long>(0L)
 
         def result = new DataFlowStream()
@@ -124,7 +124,7 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 10, result.val
     }
 
-    public void _testDirectMessage() {
+    public void testDirectMessage() {
         final Safe counter = new Safe<Long>(0L)
 
         counter << null
@@ -141,7 +141,7 @@ public class SafeTest extends GroovyTestCase {
 
     }
 
-    public void _testDirectMessageOnNullInitialValue() {
+    public void testDirectMessageOnNullInitialValue() {
         final Safe counter = new Safe<Long>()
 
         counter << 10
@@ -156,7 +156,7 @@ public class SafeTest extends GroovyTestCase {
         assertNull result.val
     }
 
-    public void _testReplies() {
+    public void testReplies() {
         final Safe counter = new Safe<Long>(0L)
 
         def result = new DataFlowVariable()
@@ -235,7 +235,7 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 'test', result.val
     }
 
-    public void _testException() {
+    public void testException() {
         final Safe counter = new Safe<Long>(0L)
         final DataFlowVariable result = new DataFlowVariable()
         counter.metaClass.onException = {result << it}

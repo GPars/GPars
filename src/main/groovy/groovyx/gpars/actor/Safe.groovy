@@ -45,7 +45,7 @@ import org.codehaus.groovy.runtime.NullObject
  * @author Vaclav Pech
  * Date: Jul 2, 2009
  */
-public class Safe<T> extends Agent {
+public class Safe<T> extends DynamicDispatchActor {
 
     /**
      * Allows reads not to wait in the message queue.
