@@ -18,37 +18,54 @@ package groovyx.gpars.agent;
 
 import groovyx.gpars.util.PoolUtils;
 
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 13.4.2010
- * Time: 12:24:34
- * To change this template use File | Settings | File Templates.
+ * @author Vaclav Pech
+ *         Date: 13.4.2010
  */
-public abstract class AgentHelper {
-    private static ExecutorService pool = Executors.newFixedThreadPool(PoolUtils.retrieveDefaultPoolSize(), new AgentThreadFactory());
+public abstract class AgentCore {
 
-    final ConcurrentLinkedQueue<Object> msgs = new ConcurrentLinkedQueue<Object>();
+    /**
+     * A thread pool shared by all agents
+     */
+    private static final ExecutorService pool = Executors.newFixedThreadPool(PoolUtils.retrieveDefaultPoolSize(), new AgentThreadFactory());
 
-    AtomicBoolean active = new AtomicBoolean(false);
+    /**
+     * Incoming messages
+     */
+    private final Queue<Object> queue = new ConcurrentLinkedQueue<Object>();
 
+    /**
+     * Indicates, whether there's an active thread handling a message inside the agent's body
+     */
+    private final AtomicBoolean active = new AtomicBoolean(false);
+
+    /**
+     * Adds the message to the agent\s message queue
+     */
     public final void send(final Object message) {
-        msgs.add(message);
+        queue.add(message);
         schedule();
     }
 
+    /**
+     * Adds the message to the agent\s message queue
+     */
     public final void leftShift(final Object message) {
         send(message);
     }
 
+    /**
+     * Handles a single message from the message queue
+     */
     final void perform() {
         try {
-            final Object message = msgs.poll();
+            final Object message = queue.poll();
             if (message != null) this.handleMessage(message);
         } finally {
             active.set(false);
@@ -56,14 +73,20 @@ public abstract class AgentHelper {
         }
     }
 
+    /**
+     * Dynamically dispatches the method call
+     */
     abstract void handleMessage(final Object message);
 
+    /**
+     * Schedules processing of a next message, if there are some and if there isn't an active thread handling a message at the moment
+     */
     void schedule() {
-        if (!msgs.isEmpty() && active.compareAndSet(false, true)) {
+        if (!queue.isEmpty() && active.compareAndSet(false, true)) {
             pool.submit(new Runnable() {
                 public void run() {
                     try {
-                        AgentHelper.this.perform();
+                        AgentCore.this.perform();
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
@@ -71,5 +94,4 @@ public abstract class AgentHelper {
             });
         }
     }
-
 }

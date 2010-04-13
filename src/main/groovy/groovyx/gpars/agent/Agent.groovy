@@ -21,14 +21,15 @@ import groovyx.gpars.util.EnhancedRWLock
 import org.codehaus.groovy.runtime.NullObject
 
 /**
- * Created by IntelliJ IDEA.
- * User: Vaclav
+ * @author Vaclav Pech
  * Date: 13.4.2010
- * Time: 9:21:59
- * To change this template use File | Settings | File Templates.
  */
-public class Agent<T> extends AgentHelper {
+public class Agent<T> extends AgentCore {
     //todo exception handlers
+    //todo grouping actors and thread pools
+    //todo javadoc
+    //todo tutorial
+    //todo reconsider Safe
 
     /**
      * Allows reads not to wait in the message queue.
@@ -133,6 +134,9 @@ public class Agent<T> extends AgentHelper {
         send {callback.call(copy(it))}
     }
 
+    /**
+     * Submits the closure waiting for the result
+     */
     final def sendAndWait(Closure message) {
         final DataFlowVariable result = new DataFlowVariable()
         this.send {
@@ -149,6 +153,9 @@ public class Agent<T> extends AgentHelper {
         sendAndWait {}
     }
 
+    /**
+     * Dynamically dispatches the method call
+     */
     void handleMessage(final Object message) {
         onMessage message
     }

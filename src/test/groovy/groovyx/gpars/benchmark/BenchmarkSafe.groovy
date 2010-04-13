@@ -20,6 +20,11 @@ import groovyx.gpars.agent.Agent
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+/**
+ * @author Vaclav Pech
+ * Date: 13.4.2010
+ */
+
 final ExecutorService pool = Executors.newFixedThreadPool(10)
 
 final long t1 = System.currentTimeMillis()
