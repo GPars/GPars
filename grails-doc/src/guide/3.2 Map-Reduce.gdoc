@@ -1,5 +1,5 @@
-The Map/Reduce DSL gives GPars a more functional flavor. In general, the Map/Reduce DSL may be used for the same purpose as the _xxxParallel()_ family methods and has very similar semantics.
-On the other hand, Map/Reduce can perform considerably faster if you need to chain multiple methods to process a single collection in multiple steps:
+The Parallel Collection Map/Reduce DSL gives GPars a more functional flavor. In general, the Map/Reduce DSL may be used for the same purpose as the _xxxParallel()_ family methods and has very similar semantics.
+On the other hand, Map/Reduce can perform considerably faster, if you need to chain multiple methods to process a single collection in multiple steps:
 {code}
     println 'Number of occurrences of the word GROOVY today: ' + urls.parallel
             .map {it.toURL().text.toUpperCase()}
@@ -33,3 +33,7 @@ def myNumbers = (1..1000).parallel.filter{it % 2 == 0}.map{Math.sqrt it}.collect
 h2. Avoid side-effects in functions
 
 Once again we need to warn you. To avoid nasty surprises, please, keep your closures, which you pass to the Map/Reduce functions, stateless and clean from side-effects.
+
+h3. Availability
+
+This feature is only available when using in the Fork/Join-based _GParsPool_ , not in _GParsExecutorsPool_ .

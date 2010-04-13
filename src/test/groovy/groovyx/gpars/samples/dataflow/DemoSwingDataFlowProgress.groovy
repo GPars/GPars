@@ -24,7 +24,7 @@ like for appending - while retrieving the several parts concurrently.
 package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
-import groovyx.gpars.ForkJoinPool
+import groovyx.gpars.GParsPool
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlows
 import static javax.swing.BorderFactory.createEmptyBorder
@@ -63,7 +63,7 @@ DataFlow.task {
     }
 }
 
-ForkJoinPool.withPool() {
+GParsPool.withPool() {
     values.eachWithIndexParallel {value, index ->
         for (progress in 1..value) {
             sleep 1000

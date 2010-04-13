@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.ForkJoinPool
+import groovyx.gpars.GParsPool
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -47,7 +47,7 @@ task {
 }
 
 task {
-    ForkJoinPool.withPool {
+    GParsPool.withPool {
         println "Number of Groovy sites today: " +
                 ([dzone, jroller, theserverside].findAllParallel {
                     it.val.toUpperCase().contains 'GROOVY'

@@ -27,35 +27,35 @@ import jsr166y.forkjoin.ForkJoinPool
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class ParallelUtilTest extends GroovyTestCase {
+public class GParsPoolUtilTest extends GroovyTestCase {
 
     public void testEach() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             final AtomicInteger result = new AtomicInteger(0)
-            ParallelArrayUtil.eachParallel([1, 2, 3, 4, 5], {result.addAndGet(it)})
+            GParsPoolUtil.eachParallel([1, 2, 3, 4, 5], {result.addAndGet(it)})
             assertEquals 15, result
         }
     }
 
     public void testEachWithIndex() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             final AtomicInteger result = new AtomicInteger(0)
-            ParallelArrayUtil.eachWithIndexParallel([1, 2, 3, 4, 5], {element, int index -> result.addAndGet(element * index)})
+            GParsPoolUtil.eachWithIndexParallel([1, 2, 3, 4, 5], {element, int index -> result.addAndGet(element * index)})
             assertEquals 40, result
         }
     }
 
     public void testCollect() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final List result = ParallelArrayUtil.collectParallel([1, 2, 3, 4, 5], {it * 2})
+        groovyx.gpars.GParsPool.withPool(5) {
+            final List result = GParsPoolUtil.collectParallel([1, 2, 3, 4, 5], {it * 2})
             assert ([2, 4, 6, 8, 10].equals(result))
             assert !([2, 41, 6, 8, 10].equals(result))
         }
     }
 
     public void testFindAll() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final List result = ParallelArrayUtil.findAllParallel([1, 2, 3, 4, 5], {it > 2})
+        groovyx.gpars.GParsPool.withPool(5) {
+            final List result = GParsPoolUtil.findAllParallel([1, 2, 3, 4, 5], {it > 2})
             assert !(1 in result)
             assert !(1 in result)
             assert (3 in result)
@@ -66,7 +66,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSplit() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             def result = [1, 2, 3, 4, 5].splitParallel {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
@@ -80,7 +80,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSplitOnString() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             def result = 'abc'.splitParallel {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
@@ -95,8 +95,8 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testGrep() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final List result = ParallelArrayUtil.grepParallel([1, 2, 3, 4, 5], 3..6)
+        groovyx.gpars.GParsPool.withPool(5) {
+            final List result = GParsPoolUtil.grepParallel([1, 2, 3, 4, 5], 3..6)
             assert !(1 in result)
             assert !(1 in result)
             assert (3 in result)
@@ -107,79 +107,79 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testEmptyFindAll() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final List<Integer> result = ParallelArrayUtil.findAllParallel([1, 2, 3, 4, 5], {it > 6})
+        groovyx.gpars.GParsPool.withPool(5) {
+            final List<Integer> result = GParsPoolUtil.findAllParallel([1, 2, 3, 4, 5], {it > 6})
             assertEquals 0, result.size()
         }
     }
 
     public void testFind() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final def result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 2})
+        groovyx.gpars.GParsPool.withPool(5) {
+            final def result = GParsPoolUtil.findParallel([1, 2, 3, 4, 5], {it > 2})
             assert result in [3, 4, 5]
             assertEquals 3, result
         }
     }
 
     public void testEmptyFind() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final def result = ParallelArrayUtil.findParallel([1, 2, 3, 4, 5], {it > 6})
+        groovyx.gpars.GParsPool.withPool(5) {
+            final def result = GParsPoolUtil.findParallel([1, 2, 3, 4, 5], {it > 6})
             assertNull result
         }
     }
 
     public void testFindAny() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 2})
+        groovyx.gpars.GParsPool.withPool(5) {
+            final int result = GParsPoolUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 2})
             assert result in [3, 4, 5]
         }
     }
 
     public void testLazyFindAny() {
-        groovyx.gpars.ForkJoinPool.withPool(2) {
+        groovyx.gpars.GParsPool.withPool(2) {
             final AtomicInteger counter = new AtomicInteger(0)
-            final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
+            final int result = GParsPoolUtil.findAnyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
             assert result in [1, 2, 3, 4, 5]
             assert counter.get() <= 2
         }
     }
 
     public void testEmptyFindAny() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final int result = ParallelArrayUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 6})
+        groovyx.gpars.GParsPool.withPool(5) {
+            final int result = GParsPoolUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 6})
             assertNull result
         }
     }
 
     public void testAny() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            assert ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {it > 2})
-            assert !ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {it > 6})
+        groovyx.gpars.GParsPool.withPool(5) {
+            assert GParsPoolUtil.anyParallel([1, 2, 3, 4, 5], {it > 2})
+            assert !GParsPoolUtil.anyParallel([1, 2, 3, 4, 5], {it > 6})
         }
     }
 
     public void testLazyAny() {
         def counter = new AtomicInteger(0)
-        groovyx.gpars.ForkJoinPool.withPool(2) {
-            assert ParallelArrayUtil.anyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
+        groovyx.gpars.GParsPool.withPool(2) {
+            assert GParsPoolUtil.anyParallel([1, 2, 3, 4, 5], {counter.incrementAndGet(); it > 0})
         }
         assert counter.get() <= 2
     }
 
     public void testAll() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            assert ParallelArrayUtil.everyParallel([1, 2, 3, 4, 5], {it > 0})
-            assert !ParallelArrayUtil.everyParallel([1, 2, 3, 4, 5], {it > 1})
+        groovyx.gpars.GParsPool.withPool(5) {
+            assert GParsPoolUtil.everyParallel([1, 2, 3, 4, 5], {it > 0})
+            assert !GParsPoolUtil.everyParallel([1, 2, 3, 4, 5], {it > 1})
         }
     }
 
     @SuppressWarnings("GroovyOverlyComplexBooleanExpression")
     public void testGroupBy() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            assert ParallelArrayUtil.groupByParallel([1, 2, 3, 4, 5], {it > 2})
-            assert ParallelArrayUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> 1}).size() == 1
-            assert ParallelArrayUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> number}).size() == 5
-            final def groups = ParallelArrayUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> number % 2})
+        groovyx.gpars.GParsPool.withPool(5) {
+            assert GParsPoolUtil.groupByParallel([1, 2, 3, 4, 5], {it > 2})
+            assert GParsPoolUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> 1}).size() == 1
+            assert GParsPoolUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> number}).size() == 5
+            final def groups = GParsPoolUtil.groupByParallel([1, 2, 3, 4, 5], {Number number -> number % 2})
             assert groups.size() == 2
             assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
             assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
@@ -193,16 +193,16 @@ public class ParallelUtilTest extends GroovyTestCase {
         final CyclicBarrier barrier2 = new CyclicBarrier(2)
 
         def thread = new Thread({
-            groovyx.gpars.ForkJoinPool.withPool(2) {
-                final ForkJoinPool pool2 = groovyx.gpars.ForkJoinPool.retrieveCurrentPool()
+            groovyx.gpars.GParsPool.withPool(2) {
+                final ForkJoinPool pool2 = groovyx.gpars.GParsPool.retrieveCurrentPool()
                 reference.set pool2
                 barrier1.await()
                 barrier2.await()
             }
         } as Runnable)
         thread.start()
-        groovyx.gpars.ForkJoinPool.withPool(5) {
-            final ForkJoinPool pool1 = groovyx.gpars.ForkJoinPool.retrieveCurrentPool()
+        groovyx.gpars.GParsPool.withPool(5) {
+            final ForkJoinPool pool1 = groovyx.gpars.GParsPool.retrieveCurrentPool()
             barrier1.await()
             final ForkJoinPool nestedPool = reference.get() as ForkJoinPool
             assert pool1 != nestedPool
@@ -213,24 +213,24 @@ public class ParallelUtilTest extends GroovyTestCase {
     public void testMissingPool() {
         final AtomicInteger counter = new AtomicInteger(0)
         shouldFail(IllegalStateException.class) {
-            ParallelArrayUtil.eachParallel([], {counter.incrementAndGet()})
+            GParsPoolUtil.eachParallel([], {counter.incrementAndGet()})
         }
         assertEquals 0, counter.get()
     }
 
     public void testNestedPools() {
-        groovyx.gpars.ForkJoinPool.withPool {a ->
-            groovyx.gpars.ForkJoinPool.withPool {b ->
-                groovyx.gpars.ForkJoinPool.withPool {c ->
-                    groovyx.gpars.ForkJoinPool.withPool {d ->
+        groovyx.gpars.GParsPool.withPool {a ->
+            groovyx.gpars.GParsPool.withPool {b ->
+                groovyx.gpars.GParsPool.withPool {c ->
+                    groovyx.gpars.GParsPool.withPool {d ->
                         assert d != c != b != a
-                        assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == d
+                        assert groovyx.gpars.GParsPool.retrieveCurrentPool() == d
                     }
-                    assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == c
+                    assert groovyx.gpars.GParsPool.retrieveCurrentPool() == c
                 }
-                assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == b
+                assert groovyx.gpars.GParsPool.retrieveCurrentPool() == b
             }
-            assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == a
+            assert groovyx.gpars.GParsPool.retrieveCurrentPool() == a
         }
     }
 
@@ -238,21 +238,21 @@ public class ParallelUtilTest extends GroovyTestCase {
         final def pool1 = new ForkJoinPool()
         final def pool2 = new ForkJoinPool()
         final def pool3 = new ForkJoinPool()
-        groovyx.gpars.ForkJoinPool.withExistingPool(pool1) {a ->
-            groovyx.gpars.ForkJoinPool.withExistingPool(pool2) {b ->
-                groovyx.gpars.ForkJoinPool.withExistingPool(pool1) {c ->
-                    groovyx.gpars.ForkJoinPool.withExistingPool(pool3) {d ->
+        groovyx.gpars.GParsPool.withExistingPool(pool1) {a ->
+            groovyx.gpars.GParsPool.withExistingPool(pool2) {b ->
+                groovyx.gpars.GParsPool.withExistingPool(pool1) {c ->
+                    groovyx.gpars.GParsPool.withExistingPool(pool3) {d ->
                         assert d == pool3
                         assert c == pool1
                         assert b == pool2
                         assert a == pool1
-                        assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == pool3
+                        assert groovyx.gpars.GParsPool.retrieveCurrentPool() == pool3
                     }
-                    assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == pool1
+                    assert groovyx.gpars.GParsPool.retrieveCurrentPool() == pool1
                 }
-                assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == pool2
+                assert groovyx.gpars.GParsPool.retrieveCurrentPool() == pool2
             }
-            assert groovyx.gpars.ForkJoinPool.retrieveCurrentPool() == pool1
+            assert groovyx.gpars.GParsPool.retrieveCurrentPool() == pool1
         }
     }
 
@@ -263,7 +263,7 @@ public class ParallelUtilTest extends GroovyTestCase {
         } as UncaughtExceptionHandler
 
         shouldFail(RuntimeException.class) {
-            groovyx.gpars.ForkJoinPool.withPool(5, handler) {ForkJoinPool pool ->
+            groovyx.gpars.GParsPool.withPool(5, handler) {ForkJoinPool pool ->
                 'abc'.eachParallel {throw new RuntimeException('test')}
             }
         }
@@ -271,9 +271,9 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public testNestedCalls() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {pool ->
+        groovyx.gpars.GParsPool.withPool(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
-                groovyx.gpars.ForkJoinPool.withExistingPool(pool) {
+                groovyx.gpars.GParsPool.withExistingPool(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
@@ -282,7 +282,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testMin() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             assertEquals 1, [1, 2, 3, 4, 5].minParallel {a, b -> a - b}
             assertEquals 5, [1, 2, 3, 4, 5].minParallel {a, b -> b - a}
             assertEquals 1, [1, 2, 3, 4, 5].minParallel {it}
@@ -294,7 +294,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testMax() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             assertEquals 5, [1, 2, 3, 4, 5].maxParallel {a, b -> a - b}
             assertEquals 1, [1, 2, 3, 4, 5].maxParallel {a, b -> b - a}
             assertEquals 5, [1, 2, 3, 4, 5].maxParallel {it}
@@ -306,14 +306,14 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSum() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].sumParallel()
             assertEquals 'abc', 'abc'.sumParallel()
         }
     }
 
     public void testCount() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             assertEquals 1, [1, 2, 3, 4, 5].countParallel(3)
             assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(3)
             assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(6)
@@ -326,7 +326,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testReduce() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].foldParallel() {a, b -> a + b}
             assertEquals 'abc', 'abc'.foldParallel {a, b -> a + b}
             assertEquals 55, [1, 2, 3, 4, 5].collectParallel {it ** 2}.foldParallel {a, b -> a + b}
@@ -334,7 +334,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     }
 
     public void testSeededReduce() {
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].foldParallel(0) {a, b -> a + b}
             assertEquals 25, [1, 2, 3, 4, 5].foldParallel(10) {a, b -> a + b}
             assertEquals 'abc', 'abc'.foldParallel('') {a, b -> a + b}
@@ -345,7 +345,7 @@ public class ParallelUtilTest extends GroovyTestCase {
     public void testReduceThreads() {
         final ConcurrentHashMap map = new ConcurrentHashMap()
 
-        groovyx.gpars.ForkJoinPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool(5) {
             assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].foldParallel {a, b ->
                 Thread.sleep 200
                 map[Thread.currentThread()] = ''
@@ -363,7 +363,7 @@ public class ParallelUtilTest extends GroovyTestCase {
                 "every": false
         ]
         def x = [1, 2, 3]
-        groovyx.gpars.ForkJoinPool.withPool {
+        groovyx.gpars.GParsPool.withPool {
             methods.each {method, expected ->
                 assertEquals "Surprise when processing parallel version of $method", expected, x."${method}Parallel"({ it % 2 })
             }
@@ -372,7 +372,7 @@ public class ParallelUtilTest extends GroovyTestCase {
 
     public void testNonBooleanParallelFindAny() {
         def x = [1, 2, 3]
-        groovyx.gpars.ForkJoinPool.withPool {
+        groovyx.gpars.GParsPool.withPool {
             // Really just making sure it doesn't explode, but what the Hell...
             assert "Surprise when processing parallel version of find", x.findAnyParallel({ it % 2 }) in [1, 3]
         }

@@ -25,7 +25,7 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlows
-import static groovyx.gpars.ForkJoinPool.withPool
+import static groovyx.gpars.GParsPool.withPool
 
 def isPerfectSequetial(num) {
     def sum = 0

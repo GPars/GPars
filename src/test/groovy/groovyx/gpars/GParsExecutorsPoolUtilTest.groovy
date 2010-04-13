@@ -27,10 +27,10 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Vaclav Pech
  * Date: Oct 23, 2008
  */
-public class AsyncUtilTest extends GroovyTestCase {
+public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
 
     public void testAsyncClosure() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def result = Collections.synchronizedSet(new HashSet())
             final CountDownLatch latch = new CountDownLatch(5);
             final Closure cl = {Number number -> result.add(number * 10); latch.countDown()}
@@ -41,11 +41,11 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testCallParallel() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2)
-            AsyncInvokerUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
-            AsyncInvokerUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
+            GParsExecutorsPoolUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
+            GParsExecutorsPoolUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
             latch.await()
             assertEquals 2, resultA
             assertEquals 3, resultB
@@ -53,17 +53,17 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testCallParallelWithResult() {
-        ThreadPool.withPool(5) {ExecutorService service ->
-            assertEquals 6, AsyncInvokerUtil.callAsync({it * 2}, 3).get()
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
+            assertEquals 6, GParsExecutorsPoolUtil.callAsync({it * 2}, 3).get()
         }
     }
 
     public void testAsync() {
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def resultA = 0, resultB = 0
             final CountDownLatch latch = new CountDownLatch(2);
-            AsyncInvokerUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
-            AsyncInvokerUtil.async({int number -> resultB = number; latch.countDown()}).call(3);
+            GParsExecutorsPoolUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
+            GParsExecutorsPoolUtil.async({int number -> resultB = number; latch.countDown()}).call(3);
             latch.await()
             assertEquals 2, resultA
             assertEquals 3, resultB
@@ -71,30 +71,30 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testAsyncWithResult() {
-        ThreadPool.withPool(5) {ExecutorService service ->
-            assertEquals 6, AsyncInvokerUtil.async({it * 2}).call(3).get()
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
+            assertEquals 6, GParsExecutorsPoolUtil.async({it * 2}).call(3).get()
         }
     }
 
     public void testInvalidPoolSize() {
         shouldFail(IllegalArgumentException.class) {
-            ThreadPool.withPool(0) {}
+            GParsExecutorsPool.withPool(0) {}
         }
         shouldFail(IllegalArgumentException.class) {
-            ThreadPool.withPool(-10) {}
+            GParsExecutorsPool.withPool(-10) {}
         }
     }
 
     public void testMissingThreadFactory() {
         shouldFail(IllegalArgumentException.class) {
-            ThreadPool.withPool(5, null) {}
+            GParsExecutorsPool.withPool(5, null) {}
         }
     }
 
     public void testMissingThreadPool() {
         final AtomicInteger counter = new AtomicInteger(0)
         shouldFail(IllegalStateException.class) {
-            AsyncInvokerUtil.callAsync({counter.set it}, 1)
+            GParsExecutorsPoolUtil.callAsync({counter.set it}, 1)
         }
         assertEquals 0, counter.get()
     }
@@ -102,7 +102,7 @@ public class AsyncUtilTest extends GroovyTestCase {
     public void testLeftShift() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final Semaphore semaphore = new Semaphore(0)
-        ThreadPool.withPool(5) {ExecutorService service ->
+        GParsExecutorsPool.withPool(5) {ExecutorService service ->
             service << {flag.set(true); semaphore.release(); }
             semaphore.acquire()
             assert flag.get()
@@ -110,9 +110,9 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public testNestedCalls() {
-        ThreadPool.withPool(5) {pool ->
+        GParsExecutorsPool.withPool(5) {pool ->
             def result = ['abc', '123', 'xyz'].findAllParallel {word ->
-                ThreadPool.withExistingPool(pool) {
+                GParsExecutorsPool.withExistingPool(pool) {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
@@ -121,18 +121,18 @@ public class AsyncUtilTest extends GroovyTestCase {
     }
 
     public void testNestedPools() {
-        ThreadPool.withPool {a ->
-            ThreadPool.withPool {b ->
-                ThreadPool.withPool {c ->
-                    ThreadPool.withPool {d ->
+        GParsExecutorsPool.withPool {a ->
+            GParsExecutorsPool.withPool {b ->
+                GParsExecutorsPool.withPool {c ->
+                    GParsExecutorsPool.withPool {d ->
                         assert d != c != b != a
-                        assert ThreadPool.retrieveCurrentPool() == d
+                        assert GParsExecutorsPool.retrieveCurrentPool() == d
                     }
-                    assert ThreadPool.retrieveCurrentPool() == c
+                    assert GParsExecutorsPool.retrieveCurrentPool() == c
                 }
-                assert ThreadPool.retrieveCurrentPool() == b
+                assert GParsExecutorsPool.retrieveCurrentPool() == b
             }
-            assert ThreadPool.retrieveCurrentPool() == a
+            assert GParsExecutorsPool.retrieveCurrentPool() == a
         }
     }
 
@@ -140,21 +140,21 @@ public class AsyncUtilTest extends GroovyTestCase {
         final def pool1 = Executors.newFixedThreadPool(1)
         final def pool2 = Executors.newFixedThreadPool(1)
         final def pool3 = Executors.newFixedThreadPool(1)
-        ThreadPool.withExistingPool(pool1) {a ->
-            ThreadPool.withExistingPool(pool2) {b ->
-                ThreadPool.withExistingPool(pool1) {c ->
-                    ThreadPool.withExistingPool(pool3) {d ->
+        GParsExecutorsPool.withExistingPool(pool1) {a ->
+            GParsExecutorsPool.withExistingPool(pool2) {b ->
+                GParsExecutorsPool.withExistingPool(pool1) {c ->
+                    GParsExecutorsPool.withExistingPool(pool3) {d ->
                         assert d == pool3
                         assert c == pool1
                         assert b == pool2
                         assert a == pool1
-                        assert ThreadPool.retrieveCurrentPool() == pool3
+                        assert GParsExecutorsPool.retrieveCurrentPool() == pool3
                     }
-                    assert ThreadPool.retrieveCurrentPool() == pool1
+                    assert GParsExecutorsPool.retrieveCurrentPool() == pool1
                 }
-                assert ThreadPool.retrieveCurrentPool() == pool2
+                assert GParsExecutorsPool.retrieveCurrentPool() == pool2
             }
-            assert ThreadPool.retrieveCurrentPool() == pool1
+            assert GParsExecutorsPool.retrieveCurrentPool() == pool1
         }
     }
 }

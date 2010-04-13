@@ -77,7 +77,7 @@ contributor(actorBody) {
 }
 
 /**
- * Enhances closures within the ThreadPool blocks with async() and callAsync() methods
+ * Enhances closures within the GParsExecutorsPool blocks with async() and callAsync() methods
  */
 
 def ThreadPoolBody = context(ctype: "groovy.lang.Closure", scope: closureScope())
@@ -88,7 +88,7 @@ contributor(ThreadPoolBody) {
         def currentMethod = call.bind()
         def clazz = currentMethod?.containingClass
         final def clazzName = clazz?.qualName?.toUpperCase()
-        if (clazzName?.contains("THREADPOOL")) {
+        if (clazzName?.contains("GPARSPOOL") || clazzName?.contains("GPARSLEGACYPOOL")) {
             method name: "async", type: "groovy.lang.Closure"
             method name: "callAsync", type: "java.util.concurrent.Future"
             method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')

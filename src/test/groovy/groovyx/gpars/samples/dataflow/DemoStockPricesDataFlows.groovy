@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.ThreadPool
+import groovyx.gpars.GParsExecutorsPool
 import groovyx.gpars.dataflow.DataFlows
 
 /* Demonstrating how to process the results of various threads
@@ -28,7 +28,7 @@ All synchronization logic is hidden in the access to DataFlows.
  */
 
 /** Fetch the stock price for the end of that year from the yahoo REST service.
- * @return price as double or 0 if call failed.      */
+ * @return price as double or 0 if call failed.       */
 def getYearEndClosing(String stock, int year) {
     def url = "http://ichart.finance.yahoo.com/table.csv?s=$stock&amp;a=11&amp;b=01&amp;c=$year&amp;d=11&amp;e=31&amp;f=$year&amp;g=m;ignore=.csv"
     try {
@@ -43,7 +43,7 @@ def getYearEndClosing(String stock, int year) {
 def stocks = ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT']
 def price = new DataFlows() // key: stock name, value: price
 
-ThreadPool.withPool {
+GParsExecutorsPool.withPool {
     // spawn a thread per stock that stores the result in its DataFlow
     stocks.each({stock ->
         price[stock] = getYearEndClosing(stock, 2008)

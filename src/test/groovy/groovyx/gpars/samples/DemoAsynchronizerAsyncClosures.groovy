@@ -17,10 +17,10 @@
 package groovyx.gpars.samples
 
 /**
- * Demonstrates asynchronous processing using the ThreadPool class.
+ * Demonstrates asynchronous processing using the GParsExecutorsPool class.
  */
 
-groovyx.gpars.ThreadPool.withPool {
+groovyx.gpars.GParsExecutorsPool.withPool {
     /**
      * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
      * It will return a Future for the result value.
@@ -36,7 +36,7 @@ groovyx.gpars.ThreadPool.withPool {
     assert [2, 4, 6] == [1, 2, 3].collect(asyncDoubler)*.get()
 
     /**
-     * Run multiple asynchronous closures in parallel by combining ThreadPool methods with lists and operators
+     * Run multiple asynchronous closures in parallel by combining GParsExecutorsPool methods with lists and operators
      */
     final Closure doubler = {it * 2}
     final Closure modulo2 = {it % 2}

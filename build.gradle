@@ -36,26 +36,26 @@ bundleVersion = version
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
 jar {
-  manifest {
-    name = 'gpars'
-    version = this.version
-    symbolicName = 'gpars.org'
-    instruction 'Bundle-Vendor', theVendor
-    instruction 'Bundle-Description', group
-    instruction 'Bundle-DocURL', 'http://gpars.codehaus.org'
-    instruction 'Built-By', System.properties.'user.name'
-    instruction 'Extension-Name', archivesBaseName
-    instruction 'Specification-Title', theTitle
-    instruction 'Specification-Version', version
-    instruction 'Specification-Vendor', theVendor
-    instruction 'Implementation-Title', theTitle
-    instruction 'Implementation-Version', version
-    instruction 'Implementation-Vendor', theVendor
-    instruction 'Implementation-Title', archivesBaseName
-    instruction 'Implementation-Version', version
-    instruction 'provider', theVendor
-    instruction 'Export-Package', '*'
-  }
+    manifest {
+        name = 'gpars'
+        version = this.version
+        symbolicName = 'gpars.org'
+        instruction 'Bundle-Vendor', theVendor
+        instruction 'Bundle-Description', group
+        instruction 'Bundle-DocURL', 'http://gpars.codehaus.org'
+        instruction 'Built-By', System.properties.'user.name'
+        instruction 'Extension-Name', archivesBaseName
+        instruction 'Specification-Title', theTitle
+        instruction 'Specification-Version', version
+        instruction 'Specification-Vendor', theVendor
+        instruction 'Implementation-Title', theTitle
+        instruction 'Implementation-Version', version
+        instruction 'Implementation-Vendor', theVendor
+        instruction 'Implementation-Title', archivesBaseName
+        instruction 'Implementation-Version', version
+        instruction 'provider', theVendor
+        instruction 'Export-Package', '*'
+    }
 }
 
 repositories {

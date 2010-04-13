@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 /**
- * Holds a thread-local stack of pools to allow for nested calls to ForkJoinPool.withPool() or ThreadPool.withPool()
+ * Holds a thread-local stack of pools to allow for nested calls to ForkJoinPool.withPool() or GParsExecutorsPool.withPool()
  *
  * @author Vaclav Pech
  * Date: Dec 15, 2009

@@ -24,8 +24,7 @@ package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
-import static groovyx.gpars.ForkJoinPool.orchestrate
-import static groovyx.gpars.ForkJoinPool.withPool
+import static groovyx.gpars.GParsPool.withPool
 
 class ForkJoinFib extends AbstractForkJoinWorker {
 
@@ -54,12 +53,12 @@ withPool(2) {
 
     final long t1 = System.currentTimeMillis()
     try {
-        assert orchestrate(new ForkJoinFib(number: 30)) == 832040
+        assert runForkJoin(new ForkJoinFib(number: 30)) == 832040
 
-        assert ForkJoinFib.sequentialFib(31) == orchestrate(new ForkJoinFib(number: 31))
+        assert ForkJoinFib.sequentialFib(31) == runForkJoin(new ForkJoinFib(number: 31))
 
         try {
-            orchestrate(new ForkJoinFib(number: -1))
+            runForkJoin(new ForkJoinFib(number: -1))
         } catch (ExecutionException ignore) {
             println "We've correctly received an exception. That's what we deserve for calculating a negative Fibbonacci number."
         }

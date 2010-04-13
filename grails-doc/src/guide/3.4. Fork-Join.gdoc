@@ -16,8 +16,8 @@ h3. The GPars abstraction convenience layer
 GPars can hide the complexities of dealing with threads, pools and recursive tasks from you, yet let you leverage the powerful Fork/Join implementation in jsr166y.
 
 {code}
-import static groovyx.gpars.ForkJoinPool.orchestrate
-import static groovyx.gpars.ForkJoinPool.withPool
+import static runForkJoin
+import static groovyx.gpars.GParsPool.withPool
 
 withPool() {
     println """Number of files: ${
@@ -45,7 +45,7 @@ the number of arguments passed into the _forkOffChild()_ method.
 {code}
 def quicksort(numbers) {
     withPool {
-        groovyx.gpars.ForkJoinPool.orchestrate(0, numbers) {index, list ->
+        runForkJoin(0, numbers) {index, list ->
             def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
             if ((list.size() < 2) || (groups.size() == 1)) {
                 return [index: index, list: list.clone()]
@@ -57,7 +57,7 @@ def quicksort(numbers) {
 }
 {code}
 
-.h4 Alternative approach
+h4. Alternative approach
 
 Alternatively, the underlying mechanism of nested Fork/Join worker tasks can be used directly. Custom-tailored workers can
 eliminate the performance overhead associated with parameter spreading imposed when using the generic workers. Also, custom
@@ -103,8 +103,8 @@ Although the algorithm creates as many tasks as there are sub-directories and ta
 h3. Mergesort example
 
 {code}
-import static groovyx.gpars.ForkJoinPool.orchestrate
-import static groovyx.gpars.ForkJoinPool.withPool
+import static runForkJoin
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * Splits a list of numbers in half
@@ -156,7 +156,7 @@ withPool(3) {  //feel free to experiment with the number of fork/join threads in
     }"""
 }
 {code}
-h3. Mergesort example using custom-tailored worker
+h3. Mergesort example using a custom-tailored worker class
 
 {code}
 public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
@@ -221,3 +221,7 @@ withPool(1) {  //feel free to experiment with the number of fork/join threads in
     println "Sorted numbers: ${orchestrate(new SortWorker(numbers))}"
 }
 {code}
+
+h3. Availability
+
+This feature is only available when using in the Fork/Join-based _GParsPool_ , not in _GParsExecutorsPool_ .

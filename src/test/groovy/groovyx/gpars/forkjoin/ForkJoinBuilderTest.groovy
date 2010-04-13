@@ -18,8 +18,8 @@ package groovyx.gpars.forkjoin
 
 import groovyx.gpars.dataflow.DataFlows
 import java.util.concurrent.ExecutionException
-import static groovyx.gpars.ForkJoinPool.orchestrate
-import static groovyx.gpars.ForkJoinPool.withPool
+import static groovyx.gpars.GParsPool.runForkJoin
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  *
@@ -78,11 +78,11 @@ class ForkJoinBuilderTest extends GroovyTestCase {
         final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
 
         withPool(3) {
-            assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), orchestrate(numbers, mergeSortCode).toArray())
+            assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), runForkJoin(numbers, mergeSortCode).toArray())
         }
         withPool(1) {
             final TestSortWorker worker = new TestSortWorker(numbers)
-            assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), orchestrate(numbers, mergeSortCode).toArray())
+            assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), runForkJoin(numbers, mergeSortCode).toArray())
             assert [] == worker.getChildrenResults()
         }
     }
@@ -92,7 +92,7 @@ class ForkJoinBuilderTest extends GroovyTestCase {
 
         withPool(3) {
             shouldFail(ExecutionException) {
-                orchestrate(numbers, mergeSortCode)
+                runForkJoin(numbers, mergeSortCode)
             }
         }
     }
@@ -101,7 +101,7 @@ class ForkJoinBuilderTest extends GroovyTestCase {
         final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
 
         withPool(3) {
-            assertArrayEquals([1].toArray(), groovyx.gpars.ForkJoinPool.orchestrate(numbers, 'foo', true) {nums, stringValue, booleanValue ->
+            assertArrayEquals([1].toArray(), groovyx.gpars.GParsPool.runForkJoin(numbers, 'foo', true) {nums, stringValue, booleanValue ->
                 if (nums.size() > 1) {
                     forkOffChild(nums.subList(0, nums.size() - 1), stringValue, booleanValue)
                     return getChildrenResults()[0]
@@ -117,31 +117,31 @@ class ForkJoinBuilderTest extends GroovyTestCase {
 
         withPool(3) {
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate()
+                groovyx.gpars.GParsPool.runForkJoin()
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3)
+                groovyx.gpars.GParsPool.runForkJoin(1, 2, 3)
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {}
+                groovyx.gpars.GParsPool.runForkJoin(1, 2, 3) {}
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {->}
+                groovyx.gpars.GParsPool.runForkJoin(1, 2, 3) {->}
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate(1) {->}
+                groovyx.gpars.GParsPool.runForkJoin(1) {->}
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {a ->}
+                groovyx.gpars.GParsPool.runForkJoin(1, 2, 3) {a ->}
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate(1, 2, 3) {a, b ->}
+                groovyx.gpars.GParsPool.runForkJoin(1, 2, 3) {a, b ->}
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate() {a, b ->}
+                groovyx.gpars.GParsPool.runForkJoin() {a, b ->}
             }
             shouldFail(IllegalArgumentException) {
-                groovyx.gpars.ForkJoinPool.orchestrate(1) {a, b ->}
+                groovyx.gpars.GParsPool.runForkJoin(1) {a, b ->}
             }
         }
     }
@@ -151,28 +151,28 @@ class ForkJoinBuilderTest extends GroovyTestCase {
         final DataFlows df = new DataFlows()
 
         withPool(3) {
-            groovyx.gpars.ForkJoinPool.orchestrate(1, 2) {a, b ->
+            groovyx.gpars.GParsPool.runForkJoin(1, 2) {a, b ->
                 try {
                     forkOffChild(5)
                 } catch (Throwable t) {
                     df.e1 = t
                 }
             }
-            groovyx.gpars.ForkJoinPool.orchestrate(1, 2) {a, b ->
+            groovyx.gpars.GParsPool.runForkJoin(1, 2) {a, b ->
                 try {
                     forkOffChild(5, 2, 4)
                 } catch (Throwable t) {
                     df.e2 = t
                 }
             }
-            groovyx.gpars.ForkJoinPool.orchestrate() {->
+            groovyx.gpars.GParsPool.runForkJoin() {->
                 try {
                     forkOffChild(5)
                 } catch (Throwable t) {
                     df.e3 = t
                 }
             }
-            groovyx.gpars.ForkJoinPool.orchestrate(1, 2) {a, b ->
+            groovyx.gpars.GParsPool.runForkJoin(1, 2) {a, b ->
                 try {
                     forkOffChild()
                 } catch (Throwable t) {

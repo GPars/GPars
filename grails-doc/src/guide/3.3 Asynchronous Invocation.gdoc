@@ -1,0 +1,59 @@
+Running long-lasting tasks in the background belongs to the activities, the need for which arises quite frequently. Your main
+thread of execution wants to initialize a few calculations, downloads, searches or such, however, the results may not be needed
+immediately. *GPars* gives the developers the tools to schedule the asynchronous activities for processing in the background
+and collect the results once they're needed.
+
+h2. Usage of GParsPool and GParsExecutorsPool asynchronous processing facilities
+
+Both _GParsPool_ and _GParsExecutorsPool_ provide almost identical services in this domain, although they leverage different
+underlying machinery, based on which of the two classes the user chooses.
+
+h3. Closures enhancements
+
+The following methods are added to closures inside the _GPars(Executors)Pool.withPool()_ blocks:
+* async() - Creates an asynchronous variant of the supplied closure, which when invoked returns a future for the potential return value
+* callAsync() - Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
+
+Examples:
+{code}GParsPool.withPool() {
+    Closure longLastingCalculation = {calculate()}
+    Closure fastCalculation = longLastingCalculation.async()  //create a new closure, which starts the original closure on a thread pool
+    Future result=fastCalculation()                           //returns almost immediately
+    //do stuff while calculation performs ...
+    println result.get()
+}
+{code}
+
+{code}
+GParsPool.withPool() {
+    /**
+     * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
+     * It will return a Future for the result value.
+     */
+    assert 6 == {it * 2}.call(3)
+    assert 6 == {it * 2}.callAsync(3).get()
+}
+{code}
+h3. Executor Service enhancements
+
+The ExecutorService and jsr166y.forkjoin.ForkJoinPool class is enhanced with the << (leftShift) operator to submit tasks to the pool and return
+a _Future_ for the result.
+
+Example:
+{code}GParsExecutorsPool.withPool {ExecutorService executorService ->
+    executorService << {println 'Inside parallel task'}
+}
+{code}
+
+h3. Running functions (closures) in parallel
+
+The _GParsPool_ and _GParsExecutorsPool_ classes also provide handy methods _executeAsync()_ and _executeAsyncAndWait()_ to easily run multiple closures asynchronously.
+
+Example:
+{code}
+GParsPool.withPool {
+    assertEquals([10, 20], GParsPool.executeAsyncAndWait({calculateA()}, {calculateB()}))         //waits for results
+    assertEquals([10, 20], GParsPool.executeAsync({calculateA()}, {calculateB()})*.get())  //returns Futures instead and doesn't wait for results to be calculated
+}
+{code}
+
