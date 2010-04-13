@@ -18,10 +18,6 @@ package groovyx.gpars.actor
 
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.util.EnhancedRWLock
-import groovyx.gpars.util.PoolUtils
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadFactory
 import org.codehaus.groovy.runtime.NullObject
 
 /**
@@ -31,16 +27,8 @@ import org.codehaus.groovy.runtime.NullObject
  * Time: 9:21:59
  * To change this template use File | Settings | File Templates.
  */
-public class Agent<T> {
-    private static ExecutorService pool = Executors.newFixedThreadPool(PoolUtils.retrieveDefaultPoolSize(), new AgentThreadFactory())
-    private static ExecutorService orchestrationPool = Executors.newCachedThreadPool(new AgentThreadFactory())
-
+public class Agent<T> extends AgentHelper {
     //todo exception handlers
-
-    final private def msgs = new LinkedList()
-    final private def msgsLock = new Object()
-
-    private def active = false
 
     /**
      * Allows reads not to wait in the message queue.
@@ -145,21 +133,6 @@ public class Agent<T> {
         send {callback.call(copy(it))}
     }
 
-    /**
-     * Blocks until all messages in the queue prior to call to await() complete.
-     * Provides a means to synchronize with the Safe
-     */
-    final public void await() {
-        sendAndWait {}
-    }
-
-    public final send(message) {
-        synchronized (msgsLock) {
-            msgs.add(message)
-            schedule()
-        }
-    }
-
     final def sendAndWait(Closure message) {
         final DataFlowVariable result = new DataFlowVariable()
         this.send {
@@ -168,45 +141,15 @@ public class Agent<T> {
         return result.val
     }
 
-    public final leftShift(message) {
-        send message
+    /**
+     * Blocks until all messages in the queue prior to call to await() complete.
+     * Provides a means to synchronize with the Safe
+     */
+    final public void await() {
+        sendAndWait {}
     }
 
-    final void perform() {
-        def message
-        synchronized (msgsLock) {
-            message = msgs.poll()
-        }
-
-        try {
-            this.onMessage message
-        } finally {
-            synchronized (msgsLock) {
-                active = false
-                schedule()
-            }
-        }
-    }
-
-    private void schedule() {
-        if ((msgs.size() > 0) && (!active)) {
-            active = true
-            pool.submit({
-                try {
-                    this.perform()
-                } catch (Throwable e) {
-                    e.printStackTrace()
-                }
-            })
-        }
-    }
-}
-
-final class AgentThreadFactory implements ThreadFactory {
-
-    Thread newThread(Runnable r) {
-        final Thread thread = new Thread(r)
-        thread.daemon = true
-        return thread
+    void handleMessage(final Object message) {
+        onMessage message
     }
 }
