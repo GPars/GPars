@@ -17,6 +17,8 @@
 package groovyx.gpars.samples.agent
 
 import groovyx.gpars.agent.Agent
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * Create a new Agent wrapping a list of strings
@@ -25,6 +27,10 @@ import groovyx.gpars.agent.Agent
  * Date: 13.4.2010
  */
 def jugMembers = new Agent<List<String>>(['Me'])  //add Me
+
+//Optionally a custom thread pool can be attached
+final ExecutorService pool = Executors.newFixedThreadPool(10)
+jugMembers.attachToThreadPool pool
 
 jugMembers.send {it.add 'James'}  //add James
 
@@ -42,4 +48,6 @@ println jugMembers.val
 jugMembers.valAsync {println "Current members: $it"}
 
 jugMembers.await()
-//jugMembers.stop().join()
+
+//Shutdown the optional pool
+pool.shutdown()

@@ -20,6 +20,9 @@ import groovyx.gpars.actor.Actors
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -45,6 +48,21 @@ public class AgentTest extends GroovyTestCase {
 
         [t1, t2]*.join()
         assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
+    }
+
+    public void testCustomThreadPool() {
+        def jugMembers = new Agent<List>(['Me'])  //add Me
+        final ExecutorService pool = Executors.newFixedThreadPool(1)
+        jugMembers.attachToThreadPool pool
+
+        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.await()
+        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+
+        pool.shutdown()
+        shouldFail RejectedExecutionException, {
+            jugMembers.send 10
+        }
     }
 
     public void testListWithCloneCopyStrategy() {
@@ -229,19 +247,21 @@ public class AgentTest extends GroovyTestCase {
         assertEquals 'test', result.val
     }
 
-    public void _testException() {
-        final Agent counter = new Agent<Long>(0L)
-        final DataFlowVariable result = new DataFlowVariable()
-        counter.metaClass.onException = {result << it}
-        counter << {throw new RuntimeException('test')}
-        counter.join()
-        assertFalse counter.isActive()
-        shouldFail(IllegalStateException) {
-            counter.val
-        }
-        shouldFail(IllegalStateException) {
-            counter << {updateValue 1L}
-        }
-        assertNotNull result.val
+    public void testErrors() {
+        def jugMembers = new Agent<List>()
+        assert jugMembers.errors.empty
+
+        jugMembers.send {throw new IllegalStateException('test1')}
+        jugMembers.send {throw new IllegalArgumentException('test2')}
+        jugMembers.await()
+
+        List errors = jugMembers.errors
+        assertEquals(2, errors.size())
+        assert errors[0] instanceof IllegalStateException
+        assertEquals 'test1', errors[0].message
+        assert errors[1] instanceof IllegalArgumentException
+        assertEquals 'test2', errors[1].message
+
+        assert jugMembers.errors.empty
     }
 }

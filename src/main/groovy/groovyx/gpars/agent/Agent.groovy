@@ -25,11 +25,9 @@ import org.codehaus.groovy.runtime.NullObject
  * Date: 13.4.2010
  */
 public class Agent<T> extends AgentCore {
-    //todo exception handlers
-    //todo grouping actors and thread pools
-    //todo javadoc
-    //todo tutorial
     //todo reconsider Safe
+    //todo tutorial
+    //todo grouping actors and thread pools
 
     /**
      * Allows reads not to wait in the message queue.

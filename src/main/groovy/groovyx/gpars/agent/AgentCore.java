@@ -17,7 +17,12 @@
 package groovyx.gpars.agent;
 
 import groovyx.gpars.util.PoolUtils;
+import org.codehaus.groovy.runtime.NullObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +40,21 @@ public abstract class AgentCore {
      */
     private static final ExecutorService pool = Executors.newFixedThreadPool(PoolUtils.retrieveDefaultPoolSize(), new AgentThreadFactory());
 
+    private ExecutorService threadPool = pool;
+
+    public final ExecutorService getThreadPool() {
+        return threadPool;
+    }
+
+    public final void attachToThreadPool(final ExecutorService threadPool) {
+        this.threadPool = threadPool;
+    }
+
+    /**
+     * Holds agent errors
+     */
+    private final Collection<Exception> errors = new ConcurrentLinkedQueue<Exception>();
+
     /**
      * Incoming messages
      */
@@ -51,7 +71,7 @@ public abstract class AgentCore {
      * @param message A value or a closure
      */
     public final void send(final Object message) {
-        queue.add(message);
+        queue.add(message != null ? message : NullObject.getNullObject());
         schedule();
     }
 
@@ -90,16 +110,43 @@ public abstract class AgentCore {
      */
     void schedule() {
         if (!queue.isEmpty() && active.compareAndSet(false, true)) {
-            pool.submit(new Runnable() {
+            threadPool.submit(new Runnable() {
                 @SuppressWarnings({"CatchGenericClass"})
                 public void run() {
                     try {
                         AgentCore.this.perform();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        registerError(e);
                     }
                 }
             });
         }
+    }
+
+    /**
+     * Adds the exception to the list of thrown exceptions
+     *
+     * @param e The exception to store
+     */
+    @SuppressWarnings({"MethodOnlyUsedFromInnerClass"})
+    private void registerError(final Exception e) {
+        errors.add(e);
+    }
+
+    /**
+     * Retrieves a list of exception thrown within the agent's body.
+     * Clears the exception history
+     *
+     * @return A detached collection of exception that have occurred in the agent's body
+     */
+    public List<Exception> getErrors() {
+        final List<Exception> result = new ArrayList<Exception>(20);
+        final Iterator<Exception> iterator = errors.iterator();
+        while (iterator.hasNext()) {
+            final Exception error = iterator.next();
+            result.add(error);
+            iterator.remove();
+        }
+        return result;
     }
 }
