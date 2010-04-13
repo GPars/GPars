@@ -16,7 +16,7 @@
 
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.actor.Agent
+import groovyx.gpars.agent.Agent
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 

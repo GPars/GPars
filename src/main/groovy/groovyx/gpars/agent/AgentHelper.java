@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor;
+package groovyx.gpars.agent;
 
 import groovyx.gpars.util.PoolUtils;
 

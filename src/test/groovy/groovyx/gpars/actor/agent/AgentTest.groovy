@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor.safe
+package groovyx.gpars.actor.agent
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.Agent
+import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.atomic.AtomicBoolean
