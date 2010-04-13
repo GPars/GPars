@@ -1,22 +1,22 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-package groovyx.gpars.samples.actors.safe
+package groovyx.gpars.samples.safe
 
-import groovyx.gpars.actor.Safe
+import groovyx.gpars.agent.Safe
 
 /**
  * A thread-safe shopping cart, which can store purchased products together with their quantities.
@@ -40,14 +40,21 @@ class ShoppingCart {
     }
 
     public void increaseQuantity(String product, int quantityChange) {
-        cartState << this.&changeQuantity.curry(product, quantityChange)  //Submit the private changeQuantity() method as a function with the two parameters pre-filled
+        final Closure cl1 = this.&changeQuantity
+        println product
+        println quantityChange
+        final Closure cl2 = cl1.curry(product)
+        final Closure cl3 = cl2.curry(quantityChange)
+        cartState << cl3  //Submit the private changeQuantity() method as a function with the two parameters pre-filled
     }
 
     public void clearItems() {
         cartState << performClear  //Submit the private performClear() method as a function
     }
 
-    private void changeQuantity(String product, int quantityChange, Map items) {
+    //todo make private once private methods can be curried normally in Groovy
+
+    void changeQuantity(String product, int quantityChange, Map items) {
         items[product] = (items[product] ?: 0) + quantityChange
     }
 

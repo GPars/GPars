@@ -14,28 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.samples.safe
 
 import groovyx.gpars.agent.Safe
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 /**
- * @author Vaclav Pech
- * Date: 13.4.2010
+ * A thread-safe counter. Threads can submit commands, which increase or decrease the internal counter without fear
+ * of mutual races or lost updates.
  */
+final Safe counter = new Safe<Long>(0L)
 
-final ExecutorService pool = Executors.newFixedThreadPool(10)
-
-final long t1 = System.currentTimeMillis()
-final Safe safe = new Safe<Long>(0L)
-300.times {
-    1000.times {
-        pool.submit {safe << {updateValue(it + 1)}}
-    }
-    safe.await()
+final Thread t1 = Thread.start {
+    counter << {updateValue it + 1}
 }
-final long t2 = System.currentTimeMillis()
-println "Result: ${safe.val}"
-println "Time: ${t2 - t1}"
-pool.shutdown()
+
+final Thread t2 = Thread.start {
+    counter << {updateValue it + 6}
+}
+
+final Thread t3 = Thread.start {
+    counter << {updateValue it - 2}
+}
+
+[t1, t2, t3]*.join()
+
+assert 5 == counter.val

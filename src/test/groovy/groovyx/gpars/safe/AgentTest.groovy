@@ -14,15 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor.safe
+package groovyx.gpars.safe
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.Safe
+import groovyx.gpars.agent.Safe
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicBoolean
 
-public class SafeTest extends GroovyTestCase {
+/**
+ * @author Vaclav Pech
+ * Date: 13.4.2010
+ */
+public class AgentTest extends GroovyTestCase {
     public void testList() {
         def jugMembers = new Safe<List>(['Me'])  //add Me
 
@@ -41,6 +48,21 @@ public class SafeTest extends GroovyTestCase {
 
         [t1, t2]*.join()
         assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
+    }
+
+    public void testCustomThreadPool() {
+        def jugMembers = new Safe<List>(['Me'])  //add Me
+        final ExecutorService pool = Executors.newFixedThreadPool(1)
+        jugMembers.attachToThreadPool pool
+
+        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.await()
+        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+
+        pool.shutdown()
+        shouldFail RejectedExecutionException, {
+            jugMembers.send 10
+        }
     }
 
     public void testListWithCloneCopyStrategy() {
@@ -111,7 +133,7 @@ public class SafeTest extends GroovyTestCase {
 
         def result = new DataFlowStream()
         Actors.actor {
-            counter << {reply 'Explicit reply'; 10}
+            counter << {owner.send 'Explicit reply'; owner.send 10}
             react {a ->
                 react {b ->
                     result << a
@@ -161,7 +183,7 @@ public class SafeTest extends GroovyTestCase {
 
         def result = new DataFlowVariable()
         Actors.actor {
-            counter << {it}
+            counter << {owner.send it}
             react {
                 result << it
             }
@@ -170,22 +192,12 @@ public class SafeTest extends GroovyTestCase {
 
         result = new DataFlowVariable()
         Actors.actor {
-            counter << {null}
+            counter << {owner.send null}
             react {
                 result << it
             }
         }
         assertNull result.val
-
-        result = new DataFlowVariable()
-        Actors.actor {
-            counter << {}
-            react {
-                result << it
-            }
-        }
-        assertNull result.val
-
     }
 
     public void testAwait() {
@@ -235,19 +247,21 @@ public class SafeTest extends GroovyTestCase {
         assertEquals 'test', result.val
     }
 
-    public void testException() {
-        final Safe counter = new Safe<Long>(0L)
-        final DataFlowVariable result = new DataFlowVariable()
-        counter.metaClass.onException = {result << it}
-        counter << {throw new RuntimeException('test')}
-        counter.join()
-        assertFalse counter.isActive()
-        shouldFail(IllegalStateException) {
-            counter.val
-        }
-        shouldFail(IllegalStateException) {
-            counter << {updateValue 1L}
-        }
-        assertNotNull result.val
+    public void testErrors() {
+        def jugMembers = new Safe<List>()
+        assert jugMembers.errors.empty
+
+        jugMembers.send {throw new IllegalStateException('test1')}
+        jugMembers.send {throw new IllegalArgumentException('test2')}
+        jugMembers.await()
+
+        List errors = jugMembers.errors
+        assertEquals(2, errors.size())
+        assert errors[0] instanceof IllegalStateException
+        assertEquals 'test1', errors[0].message
+        assert errors[1] instanceof IllegalArgumentException
+        assertEquals 'test2', errors[1].message
+
+        assert jugMembers.errors.empty
     }
 }

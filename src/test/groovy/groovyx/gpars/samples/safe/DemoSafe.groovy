@@ -14,19 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.agent
+package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Agent
+import groovyx.gpars.agent.Safe
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
- * Create a new Agent wrapping a list of strings
- *
- * @author Vaclav Pech
- * Date: 13.4.2010
+ * Create a new Safe wrapping a list of strings
  */
-def jugMembers = new Agent<List<String>>(['Me'])  //add Me
+def jugMembers = new Safe<List<String>>(['Me'])  //add Me
 
 //Optionally a custom thread pool can be attached
 final ExecutorService pool = Executors.newFixedThreadPool(10)

@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.actors.safe
+package groovyx.gpars.samples.safe
 
-import groovyx.gpars.actor.Safe
+import groovyx.gpars.agent.Safe
 
 /**
  * Conference stores number of registrations and allows parties to register and unregister.
@@ -53,5 +53,4 @@ final Thread t3 = Thread.start {
 [t1, t2, t3]*.join()
 
 assert 12L == conference.val
-conference.stop().join()
 

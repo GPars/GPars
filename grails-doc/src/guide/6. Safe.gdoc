@@ -99,7 +99,7 @@ assert 12 == conference.val
 h2. The shopping cart example
 
 {code}
-import groovyx.gpars.actor.Safe
+import groovyx.gpars.agent.Safe
 
 class ShoppingCart {
     private def cartState = new Safe([:])

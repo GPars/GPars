@@ -21,13 +21,33 @@ import groovyx.gpars.util.EnhancedRWLock
 import org.codehaus.groovy.runtime.NullObject
 
 /**
+ * A special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
+ * Agents safe-guard mutable values by allowing only a single agent-managed thread to make modifications to them.
+ * The mutable values are not directly accessible from outside, but instead requests have to be sent to the agent
+ * and the agent guarantees to process the requests sequentially on behalf of the callers. Agents guarantee sequential
+ * execution of all requests and so consistency of the values. 
+ * A Safe wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands)
+ * as messages, which can be sent to the Safe just like to any other actor using the '<<' operator
+ * or any of the send() methods.
+ * After reception of a closure / command, the closure is invoked against the internal mutable field. The closure is guaranteed
+ * to be run without intervention from other threads and so may freely alter the internal state of the Safe
+ * held in the internal <i>data</i> field.
+ * The return value of the submitted closure is sent in reply to the sender of the closure.
+ * If the message sent to a Safe is not a closure, it is considered to be a new value for the internal
+ * reference field. The internal reference can also be changed using the updateValue() method from within the received
+ * closures.
+ * The 'val' property of a Safe will safely return the current value of the Safe, while the valAsync() method
+ * will do the same without blocking the caller.
+ * The 'instantVal' property will retrieve the current value of the Safe without having to wait in the queue of tasks.
+ * The initial internal value can be passed to the constructor. The two-parameter constructor allows to alter the way
+ * the internal value is returned from val/valAsync. By default the original reference is returned, but in many scenarios a copy
+ * or a clone might be more appropriate.
+ *
  * @author Vaclav Pech
- * Date: 13.4.2010
+ * Date: Jul 2, 2009
  */
-public class Agent<T> extends AgentCore {
-    //todo reconsider Safe
-    //todo tutorial
-    //todo grouping actors and thread pools
+public class Safe<T> extends AgentCore {
+    //todo tutorial - grouping actors and thread pools, error handling, replies, packages in samples, non-private method in Cart demo
 
     /**
      * Allows reads not to wait in the message queue.
@@ -49,7 +69,7 @@ public class Agent<T> extends AgentCore {
     /**
      * Creates a new Safe with the internal state set to null
      */
-    def Agent() {
+    def Safe() {
         this(null)
     }
 
@@ -57,7 +77,7 @@ public class Agent<T> extends AgentCore {
      * Creates a new Safe around the supplied modifiable object
      * @param data The object to use for storing the internal state of the variable
      */
-    def Agent(final T data) {
+    def Safe(final T data) {
         this.data = data
     }
 
@@ -66,7 +86,7 @@ public class Agent<T> extends AgentCore {
      * @param data The object to use for storing the internal state of the variable
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      */
-    def Agent(final T data, final Closure copy) {
+    def Safe(final T data, final Closure copy) {
         this.data = data
         this.copy = copy
     }
