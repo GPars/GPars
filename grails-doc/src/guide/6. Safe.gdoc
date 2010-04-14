@@ -1,15 +1,23 @@
-The SafeVariable class, which is a special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
+The Safe class, which is a thread-safe non-blocking shared mutable state wrapper implementation inspired by Agents in Clojure.
 
-{note:title=Pending rename}
-Until 0.8 versions, this concept was called SafeVariable. Since 0.9 it will simply called Safe.
-This page reflects usage in the 0.8 version.
+{note:title=Shared Mutable State can't be avoided}
+A lot of the concurrency problems disappear when you eliminate the need for Shared Mutable State with your architecture.
+Indeed, concepts like actors, CSP or dataflow concurrency avoid or isolate mutable state completely.
+In some cases, however, sharing mutable data is either inevitable or makes the design more natural and understandable. Think, for example,
+of a shopping cart in a typical e-commerce application, when multiple AJAX requests may hit the cart with read or write requests concurrently.
 {note}
 
 h1. Introduction
 
-In the Clojure programing language you can find a concept of Agents, which essentially behave like actors accepting code (functions) as messages. After reception the received function is run against the internal state of the Agent and the return value of the function is considered to be the new internal state of the Agent.
+In the Clojure programing language you can find a concept of Agents, the purpose of which is to protect mutable data that need to be shared across threads.
+Agents hide the data and protect it from direct access. Clients can only send commands (functions) to the agent. The commands will be serialized and processed against the data one-by-one in turn.
+With the commands being executed serially the commands do not need to care about concurrency and can assume the data is all theirs when run.
+Although implemented differently, GPars Agents, called _Safe_ , fundamentally behave like actors. They accept messages and process them asynchronously.
+The messages, however, must be commands (functions or Groovy closures) and will be executed inside the agent.
+After reception the received function is run against the internal state of the Agent and the return value of the function is considered to be the new internal state of the Agent.
 
-Essentially, agents safe-guard mutable values by allowing only a single *agent-managed thread* to make modifications to them. The mutable values are *not directly accessible* from outside, but instead *requests have to be sent to the agent* and the agent guarantees to process the requests sequentially on behalf of the callers. Agents guarantee sequential execution of all requests and so consistency of the values.
+Essentially, agents safe-guard mutable values by allowing only a single *agent-managed thread* to make modifications to them. The mutable values are *not directly accessible* from outside, but instead *requests have to be sent to the agent* and the agent guarantees to process the requests sequentially on behalf of the callers.
+Agents guarantee sequential execution of all requests and so consistency of the values.
 
 Schematically:
 {code}agent = new Agent(0)  //created a new Agent wrapping an integer with initial value 0
@@ -24,28 +32,33 @@ To wrap integers, we can certainly use AtomicXXX types on the Java platform, but
 
 h1. Concepts
 
-GPars provides a SafeVariable class, which is a special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
+GPars provides a Safe class, which is a special-purpose thread-safe non-blocking implementation inspired by Agents in Clojure.
 
-A SafeVariable wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands) as messages, which can be sent to the SafeVariable just like to any other actor using the '<<' operator or any of the send() methods. After reception of a closure / command, the closure is invoked against the internal mutable field and can make changes to it. The closure is guaranteed to be run without intervention from other threads and so may freely alter the internal state of the SafeVariable held in the internal <i>data</i> field.
+A Safe wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands) as messages, which can be sent to the Safe just like to any other actor using the '<<' operator or the send() methods.
+At some point after reception of a closure / command, the closure is invoked against the internal mutable field and can make changes to it. The closure is guaranteed to be run without intervention from other threads and so may freely alter the internal state of the Safe held in the internal <i>data</i> field.
 
-The whole update process is of the fire-and-forget type, since once the message (closure) is sent to the SafeVariable, the caller thread can go off to do other things and come back later to check the current value with SafeVariable.val or SafeVariable.valAsync(closure).
+The whole update process is of the fire-and-forget type, since once the message (closure) is sent to the Safe, the caller thread can go off to do other things and come back later to check the current value with Safe.val or Safe.valAsync(closure).
 
 h3. Basic rules
-* The *return value* of the submitted closure is *sent in reply* to the sender of the closure.
-* If the message sent to a _SafeVariable_ is *not a closure*, it is considered to be a *new value* for the internal reference field.
-* The internal reference can also be changed using the *updateValue() method* from within the received closures.
-* The _val_ property of a _SafeVariable_ will safely return the current value of the SafeVariable.
+* When executed, the submitted commands obtain the agent's state ar a parameter.
+* The submitted commands /closures can call any methods on the agent's state.
+* Replacing the state object with a new one is also possible and is done using the *updateValue() method*.
+* The *return value* of the submitted closure doesn't have a special meaning and is ignored.
+* If the message sent to a _Safe_ is *not a closure*, it is considered to be a *new value* for the internal reference field.
+* The _val_ property of a _Safe_ will wait until all preceding commands in the agent's queue are consumed and then safely return the value of the Safe.
+* The _instantVal_ property will return an immediate snapshot of the internal agent's state.
 * The _valAsync()_ method will do the same *without blocking* the caller.
-* Since a _SafeVariable_ is an actor, you can call _stop()_ and _join()_ methods on it to shut it down explicitly.
+* All Safe instances share a default daemon thread pool. Setting the _threadPool_ property of a Safe instance will allow it to use a different thread pool.
+* Exceptions thrown by the commands can be collected using the _errors_ property.
 
 h1. Examples
 
 h2. Shared list of members
 
-The SafeVariable wraps a list of members, who have been added to the jug. To add a new member a message (command to add a member) has to be sent to the _jugMembers_ SafeVariable.
-{code}import groovyx.gpars.actor.SafeVariable
+The Safe wraps a list of members, who have been added to the jug. To add a new member a message (command to add a member) has to be sent to the _jugMembers_ Safe.
+{code}import groovyx.gpars.actor.Safe
 
-def jugMembers = new SafeVariable<List>(['Me'])  //add Me
+def jugMembers = new Safe<List>(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
 
@@ -68,16 +81,16 @@ jugMembers.stop()
 
 h2. Shared conference counting number of registrations
 
-The Conference class allows registration and unregistration, however these methods can only be called from the commands sent to the _conference_ SafeVariable.
-{code}import groovyx.gpars.actor.SafeVariable
+The Conference class allows registration and unregistration, however these methods can only be called from the commands sent to the _conference_ Safe.
+{code}import groovyx.gpars.actor.Safe
 
-class Conference extends SafeVariable {
+class Conference extends Safe {
     def Conference() { super(0L) }
     private def register(long num) { data += num }
     private def unregister(long num) { data -= num }
 }
 
-final SafeVariable conference = new Conference()
+final Safe conference = new Conference()
 
 final Thread t1 = Thread.start {
     conference << {register(10)}
@@ -106,7 +119,7 @@ class ShoppingCart {
 //----------------- public methods below here ----------------------------------
     public void addItem(String product, int quantity) {
         cartState << {it[product] = quantity}  //the << operator sends
-                                               //a message to the SafeVariable
+                                               //a message to the Safe
     }    public void removeItem(String product) {
         cartState << {it.remove(product)}
     }    public Object listContent() {
@@ -171,7 +184,7 @@ private Closure performClear = { it.clear() }
 h2. The printer service example
 
 Another example - a not thread-safe printer service shared by multiple threads. The printer needs to have the document and quality properties set before printing, so obviously a potential for race conditions if not guarded properly. Callers don't want to block until the printer is available, which the fire-and-forget nature of actors solves very elegantly.
-{code}import groovyx.gpars.actor.SafeVariable
+{code}import groovyx.gpars.actor.Safe
 
 class PrinterService {
     String document
@@ -184,7 +197,7 @@ class PrinterService {
     }
 }
 
-def printer = new SafeVariable<PrinterService>(new PrinterService())
+def printer = new Safe<PrinterService>(new PrinterService())
 
 final Thread thread1 = Thread.start {
     for (num in (1..3)) {

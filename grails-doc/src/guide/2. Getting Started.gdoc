@@ -5,3 +5,28 @@ Let's make several assumptions before we really start.
 # You have at least some understanding that in concurrent code some things can happen at any time in any order and often more of them at the same time.
 
 That's about it. Let's roll the ball forward.
+
+h2. Brief overview
+
+*GPars* aims to bring several useful concurrency abstractions to the Groovy developers. It's becoming obvious that dealing
+with concurrency on the thread/synchronized/lock level, as provided by the JVM, is way too low level to be safe and comfortable.
+Many high-level concepts, like actors or dataflow concurrency have been around for quite some time, since parallel computers
+had been in use in computer centers long before multi-core chips hit the hardware mainstream. Now, however, it's the time to
+adopt and test these abstractions for the mainstream software industry.
+
+The concepts available in GPars can be categorized into three main groups:
+# Code-level helpers - constructs that can be applied to small parts of the code-base such as individual algorithms or data structures without any major changes in the overall project architecture
+** Parallel Collections
+** Asynchronous Processing
+** Fork/Join (Divide/Conquer)
+
+# Architecture-level concepts - constructs that need to be taken into account when designing the project structure
+** Actors
+** Communicating Sequential Processes
+** Dataflow Concurrency
+
+# Shared Mutable State Protection - although about 95\ of current use of shared mutable state can be avoided using proper abstractions, good abstractions are still necessary for the remaining 5% use cases, when shared mutable state can't be avoided
+** Agents
+** Software Transactional Memory (not implemented in GPars yet) would also belong to this group
+
+
