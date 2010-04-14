@@ -17,13 +17,7 @@
 package groovyx.gpars
 
 /**
- * ParallelEnhancer allows classes or instances to be enhanced with parallel variants of iterative methods,
- * like eachParallel(), collectParallel(), findAllParallel() and others. These operations split processing into multiple
- * concurrently executable tasks and perform them on the underlying instance of the ForkJoinPool class from JSR-166y.
- * The Parallel class is mixed-in the enhanced instances or classes and delegates to the GParsPoolUtil class
- * to perform the actual parallel implementation.
- * The collections returned from collect(), findAll() and grep() are again mixed with a Parallel instance,
- * so they also have the parallel iterative methods available on them.
+ * The Parallel interface holds methods that ParallelEnhancer adds to classes or instances when they get enhanced.
  *
  * @author Vaclav Pech
  * Date: Nov 1, 2009
