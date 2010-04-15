@@ -3774,6 +3774,7 @@
         <option name="myLocal" value="true" />
         <inspection_tool class="AbstractBeanReferencesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="AccessStaticViaInstance" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="AndroidDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="Annotator" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="AntDuplicateImportedTargetsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AntDuplicateTargetsInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -3889,6 +3890,7 @@
         <inspection_tool class="ExceptionCaughtLocallyJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExtendsAnnotation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExtendsObject" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="FaceletsDetectingInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="FacesModelInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="FallthroughInSwitchStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="FieldCanBeLocal" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -3993,6 +3995,7 @@
         <inspection_tool class="JSUnresolvedVariable" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUntypedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnusedLocalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSValidateJSON" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSValidateTypes" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JavaDoc" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="TOP_LEVEL_CLASS_OPTIONS">
@@ -4052,6 +4055,7 @@
         <inspection_tool class="MalformedFormatString" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MalformedRegex" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MalformedXPath" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ManualArrayCopy" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ManualArrayToCollectionCopy" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MavenModelInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -4075,6 +4079,7 @@
           <option name="REPORT_ANNOTATION_NOT_PROPAGATED_TO_OVERRIDERS" value="true" />
         </inspection_tool>
         <inspection_tool class="NumberEquality" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="NumericOverflow" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ObjectEqualsNull" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OctalLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OneWayWebMethod" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -4444,12 +4449,18 @@
       <words>
         <w>arial</w>
         <w>barriered</w>
+        <w>cest</w>
         <w>chans</w>
         <w>csize</w>
         <w>dest</w>
+        <w>groovyx</w>
+        <w>jcsp</w>
+        <w>kerridge</w>
+        <w>negator</w>
         <w>restarter</w>
         <w>spooler</w>
         <w>spoolers</w>
+        <w>sqrt</w>
       </words>
     </dictionary>
     <dictionary name="vaclav">

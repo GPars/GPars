@@ -32,8 +32,8 @@ meassureThreadPool(numOfWarmupIterations, items)
 time = meassureThreadPool(numOfIterations, items)
 println "ThreadPool $time"
 
-meassureForkJoinPool(numOfWarmupIterations, items)
-time = meassureForkJoinPool(numOfIterations, items)
+measureForkJoinPool(numOfWarmupIterations, items)
+time = measureForkJoinPool(numOfIterations, items)
 println "ForkJoinPool $time"
 
 long measureSequential(iterations, List list) {
@@ -62,7 +62,7 @@ long measureThreadPool(iterations, List list) {
     return t2 - t1
 }
 
-long meassureForkJoinPool(iterations, List list) {
+long measureForkJoinPool(iterations, List list) {
     final long t1 = System.currentTimeMillis()
     GParsPool.withPool(30) {
         for (i in iterations) {
