@@ -8,10 +8,20 @@ h3. Project changes
 
 h3. Parallel collections
 
-* Renamed the Parallelizer and Asynchronizer classes to more appropriate GParsPool and GParsExecutorsPool
+* Renamed the Parallelizer and Asynchronizer classes to more appropriate GParsPool and GParsExecutorsPool as well as their methods
+* Enabled asynchronous closures inside the GParsPool.withPool() methods
 * Reorganized the asynchronous closure invocation functionality
-* Unified the GParsPool and GParsExecutorsPool functionality
-* Improved the map/reduce performance
+* Unified the GParsPool and GParsExecutorsPool functionality to eliminate the need to combine using the two classes
+* Improved the map/reduce performance by eliminating unnecessary conversions
+
+h4. Renaming hints
+Parallelizer -> GParsPool
+Asynchronizer -> GParsExecutorsPool
+doParallel() -> withPool()
+withParallelizer() -> withPool()
+withExistingParallelizer() -> withExistingPool()
+withAsynchronizer() -> withPool()
+withExistingAsynchronizer() -> withExistingPool()
 
 h3. Fork / Join
 
