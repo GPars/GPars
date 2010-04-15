@@ -308,3 +308,13 @@ The property gets cleared once read.
 
     assert jugMembers.errors.empty
 {code}
+
+h2. Fair and Non-fair agents
+
+Agents can be either fair or non-fair. Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
+As a result, non-fair agents tends to perform better than fair ones.
+The default setting for all Safe instances is to be *non-fair*, however by calling its _makeFair()_ method the instance can be made fair.
+{code}
+    def jugMembers = new Safe<List>(['Me'])  //add Me
+    jugMembers.makeFair()
+{code}

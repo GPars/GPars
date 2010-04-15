@@ -42,7 +42,7 @@ public abstract class AgentCore implements Runnable {
     /**
      * The thread pool to use with this agent
      */
-    private ExecutorService threadPool = pool;
+    private volatile ExecutorService threadPool = pool;
 
     /**
      * Retrieves the thread pool used by the agent
@@ -60,6 +60,31 @@ public abstract class AgentCore implements Runnable {
      */
     public final void attachToThreadPool(final ExecutorService threadPool) {
         this.threadPool = threadPool;
+    }
+
+    /**
+     * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
+     */
+    private volatile boolean fair = false;
+
+    /**
+     * Retrieves the agent's fairness flag
+     * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
+     * Non-fair agents tends to perform better than fair ones.
+     *
+     * @return True for fair agents, false for non-fair ones. Agents are non-fair by default.
+     */
+    public boolean isFair() {
+        return fair;
+    }
+
+    /**
+     * Makes the agent fair. Agents are non-fair by default.
+     * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
+     * Non-fair agents tends to perform better than fair ones.
+     */
+    public void makeFair() {
+        this.fair = true;
     }
 
     /**
@@ -122,8 +147,12 @@ public abstract class AgentCore implements Runnable {
     @SuppressWarnings({"CatchGenericClass"})
     public void run() {
         try {
-            final Object message = queue.poll();
-            if (message != null) this.handleMessage(message);
+            Object message = queue.poll();
+            while (message != null) {
+                this.handleMessage(message);
+                if (fair) break;
+                message = queue.poll();
+            }
         } catch (Exception e) {
             registerError(e);
         } finally {
