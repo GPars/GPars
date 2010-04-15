@@ -26,7 +26,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
  * @author Vaclav Pech
@@ -75,7 +75,10 @@ public abstract class AgentCore implements Runnable {
     /**
      * Indicates, whether there's an active thread handling a message inside the agent's body
      */
-    private final AtomicBoolean active = new AtomicBoolean(false);
+    private volatile int active = PASSIVE;
+    private static final AtomicIntegerFieldUpdater<AgentCore> activeUpdater = AtomicIntegerFieldUpdater.newUpdater(AgentCore.class, "active");
+    private static final int PASSIVE = 0;
+    private static final int ACTIVE = 1;
 
     /**
      * Adds the message to the agent\s message queue
@@ -108,7 +111,7 @@ public abstract class AgentCore implements Runnable {
      * Schedules processing of a next message, if there are some and if there isn't an active thread handling a message at the moment
      */
     void schedule() {
-        if (!queue.isEmpty() && active.compareAndSet(false, true)) {
+        if (!queue.isEmpty() && activeUpdater.compareAndSet(this, PASSIVE, ACTIVE)) {
             threadPool.submit(this);
         }
     }
@@ -124,7 +127,7 @@ public abstract class AgentCore implements Runnable {
         } catch (Exception e) {
             registerError(e);
         } finally {
-            active.set(false);
+            activeUpdater.set(this, PASSIVE);
             schedule();
         }
     }
