@@ -25,7 +25,7 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlows
-import static groovyx.gpars.Parallelizer.doParallel
+import static groovyx.gpars.GParsPool.withPool
 
 def isPerfectSequetial(num) {
     def sum = 0
@@ -61,7 +61,7 @@ def isPerfectWithDF(Integer num) {
     return sum == 2 * num
 }
 
-doParallel {
+withPool {
     assert isPerfectSequetial(6)
     assert !isPerfectWithDF(2)
     assert isPerfectWithDF(6)

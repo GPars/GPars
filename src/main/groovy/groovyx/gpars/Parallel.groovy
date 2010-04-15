@@ -17,13 +17,7 @@
 package groovyx.gpars
 
 /**
- * ParallelEnhancer allows classes or instances to be enhanced with parallel variants of iterative methods,
- * like eachParallel(), collectParallel(), findAllParallel() and others. These operations split processing into multiple
- * concurrently executable tasks and perform them on the underlying instance of the ForkJoinPool class from JSR-166y.
- * The Parallel class is mixed-in the enhanced instances or classes and delegates to the ParallelArrayUtil class
- * to perform the actual parallel implementation.
- * The collections returned from collect(), findAll() and grep() are again mixed with a Parallel instance,
- * so they also have the parallel iterative methods available on them.
+ * The Parallel interface holds methods that ParallelEnhancer adds to classes or instances when they get enhanced.
  *
  * @author Vaclav Pech
  * Date: Nov 1, 2009
@@ -39,8 +33,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def eachParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.eachParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.eachParallel(mixedIn[Object], cl)
         }
     }
 
@@ -53,8 +47,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def eachWithIndexParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.eachWithIndexParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.eachWithIndexParallel(mixedIn[Object], cl)
         }
     }
 
@@ -66,8 +60,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      * */
     public def collectParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(ParallelArrayUtil.collectParallel(mixedIn[Object], cl))
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            enhance(GParsPoolUtil.collectParallel(mixedIn[Object], cl))
         }
     }
 
@@ -79,8 +73,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findAllParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(ParallelArrayUtil.findAllParallel(mixedIn[Object], cl))
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            enhance(GParsPoolUtil.findAllParallel(mixedIn[Object], cl))
         }
     }
 
@@ -92,8 +86,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def grepParallel(Object filter) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(ParallelArrayUtil.grepParallel(mixedIn[Object], filter))
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            enhance(GParsPoolUtil.grepParallel(mixedIn[Object], filter))
         }
     }
 
@@ -105,8 +99,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def splitParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(ParallelArrayUtil.splitParallel(mixedIn[Object], cl))
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            enhance(GParsPoolUtil.splitParallel(mixedIn[Object], cl))
         }
     }
 
@@ -118,8 +112,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def countParallel(Object filter) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(ParallelArrayUtil.countParallel(mixedIn[Object], filter))
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            enhance(GParsPoolUtil.countParallel(mixedIn[Object], filter))
         }
     }
 
@@ -131,8 +125,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.findParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.findParallel(mixedIn[Object], cl)
         }
     }
 
@@ -147,8 +141,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def findAnyParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.findAnyParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.findAnyParallel(mixedIn[Object], cl)
         }
     }
 
@@ -160,8 +154,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public boolean everyParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.everyParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.everyParallel(mixedIn[Object], cl)
         }
     }
 
@@ -175,8 +169,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public boolean anyParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.anyParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.anyParallel(mixedIn[Object], cl)
         }
     }
 
@@ -188,8 +182,8 @@ final class Parallel {
      * If any of the collection's elements causes the closure to throw an exception, the exception is re-thrown.
      */
     public def groupByParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.groupByParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.groupByParallel(mixedIn[Object], cl)
         }
     }
 
@@ -199,15 +193,15 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
      * @param cl A one or two-argument closure
      */
     public def minParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.minParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.minParallel(mixedIn[Object], cl)
         }
     }
 
@@ -215,12 +209,12 @@ final class Parallel {
      * Creates a Parallel Array out of the supplied collection/object and invokes its min() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the minimum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public def minParallel() {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.minParallel(mixedIn[Object])
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.minParallel(mixedIn[Object])
         }
     }
 
@@ -230,15 +224,15 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * If the supplied closure takes two arguments it is used directly as a comparator.
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
      * @param cl A one or two-argument closure
      */
     public def maxParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.maxParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.maxParallel(mixedIn[Object], cl)
         }
     }
 
@@ -246,12 +240,12 @@ final class Parallel {
      * Creates a Parallel Array out of the supplied collection/object and invokes its max() method using the default comparator.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the maximum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public def maxParallel() {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.maxParallel(mixedIn[Object])
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.maxParallel(mixedIn[Object])
         }
     }
 
@@ -260,12 +254,12 @@ final class Parallel {
      * method with the + operator and the reduction operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the sum of the elements in the collection.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public def sumParallel() {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.sumParallel(mixedIn[Object])
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.sumParallel(mixedIn[Object])
         }
     }
 
@@ -275,12 +269,12 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public def foldParallel(Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.foldParallel(mixedIn[Object], cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.foldParallel(mixedIn[Object], cl)
         }
     }
 
@@ -290,24 +284,24 @@ final class Parallel {
      * The closure will be effectively invoked concurrently on the elements of the collection.
      * After all the elements have been processed, the method returns the reduction result of the elements in the collection.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
-     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withParallelizer</i> block
-     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>ParallelArrayUtil</i> class.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * @param seed A seed value to initialize the operation
      */
     public def foldParallel(seed, Closure cl) {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.foldParallel(mixedIn[Object], seed, cl)
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.foldParallel(mixedIn[Object], seed, cl)
         }
     }
 
     /**
-     * Creates a ParallelCollection around a ParallelArray wrapping te elements of the original collection.
+     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
-    public ParallelCollection getParallel() {
-        Parallelizer.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            ParallelArrayUtil.getParallel(mixedIn[Object])
+    public PAWrapper getParallel() {
+        GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
+            GParsPoolUtil.getParallel(mixedIn[Object])
         }
     }
 
@@ -318,15 +312,15 @@ final class Parallel {
 
     /**
      * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
-     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the ParallelArrayUtil class
+     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
      * After mixing-in, the isTransparent() method will return true.
-     * Delegates to ParallelArrayUtil.makeTransparent().
+     * Delegates to GParsPoolUtil.makeTransparent().
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
     static Object makeTransparent(Object collection) {
-        ParallelArrayUtil.makeTransparent(collection)
+        GParsPoolUtil.makeTransparent(collection)
     }
 
     /**

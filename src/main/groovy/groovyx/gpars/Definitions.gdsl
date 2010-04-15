@@ -24,7 +24,7 @@ package groovyx.gpars
 def parallelCollection = context(ctype: "java.lang.Object")
 
 contributor(parallelCollection) {
-    property name: 'parallel', type: 'groovyx.gpars.ParallelCollection'
+    property name: 'parallel', type: 'groovyx.gpars.PAWrapper'
 
     method name: "eachParallel", type: "void", params: [closure: 'groovy.lang.Closure']
     method name: "eachWithIndexParallel", type: "void", params: [closure: 'groovy.lang.Closure']
@@ -77,18 +77,18 @@ contributor(actorBody) {
 }
 
 /**
- * Enhances closures within the Asynchronizer blocks with async() and callAsync() methods
+ * Enhances closures within the GParsExecutorsPool blocks with async() and callAsync() methods
  */
 
-def asynchronizerBody = context(ctype: "groovy.lang.Closure", scope: closureScope())
+def ThreadPoolBody = context(ctype: "groovy.lang.Closure", scope: closureScope())
 
-contributor(asynchronizerBody) {
-    def call = enclosingCall("doParallel")
+contributor(ThreadPoolBody) {
+    def call = enclosingCall("withPool")
     if (call) {
         def currentMethod = call.bind()
         def clazz = currentMethod?.containingClass
         final def clazzName = clazz?.qualName?.toUpperCase()
-        if (clazzName?.contains("ASYNCHRONIZER")) {
+        if (clazzName?.contains("GPARSPOOL") || clazzName?.contains("GPARSLEGACYPOOL")) {
             method name: "async", type: "groovy.lang.Closure"
             method name: "callAsync", type: "java.util.concurrent.Future"
             method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')

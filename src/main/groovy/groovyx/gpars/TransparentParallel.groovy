@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 /**
- * Enhances objects by being mixed-in either within a Parallelizer.doParallel() block or after enhancement by
+ * Enhances objects by being mixed-in either within a GParsPool.withPool() block or after enhancement by
  * the ParallelEnhancer through the makeTransparent() method.
  * It overrides the iterative methods, like each, collect and such to delegate to eachParallel, collectParallel
  * and other parallel iterative methods.

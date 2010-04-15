@@ -77,13 +77,13 @@ class PrintSpooler implements CSProcess {
                     spooling = spooling + 1
                     def useKey = unusedSpoolers.pop()
                     preCon[useKey + 2] = true
-                    printMap[useKey] = [] // initialise the printlist for this user
+                    printMap[useKey] = [] // initialise the printList for this user
                     jobMap[useKey] = userId
                     useChannel.write(spoolChannelLocations.get(useKey))
                     useChannel.write(useKey)
                     break
                 default:
-                    // printline being received from a user
+                    // printLine being received from a user
                     def pLine = spoolChannels[index - 2].read()
                     printMap[pLine.printKey] << pLine.line
 

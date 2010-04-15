@@ -27,9 +27,9 @@ import java.io.Serializable;
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Feb 27, 2009
  */
-public class ActorMessage<T> implements Serializable {
+public class ActorMessage implements Serializable {
     private static final long serialVersionUID = -2925547808451571430L;
-    private T payLoad;
+    private Object payLoad;
     private MessageStream sender;
     //todo what are the values after deserialization?
 
@@ -39,7 +39,7 @@ public class ActorMessage<T> implements Serializable {
      * @param payLoad The original message
      * @param sender  The sending actor, null, if the message was not sent by an actor
      */
-    public ActorMessage(final T payLoad, final MessageStream sender) {
+    public ActorMessage(final Object payLoad, final MessageStream sender) {
         this.payLoad = payLoad;
         this.sender = sender;
     }
@@ -50,7 +50,7 @@ public class ActorMessage<T> implements Serializable {
     protected ActorMessage() { //
     }
 
-    public T getPayLoad() {
+    public Object getPayLoad() {
         return payLoad;
     }
 
@@ -65,8 +65,8 @@ public class ActorMessage<T> implements Serializable {
      * @param payLoad The original message
      * @return The newly created message
      */
-    public static <T> ActorMessage<T> build(final T payLoad) {
-        return new ActorMessage<T>(payLoad, Actor.threadBoundActor());
+    public static <T> ActorMessage build(final T payLoad) {
+        return new ActorMessage(payLoad, Actor.threadBoundActor());
     }
 
     @Override

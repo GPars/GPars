@@ -22,44 +22,37 @@ package groovyx.gpars.samples.forkjoin
  * Date: Feb 19, 2010
  */
 
-import groovyx.gpars.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
-import static groovyx.gpars.Parallelizer.doParallel
-import static groovyx.gpars.Parallelizer.orchestrate
+import static groovyx.gpars.GParsPool.runForkJoin
+import static groovyx.gpars.GParsPool.withPool
 
-class ForkJoinFib extends AbstractForkJoinWorker {
-
-    def number
-
-    @Override
-    protected Integer computeTask() {
-        if (number < 0) {
-            throw new RuntimeException("No fib below 0!")
-        }
-        if (number <= 13) {
-            return sequentialFib(number)
-        }
-        forkOffChild new ForkJoinFib(number: (number - 1))
-        forkOffChild new ForkJoinFib(number: (number - 2))
-        return (Integer) childrenResults.sum()
-    }
-
-    static int sequentialFib(int n) {
-        if (n <= 1) return n;
-        else return sequentialFib(n - 1) + sequentialFib(n - 2);
-    }
+int sequentialFib(int n) {
+    if (n <= 1) return n;
+    else return sequentialFib(n - 1) + sequentialFib(n - 2);
 }
 
-doParallel(2) {
+Closure fib = {number ->
+    if (number < 0) {
+        throw new RuntimeException("No fib below 0!")
+    }
+    if (number <= 13) {
+        return sequentialFib(number)
+    }
+    forkOffChild(number - 1)
+    forkOffChild(number - 2)
+    return (Integer) getChildrenResults().sum()
+}
+
+withPool(2) {
 
     final long t1 = System.currentTimeMillis()
     try {
-        assert orchestrate(new ForkJoinFib(number: 30)) == 832040
+        assert runForkJoin(30, fib) == 832040
 
-        assert ForkJoinFib.sequentialFib(31) == orchestrate(new ForkJoinFib(number: 31))
+        assert sequentialFib(31) == runForkJoin(31, fib)
 
         try {
-            orchestrate(new ForkJoinFib(number: -1))
+            runForkJoin(-1, fib)
         } catch (ExecutionException ignore) {
             println "We've correctly received an exception. That's what we deserve for calculating a negative Fibbonacci number."
         }

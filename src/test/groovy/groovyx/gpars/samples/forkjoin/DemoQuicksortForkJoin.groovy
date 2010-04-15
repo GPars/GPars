@@ -23,33 +23,18 @@
 
 package groovyx.gpars.samples.forkjoin
 
-import groovyx.gpars.AbstractForkJoinWorker
-import groovyx.gpars.Parallelizer
-import static groovyx.gpars.Parallelizer.doParallel
+import static groovyx.gpars.GParsPool.withPool
 
-class Sorter extends AbstractForkJoinWorker<Map> {
-
-    def index
-    def list
-
-    def Sorter(index, list) {
-        this.index = index
-        this.list = list
-    }
-
-    @Override protected Map computeTask() {
-        def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
-        if ((list.size() < 2) || (groups.size() == 1)) {
-            return [index: index, list: list.clone()]
-        }
-        (-1..1).each {forkOffChild new Sorter(it, groups[it] ?: [])}
-        return [index: index, list: childrenResults.sort {it.index}.sum {it.list}]
-    }
-}
-
-def quicksort(list) {
-    doParallel {
-        Parallelizer.orchestrate(new Sorter(0, list)).list
+def quicksort(numbers) {
+    withPool {
+        groovyx.gpars.GParsPool.runForkJoin(0, numbers) {index, list ->
+            def groups = list.groupBy {it <=> list[list.size().intdiv(2)]}
+            if ((list.size() < 2) || (groups.size() == 1)) {
+                return [index: index, list: list.clone()]
+            }
+            (-1..1).each {forkOffChild(it, groups[it] ?: [])}
+            return [index: index, list: childrenResults.sort {it.index}.sum {it.list}]
+        }.list
     }
 }
 

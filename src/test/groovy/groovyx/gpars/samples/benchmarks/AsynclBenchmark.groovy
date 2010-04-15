@@ -1,23 +1,22 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.Asynchronizer
-import groovyx.gpars.Parallelizer
+import groovyx.gpars.GParsPool
 
 List items = []
 for (i in 1..100000) {items << i}
@@ -29,13 +28,13 @@ meassureSequential(numOfWarmupIterations, items)
 final long time = meassureSequential(numOfIterations, items)
 println "Sequential $time"
 
-meassureAsynchronizer(numOfWarmupIterations, items)
-time = meassureAsynchronizer(numOfIterations, items)
-println "Asynchronizer $time"
+meassureThreadPool(numOfWarmupIterations, items)
+time = meassureThreadPool(numOfIterations, items)
+println "ThreadPool $time"
 
-meassureParallelizer(numOfWarmupIterations, items)
-time = meassureParallelizer(numOfIterations, items)
-println "Parallelizer $time"
+measureForkJoinPool(numOfWarmupIterations, items)
+time = measureForkJoinPool(numOfIterations, items)
+println "ForkJoinPool $time"
 
 long measureSequential(iterations, List list) {
     final long t1 = System.currentTimeMillis()
@@ -49,9 +48,9 @@ long measureSequential(iterations, List list) {
     return t2 - t1
 }
 
-long measureAsynchronizer(iterations, List list) {
+long measureThreadPool(iterations, List list) {
     final long t1 = System.currentTimeMillis()
-    Asynchronizer.withAsynchronizer(30) {
+    groovyx.gpars.GParsExecutorsPool.withPool(30) {
         for (i in iterations) {
             int result
             list.eachParallel {result = it}
@@ -63,9 +62,9 @@ long measureAsynchronizer(iterations, List list) {
     return t2 - t1
 }
 
-long measureParallelizer(iterations, List list) {
+long measureForkJoinPool(iterations, List list) {
     final long t1 = System.currentTimeMillis()
-    Parallelizer.withParallelizer(30) {
+    GParsPool.withPool(30) {
         for (i in iterations) {
             int result
             list.eachParallel {result = it}

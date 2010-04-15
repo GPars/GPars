@@ -63,7 +63,7 @@ public abstract class MessageStream extends WithSerialId {
      * @return always return message stream itself
      */
     public final <T> MessageStream send(final T message, final MessageStream replyTo) {
-        return send(new ActorMessage<T>(message, replyTo));
+        return send(new ActorMessage(message, replyTo));
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class MessageStream extends WithSerialId {
      */
     public final <T, V> V sendAndWait(final T message) throws InterruptedException {
         final ResultWaiter<V> to = new ResultWaiter<V>();
-        send(new ActorMessage<T>(message, to));
+        send(new ActorMessage(message, to));
         return to.getResult();
     }
 
@@ -118,7 +118,7 @@ public abstract class MessageStream extends WithSerialId {
      */
     public final <T> Object sendAndWait(final T message, final long timeout, final TimeUnit units) throws InterruptedException {
         final ResultWaiter<Object> to = new ResultWaiter<Object>();
-        send(new ActorMessage<T>(message, to));
+        send(new ActorMessage(message, to));
         return to.getResult(timeout, units);
     }
 
@@ -175,7 +175,7 @@ public abstract class MessageStream extends WithSerialId {
         public MessageStream send(final Object message) {
             final Thread thread = (Thread) this.value;
             if (message instanceof ActorMessage) {
-                this.value = ((ActorMessage<?>) message).getPayLoad();
+                this.value = ((ActorMessage) message).getPayLoad();
             } else {
                 this.value = message;
             }
@@ -253,9 +253,9 @@ public abstract class MessageStream extends WithSerialId {
         @SuppressWarnings({"AssignmentToMethodParameter"}) @Override
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
-                message = new ActorMessage<Object>(message, Actor.threadBoundActor());
+                message = new ActorMessage(message, Actor.threadBoundActor());
             }
-            remoteHost.write(new SendTo(this, (ActorMessage<?>) message));
+            remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;
         }
     }
@@ -263,9 +263,9 @@ public abstract class MessageStream extends WithSerialId {
     public static class SendTo<T> extends SerialMsg {
         private static final long serialVersionUID = 1989120447646342520L;
         private final MessageStream to;
-        private final ActorMessage<T> message;
+        private final ActorMessage message;
 
-        public SendTo(final MessageStream to, final ActorMessage<T> message) {
+        public SendTo(final MessageStream to, final ActorMessage message) {
             super();
             this.to = to;
             this.message = message;
@@ -275,7 +275,7 @@ public abstract class MessageStream extends WithSerialId {
             return to;
         }
 
-        public ActorMessage<T> getMessage() {
+        public ActorMessage getMessage() {
             return message;
         }
 

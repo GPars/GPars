@@ -16,15 +16,14 @@
 
 package groovyx.gpars.samples
 
-import groovyx.gpars.Parallelizer
-import jsr166y.forkjoin.ForkJoinPool
+import groovyx.gpars.GParsPool
 
 /**
  * Shows lazy nature of the anyParallel() method. Once a positive result is obtained no more elements are going to be processed.
  */
 
 def n = [15, 4, 3, 4, 10]
-Parallelizer.doParallel(3) {ForkJoinPool pool ->
+GParsPool.withPool(3) {GParsPool pool ->
     def k = n.anyParallel {t ->
         println "$t started"
         sleep t * 1000
