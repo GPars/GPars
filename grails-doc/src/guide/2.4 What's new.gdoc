@@ -15,13 +15,13 @@ h3. Parallel collections
 * Improved the map/reduce performance by eliminating unnecessary conversions
 
 h4. Renaming hints
-Parallelizer -> GParsPool
-Asynchronizer -> GParsExecutorsPool
-doParallel() -> withPool()
-withParallelizer() -> withPool()
-withExistingParallelizer() -> withExistingPool()
-withAsynchronizer() -> withPool()
-withExistingAsynchronizer() -> withExistingPool()
+* Parallelizer -> GParsPool
+* Asynchronizer -> GParsExecutorsPool
+* doParallel() -> withPool()
+* withParallelizer() -> withPool()
+* withExistingParallelizer() -> withExistingPool()
+* withAsynchronizer() -> withPool()
+* withExistingAsynchronizer() -> withExistingPool()
 
 h3. Fork / Join
 

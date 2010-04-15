@@ -16,6 +16,8 @@
 
 package groovyx.gpars.samples.safe
 
+//todo remove once works in Groovy 1.7.3 and 1.6.9
+
 class CurryFoo {
     protected void foo1(String s, int i) {
         println 'Hurray! Foo1 can be curried.'

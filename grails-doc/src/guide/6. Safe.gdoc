@@ -7,7 +7,7 @@ In some cases, however, sharing mutable data is either inevitable or makes the d
 of a shopping cart in a typical e-commerce application, when multiple AJAX requests may hit the cart with read or write requests concurrently.
 {note}
 
-h1. Introduction
+h2. Introduction
 
 In the Clojure programing language you can find a concept of Agents, the purpose of which is to protect mutable data that need to be shared across threads.
 Agents hide the data and protect it from direct access. Clients can only send commands (functions) to the agent. The commands will be serialized and processed against the data one-by-one in turn.
@@ -30,7 +30,7 @@ assert agent.val== 1
 To wrap integers, we can certainly use AtomicXXX types on the Java platform, but when the state is a more complex object we need more support.
 
 
-h1. Concepts
+h2. Concepts
 
 GPars provides a Safe class, which is a special-purpose thread-safe non-blocking implementation inspired by Agents in Clojure.
 
@@ -51,14 +51,20 @@ h3. Basic rules
 * All Safe instances share a default daemon thread pool. Setting the _threadPool_ property of a Safe instance will allow it to use a different thread pool.
 * Exceptions thrown by the commands can be collected using the _errors_ property.
 
-h1. Examples
+h2. Examples
 
-h2. Shared list of members
+h3. Shared list of members
 
 The Safe wraps a list of members, who have been added to the jug. To add a new member a message (command to add a member) has to be sent to the _jugMembers_ Safe.
-{code}import groovyx.gpars.actor.Safe
+{code}
+import groovyx.gpars.agent.Safe
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-def jugMembers = new Safe<List>(['Me'])  //add Me
+/**
+ * Create a new Safe wrapping a list of strings
+ */
+def jugMembers = new Safe<List<String>>(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
 
@@ -75,41 +81,66 @@ final Thread t2 = Thread.start {
 println jugMembers.val
 jugMembers.valAsync {println "Current members: $it"}
 
-System.in.read()
-jugMembers.stop()
+jugMembers.await()
 {code}
 
-h2. Shared conference counting number of registrations
+h3. Shared conference counting number of registrations
 
-The Conference class allows registration and unregistration, however these methods can only be called from the commands sent to the _conference_ Safe.
-{code}import groovyx.gpars.actor.Safe
+The Conference class allows registration and un-registration, however these methods can only be called from the commands sent to the _conference_ Safe.
+{code}import groovyx.gpars.agent.Safe
 
-class Conference extends Safe {
-    def Conference() { super(0L) }
+/**
+ * Conference stores number of registrations and allows parties to register and unregister.
+ * It inherits from the Safe class and adds the register() and unregister() private methods,
+ * which callers may use it the commands they submit to the Conference.
+ */
+class Conference extends Safe<Long> {
+    def Conference() { super(0) }
     private def register(long num) { data += num }
     private def unregister(long num) { data -= num }
 }
 
-final Safe conference = new Conference()
+final Safe conference = new Conference()  //new Conference created
+
+/**
+ * Three external parties will try to register/unregister concurrently
+ */
 
 final Thread t1 = Thread.start {
-    conference << {register(10)}
+    conference << {register(10L)}               //send a command to register 10 attendees
 }
 
 final Thread t2 = Thread.start {
-    conference << {register(5)}
+    conference << {register(5L)}                //send a command to register 5 attendees
 }
 
 final Thread t3 = Thread.start {
-    conference << {unregister(3)}
+    conference << {unregister(3L)}              //send a command to unregister 3 attendees
 }
 
 [t1, t2, t3]*.join()
 
-assert 12 == conference.val
+assert 12L == conference.val
 {code}
 
-h2. The shopping cart example
+h2. Custom thread pool
+
+By default all Safe instance share a common thread pool. By calling the _attachToThreadPool()_ method a custom thread pool can be specified for a Safe instance.
+{code}
+def jugMembers = new Safe<List<String>>(['Me'])  //add Me
+
+final ExecutorService pool = Executors.newFixedThreadPool(10)
+jugMembers.attachToThreadPool pool
+
+{code}
+
+{note:Title=Custom thread pools for agents}
+The default thread pool contains daemon threads. Make sure that your custom thread pools either use daemon threads, too, which can be achieved by providing your own thread factory to the thread pool construction,
+or in case your thread pools use non-daemon threads, make sure you shutdown the thread pool explicitly by calling its shutdown() method,
+otherwise your applications will be unable to exit.
+{note}
+
+h3. The shopping cart example
 
 {code}
 import groovyx.gpars.agent.Safe
@@ -181,11 +212,14 @@ private Closure performClear = { it.clear() }
 {code}
 *Currying might be necessary*, if the closure takes other arguments besides the current internal state instance. See the _increaseQuantity_ method.
 
-h2. The printer service example
+h3. The printer service example
 
 Another example - a not thread-safe printer service shared by multiple threads. The printer needs to have the document and quality properties set before printing, so obviously a potential for race conditions if not guarded properly. Callers don't want to block until the printer is available, which the fire-and-forget nature of actors solves very elegantly.
-{code}import groovyx.gpars.actor.Safe
+{code}import groovyx.gpars.agent.Safe
 
+/**
+ * A non-thread-safe service that slowly prints documents on at a time
+ */
 class PrinterService {
     String document
     String quality
@@ -226,8 +260,8 @@ final Thread thread2 = Thread.start {
 }
 
 [thread1, thread2]*.join()
-printer << {stop()}
-printer.join()
+printer.await()
+
 {code}
 For latest update, see the respective [Demos].
 
@@ -246,9 +280,31 @@ before the thread scheduler executes the body of _instantVal_.
 The _await()_ method allows you to wait for processing all the messages submitted to the Safe before and so blocks
 the calling thread.
 
-h3. State copy strategy
+h2. State copy strategy
 
 To avoid leaking the internal state the Safe class allows to specify a copy strategy as the second constructor argument.
 With the copy strategy specified, the internal state is processed by the copy strategy closure and the output value
 of the copy strategy value is returned to the caller instead of the actual internal state. This applies to _instantVal_,
-_val_ as well as to _valAsync()_.
+_val_ as well as to _valAsync()_ .
+
+h2. Error handling
+
+Exceptions thrown from within the submitted commands are stored inside the agent and can be obtained from the _errors_ property.
+The property gets cleared once read.
+{code}
+    def jugMembers = new Safe<List>()
+    assert jugMembers.errors.empty
+
+    jugMembers.send {throw new IllegalStateException('test1')}
+    jugMembers.send {throw new IllegalArgumentException('test2')}
+    jugMembers.await()
+
+    List errors = jugMembers.errors
+    assertEquals(2, errors.size())
+    assert errors[0] instanceof IllegalStateException
+    assertEquals 'test1', errors[0].message
+    assert errors[1] instanceof IllegalArgumentException
+    assertEquals 'test2', errors[1].message
+
+    assert jugMembers.errors.empty
+{code}

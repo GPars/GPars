@@ -20,8 +20,7 @@ import groovyx.gpars.util.PoolUtils;
 import org.codehaus.groovy.runtime.NullObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -33,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Vaclav Pech
  *         Date: 13.4.2010
  */
-public abstract class AgentCore {
+public abstract class AgentCore implements Runnable {
 
     /**
      * A thread pool shared by all agents
@@ -66,7 +65,7 @@ public abstract class AgentCore {
     /**
      * Holds agent errors
      */
-    private final Collection<Exception> errors = new ConcurrentLinkedQueue<Exception>();
+    private List<Exception> errors;
 
     /**
      * Incoming messages
@@ -99,19 +98,6 @@ public abstract class AgentCore {
     }
 
     /**
-     * Handles a single message from the message queue
-     */
-    final void perform() {
-        try {
-            final Object message = queue.poll();
-            if (message != null) this.handleMessage(message);
-        } finally {
-            active.set(false);
-            schedule();
-        }
-    }
-
-    /**
      * Dynamically dispatches the method call
      *
      * @param message A value or a closure
@@ -123,16 +109,23 @@ public abstract class AgentCore {
      */
     void schedule() {
         if (!queue.isEmpty() && active.compareAndSet(false, true)) {
-            threadPool.submit(new Runnable() {
-                @SuppressWarnings({"CatchGenericClass"})
-                public void run() {
-                    try {
-                        AgentCore.this.perform();
-                    } catch (Exception e) {
-                        registerError(e);
-                    }
-                }
-            });
+            threadPool.submit(this);
+        }
+    }
+
+    /**
+     * Handles a single message from the message queue
+     */
+    @SuppressWarnings({"CatchGenericClass"})
+    public void run() {
+        try {
+            final Object message = queue.poll();
+            if (message != null) this.handleMessage(message);
+        } catch (Exception e) {
+            registerError(e);
+        } finally {
+            active.set(false);
+            schedule();
         }
     }
 
@@ -141,8 +134,9 @@ public abstract class AgentCore {
      *
      * @param e The exception to store
      */
-    @SuppressWarnings({"MethodOnlyUsedFromInnerClass"})
-    private void registerError(final Exception e) {
+    @SuppressWarnings({"MethodOnlyUsedFromInnerClass", "SynchronizedMethod"})
+    private synchronized void registerError(final Exception e) {
+        if (errors == null) errors = new ArrayList<Exception>();
         errors.add(e);
     }
 
@@ -152,14 +146,13 @@ public abstract class AgentCore {
      *
      * @return A detached collection of exception that have occurred in the agent's body
      */
-    public List<Exception> getErrors() {
-        final List<Exception> result = new ArrayList<Exception>(20);
-        final Iterator<Exception> iterator = errors.iterator();
-        while (iterator.hasNext()) {
-            final Exception error = iterator.next();
-            result.add(error);
-            iterator.remove();
+    @SuppressWarnings({"SynchronizedMethod", "ReturnOfCollectionOrArrayField"})
+    public synchronized List<Exception> getErrors() {
+        if (errors == null) return Collections.emptyList();
+        try {
+            return errors;
+        } finally {
+            errors = null;
         }
-        return result;
     }
 }
