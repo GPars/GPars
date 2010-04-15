@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author Vaclav Pech
  * Date: 13.4.2010
  */
-public class AgentTest extends GroovyTestCase {
+public class SafeTest extends GroovyTestCase {
     public void testList() {
         def jugMembers = new Safe<List>(['Me'])  //add Me
 
@@ -65,6 +65,15 @@ public class AgentTest extends GroovyTestCase {
         shouldFail RejectedExecutionException, {
             jugMembers.send 10
         }
+    }
+
+    public void testFairAgent() {
+        def jugMembers = new Safe<List>(['Me'])  //add Me
+        jugMembers.makeFair()
+
+        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.await()
+        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
     }
 
     public void testListWithCloneCopyStrategy() {
