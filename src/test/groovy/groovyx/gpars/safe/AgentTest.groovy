@@ -23,6 +23,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -60,6 +61,7 @@ public class AgentTest extends GroovyTestCase {
         assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
 
         pool.shutdown()
+        pool.awaitTermination(30, TimeUnit.SECONDS)
         shouldFail RejectedExecutionException, {
             jugMembers.send 10
         }
