@@ -22,6 +22,7 @@ h4. Renaming hints
 * withExistingParallelizer() -> withExistingPool()
 * withAsynchronizer() -> withPool()
 * withExistingAsynchronizer() -> withExistingPool()
+* orchestrate() -> runForkJoin()
 
 h3. Fork / Join
 

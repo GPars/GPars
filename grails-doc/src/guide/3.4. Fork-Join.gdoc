@@ -16,12 +16,12 @@ h3. The GPars abstraction convenience layer
 GPars can hide the complexities of dealing with threads, pools and recursive tasks from you, yet let you leverage the powerful Fork/Join implementation in jsr166y.
 
 {code}
-import static runForkJoin
+import static groovyx.gpars.GParsPool.runForkJoin
 import static groovyx.gpars.GParsPool.withPool
 
 withPool() {
     println """Number of files: ${
-        orchestrate(new File("./src")) {file ->
+        runForkJoin(new File("./src")) {file ->
             long count = 0
             file.eachFile {
                 if (it.isDirectory()) {
@@ -38,8 +38,8 @@ withPool() {
 }
 {code}
 
-The _orchestrate()_ factory method will use the supplied recursive code together with the provided values and build a hierarchical Fork/Join
-calculation. The number of values passed to the _orchestrate()_ method must match the number of expected parameters of the closure as well as
+The _runForkJoin()_ factory method will use the supplied recursive code together with the provided values and build a hierarchical Fork/Join
+calculation. The number of values passed to the _runForkJoin()_ method must match the number of expected parameters of the closure as well as
 the number of arguments passed into the _forkOffChild()_ method.
 
 {code}
@@ -87,7 +87,7 @@ public final class FileCounter extends AbstractForkJoinWorker<Long> {
 }
 
 withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
-    println "Number of files: ${orchestrate(new FileCounter(new File("..")))}"
+    println "Number of files: ${runForkJoin(new FileCounter(new File("..")))}"
 }
 
 {code}
@@ -103,7 +103,7 @@ Although the algorithm creates as many tasks as there are sub-directories and ta
 h3. Mergesort example
 
 {code}
-import static runForkJoin
+import static groovyx.gpars.GParsPool.runForkJoin
 import static groovyx.gpars.GParsPool.withPool
 
 /**
@@ -139,7 +139,7 @@ final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1,
 
 withPool(3) {  //feel free to experiment with the number of fork/join threads in the pool
     println """Sorted numbers: ${
-        orchestrate(numbers) {nums ->
+        runForkJoin(numbers) {nums ->
             println "Thread ${Thread.currentThread().name[-1]}: Sorting $nums"
             switch (nums.size()) {
                 case 0..1:
@@ -218,7 +218,7 @@ public final class SortWorker extends AbstractForkJoinWorker<List<Integer>> {
 final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1, 4, 1, 7, 5, 8, 2, 3, 9, 5, 7, 4, 3]
 
 withPool(1) {  //feel free to experiment with the number of fork/join threads in the pool
-    println "Sorted numbers: ${orchestrate(new SortWorker(numbers))}"
+    println "Sorted numbers: ${runForkJoin(new SortWorker(numbers))}"
 }
 {code}
 
