@@ -1,25 +1,28 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.dataflow;
 
+import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -52,6 +55,11 @@ public final class DataFlowStream<T> {
     private final LinkedBlockingQueue<DataFlowVariable<T>> requests = new LinkedBlockingQueue<DataFlowVariable<T>>();
 
     /**
+     * A collection of listeners who need to be informed each time the stream is bound to a value
+     */
+    private final Collection<MessageStream> whenBoundListeners = new CopyOnWriteArrayList<MessageStream>();
+
+    /**
      * Adds a DataFlowVariable to the buffer.
      * Implementation detail - in fact another DFV is added to the buffer and an asynchronous 'whenBound' handler
      * is registered with the supplied DFV to update the one stored in the buffer.
@@ -61,6 +69,8 @@ public final class DataFlowStream<T> {
     @SuppressWarnings("unchecked")
     public void leftShift(final DataFlowExpression<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
+        hookWhenBoundListeners(originalRef);
+
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -4966523895011173569L;
 
@@ -78,7 +88,20 @@ public final class DataFlowStream<T> {
      * @param value The value to bind to the head of the stream
      */
     public void leftShift(final T value) {
-        retrieveForBind().bind(value);
+        hookWhenBoundListeners(retrieveForBind()).bind(value);
+    }
+
+    /**
+     * Hooks the registered when bound handlers to the supplied dataflow expression
+     *
+     * @param expr The expression to hook all the when bound listeners to
+     * @return The supplied expression handler to allow method chaining
+     */
+    private DataFlowExpression<T> hookWhenBoundListeners(final DataFlowExpression<T> expr) {
+        for (final MessageStream listener : whenBoundListeners) {
+            expr.whenBound(listener);
+        }
+        return expr;
     }
 
     /**
@@ -140,6 +163,57 @@ public final class DataFlowStream<T> {
     }
 
     /**
+     * Schedule closure to be executed by pooled actor after data became available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled
+     *
+     * @param closure closure to execute when data available
+     */
+    public void rightShift(final Closure closure) {
+        whenNextBound(closure);
+    }
+
+    /**
+     * Schedule closure to be executed by pooled actor after the next data becomes available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param closure closure to execute when data available
+     */
+    public void whenNextBound(final Closure closure) {
+        getValAsync(new DataCallback(closure));
+    }
+
+    /**
+     * Send the next bound piece of data to the provided stream when it becomes available
+     *
+     * @param stream stream where to send result
+     */
+    public void whenNextBound(final MessageStream stream) {
+        getValAsync(stream);
+    }
+
+    /**
+     * Schedule closure to be executed by pooled actor each time after data becomes available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param closure closure to execute when data available
+     */
+    public void whenBound(final Closure closure) {
+        whenBoundListeners.add(new DataCallback(closure));
+    }
+
+    /**
+     * Send all pieces of data bound in the future to the provided stream when it becomes available
+     *
+     * @param stream stream where to send result
+     */
+    public void whenBound(final MessageStream stream) {
+        whenBoundListeners.add(stream);
+    }
+
+    /**
      * Checks whether there's a DFV waiting in the queue and retrieves it. If not, a new unmatched value request, represented
      * by a new DFV, is added to the requests queue.
      *
@@ -187,7 +261,8 @@ public final class DataFlowStream<T> {
 
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "DataFlowStream(queue=" + new ArrayList<DataFlowVariable<T>>(queue).toString() + ')';
     }
 }

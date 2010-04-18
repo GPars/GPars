@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.dataflow;
 
@@ -133,8 +133,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @return true if bound already
      */
-    public boolean isBound () {
-       return state == S_INITIALIZED;
+    public boolean isBound() {
+        return state == S_INITIALIZED;
     }
 
     /**
@@ -212,7 +212,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                 // ok, we are in the queue, so writer is responsible to process us
                 while (state != S_INITIALIZED) {
                     LockSupport.park();
-                    if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting); }
+                    if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting);
+                }
                 break;
             }
         }
@@ -224,7 +225,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * Reads the value of the variable. Blocks up to given timeout, if the value has not been assigned yet.
      *
      * @param timeout The timeout value
-     * @param units Units for the timeout
+     * @param units   Units for the timeout
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
@@ -253,7 +254,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                     }
 
                     LockSupport.parkNanos(toWait);
-                    if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting); }
+                    if (Thread.currentThread().isInterrupted()) handleInterruption(newWaiting);
+                }
                 break;
             }
         }
@@ -328,7 +330,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
     /**
      * Binds the value after receiving a bing message over the wire
-     * @param hostId Id of the bind originator host
+     *
+     * @param hostId  Id of the bind originator host
      * @param message The value to bind
      */
     public void doBindRemote(final UUID hostId, final T message) {
@@ -338,6 +341,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
     /**
      * Sends notifications to all subscribers
+     *
      * @param hostId The local host id
      */
     private void notifyRemote(final UUID hostId) {
@@ -400,7 +404,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Schedule closure to be executed by pooled actor after data became available
+     * Schedule closure to be executed by pooled actor after data becomes available
      * It is important to notice that even if data already available the execution of closure
      * will not happen immediately but will be scheduled.
      *
@@ -411,7 +415,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Send result to provided stream when it becomes available
+     * Send the boudn data to provided stream when it becomes available
      *
      * @param stream stream where to send result
      */
@@ -508,7 +512,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         private static final long serialVersionUID = 3414942165521113575L;
         private final AtomicInteger count = new AtomicInteger(1);
 
-        @Override public MessageStream send(final Object message) {
+        @Override
+        public MessageStream send(final Object message) {
             if (count.decrementAndGet() == 0) {
                 bind(evaluate());
             }
@@ -554,12 +559,14 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
             arg = another;
         }
 
-        @Override protected V evaluate() {
+        @Override
+        protected V evaluate() {
             //noinspection unchecked
             return (V) closure.call(arg instanceof DataFlowExpression ? ((DataFlowExpression) arg).value : arg);
         }
 
-        @Override protected void subscribe(final DataFlowExpressionsCollector listener) {
+        @Override
+        protected void subscribe(final DataFlowExpressionsCollector listener) {
             arg = listener.subscribe(arg);
         }
     }
@@ -574,7 +581,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
             subscribe();
         }
 
-        @Override protected V evaluate() {
+        @Override
+        protected V evaluate() {
             super.evaluate();
             //noinspection unchecked
             return (V) closure.call(args);
@@ -582,6 +590,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     //todo sort out generics
+
     /**
      * Represents a remote message binding a value to a remoted DataFlowExpression
      */
@@ -591,10 +600,9 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         private final Object message;
 
         /**
-         *
-         * @param expr The local DataFlowExpression instance
+         * @param expr    The local DataFlowExpression instance
          * @param message The actual value to bind
-         * @param hostId The identification of the host to send the bind information to
+         * @param hostId  The identification of the host to send the bind information to
          */
         public BindDataFlow(final DataFlowExpression expr, final Object message, final UUID hostId) {
             super(hostId);
