@@ -189,6 +189,9 @@ public class DataFlowStreamTest extends GroovyTestCase {
                     dfs3 << it
                     react {
                         dfs3 << it
+                        react {
+                            dfs3 << it
+                        }
                     }
                 }
             }
@@ -197,14 +200,11 @@ public class DataFlowStreamTest extends GroovyTestCase {
         stream << 10
         stream << 20
         stream << 30
-        assertEquals 10, dfs1.val
-        assertEquals 20, dfs1.val
-        assertEquals 30, dfs1.val
-        assertEquals 10, dfs2.val
-        assertEquals 20, dfs2.val
-        assertEquals 30, dfs2.val
-        assertEquals 10, dfs3.val
-        assertEquals 20, dfs3.val
-        assertEquals 30, dfs3.val
+        def df = new DataFlowVariable()
+        stream << df
+        df << 40
+        assert [10, 20, 30, 40] as Set == [dfs1.val, dfs1.val, dfs1.val, dfs1.val] as Set
+        assert [10, 20, 30, 40] as Set == [dfs2.val, dfs2.val, dfs2.val, dfs2.val] as Set
+        assert [10, 20, 30, 40] as Set == [dfs3.val, dfs3.val, dfs3.val, dfs3.val] as Set
     }
 }
