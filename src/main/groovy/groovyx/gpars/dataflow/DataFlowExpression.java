@@ -90,8 +90,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
     /**
      * A logical representation of a synchronous or asynchronous request to read the value once it is bound.
-     *
-     * @param <V> The type of the value to bind
      */
     private static class WaitingThread extends AtomicBoolean {
         private static final long serialVersionUID = 8909974768784947460L;
