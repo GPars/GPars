@@ -47,7 +47,6 @@ import org.codehaus.groovy.runtime.NullObject
  * Date: Jul 2, 2009
  */
 public class Safe<T> extends AgentCore {
-    //todo tutorial - grouping actors and thread pools, error handling, replies, packages in samples, non-private method in Cart demo
 
     /**
      * Allows reads not to wait in the message queue.

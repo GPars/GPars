@@ -33,6 +33,7 @@ h3. Actors
 
 h3. Dataflow
 
+* A _maxForks_ flag has been added to allow Dataflow operators to internally work concurrently  
 
 h3. Safe
 
