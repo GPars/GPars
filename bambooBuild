@@ -1,7 +1,12 @@
 #! /bin/sh
 
 #  This script is here only for the Codehaus Bamboo build.
-#
-#  Use the -i option on grdlew so that the log has extra information in by default.
 
-./gradlew -i clean build
+buildTask="build"
+
+if [ $# -gt 0 ]
+then
+    buildTask=$1
+fi
+
+./gradlew -i clean $buildTask
