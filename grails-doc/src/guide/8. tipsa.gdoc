@@ -1,0 +1,25 @@
+h2. General GPars Tips
+
+h3. Grouping
+
+High-level concurrency concepts, like Agents, Actors or Dataflow tasks and operators can be grouped around shared thread pools.
+The ActorGroup class and its sub-classes represent convenient GPars wrappers around thread pools.
+Objects created using the group's factory methods will share the group's thread pool.
+{code}
+def group1 = new PooledActorGroup()
+def group2 = new NonDaemonActorGroup()
+
+group1.with {
+    task {...}
+    task {...}
+    def op = operator(...) {...}
+    def actor = actor{...}
+    def anotherActor = group2.actor{...}  //will belong to group2
+    def agent = safe(0)
+}
+{code}
+
+{note}
+When customizing the thread pools for groups, consider using the existing GPars implementations - the _DefaultPool_ or _ResizablePool_ classes.
+Or you may create your own implementation of the _groovyx.gpars.scheduler.Pool_ interface to pass to the _PooledActorGroup_ or _NonDaemonActorGroup_ constructors.
+{note}
