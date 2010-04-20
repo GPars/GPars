@@ -19,7 +19,7 @@ package groovyx.gpars.samples.actors
 import groovy.swing.SwingBuilder
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import javax.swing.JFrame
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {

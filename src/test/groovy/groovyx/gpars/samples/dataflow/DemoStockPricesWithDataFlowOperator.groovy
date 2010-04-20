@@ -1,7 +1,7 @@
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.actor.PGroup
-import groovyx.gpars.actor.NonDaemonPGroup
+import groovyx.gpars.group.PGroup
+import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.dataflow.DataFlowStream
 import static groovyx.gpars.dataflow.DataFlow.operator
 

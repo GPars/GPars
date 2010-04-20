@@ -26,7 +26,7 @@ def getYearEndClosing(String symbol, int year) {
     [symbol: symbol, price: price]
 }
 
-def symbols = ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT']
+def symbols = ['AAPL', 'GOOG', 'IBM', 'MSFT']
 
 def observer = actor {
     def start = System.nanoTime()

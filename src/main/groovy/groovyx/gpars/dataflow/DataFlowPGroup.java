@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow;
 
-import groovyx.gpars.actor.PGroup;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.ResizeablePool;
 
 /**

@@ -17,8 +17,8 @@
 package groovyx.gpars.safe
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultPGroup
-import groovyx.gpars.actor.NonDaemonPGroup
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.agent.Safe
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable

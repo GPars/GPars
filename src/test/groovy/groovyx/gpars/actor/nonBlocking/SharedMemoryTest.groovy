@@ -17,7 +17,7 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
 public class SharedMemoryTest extends GroovyTestCase {

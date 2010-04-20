@@ -83,7 +83,7 @@ h3. Reactive Actor
 The _ReactiveActor_ class, constructed typically by calling _Actors.reactor()_ or _DefaultPGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
 
 {code}
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 final def group = new DefaultPGroup()
 
@@ -115,7 +115,7 @@ Here's an example of an actor, which submits a batch of numbers to a _ReactiveAc
 
 {code}
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.dActors
+import groovyx.gpars.actor.Actors
 
 final def doubler = Actors.reactor {
     2 * it

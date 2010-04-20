@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 
 /**

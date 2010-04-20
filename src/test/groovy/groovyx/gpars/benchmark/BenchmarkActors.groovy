@@ -1,6 +1,6 @@
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 class Foo {
     static final def iterations = 4000000

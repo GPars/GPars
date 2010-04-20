@@ -27,7 +27,7 @@ def getYearEndClosing(String symbol, int year) {
     [symbol, price]
 }
 
-def symbols = ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT']
+def symbols = ['AAPL', 'GOOG', 'IBM', 'MSFT']
 
 def start = System.nanoTime()
 

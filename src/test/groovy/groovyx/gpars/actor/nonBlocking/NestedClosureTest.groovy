@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlowVariable
 
 public class NestedClosureTest extends GroovyTestCase {

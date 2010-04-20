@@ -14,12 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor
+package groovyx.gpars.group
 
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Safe
 import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.scheduler.Pool
+import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.ReactiveActor
+import groovyx.gpars.actor.DynamicDispatchActor
 
 /**
  * Provides a common super class of pooled actor groups.

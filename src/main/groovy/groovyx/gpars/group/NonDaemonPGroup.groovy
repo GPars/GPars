@@ -14,10 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor
+package groovyx.gpars.group
 
 import groovyx.gpars.scheduler.DefaultPool
-import groovyx.gpars.scheduler.Pool
 
 /**
  * Provides logical grouping for actors, agents and dataflow tasks and operators. Each group has an underlying thread pool, which will perform actions

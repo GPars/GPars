@@ -6,7 +6,7 @@ package groovyx.gpars.benchmark
 *  Copyright © 2009 Russel Winder.  All rights reserved.
 */
 
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 def execute(int actorCount) {
     final long n = 100000000l // 10 times fewer due to speed issues.

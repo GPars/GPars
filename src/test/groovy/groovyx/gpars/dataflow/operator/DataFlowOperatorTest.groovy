@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable

@@ -17,8 +17,8 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.PGroup
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.PGroup
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference

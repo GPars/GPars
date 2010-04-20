@@ -18,8 +18,8 @@ package groovyx.gpars.remote;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.DefaultPGroup;
-import groovyx.gpars.actor.PGroup;
+import groovyx.gpars.group.DefaultPGroup;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.DefaultPool;
 import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.serial.SerialHandles;

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 /**
  * Demonstrates use of reactor - a specialized actor responding to incoming messages with result of running its body

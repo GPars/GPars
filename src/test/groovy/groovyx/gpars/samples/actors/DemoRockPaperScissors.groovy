@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.PGroup
-import groovyx.gpars.actor.NonDaemonPGroup
+import groovyx.gpars.group.PGroup
+import groovyx.gpars.group.NonDaemonPGroup
 
 /**
  * A popular game implemented with actors.

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.agent;
 
-import groovyx.gpars.actor.PGroup;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.scheduler.Pool;
 import org.codehaus.groovy.runtime.NullObject;

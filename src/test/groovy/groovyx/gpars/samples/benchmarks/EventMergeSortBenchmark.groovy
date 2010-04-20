@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.actor.Actors.actor
 
 /**

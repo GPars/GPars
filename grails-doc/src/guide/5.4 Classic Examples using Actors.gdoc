@@ -11,8 +11,9 @@ h2. Sleeping Barber
 
 "Problem description":http://en.wikipedia.org/wiki/Sleeping_barber_problem
 
-{code}import groovyx.gpars.actor.DefaultPGroup
+{code}import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.Actor
 
 final def group = new DefaultPGroup()

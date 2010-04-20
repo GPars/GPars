@@ -17,6 +17,7 @@
 package groovyx.gpars.actor
 
 import groovyx.gpars.scheduler.ResizeablePool
+import groovyx.gpars.group.DefaultPGroup
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.

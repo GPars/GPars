@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import static java.util.concurrent.TimeUnit.SECONDS
 
 /**

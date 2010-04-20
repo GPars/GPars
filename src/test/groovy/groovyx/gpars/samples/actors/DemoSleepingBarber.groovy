@@ -18,7 +18,7 @@ package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 /**
  * Shows solution to the popular Sleeping Barber concurrency problem - http://en.wikipedia.org/wiki/Sleeping_barber_problem
@@ -127,9 +127,9 @@ customers << new Customer(name: 'Joe', localBarbers: waitingRoom).start()
 customers << new Customer(name: 'Dave', localBarbers: waitingRoom).start()
 customers << new Customer(name: 'Alice', localBarbers: waitingRoom).start()
 
-System.in.read()
+sleep 15000
 customers << new Customer(name: 'James', localBarbers: waitingRoom).start()
-System.in.read()
+sleep 5000
 customers*.join()
 barber.stop()
 waitingRoom.stop()

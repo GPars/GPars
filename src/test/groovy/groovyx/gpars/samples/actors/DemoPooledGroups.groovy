@@ -19,7 +19,7 @@ package groovyx.gpars.samples.actors
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 /**
  * Three actors are created, two of them in a newly created actor group, one in the default actor

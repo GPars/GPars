@@ -56,7 +56,7 @@ Dataflow tasks can be organized into groups to allow for performance fine-tuning
 to create tasks attached to the groups.
 
 {code}
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 def group = new DefaultPGroup()
 

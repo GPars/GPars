@@ -17,7 +17,7 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.ReactiveActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

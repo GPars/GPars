@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.actor.NonDaemonPGroup
+import groovyx.gpars.group.NonDaemonPGroup
 
 /**
  * Create a new Safe wrapping a list of strings

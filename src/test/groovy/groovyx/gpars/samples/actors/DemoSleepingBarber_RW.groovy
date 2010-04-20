@@ -29,7 +29,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 
 //  Have to call this something other than Customer because of the Customer class in DemoSleepingBarber.
 

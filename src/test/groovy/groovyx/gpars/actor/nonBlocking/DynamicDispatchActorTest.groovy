@@ -19,7 +19,7 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import org.codehaus.groovy.runtime.NullObject
 
 public class DynamicDispatchActorTest extends GroovyTestCase {

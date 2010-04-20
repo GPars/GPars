@@ -17,7 +17,7 @@
 package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

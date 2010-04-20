@@ -18,7 +18,7 @@ package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
 final def group = new DefaultPGroup(23)

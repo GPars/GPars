@@ -17,7 +17,7 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.PGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
 /**

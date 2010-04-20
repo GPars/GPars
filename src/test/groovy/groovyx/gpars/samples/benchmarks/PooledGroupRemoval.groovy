@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.benchmarks
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
 final Random random = new Random(System.currentTimeMillis())

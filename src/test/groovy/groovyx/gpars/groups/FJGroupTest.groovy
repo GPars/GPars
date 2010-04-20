@@ -14,10 +14,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package groovyx.gpars.actor.groups
+package groovyx.gpars.groups
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.FJPool
 import java.util.concurrent.CountDownLatch
