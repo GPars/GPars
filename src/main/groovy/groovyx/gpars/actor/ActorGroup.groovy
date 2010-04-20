@@ -1,22 +1,24 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.actor
 
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
+import groovyx.gpars.agent.Safe
+import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.scheduler.Pool
 
 /**
@@ -77,5 +79,72 @@ public abstract class ActorGroup {
         actor.actorGroup = this
         actor.start()
         actor
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state
+     * @param state The initial internal state of the new Safe instance
+     * @return The created instance
+     */
+    public final Safe safe(final def state) {
+        final Safe safe = new Safe(state)
+        safe.attachToThreadPool threadPool
+        return safe
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state
+     * @param state The initial internal state of the new Safe instance
+     * @param copy A closure to use to create a copy of the internal state when sending the internal state out
+     * @return The created instance
+     */
+    public final Safe safe(final def state, final Closure copy) {
+        final Safe safe = new Safe(state, copy)
+        safe.attachToThreadPool threadPool
+        return safe
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * in a fair manner.
+     * @param state The initial internal state of the new Safe instance
+     * @return The created instance
+     */
+    public final Safe fairSafe(final def state) {
+        final Safe safe = safe(state)
+        safe.makeFair()
+        return safe
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * in a fair manner.
+     * @param copy A closure to use to create a copy of the internal state when sending the internal state out
+     * @param state The initial internal state of the new Safe instance
+     * @return The created instance
+     */
+    public final Safe fairSafe(final def state, final Closure copy) {
+        final Safe safe = safe(state, copy)
+        safe.makeFair()
+        return safe
+    }
+
+    /**
+     * Creates a new task assigned to a thread from the current actor group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * @param code The task body to run
+     */
+    public void task(final Closure code) {
+        threadPool.execute code
+    }
+
+    /**
+     * Creates an operator using the current actor group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public DataFlowOperator operator(final Map channels, final Closure code) {
+        return new DataFlowOperator(channels, code).start(this)
     }
 }

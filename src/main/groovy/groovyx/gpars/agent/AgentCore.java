@@ -16,7 +16,9 @@
 
 package groovyx.gpars.agent;
 
-import groovyx.gpars.util.PoolUtils;
+import groovyx.gpars.actor.ActorGroup;
+import groovyx.gpars.actor.Actors;
+import groovyx.gpars.scheduler.Pool;
 import org.codehaus.groovy.runtime.NullObject;
 
 import java.util.ArrayList;
@@ -24,8 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
@@ -35,21 +35,16 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 public abstract class AgentCore implements Runnable {
 
     /**
-     * A thread pool shared by all agents
-     */
-    private static final ExecutorService pool = Executors.newFixedThreadPool(PoolUtils.retrieveDefaultPoolSize(), new AgentThreadFactory());
-
-    /**
      * The thread pool to use with this agent
      */
-    private volatile ExecutorService threadPool = pool;
+    private volatile Pool threadPool = Actors.defaultPooledActorGroup.getThreadPool();
 
     /**
      * Retrieves the thread pool used by the agent
      *
      * @return The thread pool
      */
-    public final ExecutorService getThreadPool() {
+    public final Pool getThreadPool() {
         return threadPool;
     }
 
@@ -58,8 +53,17 @@ public abstract class AgentCore implements Runnable {
      *
      * @param threadPool The thread pool to use
      */
-    public final void attachToThreadPool(final ExecutorService threadPool) {
+    public final void attachToThreadPool(final Pool threadPool) {
         this.threadPool = threadPool;
+    }
+
+    /**
+     * Sets an actor group to use for task scheduling
+     *
+     * @param actorGroup The actorGroup to use
+     */
+    public void setActorGroup(final ActorGroup actorGroup) {
+        attachToThreadPool(actorGroup.getThreadPool());
     }
 
     /**
@@ -137,7 +141,7 @@ public abstract class AgentCore implements Runnable {
      */
     void schedule() {
         if (!queue.isEmpty() && activeUpdater.compareAndSet(this, PASSIVE, ACTIVE)) {
-            threadPool.submit(this);
+            threadPool.execute(this);
         }
     }
 

@@ -1,4 +1,4 @@
-The GPars 0.9 release introduces a lot of changes and additions compared to the previous GParallelizer 0.8.4 release.
+The GPars 0.10 release introduces a lot of gradual enhancements and improvements on top of the previous 0.9 release.
 
 Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=15702
 
@@ -37,11 +37,13 @@ h3. Actors
 
 h3. Dataflow
 
-* A _maxForks_ flag has been added to allow Dataflow operators to internally work concurrently  
+* A _maxForks_ flag has been added to allow Dataflow operators to internally work concurrently
+* Added support for grouping operators and tasks around shared thread pools
 
 h3. Safe
 
 * Reimplemented to increase performance
+* Added support for grouping Safe instances around shared thread pools
 
 h3. Other
 

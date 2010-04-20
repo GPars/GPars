@@ -16,6 +16,7 @@
 
 package groovyx.gpars.agent
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.util.EnhancedRWLock
 import org.codehaus.groovy.runtime.NullObject
@@ -175,5 +176,49 @@ public class Safe<T> extends AgentCore {
      */
     void handleMessage(final Object message) {
         onMessage message
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state.
+     * The instance will use the default thread pool.
+     * @param state The initial internal state of the new Safe instance
+     * @return The created instance
+     */
+    public static final Safe safe(final def state) {
+        Actors.defaultPooledActorGroup.safe(state)
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state.
+     * The instance will use the default thread pool.
+     * @param state The initial internal state of the new Safe instance
+     * @param copy A closure to use to create a copy of the internal state when sending the internal state out
+     * @return The created instance
+     */
+    public static final Safe safe(final def state, final Closure copy) {
+        Actors.defaultPooledActorGroup.safe(state, copy)
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * in a fair manner.
+     * The instance will use the default thread pool.
+     * @param state The initial internal state of the new Safe instance
+     * @return The created instance
+     */
+    public static final Safe fairSafe(final def state) {
+        Actors.defaultPooledActorGroup.fairSafe(state)
+    }
+
+    /**
+     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * in a fair manner.
+     * The instance will use the default thread pool.
+     * @param state The initial internal state of the new Safe instance
+     * @param copy A closure to use to create a copy of the internal state when sending the internal state out
+     * @return The created instance
+     */
+    public static final Safe fairSafe(final def state, final Closure copy) {
+        Actors.defaultPooledActorGroup.fairSafe(state, copy)
     }
 }
