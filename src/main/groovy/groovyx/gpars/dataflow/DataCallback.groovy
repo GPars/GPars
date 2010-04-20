@@ -45,7 +45,7 @@ final class DataCallback extends MessageStream {
      */
     @Override
     public MessageStream send(Object message) {
-        Actors.defaultPooledActorGroup.threadPool.execute {
+        Actors.defaultActorPGroup.threadPool.execute {
             code.call message
         };
         return this;

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 
 /**
  *
@@ -26,6 +26,6 @@ import groovyx.gpars.actor.PooledActorGroup
 public class SingleThreadLoopTest extends LoopTest {
 
     protected void setUp() {
-        group = new PooledActorGroup(1)
+        group = new DefaultPGroup(1)
     }
 }

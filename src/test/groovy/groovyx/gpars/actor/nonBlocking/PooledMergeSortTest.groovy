@@ -16,8 +16,8 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.ActorGroup
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.PGroup
+import groovyx.gpars.actor.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -28,10 +28,10 @@ import java.util.concurrent.TimeUnit
  */
 public class PooledMergeSortTest extends GroovyTestCase {
 
-    ActorGroup group
+    PGroup group
 
     protected void setUp() {
-        group = new PooledActorGroup(10)
+        group = new DefaultPGroup(10)
     }
 
     protected void tearDown() {

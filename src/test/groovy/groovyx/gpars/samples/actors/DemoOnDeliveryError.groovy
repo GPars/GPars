@@ -26,7 +26,7 @@ import java.util.concurrent.CyclicBarrier
  * The onDeliveryError() method can, for example, send a notification back to the original sender of the message.
  */
 
-Actors.defaultPooledActorGroup.resize 10
+Actors.defaultActorPGroup.resize 10
 final CyclicBarrier barrier = new CyclicBarrier(2)
 
 final AbstractPooledActor actor = Actors.actor {

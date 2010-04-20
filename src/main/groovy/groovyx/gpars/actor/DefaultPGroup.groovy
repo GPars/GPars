@@ -41,7 +41,7 @@ import groovyx.gpars.scheduler.Pool
  * </pre>
  *
  * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.actorGroup property,
- * which defaults to the Actors.defaultPooledPGroup, can be set before the actor is started.
+ * which defaults to the Actors.defaultActorPGroup, can be set before the actor is started.
  *
  * <pre>
  * def group = new DefaultPGroup()
@@ -60,21 +60,22 @@ import groovyx.gpars.scheduler.Pool
 public final class DefaultPGroup extends PGroup {
 
     /**
-     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * Creates a group for actors, agents, tasks and operators. The actors will share the supplied thread pool.
+     * @param threadPool The thread pool to use for the group
      */
     public def DefaultPGroup(final Pool threadPool) {
         super(threadPool)
     }
 
     /**
-     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * Creates a group for actors, agents, tasks and operators. The actors will share a common daemon thread pool.
      */
     def DefaultPGroup() {
         super(new DefaultPool(true))
     }
 
     /**
-     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * Creates a group for actors, agents, tasks and operators. The actors will share a common daemon thread pool.
      * @param poolSize The initial size of the underlying thread pool
      */
     def DefaultPGroup(final int poolSize) {

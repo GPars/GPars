@@ -16,12 +16,12 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.ActorGroup
-import groovyx.gpars.actor.NonDaemonActorGroup
+import groovyx.gpars.actor.PGroup
+import groovyx.gpars.actor.NonDaemonPGroup
 
 /**
  * A popular game implemented with actors.
- * Notice the use of a PooledActorGroup to hold the actors participating in the game.
+ * Notice the use of a DefaultPGroup to hold the actors participating in the game.
  * Author: Vaclav Pech, Dierk Koenig
  */
 
@@ -57,7 +57,7 @@ def announce = {Stroke first, Stroke second ->
     out << "winner = ${winner}"
 }
 
-ActorGroup pooled = new NonDaemonActorGroup() // uses default pool size
+PGroup pooled = new NonDaemonPGroup() // uses default pool size
 
 final player1 = pooled.reactor { new Stroke("Player 1", randomMove()) }
 final player2 = pooled.reactor { new Stroke("Player 2", randomMove()) }

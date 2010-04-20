@@ -27,6 +27,9 @@ h4. Renaming hints
 * withAsynchronizer() -> withPool()
 * withExistingAsynchronizer() -> withExistingPool()
 * orchestrate() -> runForkJoin()
+* ActorGroup -> PGroup
+* PooledActorGroup -> DefaultPGroup
+* NonDaemonActorGroup -> NonDaemonPGroup
 
 h3. Fork / Join
 

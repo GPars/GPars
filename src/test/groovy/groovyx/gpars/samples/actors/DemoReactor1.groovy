@@ -16,14 +16,14 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 
 /**
  * Demonstrates use of reactor - a specialized actor responding to incoming messages with result of running its body
  * on the message.
  */
 
-final def group = new PooledActorGroup(4)
+final def group = new DefaultPGroup(4)
 
 final def doubler = group.reactor {
     2 * it

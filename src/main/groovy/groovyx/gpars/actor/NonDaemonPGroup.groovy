@@ -20,8 +20,12 @@ import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.Pool
 
 /**
- * Represents a group of pooled-bound actors, which share a pool of non-daemon threads.
- * @see groovyx.gpars.actor.PooledPGroup for more details on groups of pooled actors.
+ * Provides logical grouping for actors, agents and dataflow tasks and operators. Each group has an underlying thread pool, which will perform actions
+ * on behalf of the users belonging to the group. Actors created through the DefaultPGroup.actor() method
+ * will automatically belong to the group through which they were created, just like agents created through the safe() or fairSafe() methods
+ * or dataflow tasks and operators created through the task() or operator() methods.
+ * Uses a pool of non-daemon threads.
+ * The DefaultPGroup class implements the Pool interface through @Delegate.
  *
  * @author Vaclav Pech
  * Date: Jun 17, 2009
@@ -29,24 +33,17 @@ import groovyx.gpars.scheduler.Pool
 public final class NonDaemonPGroup extends PGroup {
 
     /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
+     * Creates a group for actors, agents, tasks and operators. The actors will share a common non-daemon thread pool.
      */
-    def NonDaemonActorGroup(final Pool threadPool) {
-        super(threadPool)
-    }
-
-    /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
-     */
-    def NonDaemonActorGroup() {
+    def NonDaemonPGroup() {
         super(new DefaultPool(false))
     }
 
     /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
+     * Creates a group for actors, agents, tasks and operators. The actors will share a common non-daemon thread pool.
      * @param poolSize The initial size of the underlying thread pool
      */
-    def NonDaemonActorGroup(final int poolSize) {
+    def NonDaemonPGroup(final int poolSize) {
         super(new DefaultPool(false, poolSize))
     }
 }

@@ -1,6 +1,6 @@
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 
 class Foo {
     static final def iterations = 4000000
@@ -32,7 +32,7 @@ class Foo {
     }
 
     static void singleActorPerform() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         def a1 = group.actor {
             perform(iterations)
         }
@@ -41,7 +41,7 @@ class Foo {
     }
 
     static void actorPerform() {
-        final PooledActorGroup group = new PooledActorGroup(2)
+        final DefaultPGroup group = new DefaultPGroup(2)
         def a1 = group.actor {
             perform(iterations / 2)
         }

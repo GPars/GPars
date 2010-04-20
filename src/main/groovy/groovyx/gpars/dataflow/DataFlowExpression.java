@@ -344,7 +344,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      */
     private void notifyRemote(final UUID hostId) {
         if (serialHandle != null) {
-            Actors.defaultPooledActorGroup.getThreadPool().execute(new Runnable() {
+            Actors.defaultActorPGroup.getThreadPool().execute(new Runnable() {
                 public void run() {
                     final Object sub = serialHandle.getSubscribers();
                     if (sub instanceof RemoteHost) {

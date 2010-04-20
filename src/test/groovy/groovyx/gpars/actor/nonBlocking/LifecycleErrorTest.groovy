@@ -17,13 +17,13 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 public class LifecycleErrorTest extends GroovyTestCase {
 
-    def group = new PooledActorGroup(3)
+    def group = new DefaultPGroup(3)
 
     protected void setUp() {
         super.setUp();

@@ -185,7 +185,7 @@ public class Safe<T> extends AgentCore {
      * @return The created instance
      */
     public static final Safe safe(final def state) {
-        Actors.defaultPooledActorGroup.safe(state)
+        Actors.defaultActorPGroup.safe(state)
     }
 
     /**
@@ -196,7 +196,7 @@ public class Safe<T> extends AgentCore {
      * @return The created instance
      */
     public static final Safe safe(final def state, final Closure copy) {
-        Actors.defaultPooledActorGroup.safe(state, copy)
+        Actors.defaultActorPGroup.safe(state, copy)
     }
 
     /**
@@ -207,7 +207,7 @@ public class Safe<T> extends AgentCore {
      * @return The created instance
      */
     public static final Safe fairSafe(final def state) {
-        Actors.defaultPooledActorGroup.fairSafe(state)
+        Actors.defaultActorPGroup.fairSafe(state)
     }
 
     /**
@@ -219,6 +219,6 @@ public class Safe<T> extends AgentCore {
      * @return The created instance
      */
     public static final Safe fairSafe(final def state, final Closure copy) {
-        Actors.defaultPooledActorGroup.fairSafe(state, copy)
+        Actors.defaultActorPGroup.fairSafe(state, copy)
     }
 }

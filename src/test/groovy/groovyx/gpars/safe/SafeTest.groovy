@@ -17,7 +17,8 @@
 package groovyx.gpars.safe
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.NonDaemonActorGroup
+import groovyx.gpars.actor.DefaultPGroup
+import groovyx.gpars.actor.NonDaemonPGroup
 import groovyx.gpars.agent.Safe
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
@@ -54,7 +55,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testCustomGroup() {
-        final NonDaemonActorGroup group = new NonDaemonActorGroup(1)
+        final NonDaemonPGroup group = new NonDaemonPGroup(1)
         def jugMembers = group.safe(['Me'])  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
@@ -70,7 +71,7 @@ public class SafeTest extends GroovyTestCase {
     public void testCustomThreadPool() {
         def jugMembers = new Safe<List>(['Me'])  //add Me
         final ExecutorService pool = Executors.newFixedThreadPool(1)
-        final NonDaemonActorGroup group = new NonDaemonActorGroup(new DefaultPool(pool))
+        final def group = new DefaultPGroup(new DefaultPool(pool))
         jugMembers.attachToThreadPool group.threadPool
 
         jugMembers.send {it.add 'James'}  //add James

@@ -11,11 +11,11 @@ h2. Sleeping Barber
 
 "Problem description":http://en.wikipedia.org/wiki/Sleeping_barber_problem
 
-{code}import groovyx.gpars.actor.PooledActorGroup
+{code}import groovyx.gpars.actor.DefaultPGroup
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 
-final def group = new PooledActorGroup()
+final def group = new DefaultPGroup()
 
 final def barber = group.actor {
     final def random = new Random()
@@ -127,7 +127,7 @@ h2. Dining Philosophers
 {code}import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actors
 
-Actors.defaultPooledActorGroup.resize 5
+Actors.defaultActorPGroup.resize 5
 
 final class Philosopher extends AbstractPooledActor {
     private Random random = new Random()

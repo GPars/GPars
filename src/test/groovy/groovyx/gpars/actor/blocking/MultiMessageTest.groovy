@@ -18,7 +18,7 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
@@ -101,7 +101,7 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
-        final def group = new PooledActorGroup(10)
+        final def group = new DefaultPGroup(10)
 
         def actor = group.actor {
             receive {a, b, c ->
@@ -124,7 +124,7 @@ public class MultiMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(3)
         volatile AtomicInteger result = new AtomicInteger(0)
-        final def group = new PooledActorGroup(10)
+        final def group = new DefaultPGroup(10)
 
         def actor = group.actor {
             receive {a, b, c ->

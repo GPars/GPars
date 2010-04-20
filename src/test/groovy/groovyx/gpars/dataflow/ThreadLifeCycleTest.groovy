@@ -24,7 +24,7 @@ import static groovyx.gpars.dataflow.DataFlow.start
 
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
-    public void testActorGroup() {
+    public void testPGroup() {
         final Actor actor = start {
             react {}
         }

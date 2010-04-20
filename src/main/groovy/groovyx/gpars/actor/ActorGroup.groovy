@@ -27,7 +27,7 @@ import groovyx.gpars.scheduler.Pool
  * @author Vaclav Pech, Alex Tkachman
  * Date: May 8, 2009
  */
-public abstract class ActorGroup {
+public abstract class PGroup {
 
     /**
      * Stores the group actors' thread pool
@@ -37,9 +37,9 @@ public abstract class ActorGroup {
     public Pool getThreadPool() { return threadPool; }
 
     /**
-     * Creates a group of pooled actors. The actors will share a common daemon thread pool.
+     * Creates a group for actors, agents, tasks and operators. The actors will share a common daemon thread pool.
      */
-    protected def ActorGroup(final Pool threadPool) {
+    protected def PGroup(final Pool threadPool) {
         this.threadPool = threadPool
     }
 

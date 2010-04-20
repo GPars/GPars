@@ -17,7 +17,7 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
 public class SharedMemoryTest extends GroovyTestCase {
@@ -27,7 +27,7 @@ public class SharedMemoryTest extends GroovyTestCase {
     public void testSharedAccess() {
         long counter = 0
 
-        def group = new PooledActorGroup(2)
+        def group = new DefaultPGroup(2)
         def latch = new CountDownLatch(1)
 
         Actor actor1 = group.actor {

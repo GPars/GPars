@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
@@ -92,7 +92,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
 
-        final PooledActorGroup group = new PooledActorGroup()
+        final DefaultPGroup group = new DefaultPGroup()
 
         def op = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
             bindOutput 0, 2 * x + y
@@ -107,7 +107,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testCombinedOperators() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -140,7 +140,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -156,7 +156,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testInterrupt() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
@@ -175,7 +175,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testEmptyInputs() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -188,7 +188,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputs() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -207,7 +207,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testEmptyOutputs() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -222,7 +222,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testInputNumber() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -261,7 +261,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
@@ -276,7 +276,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()

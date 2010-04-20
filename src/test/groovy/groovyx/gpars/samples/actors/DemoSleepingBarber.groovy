@@ -18,13 +18,13 @@ package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 
 /**
  * Shows solution to the popular Sleeping Barber concurrency problem - http://en.wikipedia.org/wiki/Sleeping_barber_problem
  */
 
-final def group = new PooledActorGroup()
+final def group = new DefaultPGroup()
 final def random = new Random()
 
 final def barber = group.reactor {message ->

@@ -20,7 +20,7 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;
 import groovy.time.Duration;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.ActorGroup;
+import groovyx.gpars.actor.PGroup;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.Actors;
 import org.codehaus.groovy.runtime.CurriedClosure;
@@ -53,7 +53,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * The actor group to which the actor belongs
      */
-    protected volatile ActorGroup actorGroup;
+    protected volatile PGroup actorGroup;
 
     /**
      * Code for the loop, if any
@@ -281,7 +281,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Creates a new instance, sets the default actor group.
      */
     protected SequentialProcessingActor() {
-        setActorGroup(Actors.defaultPooledActorGroup);
+        setActorGroup(Actors.defaultActorPGroup);
     }
 
     /**
@@ -290,7 +290,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @param group new group
      */
-    public final void setActorGroup(final ActorGroup group) {
+    public final void setActorGroup(final PGroup group) {
         if (group == null) {
             throw new IllegalArgumentException("Cannot set actor's group to null.");
         }
@@ -307,7 +307,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @return The actor's group
      */
-    public ActorGroup getActorGroup() {
+    public PGroup getActorGroup() {
         return actorGroup;
     }
 

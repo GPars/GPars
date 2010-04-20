@@ -24,7 +24,7 @@ import groovyx.gpars.scheduler.ResizeablePool
  * <pre>
  * import static org.gpars.actor.Actors.*
  *
- * Actors.defaultPooledActorGroup.resize 1
+ * Actors.defaultActorPGroup.resize 1
  *
  * def actor = actor {*     react {message ->
  *         println message
@@ -36,7 +36,7 @@ import groovyx.gpars.scheduler.ResizeablePool
  *
  * All actors created through the Actors class will belong to the same default actor group and run
  * on daemon threads.
- * The PooledActorGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
+ * The DefaultPGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
  * threads are to be used.
  * @author Vaclav Pech, Alex Tkachman
  * Date: Feb 18, 2009
@@ -46,7 +46,7 @@ public abstract class Actors {
     /**
      * The default actor group to share by all actors created through the Actors class.
      */
-    public final static PooledActorGroup defaultPooledActorGroup = new PooledActorGroup(new ResizeablePool(true))
+    public final static DefaultPGroup defaultActorPGroup = new DefaultPGroup(new ResizeablePool(true))
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
@@ -55,7 +55,7 @@ public abstract class Actors {
      * @return A newly created instance of the AbstractPooledActor class
      */
     public static AbstractPooledActor actor(Runnable handler) {
-        return defaultPooledActorGroup.actor(handler)
+        return defaultActorPGroup.actor(handler)
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class Actors {
      * @return A new instance of ReactiveEventBasedThread
      */
     public static AbstractPooledActor reactor(final Closure code) {
-        return defaultPooledActorGroup.reactor(code)
+        return defaultActorPGroup.reactor(code)
     }
 
     /**
@@ -75,6 +75,6 @@ public abstract class Actors {
      * @param code The closure specifying individual message handlers.
      */
     public static AbstractPooledActor messageHandler(final Closure code) {
-        return defaultPooledActorGroup.messageHandler(code)
+        return defaultActorPGroup.messageHandler(code)
     }
 }

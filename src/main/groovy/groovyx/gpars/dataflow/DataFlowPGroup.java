@@ -20,7 +20,7 @@ import groovyx.gpars.actor.PGroup;
 import groovyx.gpars.scheduler.ResizeablePool;
 
 /**
- * Groups all dataflow threads, which are effectively pooled actors.
+ * Groups all dataflow threads, tasks and operators.
  * DataFlow leverages a resizeable pool of non-daemon threads.
  * DataFlowPGroup can be used directly to create and group dataflow actors (threads)
  * <pre>
@@ -35,7 +35,7 @@ import groovyx.gpars.scheduler.ResizeablePool;
  */
 public final class DataFlowPGroup extends PGroup {
     /**
-     * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.
+     * Creates a default group for dataflow tasks and operators. The actors will share a common non-daemon thread pool.
      *
      * @param poolSize The initial size of the underlying thread pool
      */

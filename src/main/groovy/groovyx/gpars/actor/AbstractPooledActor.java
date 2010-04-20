@@ -34,8 +34,8 @@ import java.util.concurrent.TimeUnit;
  * AbstractPooledActor provides the default Actor implementation. It represents a standalone active object (actor),
  * which reacts asynchronously to messages sent to it from outside through the send() method.
  * Each Actor has its own message queue and a thread pool shared with other Actors by means of an instance
- * of the ActorGroup, which they have in common.
- * The ActorGroup instance is responsible for the pool creation, management and shutdown.
+ * of the PGroup, which they have in common.
+ * The PGroup instance is responsible for the pool creation, management and shutdown.
  * All work performed by an Actor is divided into chunks, which are sequentially submitted as independent tasks
  * to the thread pool for processing.
  * Whenever an Actor looks for a new message through the react() method, the actor gets detached

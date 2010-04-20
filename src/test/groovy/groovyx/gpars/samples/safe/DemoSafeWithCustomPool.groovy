@@ -16,12 +16,12 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.actor.NonDaemonActorGroup
+import groovyx.gpars.actor.NonDaemonPGroup
 
 /**
  * Create a new Safe wrapping a list of strings
  */
-final def group = new NonDaemonActorGroup(10)
+final def group = new NonDaemonPGroup(10)
 def jugMembers = group.safe(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James

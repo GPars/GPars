@@ -115,7 +115,7 @@ A little bit more realistic example of an event-driven actor that receives two n
 import static groovyx.gpars.actor.Actors.*
 
 //not necessary, just showing that a single-threaded pool can still handle multiple actors
-defaultPooledActorGroup.resize 1
+defaultActorPGroup.resize 1
 
 final def console = actor {
     loop {
@@ -187,7 +187,7 @@ Closure createMessageHandler(def parentActor) {
     }
 }
 
-def console = new PooledActorGroup(1).actor {
+def console = new DefaultPGroup(1).actor {
     react {
         println "Sorted array:\t${it}"
         System.exit 0
@@ -251,7 +251,7 @@ h3. Pool management
 _Actors_ can be organized into groups and as a default there's always an application-wide pooled actor group available. And just like the _Actors_ abstract factory can be used to create actors in the default group, custom groups can be used as abstract factories to create new actors instances belonging to these groups.
 
 {code}
-def myGroup = new PooledActorGroup()
+def myGroup = new DefaultPGroup()
 
 def actor1 = myGroup.actor {
 ...
@@ -265,35 +265,35 @@ def actor2 = myGroup.actor {
 The actors belonging to the same group share the *underlying thread pool* of that group. The pool by default contains *n + 1 threads*, where *n* stands for the number of *CPUs* detected by the JVM. The *pool size* can be set *explicitly* either by setting the _gpars.poolsize_ system property or individually for each actor group by specifying the appropriate constructor parameter.
 
 {code}
-def myGroup = new PooledActorGroup(10)  //the pool will contain 10 threads
+def myGroup = new DefaultPGroup(10)  //the pool will contain 10 threads
 {code}
 
-The thread pool can be manipulated through the appropriate _PooledActorGroup_ class, which *delegates* to the _Pool_ interface of the thread pool. For example, the _resize()_ method allows you to change the pool size any time and the _resetDefaultSize()_ sets it back to the default value. The _shutdown()_ method can be called when you need to safely finish all tasks, destroy the pool and stop all the threads in order to exit JVM in an organized manner.
+The thread pool can be manipulated through the appropriate _DefaultPGroup_ class, which *delegates* to the _Pool_ interface of the thread pool. For example, the _resize()_ method allows you to change the pool size any time and the _resetDefaultSize()_ sets it back to the default value. The _shutdown()_ method can be called when you need to safely finish all tasks, destroy the pool and stop all the threads in order to exit JVM in an organized manner.
 
 {code}
 ... (n+1 threads in the default pool after startup)
 
-Actors.defaultPooledActorGroup.resize 1  //use one-thread pool
+Actors.defaultActorPGroup.resize 1  //use one-thread pool
 
 ... (1 thread in the pool)
 
-Actors.defaultPooledActorGroup.resetDefaultSize()
+Actors.defaultActorPGroup.resetDefaultSize()
 
 ... (n+1 threads in the pool)
 
-Actors.defaultPooledActorGroup.shutdown()
+Actors.defaultActorPGroup.shutdown()
 {code}
 
-As an alternative to the _PooledActorGroup_, which creates a pool of daemon threads, the _NonDaemonActorGroup_ class can be used when non-daemon threads are required.
+As an alternative to the _DefaultPGroup_, which creates a pool of daemon threads, the _NonDaemonPGroup_ class can be used when non-daemon threads are required.
 
 {code}
-def daemonGroup = new PooledActorGroup()
+def daemonGroup = new DefaultPGroup()
 
 def actor1 = daemonGroup.actor {
 ...
 }
 
-def nonDaemonGroup = new NonDaemonActorGroup()
+def nonDaemonGroup = new NonDaemonPGroup()
 
 def actor2 = nonDaemonGroup.actor {
 ...
@@ -311,8 +311,8 @@ class MyActor {
 Actors belonging to the same group share the *underlying thread pool*. With pooled actor groups you can split your actors to leverage multiple thread pools of different sizes and so assign resources to different components of your system and tune their performance.
 
 {code}
-def coreActors = new NonDaemonActorGroup(5)  //5 non-daemon threads pool
-def helperActors = new PooledActorGroup(1)  //1 daemon thread pool
+def coreActors = new NonDaemonPGroup(5)  //5 non-daemon threads pool
+def helperActors = new DefaultPGroup(1)  //1 daemon thread pool
 
 def priceCalculator = coreActors.actor {
 ...
@@ -342,15 +342,15 @@ Do not forget to shutdown custom pooled actor groups, once you no longer need th
 h3. Common trap: App terminates while actors do not receive messages
 
 Most likely you're using daemon threads and pools, which is the default setting, and your main thread finishes. Calling _actor.join()_ on any, some or all of your actors would block the main thread until the actor terminates and thus keep all your actors running.
-Alternatively use instances of _NonDaemonActorGroup_ and assign some of your actors to these groups.
+Alternatively use instances of _NonDaemonPGroup_ and assign some of your actors to these groups.
 {code}
-def nonDaemonGroup = new NonDaemonActorGroup()
+def nonDaemonGroup = new NonDaemonPGroup()
 def myActor = nonDaemonGroup.actor {...}
 {code}
 
 alternatively
 {code}
-def nonDaemonGroup = new NonDaemonActorGroup()
+def nonDaemonGroup = new NonDaemonPGroup()
 
 class MyActor extends AbstractPooledActor {
     def MyActor() {

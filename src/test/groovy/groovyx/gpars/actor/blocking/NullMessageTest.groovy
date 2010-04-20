@@ -37,7 +37,7 @@ public class NullMessageTest extends GroovyTestCase {
     }
 
     public void testNullMessageFromActor() {
-        Actors.defaultPooledActorGroup.resize(100)
+        Actors.defaultActorPGroup.resize(100)
         volatile def result = ''
         final def latch = new CountDownLatch(1)
         final Actor actor = Actors.actor {

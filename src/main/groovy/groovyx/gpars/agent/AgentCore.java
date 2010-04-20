@@ -16,7 +16,7 @@
 
 package groovyx.gpars.agent;
 
-import groovyx.gpars.actor.ActorGroup;
+import groovyx.gpars.actor.PGroup;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.scheduler.Pool;
 import org.codehaus.groovy.runtime.NullObject;
@@ -37,7 +37,7 @@ public abstract class AgentCore implements Runnable {
     /**
      * The thread pool to use with this agent
      */
-    private volatile Pool threadPool = Actors.defaultPooledActorGroup.getThreadPool();
+    private volatile Pool threadPool = Actors.defaultActorPGroup.getThreadPool();
 
     /**
      * Retrieves the thread pool used by the agent
@@ -60,10 +60,10 @@ public abstract class AgentCore implements Runnable {
     /**
      * Sets an actor group to use for task scheduling
      *
-     * @param actorGroup The actorGroup to use
+     * @param pGroup The pGroup to use
      */
-    public void setActorGroup(final ActorGroup actorGroup) {
-        attachToThreadPool(actorGroup.getThreadPool());
+    public void setPGroup(final PGroup pGroup) {
+        attachToThreadPool(pGroup.getThreadPool());
     }
 
     /**

@@ -30,7 +30,7 @@ public abstract class DataFlow {
     /**
      * The actor group used by all Dataflow Concurrency actors by default.
      */
-    public static final DataFlowActorGroup DATA_FLOW_GROUP = new DataFlowActorGroup(1)
+    public static final DataFlowPGroup DATA_FLOW_GROUP = new DataFlowPGroup(1)
 
     /**
      * Tasks need no channels
@@ -39,10 +39,8 @@ public abstract class DataFlow {
 
     /**
      * Creates a new instance of SingleRunActor to run the supplied code.
-     * @deprecated Use task() instead
+     * In general cases prefer task() instead, which is more lightweight.
      */
-    //todo remove
-
     public static Actor start(final Closure code) {
         new SingleRunActor(body: code).start()
     }

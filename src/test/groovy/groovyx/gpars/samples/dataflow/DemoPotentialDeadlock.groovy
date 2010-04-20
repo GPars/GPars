@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowActorGroup
+import groovyx.gpars.dataflow.DataFlowPGroup
 import groovyx.gpars.dataflow.DataFlowVariable
 
 /**
@@ -26,7 +26,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
  * @author Vaclav Pech
  */
 
-final DataFlowActorGroup group = new DataFlowActorGroup(1)
+final DataFlowPGroup group = new DataFlowPGroup(1)
 
 final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()

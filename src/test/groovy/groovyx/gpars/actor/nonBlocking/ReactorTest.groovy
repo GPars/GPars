@@ -17,7 +17,7 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 import groovyx.gpars.actor.ReactiveActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -58,7 +58,7 @@ public class ReactorTest extends GroovyTestCase {
     }
 
     public void testMessageProcessing() {
-        final def group = new PooledActorGroup(4)
+        final def group = new DefaultPGroup(4)
         final def result1 = new AtomicInteger(0)
         final def result2 = new AtomicInteger(0)
         final def result3 = new AtomicInteger(0)
@@ -89,7 +89,7 @@ public class ReactorTest extends GroovyTestCase {
     }
 
     public void testGroup() {
-        final PooledActorGroup group = new PooledActorGroup()
+        final DefaultPGroup group = new DefaultPGroup()
         final ReactiveActor reactor = group.reactor {}
         assertSame group, reactor.actorGroup
     }

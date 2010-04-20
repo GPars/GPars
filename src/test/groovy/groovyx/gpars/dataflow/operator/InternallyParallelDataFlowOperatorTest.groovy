@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
@@ -85,7 +85,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
-        final PooledActorGroup group = new PooledActorGroup(poolSize)
+        final DefaultPGroup group = new DefaultPGroup(poolSize)
 
         def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: forks) {x, y, z ->
             sleep 1000
@@ -125,7 +125,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
@@ -140,7 +140,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()

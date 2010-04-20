@@ -17,8 +17,8 @@
 package groovyx.gpars.samples.benchmarks
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.ActorGroup
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.PGroup
+import groovyx.gpars.actor.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
 final Random random = new Random(System.currentTimeMillis())
@@ -29,7 +29,7 @@ final long memory1 = Runtime.runtime.freeMemory()
 println 'Threads at start: ' + Thread.threads.length
 for (i in 0..10000) {
     final CountDownLatch latch = new CountDownLatch(1)
-    final ActorGroup group = new PooledActorGroup(Math.max(1, random.nextInt(20)))
+    final PGroup group = new DefaultPGroup(Math.max(1, random.nextInt(20)))
     final Actor actor = group.actor {
         receive {
             reply it

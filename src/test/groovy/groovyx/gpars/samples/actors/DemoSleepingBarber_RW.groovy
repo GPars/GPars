@@ -29,7 +29,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.DefaultPGroup
 
 //  Have to call this something other than Customer because of the Customer class in DemoSleepingBarber.
 
@@ -53,7 +53,7 @@ class SuccessfulCustomer extends BarberCustomer {
     public SuccessfulCustomer(final Customer_RW c) { customer = c }
 }
 
-def group = new PooledActorGroup()
+def group = new DefaultPGroup()
 def barbersShop
 def barber = group.reactor {message ->
     if (message instanceof PendingCustomer) {

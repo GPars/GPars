@@ -17,8 +17,8 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.ActorGroup
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.PGroup
+import groovyx.gpars.actor.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlows
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
@@ -34,10 +34,10 @@ import java.util.concurrent.atomic.AtomicReference
  */
 public class LifeCycleTest extends GroovyTestCase {
 
-    ActorGroup group
+    PGroup group
 
     protected void setUp() {
-        group = new PooledActorGroup(5)
+        group = new DefaultPGroup(5)
     }
 
     protected void tearDown() {
