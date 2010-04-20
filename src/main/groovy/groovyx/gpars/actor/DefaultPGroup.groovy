@@ -20,13 +20,15 @@ import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.Pool
 
 /**
- * Provides logical grouping for pooled actors. Each group has an underlying thread pool, which will perform actions
- * on behalf of the actors belonging to the group. Actors created through the PooledActorGroup.actor() method
- * will automatically belong to the group through which they were created.
- * The PooledActorGroup class implements the Pool interface through @Delegate.
+ * Provides logical grouping for actors, agents and dataflow tasks and operators. Each group has an underlying thread pool, which will perform actions
+ * on behalf of the users belonging to the group. Actors created through the DefaultPGroup.actor() method
+ * will automatically belong to the group through which they were created, just like agents created through the safe() or fairSafe() methods
+ * or dataflow tasks and operators created through the task() or operator() methods.
+ * Uses a pool of non-daemon threads.
+ * The DefaultPGroup class implements the Pool interface through @Delegate.
  * <pre>
  *
- * def group = new PooledActorGroup()
+ * def group = new DefaultPGroup()
  * group.resize 1
  *
  * def actor = group.actor {*     react {message ->
@@ -39,10 +41,10 @@ import groovyx.gpars.scheduler.Pool
  * </pre>
  *
  * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.actorGroup property,
- * which defaults to the Actors.defaultPooledActorGroup, can be set before the actor is started.
+ * which defaults to the Actors.defaultPooledPGroup, can be set before the actor is started.
  *
  * <pre>
- * def group = new PooledActorGroup()
+ * def group = new DefaultPGroup()
  *
  * def actor = new MyActor()
  * actor.actorGroup = group
@@ -52,24 +54,22 @@ import groovyx.gpars.scheduler.Pool
  *
  * </pre>
  *
- * PooledActorGroups use pools of daemon threads.
- *
  * @author Vaclav Pech
  * Date: May 4, 2009
  */
-public final class PooledActorGroup extends ActorGroup {
+public final class DefaultPGroup extends PGroup {
 
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
-    public def PooledActorGroup(final Pool threadPool) {
+    public def DefaultPGroup(final Pool threadPool) {
         super(threadPool)
     }
 
     /**
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      */
-    def PooledActorGroup() {
+    def DefaultPGroup() {
         super(new DefaultPool(true))
     }
 
@@ -77,7 +77,7 @@ public final class PooledActorGroup extends ActorGroup {
      * Creates a group of pooled actors. The actors will share a common daemon thread pool.
      * @param poolSize The initial size of the underlying thread pool
      */
-    def PooledActorGroup(final int poolSize) {
+    def DefaultPGroup(final int poolSize) {
         super(new DefaultPool(true, poolSize))
     }
 }

@@ -21,12 +21,12 @@ import groovyx.gpars.scheduler.Pool
 
 /**
  * Represents a group of pooled-bound actors, which share a pool of non-daemon threads.
- * @see groovyx.gpars.actor.PooledActorGroup for more details on groups of pooled actors.
+ * @see groovyx.gpars.actor.PooledPGroup for more details on groups of pooled actors.
  *
  * @author Vaclav Pech
  * Date: Jun 17, 2009
  */
-public final class NonDaemonActorGroup extends ActorGroup {
+public final class NonDaemonPGroup extends PGroup {
 
     /**
      * Creates a group of pooled actors. The actors will share a common non-daemon thread pool.

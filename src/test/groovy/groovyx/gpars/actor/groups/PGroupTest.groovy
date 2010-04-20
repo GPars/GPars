@@ -17,13 +17,13 @@
 package groovyx.gpars.actor.groups
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.actor.PGroup
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.NonDaemonActorGroup
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.actor.NonDaemonPGroup
+import groovyx.gpars.actor.PooledPGroup
 import java.util.concurrent.CountDownLatch
 
-public class PooledActorGroupTest extends GroovyTestCase {
+public class PooledPGroupTest extends GroovyTestCase {
 
     public void testDefaultGroupDaemon() {
         volatile boolean daemon = false;
@@ -34,7 +34,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        assertEquals Actors.defaultPooledActorGroup, actor.actorGroup
+        assertEquals Actors.defaultPooledPGroup, actor.actorGroup
         latch.await()
         assert daemon
     }
@@ -44,8 +44,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
 
-        final PooledActorGroup daemonGroup = new PooledActorGroup()
-        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final PooledPGroup daemonGroup = new PooledPGroup()
+        final PGroup nonDaemonGroup = new NonDaemonPGroup()
 
         def actor1 = daemonGroup.actor {
             daemon = Thread.currentThread().isDaemon()
@@ -74,8 +74,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
 //        final CountDownLatch latch1 = new CountDownLatch(1)
 //        final CountDownLatch latch2 = new CountDownLatch(1)
 //
-//        final PooledActorGroup daemonGroup = new PooledActorGroup()
-//        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+//        final PooledPGroup daemonGroup = new PooledPGroup()
+//        final PGroup nonDaemonGroup = new NonDaemonPGroup()
 //
 //        final GroupTestActor actor1 = new GroupTestActor(daemonGroup)
 //        actor1.metaClass.act = {->
@@ -103,8 +103,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
     }
 
     public void testValidGroupReset() {
-        final PooledActorGroup daemonGroup = new PooledActorGroup()
-        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final PooledPGroup daemonGroup = new PooledPGroup()
+        final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
 
         assertEquals daemonGroup, actor.actorGroup
@@ -116,8 +116,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
     }
 
     public void testInvalidGroupReset() {
-        final PooledActorGroup daemonGroup = new PooledActorGroup()
-        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final PooledPGroup daemonGroup = new PooledPGroup()
+        final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
         actor.start()
         assertEquals daemonGroup, actor.actorGroup
@@ -130,11 +130,11 @@ public class PooledActorGroupTest extends GroovyTestCase {
 
     @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
     public void testDifferentPools() {
-        final PooledActorGroup daemonGroup1 = new PooledActorGroup()
-        final PooledActorGroup daemonGroup2 = new PooledActorGroup(3)
-        final NonDaemonActorGroup nonDaemonGroup1 = new NonDaemonActorGroup()
-        final NonDaemonActorGroup nonDaemonGroup2 = new NonDaemonActorGroup(3)
-        final PooledActorGroup defaultGroup = Actors.defaultPooledActorGroup
+        final PooledPGroup daemonGroup1 = new PooledPGroup()
+        final PooledPGroup daemonGroup2 = new PooledPGroup(3)
+        final NonDaemonPGroup nonDaemonGroup1 = new NonDaemonPGroup()
+        final NonDaemonPGroup nonDaemonGroup2 = new NonDaemonPGroup(3)
+        final PooledPGroup defaultGroup = Actors.defaultPooledPGroup
 
         assert daemonGroup1.threadPool != daemonGroup2.threadPool
         assert daemonGroup1.threadPool != nonDaemonGroup1.threadPool
@@ -148,7 +148,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
 
 class GroupTestActor extends AbstractPooledActor {
 
-    def GroupTestActor(ActorGroup group) {
+    def GroupTestActor(PGroup group) {
         actorGroup = group
     }
 
