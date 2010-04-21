@@ -23,7 +23,7 @@ import groovyx.gpars.actor.Actors
  * Shows actor solution to The Dining Philosophers problem
  */
 
-Actors.defaultPooledActorGroup.resize 5
+Actors.defaultActorPGroup.resize 5
 
 final class Philosopher extends AbstractPooledActor {
     private Random random = new Random()

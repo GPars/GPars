@@ -18,7 +18,7 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.impl.ActorReplyException
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CountDownLatch
@@ -96,7 +96,7 @@ public class ReplyTest extends GroovyTestCase {
     public void testMultipleActors() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CyclicBarrier completedBarrier = new CyclicBarrier(3)
-        final def group = new PooledActorGroup(5)
+        final def group = new DefaultPGroup(5)
         def replies1 = []
         def replies2 = []
 

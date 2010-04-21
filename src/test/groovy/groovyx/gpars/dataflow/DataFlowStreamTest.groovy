@@ -1,22 +1,23 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 
@@ -153,5 +154,57 @@ public class DataFlowStreamTest extends GroovyTestCase {
         stream.val
         assertEquals 'DataFlowStream(queue=[])', stream.toString()
         assertEquals 'DataFlowStream(queue=[])', stream.toString()
+    }
+
+    public void testWhenNextBound() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlows df = new DataFlows()
+        stream >> {df.x1 = it}
+        stream >> {df.x2 = it}
+        def actor = Actors.actor {
+            react {
+                df.x3 = it
+            }
+        }
+        stream.whenNextBound(actor)
+        stream << 10
+        stream << 20
+        stream << 30
+        assertEquals 10, df.x1
+        assertEquals 20, df.x2
+        assertEquals 30, df.x3
+    }
+
+    public void testWhenBound() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlowStream dfs1 = new DataFlowStream()
+        final DataFlowStream dfs2 = new DataFlowStream()
+        final DataFlowStream dfs3 = new DataFlowStream()
+        stream.whenBound {dfs1 << it}
+        stream.whenBound {dfs2 << it}
+        def actor = Actors.actor {
+            react {
+                dfs3 << it
+                react {
+                    dfs3 << it
+                    react {
+                        dfs3 << it
+                        react {
+                            dfs3 << it
+                        }
+                    }
+                }
+            }
+        }
+        stream.whenBound(actor)
+        stream << 10
+        stream << 20
+        stream << 30
+        def df = new DataFlowVariable()
+        stream << df
+        df << 40
+        assert [10, 20, 30, 40] as Set == [dfs1.val, dfs1.val, dfs1.val, dfs1.val] as Set
+        assert [10, 20, 30, 40] as Set == [dfs2.val, dfs2.val, dfs2.val, dfs2.val] as Set
+        assert [10, 20, 30, 40] as Set == [dfs3.val, dfs3.val, dfs3.val, dfs3.val] as Set
     }
 }

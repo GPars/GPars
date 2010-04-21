@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import static java.util.concurrent.TimeUnit.SECONDS
 
 /**
@@ -29,7 +29,7 @@ import static java.util.concurrent.TimeUnit.SECONDS
  * @author Vaclav Pech
  */
 
-final PooledActorGroup group = new PooledActorGroup(1)
+final DefaultPGroup group = new DefaultPGroup(1)
 class Messages {
     static def REPLY = 'Received your kind offer. Now processing it and comparing with others.'
 }

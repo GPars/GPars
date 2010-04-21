@@ -19,7 +19,7 @@ package groovyx.gpars.samples.actors
 import groovy.swing.SwingBuilder
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import javax.swing.JFrame
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
@@ -43,7 +43,7 @@ frame.pack()
 
 public void foo() {
     println 'Running'
-    final def group = new PooledActorGroup(20)
+    final def group = new DefaultPGroup(20)
 
     final def nestedActor = group.actor {
         println 'Started nested actor'
@@ -62,7 +62,7 @@ public void foo() {
 }
 
 public void bar() {
-    final def group = new PooledActorGroup(20)
+    final def group = new DefaultPGroup(20)
 
     final Actor actor = group.actor {
         println 'Started an actor ' + delegate + ":" + owner

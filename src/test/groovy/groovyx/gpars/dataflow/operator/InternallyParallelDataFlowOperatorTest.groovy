@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
@@ -85,9 +85,9 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
-        final PooledActorGroup group = new PooledActorGroup(poolSize)
+        final DefaultPGroup group = new DefaultPGroup(poolSize)
 
-        def op = operator(inputs: [a, b, c], outputs: [d, e], maxForks: forks, group) {x, y, z ->
+        def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: forks) {x, y, z ->
             sleep 1000
             bindOutput 0, x + y + z
             bindOutput 1, Thread.currentThread().name
@@ -125,14 +125,14 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        operator(inputs: [a], outputs: [], maxForks: 2, group) {v -> stop()}
-        operator(inputs: [a], maxForks: 2, group) {v -> stop()}
-        operator(inputs: [a], mistypedOutputs: [d], maxForks: 2, group) {v -> stop()}
+        group.operator(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
+        group.operator(inputs: [a], maxForks: 2) {v -> stop()}
+        group.operator(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> stop()}
 
         a << 'value'
         a << 'value'
@@ -140,20 +140,20 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final PooledActorGroup group = new PooledActorGroup(1)
+        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = operator(inputs1: [a], outputs: [d], maxForks: 2, group) {v -> }
+            def op1 = group.operator(inputs1: [a], outputs: [d], maxForks: 2) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = operator(outputs: [d], maxForks: 2, group) {v -> }
+            def op1 = group.operator(outputs: [d], maxForks: 2) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = operator([maxForks: 2], group) {v -> }
+            def op1 = group.operator([maxForks: 2]) {v -> }
         }
     }
 

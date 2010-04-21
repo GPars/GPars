@@ -18,8 +18,8 @@ package groovyx.gpars.remote;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.ActorGroup;
-import groovyx.gpars.actor.PooledActorGroup;
+import groovyx.gpars.group.DefaultPGroup;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.DefaultPool;
 import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.serial.SerialHandles;
@@ -83,14 +83,14 @@ public class LocalNode {
                     }
                 });
 
-        final ActorGroup actorGroup=new PooledActorGroup(new DefaultPool(scheduler));
+        final PGroup group = new DefaultPGroup(new DefaultPool(scheduler));
 
         if (runnable != null) {
             if (runnable instanceof Closure) {
                 ((Closure) runnable).setDelegate(this);
                 ((Closure) runnable).setResolveStrategy(Closure.DELEGATE_FIRST);
             }
-            mainActor = actorGroup.actor(runnable);
+            mainActor = group.actor(runnable);
         } else {
             mainActor = null;
         }

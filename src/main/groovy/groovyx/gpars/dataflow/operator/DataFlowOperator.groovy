@@ -17,7 +17,7 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.ActorGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
 /**
@@ -65,7 +65,7 @@ public final class DataFlowOperator {
      * Starts an operator using the specified operator actor group
      * @param group The operator actor group to use with the operator
      */
-    DataFlowOperator start(ActorGroup group) {
+    DataFlowOperator start(PGroup group) {
         actor.actorGroup = group
         actor.start()
         return this

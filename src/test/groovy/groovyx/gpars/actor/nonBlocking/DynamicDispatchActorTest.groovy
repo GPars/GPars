@@ -19,7 +19,7 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import org.codehaus.groovy.runtime.NullObject
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
@@ -213,7 +213,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testGroup() {
-        final PooledActorGroup group = new PooledActorGroup()
+        final DefaultPGroup group = new DefaultPGroup()
         final DynamicDispatchActor handler = group.messageHandler {}
         assertSame group, handler.actorGroup
     }

@@ -52,8 +52,8 @@ me.join()
 
 h3. Actor groups
 {code}
-def coreActors = new NonDaemonActorGroup(5)  //5 non-daemon threads pool
-def helperActors = new PooledActorGroup(1)  //1 daemon thread pool
+def coreActors = new NonDaemonPGroup(5)  //5 non-daemon threads pool
+def helperActors = new DefaultPGroup(1)  //1 daemon thread pool
 
 def priceCalculator = coreActors.actor {
 ...

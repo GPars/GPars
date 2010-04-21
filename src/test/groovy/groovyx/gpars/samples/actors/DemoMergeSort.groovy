@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 
 /**
@@ -49,7 +49,7 @@ List<Integer> merge(List<Integer> a, List<Integer> b) {
 }
 
 class GroupTestHelper {
-    public static final def group = new PooledActorGroup(new ResizeablePool(true))
+    public static final def group = new DefaultPGroup(new ResizeablePool(true))
 }
 
 Closure createMessageHandler(def parentActor) {

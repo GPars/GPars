@@ -27,12 +27,12 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        Actors.defaultPooledActorGroup.resize 10
+        Actors.defaultActorPGroup.resize 10
     }
 
     protected void tearDown() {
         super.tearDown();
-        Actors.defaultPooledActorGroup.resetDefaultSize()
+        Actors.defaultActorPGroup.resetDefaultSize()
     }
 
     public void testMultipleClients() {

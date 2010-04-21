@@ -1,7 +1,7 @@
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.actor.ActorGroup
-import groovyx.gpars.actor.NonDaemonActorGroup
+import groovyx.gpars.group.PGroup
+import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.dataflow.DataFlowStream
 import static groovyx.gpars.dataflow.DataFlow.operator
 
@@ -16,7 +16,7 @@ def getYearEndClosing(String stock, int year) {
     }
 }
 
-final ActorGroup group = new NonDaemonActorGroup(1)
+final PGroup group = new NonDaemonPGroup(1)
 final DataFlowStream stocksStream = new DataFlowStream()
 final DataFlowStream pricedStocks = new DataFlowStream()
 

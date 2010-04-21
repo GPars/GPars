@@ -79,3 +79,29 @@ To enable multiple threads to run the operator's body concurrently, pass an extr
 
 The value of the _maxForks_ parameter indicates the maximum of threads running the operator concurrently. Only positive
 numbers are allowed with value 1 being the default.
+
+h3. Grouping operators
+
+Dataflow operators can be organized into groups to allow for performance fine-tuning. Groups provide a handy _operator()_ factory method
+to create tasks attached to the groups.
+
+{code}
+import groovyx.gpars.group.DefaultPGroup
+
+def group = new DefaultPGroup()
+
+group.with {
+    operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+        ...
+        bindOutput 0, x + y + z
+    }
+}
+{code}
+
+{note:Title=Custom thread pools for dataflow}
+The default thread pool for dataflow operators contains non-daemon threads, which means your application will not exit before all operators are stopped.
+When grouping operators, make sure that your custom thread pools either use daemon threads, too, which can be achieved by
+using DefaultPGroup or by providing your own thread factory to a thread pool constructor,
+or in case your thread pools use non-daemon threads, such as when using the NonDaemonPGroup group class, make sure you shutdown the group or the thread pool explicitly by calling its shutdown() method,
+otherwise your applications will not exit.
+{note}

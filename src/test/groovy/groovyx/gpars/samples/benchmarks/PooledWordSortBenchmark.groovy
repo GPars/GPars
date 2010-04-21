@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch
 public class PooledWordSortBenchmark implements Benchmark {
 
     public long perform(final int numberOfIterations) {
-        Actors.defaultPooledActorGroup.resize 23
+        Actors.defaultActorPGroup.resize 23
 
         final long t1 = System.currentTimeMillis()
         final SortMaster master = new SortMaster(numActors: 10, docRoot: 'C:/dev/TeamCity/logs/')
@@ -32,7 +32,7 @@ public class PooledWordSortBenchmark implements Benchmark {
         master.waitUntilDone()
         final long t2 = System.currentTimeMillis()
         master.stopAll()
-        Actors.defaultPooledActorGroup.resetDefaultSize()
+        Actors.defaultActorPGroup.resetDefaultSize()
 
         return (t2 - t1)
     }

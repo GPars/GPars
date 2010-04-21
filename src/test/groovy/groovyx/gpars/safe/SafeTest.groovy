@@ -17,9 +17,12 @@
 package groovyx.gpars.safe
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.agent.Safe
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
@@ -51,10 +54,25 @@ public class SafeTest extends GroovyTestCase {
         assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
     }
 
+    public void testCustomGroup() {
+        final NonDaemonPGroup group = new NonDaemonPGroup(1)
+        def jugMembers = group.safe(['Me'])  //add Me
+
+        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.await()
+        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+
+        group.threadPool.shutdown()
+        shouldFail RejectedExecutionException, {
+            jugMembers.send 10
+        }
+    }
+
     public void testCustomThreadPool() {
         def jugMembers = new Safe<List>(['Me'])  //add Me
         final ExecutorService pool = Executors.newFixedThreadPool(1)
-        jugMembers.attachToThreadPool pool
+        final def group = new DefaultPGroup(new DefaultPool(pool))
+        jugMembers.attachToThreadPool group.threadPool
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
@@ -70,6 +88,23 @@ public class SafeTest extends GroovyTestCase {
     public void testFairAgent() {
         def jugMembers = new Safe<List>(['Me'])  //add Me
         jugMembers.makeFair()
+
+        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.await()
+        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+    }
+
+    public void testAgentFactory() {
+        def jugMembers = Safe.safe(['Me'])  //add Me
+        jugMembers.makeFair()
+
+        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.await()
+        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+    }
+
+    public void testFairAgentFactory() {
+        def jugMembers = Safe.fairSafe(['Me'])  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()

@@ -61,7 +61,7 @@ contributor(actorBody) {
         def currentMethod = call.bind()
         def clazz = currentMethod?.containingClass
         final def clazzName = clazz?.qualName?.toUpperCase()
-        if ((clazzName?.contains("ACTORGROUP")) || (clazzName?.contains("ACTORS"))) {
+        if ((clazzName?.contains("PGROUP")) || (clazzName?.contains("ACTORS"))) {
             method name: "react", type: "void", params: [closure: 'groovy.lang.Closure']
             method name: "react", type: "void", params: [timeout: 'long', unit: 'java.util.concurrent.TimeUnit', closure: 'groovy.lang.Closure']
             method name: "react", type: "void", params: [timeout: 'groovy.time.Duration', closure: 'groovy.lang.Closure']

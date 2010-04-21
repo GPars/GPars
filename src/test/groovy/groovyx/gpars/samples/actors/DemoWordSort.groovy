@@ -18,10 +18,10 @@ package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
-final def group = new PooledActorGroup(23)
+final def group = new DefaultPGroup(23)
 
 //Messages
 private final class FileToSort {

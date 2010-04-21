@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -55,7 +55,7 @@ barber.scheduleAtFixedRate({
 //}, 0, 15, TimeUnit.MINUTES)
 }, 0, 15, TimeUnit.SECONDS)  //we're using SECONDS to save your time while watching the demo
 
-def barberShop = new PooledActorGroup().reactor {message ->
+def barberShop = new DefaultPGroup().reactor {message ->
     //noinspection GroovySwitchStatementWithNoDefault
     switch (message) {
         case EnterShop:

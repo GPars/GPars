@@ -18,7 +18,7 @@ package groovyx.gpars.samples.benchmarks
 
 import groovyx.gpars.actor.Actors
 
-Actors.defaultPooledActorGroup.resize 10
+Actors.defaultActorPGroup.resize 10
 
 final int iterations = 10000
 final int warmupIterations = 3000

@@ -18,7 +18,7 @@ package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
@@ -197,7 +197,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testSuccessfulMessagesFromActor() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final PooledActorGroup group = new PooledActorGroup(2)
+        final DefaultPGroup group = new DefaultPGroup(2)
 
         final Actor actor = group.actor {
             react {

@@ -1,30 +1,42 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-package groovyx.gpars.actor.groups
+package groovyx.gpars.groups
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.ActorGroup
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.NonDaemonActorGroup
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.NonDaemonPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 
-public class PooledActorGroupTest extends GroovyTestCase {
-
+/**
+ * Created by IntelliJ IDEA.
+ * User: Vaclav
+ * Date: 20.4.2010
+ * Time: 16:55:32
+ * To change this template use File | Settings | File Templates.
+ */
+public class PGroupTest extends GroovyTestCase { /**
+ * Created by IntelliJ IDEA.
+ * User: Vaclav
+ * Date: 20.4.2010
+ * Time: 16:55:32
+ * To change this template use File | Settings | File Templates.
+ */
     public void testDefaultGroupDaemon() {
         volatile boolean daemon = false;
         final CountDownLatch latch = new CountDownLatch(1)
@@ -34,7 +46,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        assertEquals Actors.defaultPooledActorGroup, actor.actorGroup
+        assertEquals Actors.defaultActorPGroup, actor.actorGroup
         latch.await()
         assert daemon
     }
@@ -44,8 +56,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
 
-        final PooledActorGroup daemonGroup = new PooledActorGroup()
-        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final DefaultPGroup daemonGroup = new DefaultPGroup()
+        final PGroup nonDaemonGroup = new NonDaemonPGroup()
 
         def actor1 = daemonGroup.actor {
             daemon = Thread.currentThread().isDaemon()
@@ -74,8 +86,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
 //        final CountDownLatch latch1 = new CountDownLatch(1)
 //        final CountDownLatch latch2 = new CountDownLatch(1)
 //
-//        final PooledActorGroup daemonGroup = new PooledActorGroup()
-//        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+//        final DefaultPGroup daemonGroup = new DefaultPGroup()
+//        final PGroup nonDaemonGroup = new NonDaemonPGroup()
 //
 //        final GroupTestActor actor1 = new GroupTestActor(daemonGroup)
 //        actor1.metaClass.act = {->
@@ -103,8 +115,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
     }
 
     public void testValidGroupReset() {
-        final PooledActorGroup daemonGroup = new PooledActorGroup()
-        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final DefaultPGroup daemonGroup = new DefaultPGroup()
+        final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
 
         assertEquals daemonGroup, actor.actorGroup
@@ -116,8 +128,8 @@ public class PooledActorGroupTest extends GroovyTestCase {
     }
 
     public void testInvalidGroupReset() {
-        final PooledActorGroup daemonGroup = new PooledActorGroup()
-        final ActorGroup nonDaemonGroup = new NonDaemonActorGroup()
+        final DefaultPGroup daemonGroup = new DefaultPGroup()
+        final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
         actor.start()
         assertEquals daemonGroup, actor.actorGroup
@@ -130,11 +142,11 @@ public class PooledActorGroupTest extends GroovyTestCase {
 
     @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
     public void testDifferentPools() {
-        final PooledActorGroup daemonGroup1 = new PooledActorGroup()
-        final PooledActorGroup daemonGroup2 = new PooledActorGroup(3)
-        final NonDaemonActorGroup nonDaemonGroup1 = new NonDaemonActorGroup()
-        final NonDaemonActorGroup nonDaemonGroup2 = new NonDaemonActorGroup(3)
-        final PooledActorGroup defaultGroup = Actors.defaultPooledActorGroup
+        final DefaultPGroup daemonGroup1 = new DefaultPGroup()
+        final DefaultPGroup daemonGroup2 = new DefaultPGroup(3)
+        final NonDaemonPGroup nonDaemonGroup1 = new NonDaemonPGroup()
+        final NonDaemonPGroup nonDaemonGroup2 = new NonDaemonPGroup(3)
+        final DefaultPGroup defaultGroup = Actors.defaultActorPGroup
 
         assert daemonGroup1.threadPool != daemonGroup2.threadPool
         assert daemonGroup1.threadPool != nonDaemonGroup1.threadPool
@@ -148,7 +160,7 @@ public class PooledActorGroupTest extends GroovyTestCase {
 
 class GroupTestActor extends AbstractPooledActor {
 
-    def GroupTestActor(ActorGroup group) {
+    def GroupTestActor(PGroup group) {
         actorGroup = group
     }
 

@@ -1,5 +1,6 @@
-The *Dataflow tasks* give you an easy-to-grasp abstraction of mutually-independant logical tasks or threads, which can run concurrency and exchange
-solely through Dataflow Variables and Streams.
+The *Dataflow tasks* give you an easy-to-grasp abstraction of mutually-independant logical tasks or threads, which can run
+concurrently and exchange data solely through Dataflow Variables and Streams.
+
 Check out the examples.
 
 h3. A simple mashup example
@@ -48,6 +49,36 @@ task {
     System.exit 0
 }
 {code}
+
+h3. Grouping tasks
+
+Dataflow tasks can be organized into groups to allow for performance fine-tuning. Groups provide a handy _task()_ factory method
+to create tasks attached to the groups.
+
+{code}
+import groovyx.gpars.group.DefaultPGroup
+
+def group = new DefaultPGroup()
+
+group.with {
+    task {
+        ...
+    }
+
+    task {
+        ...
+    }
+}
+{code}
+
+{note:Title=Custom thread pools for dataflow}
+The default thread pool for dataflow tasks contains non-daemon threads, which means your application will not exit before all tasks complete.
+When grouping tasks, make sure that your custom thread pools either use daemon threads, too, which can be achieved by
+using DefaultPGroup or by providing your own thread factory to a thread pool constructor,
+or in case your thread pools use non-daemon threads, such as when using the NonDaemonPGroup group class, make sure you shutdown the group or the thread pool explicitly by calling its shutdown() method,
+otherwise your applications will not exit.
+{note}
+
 h3. A mashup variant with methods
 
 To avoid giving you wrong impression about structuring the Dataflow code, here's a rewrite of the mashup example, with a _downloadPage()_ method performing the actual download in a separate task and returning a DataFlowVariable instance, so that the main application thread could eventually get hold of the downloaded content.

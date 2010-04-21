@@ -16,12 +16,13 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.group.NonDaemonPGroup
 
 /**
  * Create a new Safe wrapping a list of strings
  */
-def jugMembers = new Safe<List<String>>(['Me'])  //add Me
+final def group = new NonDaemonPGroup(10)
+def jugMembers = group.safe(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
 
@@ -39,3 +40,6 @@ println jugMembers.val
 jugMembers.valAsync {println "Current members: $it"}
 
 jugMembers.await()
+
+//Shutdown the optional pool
+group.threadPool.shutdown()

@@ -14,10 +14,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License. 
 
-package groovyx.gpars.actor.groups
+package groovyx.gpars.groups
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.FJPool
 import java.util.concurrent.CountDownLatch
@@ -25,7 +25,7 @@ import jsr166y.forkjoin.ForkJoinWorkerThread
 
 public class FJGroupTest extends GroovyTestCase {
     public void testFJGroup() {
-        final PooledActorGroup group = new PooledActorGroup(new FJPool())
+        final DefaultPGroup group = new DefaultPGroup(new FJPool())
 
         final CountDownLatch latch = new CountDownLatch(1)
         boolean result = false
@@ -40,7 +40,7 @@ public class FJGroupTest extends GroovyTestCase {
     }
 
     public void testNonFJGroup() {
-        final PooledActorGroup group = new PooledActorGroup(new DefaultPool())
+        final DefaultPGroup group = new DefaultPGroup(new DefaultPool())
 
         final CountDownLatch latch = new CountDownLatch(1)
         boolean result = false
@@ -55,8 +55,8 @@ public class FJGroupTest extends GroovyTestCase {
     }
 
     public void testFJNonFJGroupCommunication() {
-        final PooledActorGroup group1 = new PooledActorGroup(new DefaultPool())
-        final PooledActorGroup group2 = new PooledActorGroup(new FJPool())
+        final DefaultPGroup group1 = new DefaultPGroup(new DefaultPool())
+        final DefaultPGroup group2 = new DefaultPGroup(new FJPool())
 
         final CountDownLatch latch = new CountDownLatch(1)
         int result = 0

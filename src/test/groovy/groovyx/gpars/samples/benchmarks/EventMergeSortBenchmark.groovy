@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.actor.PooledActorGroup
+import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -77,8 +77,8 @@ Closure createMessageHandler(def parentActor) {
     }
 }
 
-final PooledActorGroup pooledGroup = new PooledActorGroup(3)
-final PooledActorGroup threadGroup = new PooledActorGroup(3)
+final DefaultPGroup pooledGroup = new DefaultPGroup(3)
+final DefaultPGroup threadGroup = new DefaultPGroup(3)
 
 final List items = []
 final Random random = new Random()
