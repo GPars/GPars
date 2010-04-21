@@ -39,7 +39,9 @@
           <root url="file://$GROOVY_HOME$/lib" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$GROOVY_HOME$/src/main" />
+        </SOURCES>
         <jarDirectory url="file://$GROOVY_HOME$/lib" recursive="false" />
       </library>
     </orderEntry>
