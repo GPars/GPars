@@ -16,3 +16,37 @@
 
 package groovyx.gpars.samples.safe
 
+import groovyx.gpars.agent.Safe
+import static groovyx.gpars.GParsPool.withPool
+
+/**
+ * For demoing the classical issue of updating the balance of an account and
+ * transferring money between accounts concurrently
+ * without lost updates or deadlocks.
+ * Money transfer is still to be composed of existing, safe credit/debit actions.
+ * Unlike accounts in real banks, transferring money is _not_ transactional!
+ * @author Dierk König
+ */
+class Account {
+    Safe balance = new Safe(0)
+
+    void credit(int add) {
+        balance << { updateValue it + add } // protect against lost updates
+    }
+    /** This is not transactional! */
+    void transferTo(Account target, int amount) {
+        credit(-amount)
+        target.credit amount
+    }
+}
+
+def a = new Account()
+def b = new Account()
+
+withPool(50) {
+    (1..1000).eachParallel { // while in this scope, other threads may see the total of all accounts as unbalanced.
+        a.transferTo b, it   // even mutual transfer does not lead to deadlocks
+        b.transferTo a, it
+    }                        // all accounts are balanced again.
+}
+assert [0,0] == [a, b].balance.val
