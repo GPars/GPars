@@ -50,3 +50,5 @@ h3. Safe
 
 h3. Other
 
+* Dependency on Jetty has been made optional
+
