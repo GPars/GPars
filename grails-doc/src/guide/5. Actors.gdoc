@@ -13,7 +13,7 @@ GPars used to come with two types of actors: _thread-bound actors_ and _event-dr
 
 Actors can share a relatively small thread pool. This can go as far as having many concurrent actors that share a single pooled thread. They avoid the threading limitations of the JVM.
 
-Actor code is processed in chunks separated by quiet periods of waiting for new events (messages). This can be naturally modeled through _continuations_. As JVM doesn't support continuations directly, they have to be simulated in the actors frameworks, which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
+Actor code is processed in chunks separated by quiet periods of waiting for new events (messages). This can be naturally modeled through _continuations_ . As JVM doesn't support continuations directly, they have to be simulated in the actors frameworks, which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
 
 {code}
 import groovyx.gpars.actor.AbstractPooledActor
