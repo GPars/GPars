@@ -14,23 +14,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.safe
+package groovyx.gpars.samples.agent
 
-//todo remove once works in Groovy 1.7.3 and 1.6.9
+import groovyx.gpars.group.NonDaemonPGroup
 
-class CurryFoo {
-    protected void foo1(String s, int i) {
-        println 'Hurray! Foo1 can be curried.'
-    }
+/**
+ * Create a new Agent wrapping a list of strings
+ */
+final def group = new NonDaemonPGroup(10)
+def jugMembers = group.agent(['Me'])  //add Me
 
-    private void foo2(String s, int i) {
-        println 'Hurray! Foo2 can be curried.'
-    }
+jugMembers.send {it.add 'James'}  //add James
 
-    public void bar() {
-        this.&foo1.curry('anything', 1).call()
-        this.&foo2.curry('anything', 1).call()
-    }
+final Thread t1 = Thread.start {
+    jugMembers.send {it.add 'Joe'}  //add Joe
 }
 
-new CurryFoo().bar()
+final Thread t2 = Thread.start {
+    jugMembers << {it.add 'Dave'}  //add Dave
+    jugMembers << {it.add 'Alice'}  //add Alice
+}
+
+[t1, t2]*.join()
+println jugMembers.val
+jugMembers.valAsync {println "Current members: $it"}
+
+jugMembers.await()
+
+//Shutdown the optional pool
+group.threadPool.shutdown()

@@ -14,28 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.safe
+package groovyx.gpars.samples.agent
 
 import groovyx.gpars.agent.Agent
 
 /**
- * Create a new Agent wrapping a list of strings
+ * A thread-safe counter. Threads can submit commands, which increase or decrease the internal counter without fear
+ * of mutual races or lost updates.
  */
-def jugMembers = new Agent<List<String>>(['Me'])  //add Me
-
-jugMembers.send {it.add 'James'}  //add James
+final Agent counter = new Agent<Long>(0L)
 
 final Thread t1 = Thread.start {
-    jugMembers << {it.add 'Joe'}  //add Joe (using the operator)
+    counter << {updateValue it + 1}
 }
 
 final Thread t2 = Thread.start {
-    jugMembers {it.add 'Dave'}  //add Dave (using the implicit call() method)
-    jugMembers {it.add 'Alice'}  //add Alice (using the implicit call() method)
+    counter << {updateValue it + 6}
 }
 
-[t1, t2]*.join()
-println jugMembers.val
-jugMembers.valAsync {println "Current members: $it"}
+final Thread t3 = Thread.start {
+    counter << {updateValue it - 2}
+}
 
-jugMembers.await()
+[t1, t2, t3]*.join()
+
+assert 5 == counter.val

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.safe
+package groovyx.gpars.samples.agent
 
 import groovyx.gpars.agent.Agent
 import static groovyx.gpars.GParsPool.withPool
@@ -33,7 +33,7 @@ class Account {
     void credit(int add) {
         balance << { updateValue it + add } // protect against lost updates
     }
-    /** This is not transactional!  */
+    /** This is not transactional!   */
     void transferTo(Account target, int amount) {
         credit(-amount)
         target.credit amount

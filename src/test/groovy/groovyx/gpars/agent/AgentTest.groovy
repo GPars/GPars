@@ -14,10 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.safe
+package groovyx.gpars.agent
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup

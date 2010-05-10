@@ -301,7 +301,7 @@ _valAsync(Clojure cl)_ , which will invoke the provided closure with the interna
 
 You have to bear in mind that the _instantVal_ property might return although correct, but randomly looking results, since the internal state
 of the Agent at the time of _instantVal_ execution is non-deterministic and depends on the messages that have been processed
-before the thread scheduler executes the body of _instantVal_.
+before the thread scheduler executes the body of _instantVal_ .
 
 The _await()_ method allows you to wait for processing all the messages submitted to the Agent before and so blocks
 the calling thread.

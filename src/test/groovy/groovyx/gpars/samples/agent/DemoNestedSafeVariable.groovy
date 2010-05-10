@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.safe
+package groovyx.gpars.samples.agent
 
 import groovyx.gpars.agent.Agent
 
