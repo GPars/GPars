@@ -1,13 +1,13 @@
-h3. Safe implements a Clojure-like Agent concept
+h3. Agent implements a Clojure-like agent concept
 
-{code}import groovyx.gpars.actor.SafeVariable
+{code}import groovyx.gpars.agent.Agent
 
-def jugMembers = new SafeVariable<List>(['Me'])  //add Me
+def jugMembers = new Agent<List>(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
 
 final Thread t1 = Thread.start {
-    jugMembers.send {it.add 'Joe'}  //add Joe
+    jugMembers {it.add 'Joe'}  //add Joe (using the implicit call() method to send the function)
 }
 
 final Thread t2 = Thread.start {

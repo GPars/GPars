@@ -16,7 +16,7 @@
 
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -28,14 +28,14 @@ import java.util.concurrent.Executors
 final ExecutorService pool = Executors.newFixedThreadPool(10)
 
 final long t1 = System.currentTimeMillis()
-final Safe safe = new Safe<Long>(0L)
+final Agent agent = new Agent<Long>(0L)
 300.times {
     1000.times {
-        pool.submit {safe << {updateValue(it + 1)}}
+        pool.submit {agent << {updateValue(it + 1)}}
     }
-    safe.await()
+    agent.await()
 }
 final long t2 = System.currentTimeMillis()
-println "Result: ${safe.val}"
+println "Result: ${agent.val}"
 println "Time: ${t2 - t1}"
 pool.shutdown()

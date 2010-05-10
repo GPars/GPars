@@ -27,19 +27,19 @@ import org.codehaus.groovy.runtime.NullObject
  * The mutable values are not directly accessible from outside, but instead requests have to be sent to the agent
  * and the agent guarantees to process the requests sequentially on behalf of the callers. Agents guarantee sequential
  * execution of all requests and so consistency of the values. 
- * A Safe wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands)
- * as messages, which can be sent to the Safe just like to any other actor using the '<<' operator
+ * An agent wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands)
+ * as messages, which can be sent to the Agent just like to any other actor using the '<<' operator
  * or any of the send() methods.
  * After reception of a closure / command, the closure is invoked against the internal mutable field. The closure is guaranteed
- * to be run without intervention from other threads and so may freely alter the internal state of the Safe
+ * to be run without intervention from other threads and so may freely alter the internal state of the Agent
  * held in the internal <i>data</i> field.
  * The return value of the submitted closure is sent in reply to the sender of the closure.
- * If the message sent to a Safe is not a closure, it is considered to be a new value for the internal
+ * If the message sent to an agent is not a closure, it is considered to be a new value for the internal
  * reference field. The internal reference can also be changed using the updateValue() method from within the received
  * closures.
- * The 'val' property of a Safe will safely return the current value of the Safe, while the valAsync() method
+ * The 'val' property of an agent will safely return the current value of the Agent, while the valAsync() method
  * will do the same without blocking the caller.
- * The 'instantVal' property will retrieve the current value of the Safe without having to wait in the queue of tasks.
+ * The 'instantVal' property will retrieve the current value of the Agent without having to wait in the queue of tasks.
  * The initial internal value can be passed to the constructor. The two-parameter constructor allows to alter the way
  * the internal value is returned from val/valAsync. By default the original reference is returned, but in many scenarios a copy
  * or a clone might be more appropriate.
@@ -47,7 +47,7 @@ import org.codehaus.groovy.runtime.NullObject
  * @author Vaclav Pech
  * Date: Jul 2, 2009
  */
-public class Safe<T> extends AgentCore {
+public class Agent<T> extends AgentCore {
 
     /**
      * Allows reads not to wait in the message queue.
@@ -67,26 +67,26 @@ public class Safe<T> extends AgentCore {
     final Closure copy = {it}
 
     /**
-     * Creates a new Safe with the internal state set to null
+     * Creates a new Agent with the internal state set to null
      */
-    def Safe() {
+    def Agent() {
         this(null)
     }
 
     /**
-     * Creates a new Safe around the supplied modifiable object
+     * Creates a new Agent around the supplied modifiable object
      * @param data The object to use for storing the internal state of the variable
      */
-    def Safe(final T data) {
+    def Agent(final T data) {
         this.data = data
     }
 
     /**
-     * Creates a new Safe around the supplied modifiable object
+     * Creates a new Agent around the supplied modifiable object
      * @param data The object to use for storing the internal state of the variable
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      */
-    def Safe(final T data, final Closure copy) {
+    def Agent(final T data, final Closure copy) {
         this.data = data
         this.copy = copy
     }
@@ -165,7 +165,7 @@ public class Safe<T> extends AgentCore {
 
     /**
      * Blocks until all messages in the queue prior to call to await() complete.
-     * Provides a means to synchronize with the Safe
+     * Provides a means to synchronize with the Agent
      */
     final public void await() {
         sendAndWait {}
@@ -179,46 +179,46 @@ public class Safe<T> extends AgentCore {
     }
 
     /**
-     * Creates a Safe instance initialized with the given state.
+     * Creates an agent instance initialized with the given state.
      * The instance will use the default thread pool.
-     * @param state The initial internal state of the new Safe instance
+     * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public static final Safe safe(final def state) {
-        Actors.defaultActorPGroup.safe(state)
+    public static final Agent agent(final def state) {
+        Actors.defaultActorPGroup.agent(state)
     }
 
     /**
-     * Creates a Safe instance initialized with the given state.
+     * Creates an agent instance initialized with the given state.
      * The instance will use the default thread pool.
-     * @param state The initial internal state of the new Safe instance
+     * @param state The initial internal state of the new Agent instance
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      * @return The created instance
      */
-    public static final Safe safe(final def state, final Closure copy) {
-        Actors.defaultActorPGroup.safe(state, copy)
+    public static final Agent agent(final def state, final Closure copy) {
+        Actors.defaultActorPGroup.agent(state, copy)
     }
 
     /**
-     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
      * in a fair manner.
      * The instance will use the default thread pool.
-     * @param state The initial internal state of the new Safe instance
+     * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public static final Safe fairSafe(final def state) {
-        Actors.defaultActorPGroup.fairSafe(state)
+    public static final Agent fairAgent(final def state) {
+        Actors.defaultActorPGroup.fairAgent(state)
     }
 
     /**
-     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
      * in a fair manner.
      * The instance will use the default thread pool.
-     * @param state The initial internal state of the new Safe instance
+     * @param state The initial internal state of the new Agent instance
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      * @return The created instance
      */
-    public static final Safe fairSafe(final def state, final Closure copy) {
-        Actors.defaultActorPGroup.fairSafe(state, copy)
+    public static final Agent fairAgent(final def state, final Closure copy) {
+        Actors.defaultActorPGroup.fairAgent(state, copy)
     }
 }

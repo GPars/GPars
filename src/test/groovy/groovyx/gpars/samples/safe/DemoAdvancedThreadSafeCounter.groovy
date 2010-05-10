@@ -16,14 +16,14 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 /**
  * Conference stores number of registrations and allows parties to register and unregister.
- * It inherits from the Safe class and adds the register() and unregister() private methods,
+ * It inherits from the Agent class and adds the register() and unregister() private methods,
  * which callers may use it the commands they submit to the Conference.
  */
-class Conference extends Safe<Long> {
+class Conference extends Agent<Long> {
 
     def Conference() { super(0) }
 
@@ -32,7 +32,7 @@ class Conference extends Safe<Long> {
     private def unregister(long num) { data -= num }
 }
 
-final Safe conference = new Conference()  //new Conference created
+final Agent conference = new Conference()  //new Conference created
 
 /**
  * Three external parties will try to register/unregister concurrently

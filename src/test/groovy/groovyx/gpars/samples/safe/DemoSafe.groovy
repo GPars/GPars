@@ -16,12 +16,12 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 /**
- * Create a new Safe wrapping a list of strings
+ * Create a new Agent wrapping a list of strings
  */
-def jugMembers = new Safe<List<String>>(['Me'])  //add Me
+def jugMembers = new Agent<List<String>>(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
 

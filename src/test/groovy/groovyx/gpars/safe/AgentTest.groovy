@@ -17,7 +17,7 @@
 package groovyx.gpars.safe
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
@@ -33,9 +33,9 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author Vaclav Pech
  * Date: 13.4.2010
  */
-public class SafeTest extends GroovyTestCase {
+public class AgentTest extends GroovyTestCase {
     public void testList() {
-        def jugMembers = new Safe<List>(['Me'])  //add Me
+        def jugMembers = new Agent<List>(['Me'])  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
@@ -56,7 +56,7 @@ public class SafeTest extends GroovyTestCase {
 
     public void testCustomGroup() {
         final NonDaemonPGroup group = new NonDaemonPGroup(1)
-        def jugMembers = group.safe(['Me'])  //add Me
+        def jugMembers = group.agent(['Me'])  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
@@ -69,7 +69,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testCustomThreadPool() {
-        def jugMembers = new Safe<List>(['Me'])  //add Me
+        def jugMembers = new Agent<List>(['Me'])  //add Me
         final ExecutorService pool = Executors.newFixedThreadPool(1)
         final def group = new DefaultPGroup(new DefaultPool(pool))
         jugMembers.attachToThreadPool group.threadPool
@@ -86,7 +86,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testFairAgent() {
-        def jugMembers = new Safe<List>(['Me'])  //add Me
+        def jugMembers = new Agent<List>(['Me'])  //add Me
         jugMembers.makeFair()
 
         jugMembers {it.add 'James'}  //add James
@@ -95,7 +95,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testAgentFactory() {
-        def jugMembers = Safe.safe(['Me'])  //add Me
+        def jugMembers = Agent.agent(['Me'])  //add Me
         jugMembers.makeFair()
 
         jugMembers.send {it.add 'James'}  //add James
@@ -104,7 +104,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testFairAgentFactory() {
-        def jugMembers = Safe.fairSafe(['Me'])  //add Me
+        def jugMembers = Agent.fairAgent(['Me'])  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
@@ -112,7 +112,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testListWithCloneCopyStrategy() {
-        def jugMembers = new Safe<List>(['Me'], {it?.clone()})  //add Me
+        def jugMembers = new Agent<List>(['Me'], {it?.clone()})  //add Me
 
         jugMembers.send {it.add 'James'}  //add James
 
@@ -130,7 +130,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testCounter() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
 
         final Thread t1 = Thread.start {
             counter << {updateValue it + 1}
@@ -150,7 +150,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testAsyncVal() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
 
         final Thread t1 = Thread.start {
             counter << {updateValue it + 1}
@@ -175,7 +175,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testExplicitReply() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
 
         def result = new DataFlowStream()
         Actors.actor {
@@ -193,7 +193,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testDirectMessage() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
 
         counter << null
         assertNull counter.val
@@ -210,14 +210,14 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testDirectMessageOnNullInitialValue() {
-        final Safe counter = new Safe<Long>()
+        final Agent counter = new Agent<Long>()
 
         counter << 10
         assertEquals 10, counter.val
     }
 
     public void testNullInitialValue() {
-        final Safe counter = new Safe<Long>()
+        final Agent counter = new Agent<Long>()
 
         final def result = new DataFlowVariable()
         counter << {result << it}
@@ -225,7 +225,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testReplies() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
 
         def result = new DataFlowVariable()
         Actors.actor {
@@ -247,7 +247,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testAwait() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
 
         final AtomicBoolean flag = new AtomicBoolean(false)
         counter << {
@@ -262,7 +262,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testInstantVal() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
 
         assertEquals 0, counter.instantVal
         counter << {
@@ -274,7 +274,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testIncompatibleMessageType() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
         counter << 'test'
         assertEquals 'test', counter.val
         counter << 1L
@@ -282,7 +282,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testNullMessage() {
-        final Safe counter = new Safe<Long>(0L)
+        final Agent counter = new Agent<Long>(0L)
         counter << 'test'
 
         final DataFlowVariable result = new DataFlowVariable<Long>()
@@ -294,7 +294,7 @@ public class SafeTest extends GroovyTestCase {
     }
 
     public void testErrors() {
-        def jugMembers = new Safe<List>()
+        def jugMembers = new Agent<List>()
         assert jugMembers.errors.empty
 
         jugMembers.send {throw new IllegalStateException('test1')}

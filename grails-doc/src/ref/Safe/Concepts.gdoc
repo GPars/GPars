@@ -1,6 +1,6 @@
 h3. Concepts
 
-h4. Safe
+h4. Agent
 
 In the Clojure programing language you can find a concept of Agents, which essentially behave like actors accepting code (functions) as messages.
 After reception the received function is run against the internal state of the Agent and the return value of the function is considered to be the new internal state of the Agent.

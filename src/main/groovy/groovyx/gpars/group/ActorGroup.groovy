@@ -16,13 +16,13 @@
 
 package groovyx.gpars.group
 
+import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.scheduler.Pool
-import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.ReactiveActor
-import groovyx.gpars.actor.DynamicDispatchActor
 
 /**
  * Provides a common super class of pooled actor groups.
@@ -85,49 +85,49 @@ public abstract class PGroup {
     }
 
     /**
-     * Creates a Safe instance initialized with the given state
-     * @param state The initial internal state of the new Safe instance
+     * Creates an agent instance initialized with the given state
+     * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public final Safe safe(final def state) {
-        final Safe safe = new Safe(state)
+    public final Agent agent(final def state) {
+        final Agent safe = new Agent(state)
         safe.attachToThreadPool threadPool
         return safe
     }
 
     /**
-     * Creates a Safe instance initialized with the given state
-     * @param state The initial internal state of the new Safe instance
+     * Creates an agent instance initialized with the given state
+     * @param state The initial internal state of the new Agent instance
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      * @return The created instance
      */
-    public final Safe safe(final def state, final Closure copy) {
-        final Safe safe = new Safe(state, copy)
+    public final Agent agent(final def state, final Closure copy) {
+        final Agent safe = new Agent(state, copy)
         safe.attachToThreadPool threadPool
         return safe
     }
 
     /**
-     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
      * in a fair manner.
-     * @param state The initial internal state of the new Safe instance
+     * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public final Safe fairSafe(final def state) {
-        final Safe safe = safe(state)
+    public final Agent fairAgent(final def state) {
+        final Agent safe = agent(state)
         safe.makeFair()
         return safe
     }
 
     /**
-     * Creates a Safe instance initialized with the given state, which will cooperate in thread sharing with other Safe instances
+     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
      * in a fair manner.
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
-     * @param state The initial internal state of the new Safe instance
+     * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public final Safe fairSafe(final def state, final Closure copy) {
-        final Safe safe = safe(state, copy)
+    public final Agent fairAgent(final def state, final Closure copy) {
+        final Agent safe = agent(state, copy)
         safe.makeFair()
         return safe
     }

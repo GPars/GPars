@@ -16,13 +16,13 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 /**
  * A thread-safe counter. Threads can submit commands, which increase or decrease the internal counter without fear
  * of mutual races or lost updates.
  */
-final Safe counter = new Safe<Long>(0L)
+final Agent counter = new Agent<Long>(0L)
 
 final Thread t1 = Thread.start {
     counter << {updateValue it + 1}

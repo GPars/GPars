@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 /**
  * A non-thread-safe service that slowly prints documents on at a time
@@ -32,9 +32,9 @@ class PrinterService {
     }
 }
 
-def printer = new Safe<PrinterService>(new PrinterService())    //Wrap the service in a Safe
+def printer = new Agent<PrinterService>(new PrinterService())    //Wrap the service in an agent
 
-final Thread thread1 = Thread.start {       //Send off print tasks to the Safe, the tasks must each have exclusive access to the actual printing service
+final Thread thread1 = Thread.start {       //Send off print tasks to the Agent, the tasks must each have exclusive access to the actual printing service
     for (num in (1..3)) {
         final String text = "document $num"
         printer << {printerService ->
@@ -48,7 +48,7 @@ final Thread thread1 = Thread.start {       //Send off print tasks to the Safe, 
 }
 
 final Thread thread2 = Thread.start {
-    for (num in (1..4)) {                   //Send off some other print tasks to the Safe, the tasks must each have exclusive access to the actual printing service
+    for (num in (1..4)) {                   //Send off some other print tasks to the Agent, the tasks must each have exclusive access to the actual printing service
         final String text = "picture $num"
         printer << {printerService ->
             printerService.document = text

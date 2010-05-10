@@ -21,7 +21,7 @@ import groovyx.gpars.scheduler.DefaultPool
 /**
  * Provides logical grouping for actors, agents and dataflow tasks and operators. Each group has an underlying thread pool, which will perform actions
  * on behalf of the users belonging to the group. Actors created through the DefaultPGroup.actor() method
- * will automatically belong to the group through which they were created, just like agents created through the safe() or fairSafe() methods
+ * will automatically belong to the group through which they were created, just like agents created through the agent() or fairAgent() methods
  * or dataflow tasks and operators created through the task() or operator() methods.
  * Uses a pool of non-daemon threads.
  * The DefaultPGroup class implements the Pool interface through @Delegate.

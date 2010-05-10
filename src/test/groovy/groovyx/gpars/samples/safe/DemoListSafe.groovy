@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 /**
  * A copy strategy to create a safe copy when someone reads the internal state
@@ -26,12 +26,12 @@ final Closure cl = {
 }
 
 /**
- * Creating a Safe around a single-element list, with custom copy strategy.
+ * Creating an agent around a single-element list, with custom copy strategy.
  */
-final Safe<List> agent = new Safe<List>([1], cl)
+final Agent<List> agent = new Agent<List>([1], cl)
 
-agent << {it << 2}      //add 2 to the list
-agent << {println it}   //print the state [1, 2]
+agent {it << 2}      //add 2 to the list
+agent {println it}   //print the state [1, 2]
 
 println(agent.sendAndWait {it})         //The return value of the closure it sent back in reply
 println(agent.sendAndWait {it.size()})  //The size of the internal list is sent back
@@ -43,5 +43,5 @@ agent.await()                           //Waits until all messages currently in 
 agent << [1, 2, 3, 4, 5]                //Send a new array to set as the new internal state
 println agent.val                       //Print the new state
 
-agent.await()                            //Wait for the Safe to process all messages
+agent.await()                            //Wait for the Agent to process all messages
 

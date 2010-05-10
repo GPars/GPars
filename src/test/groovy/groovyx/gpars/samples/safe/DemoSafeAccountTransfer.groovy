@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 import static groovyx.gpars.GParsPool.withPool
 
 /**
@@ -28,12 +28,12 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Dierk König
  */
 class Account {
-    Safe balance = new Safe(0)
+    Agent balance = new Agent(0)
 
     void credit(int add) {
         balance << { updateValue it + add } // protect against lost updates
     }
-    /** This is not transactional! */
+    /** This is not transactional!  */
     void transferTo(Account target, int amount) {
         credit(-amount)
         target.credit amount
@@ -49,4 +49,4 @@ withPool(50) {
         b.transferTo a, it
     }                        // all accounts are balanced again.
 }
-assert [0,0] == [a, b].balance.val
+assert [0, 0] == [a, b].balance.val

@@ -16,16 +16,16 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 /**
  * A thread-safe shopping cart, which can store purchased products together with their quantities.
- * Each public method internally submits a function for processing by the internal Safe instance
+ * Each public method internally submits a function for processing by the internal Agent instance
  * to protect the shared mutable HashMap from races by multiple threads.
  */
 class ShoppingCart {
 
-    private def cartState = new Safe<Map<String, Integer>>([:])
+    private def cartState = new Agent<Map<String, Integer>>([:])
 
     public void addItem(String product, int quantity) {
         cartState << {it[product] = quantity}

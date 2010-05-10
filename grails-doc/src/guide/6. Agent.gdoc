@@ -1,4 +1,4 @@
-The Safe class, which is a thread-safe non-blocking shared mutable state wrapper implementation inspired by Agents in Clojure.
+The Agent class, which is a thread-safe non-blocking shared mutable state wrapper implementation inspired by Agents in Clojure.
 
 {note:title=Shared Mutable State can't be avoided}
 A lot of the concurrency problems disappear when you eliminate the need for Shared Mutable State with your architecture.
@@ -12,7 +12,7 @@ h2. Introduction
 In the Clojure programing language you can find a concept of Agents, the purpose of which is to protect mutable data that need to be shared across threads.
 Agents hide the data and protect it from direct access. Clients can only send commands (functions) to the agent. The commands will be serialized and processed against the data one-by-one in turn.
 With the commands being executed serially the commands do not need to care about concurrency and can assume the data is all theirs when run.
-Although implemented differently, GPars Agents, called _Safe_ , fundamentally behave like actors. They accept messages and process them asynchronously.
+Although implemented differently, GPars Agents, called _Agent_ , fundamentally behave like actors. They accept messages and process them asynchronously.
 The messages, however, must be commands (functions or Groovy closures) and will be executed inside the agent.
 After reception the received function is run against the internal state of the Agent and the return value of the function is considered to be the new internal state of the Agent.
 
@@ -32,39 +32,39 @@ To wrap integers, we can certainly use AtomicXXX types on the Java platform, but
 
 h2. Concepts
 
-GPars provides a Safe class, which is a special-purpose thread-safe non-blocking implementation inspired by Agents in Clojure.
+GPars provides an Agent class, which is a special-purpose thread-safe non-blocking implementation inspired by Agents in Clojure.
 
-A Safe wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands) as messages, which can be sent to the Safe just like to any other actor using the '<<' operator, the send() methods or the implicit _call()_ method.
-At some point after reception of a closure / command, the closure is invoked against the internal mutable field and can make changes to it. The closure is guaranteed to be run without intervention from other threads and so may freely alter the internal state of the Safe held in the internal <i>data</i> field.
+An Agent wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands) as messages, which can be sent to the Agent just like to any other actor using the '<<' operator, the send() methods or the implicit _call()_ method.
+At some point after reception of a closure / command, the closure is invoked against the internal mutable field and can make changes to it. The closure is guaranteed to be run without intervention from other threads and so may freely alter the internal state of the Agent held in the internal <i>data</i> field.
 
-The whole update process is of the fire-and-forget type, since once the message (closure) is sent to the Safe, the caller thread can go off to do other things and come back later to check the current value with Safe.val or Safe.valAsync(closure).
+The whole update process is of the fire-and-forget type, since once the message (closure) is sent to the Agent, the caller thread can go off to do other things and come back later to check the current value with Agent.val or Agent.valAsync(closure).
 
 h3. Basic rules
 * When executed, the submitted commands obtain the agent's state ar a parameter.
 * The submitted commands /closures can call any methods on the agent's state.
 * Replacing the state object with a new one is also possible and is done using the *updateValue() method*.
 * The *return value* of the submitted closure doesn't have a special meaning and is ignored.
-* If the message sent to a _Safe_ is *not a closure*, it is considered to be a *new value* for the internal reference field.
-* The _val_ property of a _Safe_ will wait until all preceding commands in the agent's queue are consumed and then safely return the value of the Safe.
+* If the message sent to an _Agent_ is *not a closure*, it is considered to be a *new value* for the internal reference field.
+* The _val_ property of an _Agent_ will wait until all preceding commands in the agent's queue are consumed and then safely return the value of the Agent.
 * The _instantVal_ property will return an immediate snapshot of the internal agent's state.
 * The _valAsync()_ method will do the same *without blocking* the caller.
-* All Safe instances share a default daemon thread pool. Setting the _threadPool_ property of a Safe instance will allow it to use a different thread pool.
+* All Agent instances share a default daemon thread pool. Setting the _threadPool_ property of an Agent instance will allow it to use a different thread pool.
 * Exceptions thrown by the commands can be collected using the _errors_ property.
 
 h2. Examples
 
 h3. Shared list of members
 
-The Safe wraps a list of members, who have been added to the jug. To add a new member a message (command to add a member) has to be sent to the _jugMembers_ Safe.
+The Agent wraps a list of members, who have been added to the jug. To add a new member a message (command to add a member) has to be sent to the _jugMembers_ Agent.
 {code}
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
- * Create a new Safe wrapping a list of strings
+ * Create a new Agent wrapping a list of strings
  */
-def jugMembers = new Safe<List<String>>(['Me'])  //add Me
+def jugMembers = new Agent<List<String>>(['Me'])  //add Me
 
 jugMembers.send {it.add 'James'}  //add James
 
@@ -86,21 +86,21 @@ jugMembers.await()
 
 h3. Shared conference counting number of registrations
 
-The Conference class allows registration and un-registration, however these methods can only be called from the commands sent to the _conference_ Safe.
-{code}import groovyx.gpars.agent.Safe
+The Conference class allows registration and un-registration, however these methods can only be called from the commands sent to the _conference_ Agent.
+{code}import groovyx.gpars.agent.Agent
 
 /**
  * Conference stores number of registrations and allows parties to register and unregister.
- * It inherits from the Safe class and adds the register() and unregister() private methods,
+ * It inherits from the Agent class and adds the register() and unregister() private methods,
  * which callers may use it the commands they submit to the Conference.
  */
-class Conference extends Safe<Long> {
+class Conference extends Agent<Long> {
     def Conference() { super(0) }
     private def register(long num) { data += num }
     private def unregister(long num) { data -= num }
 }
 
-final Safe conference = new Conference()  //new Conference created
+final Agent conference = new Conference()  //new Conference created
 
 /**
  * Three external parties will try to register/unregister concurrently
@@ -125,23 +125,23 @@ assert 12L == conference.val
 
 h2. Factory methods
 
-Safe instances can also be created using the _Safe.safe()_ factory method.
+Agent instances can also be created using the _Agent.agent()_ factory method.
 
 {code}
-def jugMembers = Safe.safe ['Me']  //add Me
+def jugMembers = Agent.agent ['Me']  //add Me
 {code}
 
 h2. Grouping
 
-By default all Safe instances belong to the same group sharing its daemon thread pool.
+By default all Agent instances belong to the same group sharing its daemon thread pool.
 
-Custom groups can also create instances of Safe. These instances will belong to the group, which created them, and will share a thread pool.
-To create a Safe instance belonging to a group, call the _safe()_ factory method on the group. This way you can organize
+Custom groups can also create instances of Agent. These instances will belong to the group, which created them, and will share a thread pool.
+To create an Agent instance belonging to a group, call the _agent()_ factory method on the group. This way you can organize
 and tune performance of agents.
 
 {code}
 final def group = new NonDaemonPGroup(5)  //create a group around a thread pool
-def jugMembers = group.safe(['Me'])  //add Me
+def jugMembers = group.agent(['Me'])  //add Me
 {code}
 
 {note:Title=Custom thread pools for agents}
@@ -153,9 +153,9 @@ otherwise your applications will not exit.
 
 h4. Direct pool replacement
 
-Alternatively, by calling the _attachToThreadPool()_ method on a Safe instance a custom thread pool can be specified for it.
+Alternatively, by calling the _attachToThreadPool()_ method on an Agent instance a custom thread pool can be specified for it.
 {code}
-def jugMembers = new Safe<List<String>>(['Me'])  //add Me
+def jugMembers = new Agent<List<String>>(['Me'])  //add Me
 
 final ExecutorService pool = Executors.newFixedThreadPool(10)
 jugMembers.attachToThreadPool(new DefaultPool(pool))
@@ -163,20 +163,20 @@ jugMembers.attachToThreadPool(new DefaultPool(pool))
 {code}
 
 {note}
-Remember, like actors, a single Safe instance (aka agent) can never use more than one thread at a time
+Remember, like actors, a single Agent instance (aka agent) can never use more than one thread at a time
 {note}
 
 h3. The shopping cart example
 
 {code}
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 class ShoppingCart {
-    private def cartState = new Safe([:])
+    private def cartState = new Agent([:])
 //----------------- public methods below here ----------------------------------
     public void addItem(String product, int quantity) {
         cartState << {it[product] = quantity}  //the << operator sends
-                                               //a message to the Safe
+                                               //a message to the Agent
     }    public void removeItem(String product) {
         cartState << {it.remove(product)}
     }    public Object listContent() {
@@ -241,7 +241,7 @@ private Closure performClear = { it.clear() }
 h3. The printer service example
 
 Another example - a not thread-safe printer service shared by multiple threads. The printer needs to have the document and quality properties set before printing, so obviously a potential for race conditions if not guarded properly. Callers don't want to block until the printer is available, which the fire-and-forget nature of actors solves very elegantly.
-{code}import groovyx.gpars.agent.Safe
+{code}import groovyx.gpars.agent.Agent
 
 /**
  * A non-thread-safe service that slowly prints documents on at a time
@@ -257,7 +257,7 @@ class PrinterService {
     }
 }
 
-def printer = new Safe<PrinterService>(new PrinterService())
+def printer = new Agent<PrinterService>(new PrinterService())
 
 final Thread thread1 = Thread.start {
     for (num in (1..3)) {
@@ -293,22 +293,22 @@ For latest update, see the respective [Demos].
 
 h2. Reading the value
 
-To follow the clojure philosophy closely the Safe class gives reads higher priority than to writes.
-By using the _instantVal_ property your read request will bypass the incoming message queue of the Safe
+To follow the clojure philosophy closely the Agent class gives reads higher priority than to writes.
+By using the _instantVal_ property your read request will bypass the incoming message queue of the Agent
 and return the current snapshot of the internal state.
 The _val_ property will wait in the message queue for processing, just like the non-blocking variant
 _valAsync(Clojure cl)_ , which will invoke the provided closure with the internal state as a parameter.
 
 You have to bear in mind that the _instantVal_ property might return although correct, but randomly looking results, since the internal state
-of the Safe at the time of _instantVal_ execution is non-deterministic and depends on the messages that have been processed
+of the Agent at the time of _instantVal_ execution is non-deterministic and depends on the messages that have been processed
 before the thread scheduler executes the body of _instantVal_.
 
-The _await()_ method allows you to wait for processing all the messages submitted to the Safe before and so blocks
+The _await()_ method allows you to wait for processing all the messages submitted to the Agent before and so blocks
 the calling thread.
 
 h2. State copy strategy
 
-To avoid leaking the internal state the Safe class allows to specify a copy strategy as the second constructor argument.
+To avoid leaking the internal state the Agent class allows to specify a copy strategy as the second constructor argument.
 With the copy strategy specified, the internal state is processed by the copy strategy closure and the output value
 of the copy strategy value is returned to the caller instead of the actual internal state. This applies to _instantVal_,
 _val_ as well as to _valAsync()_ .
@@ -318,7 +318,7 @@ h2. Error handling
 Exceptions thrown from within the submitted commands are stored inside the agent and can be obtained from the _errors_ property.
 The property gets cleared once read.
 {code}
-    def jugMembers = new Safe<List>()
+    def jugMembers = new Agent<List>()
     assert jugMembers.errors.empty
 
     jugMembers.send {throw new IllegalStateException('test1')}
@@ -339,8 +339,8 @@ h2. Fair and Non-fair agents
 
 Agents can be either fair or non-fair. Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
 As a result, non-fair agents tends to perform better than fair ones.
-The default setting for all Safe instances is to be *non-fair*, however by calling its _makeFair()_ method the instance can be made fair.
+The default setting for all Agent instances is to be *non-fair*, however by calling its _makeFair()_ method the instance can be made fair.
 {code}
-    def jugMembers = new Safe<List>(['Me'])  //add Me
+    def jugMembers = new Agent<List>(['Me'])  //add Me
     jugMembers.makeFair()
 {code}

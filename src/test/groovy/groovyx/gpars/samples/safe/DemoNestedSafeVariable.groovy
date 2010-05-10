@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.safe
 
-import groovyx.gpars.agent.Safe
+import groovyx.gpars.agent.Agent
 
 /**
  * Shows two cooperating agents.
@@ -28,8 +28,8 @@ import groovyx.gpars.agent.Safe
 def account1 = [withdraw: {println "Withdrawing: $it"}] as Object
 def account2 = [deposit: {println "Depositing: $it"}] as Object
 
-def a1 = new Safe(account1)
-def a2 = new Safe(account2)
+def a1 = new Agent(account1)
+def a2 = new Agent(account2)
 
 def amount = 20
 
