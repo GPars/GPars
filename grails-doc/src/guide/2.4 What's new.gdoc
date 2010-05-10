@@ -30,6 +30,7 @@ h4. Renaming hints
 * ActorGroup -> PGroup
 * PooledActorGroup -> DefaultPGroup
 * NonDaemonActorGroup -> NonDaemonPGroup
+* Safe -> Agent
 
 h3. Fork / Join
 
@@ -37,6 +38,10 @@ h3. Fork / Join
 
 h3. Actors
 
+* The implicit _call()_ method can be used to send messages
+{code}
+myActor 'message'
+{code}
 
 h3. Dataflow
 
@@ -47,6 +52,12 @@ h3. Safe
 
 * Reimplemented to increase performance
 * Added support for grouping Safe instances around shared thread pools
+* Renamed to *Agent*
+* The implicit _call()_ method can be used to update the agent
+{code}
+myAgent increment
+{code}
+
 
 h3. Other
 

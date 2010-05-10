@@ -37,7 +37,7 @@ Messages can be sent to the actor using multiple methods
 
 {code}
 console.send('Message')
-console << 'Message'
+console 'Message'
 console.sendAndContinue 'Message', {reply -> println "I received reply: $reply"}
 console.sendAndWait 'Message'
 {code}

@@ -27,10 +27,10 @@ final class MyActor extends DynamicDispatchActor {
 
 final def actor = new MyActor().start()
 
-actor  << 1
-actor  << ''
-actor  << 1.0
-actor  << new ArrayList()
+actor 1
+actor ''
+actor 1.0
+actor(new ArrayList())
 
 actor.join()
 {code}

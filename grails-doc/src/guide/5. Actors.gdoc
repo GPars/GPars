@@ -68,12 +68,13 @@ messages should be immutable or at least follow the *hands-off* policy when the 
 
 h2. Sending messages
 
-Messages can be sent to actors using the _send()_ method. Alternatively, the _<<_ operator can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available.
+Messages can be sent to actors using the _send()_ method. Alternatively, the _<<_ operator or the implicit _call()_ method can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available.
 The _reply_ is returned from the _sendAndWait()_ method as a return value.
 The _sendAndWait()_ methods may also return after a timeout expires or in case of termination of the called actor.
 {code}
-actor << 'Message'
 actor.send 'Message'
+actor << 'Message'    //using the << operator
+actor 'Message'       //using the implicit call() method
 def reply1 = actor.sendAndWait('Message')
 def reply2 = actor.sendAndWait(10, TimeUnit.SECONDS, 'Message')
 def reply3 = actor.sendAndWait(10.seconds, 'Message')

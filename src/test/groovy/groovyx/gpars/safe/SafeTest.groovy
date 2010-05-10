@@ -17,11 +17,11 @@
 package groovyx.gpars.safe
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.agent.Safe
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -42,11 +42,11 @@ public class SafeTest extends GroovyTestCase {
         assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
 
         final Thread t1 = Thread.start {
-            jugMembers.send {it.add 'Joe'}  //add Joe
+            jugMembers {it.add 'Joe'}  //add Joe
         }
 
         final Thread t2 = Thread.start {
-            jugMembers << {it.add 'Dave'}  //add Dave
+            jugMembers {it.add 'Dave'}  //add Dave
             jugMembers << {it.add 'Alice'}  //add Alice
         }
 
@@ -89,7 +89,7 @@ public class SafeTest extends GroovyTestCase {
         def jugMembers = new Safe<List>(['Me'])  //add Me
         jugMembers.makeFair()
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers {it.add 'James'}  //add James
         jugMembers.await()
         assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
     }

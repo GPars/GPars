@@ -16,8 +16,8 @@
 
 package groovyx.gpars.agent;
 
-import groovyx.gpars.group.PGroup;
 import groovyx.gpars.actor.Actors;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 import org.codehaus.groovy.runtime.NullObject;
 
@@ -126,6 +126,16 @@ public abstract class AgentCore implements Runnable {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     public final void leftShift(final Object message) {
+        send(message);
+    }
+
+    /**
+     * Adds the message to the agent\s message queue
+     *
+     * @param message A value or a closure
+     */
+    @SuppressWarnings({"UnusedDeclaration"})
+    public final void call(final Object message) {
         send(message);
     }
 

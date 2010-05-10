@@ -34,7 +34,7 @@ h2. Concepts
 
 GPars provides a Safe class, which is a special-purpose thread-safe non-blocking implementation inspired by Agents in Clojure.
 
-A Safe wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands) as messages, which can be sent to the Safe just like to any other actor using the '<<' operator or the send() methods.
+A Safe wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands) as messages, which can be sent to the Safe just like to any other actor using the '<<' operator, the send() methods or the implicit _call()_ method.
 At some point after reception of a closure / command, the closure is invoked against the internal mutable field and can make changes to it. The closure is guaranteed to be run without intervention from other threads and so may freely alter the internal state of the Safe held in the internal <i>data</i> field.
 
 The whole update process is of the fire-and-forget type, since once the message (closure) is sent to the Safe, the caller thread can go off to do other things and come back later to check the current value with Safe.val or Safe.valAsync(closure).
@@ -74,7 +74,7 @@ final Thread t1 = Thread.start {
 
 final Thread t2 = Thread.start {
     jugMembers << {it.add 'Dave'}  //add Dave
-    jugMembers << {it.add 'Alice'}  //add Alice
+    jugMembers {it.add 'Alice'}    //add Alice (using the implicit call() method)
 }
 
 [t1, t2]*.join()
