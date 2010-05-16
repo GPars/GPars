@@ -20,7 +20,6 @@ import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
-import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.RecursiveTask
 
 /**
@@ -134,33 +133,6 @@ public class GParsPool {
      */
     public static withPool(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
         final jsr166y.forkjoin.ForkJoinPool pool = createPool(numberOfThreads, handler)
-        try {
-            return withExistingPool(pool, cl)
-        } finally {
-            pool.shutdown()
-            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    public static doParallel(Closure cl) {
-        return withPool(defaultPoolSize, cl)
-    }
-
-    /**
-     * @deprecated
-     */
-    public static doParallel(int numberOfThreads, Closure cl) {
-        return withPool(numberOfThreads, createDefaultUncaughtExceptionHandler(), cl)
-    }
-
-    /**
-     * @deprecated
-     */
-    public static doParallel(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
-        final ForkJoinPool pool = createPool(numberOfThreads, handler)
         try {
             return withExistingPool(pool, cl)
         } finally {

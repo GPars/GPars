@@ -161,34 +161,6 @@ class GParsExecutorsPool {
     }
 
     /**
-     * @deprecated
-     */
-    public static doParallel(Closure cl) {
-        return withPool(defaultPoolSize, cl)
-    }
-
-    /**
-     * @deprecated
-     */
-    public static doParallel(int numberOfThreads, Closure cl) {
-        return withPool(numberOfThreads, createDefaultThreadFactory(), cl)
-    }
-
-    /**
-     * @deprecated
-     */
-    public static doParallel(int numberOfThreads, ThreadFactory threadFactory, Closure cl) {
-        final ExecutorService pool = createPool(numberOfThreads, threadFactory)
-        try {
-            return withExistingPool(pool, cl)
-        } finally {
-            pool.shutdown()
-            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
-        }
-
-    }
-
-    /**
      * Creates a new instance of <i>ExecutorService</i>, binds it to the current thread, enables the ExecutorService DSL
      * and runs the supplied closure.
      * Within the supplied code block the <i>ExecutorService</i> is available as the only parameter, objects have been
