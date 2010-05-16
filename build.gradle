@@ -30,7 +30,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
-version = '0.10-beta-2'
+version = '0.10'
 bundleVersion = version
 
 def theVendor = 'gpars.org'

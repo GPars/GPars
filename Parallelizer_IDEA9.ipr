@@ -241,7 +241,7 @@
         </setting>
       </setting>
       <setting name="main_panel">
-        <setting name="current-tab" value="Favorites" />
+        <setting name="current-tab" value="Task Tree" />
       </setting>
     </setting>
   </component>
