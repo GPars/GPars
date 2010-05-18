@@ -20,9 +20,9 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;
 import groovy.time.Duration;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.group.PGroup;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.Actors;
+import groovyx.gpars.group.PGroup;
 import org.codehaus.groovy.runtime.CurriedClosure;
 import org.codehaus.groovy.runtime.GeneratedClosure;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
@@ -76,7 +76,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     private Node outputQueue;
 
-    private AtomicBoolean ongoingThreadTermination = new AtomicBoolean(false);
+    private final AtomicBoolean ongoingThreadTermination = new AtomicBoolean(false);
 
     /**
      * Counter of messages in the queues

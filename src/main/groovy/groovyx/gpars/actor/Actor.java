@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package groovyx.gpars.actor;
 
 import groovy.time.BaseDuration;
@@ -161,14 +161,14 @@ public abstract class Actor extends ReceivingMessageStream {
      * @param currentActor The actor to register
      */
     protected static void registerCurrentActorWithThread(final Actor currentActor) {
-        currentActorPerThread.set(currentActor);
+        Actor.currentActorPerThread.set(currentActor);
     }
 
     /**
      * Deregisters the actor registered from the thread
      */
     protected static void deregisterCurrentActorWithThread() {
-        currentActorPerThread.set(null);
+        Actor.currentActorPerThread.set(null);
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class Actor extends ReceivingMessageStream {
      * @return The associated actor
      */
     public static Actor threadBoundActor() {
-        return currentActorPerThread.get();
+        return Actor.currentActorPerThread.get();
     }
 
     @Override
@@ -209,42 +209,50 @@ public abstract class Actor extends ReceivingMessageStream {
             remoteHost = (RemoteHost) host;
         }
 
-        @Override public Actor start() {
+        @Override
+        public Actor start() {
             throw new UnsupportedOperationException();
         }
 
-        @Override public Actor stop() {
+        @Override
+        public Actor stop() {
             remoteHost.write(new StopActorMsg(this));
             return this;
         }
 
-        @Override public Actor terminate() {
+        @Override
+        public Actor terminate() {
             remoteHost.write(new TerminateActorMsg(this));
             return this;
         }
 
-        @Override public boolean isActive() {
+        @Override
+        public boolean isActive() {
             throw new UnsupportedOperationException();
         }
 
-        @Override public boolean isActorThread() {
+        @Override
+        public boolean isActorThread() {
             return false;
         }
 
-        @SuppressWarnings({"AssignmentToMethodParameter"}) @Override
+        @SuppressWarnings({"AssignmentToMethodParameter"})
+        @Override
         public MessageStream send(Object message) {
             if (!(message instanceof ActorMessage)) {
-                message = new ActorMessage(message, threadBoundActor());
+                message = new ActorMessage(message, Actor.threadBoundActor());
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;
         }
 
-        @Override protected Object receiveImpl() throws InterruptedException {
+        @Override
+        protected Object receiveImpl() throws InterruptedException {
             throw new UnsupportedOperationException();
         }
 
-        @Override protected Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
+        @Override
+        protected Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
             throw new UnsupportedOperationException();
         }
 

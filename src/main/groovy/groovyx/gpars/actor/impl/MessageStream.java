@@ -228,7 +228,7 @@ public abstract class MessageStream extends WithSerialId {
                     return null;
                 }
                 LockSupport.parkNanos(toWait);
-                reInterrupt();
+                MessageStream.reInterrupt();
             }
             rethrowException();
             return value;
