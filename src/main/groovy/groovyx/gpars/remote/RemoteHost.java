@@ -70,9 +70,10 @@ public final class RemoteHost extends SerialContext {
     }
 
     public boolean isConnected() {
-        return connections.size() != 0;
+        return !connections.isEmpty();
     }
 
+    @Override
     public void write(final SerialMsg msg) {
         msg.hostId = getLocalHost().getId();
         getConnection().write(msg);

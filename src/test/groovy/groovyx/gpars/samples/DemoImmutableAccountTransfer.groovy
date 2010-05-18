@@ -28,25 +28,29 @@ import static groovyx.gpars.GParsPool.withPool
  * long-running business tasks (longer than transferTo) can run lock-free.
  * @author Dierk König
  */
-@Immutable class ImmutableAccount {
+@Immutable final class ImmutableAccount {
     int balance = 0
 
     ImmutableAccount credit(int add) {
         new ImmutableAccount(balance + add)
     }
 
-    /** @return list of new "this" and new target account  */
+    /** @return list of new "this" and new target account   */
     List<ImmutableAccount> transferTo(ImmutableAccount target, int amount) {
         [credit(-amount), target.credit(amount)]
     }
 }
 
+@SuppressWarnings("GroovySynchronizedMethod")
 class AtomicPair {
     private List safe
-    AtomicPair(a,b) {
-        safe = [a,b].asImmutable()
+
+    AtomicPair(a, b) {
+        safe = [a, b].asImmutable()
     }
+
     synchronized List getAb() { safe }
+
     synchronized void setAb(List ab) {
         safe = ab.asImmutable()
     }
@@ -57,9 +61,11 @@ def pair = new AtomicPair(new ImmutableAccount(0), new ImmutableAccount(0))
 withPool(50) {
     (1..1000).eachParallel {
         assert [0, 0] == pair.ab.balance
-        def (a,b) = pair.ab                 // tricky bit: does it need to be fetched in advance (?)
-        (a,b)     = a.transferTo(b,  it)    // store the refs for the return transfer only locally
-        pair.ab   = a.transferTo(b, -it)    // update the safe pair to make new refs visible for other tasks
+        def (a, b) = pair.ab                 // tricky bit: does it need to be fetched in advance (?)
+        //noinspection GroovyVariableNotAssigned
+        (a, b) = a.transferTo(b, it)    // store the refs for the return transfer only locally
+        //noinspection GroovyVariableNotAssigned
+        pair.ab = a.transferTo(b, -it)    // update the safe pair to make new refs visible for other tasks
     }
 }
 assert [0, 0] == pair.ab.balance

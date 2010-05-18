@@ -46,7 +46,7 @@ import java.util.concurrent.locks.LockSupport;
  *
  * @author Alex Tkachman, Vaclav Pech
  */
-@SuppressWarnings({"UnqualifiedStaticUsage"})
+@SuppressWarnings({"UnqualifiedStaticUsage", "CallToSimpleGetterFromWithinClass"})
 public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject {
 
     /**
