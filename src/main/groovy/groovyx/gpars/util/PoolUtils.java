@@ -1,6 +1,6 @@
 // GPars (formerly GParallelizer)
 //
-// Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,16 +22,17 @@ import groovyx.gpars.scheduler.Pool;
  * Provides a couple of utility methods to pools and schedulers.
  *
  * @author Vaclav Pech
- * Date: Oct 31, 2009
+ *         Date: Oct 31, 2009
  */
 @SuppressWarnings({"AccessOfSystemProperties", "UtilityClass"})
 public final class PoolUtils {
     private static final String GPARS_POOLSIZE = "gpars.poolsize";
 
-    private PoolUtils() { }
+    private PoolUtils() {
+    }
 
     public static int retrieveDefaultPoolSize() {
-        final String poolSizeValue = System.getProperty(GPARS_POOLSIZE);
+        final String poolSizeValue = System.getProperty(PoolUtils.GPARS_POOLSIZE);
         try {
             return Integer.parseInt(poolSizeValue);
         } catch (NumberFormatException ignored) {

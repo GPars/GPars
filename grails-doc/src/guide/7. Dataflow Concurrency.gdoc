@@ -24,7 +24,7 @@ task {
 }
 {code}
 
-Or the same algorithm rewriten using the _DataFlows_ class.
+Or the same algorithm rewritten using the _DataFlows_ class.
 
 {code}
 
@@ -47,9 +47,9 @@ task {
 {code}
 
 We start three logical tasks, which can run in parallel and perform their particular activities. The tasks need to exchange data and they do so using *Dataflow Variables*.
-Think of Dataflow Variables as one-shot channels safely and reliably tranferring data from producers to their consumers.
+Think of Dataflow Variables as one-shot channels safely and reliably transferring data from producers to their consumers.
 
-The Dataflow Variables have a pretty straightforward semantics. When a task needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another taks or thread (using the '<<' operator). Each _DataFlowVariable_ can be set *only once* in its lifetime. Notice that you don't have to bother with ordering and synchronizing the tasks or threads and their access to shared variables. The values are magically transferred among tasks at the right time without your intervention.
+The Dataflow Variables have a pretty straightforward semantics. When a task needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another task or thread (using the '<<' operator). Each _DataFlowVariable_ can be set *only once* in its lifetime. Notice that you don't have to bother with ordering and synchronizing the tasks or threads and their access to shared variables. The values are magically transferred among tasks at the right time without your intervention.
 The data flow seamlessly among tasks / threads without your intervention or care.
 
 *Implementation detail:* The three tasks in the example *do not necessarily need to be mapped to three physical threads*. Tasks represent so-called "green" or "logical" threads and can be mapped under the covers to any number of physical threads. The actual mapping depends on the scheduler, but the outcome of dataflow algorithms doesn't depend on the actual scheduling.

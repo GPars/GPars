@@ -1,3 +1,19 @@
+// GPars (formerly GParallelizer)
+//
+// Copyright © 2008-10  The original author or authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package groovyx.gpars.remote;
 
 import groovyx.gpars.remote.message.HostIdMsg;
@@ -13,11 +29,11 @@ public abstract class RemoteConnection {
 
     private RemoteHost host;
 
-    public RemoteConnection(LocalHost provider) {
+    public RemoteConnection(final LocalHost provider) {
         this.localHost = provider;
     }
 
-    public void onMessage(SerialMsg msg) {
+    public void onMessage(final SerialMsg msg) {
         if (host == null) {
             final HostIdMsg idMsg = (HostIdMsg) msg;
             host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
@@ -26,7 +42,7 @@ public abstract class RemoteConnection {
         }
     }
 
-    public void onException(Throwable cause) {
+    public void onException(final Throwable cause) {
     }
 
     public void onConnect() {
@@ -43,7 +59,7 @@ public abstract class RemoteConnection {
         return host;
     }
 
-    public void setHost(RemoteHost host) {
+    public void setHost(final RemoteHost host) {
         this.host = host;
     }
 

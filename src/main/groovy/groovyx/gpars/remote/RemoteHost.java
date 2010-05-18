@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.remote;
 
@@ -33,19 +33,19 @@ import java.util.UUID;
 public final class RemoteHost extends SerialContext {
     private final ArrayList<RemoteConnection> connections = new ArrayList<RemoteConnection>();
 
-    public RemoteHost(LocalHost localHost, UUID hostId) {
+    public RemoteHost(final LocalHost localHost, final UUID hostId) {
         super(localHost, hostId);
     }
 
-    public void addConnection(RemoteConnection connection) {
+    public void addConnection(final RemoteConnection connection) {
         synchronized (connections) {
-            boolean wasConnected = isConnected();
+            final boolean wasConnected = isConnected();
             connections.add(connection);
             if (wasConnected != isConnected()) {
-                Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
+                final Map<UUID, LocalNode> localNodes = ((LocalHost) localHost).localNodes;
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (localNodes) {
-                    for (LocalNode localNode : localNodes.values()) {
+                    for (final LocalNode localNode : localNodes.values()) {
                         connection.write(new NodeConnectedMsg(localNode));
                     }
                 }
@@ -53,9 +53,9 @@ public final class RemoteHost extends SerialContext {
         }
     }
 
-    public void removeConnection(RemoteConnection connection) {
+    public void removeConnection(final RemoteConnection connection) {
         synchronized (connections) {
-            boolean wasConnected = isConnected();
+            final boolean wasConnected = isConnected();
             connections.remove(connection);
             if (wasConnected != isConnected()) {
 //            sendLocalNodes();
@@ -64,7 +64,7 @@ public final class RemoteHost extends SerialContext {
     }
 
     public void disconnect() {
-        for (RemoteConnection connection : connections) {
+        for (final RemoteConnection connection : connections) {
             connection.disconnect();
         }
     }
@@ -73,7 +73,7 @@ public final class RemoteHost extends SerialContext {
         return connections.size() != 0;
     }
 
-    public void write(SerialMsg msg) {
+    public void write(final SerialMsg msg) {
         msg.hostId = getLocalHost().getId();
         getConnection().write(msg);
     }
@@ -82,11 +82,11 @@ public final class RemoteHost extends SerialContext {
         return connections.get(0);
     }
 
-    public void connect(LocalNode node) {
+    public void connect(final LocalNode node) {
         write(new NodeConnectedMsg(node));
     }
 
-    public void disconnect(LocalNode node) {
+    public void disconnect(final LocalNode node) {
         write(new NodeDisconnectedMsg(node));
     }
 

@@ -1,18 +1,18 @@
-//  GPars (formerly GParallelizer)
+// GPars (formerly GParallelizer)
 //
-//  Copyright © 2008-9  The original author or authors
+// Copyright © 2008-10  The original author or authors
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//        http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License. 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package groovyx.gpars.scheduler;
 
@@ -50,7 +50,7 @@ public class FJPool implements Pool {
     public FJPool(final int configuredPoolSize) {
         PoolUtils.checkValidPoolSize(configuredPoolSize);
         this.configuredPoolSize = configuredPoolSize;
-        pool = createPool(configuredPoolSize);
+        pool = FJPool.createPool(configuredPoolSize);
     }
 
     /**
@@ -67,7 +67,7 @@ public class FJPool implements Pool {
         pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
             public void uncaughtException(final Thread t, final Throwable e) {
-                System.err.println(UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
+                System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                 e.printStackTrace(System.err);
             }
         });
@@ -115,7 +115,7 @@ public class FJPool implements Pool {
     public final void shutdown() {
         pool.shutdown();
         try {
-            pool.awaitTermination(DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+            pool.awaitTermination(FJPool.DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();  // set the interrupted flag
         }

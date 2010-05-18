@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
  * @author Vaclav Pech
  *         Date: 13.4.2010
  */
+@SuppressWarnings({"UnqualifiedStaticUsage"})
 public abstract class AgentCore implements Runnable {
 
     /**
@@ -104,7 +105,8 @@ public abstract class AgentCore implements Runnable {
     /**
      * Indicates, whether there's an active thread handling a message inside the agent's body
      */
-    private volatile int active = PASSIVE;
+    @SuppressWarnings({"FieldMayBeFinal"})
+    private volatile int active = AgentCore.PASSIVE;
     private static final AtomicIntegerFieldUpdater<AgentCore> activeUpdater = AtomicIntegerFieldUpdater.newUpdater(AgentCore.class, "active");
     private static final int PASSIVE = 0;
     private static final int ACTIVE = 1;
