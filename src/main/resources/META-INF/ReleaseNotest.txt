@@ -48,6 +48,7 @@ Other
 
 * Dependency on Jetty has been made optional
 * Automated upload of downloadable artifacts
+* OSGi support for the GPars jar
 
 0.9
 
