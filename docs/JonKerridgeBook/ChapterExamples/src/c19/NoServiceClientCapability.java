@@ -40,7 +40,7 @@ public class NoServiceClientCapability implements CSProcess {
         System.out.println("No service client capability started ");
         messageConfigure.write("Service Currently Unavailable");
         String response = (String) responseEvent.read();
-        while ((response != "Retry") && (response != "Close")) {
+        while (response != "Retry" && response != "Close") {
             response = (String) responseEvent.read();
         }
         System.out.println("NSCC: response is " + response);

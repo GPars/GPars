@@ -45,7 +45,7 @@ public class AccessClientCapability implements CSProcess {
         System.out.println("Service Chooser has started");
         final String eventType = (String) eventChannel.read();
         //System.out.println ( "Event received: " + eventType );
-        String serviceName = (eventType == "Create New Meeting") ? "N" : "F";
+        String serviceName = eventType == "Create New Meeting" ? "N" : "F";
         /*
         String serviceName = null;
         if ( eventType == "Create New Meeting" ) {
