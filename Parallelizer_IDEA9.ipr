@@ -4378,7 +4378,7 @@
         </inspection_tool>
       </profile>
     </profiles>
-    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="PROJECT_PROFILE" value="GPars default" />
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
     <list size="5">
@@ -4533,20 +4533,42 @@
   <component name="ProjectDictionaryState">
     <dictionary name="Vaclav">
       <words>
+        <w>anàlisi</w>
         <w>arial</w>
+        <w>attrs</w>
         <w>barriered</w>
+        <w>budweisser</w>
+        <w>canoo</w>
         <w>cest</w>
         <w>chans</w>
+        <w>cobertura</w>
+        <w>conv</w>
         <w>csize</w>
         <w>dest</w>
+        <w>dgpars</w>
+        <w>dists</w>
+        <w>dorg</w>
+        <w>egrep</w>
+        <w>forkjoin</w>
+        <w>galpin</w>
         <w>groovyx</w>
+        <w>intdiv</w>
+        <w>javax</w>
+        <w>jboss</w>
         <w>jcsp</w>
         <w>kerridge</w>
+        <w>matemàtica</w>
+        <w>matemàtiques</w>
         <w>negator</w>
+        <w>pilsner</w>
+        <w>protobuf</w>
+        <w>regex</w>
         <w>restarter</w>
         <w>spooler</w>
         <w>spoolers</w>
         <w>sqrt</w>
+        <w>staropramen</w>
+        <w>topleft</w>
       </words>
     </dictionary>
     <dictionary name="vaclav">

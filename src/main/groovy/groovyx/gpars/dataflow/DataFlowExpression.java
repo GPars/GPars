@@ -414,7 +414,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Send the boudn data to provided stream when it becomes available
+     * Send the bound data to provided stream when it becomes available
      *
      * @param stream stream where to send result
      */

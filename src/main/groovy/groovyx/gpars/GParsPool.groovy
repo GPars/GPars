@@ -197,7 +197,7 @@ public class GParsPool {
     }
 
     /**
-     * Starts multiple closures in separate threads, collecting thir return values
+     * Starts multiple closures in separate threads, collecting their return values
      * Reuses the pool defined by the surrounding withPool() call.
      * If an exception is thrown from the closure when called on any of the collection's elements,
      * it will be re-thrown in the calling thread when it calls the Future.get() method.

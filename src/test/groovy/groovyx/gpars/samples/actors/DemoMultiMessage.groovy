@@ -25,7 +25,7 @@ import static java.util.concurrent.TimeUnit.SECONDS
  * Notice the ability to sent HashMaps as well as instances of the Offer class as messages.
  * A custom pooled actor group is used to group the actors with a single thread pool.
  * The actors, which have submitted their offers, terminate, if they don't hear back from the actor within a timeout.
- * The main threads joins all actors to wait for their termination, since we're using a non-deamon actor group.
+ * The main threads joins all actors to wait for their termination, since we're using a non-daemon actor group.
  * @author Vaclav Pech
  */
 

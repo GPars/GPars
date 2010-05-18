@@ -61,7 +61,7 @@ example by _Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàl
 
 h1. Usage of Actors
 
-Gpars provides consistent Actor APIs and DSLs. Actors in principal perform three specific operations - send messages, receive messages and create new actors. Althought not specifically enforced by *GPars*
+Gpars provides consistent Actor APIs and DSLs. Actors in principal perform three specific operations - send messages, receive messages and create new actors. Although not specifically enforced by *GPars*
 messages should be immutable or at least follow the *hands-off* policy when the sender never touches the messages after the message has been sent off.
 
 h2. Sending messages

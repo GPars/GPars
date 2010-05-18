@@ -37,7 +37,7 @@ actor.join()
 
 In some scenarios, typically when no implicit conversation-history-dependent state needs to be preserved for the actor, the dynamic dispatch code structure may be more intuitive than the traditional one using nested _loop_ and _react_ statements.
 
-The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamicaly at actor construction time using the _when_ handlers:
+The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamically at actor construction time using the _when_ handlers:
 
 {code}
 final Actor actor = new DynamicDispatchActor({
