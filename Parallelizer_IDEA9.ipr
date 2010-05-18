@@ -4541,6 +4541,7 @@
         <w>canoo</w>
         <w>cest</w>
         <w>chans</w>
+        <w>classpathentry</w>
         <w>cobertura</w>
         <w>conv</w>
         <w>csize</w>
@@ -4553,9 +4554,12 @@
         <w>galpin</w>
         <w>groovyx</w>
         <w>intdiv</w>
+        <w>javabuilder</w>
+        <w>javanature</w>
         <w>javax</w>
         <w>jboss</w>
         <w>jcsp</w>
+        <w>junit</w>
         <w>kerridge</w>
         <w>matemàtica</w>
         <w>matemàtiques</w>
