@@ -54,7 +54,8 @@ jar {
         instruction 'Implementation-Title', archivesBaseName
         instruction 'Implementation-Version', version
         instruction 'provider', theVendor
-        instruction 'Export-Package', '*'
+        instruction 'Export-Package', "*;version=${version}"
+        instruction 'Import-Package', '*;resolution:=optional'
     }
 }
 
