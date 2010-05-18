@@ -2,8 +2,52 @@ GPars (formerly GParallelizer)
 
 0.10
 
-todo
-Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=15702
+Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=15793
+
+Project changes
+
+See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
+
+Parallel collections
+
+* Renamed the Parallelizer and Asynchronizer classes to more appropriate GParsPool and GParsExecutorsPool as well as their methods
+* Enabled asynchronous closures inside the GParsPool.withPool() methods
+* Reorganized the asynchronous closure invocation functionality
+* Unified the GParsPool and GParsExecutorsPool functionality to eliminate the need to combine uses of the two classes
+* Improved the map/reduce performance by eliminating unnecessary conversions
+* Seed values are now allowed for fold() and reduce() methods
+* Added findAnyParallel() and countParallel() methods
+
+Fork / Join
+
+* Simplified API to define Fork/Join calculation without the need to create explicit subclasses
+
+Actors
+
+* Restructured actor grouping in order to unify it with agent and dataflow task grouping
+* The implicit _call()_ method can be used to send messages
+
+GroovyCSP
+
+* Added a JCSP-wrapping CSP implementation
+
+Dataflow
+
+* A _maxForks_ flag has been added to allow Dataflow operators to internally work concurrently
+* Added support for grouping operators and tasks around shared thread pools
+
+Safe
+
+* Reimplemented to increase performance
+* Added support for grouping Safe instances around shared thread pools
+* Added agent error handling capabilities
+* Renamed to *Agent*
+* The implicit _call()_ method can be used to update the agent
+
+Other
+
+* Dependency on Jetty has been made optional
+* Automated upload of downloadable artifacts
 
 0.9
 

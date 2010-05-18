@@ -8,17 +8,55 @@ h3. Project changes
 See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
 {note}
 
-* Experimental OSGi support
-
 h3. Parallel collections
 
 * Renamed the Parallelizer and Asynchronizer classes to more appropriate GParsPool and GParsExecutorsPool as well as their methods
 * Enabled asynchronous closures inside the GParsPool.withPool() methods
 * Reorganized the asynchronous closure invocation functionality
-* Unified the GParsPool and GParsExecutorsPool functionality to eliminate the need to combine using the two classes
+* Unified the GParsPool and GParsExecutorsPool functionality to eliminate the need to combine uses of the two classes
 * Improved the map/reduce performance by eliminating unnecessary conversions
+* Seed values are now allowed for fold() and reduce() methods
+* Added findAnyParallel() and countParallel() methods
 
-h4. Renaming hints
+h3. Fork / Join
+
+* Simplified API to define Fork/Join calculation without the need to create explicit subclasses
+
+h3. Actors
+
+* Restructured actor grouping in order to unify it with agent and dataflow task grouping
+* The implicit _call()_ method can be used to send messages
+{code}
+myActor 'message'
+{code}
+
+h3. GroovyCSP
+
+* Added a JCSP-wrapping CSP implementation
+
+h3. Dataflow
+
+* A _maxForks_ flag has been added to allow Dataflow operators to internally work concurrently
+* Added support for grouping operators and tasks around shared thread pools
+
+h3. Safe
+
+* Reimplemented to increase performance
+* Added support for grouping Safe instances around shared thread pools
+* Added agent error handling capabilities
+* Renamed to *Agent*
+* The implicit _call()_ method can be used to update the agent
+{code}
+myAgent increment
+{code}
+
+
+h3. Other
+
+* Dependency on Jetty has been made optional
+* Automated upload of downloadable artifacts
+
+h3. Renaming hints
 * Parallelizer -> GParsPool
 * Asynchronizer -> GParsExecutorsPool
 * doParallel() -> withPool()
@@ -31,35 +69,4 @@ h4. Renaming hints
 * PooledActorGroup -> DefaultPGroup
 * NonDaemonActorGroup -> NonDaemonPGroup
 * Safe -> Agent
-
-h3. Fork / Join
-
-* Simplified API to define Fork/Join calculation without the need to create explicit subclasses
-
-h3. Actors
-
-* The implicit _call()_ method can be used to send messages
-{code}
-myActor 'message'
-{code}
-
-h3. Dataflow
-
-* A _maxForks_ flag has been added to allow Dataflow operators to internally work concurrently
-* Added support for grouping operators and tasks around shared thread pools
-
-h3. Safe
-
-* Reimplemented to increase performance
-* Added support for grouping Safe instances around shared thread pools
-* Renamed to *Agent*
-* The implicit _call()_ method can be used to update the agent
-{code}
-myAgent increment
-{code}
-
-
-h3. Other
-
-* Dependency on Jetty has been made optional
 
