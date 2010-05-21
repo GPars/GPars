@@ -56,6 +56,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="buildSrc" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/spock-core-0.4-groovy-1.7-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
   <component name="copyright">
     <Base>
