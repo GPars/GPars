@@ -215,7 +215,7 @@ public class DataFlowsTest extends GroovyTestCase {
     public void testUnboundContains() {
         final DataFlows data = new DataFlows()
         Thread.start { data.key1 }
-        Thread.sleep 500
+        Thread.sleep 3000
 
         assertTrue data.contains('key1')
         data.key1 = 'value1'
