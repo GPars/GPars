@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 public class DataFlowsTest extends GroovyTestCase {
 
@@ -214,7 +215,12 @@ public class DataFlowsTest extends GroovyTestCase {
 
     public void testUnboundContains() {
         final DataFlows data = new DataFlows()
-        Thread.start { data.key1 }
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+        Thread.start {
+            barrier.await()
+            data.key1
+        }
+        barrier.await(30, TimeUnit.SECONDS)
         Thread.sleep 3000
 
         assertTrue data.contains('key1')
