@@ -1,4 +1,4 @@
-GPars (formerly GParallelizer)
+GPars - Groovy Parallel Systems
 
 0.10
 

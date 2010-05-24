@@ -1,3 +1,3 @@
-*GPars* (formerly *GParallelizer*) allows Groovy code to easily handle tasks concurrently and asynchronously, leveraging either the JSR-166y _Parallel Arrays_ or Java's executor services.
+*GPars* (Groovy Parallel Systems) allows Groovy code to easily handle tasks concurrently and asynchronously, leveraging either the JSR-166y _Parallel Arrays_ or Java's executor services.
 
 Please visit the project site for more information - http://gpars.codehaus.org

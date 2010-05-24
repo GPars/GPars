@@ -1,2 +1,2 @@
-GPars (formerly GParallelizer) is licences under the Apache Software Licence v2.0.  See
+GPars (Groovy Parallel Systems) is licences under the Apache Software Licence v2.0.  See
 http://www.apache.org/licenses/LICENSE-2.0 for the text of the licence.
