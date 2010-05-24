@@ -716,7 +716,7 @@ public class GParsPoolUtil {
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
-    public static Object getParallel(Object collection) {
+    public static PAWrapper getParallel(Object collection) {
         return getParallel(createCollection(collection))
     }
 
@@ -761,7 +761,7 @@ abstract class AbstractPAWrapper<T> {
      * @return The product of reduction
      */
     public final T reduce(Closure cl) {
-        pa.reduce(cl as Reducer, null)
+        pa.all().reduce(cl as Reducer, null)
     }
 
     /**
@@ -844,26 +844,16 @@ abstract class AbstractPAWrapper<T> {
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
-    public abstract AbstractPAWrapper filter(Closure cl)
+    public AbstractPAWrapper filter(Closure cl) {
+        new PAWrapper(pa.withFilter({cl(it)} as Predicate))
+    }
 }
 
 /**
  * The default ParallelArray wrapper class
  */
 final class PAWrapper<T> extends AbstractPAWrapper {
-
-    def PAWrapper(final pa) {
-        super(pa)
-    }
-
-    /**
-     * Filters concurrently elements in the collection based on the outcome of the supplied function on each of the elements.
-     * @param A closure indicating whether to propagate the given element into the filtered collection
-     * @return A collection holding the allowed values
-     */
-    public PAWrapper filter(Closure cl) {
-        new PAWrapper(pa.withFilter({cl(it)} as Predicate).all())
-    }
+    def PAWrapper(final pa) { super(pa) }
 }
 
 /**
@@ -880,7 +870,7 @@ final class MappedPAWrapper<T> extends AbstractPAWrapper {
      * @param A closure indicating whether to propagate the given element into the filtered collection
      * @return A collection holding the allowed values
      */
-    public PAWrapper filter(Closure cl) {
-        new PAWrapper(pa.all().withFilter({cl(it)} as Predicate).all())
+    public final AbstractPAWrapper filter(Closure cl) {
+        new PAWrapper(pa.all().withFilter({cl(it)} as Predicate))
     }
 }

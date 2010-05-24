@@ -35,6 +35,18 @@ public class MapReduceTest extends GroovyTestCase {
         }
     }
 
+    @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
+    public void testFilterOperations() {
+        GParsPool.withPool(5) {
+            assertEquals 'aa', 'abcde'.parallel.filter {it != 'e'}.map {it * 2}.filter {it != 'cc'}.min()
+            assertEquals 'dd', 'abcde'.parallel.filter {it != 'e'}.map {it * 2}.filter {it != 'cc'}.max()
+            assertEquals 'aabbdd', 'abcde'.parallel.filter {it != 'e'}.map {it * 2}.filter {it != 'cc'}.sum()
+            assertEquals 3, 'abcde'.parallel.filter {it != 'e'}.map {it * 2}.filter {it != 'cc'}.size()
+            assertEquals 4, 'abcde'.parallel.filter {it != 'e'}.map {it.size() * 2}.size()
+            assertEquals 4, 'abcde'.parallel.filter {it != 'e'}.map {it.size() * 2}.collection.size()
+        }
+    }
+
     public void testSeededReduce() {
         GParsPool.withPool(5) {
             assertEquals 15, [1, 2, 3, 4, 5].parallel.map {it}.reduce(0) {a, b -> a + b}
