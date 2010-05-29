@@ -73,7 +73,7 @@ configurations {
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.6.8'
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.8.1'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: hasProperty('spockVersion') ? spockVersion : '0.3'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: hasProperty('spockVersion') ? spockVersion : '0.4-groovy-1.6'
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
 //    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
@@ -233,7 +233,7 @@ zipDist << {
 
 task wrapper(type: Wrapper) {
     jarPath = 'wrapper'
-    gradleVersion = '0.9-20100510212332+1000'
+    gradleVersion = '0.9-20100528144306+0200'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
