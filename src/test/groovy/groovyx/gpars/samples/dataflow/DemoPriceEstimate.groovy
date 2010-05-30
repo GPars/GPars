@@ -30,25 +30,26 @@ public Map calculateProjectDuration(int numOfEntities) {
     def df = new DataFlows()
     final def group = new DefaultPGroup(4)
 
-    group.task {
-        log 'Calculating total project estimate'
-        df.durationEstimate = Math.max(df.dbaEstimate, df.uiEstimate) + 1
+    group.with {
+        task {
+            log 'Calculating total project estimate'
+            df.durationEstimate = Math.max(df.dbaEstimate, df.uiEstimate) + 1
+        }
+        task {
+            log 'Calculating db admin time'
+            df.dbaEstimate = (numOfEntities * 3 / 20)
+        }
+        task {
+            log 'Calculating UI designer time'
+            df.uiEstimate = ((5 + numOfEntities) * 3 / 5)
+        }
+        task {
+            log 'Calculating the cost'
+            df.costEstimate = 500 + numOfEntities * 9
+        }
     }
 
-    group.task {
-        log 'Calculating db admin time'
-        df.dbaEstimate = (numOfEntities * 3 / 20)
-    }
 
-    group.task {
-        log 'Calculating UI designer time'
-        df.uiEstimate = ((5 + numOfEntities) * 3 / 5)
-    }
-
-    group.task {
-        log 'Calculating the cost'
-        df.costEstimate = 500 + numOfEntities * 9
-    }
 
     return [cost: df.costEstimate, duration: df.durationEstimate]
 }
