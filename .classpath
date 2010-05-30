@@ -2,11 +2,12 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/groovy"/>
 	<classpathentry kind="src" path="src/test/groovy"/>
-	<classpathentry kind="lib" path="lib/jsr166y-070108.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/netty-3.1.5.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/codehaus/jcsp/jcsp/1.1-rc5-SNAPSHOT/jcsp-1.1-rc5-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/codehaus/groovy/groovy-all/1.7.1/groovy-all-1.7.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/4.8.1/junit-4.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/spockframework/spock-core/0.5-groovy-1.7-SNAPSHOT/spock-core-0.5-groovy-1.7-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/groovy/groovy-all/1.7.2/groovy-all-1.7.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
