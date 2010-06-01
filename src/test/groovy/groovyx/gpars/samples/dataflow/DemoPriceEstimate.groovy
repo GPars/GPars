@@ -33,7 +33,7 @@ public Map calculateProjectDuration(int numOfEntities) {
     group.with {
         task {
             log 'Calculating total project estimate'
-            df.durationEstimate = Math.max(df.dbaEstimate, df.uiEstimate) + 1
+            df.durationEstimate = [df.dbaEstimate, df.uiEstimate].max() + 1
         }
         task {
             log 'Calculating db admin time'
