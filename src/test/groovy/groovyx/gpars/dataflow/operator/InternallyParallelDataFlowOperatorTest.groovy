@@ -16,10 +16,10 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.dataflow.DataFlow.operator
 
 /**
@@ -103,7 +103,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
 
         def threads = (1..10).collect {e.val}
         assertEquals 10, threads.size()
-        assertEquals poolSize, threads.unique().size()
+        assert threads.unique().size() in (poolSize..forks)
 
         op.stop()
         group.shutdown()
