@@ -132,4 +132,43 @@ public class AgentListenerTest extends GroovyTestCase {
             counter.addValidator {->}
         }
     }
+
+    @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
+    public void testCloneStrategyWithValidators() {
+        def registrations = new Agent([], {it.clone()})
+        registrations.addValidator {o, n -> if ('Joe' in n) throw new IllegalArgumentException('Joe must not be allowed to register!')}
+
+        registrations {updateValue(['Joe'])}
+        assert registrations.val == []
+        assert !registrations.hasErrors()
+
+        registrations {updateValue(['Dave'])}
+        assert registrations.val == ['Dave']
+        assert !registrations.hasErrors()
+
+        registrations {updateValue(['Joe'])}
+        assert registrations.val == ['Dave']
+        assert !registrations.hasErrors()
+
+        registrations {updateValue(it << 'Joe')}
+        assert registrations.val == ['Dave']
+        assert !registrations.hasErrors()
+
+        registrations {r ->
+            r << 'Alice'
+            r << 'Joe'
+            r << 'James'
+            updateValue r
+        }
+        assert registrations.val == ['Dave']
+        assert !registrations.hasErrors()
+
+        registrations {r ->
+            r << 'Alice'
+            r << 'James'
+            updateValue r
+        }
+        assert registrations.val == ['Dave', 'Alice', 'James']
+        assert !registrations.hasErrors()
+    }
 }
