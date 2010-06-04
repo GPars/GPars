@@ -19,6 +19,7 @@ package groovyx.gpars.agent
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.util.EnhancedRWLock
+import java.util.concurrent.CopyOnWriteArrayList
 import org.codehaus.groovy.runtime.NullObject
 
 /**
@@ -65,6 +66,18 @@ public class Agent<T> extends AgentCore {
      * the protected boundary of the agent
      */
     final Closure copy = {it}
+
+    /**
+     * Holds all listeners interested in state updates
+     * A listener should be a closure accepting the old and the new value in this order.
+     */
+    final List listeners = new CopyOnWriteArrayList()
+
+    /**
+     * Holds all validators checking the agent's state
+     * A validator should be a closure accepting the old and the new value in this order.
+     */
+    final List validators = new CopyOnWriteArrayList()
 
     /**
      * Creates a new Agent with the internal state set to null
@@ -175,7 +188,42 @@ public class Agent<T> extends AgentCore {
      * Dynamically dispatches the method call
      */
     void handleMessage(final Object message) {
+        def oldValue = copy(data)
         onMessage message
+        def newValue = copy(data)
+
+        def validated = false
+        try {
+            for (validator in validators) validator(oldValue, newValue)
+            validated = true
+        } catch (all) {
+            lock.withWriteLock {
+                data = oldValue
+            }
+        }
+        if (validated) for (listener in listeners) listener(oldValue, newValue)
+    }
+
+    /**
+     * Adds a listener interested in state updates
+     * A listener should be a closure accepting the old and the new value in this order.
+     */
+    public void addListener(Closure listener) {
+        checkClosure(listener)
+        listeners.add listener
+    }
+
+    /**
+     * Adds a validator checking the agent's state
+     * A validator should be a closure accepting the old and the new value in this order.
+     */
+    public void addValidator(Closure listener) {
+        checkClosure(listener)
+        validators.add listener
+    }
+
+    private static def checkClosure(Closure listener) {
+        if (listener.maximumNumberOfParameters != 2) throw new IllegalArgumentException("Agent listeners and validators can only take two argments.")
     }
 
     /**

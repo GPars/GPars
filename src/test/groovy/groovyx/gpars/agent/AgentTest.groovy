@@ -295,11 +295,13 @@ public class AgentTest extends GroovyTestCase {
     public void testErrors() {
         def jugMembers = new Agent<List>()
         assert jugMembers.errors.empty
+        assert !jugMembers.hasErrors()
 
         jugMembers.send {throw new IllegalStateException('test1')}
         jugMembers.send {throw new IllegalArgumentException('test2')}
         jugMembers.await()
 
+        assert jugMembers.hasErrors()
         List errors = jugMembers.errors
         assertEquals(2, errors.size())
         assert errors[0] instanceof IllegalStateException
@@ -308,5 +310,6 @@ public class AgentTest extends GroovyTestCase {
         assertEquals 'test2', errors[1].message
 
         assert jugMembers.errors.empty
+        assert !jugMembers.hasErrors()
     }
 }
