@@ -77,6 +77,25 @@ public class GParsPoolUtil {
         return {Object... args -> callAsync(cl, * args)}
     }
 
+    /**
+     * Creates a caching variant of the supplied closure
+     */
+    public static Closure memoize(Closure cl) {
+        final String MEMOIZE_NULL = 'memoize_null_value'
+
+        def cache = [:] as ConcurrentHashMap
+
+        return {Object... args ->
+            def key = args.collect {it}
+            Object result = cache[key]
+            if (result == null) {
+                result = cl.call(* args)
+                cache[key] = result ?: MEMOIZE_NULL
+            }
+            result == MEMOIZE_NULL ? null : result
+        }
+    }
+
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {
         return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
     }
