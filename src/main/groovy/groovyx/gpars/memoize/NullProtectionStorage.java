@@ -14,15 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars
+package groovyx.gpars.memoize;
 
 /**
+ * Doesn't protect any resources.
+ * Used when the user agrees to have the whole cache emptied by gc.
+ *
  * @author Vaclav Pech
- * Date: Jun 21, 2010
+ *         Date: Jun 22, 2010
  */
+@SuppressWarnings({"UnusedDeclaration"})
+public final class NullProtectionStorage {
 
-public class MemoizeTest extends AbstractMemoizeTest {
-    Closure buildMemoizeClosure(Closure cl) {
-        cl.memoize()
+    /**
+     * Does nothing
+     *
+     * @param key   The key of the element to renew
+     * @param value A value to newly associate with the key
+     */
+    public void touch(final Object key, final Object value) {
     }
 }

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars
+package groovyx.gpars.memoize
 
 /**
  * @author Vaclav Pech
@@ -35,48 +35,42 @@ public class LRUMemoizeTest extends AbstractMemoizeTest {
                 it * 2
             }
             Closure mem = cl.memoize(0)
-            [1, 2, 3, 4, 5, 6].each {println it; mem(it)}
+            [1, 2, 3, 4, 5, 6].each {mem(it)}
             assert flag
         }
     }
 
-    public void _testLRUCaching() {
-        groovyx.gpars.GParsPool.withPool(5) {
+    //todo disable
+
+    public void testLRUCaching() {
+        groovyx.gpars.GParsPool.withPool(3) {
             def flag = false
-            Closure cl = {
+            Closure cl = {a ->
                 flag = true
-                it * 2
+                a % 100 == 0 ? null : new TestFilling(a)
             }
             Closure mem = cl.memoize(5)
-            [1, 2, 3, 4, 5, 6].each {println it; mem(it)}
+            final int max = 1000
+            5.times {iteration ->
+                (1..max).each {value -> mem(value * iteration)}
+                println("Mem: " + Runtime.runtime.freeMemory() + " : " + Runtime.runtime.maxMemory())
+            }
             flag = false
-            System.gc()
-            sleep 2000
-            assertEquals 4, mem(2)
-            assertEquals 6, mem(3)
-            assertEquals 12, mem(6)
-            println 'AAAAAAAAAAAAAAAAAAAAAAAAaa'
-            assert !flag
-
-            System.gc()
-            sleep 2000
-            assertEquals 2, mem(1)
-            println 'BBBBBBBBBBBBBBBBBBBBB'
-            assert flag
-            flag = false
-
-            System.gc()
-            sleep 2000
-            assertEquals 4, mem(2)
-            assertEquals 6, mem(3)
-            assertEquals 12, mem(6)
-            assertEquals 2, mem(1)
-            assert !flag
-            System.gc()
-            sleep 2000
-            assertEquals 8, mem(4)
+            assertEquals 1, mem(1).value
             assert flag
         }
     }
 
+}
+
+class TestFilling {
+    def a = []
+    int value
+
+    def TestFilling(final value) {
+        this.value = value;
+        60.times {
+            a << new String("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa" + it + System.currentTimeMillis())
+        }
+    }
 }

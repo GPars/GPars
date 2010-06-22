@@ -14,13 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars
+package groovyx.gpars.memoize
 
 /**
  * @author Vaclav Pech
  * Date: Jun 22, 2010
  */
-
 public abstract class AbstractMemoizeTest extends GroovyTestCase {
 
     public void testCorrectness() {

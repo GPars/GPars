@@ -17,6 +17,7 @@
 package groovyx.gpars
 
 import groovyx.gpars.memoize.LRUProtectionStorage
+import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
@@ -119,19 +120,13 @@ public class GParsPoolUtil {
 
         def cache = [:] as ConcurrentHashMap
 
-        def lruProtectionStorage = protectedCacheSize > 0 ? new LRUProtectionStorage(protectedCacheSize) : null
-        def markElementAccess = protectedCacheSize > 0 ?
-            {key, value ->
-                lruProtectionStorage.remove(key)
-                lruProtectionStorage[key] = value
-            } :
-            {key, value ->}  //Nothing needs to be done when no elements need protection against eviction
+        def lruProtectionStorage = protectedCacheSize > 0 ?
+            new LRUProtectionStorage(protectedCacheSize) :
+            new NullProtectionStorage() //Nothing should be done when no elements need protection against eviction
 
         return {Object... args ->
             cleanUpNullReferences(cache)
-            //todo clean-up the null references - test
-            //todo test LRU
-            //todo test MEMOIZE_NULL
+            //todo limit cache size
             //todo javadoc, document
             def key = args.collect {it}
             def result = cache[key]?.get()
@@ -142,7 +137,7 @@ public class GParsPoolUtil {
                 }
                 cache[key] = new SoftReference(result)
             }
-            markElementAccess(key, result)
+            lruProtectionStorage.touch(key, result)
             result == MEMOIZE_NULL ? null : result
         }
     }

@@ -20,10 +20,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * Protects stored resources from eviction from memory following the LRU (Last Recently Used) strategy.
+ * If the maximum size has been reached all newly added elements will cause the oldest element to be removed from the storage
+ * in order not to exceed the maximum capacity.
+ * The touch method can be used to renew an element and move it to the from of the LRU queue.
+ *
  * @author Vaclav Pech
  *         Date: Jun 22, 2010
  */
-public class LRUProtectionStorage extends LinkedHashMap {
+public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
     private final int maxSize;
 
     public LRUProtectionStorage(final int maxSize) {
@@ -32,7 +37,18 @@ public class LRUProtectionStorage extends LinkedHashMap {
 
     @Override
     protected boolean removeEldestEntry(final Map.Entry eldest) {
-        System.out.println("Removing " + eldest + ":" + size());
         return size() > maxSize;
+    }
+
+    /**
+     * The touch method can be used to renew an element and move it to the from of the LRU queue.
+     *
+     * @param key   The key of the element to renew
+     * @param value A value to newly associate with the key
+     */
+    @SuppressWarnings({"SynchronizedMethod"})
+    public synchronized void touch(final Object key, final Object value) {
+        remove(key);
+        put(key, value);
     }
 }
