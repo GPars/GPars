@@ -18,10 +18,10 @@ package groovyx.gpars
 
 /**
  * @author Vaclav Pech
- * Date: Jun 21, 2010
+ * Date: Jun 22, 2010
  */
 
-public class AbstractMemoizeTest extends GroovyTestCase {
+public abstract class AbstractMemoizeTest extends GroovyTestCase {
 
     public void testCorrectness() {
         groovyx.gpars.GParsPool.withPool(5) {
@@ -32,9 +32,9 @@ public class AbstractMemoizeTest extends GroovyTestCase {
         }
     }
 
-    private def buildMemoizedClosure(Closure cl) {
-        cl.memoize()
-    }
+    abstract def buildMemoizedClosure(Closure cl)
+
+    ;
 
     public void testNullParams() {
         groovyx.gpars.GParsPool.withPool(5) {
@@ -105,7 +105,7 @@ public class AbstractMemoizeTest extends GroovyTestCase {
         }
     }
 
-    private def checkParams(Closure mem, callFlag, args, desiredResult) {
+    def checkParams(Closure mem, callFlag, args, desiredResult) {
         assertEquals desiredResult, mem(* args)
         assert !callFlag.empty
         callFlag.clear()

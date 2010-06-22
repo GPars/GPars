@@ -21,92 +21,10 @@ package groovyx.gpars
  * Date: Jun 22, 2010
  */
 
-public class LRUMemoizeTest extends GroovyTestCase {
+public class LRUMemoizeTest extends AbstractMemoizeTest {
 
-    public void testCorrectness() {
-        groovyx.gpars.GParsPool.withPool(5) {
-            Closure cl = {it * 2}
-            Closure mem = cl.memoize(100)
-            assertEquals 10, mem(5)
-            assertEquals 4, mem(2)
-        }
-    }
-
-    public void testNullParams() {
-        groovyx.gpars.GParsPool.withPool(5) {
-            Closure cl = {2}
-            Closure mem = cl.memoize(100)
-            assertEquals 2, mem(5)
-            assertEquals 2, mem(2)
-            assertEquals 2, mem(null)
-        }
-    }
-
-    public void testNoParams() {
-        groovyx.gpars.GParsPool.withPool(5) {
-            Closure cl = {-> 2}
-            Closure mem = cl.memoize(100)
-            assertEquals 2, mem()
-            assertEquals 2, mem()
-        }
-    }
-
-    public void testCaching() {
-        groovyx.gpars.GParsPool.withPool(5) {
-            def flag = false
-            Closure cl = {
-                flag = true
-                it * 2
-            }
-            Closure mem = cl.memoize(100)
-            assertEquals 10, mem(5)
-            assert flag
-            flag = false
-            assertEquals 4, mem(2)
-            assert flag
-            flag = false
-
-            assertEquals 4, mem(2)
-            assertEquals 4, mem(2)
-            assertEquals 10, mem(5)
-            assert !flag
-
-            assertEquals 6, mem(3)
-            assert flag
-            flag = false
-            assertEquals 6, mem(3)
-            assert !flag
-        }
-    }
-
-    public void testComplexParameter() {
-        def callFlag = []
-
-        groovyx.gpars.GParsPool.withPool(5) {
-            Closure cl = {a, b, c ->
-                callFlag << true
-                c
-            }
-            Closure mem = cl.memoize(100)
-            checkParams(mem, callFlag, [1, 2, 3], 3)
-            checkParams(mem, callFlag, [1, 2, 4], 4)
-            checkParams(mem, callFlag, [1, [2], 4], 4)
-            checkParams(mem, callFlag, [[1: '1'], [2], 4], 4)
-            checkParams(mem, callFlag, [[1, 2], 2, 4], 4)
-            checkParams(mem, callFlag, [[1, 2], null, 4], 4)
-            checkParams(mem, callFlag, [null, null, 4], 4)
-            checkParams(mem, callFlag, [null, null, null], null)
-            checkParams(mem, callFlag, [null, [null], null], null)
-
-        }
-    }
-
-    private def checkParams(Closure mem, callFlag, args, desiredResult) {
-        assertEquals desiredResult, mem(* args)
-        assert !callFlag.empty
-        callFlag.clear()
-        assertEquals desiredResult, mem(* args)
-        assert callFlag.empty
+    def buildMemoizedClosure(Closure cl) {
+        cl.memoize(100)
     }
 
     public void testLRUCaching() {

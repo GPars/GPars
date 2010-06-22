@@ -116,8 +116,10 @@ public class GParsPoolUtil {
         if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize for memoize.")
 
         def cache = [:] as ConcurrentHashMap
-        def lru = [protectedCacheSize] as MemoizeLRUCache
+
+        def lru = new MemoizeLRUCache(protectedCacheSize)
         def cacheStrategy = {value ->
+            //todo handle null values
             lru.remove(value)
             lru[value] = value
         }
@@ -126,7 +128,7 @@ public class GParsPoolUtil {
             cleanUpNullReferences(cache)
             //todo clean-up the null references - test
             //todo test LRU
-            //todo unify and test both versions
+            //todo test MEMOIZE_NULL
             //todo javadoc, document
             def key = args.collect {it}
             final Object reference = cache[key]
