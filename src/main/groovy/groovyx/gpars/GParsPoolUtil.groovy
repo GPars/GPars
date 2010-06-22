@@ -16,6 +16,7 @@
 
 package groovyx.gpars
 
+import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
 import jsr166y.forkjoin.ForkJoinExecutor
@@ -37,6 +38,8 @@ import jsr166y.forkjoin.RecursiveTask
  * Date: Mar 10, 2010
  */
 public class GParsPoolUtil {
+
+    final static String MEMOIZE_NULL = 'memoize_null_value'
 
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = groovyx.gpars.GParsPool.retrieveCurrentPool()
@@ -78,11 +81,12 @@ public class GParsPoolUtil {
     }
 
     /**
-     * Creates a caching variant of the supplied closure
+     * Creates a caching variant of the supplied closure.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant will keep all values forever.
      */
     public static Closure memoize(Closure cl) {
-        final String MEMOIZE_NULL = 'memoize_null_value'
-
         def cache = [:] as ConcurrentHashMap
 
         return {Object... args ->
@@ -94,6 +98,58 @@ public class GParsPoolUtil {
             }
             result == MEMOIZE_NULL ? null : result
         }
+    }
+
+    /**
+     * Creates a caching variant of the supplied closure.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant allows the garbage collector to release entries from the cache and at the same time allows
+     * the user to specify how many entries should be protected from the eventual eviction.
+     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
+     * the LRU (Last Recently Used) strategy.
+     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the limits
+     * set by the user if memory is plentiful.
+     */
+    public static Closure memoize(Closure cl, int protectedCacheSize) {
+
+        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize for memoize.")
+
+        def cache = [:] as ConcurrentHashMap
+        def lru = [protectedCacheSize] as MemoizeLRUCache
+        def cacheStrategy = {value ->
+            lru.remove(value)
+            lru[value] = value
+        }
+
+        return {Object... args ->
+            cleanUpNullReferences(cache)
+            //todo clean-up the null references - test
+            //todo test LRU
+            //todo unify and test both versions
+            //todo javadoc, document
+            def key = args.collect {it}
+            final Object reference = cache[key]
+            def result = retrieveReferent(reference)
+            if (result == null) {
+                result = cl.call(* args)
+                cache[key] = result != null ? new SoftReference(result) : MEMOIZE_NULL
+            }
+            if (result == MEMOIZE_NULL) return null
+            else {
+                cacheStrategy(result)
+                return result
+            }
+        }
+    }
+
+    private static void cleanUpNullReferences(cache) {
+        cache.findAll {k, v -> v != MEMOIZE_NULL && v.get() == null}.each {k, v -> cache.remove k}
+    }
+
+    private static def retrieveReferent(final def reference) {
+        if (reference == MEMOIZE_NULL) MEMOIZE_NULL
+        else reference?.get()
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {

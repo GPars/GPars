@@ -93,6 +93,7 @@ contributor(ThreadPoolBody) {
             method name: "callAsync", type: "java.util.concurrent.Future"
             method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')
             method name: "memoize", type: "groovy.lang.Closure"
+            method name: "memoize", type: "groovy.lang.Closure", params: [protectedCacheSize: 'int']
         }
     }
 }

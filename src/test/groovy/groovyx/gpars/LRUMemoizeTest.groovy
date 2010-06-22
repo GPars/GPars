@@ -18,15 +18,15 @@ package groovyx.gpars
 
 /**
  * @author Vaclav Pech
- * Date: Jun 21, 2010
+ * Date: Jun 22, 2010
  */
 
-public class MemoizeTest extends GroovyTestCase {
+public class LRUMemoizeTest extends GroovyTestCase {
 
     public void testCorrectness() {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {it * 2}
-            Closure mem = cl.memoize()
+            Closure mem = cl.memoize(100)
             assertEquals 10, mem(5)
             assertEquals 4, mem(2)
         }
@@ -35,7 +35,7 @@ public class MemoizeTest extends GroovyTestCase {
     public void testNullParams() {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {2}
-            Closure mem = cl.memoize()
+            Closure mem = cl.memoize(100)
             assertEquals 2, mem(5)
             assertEquals 2, mem(2)
             assertEquals 2, mem(null)
@@ -45,7 +45,7 @@ public class MemoizeTest extends GroovyTestCase {
     public void testNoParams() {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {-> 2}
-            Closure mem = cl.memoize()
+            Closure mem = cl.memoize(100)
             assertEquals 2, mem()
             assertEquals 2, mem()
         }
@@ -58,7 +58,7 @@ public class MemoizeTest extends GroovyTestCase {
                 flag = true
                 it * 2
             }
-            Closure mem = cl.memoize()
+            Closure mem = cl.memoize(100)
             assertEquals 10, mem(5)
             assert flag
             flag = false
@@ -87,7 +87,7 @@ public class MemoizeTest extends GroovyTestCase {
                 callFlag << true
                 c
             }
-            Closure mem = cl.memoize()
+            Closure mem = cl.memoize(100)
             checkParams(mem, callFlag, [1, 2, 3], 3)
             checkParams(mem, callFlag, [1, 2, 4], 4)
             checkParams(mem, callFlag, [1, [2], 4], 4)
@@ -108,4 +108,44 @@ public class MemoizeTest extends GroovyTestCase {
         assertEquals desiredResult, mem(* args)
         assert callFlag.empty
     }
+
+    public void testLRUCaching() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            def flag = false
+            Closure cl = {
+                flag = true
+                it * 2
+            }
+            Closure mem = cl.memoize(5)
+            [1, 2, 3, 4, 5, 6].each {println it; mem(it)}
+            flag = false
+            System.gc()
+            sleep 2000
+            assertEquals 4, mem(2)
+            assertEquals 6, mem(3)
+            assertEquals 12, mem(6)
+            println 'AAAAAAAAAAAAAAAAAAAAAAAAaa'
+            assert !flag
+
+            System.gc()
+            sleep 2000
+            assertEquals 2, mem(1)
+            println 'BBBBBBBBBBBBBBBBBBBBB'
+            assert flag
+            flag = false
+
+            System.gc()
+            sleep 2000
+            assertEquals 4, mem(2)
+            assertEquals 6, mem(3)
+            assertEquals 12, mem(6)
+            assertEquals 2, mem(1)
+            assert !flag
+            System.gc()
+            sleep 2000
+            assertEquals 8, mem(4)
+            assert flag
+        }
+    }
+
 }
