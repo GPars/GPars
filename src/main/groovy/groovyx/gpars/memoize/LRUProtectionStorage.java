@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars;
+package groovyx.gpars.memoize;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,15 +23,16 @@ import java.util.Map;
  * @author Vaclav Pech
  *         Date: Jun 22, 2010
  */
-public class MemoizeLRUCache extends LinkedHashMap {
+public class LRUProtectionStorage extends LinkedHashMap {
     private final int maxSize;
 
-    public MemoizeLRUCache(final int maxSize) {
+    public LRUProtectionStorage(final int maxSize) {
         this.maxSize = maxSize;
     }
 
     @Override
     protected boolean removeEldestEntry(final Map.Entry eldest) {
+        System.out.println("Removing " + eldest + ":" + size());
         return size() > maxSize;
     }
 }

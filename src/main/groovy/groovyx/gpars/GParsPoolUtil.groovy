@@ -16,6 +16,8 @@
 
 package groovyx.gpars
 
+import groovyx.gpars.memoize.LRUProtectionStorage
+import groovyx.gpars.memoize.NullValue
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
@@ -39,7 +41,7 @@ import jsr166y.forkjoin.RecursiveTask
  */
 public class GParsPoolUtil {
 
-    final static String MEMOIZE_NULL = 'memoize_null_value'
+    final static String MEMOIZE_NULL = new NullValue()
 
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = groovyx.gpars.GParsPool.retrieveCurrentPool()
@@ -117,12 +119,13 @@ public class GParsPoolUtil {
 
         def cache = [:] as ConcurrentHashMap
 
-        def lru = new MemoizeLRUCache(protectedCacheSize)
-        def cacheStrategy = {value ->
-            //todo handle null values
-            lru.remove(value)
-            lru[value] = value
-        }
+        def lruProtectionStorage = protectedCacheSize > 0 ? new LRUProtectionStorage(protectedCacheSize) : null
+        def markElementAccess = protectedCacheSize > 0 ?
+            {key, value ->
+                lruProtectionStorage.remove(key)
+                lruProtectionStorage[key] = value
+            } :
+            {key, value ->}  //Nothing needs to be done when no elements need protection against eviction
 
         return {Object... args ->
             cleanUpNullReferences(cache)
@@ -131,27 +134,21 @@ public class GParsPoolUtil {
             //todo test MEMOIZE_NULL
             //todo javadoc, document
             def key = args.collect {it}
-            final Object reference = cache[key]
-            def result = retrieveReferent(reference)
+            def result = cache[key]?.get()
             if (result == null) {
                 result = cl.call(* args)
-                cache[key] = result != null ? new SoftReference(result) : MEMOIZE_NULL
+                if (result == null) {
+                    result = new NullValue()
+                }
+                cache[key] = new SoftReference(result)
             }
-            if (result == MEMOIZE_NULL) return null
-            else {
-                cacheStrategy(result)
-                return result
-            }
+            markElementAccess(key, result)
+            result == MEMOIZE_NULL ? null : result
         }
     }
 
     private static void cleanUpNullReferences(cache) {
-        cache.findAll {k, v -> v != MEMOIZE_NULL && v.get() == null}.each {k, v -> cache.remove k}
-    }
-
-    private static def retrieveReferent(final def reference) {
-        if (reference == MEMOIZE_NULL) MEMOIZE_NULL
-        else reference?.get()
+        cache.findAll {k, v -> v.get() == null}.each {k, v -> cache.remove k}
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {

@@ -23,11 +23,24 @@ package groovyx.gpars
 
 public class LRUMemoizeTest extends AbstractMemoizeTest {
 
-    def buildMemoizedClosure(Closure cl) {
+    Closure buildMemoizeClosure(Closure cl) {
         cl.memoize(100)
     }
 
-    public void testLRUCaching() {
+    public void testZeroCache() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            def flag = false
+            Closure cl = {
+                flag = true
+                it * 2
+            }
+            Closure mem = cl.memoize(0)
+            [1, 2, 3, 4, 5, 6].each {println it; mem(it)}
+            assert flag
+        }
+    }
+
+    public void _testLRUCaching() {
         groovyx.gpars.GParsPool.withPool(5) {
             def flag = false
             Closure cl = {

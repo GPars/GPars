@@ -26,15 +26,13 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
     public void testCorrectness() {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {it * 2}
-            Closure mem = buildMemoizedClosure(cl)
+            Closure mem = buildMemoizeClosure(cl)
             assertEquals 10, mem(5)
             assertEquals 4, mem(2)
         }
     }
 
-    abstract def buildMemoizedClosure(Closure cl)
-
-    ;
+    abstract Closure buildMemoizeClosure(Closure cl)
 
     public void testNullParams() {
         groovyx.gpars.GParsPool.withPool(5) {

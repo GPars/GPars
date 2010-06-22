@@ -14,15 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars
+package groovyx.gpars.memoize;
 
 /**
  * @author Vaclav Pech
- * Date: Jun 21, 2010
+ *         Date: Jun 22, 2010
  */
+public final class NullValue {
 
-public class MemoizeTest extends AbstractMemoizeTest {
-    Closure buildMemoizeClosure(Closure cl) {
-        cl.memoize()
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof NullValue;
+    }
+
+    @Override
+    public int hashCode() {
+        return "NullValue".hashCode();
     }
 }
