@@ -39,38 +39,4 @@ public class LRUMemoizeTest extends AbstractMemoizeTest {
             assert flag
         }
     }
-
-    //todo disable
-
-    public void testLRUCaching() {
-        groovyx.gpars.GParsPool.withPool(3) {
-            def flag = false
-            Closure cl = {a ->
-                flag = true
-                a % 100 == 0 ? null : new TestFilling(a)
-            }
-            Closure mem = cl.memoize(5)
-            final int max = 1000
-            5.times {iteration ->
-                (1..max).each {value -> mem(value * iteration)}
-                println("Mem: " + Runtime.runtime.freeMemory() + " : " + Runtime.runtime.maxMemory())
-            }
-            flag = false
-            assertEquals 1, mem(1).value
-            assert flag
-        }
-    }
-
-}
-
-class TestFilling {
-    def a = []
-    int value
-
-    def TestFilling(final value) {
-        this.value = value;
-        60.times {
-            a << new String("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa" + it + System.currentTimeMillis())
-        }
-    }
 }

@@ -127,7 +127,9 @@ public class GParsPoolUtil {
         return {Object... args ->
             cleanUpNullReferences(cache)
             //todo limit cache size
-            //todo javadoc, document
+            //todo concurrent access
+            //todo concurrent implementation
+            //todo document
             def key = args.collect {it}
             def result = cache[key]?.get()
             if (result == null) {
@@ -143,7 +145,7 @@ public class GParsPoolUtil {
     }
 
     private static void cleanUpNullReferences(cache) {
-        cache.findAll {k, v -> v.get() == null}.each {k, v -> cache.remove k}
+        cache.findAllParallel({entry -> entry.value.get() == null}).eachParallel {entry -> cache.remove entry.key}
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {
