@@ -90,8 +90,22 @@ public class GParsPoolUtil {
      * This variant will keep all values forever.
      */
     public static Closure memoize(Closure cl) {
-        def cache = [:] as ConcurrentHashMap
+        return buildMemoizeFunction([:] as ConcurrentHashMap, cl)
+    }
 
+    /**
+     * Creates a caching variant of the supplied closure with upper limit on the cache size.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant will keep all values until the upper size limit is reached. Then the values in the cache start rotating
+     * using the LRU (Last Recently Used) strategy.
+     */
+    public static Closure memoizeAtMost(Closure cl, int maxCacheSize) {
+        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeAtMost.")
+        return buildMemoizeFunction(new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
+    }
+
+    private static def buildMemoizeFunction(cache, Closure cl) {
         return {Object... args ->
             def key = args.collect {it}
             Object result = cache[key]
@@ -104,31 +118,51 @@ public class GParsPoolUtil {
     }
 
     /**
-     * Creates a caching variant of the supplied closure.
+     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower limit
+     * on the cache size.
      * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
      * making subsequent calls with the same arguments fast.
      * This variant allows the garbage collector to release entries from the cache and at the same time allows
-     * the user to specify how many entries should be protected from the eventual eviction.
+     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
      * Cached entries exceeding the specified preservation threshold are made available for eviction based on
      * the LRU (Last Recently Used) strategy.
      * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the limits
      * set by the user if memory is plentiful.
      */
-    public static Closure memoize(Closure cl, int protectedCacheSize) {
+    public static Closure memoizeAtLeast(Closure cl, int protectedCacheSize) {
+        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeAtLeast.")
+        return buildSoftReferenceMemoizeFunction(protectedCacheSize, [:] as ConcurrentHashMap, cl)
+    }
 
-        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize for memoize.")
+    /**
+     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower and upper limits
+     * on the cache size.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant allows the garbage collector to release entries from the cache and at the same time allows
+     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
+     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
+     * the LRU (Last Recently Used) strategy.
+     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the protected
+     * size limits set by the user, if memory is plentiful.
+     * Also, this variant will never exceed in size the upper size limit. Once the upper size limit has been reached,
+     * the values in the cache start rotating using the LRU (Last Recently Used) strategy.
+     */
+    public static Closure memoizeBetween(Closure cl, int protectedCacheSize, int maxCacheSize) {
+        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeBetween.")
+        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeBetween.")
+        if (protectedCacheSize > maxCacheSize) throw new IllegalArgumentException("The maxCacheSize parameter to memoizeBetween is required to be greater or equal to the protectedCacheSize parameter.")
+        return buildSoftReferenceMemoizeFunction(protectedCacheSize, new LRUProtectionStorage(maxCacheSize), cl)
+    }
 
-        def cache = [:] as ConcurrentHashMap
-
+    private static def buildSoftReferenceMemoizeFunction(int protectedCacheSize, cache, Closure cl) {
         def lruProtectionStorage = protectedCacheSize > 0 ?
             new LRUProtectionStorage(protectedCacheSize) :
             new NullProtectionStorage() //Nothing should be done when no elements need protection against eviction
 
         return {Object... args ->
             cleanUpNullReferences(cache)
-            //todo limit cache size
             //todo concurrent access
-            //todo concurrent implementation
             //todo document
             def key = args.collect {it}
             def result = cache[key]?.get()

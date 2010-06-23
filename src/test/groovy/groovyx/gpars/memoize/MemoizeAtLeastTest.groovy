@@ -21,20 +21,20 @@ package groovyx.gpars.memoize
  * Date: Jun 22, 2010
  */
 
-public class LRUMemoizeTest extends AbstractMemoizeTest {
+public class MemoizeAtLeastTest extends AbstractMemoizeTest {
 
     Closure buildMemoizeClosure(Closure cl) {
-        cl.memoize(100)
+        cl.memoizeAtLeast(100)
     }
 
     public void testZeroCache() {
-        groovyx.gpars.GParsPool.withPool(5) {
+        groovyx.gpars.GParsPool.withPool {
             def flag = false
             Closure cl = {
                 flag = true
                 it * 2
             }
-            Closure mem = cl.memoize(0)
+            Closure mem = cl.memoizeAtLeast(0)
             [1, 2, 3, 4, 5, 6].each {mem(it)}
             assert flag
         }
