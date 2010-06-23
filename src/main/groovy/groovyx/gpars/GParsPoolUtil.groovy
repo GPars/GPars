@@ -88,6 +88,10 @@ public class GParsPoolUtil {
      * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
      * making subsequent calls with the same arguments fast.
      * This variant will keep all values forever.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
      */
     public static Closure memoize(Closure cl) {
         return buildMemoizeFunction([:] as ConcurrentHashMap, cl)
@@ -99,9 +103,14 @@ public class GParsPoolUtil {
      * making subsequent calls with the same arguments fast.
      * This variant will keep all values until the upper size limit is reached. Then the values in the cache start rotating
      * using the LRU (Last Recently Used) strategy.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
      */
     public static Closure memoizeAtMost(Closure cl, int maxCacheSize) {
         if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeAtMost.")
+
         return buildMemoizeFunction(new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
     }
 
@@ -111,7 +120,8 @@ public class GParsPoolUtil {
             Object result = cache[key]
             if (result == null) {
                 result = cl.call(* args)
-                cache[key] = result ?: MEMOIZE_NULL
+                //noinspection GroovyConditionalCanBeElvis
+                cache[key] = result != null ? result : MEMOIZE_NULL
             }
             result == MEMOIZE_NULL ? null : result
         }
@@ -128,9 +138,15 @@ public class GParsPoolUtil {
      * the LRU (Last Recently Used) strategy.
      * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the limits
      * set by the user if memory is plentiful.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
+     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
      */
     public static Closure memoizeAtLeast(Closure cl, int protectedCacheSize) {
         if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeAtLeast.")
+
         return buildSoftReferenceMemoizeFunction(protectedCacheSize, [:] as ConcurrentHashMap, cl)
     }
 
@@ -147,12 +163,18 @@ public class GParsPoolUtil {
      * size limits set by the user, if memory is plentiful.
      * Also, this variant will never exceed in size the upper size limit. Once the upper size limit has been reached,
      * the values in the cache start rotating using the LRU (Last Recently Used) strategy.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
+     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
      */
     public static Closure memoizeBetween(Closure cl, int protectedCacheSize, int maxCacheSize) {
         if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeBetween.")
         if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeBetween.")
         if (protectedCacheSize > maxCacheSize) throw new IllegalArgumentException("The maxCacheSize parameter to memoizeBetween is required to be greater or equal to the protectedCacheSize parameter.")
-        return buildSoftReferenceMemoizeFunction(protectedCacheSize, new LRUProtectionStorage(maxCacheSize), cl)
+
+        return buildSoftReferenceMemoizeFunction(protectedCacheSize, new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
     }
 
     private static def buildSoftReferenceMemoizeFunction(int protectedCacheSize, cache, Closure cl) {
@@ -162,8 +184,6 @@ public class GParsPoolUtil {
 
         return {Object... args ->
             cleanUpNullReferences(cache)
-            //todo concurrent access
-            //todo document
             def key = args.collect {it}
             def result = cache[key]?.get()
             if (result == null) {
