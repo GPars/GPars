@@ -16,6 +16,10 @@
 
 package groovyx.gpars
 
+import groovyx.gpars.memoize.LRUProtectionStorage
+import groovyx.gpars.memoize.NullProtectionStorage
+import groovyx.gpars.memoize.NullValue
+import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
 import jsr166y.forkjoin.ForkJoinExecutor
@@ -37,6 +41,8 @@ import jsr166y.forkjoin.RecursiveTask
  * Date: Mar 10, 2010
  */
 public class GParsPoolUtil {
+
+    final static String MEMOIZE_NULL = new NullValue()
 
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = groovyx.gpars.GParsPool.retrieveCurrentPool()
@@ -75,6 +81,125 @@ public class GParsPoolUtil {
      */
     public static Closure async(Closure cl) {
         return {Object... args -> callAsync(cl, * args)}
+    }
+
+    /**
+     * Creates a caching variant of the supplied closure.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant will keep all values forever.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     */
+    public static Closure memoize(Closure cl) {
+        return buildMemoizeFunction([:] as ConcurrentHashMap, cl)
+    }
+
+    /**
+     * Creates a caching variant of the supplied closure with upper limit on the cache size.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant will keep all values until the upper size limit is reached. Then the values in the cache start rotating
+     * using the LRU (Last Recently Used) strategy.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     */
+    public static Closure memoizeAtMost(Closure cl, int maxCacheSize) {
+        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeAtMost.")
+
+        return buildMemoizeFunction(new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
+    }
+
+    private static def buildMemoizeFunction(cache, Closure cl) {
+        return {Object... args ->
+            def key = args.collect {it}
+            Object result = cache[key]
+            if (result == null) {
+                result = cl.call(* args)
+                //noinspection GroovyConditionalCanBeElvis
+                cache[key] = result != null ? result : MEMOIZE_NULL
+            }
+            result == MEMOIZE_NULL ? null : result
+        }
+    }
+
+    /**
+     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower limit
+     * on the cache size.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant allows the garbage collector to release entries from the cache and at the same time allows
+     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
+     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
+     * the LRU (Last Recently Used) strategy.
+     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the limits
+     * set by the user if memory is plentiful.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
+     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     */
+    public static Closure memoizeAtLeast(Closure cl, int protectedCacheSize) {
+        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeAtLeast.")
+
+        return buildSoftReferenceMemoizeFunction(protectedCacheSize, [:] as ConcurrentHashMap, cl)
+    }
+
+    /**
+     * Creates a caching variant of the supplied closure with automatic cache size adjustment and lower and upper limits
+     * on the cache size.
+     * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
+     * making subsequent calls with the same arguments fast.
+     * This variant allows the garbage collector to release entries from the cache and at the same time allows
+     * the user to specify how many entries should be protected from the eventual gc-initiated eviction.
+     * Cached entries exceeding the specified preservation threshold are made available for eviction based on
+     * the LRU (Last Recently Used) strategy.
+     * Given the non-deterministic nature of garbage collector, the actual cache size may grow well beyond the protected
+     * size limits set by the user, if memory is plentiful.
+     * Also, this variant will never exceed in size the upper size limit. Once the upper size limit has been reached,
+     * the values in the cache start rotating using the LRU (Last Recently Used) strategy.
+     * The returned function can be safely used concurrently from multiple threads, however, the implementation
+     * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
+     * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
+     * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
+     * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     */
+    public static Closure memoizeBetween(Closure cl, int protectedCacheSize, int maxCacheSize) {
+        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeBetween.")
+        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeBetween.")
+        if (protectedCacheSize > maxCacheSize) throw new IllegalArgumentException("The maxCacheSize parameter to memoizeBetween is required to be greater or equal to the protectedCacheSize parameter.")
+
+        return buildSoftReferenceMemoizeFunction(protectedCacheSize, new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
+    }
+
+    private static def buildSoftReferenceMemoizeFunction(int protectedCacheSize, cache, Closure cl) {
+        def lruProtectionStorage = protectedCacheSize > 0 ?
+            new LRUProtectionStorage(protectedCacheSize) :
+            new NullProtectionStorage() //Nothing should be done when no elements need protection against eviction
+
+        return {Object... args ->
+            cleanUpNullReferences(cache)
+            def key = args.collect {it}
+            def result = cache[key]?.get()
+            if (result == null) {
+                result = cl.call(* args)
+                if (result == null) {
+                    result = new NullValue()
+                }
+                cache[key] = new SoftReference(result)
+            }
+            lruProtectionStorage.touch(key, result)
+            result == MEMOIZE_NULL ? null : result
+        }
+    }
+
+    private static void cleanUpNullReferences(cache) {
+        cache.findAllParallel({entry -> entry.value.get() == null}).eachParallel {entry -> cache.remove entry.key}
     }
 
     private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {
