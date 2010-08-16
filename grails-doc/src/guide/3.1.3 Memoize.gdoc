@@ -22,7 +22,7 @@ GParsPool.withPool {
 }
 {code}
 
-Notice closures are enhanced inside the _GParsPool.withPool()_ blocks with a _memoize()_ function, whill returns a new closure
+Notice closures are enhanced inside the _GParsPool.withPool()_ blocks with a _memoize()_ function, which returns a new closure
 wrapping the original closure with a cache.
 In the example we're calling the _cachingDownload_ function in several places in the code, however, each unique url gets downloaded only once - the first time
 it is needed. The values are then cached and available for subsequent calls. And also to all threads, no matter which thread originally came first with
