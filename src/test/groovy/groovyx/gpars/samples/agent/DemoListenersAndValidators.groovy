@@ -40,3 +40,6 @@ counter {updateValue 11}  //Will be rejected
 counter 12  //Will be rejected
 counter 20
 counter.await()
+
+assert counter.hasErrors()
+assert counter.errors.size() == 5
