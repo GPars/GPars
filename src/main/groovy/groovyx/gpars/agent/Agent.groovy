@@ -143,7 +143,6 @@ public class Agent<T> extends AgentCore {
             for (validator in validators) validator(oldValue, newValue)
             validated = true
         } catch (Exception e) {
-            validated = false
             registerError e
         }
         if (validated) {
