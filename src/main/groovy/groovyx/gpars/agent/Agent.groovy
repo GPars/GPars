@@ -210,8 +210,7 @@ public class Agent<T> extends AgentCore {
      * A listener should be a closure accepting the old and the new value in this order.
      */
     public void addListener(Closure listener) {
-        checkClosure(listener)
-        listeners.add listener
+        listeners.add checkClosure(listener)
     }
 
     /**
@@ -219,16 +218,18 @@ public class Agent<T> extends AgentCore {
      * A validator should be a closure accepting the old and the new value in this order.
      */
     public void addValidator(Closure validator) {
-        checkClosure(validator)
-        validators.add validator
+        validators.add checkClosure(validator)
     }
 
     /**
      * Only two-argument closures are allowed
      * @param code The passed-in closure
      */
-    private static void checkClosure(Closure code) {
-        if (code.maximumNumberOfParameters != 2) throw new IllegalArgumentException("Agent listeners and validators can only take two argments.")
+    @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
+    private Closure checkClosure(Closure code) {
+        if (!(code.maximumNumberOfParameters in [2, 3])) throw new IllegalArgumentException("Agent listeners and validators can only take two argments plus optionally the current agent instance as the first argument.")
+        if (code.maximumNumberOfParameters == 3) return code.curry(this)
+        else return code
     }
 
     /**
