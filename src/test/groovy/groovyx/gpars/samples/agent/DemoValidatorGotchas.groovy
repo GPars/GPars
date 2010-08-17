@@ -23,8 +23,8 @@ import groovyx.gpars.agent.Agent
  * If the submitted code modifies the state directly, validators will not be able to un-do the change in case of a validation rule violation.
  * There are two possible solutions available:
  * <ol>
- * <li>Make sure you never change the supplied object representing current agent state and call <i>updateValue</i> to set the new state properly</li>
- * <li>Use custom copy strategy on the agent to allow the agent to create copies of the internal state</li>
+ * <li>Make sure you never change the supplied object representing current agent state and call <i>updateValue</i> to set and validate the new state</li>
+ * <li>Use custom copy strategy on the agent to allow the agent to create copies of the internal state and call <i>updateValue</i> to set and validate the new state</li>
  * </ol>
  *
  * The problem as well as both of the solutions are shown here.
