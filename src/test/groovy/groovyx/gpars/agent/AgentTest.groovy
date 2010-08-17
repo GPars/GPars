@@ -113,15 +113,15 @@ public class AgentTest extends GroovyTestCase {
     public void testListWithCloneCopyStrategy() {
         def jugMembers = new Agent<List>(['Me'], {it?.clone()})  //add Me
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.send {updateValue it << 'James'}  //add James
 
         final Thread t1 = Thread.start {
-            jugMembers.send {it.add 'Joe'}  //add Joe
+            jugMembers.send {updateValue it << 'Joe'}  //add Joe
         }
 
         final Thread t2 = Thread.start {
-            jugMembers << {it.add 'Dave'}  //add Dave
-            jugMembers << {it.add 'Alice'}  //add Alice
+            jugMembers << {updateValue it << 'Dave'}  //add Dave
+            jugMembers << {updateValue it << 'Alice'}  //add Alice
         }
 
         [t1, t2]*.join()

@@ -119,7 +119,7 @@ public class Agent<T> extends AgentCore {
     final void onMessage(Closure code) {
         lock.withWriteLock {
             code.delegate = this
-            code.call(data)
+            code.call(copy(data))
         }
     }
 
@@ -135,7 +135,21 @@ public class Agent<T> extends AgentCore {
     /**
      * Allows closures to set the new internal state as a whole
      */
-    final void updateValue(T newValue) { data = newValue }
+    final void updateValue(T newValue) {
+        def oldValue = copy(data)
+
+        def validated = false
+        try {
+            for (validator in validators) validator(oldValue, newValue)
+            validated = true
+        } catch (all) {
+            validated = false
+        }
+        if (validated) {
+            data = newValue
+            for (listener in listeners) listener(oldValue, newValue)
+        }
+    }
 
     /**
      * A shorthand method for safe message-based retrieval of the internal state.
@@ -188,20 +202,7 @@ public class Agent<T> extends AgentCore {
      * Dynamically dispatches the method call
      */
     void handleMessage(final Object message) {
-        def oldValue = copy(data)
         onMessage message
-        def newValue = copy(data)
-
-        def validated = false
-        try {
-            for (validator in validators) validator(oldValue, newValue)
-            validated = true
-        } catch (all) {
-            lock.withWriteLock {
-                data = oldValue
-            }
-        }
-        if (validated) for (listener in listeners) listener(oldValue, newValue)
     }
 
     /**
@@ -217,13 +218,17 @@ public class Agent<T> extends AgentCore {
      * Adds a validator checking the agent's state
      * A validator should be a closure accepting the old and the new value in this order.
      */
-    public void addValidator(Closure listener) {
-        checkClosure(listener)
-        validators.add listener
+    public void addValidator(Closure validator) {
+        checkClosure(validator)
+        validators.add validator
     }
 
-    private static def checkClosure(Closure listener) {
-        if (listener.maximumNumberOfParameters != 2) throw new IllegalArgumentException("Agent listeners and validators can only take two argments.")
+    /**
+     * Only two-argument closures are allowed
+     * @param code The passed-in closure
+     */
+    private static void checkClosure(Closure code) {
+        if (code.maximumNumberOfParameters != 2) throw new IllegalArgumentException("Agent listeners and validators can only take two argments.")
     }
 
     /**
