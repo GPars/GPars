@@ -97,8 +97,8 @@ public class AgentListenerTest extends GroovyTestCase {
 
         counter {updateValue(it + 3)}
         assertEquals(3, counter.val)
-        assert !counter.hasErrors()
-        assertEquals 0, counter.errors.size()
+        assert counter.hasErrors()
+        assertEquals 1, counter.errors.size()
     }
 
     public void testInvalidListenerArguments() {
@@ -140,7 +140,8 @@ public class AgentListenerTest extends GroovyTestCase {
 
         registrations {updateValue(['Joe'])}
         assert registrations.val == []
-        assert !registrations.hasErrors()
+        assert registrations.hasErrors()
+        assertEquals 1, registrations.errors.size()
 
         registrations {updateValue(['Dave'])}
         assert registrations.val == ['Dave']
@@ -148,11 +149,13 @@ public class AgentListenerTest extends GroovyTestCase {
 
         registrations {updateValue(['Joe'])}
         assert registrations.val == ['Dave']
-        assert !registrations.hasErrors()
+        assert registrations.hasErrors()
+        assertEquals 1, registrations.errors.size()
 
         registrations {updateValue(it << 'Joe')}
         assert registrations.val == ['Dave']
-        assert !registrations.hasErrors()
+        assert registrations.hasErrors()
+        assertEquals 1, registrations.errors.size()
 
         registrations {r ->
             r << 'Alice'
@@ -161,7 +164,8 @@ public class AgentListenerTest extends GroovyTestCase {
             updateValue r
         }
         assert registrations.val == ['Dave']
-        assert !registrations.hasErrors()
+        assert registrations.hasErrors()
+        assertEquals 1, registrations.errors.size()
 
         registrations {r ->
             r << 'Alice'
