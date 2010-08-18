@@ -19,6 +19,7 @@ package groovyx.gpars.agent
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.util.EnhancedRWLock
+import java.util.concurrent.CopyOnWriteArrayList
 import org.codehaus.groovy.runtime.NullObject
 
 /**
@@ -67,6 +68,18 @@ public class Agent<T> extends AgentCore {
     final Closure copy = {it}
 
     /**
+     * Holds all listeners interested in state updates
+     * A listener should be a closure accepting the old and the new value in this order.
+     */
+    final List listeners = new CopyOnWriteArrayList()
+
+    /**
+     * Holds all validators checking the agent's state
+     * A validator should be a closure accepting the old and the new value in this order.
+     */
+    final List validators = new CopyOnWriteArrayList()
+
+    /**
      * Creates a new Agent with the internal state set to null
      */
     def Agent() {
@@ -106,7 +119,7 @@ public class Agent<T> extends AgentCore {
     final void onMessage(Closure code) {
         lock.withWriteLock {
             code.delegate = this
-            code.call(data)
+            code.call(copy(data))
         }
     }
 
@@ -122,7 +135,21 @@ public class Agent<T> extends AgentCore {
     /**
      * Allows closures to set the new internal state as a whole
      */
-    final void updateValue(T newValue) { data = newValue }
+    final void updateValue(T newValue) {
+        def oldValue = copy(data)
+
+        def validated = false
+        try {
+            for (validator in validators) validator(oldValue, newValue)
+            validated = true
+        } catch (Exception e) {
+            registerError e
+        }
+        if (validated) {
+            data = newValue
+            for (listener in listeners) listener(oldValue, newValue)
+        }
+    }
 
     /**
      * A shorthand method for safe message-based retrieval of the internal state.
@@ -176,6 +203,33 @@ public class Agent<T> extends AgentCore {
      */
     void handleMessage(final Object message) {
         onMessage message
+    }
+
+    /**
+     * Adds a listener interested in state updates
+     * A listener should be a closure accepting the old and the new value in this order.
+     */
+    public void addListener(Closure listener) {
+        listeners.add checkClosure(listener)
+    }
+
+    /**
+     * Adds a validator checking the agent's state
+     * A validator should be a closure accepting the old and the new value in this order.
+     */
+    public void addValidator(Closure validator) {
+        validators.add checkClosure(validator)
+    }
+
+    /**
+     * Only two-argument closures are allowed
+     * @param code The passed-in closure
+     */
+    @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
+    private Closure checkClosure(Closure code) {
+        if (!(code.maximumNumberOfParameters in [2, 3])) throw new IllegalArgumentException("Agent listeners and validators can only take two argments plus optionally the current agent instance as the first argument.")
+        if (code.maximumNumberOfParameters == 3) return code.curry(this)
+        else return code
     }
 
     /**

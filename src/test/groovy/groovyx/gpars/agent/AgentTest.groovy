@@ -113,15 +113,15 @@ public class AgentTest extends GroovyTestCase {
     public void testListWithCloneCopyStrategy() {
         def jugMembers = new Agent<List>(['Me'], {it?.clone()})  //add Me
 
-        jugMembers.send {it.add 'James'}  //add James
+        jugMembers.send {updateValue it << 'James'}  //add James
 
         final Thread t1 = Thread.start {
-            jugMembers.send {it.add 'Joe'}  //add Joe
+            jugMembers.send {updateValue it << 'Joe'}  //add Joe
         }
 
         final Thread t2 = Thread.start {
-            jugMembers << {it.add 'Dave'}  //add Dave
-            jugMembers << {it.add 'Alice'}  //add Alice
+            jugMembers << {updateValue it << 'Dave'}  //add Dave
+            jugMembers << {updateValue it << 'Alice'}  //add Alice
         }
 
         [t1, t2]*.join()
@@ -295,11 +295,13 @@ public class AgentTest extends GroovyTestCase {
     public void testErrors() {
         def jugMembers = new Agent<List>()
         assert jugMembers.errors.empty
+        assert !jugMembers.hasErrors()
 
         jugMembers.send {throw new IllegalStateException('test1')}
         jugMembers.send {throw new IllegalArgumentException('test2')}
         jugMembers.await()
 
+        assert jugMembers.hasErrors()
         List errors = jugMembers.errors
         assertEquals(2, errors.size())
         assert errors[0] instanceof IllegalStateException
@@ -308,5 +310,6 @@ public class AgentTest extends GroovyTestCase {
         assertEquals 'test2', errors[1].message
 
         assert jugMembers.errors.empty
+        assert !jugMembers.hasErrors()
     }
 }

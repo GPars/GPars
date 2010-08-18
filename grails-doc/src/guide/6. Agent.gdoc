@@ -131,6 +131,80 @@ Agent instances can also be created using the _Agent.agent()_ factory method.
 def jugMembers = Agent.agent ['Me']  //add Me
 {code}
 
+h2. Listeners and validators
+
+Agents allow the user to add listeners and validators. While listeners will get notified each time the internal state changes,
+validators get a chance to reject a coming change by throwing an exception.
+
+{code}
+final Agent counter = new Agent()
+
+counter.addListener {oldValue, newValue -> println "Changing value from $oldValue to $newValue"}
+counter.addListener {agent, oldValue, newValue -> println "Agent $agent changing value from $oldValue to $newValue"}
+
+counter.addValidator {oldValue, newValue -> if (oldValue > newValue) throw new IllegalArgumentException('Things can only go up in Groovy')}
+counter.addValidator {agent, oldValue, newValue -> if (oldValue == newValue) throw new IllegalArgumentException('Things never stay the same for $agent')}
+
+counter 10
+counter 11
+counter {updateValue 12}
+counter 10  //Will be rejected
+counter {updateValue it - 1}  //Will be rejected
+counter {updateValue it}  //Will be rejected
+counter {updateValue 11}  //Will be rejected
+counter 12  //Will be rejected
+counter 20
+counter.await()
+{code}
+
+Both listeners and validators are essentially closures taking two or three arguments. Exceptions thrown from the validators
+will be logged inside the agent and can be tested using the _hasErrors()_ method or retrieved through the _errors_ property.
+
+{code}
+assert counter.hasErrors()
+assert counter.errors.size() == 5
+{code}
+
+h3. Validator gotchas
+
+With Groovy being not very strict on data types and immutability, agent users should be aware of potential bumps on the road.
+If the submitted code modifies the state directly, validators will not be able to un-do the change in case of a validation rule violation.
+There are two possible solutions available:
+ # Make sure you never change the supplied object representing current agent state
+ # Use custom copy strategy on the agent to allow the agent to create copies of the internal state
+
+In both cases you need to call _updateValue()_ to set and validate the new state properly.
+
+The problem as well as both of the solutions are shown below:
+
+{code}
+//Create an agent storing names, rejecting 'Joe'
+final Closure rejectJoeValidator = {oldValue, newValue -> if ('Joe' in newValue) throw new IllegalArgumentException('Joe is not allowed to enter our list.')}
+
+Agent agent = new Agent([])
+agent.addValidator rejectJoeValidator
+
+agent {it << 'Dave'}                    //Accepted
+agent {it << 'Joe'}                     //Erroneously accepted, since by-passes the validation mechanism
+println agent.val
+
+//Solution 1 - never alter the supplied state object
+agent = new Agent([])
+agent.addValidator rejectJoeValidator
+
+agent {updateValue(['Dave', * it])}      //Accepted
+agent {updateValue(['Joe', * it])}       //Rejected
+println agent.val
+
+//Solution 2 - use custom copy strategy on the agent
+agent = new Agent([], {it.clone()})
+agent.addValidator rejectJoeValidator
+
+agent {updateValue it << 'Dave'}        //Accepted
+agent {updateValue it << 'Joe'}         //Rejected, since 'it' is now just a copy of the internal agent's state
+println agent.val
+{code}
+
 h2. Grouping
 
 By default all Agent instances belong to the same group sharing its daemon thread pool.
