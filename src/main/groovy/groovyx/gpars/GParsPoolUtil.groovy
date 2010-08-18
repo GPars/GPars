@@ -16,6 +16,7 @@
 
 package groovyx.gpars
 
+import groovy.time.Duration
 import groovyx.gpars.memoize.LRUProtectionStorage
 import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
@@ -44,6 +45,11 @@ public class GParsPoolUtil {
 
     final static String MEMOIZE_NULL = new NullValue()
 
+    /**
+     * Allows timeouts for async operations
+     */
+    private static final Timer timer = new Timer('GParsExecutorsTimeoutTimer', true)
+
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = groovyx.gpars.GParsPool.retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("No ForkJoinPool available for the current thread")
@@ -64,6 +70,22 @@ public class GParsPoolUtil {
      */
     public static Future callAsync(final Closure cl, final Object... args) {
         callParallel {-> cl(* args)}
+    }
+
+    /**
+     * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
+     */
+    public static Future callTimeoutAsync(final Closure cl, long timeout, final Object... args) {
+        final Future f = callAsync(cl, args)
+        timer.schedule({f.cancel(true)} as TimerTask, timeout)
+        return f
+    }
+
+    /**
+     * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value,
+     */
+    public static Future callTimeoutAsync(final Closure cl, Duration timeout, final Object... args) {
+        callTimeoutAsync(cl, timeout.toMilliseconds(), args)
     }
 
     /**

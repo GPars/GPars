@@ -92,6 +92,9 @@ contributor(ThreadPoolBody) {
             method name: "async", type: "groovy.lang.Closure"
             method name: "callAsync", type: "java.util.concurrent.Future"
             method name: "callAsync", type: "java.util.concurrent.Future", params: rep('Object')
+            method name: "callTimeoutAsync", type: "java.util.concurrent.Future", params: [timeout: 'Long']
+            method name: "callTimeoutAsync", type: "java.util.concurrent.Future", params: [timeout: 'groovy.time.Duration']
+//            method name: "callTimeoutAsync", type: "java.util.concurrent.Future", params: [timeout:'Long', *:rep('Object')]
             method name: "memoize", type: "groovy.lang.Closure"
             method name: "memoizeAtLeast", type: "groovy.lang.Closure", params: [protectedCacheSize: 'int']
             method name: "memoizeAtMost", type: "groovy.lang.Closure", params: [maxCacheSize: 'int']
