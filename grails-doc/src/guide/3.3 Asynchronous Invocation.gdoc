@@ -34,6 +34,22 @@ GParsPool.withPool() {
     assert 6 == {it * 2}.callAsync(3).get()
 }
 {code}
+
+h4. Timeouts
+
+The _callTimeoutAsync()_ methods, taking either a long value or a Duration instance, allow the user to have the calculation cancelled after a given time interval.
+
+{code}
+{->
+    while(true) {
+        Thread.sleep 1000  //Simulate a bit of interesting calculation
+        if (Thread.currentThread().isInterrupted()) break;  //We've been cancelled
+    }
+}.callTimeoutAsync(2000)
+{code}
+
+In order to allow cancellation, the asynchronously running code must keep checking the _interrupted_ flag of its own thread and cease the calculation once the flag is set to true.
+
 h3. Executor Service enhancements
 
 The ExecutorService and jsr166y.forkjoin.ForkJoinPool class is enhanced with the << (leftShift) operator to submit tasks to the pool and return
