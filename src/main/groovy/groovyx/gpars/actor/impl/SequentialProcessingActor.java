@@ -18,6 +18,7 @@ package groovyx.gpars.actor.impl;
 
 import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;
+import groovy.time.BaseDuration;
 import groovy.time.Duration;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
@@ -571,6 +572,68 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             reaction = reactCode;
             throw CONTINUE;
         }
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected abstract Object receiveImpl() throws InterruptedException;
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param units   a TimeUnit determining how to interpret the timeout parameter
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected abstract Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException;
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final Object receive() throws InterruptedException {
+        final Object msg = receiveImpl();
+        return SequentialProcessingActor.unwrapMessage(msg);
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param units   a TimeUnit determining how to interpret the timeout parameter
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final Object receive(final long timeout, final TimeUnit units) throws InterruptedException {
+        final Object msg = receiveImpl(timeout, units);
+        return SequentialProcessingActor.unwrapMessage(msg);
+    }
+
+    private static Object unwrapMessage(final Object msg) {
+        //more a double-check here, since all current implementations of the receiveImpl() method do unwrap already
+        if (msg instanceof ActorMessage) {
+            return ((ActorMessage) msg).getPayLoad();
+        } else {
+            return msg;
+        }
+    }
+
+    /**
+     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
+     *
+     * @param duration how long to wait before giving up, in units of unit
+     * @return The message retrieved from the queue, or null, if the timeout expires.
+     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
+     */
+    protected final Object receive(final BaseDuration duration) throws InterruptedException {
+        return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
     /**

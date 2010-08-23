@@ -185,68 +185,6 @@ public abstract class Actor extends ReplyingMessageStream {
         return new MyRemoteHandle(handle, host, joinLatch);
     }
 
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected abstract Object receiveImpl() throws InterruptedException;
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param timeout how long to wait before giving up, in units of unit
-     * @param units   a TimeUnit determining how to interpret the timeout parameter
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected abstract Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException;
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive() throws InterruptedException {
-        final Object msg = receiveImpl();
-        return Actor.unwrapMessage(msg);
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param timeout how long to wait before giving up, in units of unit
-     * @param units   a TimeUnit determining how to interpret the timeout parameter
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive(final long timeout, final TimeUnit units) throws InterruptedException {
-        final Object msg = receiveImpl(timeout, units);
-        return Actor.unwrapMessage(msg);
-    }
-
-    private static Object unwrapMessage(final Object msg) {
-        //more a double-check here, since all current implementations of the receiveImpl() method do unwrap already
-        if (msg instanceof ActorMessage) {
-            return ((ActorMessage) msg).getPayLoad();
-        } else {
-            return msg;
-        }
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param duration how long to wait before giving up, in units of unit
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive(final BaseDuration duration) throws InterruptedException {
-        return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
-    }
-
     public static class MyRemoteHandle extends DefaultRemoteHandle {
         private final DataFlowExpression<Object> joinLatch;
         private static final long serialVersionUID = 3721849638877039035L;
@@ -306,16 +244,6 @@ public abstract class Actor extends ReplyingMessageStream {
             }
             remoteHost.write(new SendTo(this, (ActorMessage) message));
             return this;
-        }
-
-        @Override
-        protected Object receiveImpl() throws InterruptedException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        protected Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
-            throw new UnsupportedOperationException();
         }
 
         public static class StopActorMsg extends SerialMsg {
