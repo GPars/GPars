@@ -16,11 +16,6 @@
 
 package groovyx.gpars.actor.impl;
 
-import groovy.lang.Closure;
-import groovyx.gpars.actor.Actors;
-import groovyx.gpars.dataflow.DataCallback;
-import groovyx.gpars.group.PGroup;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -40,60 +35,6 @@ public abstract class ReplyingMessageStream extends MessageStream {
     @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
     protected final List<MessageStream> getSenders() {
         return senders;
-    }
-
-    /**
-     * The parallel group to which the message stream belongs
-     */
-    protected volatile PGroup parallelGroup;
-
-    //todo remove either constructor
-
-    protected ReplyingMessageStream() {
-        this(Actors.defaultActorPGroup);
-    }
-
-    protected ReplyingMessageStream(final PGroup parallelGroup) {
-        this.parallelGroup = parallelGroup;
-    }
-
-    /**
-     * Retrieves the group to which the actor belongs
-     *
-     * @return The group
-     */
-    public final PGroup getParallelGroup() {
-        return parallelGroup;
-    }
-
-    /**
-     * Sets the parallel group.
-     * It can only be invoked before the actor is started.
-     *
-     * @param group new group
-     */
-    public void setParallelGroup(final PGroup group) {
-        if (group == null) {
-            throw new IllegalArgumentException("Cannot set actor's group to null.");
-        }
-
-        parallelGroup = group;
-    }
-
-    /**
-     * Sends a message and execute continuation when reply became available.
-     *
-     * @param message message to send
-     * @param closure closure to execute when reply became available
-     * @return The message that came in reply to the original send.
-     * @throws InterruptedException if interrupted while waiting
-     */
-    @SuppressWarnings({"AssignmentToMethodParameter"})
-    public final <T> MessageStream sendAndContinue(final T message, Closure closure) throws InterruptedException {
-        closure = (Closure) closure.clone();
-        closure.setDelegate(this);
-        closure.setResolveStrategy(Closure.DELEGATE_FIRST);
-        return send(message, new DataCallback(closure, parallelGroup));
     }
 
     /**

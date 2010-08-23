@@ -15,11 +15,14 @@
 // limitations under the License.
 package groovyx.gpars.actor;
 
+import groovy.lang.Closure;
 import groovy.time.BaseDuration;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.actor.impl.ReplyingMessageStream;
+import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.DefaultRemoteHandle;
@@ -50,6 +53,11 @@ public abstract class Actor extends ReplyingMessageStream {
 
     private final DataFlowExpression<Object> joinLatch;
 
+    /**
+     * The parallel group to which the message stream belongs
+     */
+    protected volatile PGroup parallelGroup;
+
     protected Actor() {
         this(new DataFlowVariable());
     }
@@ -60,7 +68,51 @@ public abstract class Actor extends ReplyingMessageStream {
      * @param joinLatch The instance of DataFlowExpression to use for join operation
      */
     protected Actor(final DataFlowExpression<Object> joinLatch) {
+        this(joinLatch, Actors.defaultActorPGroup);
+    }
+
+    protected Actor(final DataFlowExpression<Object> joinLatch, final PGroup parallelGroup) {
         this.joinLatch = joinLatch;
+        this.parallelGroup = parallelGroup;
+    }
+
+    /**
+     * Retrieves the group to which the actor belongs
+     *
+     * @return The group
+     */
+    public final PGroup getParallelGroup() {
+        return parallelGroup;
+    }
+
+    /**
+     * Sets the parallel group.
+     * It can only be invoked before the actor is started.
+     *
+     * @param group new group
+     */
+    public void setParallelGroup(final PGroup group) {
+        if (group == null) {
+            throw new IllegalArgumentException("Cannot set actor's group to null.");
+        }
+
+        parallelGroup = group;
+    }
+
+    /**
+     * Sends a message and execute continuation when reply became available.
+     *
+     * @param message message to send
+     * @param closure closure to execute when reply became available
+     * @return The message that came in reply to the original send.
+     * @throws InterruptedException if interrupted while waiting
+     */
+    @SuppressWarnings({"AssignmentToMethodParameter"})
+    public final <T> MessageStream sendAndContinue(final T message, Closure closure) throws InterruptedException {
+        closure = (Closure) closure.clone();
+        closure.setDelegate(this);
+        closure.setResolveStrategy(Closure.DELEGATE_FIRST);
+        return send(message, new DataCallback(closure, parallelGroup));
     }
 
     /**
