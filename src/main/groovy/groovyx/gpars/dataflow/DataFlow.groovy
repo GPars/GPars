@@ -50,8 +50,9 @@ public abstract class DataFlow {
      * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
      * but can only exchange data using explicit DataFlowVariables and Streams.
      * @param code The task body to run
+     * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
      */
-    public static void task(final Closure code) {
+    public static DataFlowVariable task(final Closure code) {
         DataFlow.DATA_FLOW_GROUP.task code
     }
 

@@ -219,3 +219,47 @@ DataFlow.task {df.y = 'value2}
 assert df.y == 'value2'
 {code}
 Think of DataFlows as a map with Dataflow Variables as keys storing their bound values as appropriate map values. The semantics of reading a value (e.g. df.x) and binding a value (e.g. df.x = 'value') remain identical to the semantics of plain Dataflow Variables (x.val and x << 'value' respectively).
+
+h2. Returning a value from a task
+
+Typically dataflow tasks communicate through dataflow variables. On top of that, tasks can also return values, again through a dataflow variable.
+ When you invoke the _task()_ factory method, you get back an instance of DataFlowVariable, on which you can listen for the task's return value,
+ just like when using any other DataFlowVariable.
+
+ {code}
+    final DataFlowVariable t1 = task {
+        return 10
+    }
+    final DataFlowVariable t2 = task {
+        return 20
+    }
+    def results = [t1, t2]*.val
+    println 'Both sub-tasks finished and returned values: ' + results
+ {code}
+
+ Obviously the value can also be obtained without blocking the caller using the _whenBound()_ method.
+
+ {code}
+def task = task {
+    println 'The task is running and calculating the return value'
+    30
+}
+task >> {value -> println "The task finished and returned $value"}
+ {code}
+
+ h2. Joining tasks
+
+ Using the _join()_ operation on the result dataflow variable of a task you can block until the task finishes.
+
+ {code}
+ task {
+     final DataFlowVariable t1 = task {
+         println 'First sub-task running.'
+     }
+     final DataFlowVariable t2 = task {
+         println 'Second sub-task running'
+     }
+     [t1, t2]*.join()
+     println 'Both sub-tasks finished'
+ }.join()
+ {code}

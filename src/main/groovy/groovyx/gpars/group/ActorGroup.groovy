@@ -21,6 +21,7 @@ import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
+import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.scheduler.Pool
 
@@ -137,9 +138,12 @@ public abstract class PGroup {
      * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
      * but can only exchange data using explicit DataFlowVariables and Streams.
      * @param code The task body to run
+     * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
      */
-    public void task(final Closure code) {
-        threadPool.execute code
+    public DataFlowVariable task(final Closure code) {
+        final DataFlowVariable result = new DataFlowVariable()
+        threadPool.execute {-> result.bind code()}
+        return result
     }
 
     /**
