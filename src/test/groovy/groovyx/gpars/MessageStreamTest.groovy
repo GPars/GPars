@@ -73,5 +73,4 @@ class MessageStreamTest extends GroovyTestCase {
         receiver.join()
         assert flag1 && flag2 && flag3
     }
-
 }

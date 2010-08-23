@@ -142,7 +142,8 @@ public abstract class PGroup {
      */
     public DataFlowVariable task(final Closure code) {
         final DataFlowVariable result = new DataFlowVariable()
-        threadPool.execute {-> result.bind code()}
+        def cloned = code.clone()
+        threadPool.execute {-> result.bind cloned()}
         return result
     }
 

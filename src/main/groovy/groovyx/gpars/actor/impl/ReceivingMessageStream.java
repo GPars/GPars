@@ -18,10 +18,11 @@ package groovyx.gpars.actor.impl;
 
 import groovy.lang.Closure;
 import groovy.time.BaseDuration;
-import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
+import groovyx.gpars.actor.Actors;
+import groovyx.gpars.dataflow.DataCallback;
+import groovyx.gpars.group.PGroup;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -42,6 +43,60 @@ public abstract class ReceivingMessageStream extends MessageStream {
     @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
     protected final List<MessageStream> getSenders() {
         return senders;
+    }
+
+    /**
+     * The parallel group to which the message stream belongs
+     */
+    protected volatile PGroup parallelGroup;
+
+    //todo remove either constructor
+
+    protected ReceivingMessageStream() {
+        this(Actors.defaultActorPGroup);
+    }
+
+    protected ReceivingMessageStream(final PGroup parallelGroup) {
+        this.parallelGroup = parallelGroup;
+    }
+
+    /**
+     * Retrieves the group to which the actor belongs
+     *
+     * @return The group
+     */
+    public final PGroup getParallelGroup() {
+        return parallelGroup;
+    }
+
+    /**
+     * Sets the parallel group.
+     * It can only be invoked before the actor is started.
+     *
+     * @param group new group
+     */
+    public void setParallelGroup(final PGroup group) {
+        if (group == null) {
+            throw new IllegalArgumentException("Cannot set actor's group to null.");
+        }
+
+        parallelGroup = group;
+    }
+
+    /**
+     * Sends a message and execute continuation when reply became available.
+     *
+     * @param message message to send
+     * @param closure closure to execute when reply became available
+     * @return The message that came in reply to the original send.
+     * @throws InterruptedException if interrupted while waiting
+     */
+    @SuppressWarnings({"AssignmentToMethodParameter"})
+    public final <T> MessageStream sendAndContinue(final T message, Closure closure) throws InterruptedException {
+        closure = (Closure) closure.clone();
+        closure.setDelegate(this);
+        closure.setResolveStrategy(Closure.DELEGATE_FIRST);
+        return send(message, new DataCallback(closure, parallelGroup));
     }
 
     /**
@@ -162,73 +217,4 @@ public abstract class ReceivingMessageStream extends MessageStream {
         return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * Enhances objects with the ability to send replies and detect message originators.
-     */
-    public static final class ReplyCategory {
-        private ReplyCategory() {
-        }
-
-        /**
-         * Retrieves the originator of a message
-         *
-         * @param original The message to detect the originator of
-         * @return The message originator
-         */
-        public static MessageStream getSender(final Object original) {
-            final ReceivingMessageStream actor = Actor.threadBoundActor();
-            if (actor == null) {
-                throw new IllegalStateException("message originator detection in a non-actor");
-            }
-
-            return actor.obj2Sender.get(original);
-        }
-
-        public static void reply(final Object original, final Object reply) {
-            if (original instanceof ReceivingMessageStream) {
-                ((ReceivingMessageStream) original).reply(reply);
-                return;
-            }
-
-            if (original instanceof Closure) {
-                ((ReceivingMessageStream) ((Closure) original).getDelegate()).reply(reply);
-                return;
-            }
-
-            final ReceivingMessageStream actor = Actor.threadBoundActor();
-            if (actor == null) {
-                throw new IllegalStateException("reply from non-actor");
-            }
-
-            final MessageStream sender = actor.obj2Sender.get(original);
-            if (sender == null) {
-                throw new IllegalStateException(MessageFormat.format("Cannot send a reply message {0} to a null recipient.", original.toString()));
-            }
-
-            sender.send(reply);
-        }
-
-        public static void replyIfExists(final Object original, final Object reply) {
-            if (original instanceof ReceivingMessageStream) {
-                ((ReceivingMessageStream) original).replyIfExists(reply);
-                return;
-            }
-
-            if (original instanceof Closure) {
-                ((ReceivingMessageStream) ((Closure) original).getDelegate()).replyIfExists(reply);
-                return;
-            }
-
-            final ReceivingMessageStream actor = Actor.threadBoundActor();
-            if (actor != null) {
-                final MessageStream sender = actor.obj2Sender.get(original);
-                if (sender != null) {
-                    try {
-                        sender.send(reply);
-                    } catch (IllegalStateException ignored) {
-                    }
-                }
-            }
-        }
-    }
 }

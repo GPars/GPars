@@ -32,12 +32,14 @@ import groovyx.gpars.group.PGroup
 final class DataCallback extends MessageStream {
     private static final long serialVersionUID = 6512046150477794254L;
     private final Closure code
+    private PGroup parallelGroup
 
     /**
      * @param code The closure to run
      */
     DataCallback(final Closure code, PGroup pGroup) {
-        super(pGroup)
+        if (pGroup == null) throw new IllegalArgumentException("Cannot create a DataCallback without a parallelGroup parameter")
+        this.parallelGroup = pGroup
         this.code = code
     }
 
