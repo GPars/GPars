@@ -52,9 +52,7 @@ class ShoppingCart {
         cartState << performClear  //Submit the private performClear() method as a function
     }
 
-    //todo make private once private methods can be curried normally in Groovy - http://jira.codehaus.org/browse/GROOVY-4170
-
-    void changeQuantity(String product, int quantityChange, Map items) {
+    private void changeQuantity(String product, int quantityChange, Map items) {
         items[product] = (items[product] ?: 0) + quantityChange
     }
 
