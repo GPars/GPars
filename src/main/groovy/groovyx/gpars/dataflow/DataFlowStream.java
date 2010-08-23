@@ -181,7 +181,7 @@ public final class DataFlowStream<T> {
      * @param closure closure to execute when data available
      */
     public void whenNextBound(final Closure closure) {
-        getValAsync(new DataCallback(closure));
+        getValAsync(new DataCallback(closure, DataFlow.DATA_FLOW_GROUP));
     }
 
     /**
@@ -201,7 +201,7 @@ public final class DataFlowStream<T> {
      * @param closure closure to execute when data available
      */
     public void whenBound(final Closure closure) {
-        whenBoundListeners.add(new DataCallback(closure));
+        whenBoundListeners.add(new DataCallback(closure, DataFlow.DATA_FLOW_GROUP));
     }
 
     /**

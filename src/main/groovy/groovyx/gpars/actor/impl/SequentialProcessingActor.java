@@ -51,11 +51,6 @@ import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
 public abstract class SequentialProcessingActor extends Actor implements Runnable {
 
     /**
-     * The parallel group to which the message stream belongs
-     */
-    protected volatile PGroup parallelGroup;
-
-    /**
      * Code for the loop, if any
      */
     protected Runnable loopCode;
@@ -300,15 +295,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
 
         parallelGroup = group;
-    }
-
-    /**
-     * Retrieves the group to which the actor belongs
-     *
-     * @return The actor's group
-     */
-    public PGroup getParallelGroup() {
-        return parallelGroup;
     }
 
     @Override

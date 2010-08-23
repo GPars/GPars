@@ -16,13 +16,14 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.impl.MessageStream
+import groovyx.gpars.group.PGroup
 
 /**
  *
- * A helper class enabling the 'whenBound()' functionality of a DataFlowVariable.
- * An actor that waits asynchronously on the DFV to be bound. Once the DFV is bound,
+ * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataFlowVariable, as well as
+ * 'sendAndContinue()' on actors.
+ * A task that waits asynchronously on the DFV to be bound. Once the DFV is bound,
  * upon receiving the message the actor runs the supplied closure / code with the DFV value as a parameter.
  *
  * @author Vaclav Pech, Alex Tkachman
@@ -35,7 +36,8 @@ final class DataCallback extends MessageStream {
     /**
      * @param code The closure to run
      */
-    DataCallback(final Closure code) {
+    DataCallback(final Closure code, PGroup pGroup) {
+        super(pGroup)
         this.code = code
     }
 
@@ -45,7 +47,7 @@ final class DataCallback extends MessageStream {
      */
     @Override
     public MessageStream send(Object message) {
-        Actors.defaultActorPGroup.threadPool.execute {
+        parallelGroup.threadPool.execute {
             code.call message
         };
         return this;

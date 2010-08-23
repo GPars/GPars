@@ -430,7 +430,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data available
      */
     public void whenBound(final Closure closure) {
-        getValAsync(new DataCallback(closure));
+        getValAsync(new DataCallback(closure, DataFlow.DATA_FLOW_GROUP));
     }
 
     /**

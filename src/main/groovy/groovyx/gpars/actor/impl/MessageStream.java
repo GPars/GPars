@@ -19,7 +19,9 @@ import groovy.lang.Closure;
 import groovy.time.Duration;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
+import groovyx.gpars.actor.Actors;
 import groovyx.gpars.dataflow.DataCallback;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.RemoteSerialized;
@@ -35,6 +37,21 @@ import java.util.concurrent.locks.LockSupport;
  * @author Alex Tkachman, Vaclav Pech, Dierk Koenig
  */
 public abstract class MessageStream extends WithSerialId {
+    /**
+     * The parallel group to which the message stream belongs
+     */
+    protected volatile PGroup parallelGroup;
+
+    //todo remove once all actors and remote ators set the group properly
+
+    protected MessageStream() {
+        this(Actors.defaultActorPGroup);
+    }
+
+    protected MessageStream(final PGroup parallelGroup) {
+        this.parallelGroup = parallelGroup;
+    }
+
     /**
      * Send message to stream and return immediately
      *
@@ -113,7 +130,7 @@ public abstract class MessageStream extends WithSerialId {
         closure = (Closure) closure.clone();
         closure.setDelegate(this);
         closure.setResolveStrategy(Closure.DELEGATE_FIRST);
-        return send(message, new DataCallback(closure));
+        return send(message, new DataCallback(closure, parallelGroup));
     }
 
     /**
@@ -154,6 +171,29 @@ public abstract class MessageStream extends WithSerialId {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
+    }
+
+    /**
+     * Retrieves the group to which the actor belongs
+     *
+     * @return The actor's group
+     */
+    public final PGroup getParallelGroup() {
+        return parallelGroup;
+    }
+
+    /**
+     * Sets the actor's group.
+     * It can only be invoked before the actor is started.
+     *
+     * @param group new group
+     */
+    public void setParallelGroup(final PGroup group) {
+        if (group == null) {
+            throw new IllegalArgumentException("Cannot set actor's group to null.");
+        }
+
+        parallelGroup = group;
     }
 
     /**
