@@ -35,16 +35,22 @@ import groovyx.gpars.actor.impl.RunnableBackedPooledActor
  */
 public class ReactiveActor extends RunnableBackedPooledActor {
 
+    final def code
+
     ReactiveActor(Closure body) {
+        code = body.clone()
+        code.delegate = this
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+
         setAction {
-            def cloned = body.clone()
-            cloned.delegate = this
-            cloned.resolveStrategy = Closure.DELEGATE_FIRST
-            loop {
-                react {
-                    it?.replyIfExists cloned(it)
-                }
-            }
+            doLoopBody()
+        }
+    }
+
+    private final void doLoopBody() {
+        react {
+            it?.replyIfExists code(it)
+            doLoopBody()
         }
     }
 }

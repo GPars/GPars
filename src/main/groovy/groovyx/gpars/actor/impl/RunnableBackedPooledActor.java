@@ -43,7 +43,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         setAction(handler);
     }
 
-    final void setAction(final Runnable handler) {
+    protected final void setAction(final Runnable handler) {
         if (handler == null) {
             action = null;
         } else {
@@ -63,7 +63,8 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         }
     }
 
-    @Override protected void act() {
+    @Override
+    protected void act() {
         if (action != null) {
             if (action instanceof Closure) {
                 GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) action);
@@ -82,7 +83,8 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
             this.second = second;
         }
 
-        @Override public Object invokeMethod(final String name, final Object args) {
+        @Override
+        public Object invokeMethod(final String name, final Object args) {
             try {
                 return InvokerHelper.invokeMethod(first, name, args);
             }
@@ -91,7 +93,8 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
             }
         }
 
-        @Override public Object getProperty(final String propertyName) {
+        @Override
+        public Object getProperty(final String propertyName) {
             try {
                 return InvokerHelper.getProperty(first, propertyName);
             }
@@ -100,7 +103,8 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
             }
         }
 
-        @Override public void setProperty(final String propertyName, final Object newValue) {
+        @Override
+        public void setProperty(final String propertyName, final Object newValue) {
             try {
                 InvokerHelper.setProperty(first, propertyName, newValue);
             }
