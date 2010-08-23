@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * Stream of abstract messages
+ * Represents a stream of messages and forms the base class for actors
  *
  * @author Alex Tkachman, Vaclav Pech, Dierk Koenig
  */
