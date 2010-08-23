@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 public class DataFlowVariableTest extends GroovyTestCase {
 
@@ -131,6 +132,46 @@ public class DataFlowVariableTest extends GroovyTestCase {
             result << it
         }
         assertEquals 10, result.val
+    }
+
+    public void testJoin() {
+        final DataFlowVariable variable = new DataFlowVariable()
+
+        def t1 = System.currentTimeMillis()
+
+        Thread.start {
+            sleep 1000
+            variable << 10
+        }
+
+        variable.join()
+        assert 10 == variable.val
+
+        variable.join()
+        assert 10 == variable.val
+
+        assert System.currentTimeMillis() - t1 < 60000
+    }
+
+    public void testTimedJoin() {
+        final DataFlowVariable variable = new DataFlowVariable()
+
+        def t1 = System.currentTimeMillis()
+
+        Thread.start {
+            sleep 3000
+            variable << 10
+        }
+        variable.join(10, TimeUnit.MILLISECONDS)
+        assert !variable.isBound()
+
+        variable.join(10, TimeUnit.MINUTES)
+        assert 10 == variable.val
+
+        variable.join(10, TimeUnit.MINUTES)
+        assert 10 == variable.val
+
+        assert System.currentTimeMillis() - t1 < 60000
     }
 
 }

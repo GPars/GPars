@@ -188,6 +188,26 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
+     * Blocks, if the value has not been assigned yet to the DataFlowVariable
+     *
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
+    public void join() throws InterruptedException {
+        getVal();
+    }
+
+    /**
+     * Blocks, if the value has not been assigned yet to the DataFlowVariable
+     *
+     * @param timeout The timeout value
+     * @param units   Units for the timeout
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
+    public void join(final long timeout, final TimeUnit units) throws InterruptedException {
+        getVal(timeout, units);
+    }
+
+    /**
      * Reads the value of the variable. Blocks, if the value has not been assigned yet.
      *
      * @return The actual value
