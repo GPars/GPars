@@ -28,7 +28,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         final Actor actor = start {
             react {}
         }
-        assertEquals DataFlow.DATA_FLOW_GROUP, actor.actorGroup
+        assertEquals DataFlow.DATA_FLOW_GROUP, actor.parallelGroup
         actor << 'Message'
     }
 

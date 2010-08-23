@@ -91,7 +91,7 @@ public class ReactorTest extends GroovyTestCase {
     public void testGroup() {
         final DefaultPGroup group = new DefaultPGroup()
         final ReactiveActor reactor = group.reactor {}
-        assertSame group, reactor.actorGroup
+        assertSame group, reactor.parallelGroup
     }
 
     public void testNullMessage() {

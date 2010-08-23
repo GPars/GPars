@@ -215,7 +215,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     public void testGroup() {
         final DefaultPGroup group = new DefaultPGroup()
         final DynamicDispatchActor handler = group.messageHandler {}
-        assertSame group, handler.actorGroup
+        assertSame group, handler.parallelGroup
     }
 }
 

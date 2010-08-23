@@ -35,7 +35,7 @@ private final class SortResult {
 //Worker actor
 final class WordSortActor extends AbstractPooledActor {
 
-    def WordSortActor(group) { this.actorGroup = group }
+    def WordSortActor(group) { this.parallelGroup = group }
 
     private List<String> sortedWords(String fileName) {
         parseFile(fileName).sort {it.toLowerCase()}
@@ -76,7 +76,7 @@ final class SortMaster extends AbstractPooledActor {
     }
 
     private List createWorkers() {
-        return (1..numActors).collect {new WordSortActor(this.actorGroup).start()}
+        return (1..numActors).collect {new WordSortActor(this.parallelGroup).start()}
     }
 
     private int sendTasksToWorkers() {
@@ -113,10 +113,10 @@ String docRoot = ''  //set a folder to scan with absolute path
 
 if (docRoot) {
 //start the actors to sort words
-    def master = new SortMaster(actorGroup: group, docRoot: docRoot, numActors: 21).start()
+    def master = new SortMaster(parallelGroup: group, docRoot: docRoot, numActors: 21).start()
     master.waitUntilDone()
     final long t1 = System.currentTimeMillis()
-    master = new SortMaster(actorGroup: group, docRoot: docRoot, numActors: 21).start()
+    master = new SortMaster(parallelGroup: group, docRoot: docRoot, numActors: 21).start()
     master.waitUntilDone()
     final long t2 = System.currentTimeMillis()
     println 'Done ' + (t2 - t1)

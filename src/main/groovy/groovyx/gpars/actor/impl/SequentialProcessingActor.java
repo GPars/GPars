@@ -51,9 +51,9 @@ import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
 public abstract class SequentialProcessingActor extends Actor implements Runnable {
 
     /**
-     * The actor group to which the actor belongs
+     * The parallel group to which the message stream belongs
      */
-    protected volatile PGroup actorGroup;
+    protected volatile PGroup parallelGroup;
 
     /**
      * Code for the loop, if any
@@ -281,7 +281,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Creates a new instance, sets the default actor group.
      */
     protected SequentialProcessingActor() {
-        setActorGroup(Actors.defaultActorPGroup);
+        setParallelGroup(Actors.defaultActorPGroup);
     }
 
     /**
@@ -290,7 +290,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @param group new group
      */
-    public final void setActorGroup(final PGroup group) {
+    public final void setParallelGroup(final PGroup group) {
         if (group == null) {
             throw new IllegalArgumentException("Cannot set actor's group to null.");
         }
@@ -299,7 +299,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             throw new IllegalStateException("Cannot reset actor's group after it was started.");
         }
 
-        actorGroup = group;
+        parallelGroup = group;
     }
 
     /**
@@ -307,8 +307,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @return The actor's group
      */
-    public PGroup getActorGroup() {
-        return actorGroup;
+    public PGroup getParallelGroup() {
+        return parallelGroup;
     }
 
     @Override
@@ -354,7 +354,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Schedules the current actor for processing on the actor group's thread pool.
      */
     private void schedule() {
-        actorGroup.getThreadPool().execute(this);
+        parallelGroup.getThreadPool().execute(this);
     }
 
     protected void scheduleLoop() {

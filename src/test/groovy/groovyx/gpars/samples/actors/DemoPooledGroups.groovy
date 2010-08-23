@@ -34,7 +34,7 @@ println "Default group ${Actors.defaultActorPGroup}"
 println ""
 
 sampleGroup.actor {
-    println((actorGroup == Actors.defaultActorPGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
+    println((getParallelGroup == Actors.defaultActorPGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
 }
 
 Thread.sleep 1000
@@ -42,7 +42,7 @@ Thread.sleep 1000
 class GroupSamplePooledActor extends AbstractPooledActor {
 
     protected void act() {
-        println((actorGroup == Actors.defaultActorPGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
+        println((parallelGroup == Actors.defaultActorPGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
     }
 }
 
@@ -51,5 +51,5 @@ new GroupSamplePooledActor().start()
 Thread.sleep 1000
 
 final Actor actor = new GroupSamplePooledActor()
-actor.actorGroup = sampleGroup
+actor.parallelGroup = sampleGroup
 actor.start()

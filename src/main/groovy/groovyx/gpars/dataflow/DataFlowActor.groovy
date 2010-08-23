@@ -29,5 +29,5 @@ abstract class DataFlowActor extends AbstractPooledActor {
     /**
      * Sets the default Dataflow Concurrency actor group on the actor.
      */
-    def DataFlowActor() { this.actorGroup = DataFlow.DATA_FLOW_GROUP }
+    def DataFlowActor() { this.parallelGroup = DataFlow.DATA_FLOW_GROUP }
 }

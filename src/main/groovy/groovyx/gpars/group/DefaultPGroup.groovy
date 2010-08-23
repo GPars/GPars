@@ -40,14 +40,14 @@ import groovyx.gpars.scheduler.Pool
  * group.shutdown()
  * </pre>
  *
- * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.actorGroup property,
+ * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.parallelGroup property,
  * which defaults to the Actors.defaultActorPGroup, can be set before the actor is started.
  *
  * <pre>
  * def group = new DefaultPGroup()
  *
  * def actor = new MyActor()
- * actor.actorGroup = group
+ * actor.parallelGroup = group
  * actor.start()
  * ...
  * group.shutdown()

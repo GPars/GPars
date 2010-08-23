@@ -66,7 +66,7 @@ public final class DataFlowOperator {
      * @param group The operator actor group to use with the operator
      */
     DataFlowOperator start(PGroup group) {
-        actor.actorGroup = group
+        actor.parallelGroup = group
         actor.start()
         return this
     }
@@ -185,7 +185,7 @@ private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
 
     def startTask(results) {
         semaphore.acquire()
-        actorGroup.threadPool.execute {
+        parallelGroup.threadPool.execute {
             try {
                 code.call(* results)
             } catch (Throwable e) {

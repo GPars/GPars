@@ -55,7 +55,7 @@ public abstract class PGroup {
      */
     public final AbstractPooledActor actor(Runnable handler) {
         final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
-        actor.actorGroup = this
+        actor.parallelGroup = this
         actor.start()
         return actor
     }
@@ -69,7 +69,7 @@ public abstract class PGroup {
      */
     public final AbstractPooledActor reactor(final Closure code) {
         final def actor = new ReactiveActor(code)
-        actor.actorGroup = this
+        actor.parallelGroup = this
         actor.start()
         actor
     }
@@ -80,7 +80,7 @@ public abstract class PGroup {
      */
     public final AbstractPooledActor messageHandler(final Closure code) {
         final def actor = new DynamicDispatchActor(code)
-        actor.actorGroup = this
+        actor.parallelGroup = this
         actor.start()
         actor
     }

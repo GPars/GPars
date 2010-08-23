@@ -46,7 +46,7 @@ public class PGroupTest extends GroovyTestCase { /**
             latch.countDown()
         }
 
-        assertEquals Actors.defaultActorPGroup, actor.actorGroup
+        assertEquals Actors.defaultActorPGroup, actor.parallelGroup
         latch.await()
         assert daemon
     }
@@ -64,7 +64,7 @@ public class PGroupTest extends GroovyTestCase { /**
             latch1.countDown()
         }
 
-        assertEquals daemonGroup, actor1.actorGroup
+        assertEquals daemonGroup, actor1.parallelGroup
         latch1.await()
         assert daemon
 
@@ -73,7 +73,7 @@ public class PGroupTest extends GroovyTestCase { /**
             latch2.countDown()
         }
 
-        assertEquals nonDaemonGroup, actor2.actorGroup
+        assertEquals nonDaemonGroup, actor2.parallelGroup
         latch2.await()
         assertFalse daemon
 
@@ -96,7 +96,7 @@ public class PGroupTest extends GroovyTestCase { /**
 //        }
 //        actor1.start()
 //
-//        assertEquals daemonGroup, actor1.actorGroup
+//        assertEquals daemonGroup, actor1.parallelGroup
 //        latch1.await()
 //        assert daemon
 //
@@ -107,7 +107,7 @@ public class PGroupTest extends GroovyTestCase { /**
 //        }
 //        actor2.start()
 //
-//        assertEquals nonDaemonGroup, actor2.actorGroup
+//        assertEquals nonDaemonGroup, actor2.parallelGroup
 //        latch2.await()
 //        assertFalse daemon
 //        daemonGroup.shutdown()
@@ -119,9 +119,9 @@ public class PGroupTest extends GroovyTestCase { /**
         final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
 
-        assertEquals daemonGroup, actor.actorGroup
-        actor.actorGroup = nonDaemonGroup
-        assertEquals nonDaemonGroup, actor.actorGroup
+        assertEquals daemonGroup, actor.parallelGroup
+        actor.parallelGroup = nonDaemonGroup
+        assertEquals nonDaemonGroup, actor.parallelGroup
 
         daemonGroup.shutdown()
         nonDaemonGroup.shutdown()
@@ -132,9 +132,9 @@ public class PGroupTest extends GroovyTestCase { /**
         final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
         actor.start()
-        assertEquals daemonGroup, actor.actorGroup
+        assertEquals daemonGroup, actor.parallelGroup
         shouldFail(IllegalStateException) {
-            actor.actorGroup = nonDaemonGroup
+            actor.parallelGroup = nonDaemonGroup
         }
         daemonGroup.shutdown()
         nonDaemonGroup.shutdown()
@@ -161,7 +161,7 @@ public class PGroupTest extends GroovyTestCase { /**
 class GroupTestActor extends AbstractPooledActor {
 
     def GroupTestActor(PGroup group) {
-        actorGroup = group
+        parallelGroup = group
     }
 
     protected void act() {

@@ -18,8 +18,8 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.group.PGroup
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
@@ -64,7 +64,7 @@ class Processor extends AbstractPooledActor {
 
     def Processor(Actor parent, group) {
         this.parent = parent
-        actorGroup = group
+        parallelGroup = group
     }
 
     protected void act() {
@@ -81,8 +81,8 @@ class Processor extends AbstractPooledActor {
                     def splitList2
                     (splitList1, splitList2) = split(list)
                     Actor replyActor = new ReplyActor(parent).start()
-                    new Processor(replyActor, actorGroup).start().send(splitList1)
-                    new Processor(replyActor, actorGroup).start().send(splitList2)
+                    new Processor(replyActor, parallelGroup).start().send(splitList1)
+                    new Processor(replyActor, parallelGroup).start().send(splitList2)
             }
         }
         stop()
@@ -103,7 +103,7 @@ class ReplyActor extends AbstractPooledActor {
 
     def ReplyActor(Actor parent) {
         this.parent = parent
-        actorGroup = parent.actorGroup
+        parallelGroup = parent.parallelGroup
     }
 
     void act() {
@@ -124,11 +124,11 @@ class ArrayCalculator extends AbstractPooledActor {
 
     def ArrayCalculator(final List<Integer> listToCalculate, final group) {
         this.listToCalculate = listToCalculate;
-        this.actorGroup = group
+        this.parallelGroup = group
     }
 
     protected void act() {
-        new Processor(this, actorGroup).start().send(listToCalculate)
+        new Processor(this, parallelGroup).start().send(listToCalculate)
         receive {
             result.set it[0]
             latch.countDown()
