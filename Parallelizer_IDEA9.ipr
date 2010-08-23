@@ -4783,9 +4783,6 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="$project_jdk_name$" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
-  <component name="ScalacSettings">
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
-  </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
       <map>
