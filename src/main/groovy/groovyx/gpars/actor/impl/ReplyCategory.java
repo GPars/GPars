@@ -36,7 +36,7 @@ public final class ReplyCategory {
      * @return The message originator
      */
     public static MessageStream getSender(final Object original) {
-        final ReceivingMessageStream actor = Actor.threadBoundActor();
+        final ReplyingMessageStream actor = Actor.threadBoundActor();
         if (actor == null) {
             throw new IllegalStateException("message originator detection in a non-actor");
         }
@@ -45,17 +45,17 @@ public final class ReplyCategory {
     }
 
     public static void reply(final Object original, final Object reply) {
-        if (original instanceof ReceivingMessageStream) {
-            ((ReceivingMessageStream) original).reply(reply);
+        if (original instanceof ReplyingMessageStream) {
+            ((ReplyingMessageStream) original).reply(reply);
             return;
         }
 
         if (original instanceof Closure) {
-            ((ReceivingMessageStream) ((Closure) original).getDelegate()).reply(reply);
+            ((ReplyingMessageStream) ((Closure) original).getDelegate()).reply(reply);
             return;
         }
 
-        final ReceivingMessageStream actor = Actor.threadBoundActor();
+        final ReplyingMessageStream actor = Actor.threadBoundActor();
         if (actor == null) {
             throw new IllegalStateException("reply from non-actor");
         }
@@ -69,17 +69,17 @@ public final class ReplyCategory {
     }
 
     public static void replyIfExists(final Object original, final Object reply) {
-        if (original instanceof ReceivingMessageStream) {
-            ((ReceivingMessageStream) original).replyIfExists(reply);
+        if (original instanceof ReplyingMessageStream) {
+            ((ReplyingMessageStream) original).replyIfExists(reply);
             return;
         }
 
         if (original instanceof Closure) {
-            ((ReceivingMessageStream) ((Closure) original).getDelegate()).replyIfExists(reply);
+            ((ReplyingMessageStream) ((Closure) original).getDelegate()).replyIfExists(reply);
             return;
         }
 
-        final ReceivingMessageStream actor = Actor.threadBoundActor();
+        final ReplyingMessageStream actor = Actor.threadBoundActor();
         if (actor != null) {
             final MessageStream sender = actor.obj2Sender.get(original);
             if (sender != null) {

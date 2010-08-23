@@ -17,8 +17,6 @@
 package groovyx.gpars.actor.impl;
 
 import groovy.lang.Closure;
-import groovy.time.BaseDuration;
-import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.group.PGroup;
@@ -26,13 +24,12 @@ import groovyx.gpars.group.PGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Alex Tkachman, Vaclav Pech
  */
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-public abstract class ReceivingMessageStream extends MessageStream {
+public abstract class ReplyingMessageStream extends MessageStream {
     /**
      * A list of senders for the currently processed messages
      */
@@ -52,11 +49,11 @@ public abstract class ReceivingMessageStream extends MessageStream {
 
     //todo remove either constructor
 
-    protected ReceivingMessageStream() {
+    protected ReplyingMessageStream() {
         this(Actors.defaultActorPGroup);
     }
 
-    protected ReceivingMessageStream(final PGroup parallelGroup) {
+    protected ReplyingMessageStream(final PGroup parallelGroup) {
         this.parallelGroup = parallelGroup;
     }
 
@@ -153,68 +150,6 @@ public abstract class ReceivingMessageStream extends MessageStream {
             } catch (IllegalStateException ignore) {
             }
         }
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected abstract Object receiveImpl() throws InterruptedException;
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param timeout how long to wait before giving up, in units of unit
-     * @param units   a TimeUnit determining how to interpret the timeout parameter
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected abstract Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException;
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive() throws InterruptedException {
-        final Object msg = receiveImpl();
-        return ReceivingMessageStream.unwrapMessage(msg);
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param timeout how long to wait before giving up, in units of unit
-     * @param units   a TimeUnit determining how to interpret the timeout parameter
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive(final long timeout, final TimeUnit units) throws InterruptedException {
-        final Object msg = receiveImpl(timeout, units);
-        return ReceivingMessageStream.unwrapMessage(msg);
-    }
-
-    private static Object unwrapMessage(final Object msg) {
-        //more a double-check here, since all current implementations of the receiveImpl() method do unwrap already
-        if (msg instanceof ActorMessage) {
-            return ((ActorMessage) msg).getPayLoad();
-        } else {
-            return msg;
-        }
-    }
-
-    /**
-     * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
-     *
-     * @param duration how long to wait before giving up, in units of unit
-     * @return The message retrieved from the queue, or null, if the timeout expires.
-     * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
-     */
-    protected final Object receive(final BaseDuration duration) throws InterruptedException {
-        return receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS);
     }
 
 }

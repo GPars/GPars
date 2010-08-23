@@ -285,15 +285,12 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      *
      * @param group new group
      */
+    @Override
     public final void setParallelGroup(final PGroup group) {
-        if (group == null) {
-            throw new IllegalArgumentException("Cannot set actor's group to null.");
-        }
-
         if (stopFlag != S_NOT_STARTED) {
             throw new IllegalStateException("Cannot reset actor's group after it was started.");
         }
-
+        super.setParallelGroup(group);
         parallelGroup = group;
     }
 
