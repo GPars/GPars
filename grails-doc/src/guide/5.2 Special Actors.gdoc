@@ -78,6 +78,19 @@ final def actor = new MyActor({
 }).start()
 {code}
 
+{note}
+DynamicDispatchActor can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor
+either makes the thread available to other actors sharing the same parallel group (fair), or keeps the thread fot itself
+until the message queue gets empty (non-fair). Generally, non-fair actors perform 2 - 3 times better than fair ones.
+
+Use either the _fairMessageHandler()_ factory method or the actor's makeFair() method.
+
+{note}
+
+{code}
+    def fairActor = Actors.fairMessageHandler {...}
+{code}
+
 h3. Reactive Actor
 
 The _ReactiveActor_ class, constructed typically by calling _Actors.reactor()_ or _DefaultPGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
@@ -155,3 +168,17 @@ public class ReactiveActor extends AbstractPooledActor {
     }
 }
 {code}
+
+{note}
+DynamicDispatchActor can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor
+either makes the thread available to other actors sharing the same parallel group (fair), or keeps the thread fot itself
+until the message queue gets empty (non-fair). Generally, non-fair actors perform 2 - 3 times better than fair ones.
+
+Use either the _fairReactor()_ factory method or the actor's makeFair() method.
+
+{note}
+
+{code}
+    def fairActor = Actors.fairReactor {...}
+{code}
+
