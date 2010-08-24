@@ -27,6 +27,8 @@ import groovyx.gpars.util.AsyncMessagingCore;
  */
 public abstract class AbstractLoopingActor extends Actor {
 
+    private volatile boolean stoppedFlag = false;
+
     private final AsyncMessagingCore core;
 
     protected AbstractLoopingActor(final Closure code, final Closure errorHandler, final boolean fair) {
@@ -43,24 +45,48 @@ public abstract class AbstractLoopingActor extends Actor {
         };
     }
 
+    /**
+     * Retrieves the actor's fairness flag
+     * Fair actors give up the thread after processing each message, non-fair actors keep a thread until their message queue is empty.
+     * Non-fair actors tends to perform better than fair ones.
+     *
+     * @return True for fair actors, false for non-fair ones. actors are non-fair by default.
+     */
+    public boolean isFair() {
+        return core.isFair();
+    }
+
+    /**
+     * Makes the actor fair. Actors are non-fair by default.
+     * Fair actors give up the thread after processing each message, non-fair actors keep a thread until their message queue is empty.
+     * Non-fair actors tends to perform better than fair ones.
+     */
+    public void makeFair() {
+        core.makeFair();
+    }
+
     @Override
     public Actor start() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return this;
     }
 
     @Override
     public Actor stop() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        stoppedFlag = true;
+        return this;
     }
 
     @Override
     public Actor terminate() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        stop();
+        //todo handle, refactor
+        //todo event-handlers
+        return this;
     }
 
     @Override
     public boolean isActive() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return !hasBeenStopped();
     }
 
     @Override
@@ -70,7 +96,7 @@ public abstract class AbstractLoopingActor extends Actor {
 
     @Override
     protected boolean hasBeenStopped() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return stoppedFlag;
     }
 
     @Override

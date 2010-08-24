@@ -19,34 +19,33 @@ package groovyx.gpars.agent;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
-import org.codehaus.groovy.runtime.NullObject;
+import groovyx.gpars.util.AsyncMessagingCore;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
  * @author Vaclav Pech
  *         Date: 13.4.2010
  */
 @SuppressWarnings({"UnqualifiedStaticUsage"})
-public abstract class AgentCore implements Runnable {
+public abstract class AgentCore {
 
-    /**
-     * The thread pool to use with this agent
-     */
-    private volatile Pool threadPool = Actors.defaultActorPGroup.getThreadPool();
+    private final AsyncMessagingCore core;
 
-    /**
-     * Retrieves the thread pool used by the agent
-     *
-     * @return The thread pool
-     */
-    public final Pool getThreadPool() {
-        return threadPool;
+    protected AgentCore() {
+        this.core = new AsyncMessagingCore(Actors.defaultActorPGroup.getThreadPool(), false) {
+            @Override
+            protected void registerError(final Exception e) {
+                AgentCore.this.registerError(e);
+            }
+
+            @Override
+            protected void handleMessage(final Object message) {
+                AgentCore.this.handleMessage(message);
+            }
+        };
     }
 
     /**
@@ -55,7 +54,7 @@ public abstract class AgentCore implements Runnable {
      * @param threadPool The thread pool to use
      */
     public final void attachToThreadPool(final Pool threadPool) {
-        this.threadPool = threadPool;
+        core.attachToThreadPool(threadPool);
     }
 
     /**
@@ -68,11 +67,6 @@ public abstract class AgentCore implements Runnable {
     }
 
     /**
-     * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
-     */
-    private volatile boolean fair = false;
-
-    /**
      * Retrieves the agent's fairness flag
      * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
      * Non-fair agents tends to perform better than fair ones.
@@ -80,7 +74,7 @@ public abstract class AgentCore implements Runnable {
      * @return True for fair agents, false for non-fair ones. Agents are non-fair by default.
      */
     public boolean isFair() {
-        return fair;
+        return core.isFair();
     }
 
     /**
@@ -89,7 +83,7 @@ public abstract class AgentCore implements Runnable {
      * Non-fair agents tends to perform better than fair ones.
      */
     public void makeFair() {
-        this.fair = true;
+        core.makeFair();
     }
 
     /**
@@ -98,27 +92,12 @@ public abstract class AgentCore implements Runnable {
     private List<Exception> errors;
 
     /**
-     * Incoming messages
-     */
-    private final Queue<Object> queue = new ConcurrentLinkedQueue<Object>();
-
-    /**
-     * Indicates, whether there's an active thread handling a message inside the agent's body
-     */
-    @SuppressWarnings({"FieldMayBeFinal"})
-    private volatile int active = AgentCore.PASSIVE;
-    private static final AtomicIntegerFieldUpdater<AgentCore> activeUpdater = AtomicIntegerFieldUpdater.newUpdater(AgentCore.class, "active");
-    private static final int PASSIVE = 0;
-    private static final int ACTIVE = 1;
-
-    /**
      * Adds the message to the agent\s message queue
      *
      * @param message A value or a closure
      */
     public final void send(final Object message) {
-        queue.add(message != null ? message : NullObject.getNullObject());
-        schedule();
+        core.store(message);
     }
 
     /**
@@ -147,35 +126,6 @@ public abstract class AgentCore implements Runnable {
      * @param message A value or a closure
      */
     abstract void handleMessage(final Object message);
-
-    /**
-     * Schedules processing of a next message, if there are some and if there isn't an active thread handling a message at the moment
-     */
-    void schedule() {
-        if (!queue.isEmpty() && activeUpdater.compareAndSet(this, PASSIVE, ACTIVE)) {
-            threadPool.execute(this);
-        }
-    }
-
-    /**
-     * Handles a single message from the message queue
-     */
-    @SuppressWarnings({"CatchGenericClass"})
-    public void run() {
-        try {
-            Object message = queue.poll();
-            while (message != null) {
-                this.handleMessage(message);
-                if (fair) break;
-                message = queue.poll();
-            }
-        } catch (Exception e) {
-            registerError(e);
-        } finally {
-            activeUpdater.set(this, PASSIVE);
-            schedule();
-        }
-    }
 
     /**
      * Adds the exception to the list of thrown exceptions

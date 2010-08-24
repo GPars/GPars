@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
  */
 public abstract class AsyncMessagingCore implements Runnable {
 
-    private final Pool threadPool;
+    private Pool threadPool;
 
     /**
      * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
@@ -37,9 +37,18 @@ public abstract class AsyncMessagingCore implements Runnable {
     private volatile boolean fair = false;
 
 
-    public AsyncMessagingCore(final Pool threadPool, final boolean fair) {
+    protected AsyncMessagingCore(final Pool threadPool, final boolean fair) {
         this.threadPool = threadPool;
         this.fair = fair;
+    }
+
+    /**
+     * Sets a new thread pool to be used by the agent
+     *
+     * @param threadPool The thread pool to use
+     */
+    public final void attachToThreadPool(final Pool threadPool) {
+        this.threadPool = threadPool;
     }
 
     /**
