@@ -18,6 +18,7 @@ package groovyx.gpars.actor;
 import groovy.lang.Closure;
 import groovy.time.BaseDuration;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.actor.impl.ReplyCategory;
 import groovyx.gpars.actor.impl.ReplyingMessageStream;
 import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.DataFlowExpression;
@@ -32,9 +33,13 @@ import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandle;
 import groovyx.gpars.serial.SerialMsg;
 import groovyx.gpars.serial.WithSerialId;
+import org.codehaus.groovy.runtime.GroovyCategorySupport;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
+import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
 
 /**
  * Actors are active objects, which borrow a thread from a thread pool.
@@ -57,6 +62,8 @@ public abstract class Actor extends ReplyingMessageStream {
      * The parallel group to which the message stream belongs
      */
     protected volatile PGroup parallelGroup;
+    protected static final ActorMessage stopMessage = new ActorMessage("stopMessage", null);
+    protected static final ActorMessage terminateMessage = new ActorMessage("terminateMessage", null);
 
     protected Actor() {
         this(new DataFlowVariable());
@@ -232,6 +239,35 @@ public abstract class Actor extends ReplyingMessageStream {
         return Actor.currentActorPerThread.get();
     }
 
+    protected final ActorMessage createActorMessage(final Object message) {
+        if (hasBeenStopped()) {
+            //noinspection ObjectEquality
+            if (message != terminateMessage && message != stopMessage)
+                throw new IllegalStateException("The actor cannot accept messages at this point.");
+        }
+
+        final ActorMessage actorMessage;
+        if (message instanceof ActorMessage) {
+            actorMessage = (ActorMessage) message;
+        } else {
+            actorMessage = ActorMessage.build(message);
+        }
+        return actorMessage;
+    }
+
+    protected abstract boolean hasBeenStopped();
+
+    protected final void runEnhancedWithReplies(final ActorMessage message, final Closure code) {
+        assert message != null;
+
+        if (message.getPayLoad() == TIMEOUT) throw TIMEOUT;
+        getSenders().add(message.getSender());
+        obj2Sender.put(message.getPayLoad(), message.getSender());
+
+        //noinspection deprecation
+        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
+    }
+
     @Override
     protected RemoteHandle createRemoteHandle(final SerialHandle handle, final SerialContext host) {
         return new MyRemoteHandle(handle, host, joinLatch);
@@ -286,6 +322,11 @@ public abstract class Actor extends ReplyingMessageStream {
         @Override
         public boolean isActorThread() {
             return false;
+        }
+
+        @Override
+        protected boolean hasBeenStopped() {
+            return false;  //todo implement
         }
 
         @SuppressWarnings({"AssignmentToMethodParameter"})

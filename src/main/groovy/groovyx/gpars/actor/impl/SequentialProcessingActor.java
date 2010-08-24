@@ -87,9 +87,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     private volatile Thread currentThread;
 
     private static final ActorMessage startMessage = new ActorMessage("startMessage", null);
-    private static final ActorMessage stopMessage = new ActorMessage("stopMessage", null);
     private static final ActorMessage loopMessage = new ActorMessage("loopMessage", null);
-    private static final ActorMessage terminateMessage = new ActorMessage("terminateMessage", null);
 
     protected static final int S_ACTIVE_MASK = 1;
     protected static final int S_FINISHING_MASK = 2;
@@ -297,20 +295,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     @Override
     public final MessageStream send(final Object message) {
-        if (stopFlag != S_RUNNING) {
-            //noinspection ObjectEquality
-            if (message != terminateMessage && message != stopMessage)
-                throw new IllegalStateException("The actor cannot accept messages at this point.");
-        }
 
-        final ActorMessage actorMessage;
-        if (message instanceof ActorMessage) {
-            actorMessage = (ActorMessage) message;
-        } else {
-            actorMessage = ActorMessage.build(message);
-        }
-
-        final Node toAdd = new Node(actorMessage);
+        final Node toAdd = new Node(createActorMessage(message));
 
         while (true) {
             final Node prev = inputQueue;
@@ -332,6 +318,11 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             }
         }
         return this;
+    }
+
+    @Override
+    protected final boolean hasBeenStopped() {
+        return stopFlag != S_RUNNING;
     }
 
     /**
@@ -838,26 +829,19 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    final void runReaction(final ActorMessage message, final Closure code) {
+        runEnhancedWithReplies(message, code);
+        doLoopCall();
+    }
+
     protected final void checkStopTerminate() {
-        if (stopFlag != S_RUNNING) {
+        if (hasBeenStopped()) {
             if (stopFlag == S_TERMINATING)
                 throw TERMINATE;
 
             if (stopFlag != S_STOPPING)
                 throw new IllegalStateException("Should not reach here");
         }
-    }
-
-    void runReaction(final ActorMessage message, final Closure code) {
-        assert message != null;
-
-        if (message.getPayLoad() == TIMEOUT) throw TIMEOUT;
-        getSenders().add(message.getSender());
-        obj2Sender.put(message.getPayLoad(), message.getSender());
-
-        //noinspection deprecation
-        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
-        doLoopCall();
     }
 
     /**
