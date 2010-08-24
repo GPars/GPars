@@ -19,7 +19,9 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.group.DefaultPGroup
+import java.util.concurrent.TimeUnit
 import org.codehaus.groovy.runtime.NullObject
 
 public class DynamicDispatchActorTest extends GroovyTestCase {
@@ -216,6 +218,56 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         final DefaultPGroup group = new DefaultPGroup()
         final DynamicDispatchActor handler = group.messageHandler {}
         assertSame group, handler.parallelGroup
+    }
+
+    public void testReplies() {
+        def dda = Actors.messageHandler {
+            when {message ->
+                reply 10
+                message.reply 20
+            }
+        }
+
+        Actors.actor {
+            dda << 1
+            def results = (1..2).collect {receive(1000, TimeUnit.MILLISECONDS)}
+            assert results == [10, 20]
+            dda.stop()
+        }
+    }
+
+    public void testSendAndWait() {
+        def dda = Actors.messageHandler {
+            when {message ->
+                reply 10
+            }
+        }
+
+        Actors.actor {
+            assert 10 == dda.sendAndWait(1)
+            assert 10 == dda.sendAndWait(1)
+        }
+    }
+
+    public void testSendAndContinue() {
+        def dda = Actors.messageHandler {
+            when {message ->
+                reply 2 * message
+            }
+        }
+
+        final DataFlows results = new DataFlows()
+
+        dda.sendAndContinue(1) {results.d1 = it}
+        dda.sendAndContinue(2) {results.d2 = it}
+        dda.sendAndContinue(3) {results.d3 = it}
+        Actors.actor {
+            dda.sendAndContinue(4) {results.d4 = it}
+        }
+        assert results.d1 == 2
+        assert results.d2 == 4
+        assert results.d3 == 6
+        assert results.d4 == 8
     }
 }
 
