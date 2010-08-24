@@ -155,13 +155,6 @@ public abstract class Actor extends ReplyingMessageStream {
     public abstract boolean isActive();
 
     /**
-     * Checks whether the current thread is the actor's worker thread.
-     *
-     * @return whether the current thread is the actor's worker thread
-     */
-    public abstract boolean isActorThread();
-
-    /**
      * Joins the actor. Waits for its termination.
      *
      * @throws InterruptedException when interrupted while waiting
@@ -317,11 +310,6 @@ public abstract class Actor extends ReplyingMessageStream {
         @Override
         public boolean isActive() {
             throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean isActorThread() {
-            return false;
         }
 
         @Override

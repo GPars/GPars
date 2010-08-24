@@ -120,11 +120,6 @@ public abstract class AbstractLoopingActor extends Actor {
     }
 
     @Override
-    public boolean isActorThread() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     protected final boolean hasBeenStopped() {
         return stoppedFlag;
     }

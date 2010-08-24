@@ -118,7 +118,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Checks whether the current thread is the actor's current thread.
      */
-    @Override
     public final boolean isActorThread() {
         return Thread.currentThread() == currentThread;
     }
