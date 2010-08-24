@@ -46,11 +46,17 @@ final class DataCallback extends MessageStream {
     /**
      * Sends a message back to the DataCallback.
      * Will schedule processing the internal closure with the thread pool
+     * Registers its parallel group with DataFlowExpressions for nested 'whenBound' handlers to use the same group.
      */
     @Override
     public MessageStream send(Object message) {
-        parallelGroup.threadPool.execute {
-            code.call message
+        parallelGroup.threadPool.execute {->
+            DataFlowExpression.activeParallelGroup.set parallelGroup
+            try {
+                code.call message
+            } finally {
+                DataFlowExpression.activeParallelGroup.remove()
+            }
         };
         return this;
     }

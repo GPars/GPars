@@ -21,6 +21,7 @@ import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
+import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.scheduler.Pool
@@ -137,13 +138,21 @@ public abstract class PGroup {
      * Creates a new task assigned to a thread from the current actor group.
      * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
      * but can only exchange data using explicit DataFlowVariables and Streams.
+     * Registers itself with DataFlowExpressions for nested 'whenBound' handlers to use the same group.
      * @param code The task body to run
      * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
      */
     public DataFlowVariable task(final Closure code) {
         final DataFlowVariable result = new DataFlowVariable()
         def cloned = code.clone()
-        threadPool.execute {-> result.bind cloned()}
+        threadPool.execute {->
+            DataFlowExpression.activeParallelGroup.set this
+            try {
+                result.bind cloned()
+            } finally {
+                DataFlowExpression.activeParallelGroup.remove()
+            }
+        }
         return result
     }
 
