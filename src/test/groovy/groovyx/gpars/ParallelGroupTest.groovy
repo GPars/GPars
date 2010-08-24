@@ -91,4 +91,20 @@ class ParallelGroupTest extends GroovyTestCase {
         assert results.t1 == results.t2
         assert (1..4).collect {results.t1} == [results.t1, results.t2, results.t3, results.t4]
     }
+
+    public void testSendAndContinue() {
+        final DefaultPGroup group = new DefaultPGroup(1)
+        def results = new DataFlows()
+
+        def actor = group.actor {
+            results.t1 = Thread.currentThread()
+            react {
+                results.t2 = Thread.currentThread()
+                reply it
+            }
+        }
+        actor.sendAndContinue(1) {results.t3 = Thread.currentThread();}
+        assert results.t1 == results.t2
+        assert results.t1 == results.t3
+    }
 }

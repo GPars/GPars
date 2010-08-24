@@ -108,8 +108,9 @@ public abstract class AsyncMessagingCore implements Runnable {
      * Handles a single message from the message queue
      */
     @SuppressWarnings({"CatchGenericClass"})
-    public void run() {
+    public final void run() {
         try {
+            threadAssigned();
             Object message = queue.poll();
             while (message != null) {
                 handleMessage(message);
@@ -120,8 +121,17 @@ public abstract class AsyncMessagingCore implements Runnable {
             registerError(e);
         } finally {
             activeUpdater.set(this, PASSIVE);
+            threadUnassigned();
             schedule();
         }
+    }
+
+    @SuppressWarnings({"NoopMethodInAbstractClass"})
+    protected void threadUnassigned() {
+    }
+
+    @SuppressWarnings({"NoopMethodInAbstractClass"})
+    protected void threadAssigned() {
     }
 
     protected abstract void registerError(final Exception e);

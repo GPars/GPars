@@ -165,6 +165,8 @@ public abstract class MessageStream extends WithSerialId {
          */
         @Override
         public MessageStream send(final Object message) {
+            if (isSet)
+                throw new IllegalStateException("A reply has already been sent. The originator does not expect more than one reply.");
             final Thread thread = (Thread) this.value;
             if (message instanceof ActorMessage) {
                 this.value = ((ActorMessage) message).getPayLoad();

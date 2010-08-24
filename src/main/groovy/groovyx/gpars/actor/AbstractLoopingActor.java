@@ -30,13 +30,20 @@ public abstract class AbstractLoopingActor extends Actor {
 
     private volatile boolean stoppedFlag = true;
 
+    /**
+     * Holds the particular instance of async messaging core to use
+     */
     private AsyncMessagingCore core;
 
-    //todo clean-up senders and replies
-    //todo make the reply mechanism more lightweight
-
+    /**
+     * Builds the async messaging core using the supplied code handlers
+     *
+     * @param code         Code to run on each message
+     * @param errorHandler Handler to run on any exception that occurs when handling messages
+     */
     final void initialize(final Closure code, final Closure errorHandler) {
 
+        //noinspection OverlyComplexAnonymousInnerClass
         this.core = new AsyncMessagingCore(parallelGroup.getThreadPool()) {
             @Override
             protected void registerError(final Exception e) {
@@ -46,10 +53,24 @@ public abstract class AbstractLoopingActor extends Actor {
             @Override
             protected void handleMessage(final Object message) {
                 final ActorMessage actorMessage = (ActorMessage) message;
-                runEnhancedWithReplies(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
+                try {
+                    runEnhancedWithReplies(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
+                } finally {
+                    getSenders().clear();
+                    obj2Sender.clear();
+                }
+            }
+
+            @Override
+            protected void threadAssigned() {
+                registerCurrentActorWithThread(AbstractLoopingActor.this);
+            }
+
+            @Override
+            protected void threadUnassigned() {
+                deregisterCurrentActorWithThread();
             }
         };
-        stoppedFlag = false;
     }
 
     /**
@@ -59,7 +80,7 @@ public abstract class AbstractLoopingActor extends Actor {
      *
      * @return True for fair actors, false for non-fair ones. actors are non-fair by default.
      */
-    public boolean isFair() {
+    public final boolean isFair() {
         return core.isFair();
     }
 
@@ -68,24 +89,25 @@ public abstract class AbstractLoopingActor extends Actor {
      * Fair actors give up the thread after processing each message, non-fair actors keep a thread until their message queue is empty.
      * Non-fair actors tends to perform better than fair ones.
      */
-    public void makeFair() {
+    public final void makeFair() {
         core.makeFair();
     }
 
     @Override
-    public Actor start() {
+    public final Actor start() {
+        stoppedFlag = false;
         return this;
     }
 
     @Override
-    public Actor stop() {
+    public final Actor stop() {
         stoppedFlag = true;
         getJoinLatch().bind(null);
         return this;
     }
 
     @Override
-    public Actor terminate() {
+    public final Actor terminate() {
         stop();
         //todo handle, refactor
         //todo event-handlers
@@ -93,7 +115,7 @@ public abstract class AbstractLoopingActor extends Actor {
     }
 
     @Override
-    public boolean isActive() {
+    public final boolean isActive() {
         return !hasBeenStopped();
     }
 
@@ -103,12 +125,12 @@ public abstract class AbstractLoopingActor extends Actor {
     }
 
     @Override
-    protected boolean hasBeenStopped() {
+    protected final boolean hasBeenStopped() {
         return stoppedFlag;
     }
 
     @Override
-    public MessageStream send(final Object message) {
+    public final MessageStream send(final Object message) {
         core.store(createActorMessage(message));
         return this;
     }
