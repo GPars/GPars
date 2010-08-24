@@ -35,7 +35,7 @@ public abstract class AgentCore {
     private final AsyncMessagingCore core;
 
     protected AgentCore() {
-        this.core = new AsyncMessagingCore(Actors.defaultActorPGroup.getThreadPool(), false) {
+        this.core = new AsyncMessagingCore(Actors.defaultActorPGroup.getThreadPool()) {
             @Override
             protected void registerError(final Exception e) {
                 AgentCore.this.registerError(e);

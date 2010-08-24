@@ -16,8 +16,8 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.scheduler.ResizeablePool
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.ResizeablePool
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
@@ -67,15 +67,37 @@ public abstract class Actors {
      * @param The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
-    public static AbstractPooledActor reactor(final Closure code) {
+    public static Actor reactor(final Closure code) {
         return defaultActorPGroup.reactor(code)
+    }
+
+    /**
+     * Creates a reactor around the supplied code, which will cooperate in thread sharing with other Agent instances
+     * in a fair manner.
+     * When a reactor receives a message, the supplied block of code is run with the message
+     * as a parameter and the result of the code is send in reply.
+     * The created actor will be part of the default actor group.
+     * @param The code to invoke for each received message
+     * @return A new instance of ReactiveEventBasedThread
+     */
+    public static Actor fairReactor(final Closure code) {
+        return defaultActorPGroup.fairReactor(code)
     }
 
     /**
      * Creates an instance of DynamicDispatchActor.
      * @param code The closure specifying individual message handlers.
      */
-    public static AbstractPooledActor messageHandler(final Closure code) {
+    public static Actor messageHandler(final Closure code) {
         return defaultActorPGroup.messageHandler(code)
+    }
+
+    /**
+     * Creates an instance of DynamicDispatchActor, which will cooperate in thread sharing with other Agent instances
+     * in a fair manner.
+     * @param code The closure specifying individual message handlers.
+     */
+    public static Actor fairMessageHandler(final Closure code) {
+        return defaultActorPGroup.fairMessageHandler(code)
     }
 }

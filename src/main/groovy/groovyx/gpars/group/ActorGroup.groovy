@@ -17,6 +17,7 @@
 package groovyx.gpars.group
 
 import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
@@ -68,9 +69,25 @@ public abstract class PGroup {
      * @param The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
-    public final AbstractPooledActor reactor(final Closure code) {
+    public final Actor reactor(final Closure code) {
         final def actor = new ReactiveActor(code)
         actor.parallelGroup = this
+        actor.start()
+        actor
+    }
+
+    /**
+     * Creates a reactor around the supplied code, which will cooperate in thread sharing with other Agent instances
+     * in a fair manner.
+     * When a reactor receives a message, the supplied block of code is run with the message
+     * as a parameter and the result of the code is send in reply.
+     * @param The code to invoke for each received message
+     * @return A new instance of ReactiveEventBasedThread
+     */
+    public final Actor fairReactor(final Closure code) {
+        final def actor = new ReactiveActor(code)
+        actor.parallelGroup = this
+        actor.makeFair()
         actor.start()
         actor
     }
@@ -79,9 +96,22 @@ public abstract class PGroup {
      * Creates an instance of DynamicDispatchActor.
      * @param code The closure specifying individual message handlers.
      */
-    public final AbstractPooledActor messageHandler(final Closure code) {
+    public final Actor messageHandler(final Closure code) {
         final def actor = new DynamicDispatchActor(code)
         actor.parallelGroup = this
+        actor.start()
+        actor
+    }
+
+    /**
+     * Creates an instance of DynamicDispatchActor, which will cooperate in thread sharing with other Agent instances
+     * in a fair manner.
+     * @param code The closure specifying individual message handlers.
+     */
+    public final Actor fairMessageHandler(final Closure code) {
+        final def actor = new DynamicDispatchActor(code)
+        actor.parallelGroup = this
+        actor.makeFair()
         actor.start()
         actor
     }

@@ -37,9 +37,8 @@ public abstract class AsyncMessagingCore implements Runnable {
     private volatile boolean fair = false;
 
 
-    protected AsyncMessagingCore(final Pool threadPool, final boolean fair) {
+    protected AsyncMessagingCore(final Pool threadPool) {
         this.threadPool = threadPool;
-        this.fair = fair;
     }
 
     /**
