@@ -61,7 +61,7 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
             if (msg == null)
                 msg = NullObject.nullObject
             onMessage msg
-        }, {throw it})
+        })
     }
 
     void when(Closure closure) {

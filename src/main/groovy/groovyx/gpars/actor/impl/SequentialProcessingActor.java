@@ -84,7 +84,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     private static final AtomicIntegerFieldUpdater<SequentialProcessingActor> countUpdater = AtomicIntegerFieldUpdater.newUpdater(SequentialProcessingActor.class, "count");
 
     private volatile Thread waitingThread;
-    private volatile Thread currentThread;
 
     private static final ActorMessage startMessage = new ActorMessage("startMessage", null);
     private static final ActorMessage loopMessage = new ActorMessage("loopMessage", null);
@@ -114,13 +113,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Timer holding timeouts for react methods
      */
     private static final Timer timer = new Timer(true);
-
-    /**
-     * Checks whether the current thread is the actor's current thread.
-     */
-    public final boolean isActorThread() {
-        return Thread.currentThread() == currentThread;
-    }
 
     /**
      * Checks the current status of the Actor.
@@ -352,25 +344,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         throw CONTINUE;
     }
 
-    private void handleStart() {
-        doOnStart();
-    }
-
-    /**
-     * Allows subclasses to add behavior to run after actor's start
-     */
-    protected abstract void doOnStart();
-
-    private void handleTimeout() {
-        doOnTimeout();
-    }
-
-    /**
-     * Allows subclasses to add behavior to run after actor's timeout
-     */
-    protected abstract void doOnTimeout();
-
-    private void handleTermination() {
+    @Override
+    protected void handleTermination() {
         if (stopFlag == S_STOPPING)
             stopFlag = S_STOPPED;
         else if (stopFlag == S_TERMINATING)
@@ -380,39 +355,10 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             throw new IllegalStateException("Messed up actors state detected when terminating: " + stopFlag);
 
         try {
-            doOnTermination();
+            super.handleTermination();
         } finally {
             getJoinLatch().bind(null);
         }
-    }
-
-    /**
-     * Allows subclasses to add behavior to run after actor's termination
-     */
-    protected abstract void doOnTermination();
-
-    private void handleException(final Throwable exception) {
-        doOnException(exception);
-    }
-
-    /**
-     * Allows subclasses to add behavior to run after exception in actor's body
-     *
-     * @param exception The exception that was fired
-     */
-    protected abstract void doOnException(final Throwable exception);
-
-    private void handleInterrupt(final InterruptedException exception) {
-        Thread.interrupted();
-        doOnInterrupt(exception);
-    }
-
-    /**
-     * Allows subclasses to add behavior to run after actor's interruption
-     *
-     * @param exception The InterruptedException
-     */
-    protected void doOnInterrupt(final InterruptedException exception) {
     }
 
     /**
@@ -423,7 +369,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     @Override
     public final SequentialProcessingActor start() {
         if (!stopFlagUpdater.compareAndSet(this, S_NOT_STARTED, S_RUNNING)) {
-            throw new IllegalStateException("Actor has already been started.");
+            throw new IllegalStateException(ACTOR_HAS_ALREADY_BEEN_STARTED);
         }
 
         send(startMessage);

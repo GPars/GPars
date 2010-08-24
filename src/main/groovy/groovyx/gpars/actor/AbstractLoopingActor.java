@@ -29,6 +29,8 @@ import org.codehaus.groovy.runtime.CurriedClosure;
 public abstract class AbstractLoopingActor extends Actor {
 
     private volatile boolean stoppedFlag = true;
+    private volatile boolean terminatedFlag = true;
+    private volatile boolean terminatingFlag = true;
 
     /**
      * Holds the particular instance of async messaging core to use
@@ -36,39 +38,56 @@ public abstract class AbstractLoopingActor extends Actor {
     private AsyncMessagingCore core;
 
     /**
-     * Builds the async messaging core using the supplied code handlers
+     * Builds the async messaging core using the supplied code handler
      *
-     * @param code         Code to run on each message
-     * @param errorHandler Handler to run on any exception that occurs when handling messages
+     * @param code Code to run on each message
      */
-    final void initialize(final Closure code, final Closure errorHandler) {
+    final void initialize(final Closure code) {
 
         //noinspection OverlyComplexAnonymousInnerClass
         this.core = new AsyncMessagingCore(parallelGroup.getThreadPool()) {
             @Override
             protected void registerError(final Exception e) {
-                errorHandler.call(e);
+                if (e instanceof InterruptedException) {
+                    handleInterrupt((InterruptedException) e);
+                } else {
+                    handleException(e);
+                }
+                terminate();
             }
 
             @Override
             protected void handleMessage(final Object message) {
-                final ActorMessage actorMessage = (ActorMessage) message;
-                try {
-                    runEnhancedWithReplies(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
-                } finally {
-                    getSenders().clear();
-                    obj2Sender.clear();
+                if (terminatingFlag || message == stopMessage) {
+                    handleTermination();
+                    terminatedFlag = true;
+                    getJoinLatch().bind(null);
+                } else {
+                    final ActorMessage actorMessage = (ActorMessage) message;
+                    try {
+                        runEnhancedWithReplies(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
+                    } finally {
+                        getSenders().clear();
+                        obj2Sender.clear();
+                    }
                 }
+            }
+
+            @Override
+            protected boolean continueProcessingMessages() {
+                return isActive();
             }
 
             @Override
             protected void threadAssigned() {
                 registerCurrentActorWithThread(AbstractLoopingActor.this);
+                currentThread = Thread.currentThread();
             }
 
             @Override
             protected void threadUnassigned() {
                 deregisterCurrentActorWithThread();
+                currentThread = null;
             }
         };
     }
@@ -95,33 +114,60 @@ public abstract class AbstractLoopingActor extends Actor {
 
     @Override
     public final Actor start() {
+        if (!hasBeenStopped()) throw new IllegalStateException(ACTOR_HAS_ALREADY_BEEN_STARTED);
         stoppedFlag = false;
+        terminatedFlag = false;
+        terminatingFlag = false;
         return this;
     }
 
     @Override
     public final Actor stop() {
-        stoppedFlag = true;
-        getJoinLatch().bind(null);
+        if (!hasBeenStopped()) {
+            send(stopMessage);
+            stoppedFlag = true;
+        }
         return this;
     }
 
     @Override
     public final Actor terminate() {
-        stop();
-        //todo handle, refactor
-        //todo event-handlers
+        if (isActive()) {
+            stop();
+
+            terminatingFlag = true;
+
+            if (isActorThread()) {
+                terminatedFlag = true;
+                handleTermination();
+                getJoinLatch().bind(null);
+            }
+            final Thread localCurrentThread = currentThread;
+            if (!isActorThread() && localCurrentThread != null) {
+                localCurrentThread.interrupt();
+            } else send(terminateMessage);
+        }
         return this;
     }
 
     @Override
     public final boolean isActive() {
-        return !hasBeenStopped();
+        return !terminatedFlag;
     }
 
     @Override
     protected final boolean hasBeenStopped() {
         return stoppedFlag;
+    }
+
+    /**
+     * Removes the head of the message queue
+     *
+     * @return The head message, or null, if the message queue is empty
+     */
+    @Override
+    protected ActorMessage sweepNextMessage() {
+        return (ActorMessage) core.sweepNextMessage();
     }
 
     @Override

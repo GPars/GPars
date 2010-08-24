@@ -17,6 +17,7 @@
 package groovyx.gpars.util;
 
 import groovyx.gpars.scheduler.Pool;
+import org.codehaus.groovy.runtime.InvokerInvocationException;
 import org.codehaus.groovy.runtime.NullObject;
 
 import java.util.Queue;
@@ -105,31 +106,64 @@ public abstract class AsyncMessagingCore implements Runnable {
     }
 
     /**
+     * Removes the head of the message queue
+     *
+     * @return The head message, or null, if the message queue is empty
+     */
+    public Object sweepNextMessage() {
+        return queue.poll();
+    }
+
+    /**
      * Handles a single message from the message queue
      */
-    @SuppressWarnings({"CatchGenericClass"})
+    @SuppressWarnings({"CatchGenericClass", "ThrowCaughtLocally"})
     public final void run() {
         try {
             threadAssigned();
+            if (!continueProcessingMessages()) return;
             Object message = queue.poll();
             while (message != null) {
                 handleMessage(message);
-                if (fair) break;
+                if (Thread.interrupted()) throw new InterruptedException();
+                if (fair || !continueProcessingMessages()) break;
                 message = queue.poll();
             }
+        } catch (InvokerInvocationException e) {
+            registerError((Exception) e.getCause());
         } catch (Exception e) {
             registerError(e);
         } finally {
             activeUpdater.set(this, PASSIVE);
             threadUnassigned();
-            schedule();
+            if (continueProcessingMessages()) schedule();
         }
     }
 
-    @SuppressWarnings({"NoopMethodInAbstractClass"})
-    protected void threadUnassigned() {
+    /**
+     * Informs about a new thread being assigned to process the next message
+     *
+     * @return True, if the calculation should proceed
+     */
+    protected boolean continueProcessingMessages() {
+        return true;
     }
 
+    /**
+     * Informs about a new thread being assigned to process the next message
+     *
+     * @return True, if the calculation should proceed
+     */
+    @SuppressWarnings({"NoopMethodInAbstractClass"})
+    protected void threadUnassigned() {
+
+    }
+
+    /**
+     * Informs about the thread being removed from the task
+     *
+     * @return True, if the calculation should proceed
+     */
     @SuppressWarnings({"NoopMethodInAbstractClass"})
     protected void threadAssigned() {
     }

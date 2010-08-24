@@ -38,6 +38,6 @@ public class ReactiveActor extends AbstractLoopingActor {
         cloned.delegate = this;
         cloned.resolveStrategy = Closure.DELEGATE_FIRST;
 
-        initialize({ it?.replyIfExists cloned(it) }, {throw it})
+        initialize({ it?.replyIfExists cloned(it) })
     }
 }

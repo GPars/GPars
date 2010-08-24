@@ -17,12 +17,9 @@
 package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
-import groovy.lang.MetaClass;
-import groovy.lang.MetaMethod;
 import groovy.time.Duration;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.actor.impl.SequentialProcessingActor;
-import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,13 +122,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings({"ThrowCaughtLocally", "UnqualifiedStaticUsage"})
 public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
-    private volatile Closure onStop = null;
     private static final String THE_ACTOR_HAS_NOT_BEEN_STARTED = "The actor hasn't been started.";
     private static final String THE_ACTOR_HAS_BEEN_STOPPED = "The actor has been stopped.";
-    private static final String RESPONDS_TO = "respondsTo";
-    private static final String ON_DELIVERY_ERROR = "onDeliveryError";
-    private static final Object[] EMPTY_ARGUMENTS = new Object[0];
-    private static final String AFTER_START = "afterStart";
 
     /**
      * This method represents the body of the actor. It is called upon actor's start and can exit either normally
@@ -177,8 +169,8 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     /**
      * Retrieves a message from the message queue, waiting, if necessary, for a message to arrive.
      *
-     * @param timeout  how long to wait before giving up, in units of unit
-     * @param units a TimeUnit determining how to interpret the timeout parameter
+     * @param timeout how long to wait before giving up, in units of unit
+     * @param units   a TimeUnit determining how to interpret the timeout parameter
      * @return The message retrieved from the queue, or null, if the timeout expires.
      * @throws InterruptedException If the thread is interrupted during the wait. Should propagate up to stop the thread.
      */
@@ -319,96 +311,18 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     }
 
     /**
-     * Clears the message queue returning all the messages it held.
+     * Removes the head of the message queue
      *
-     * @return The messages stored in the queue
+     * @return The head message, or null, if the message queue is empty
      */
-    final List<ActorMessage> sweepQueue() {
-        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
-
-        ActorMessage message = pollMessage();
-        while (message != null) {
-            final Object payloadList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
-            if (payloadList != null && !((Collection<Object>) payloadList).isEmpty()) {
-                InvokerHelper.invokeMethod(message.getPayLoad(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
-            } else {
-                final Object senderList = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
-                if (senderList != null && !((Collection<Object>) senderList).isEmpty()) {
-                    InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
-                }
-            }
-
-            messages.add(message);
-            message = pollMessage();
-        }
-        return messages;
-    }
-
-    /**
-     * Set on stop handler for this actor
-     *
-     * @param onStop The code to invoke when stopping
-     */
-    public final void onStop(final Closure onStop) {
-        if (onStop != null) {
-            this.onStop = (Closure) onStop.clone();
-            this.onStop.setDelegate(this);
-            this.onStop.setResolveStrategy(Closure.DELEGATE_FIRST);
-        }
+    @Override
+    protected final ActorMessage sweepNextMessage() {
+        return pollMessage();
     }
 
     @Override
-    protected void doOnStart() {
-        final Object list = InvokerHelper.invokeMethod(this, RESPONDS_TO, new Object[]{AFTER_START});
-        if (list != null && !((Collection<Object>) list).isEmpty()) {
-            InvokerHelper.invokeMethod(this, AFTER_START, EMPTY_ARGUMENTS);
-        }
+    protected void handleStart() {
+        super.handleStart();
         act();
     }
-
-    @Override
-    protected void doOnTimeout() {
-        callDynamic("onTimeout", EMPTY_ARGUMENTS);
-    }
-
-    @Override
-    @SuppressWarnings({"FeatureEnvy"})
-    protected void doOnTermination() {
-        final List<?> queue = sweepQueue();
-        if (onStop != null)
-            onStop.call(queue);
-
-        callDynamic("afterStop", new Object[]{queue});
-    }
-
-    @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
-    @Override
-    protected void doOnException(final Throwable exception) {
-        if (!callDynamic("onException", new Object[]{exception})) {
-            System.err.println("An exception occurred in the Actor thread " + Thread.currentThread().getName());
-            exception.printStackTrace(System.err);
-        }
-    }
-
-    @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
-    @Override
-    protected void doOnInterrupt(final InterruptedException exception) {
-        if (!callDynamic("onInterrupt", new Object[]{exception})) {
-            if (stopFlag == S_RUNNING) {
-                System.err.println("The actor processing thread has been interrupted " + Thread.currentThread().getName());
-                exception.printStackTrace(System.err);
-            }
-        }
-    }
-
-    private boolean callDynamic(final String method, final Object[] args) {
-        final MetaClass metaClass = InvokerHelper.getMetaClass(this);
-        final List<MetaMethod> list = metaClass.respondsTo(this, method);
-        if (list != null && !list.isEmpty()) {
-            InvokerHelper.invokeMethod(this, method, args);
-            return true;
-        }
-        return false;
-    }
-
 }

@@ -16,6 +16,8 @@
 package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
+import groovy.lang.MetaClass;
+import groovy.lang.MetaMethod;
 import groovy.time.BaseDuration;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.actor.impl.ReplyCategory;
@@ -34,9 +36,13 @@ import groovyx.gpars.serial.SerialHandle;
 import groovyx.gpars.serial.SerialMsg;
 import groovyx.gpars.serial.WithSerialId;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
+import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
@@ -64,6 +70,15 @@ public abstract class Actor extends ReplyingMessageStream {
     protected volatile PGroup parallelGroup;
     protected static final ActorMessage stopMessage = new ActorMessage("stopMessage", null);
     protected static final ActorMessage terminateMessage = new ActorMessage("terminateMessage", null);
+    private static final String AFTER_START = "afterStart";
+    private static final String RESPONDS_TO = "respondsTo";
+    private static final String ON_DELIVERY_ERROR = "onDeliveryError";
+    private static final Object[] EMPTY_ARGUMENTS = new Object[0];
+
+    private volatile Closure onStop = null;
+
+    protected volatile Thread currentThread;
+    protected static final String ACTOR_HAS_ALREADY_BEEN_STARTED = "Actor has already been started.";
 
     protected Actor() {
         this(new DataFlowVariable());
@@ -266,6 +281,108 @@ public abstract class Actor extends ReplyingMessageStream {
         return new MyRemoteHandle(handle, host, joinLatch);
     }
 
+    protected void handleStart() {
+        final Object list = InvokerHelper.invokeMethod(this, RESPONDS_TO, new Object[]{AFTER_START});
+        if (list != null && !((Collection<Object>) list).isEmpty()) {
+            InvokerHelper.invokeMethod(this, AFTER_START, EMPTY_ARGUMENTS);
+        }
+    }
+
+    protected void handleTermination() {
+        final List<?> queue = sweepQueue();
+        if (onStop != null)
+            onStop.call(queue);
+
+        callDynamic("afterStop", new Object[]{queue});
+    }
+
+    /**
+     * Set on stop handler for this actor
+     *
+     * @param onStop The code to invoke when stopping
+     */
+    public final void onStop(final Closure onStop) {
+        if (onStop != null) {
+            this.onStop = (Closure) onStop.clone();
+            this.onStop.setDelegate(this);
+            this.onStop.setResolveStrategy(Closure.DELEGATE_FIRST);
+        }
+    }
+
+
+    protected void handleException(final Throwable exception) {
+        if (!callDynamic("onException", new Object[]{exception})) {
+            System.err.println("An exception occurred in the Actor thread " + Thread.currentThread().getName());
+            exception.printStackTrace(System.err);
+        }
+    }
+
+    protected void handleInterrupt(final InterruptedException exception) {
+        Thread.interrupted();
+        if (!callDynamic("onInterrupt", new Object[]{exception})) {
+            if (!hasBeenStopped()) {
+                System.err.println("The actor processing thread has been interrupted " + Thread.currentThread().getName());
+                exception.printStackTrace(System.err);
+            }
+        }
+    }
+
+    protected void handleTimeout() {
+        callDynamic("onTimeout", EMPTY_ARGUMENTS);
+    }
+
+    private boolean callDynamic(final String method, final Object[] args) {
+        final MetaClass metaClass = InvokerHelper.getMetaClass(this);
+        final List<MetaMethod> list = metaClass.respondsTo(this, method);
+        if (list != null && !list.isEmpty()) {
+            InvokerHelper.invokeMethod(this, method, args);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes the head of the message queue
+     *
+     * @return The head message, or null, if the message queue is empty
+     */
+    protected abstract ActorMessage sweepNextMessage();
+
+    /**
+     * Clears the message queue returning all the messages it held.
+     *
+     * @return The messages stored in the queue
+     */
+    final List<ActorMessage> sweepQueue() {
+        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
+
+        ActorMessage message = sweepNextMessage();
+        while (message != null && message != stopMessage) {
+            final Object payloadList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
+            if (payloadList != null && !((Collection<Object>) payloadList).isEmpty()) {
+                InvokerHelper.invokeMethod(message.getPayLoad(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
+            } else {
+                final Object senderList = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
+                if (senderList != null && !((Collection<Object>) senderList).isEmpty()) {
+                    InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
+                }
+            }
+
+            messages.add(message);
+            message = sweepNextMessage();
+        }
+        return messages;
+    }
+
+    /**
+     * Checks whether the current thread is the actor's current thread.
+     *
+     * @return True if invoked from within an actor thread
+     */
+    public final boolean isActorThread() {
+        return Thread.currentThread() == currentThread;
+    }
+
     public static class MyRemoteHandle extends DefaultRemoteHandle {
         private final DataFlowExpression<Object> joinLatch;
         private static final long serialVersionUID = 3721849638877039035L;
@@ -315,6 +432,11 @@ public abstract class Actor extends ReplyingMessageStream {
         @Override
         protected boolean hasBeenStopped() {
             return false;  //todo implement
+        }
+
+        @Override
+        protected ActorMessage sweepNextMessage() {
+            throw new UnsupportedOperationException();
         }
 
         @SuppressWarnings({"AssignmentToMethodParameter"})
