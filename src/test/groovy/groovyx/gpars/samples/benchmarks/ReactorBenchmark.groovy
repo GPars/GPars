@@ -20,7 +20,6 @@ import static groovyx.gpars.actor.Actors.reactor
 
 def reactor = reactor {
     if (it == null) stop()
-//    else reply it
 }
 
 def t1 = System.currentTimeMillis()

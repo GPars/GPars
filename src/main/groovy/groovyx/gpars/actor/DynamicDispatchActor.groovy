@@ -16,7 +16,6 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import org.codehaus.groovy.runtime.NullObject
 
@@ -37,7 +36,7 @@ import org.codehaus.groovy.runtime.NullObject
  * Date: Jun 26, 2009
  */
 
-@SuppressWarnings("GroovyAssignmentToMethodParameter") public class DynamicDispatchActor extends RunnableBackedPooledActor {
+public class DynamicDispatchActor extends AbstractLoopingActor {
 
     /**
      * Creates a new instance without any when handlers registered
@@ -58,21 +57,11 @@ import org.codehaus.groovy.runtime.NullObject
             cloned.call()
         }
 
-        setAction {
-            doLoopBody()
-        }
-    }
-
-    /**
-     * Loops reading messages using the react() method and dispatches to the corresponding onMessage() method.
-     */
-    final void doLoopBody() {
-        react {msg ->
+        initialize({msg ->
             if (msg == null)
                 msg = NullObject.nullObject
             onMessage msg
-            doLoopBody()
-        }
+        }, {throw it})
     }
 
     void when(Closure closure) {

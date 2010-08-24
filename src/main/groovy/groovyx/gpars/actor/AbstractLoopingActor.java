@@ -18,6 +18,7 @@ package groovyx.gpars.actor;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.util.AsyncMessagingCore;
+import org.codehaus.groovy.runtime.CurriedClosure;
 
 /**
  * Wraps all actors that repeatedly loop through incoming messages and hold no implicit state between subsequent messages.
@@ -27,12 +28,16 @@ import groovyx.gpars.util.AsyncMessagingCore;
  */
 public abstract class AbstractLoopingActor extends Actor {
 
-    private volatile boolean stoppedFlag = false;
+    private volatile boolean stoppedFlag = true;
 
-    private final AsyncMessagingCore core;
+    private AsyncMessagingCore core;
 
-    protected AbstractLoopingActor(final Closure code, final Closure errorHandler, final boolean fair) {
-        this.core = new AsyncMessagingCore(parallelGroup.getThreadPool(), fair) {
+    //todo clean-up senders and replies
+    //todo make the reply mechanism more lightweight
+
+    final void initialize(final Closure code, final Closure errorHandler) {
+
+        this.core = new AsyncMessagingCore(parallelGroup.getThreadPool()) {
             @Override
             protected void registerError(final Exception e) {
                 errorHandler.call(e);
@@ -40,9 +45,11 @@ public abstract class AbstractLoopingActor extends Actor {
 
             @Override
             protected void handleMessage(final Object message) {
-                runEnhancedWithReplies((ActorMessage) message, code);
+                final ActorMessage actorMessage = (ActorMessage) message;
+                runEnhancedWithReplies(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
             }
         };
+        stoppedFlag = false;
     }
 
     /**
@@ -73,6 +80,7 @@ public abstract class AbstractLoopingActor extends Actor {
     @Override
     public Actor stop() {
         stoppedFlag = true;
+        getJoinLatch().bind(null);
         return this;
     }
 
