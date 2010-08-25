@@ -573,6 +573,16 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     }
 
     /**
+     * Removes the head of the message queue
+     *
+     * @return The head message, or null, if the message queue is empty
+     */
+    @Override
+    protected final ActorMessage sweepNextMessage() {
+        return pollMessage();
+    }
+
+    /**
      * Enables multiple argument closures to be passed to react().
      * The MultiMessageReaction class takes just one argument and will wrap the intended closure.
      * After invoking the MultiMessageReaction will curry the obtained value onto the wrapped multi-argument closure.

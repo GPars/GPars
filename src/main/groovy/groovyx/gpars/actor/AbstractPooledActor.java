@@ -310,16 +310,6 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         receive(duration.toMilliseconds(), TimeUnit.MILLISECONDS, handler);
     }
 
-    /**
-     * Removes the head of the message queue
-     *
-     * @return The head message, or null, if the message queue is empty
-     */
-    @Override
-    protected final ActorMessage sweepNextMessage() {
-        return pollMessage();
-    }
-
     @Override
     protected void handleStart() {
         super.handleStart();
