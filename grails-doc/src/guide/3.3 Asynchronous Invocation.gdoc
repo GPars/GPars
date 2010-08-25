@@ -75,10 +75,13 @@ GParsPool.withPool {
 
 h3. Parallel speculations
 
-Imagine you need to perform a task like e.g. calculate a value or download data and you have several functions or ways to achieve your goal,
-however, they may all take different amount of time to complete, some of them may fail (e.g. network issues), but they all should ultimately
-result in the same (as far as your needs are concerned) result. Given the parallel resources available these days on mainstream hardware,
-we could run all the functions speculatively in parallel and harvest the result we obtain in smallest amount of time. The other calculations can then be safely cancelled.
+Imagine you need to perform a task like e.g. calculate an expensive function or read data from a file, database or internet. Luckily, you know of several good ways (e.g. functions or urls)
+to achieve your goal. However, they are not all equal. Although they return back the same (as far as your needs are concerned) result, they may all take different amount of time to complete
+and some of them may even fail (e.g. network issues). What's worse, no-one is going to tell you which path gives you the solution first nor which paths lead to no solution at all. Shall I
+run quicksort or merge sort on my list? Which url will work best? Is this service available at its primary location or should I use the backup one?
+
+GPars speculations give you the option to try all the available alternatives in parallel and so get the result from the fastest functional path, silently ignoring the slow or broken ones.
+
 This is what the _speculate()_ methods on _GParsPool_ and _GParsExecutorsPool()_ can do.
 
 {code}
@@ -88,8 +91,12 @@ def mergeSort = ...
 def sortedNumbers = speculate(quickSort, mergeSort)
 {code}
 
-Similarly, downloading a document from multiple sources of different speed and some of which may even not be available would look
-like this:
+Here we're performing both quick sort and merge sort concurrently, while getting the result of the faster one. Given the parallel resources available these days on mainstream hardware,
+running the two functions in parallel will not have dramatic impact on speed of calculation of either one, and so we get the result in about the same time as if we ran the faster of the two
+calculations. And we get the result sooner than when running the slower one. Yet we didn't have to know up-front, which of the two sorting algorithms would perform better on our data. Thus
+we speculate.
+
+Similarly, downloading a document from multiple sources of different speed and reliability would look like this:
 
 {code}
 import static groovyx.gpars.GParsPool.speculate
