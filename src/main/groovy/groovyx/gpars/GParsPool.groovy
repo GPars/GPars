@@ -217,7 +217,7 @@ public class GParsPool {
      */
     public static List<Future<Object>> executeAsync(Closure... closures) {
         jsr166y.forkjoin.ForkJoinPool pool = retrieveCurrentPool()
-        if (pool == null) throw new IllegalStateException("No active Fork/Join thread pool available to execute closures asynchronously.")
+        if (pool == null) throw new IllegalStateException("No active Fork/Join thread pool available to execute closures asynchronously. Consider wrapping the function call with GParsPool.withPool().")
         List<Future<Object>> result = closures.collect {cl ->
             pool.submit([compute: { cl.call() }] as RecursiveTask)
         }

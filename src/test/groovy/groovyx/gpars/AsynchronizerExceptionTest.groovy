@@ -36,9 +36,11 @@ public class ThreadPoolExceptionTest extends GroovyTestCase {
     }
 
     public void testExecuteInParralelWithException() {
-        List<Future<Object>> result = GParsExecutorsPool.executeAsync({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
-        shouldFail {
-            result*.get()
+        GParsExecutorsPool.withPool {
+            List<Future<Object>> result = GParsExecutorsPool.executeAsync({20}, {throw new RuntimeException('test1')}, {throw new RuntimeException('test2')}, {10})
+            shouldFail {
+                result*.get()
+            }
         }
     }
 

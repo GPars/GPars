@@ -29,19 +29,27 @@ import java.util.concurrent.atomic.AtomicInteger
 public class GParsExecutorsPoolTest extends GroovyTestCase {
 
     public void testDoInParallel() {
-        assertEquals([10, 20], GParsExecutorsPool.executeAsyncAndWait({10}, {20}))
+        GParsExecutorsPool.withPool {
+            assertEquals([10, 20], GParsExecutorsPool.executeAsyncAndWait({10}, {20}))
+        }
     }
 
     public void testExecuteInParallel() {
-        assertEquals([10, 20], GParsExecutorsPool.executeAsync({10}, {20})*.get())
+        GParsExecutorsPool.withPool {
+            assertEquals([10, 20], GParsExecutorsPool.executeAsync({10}, {20})*.get())
+        }
     }
 
     public void testDoInParallelList() {
-        assertEquals([10, 20], GParsExecutorsPool.executeAsyncAndWait([{10}, {20}]))
+        GParsExecutorsPool.withPool {
+            assertEquals([10, 20], GParsExecutorsPool.executeAsyncAndWait([{10}, {20}]))
+        }
     }
 
     public void testExecuteAsyncList() {
-        assertEquals([10, 20], GParsExecutorsPool.executeAsync([{10}, {20}])*.get())
+        GParsExecutorsPool.withPool {
+            assertEquals([10, 20], GParsExecutorsPool.executeAsync([{10}, {20}])*.get())
+        }
     }
 
     public void testAsyncWithCollectionAndResult() {

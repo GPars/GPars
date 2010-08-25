@@ -214,19 +214,20 @@ class GParsExecutorsPool {
 
     /**
      * Starts multiple closures in separate threads, collecting Futures for their return values
+     * Reuses the pool defined by the surrounding withPool() call.
      * If an exception is thrown from the closure when called on any of the collection's elements,
      * it will be re-thrown in the calling thread when it calls the Future.get() method.
      * @return Futures for the result values or exceptions of all closures
      */
     public static List<Future<Object>> executeAsync(Closure... closures) {
-        GParsExecutorsPool.withPool(closures.size()) {ExecutorService executorService ->
-            List<Future<Object>> result = closures.collect {cl ->
-                executorService.submit({
-                    cl.call()
-                } as Callable<Object>)
-            }
-            result
+        ExecutorService executorService = retrieveCurrentPool()
+        if (executorService == null) throw new IllegalStateException("No active thread pool available to execute closures asynchronously. Consider wrapping the function call with GParsExecutorsPool.withPool().")
+        List<Future<Object>> result = closures.collect {cl ->
+            executorService.submit({
+                cl.call()
+            } as Callable<Object>)
         }
+        result
     }
 
     /**
