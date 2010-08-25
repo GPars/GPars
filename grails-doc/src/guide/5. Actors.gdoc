@@ -292,6 +292,57 @@ def player = new Player(name: 'Player', server: master).start()
 [master, player]*.join()
 {code}
 
+h2. Conditional and counting loops
+
+The _loop()_ method allows for either a condition or a number of iterations to be specified, optionally accompanied with a closure
+to invoke once the loop finishes - _After Loop Termination Code Handler_ .
+
+The following actor will loop three times to receive 3 messages and then prints out the maximum of the received messages.
+
+{code}
+final Actor actor = actor {
+    def candidates = []
+    def printResult = {-> println "The best offer is ${candidates.max()}"}
+
+    loop(3, printResult) {
+        react {
+            candidates << it
+        }
+    }
+}
+
+actor 10
+actor 30
+actor 20
+actor.join()
+{code}
+
+The following actor will receive messages until a value greater then 30 arrives.
+
+{code}
+final Actor actor = actor {
+    def candidates = []
+    final Closure printResult = {-> println "Reached best offer - ${candidates.max()}"}
+
+    loop({-> candidates.max() < 30}, printResult) {
+        react {
+            candidates << it
+        }
+    }
+}
+
+actor 10
+actor 20
+actor 25
+actor 31
+actor 20
+actor.join()
+{code}
+
+{note}
+The _After Loop Termination Code Handler_ can use actor's _react{}_ but not _loop()_ .
+{note}
+
 h2. Custom schedulers
 
 Actors leverage the standard JDK concurrency library by default.  To provide a custom thread scheduler use the appropriate constructor parameter when creating an actor group. The supplied scheduler will orchestrate threads in the group's thread pool.

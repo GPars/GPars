@@ -20,7 +20,8 @@ import groovyx.gpars.actor.Actor
 import static groovyx.gpars.actor.Actors.actor
 
 /**
- * Demonstrates the use of conditional actor loops
+ * Demonstrates the use of conditional actor loops.
+ * The following actor will receive messages until a value greater then 30 arrives.
  *
  * @author Vaclav Pech
  * Date: Aug 25th 2010
@@ -28,16 +29,19 @@ import static groovyx.gpars.actor.Actors.actor
 
 final Actor actor = actor {
     def candidates = []
-    loop({-> candidates.max() < 30}) {
+    final Closure printResult = {-> println "Reached best offer - ${candidates.max()}"}
+
+    loop({-> candidates.max() < 30}, printResult) {
         react {
             candidates << it
-            if (candidates.size() == 2) println "Reached best offer - ${candidates.max()}"
         }
     }
 }
 
 actor 10
-actor 30
+actor 20
+actor 25
+actor 31
 actor 20
 actor.join()
 

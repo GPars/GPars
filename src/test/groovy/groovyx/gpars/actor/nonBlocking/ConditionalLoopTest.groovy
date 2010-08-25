@@ -16,7 +16,6 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import java.util.concurrent.Callable
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -28,18 +27,6 @@ class ConditionalLoopTest extends GroovyTestCase {
         volatile int result = 0
         def actor = actor {
             loop({-> false}) {
-                result = 1
-            }
-            result = 2
-        }
-        actor.join()
-        assert result == 0
-    }
-
-    public void testNoLoopWithCallable() {
-        volatile int result = 0
-        def actor = actor {
-            loop({-> false} as Callable) {
                 result = 1
             }
             result = 2
@@ -211,5 +198,112 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor 6
         actor.join()
         assert result == 5
+    }
+
+    public void testNoLoopWithAfterLoopCode() {
+        volatile int result = 0
+        def actor = actor {
+            loop({-> false}, {-> result += 3}) {
+                result = 1
+            }
+            result = 2
+        }
+        actor.join()
+        assert result == 3
+    }
+
+    public void testSingleLoopWithAfterLoopCode() {
+        volatile int result = 0
+        def actor = actor {
+            int counter = 0
+
+            loop({-> counter < 1}, {-> result += 3}) {
+                counter++
+                result++
+            }
+            result = 100
+        }
+        actor.join()
+        assert result == 4
+    }
+
+    public void testRepeatedLoopWithAfterLoopCode() {
+        volatile int result = 0
+        def actor = actor {
+            int counter = 0
+
+            loop({-> counter < 5}, {-> result += 3}) {
+                counter++
+                result++
+            }
+            result = 100
+        }
+        actor.join()
+        assert result == 8
+    }
+
+    public void testComplexAfterLoopCode() {
+        volatile int result = 0
+        def actor = actor {
+            int counter = 0
+
+            def afterLoopCode = {->
+                react {
+                    result += it
+                    react {
+                        result += it
+                    }
+                }
+            }
+            loop({-> counter < 5}, afterLoopCode) {
+                counter++
+                result++
+                react {}
+            }
+            result = 100
+        }
+        actor 1
+        actor 2
+        actor 3
+        actor 4
+        actor 5
+        actor 6
+        actor 7
+        actor 8
+        actor.join()
+        assert result == 18
+    }
+
+    public void testLoopingAfterLoopCode() {
+        volatile int result = 0
+        volatile exception = null
+        def actor = actor {
+            int counter = 0
+
+            def afterLoopCode = {->
+                try {
+                    loop { }
+                } catch (all) {
+                    exception = all
+                }
+            }
+            loop({-> counter < 5}, afterLoopCode) {
+                counter++
+                result++
+                react {}
+            }
+            result = 100
+        }
+        actor 1
+        actor 2
+        actor 3
+        actor 4
+        actor 5
+        actor 6
+        actor 7
+        actor 8
+        actor.join()
+        assert result == 5
+        assert exception in IllegalStateException
     }
 }

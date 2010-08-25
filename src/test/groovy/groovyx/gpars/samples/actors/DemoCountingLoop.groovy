@@ -20,7 +20,8 @@ import groovyx.gpars.actor.Actor
 import static groovyx.gpars.actor.Actors.actor
 
 /**
- * Demonstrates the use of conditional actor loops
+ * Demonstrates the use of conditional actor loops. 
+ * The following actor will loop three times to receive 3 messages and then prints out the maximum of the received messages.
  *
  * @author Vaclav Pech
  * Date: Aug 25th 2010
@@ -28,10 +29,11 @@ import static groovyx.gpars.actor.Actors.actor
 
 final Actor actor = actor {
     def candidates = []
-    loop(3) {
+    def printResult = {-> println "The best offer is ${candidates.max()}"}
+
+    loop(3, printResult) {
         react {
             candidates << it
-            if (candidates.size() == 3) println "The best offer is ${candidates.max()}"
         }
     }
 }

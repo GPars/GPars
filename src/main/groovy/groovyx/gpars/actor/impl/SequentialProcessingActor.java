@@ -56,6 +56,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Code for the loop, if any
      */
     protected Runnable loopCode;
+    protected Closure afterLoopCode;
     protected Callable<Boolean> loopCondition;
 
     /**
@@ -750,11 +751,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * @param code The closure to invoke repeatedly
      */
     protected final void loop(final Runnable code) {
-        loop(new Callable<Boolean>() {
-            public Boolean call() {
-                return Boolean.TRUE;
-            }
-        }, code);
+        loop((Callable<Boolean>) null, null, code);
     }
 
     /**
@@ -773,7 +770,27 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 //noinspection UnnecessaryBoxing
                 return Boolean.valueOf(counter <= numberOfLoops);
             }
-        }, code);
+        }, null, code);
+    }
+
+    /**
+     * Ensures that the supplied closure will be invoked repeatedly in a loop.
+     * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
+     * @param numberOfLoops The loop will only be run the given number of times
+     * @param afterLoopCode Code to run after the main actor's loop finishes
+     * @param code          The closure to invoke repeatedly
+     */
+    protected final void loop(final int numberOfLoops, final Closure afterLoopCode, final Runnable code) {
+        loop(new Callable<Boolean>() {
+            private int counter = 0;
+
+            public Boolean call() {
+                counter++;
+                //noinspection UnnecessaryBoxing
+                return Boolean.valueOf(counter <= numberOfLoops);
+            }
+        }, afterLoopCode, code);
     }
 
     /**
@@ -788,7 +805,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             public Boolean call() {
                 return (Boolean) condition.call();
             }
-        }, code);
+        }, null, code);
 
     }
 
@@ -796,10 +813,28 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Ensures that the supplied closure will be invoked repeatedly in a loop.
      * The method never returns, but instead frees the processing thread back to the thread pool.
      *
-     * @param condition A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
-     * @param code      The closure to invoke repeatedly
+     * @param condition     A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
+     * @param afterLoopCode Code to run after the main actor's loop finishes
+     * @param code          The closure to invoke repeatedly
      */
-    protected final void loop(final Callable<Boolean> condition, final Runnable code) {
+    protected final void loop(final Closure condition, final Closure afterLoopCode, final Runnable code) {
+        loop(new Callable<Boolean>() {
+            public Boolean call() {
+                return (Boolean) condition.call();
+            }
+        }, afterLoopCode, code);
+
+    }
+
+    /**
+     * Ensures that the supplied closure will be invoked repeatedly in a loop.
+     * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
+     * @param condition     A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
+     * @param afterLoopCode Code to run after the main actor's loop finishes
+     * @param code          The closure to invoke repeatedly
+     */
+    private void loop(final Callable<Boolean> condition, final Closure afterLoopCode, final Runnable code) {
         if (loopCode != null || loopCondition != null) {
             throw new IllegalStateException("The loop method must be only called once");
         }
@@ -824,11 +859,17 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 doLoopCall();
             }
         };
+        if (afterLoopCode != null) {
+            this.afterLoopCode = afterLoopCode;
+            this.afterLoopCode.setDelegate(this);
+            this.afterLoopCode.setResolveStrategy(Closure.DELEGATE_FIRST);
+        }
         doLoopCall();
     }
 
     private static boolean verifyLoopCondition(final Callable<Boolean> condition) {
         try {
+            if (condition == null) return true;
             return condition.call() == Boolean.TRUE;
         } catch (Exception e) {
             throw new RuntimeException(ERROR_EVALUATING_LOOP_CONDITION, e);
@@ -841,9 +882,14 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
             //noinspection VariableNotUsedInsideIf
             if (loopCode != null) {
-                scheduleLoop();
-                return;
+                scheduleLoop();  //throws a control exception
             }
+        }
+        if (afterLoopCode != null) {
+            loopCode = null;
+            final Closure localAfterLoopCode = afterLoopCode;
+            afterLoopCode = null;
+            localAfterLoopCode.call();
         }
         stopFlag = S_STOPPING;
         throw STOP;
