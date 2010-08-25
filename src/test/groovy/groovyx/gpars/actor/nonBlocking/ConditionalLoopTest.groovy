@@ -27,6 +27,18 @@ class ConditionalLoopTest extends GroovyTestCase {
     public void testNoLoop() {
         volatile int result = 0
         def actor = actor {
+            loop({-> false}) {
+                result = 1
+            }
+            result = 2
+        }
+        actor.join()
+        assert result == 0
+    }
+
+    public void testNoLoopWithCallable() {
+        volatile int result = 0
+        def actor = actor {
             loop({-> false} as Callable) {
                 result = 1
             }
@@ -53,7 +65,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         def actor = actor {
             int counter = 0
 
-            loop({-> counter < 1} as Callable) {
+            loop({-> counter < 1}) {
                 counter++
                 result++
             }
@@ -80,7 +92,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         def actor = actor {
             int counter = 0
 
-            loop({-> counter < 5} as Callable) {
+            loop({-> counter < 5}) {
                 counter++
                 result++
             }
@@ -107,7 +119,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         def actor = actor {
             int counter = 0
 
-            loop({-> counter < 5} as Callable) {
+            loop({-> counter < 5}) {
                 counter++
                 result++
                 stop()
@@ -136,7 +148,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         def actor = actor {
             int counter = 0
 
-            loop({-> counter < 5} as Callable) {
+            loop({-> counter < 5}) {
                 counter++
                 result++
                 terminate()

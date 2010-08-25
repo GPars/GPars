@@ -782,6 +782,22 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * @param condition A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
      * @param code      The closure to invoke repeatedly
      */
+    protected final void loop(final Closure condition, final Runnable code) {
+        loop(new Callable<Boolean>() {
+            public Boolean call() {
+                return (Boolean) condition.call();
+            }
+        }, code);
+
+    }
+
+    /**
+     * Ensures that the supplied closure will be invoked repeatedly in a loop.
+     * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
+     * @param condition A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
+     * @param code      The closure to invoke repeatedly
+     */
     protected final void loop(final Callable<Boolean> condition, final Runnable code) {
         if (loopCode != null) {
             throw new IllegalStateException("The loop method must be only called once");
