@@ -113,6 +113,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Timer holding timeouts for react methods
      */
     private static final Timer timer = new Timer(true);
+    private static final String SHOULD_NOT_REACH_HERE = "Should not reach here";
 
     /**
      * Checks the current status of the Actor.
@@ -669,7 +670,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
                 if (toProcess == loopMessage) {
                     loopCode.run();
-                    throw new IllegalStateException("Should not reach here");
+                    throw new IllegalStateException(SHOULD_NOT_REACH_HERE);
                 }
 
                 if (reaction != null) {
@@ -775,6 +776,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     private void doLoopCall() {
         checkStopTerminate();
 
+        //noinspection VariableNotUsedInsideIf
         if (loopCode != null) {
             scheduleLoop();
         } else {
@@ -795,7 +797,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 throw TERMINATE;
 
             if (stopFlag != S_STOPPING)
-                throw new IllegalStateException("Should not reach here");
+                throw new IllegalStateException(SHOULD_NOT_REACH_HERE);
         }
     }
 
