@@ -142,9 +142,10 @@ public abstract class AbstractLoopingActor extends Actor {
                 handleTermination();
                 getJoinLatch().bind(null);
             }
-            final Thread localCurrentThread = currentThread;
-            if (!isActorThread() && localCurrentThread != null) {
-                localCurrentThread.interrupt();
+            //noinspection CallToThreadYield
+            Thread.yield();
+            if (!isActorThread() && currentThread != null) {
+                currentThread.interrupt();
             } else send(terminateMessage);
         }
         return this;
