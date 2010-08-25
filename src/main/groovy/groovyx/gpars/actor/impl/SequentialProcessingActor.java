@@ -824,8 +824,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 doLoopCall();
             }
         };
-        //todo remove
-//        if (verifyLoopCondition(condition)) loopCode.run();
         doLoopCall();
     }
 
