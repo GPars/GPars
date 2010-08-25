@@ -151,8 +151,6 @@ public abstract class AsyncMessagingCore implements Runnable {
 
     /**
      * Informs about a new thread being assigned to process the next message
-     *
-     * @return True, if the calculation should proceed
      */
     @SuppressWarnings({"NoopMethodInAbstractClass"})
     protected void threadUnassigned() {
@@ -161,8 +159,6 @@ public abstract class AsyncMessagingCore implements Runnable {
 
     /**
      * Informs about the thread being removed from the task
-     *
-     * @return True, if the calculation should proceed
      */
     @SuppressWarnings({"NoopMethodInAbstractClass"})
     protected void threadAssigned() {
