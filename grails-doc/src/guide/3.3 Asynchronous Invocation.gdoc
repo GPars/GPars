@@ -73,3 +73,50 @@ GParsPool.withPool {
 }
 {code}
 
+h3. Parallel speculations
+
+Imagine you need to perform a task like e.g. calculate a value or download data and you have several functions or ways to achieve your goal,
+however, they may all take different amount of time to complete, some of them may fail (e.g. network issues), but they all should ultimately
+result in the same (as far as your needs are concerned) result. Given the parallel resources available these days on mainstream hardware,
+we could run all the functions speculatively in parallel and harvest the result we obtain in smallest amount of time. The other calculations can then be safely cancelled.
+This is what the _speculate()_ methods on _GParsPool_ and _GParsExecutorsPool()_ can do.
+
+{code}
+def numbers = ...
+def quickSort = ...
+def mergeSort = ...
+def sortedNumbers = speculate(quickSort, mergeSort)
+{code}
+
+Similarly, downloading a document from multiple sources of different speed and some of which may even not be available would look
+like this:
+
+{code}
+import static groovyx.gpars.GParsPool.speculate
+import static groovyx.gpars.GParsPool.withPool
+
+def alternative1 = {
+    'http://www.dzone.com/links/index.html'.toURL().text
+}
+
+def alternative2 = {
+    'http://www.dzone.com/'.toURL().text
+}
+
+def alternative3 = {
+    'http://www.dzzzzzone.com/'.toURL().text  //wrong url
+}
+
+def alternative4 = {
+    'http://dzone.com/'.toURL().text
+}
+
+withPool(4) {
+    println speculate([alternative1, alternative2, alternative3, alternative4]).contains('groovy')
+}
+{code}
+
+{note}
+Make sure the surrounding thread pool has enough threads to process all alternatives in parallel. The size of the pool should match
+the number of closures supplied.
+{note}
