@@ -171,4 +171,45 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor.join()
         assert result == 1
     }
+
+    public void testRepeatedLoopWithReact() {
+        volatile int result = 0
+        def actor = actor {
+            int counter = 0
+
+            loop({-> counter < 5}) {
+                counter++
+                result++
+                react {}
+            }
+            result = 100
+        }
+        actor 1
+        actor 2
+        actor 3
+        actor 4
+        actor 5
+        actor 6
+        actor.join()
+        assert result == 5
+    }
+
+    public void testRepeatedLoopOnNumberOfIterationsWithReact() {
+        volatile int result = 0
+        def actor = actor {
+            loop(5) {
+                result++
+                react {}
+            }
+            result = 100
+        }
+        actor 1
+        actor 2
+        actor 3
+        actor 4
+        actor 5
+        actor 6
+        actor.join()
+        assert result == 5
+    }
 }

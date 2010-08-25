@@ -56,6 +56,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * Code for the loop, if any
      */
     protected Runnable loopCode;
+    protected Callable<Boolean> loopCondition;
 
     /**
      * Code for the next action
@@ -799,7 +800,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * @param code      The closure to invoke repeatedly
      */
     protected final void loop(final Callable<Boolean> condition, final Runnable code) {
-        if (loopCode != null) {
+        if (loopCode != null || loopCondition != null) {
             throw new IllegalStateException("The loop method must be only called once");
         }
 
@@ -807,6 +808,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             ((Closure) code).setResolveStrategy(Closure.DELEGATE_FIRST);
             ((Closure) code).setDelegate(this);
         }
+        loopCondition = condition;
         loopCode = new Runnable() {
             public void run() {
                 getSenders().clear();
@@ -819,37 +821,34 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 } else {
                     code.run();
                 }
-                if (verifyLoopCondition(condition)) doLoopCall();
+                doLoopCall();
             }
         };
-        if (verifyLoopCondition(condition)) loopCode.run();
+        //todo remove
+//        if (verifyLoopCondition(condition)) loopCode.run();
+        doLoopCall();
     }
 
-    private boolean verifyLoopCondition(final Callable<Boolean> condition) {
+    private static boolean verifyLoopCondition(final Callable<Boolean> condition) {
         try {
-            if (condition.call() == Boolean.FALSE) {
-                stopFlag = S_STOPPING;
-                //noinspection ThrowCaughtLocally
-                throw STOP;
-            } else return true;
-        } catch (ActorException e) {
-            throw e;
+            return condition.call() == Boolean.TRUE;
         } catch (Exception e) {
             throw new RuntimeException(ERROR_EVALUATING_LOOP_CONDITION, e);
         }
     }
 
     private void doLoopCall() {
-        checkStopTerminate();
+        if (verifyLoopCondition(loopCondition)) {
+            checkStopTerminate();
 
-        //noinspection VariableNotUsedInsideIf
-        if (loopCode != null) {
-            scheduleLoop();
-        } else {
-            // case of react called directly from act () without top-level loop being present
-            stopFlag = S_STOPPING;
-            throw STOP;
+            //noinspection VariableNotUsedInsideIf
+            if (loopCode != null) {
+                scheduleLoop();
+                return;
+            }
         }
+        stopFlag = S_STOPPING;
+        throw STOP;
     }
 
     final void runReaction(final ActorMessage message, final Closure code) {
