@@ -464,7 +464,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findAnyParallel(Object collection, Closure cl) {
-        return findParallel(createCollection(collection), cl)
+        return findAnyParallel(createCollection(collection), cl)
     }
 
     /**
