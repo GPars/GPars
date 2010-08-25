@@ -72,6 +72,8 @@ contributor(actorBody) {
             method name: "receive", type: "Object", params: [timeout: 'long', unit: 'java.util.concurrent.TimeUnit']
             method name: "receive", type: "Object", params: [timeout: 'groovy.time.Duration']
             method name: "loop", type: "void", params: [closure: 'groovy.lang.Closure']
+            method name: "loop", type: "void", params: [numberOfLoops: 'int', closure: 'groovy.lang.Closure']
+            method name: "loop", type: "void", params: [condition: 'groovy.lang.Closure', closure: 'groovy.lang.Closure']
         }
     }
 }

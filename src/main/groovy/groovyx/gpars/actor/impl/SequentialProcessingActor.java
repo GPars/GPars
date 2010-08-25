@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
@@ -114,6 +115,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     private static final Timer timer = new Timer(true);
     private static final String SHOULD_NOT_REACH_HERE = "Should not reach here";
+    private static final String ERROR_EVALUATING_LOOP_CONDITION = "Error evaluating loop condition";
 
     /**
      * Checks the current status of the Actor.
@@ -747,6 +749,40 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * @param code The closure to invoke repeatedly
      */
     protected final void loop(final Runnable code) {
+        loop(new Callable<Boolean>() {
+            public Boolean call() {
+                return Boolean.TRUE;
+            }
+        }, code);
+    }
+
+    /**
+     * Ensures that the supplied closure will be invoked repeatedly in a loop.
+     * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
+     * @param numberOfLoops The loop will only be run the given number of times
+     * @param code          The closure to invoke repeatedly
+     */
+    protected final void loop(final int numberOfLoops, final Runnable code) {
+        loop(new Callable<Boolean>() {
+            private int counter = 0;
+
+            public Boolean call() {
+                counter++;
+                //noinspection UnnecessaryBoxing
+                return Boolean.valueOf(counter <= numberOfLoops);
+            }
+        }, code);
+    }
+
+    /**
+     * Ensures that the supplied closure will be invoked repeatedly in a loop.
+     * The method never returns, but instead frees the processing thread back to the thread pool.
+     *
+     * @param condition A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
+     * @param code      The closure to invoke repeatedly
+     */
+    protected final void loop(final Callable<Boolean> condition, final Runnable code) {
         if (loopCode != null) {
             throw new IllegalStateException("The loop method must be only called once");
         }
@@ -767,10 +803,24 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 } else {
                     code.run();
                 }
-                doLoopCall();
+                if (verifyLoopCondition(condition)) doLoopCall();
             }
         };
-        loopCode.run();
+        if (verifyLoopCondition(condition)) loopCode.run();
+    }
+
+    private boolean verifyLoopCondition(final Callable<Boolean> condition) {
+        try {
+            if (condition.call() == Boolean.FALSE) {
+                stopFlag = S_STOPPING;
+                //noinspection ThrowCaughtLocally
+                throw STOP;
+            } else return true;
+        } catch (ActorException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(ERROR_EVALUATING_LOOP_CONDITION, e);
+        }
     }
 
     private void doLoopCall() {
@@ -780,7 +830,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         if (loopCode != null) {
             scheduleLoop();
         } else {
-            // case of react called directly from act ()
+            // case of react called directly from act () without top-level loop being present
             stopFlag = S_STOPPING;
             throw STOP;
         }
