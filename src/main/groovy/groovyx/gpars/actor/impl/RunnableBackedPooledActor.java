@@ -36,9 +36,6 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
 
     private Runnable action;
 
-    public RunnableBackedPooledActor() {
-    }
-
     public RunnableBackedPooledActor(final Runnable handler) {
         setAction(handler);
     }
