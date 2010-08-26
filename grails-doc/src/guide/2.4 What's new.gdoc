@@ -10,64 +10,29 @@ See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
 
 h3. Parallel collections
 
-* Renamed the Parallelizer and Asynchronizer classes to more appropriate GParsPool and GParsExecutorsPool as well as their methods
-* Enabled asynchronous closures inside the GParsPool.withPool() methods
-* Reorganized the asynchronous closure invocation functionality
-* Unified the GParsPool and GParsExecutorsPool functionality to eliminate the need to combine uses of the two classes
-* Improved the map/reduce performance by eliminating unnecessary conversions
-* Seed values are now allowed for fold() and reduce() methods
-* Added findAnyParallel() and countParallel() methods
+* Added a speculate() method to concurrently run multiple functions each representing a different path to achieve the required goal, while harvesting the first calculated result
 
 h3. Fork / Join
 
-* Simplified API to define Fork/Join calculation without the need to create explicit subclasses
-
 h3. Actors
 
-* Restructured actor grouping in order to unify it with agent and dataflow task grouping
-* The implicit _call()_ method can be used to send messages
-{code}
-myActor 'message'
-{code}
+* Conditional and counting loop
+* Changed the message timeout API
+* Refactored Reactor and DynamicDispatchActor achieving a 15x speed-up
 
 h3. GroovyCSP
 
-* Added a JCSP-wrapping CSP implementation
-
 h3. Dataflow
 
-* A _maxForks_ flag has been added to allow Dataflow operators to internally work concurrently
-* Added support for grouping operators and tasks around shared thread pools
+* Fixed issues with reusing the same parallel group in the DataFlowVariable's whenBound() handlers
+* Tasks can return values and can be joined
 
-h3. Safe
+h3. Agent
 
-* Reimplemented to increase performance
-* Added support for grouping Safe instances around shared thread pools
-* Added agent error handling capabilities
-* Renamed to *Agent*
-* The implicit _call()_ method can be used to update the agent
-{code}
-myAgent increment
-{code}
-
+* Added listeners and validators
 
 h3. Other
 
-* Dependency on Jetty has been made optional
-* Automated upload of downloadable artifacts
-* OSGi support for the GPars jar
 
 h3. Renaming hints
-* Parallelizer -> GParsPool
-* Asynchronizer -> GParsExecutorsPool
-* doParallel() -> withPool()
-* withParallelizer() -> withPool()
-* withExistingParallelizer() -> withExistingPool()
-* withAsynchronizer() -> withPool()
-* withExistingAsynchronizer() -> withExistingPool()
-* orchestrate() -> runForkJoin()
-* ActorGroup -> PGroup
-* PooledActorGroup -> DefaultPGroup
-* NonDaemonActorGroup -> NonDaemonPGroup
-* Safe -> Agent
 
