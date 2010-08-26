@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.TimeUnit
 
@@ -32,27 +33,29 @@ private class ExceptionFlag {
 Actors.actor {
     println "actor1 has started"
 
-delegate.metaClass {
-    afterStop = {List undeliveredMessages ->
-        println "actor1 has stopped"
-    }
+    delegate.metaClass {
+        afterStop = {List undeliveredMessages ->
+            println "actor1 has stopped"
+        }
 
-    onInterrupt = {InterruptedException e ->
-        println "actor1 has been interrupted"
-    }
+        onInterrupt = {InterruptedException e ->
+            println "actor1 has been interrupted"
+        }
 
-    onTimeout = {->
-        println "actor1 has timed out"
-    }
+        onTimeout = {->
+            println "actor1 has timed out"
+        }
 
-    onException = {Exception e ->
-        println "actor1 threw an exception"
+        onException = {Exception e ->
+            println "actor1 threw an exception"
+        }
     }
-}
     println("Running actor1")
     if (ExceptionFlag.THROW_EXCEPTION) throw new RuntimeException('test')
     else {
-        react(10, TimeUnit.MILLISECONDS) {}  //will timeout
+        react(10, TimeUnit.MILLISECONDS) {msg ->  //will timeout
+            if (msg == Actor.TIMEOUT) println 'Timeout!'
+        }
     }
 }
 
@@ -64,7 +67,9 @@ class PooledLifeCycleSampleActor extends AbstractPooledActor {
         println("Running actor2")
         if (ExceptionFlag.THROW_EXCEPTION) throw new RuntimeException('test')
         else {
-            react(10.milliseconds) {}  //will timeout
+            react(10, TimeUnit.MILLISECONDS) {msg ->  //will timeout
+                if (msg == Actor.TIMEOUT) println 'Timeout!'
+            }
         }
     }
 

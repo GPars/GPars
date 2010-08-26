@@ -45,8 +45,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
-
 /**
  * Actors are active objects, which borrow a thread from a thread pool.
  * The Actor interface provides means to send messages to the actor, start and stop the background thread as well as
@@ -74,6 +72,9 @@ public abstract class Actor extends ReplyingMessageStream {
     private static final String RESPONDS_TO = "respondsTo";
     private static final String ON_DELIVERY_ERROR = "onDeliveryError";
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
+    @SuppressWarnings({"ConstantDeclaredInAbstractClass"})
+    public static final String TIMEOUT = "TIMEOUT";
+    protected static final ActorMessage TIMEOUT_MESSAGE = new ActorMessage(TIMEOUT, null);
 
     private volatile Closure onStop = null;
 
@@ -268,7 +269,7 @@ public abstract class Actor extends ReplyingMessageStream {
     protected final void runEnhancedWithReplies(final ActorMessage message, final Closure code) {
         assert message != null;
 
-        if (message.getPayLoad() == TIMEOUT) throw TIMEOUT;
+        if (message == TIMEOUT_MESSAGE) handleTimeout();
         getSenders().add(message.getSender());
         obj2Sender.put(message.getPayLoad(), message.getSender());
 

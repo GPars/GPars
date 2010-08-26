@@ -16,6 +16,7 @@
 
 package groovyx.gpars.actor.blocking
 
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
@@ -81,7 +82,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 2
         barrier.await()
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals([2, null, null], result)
+        assertEquals([2, Actor.TIMEOUT, Actor.TIMEOUT], result)
     }
 
     public void testReceivePassedNonZeroTimeout() {
@@ -102,7 +103,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         actor.send 2
         barrier.await()
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals([2, null, null], result)
+        assertEquals([2, Actor.TIMEOUT, Actor.TIMEOUT], result)
     }
 
     public void testReceiveNonZeroTimeout() {

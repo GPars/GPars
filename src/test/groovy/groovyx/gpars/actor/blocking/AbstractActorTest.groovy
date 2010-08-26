@@ -86,6 +86,7 @@ public class AbstractActorTest extends GroovyTestCase {
     public void testMessagingWithTimeout() {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final AtomicBoolean receiveFlag = new AtomicBoolean(false)
+        final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
         final AtomicReference result = new AtomicReference()
 
@@ -98,10 +99,13 @@ public class AbstractActorTest extends GroovyTestCase {
             latch.countDown()
         }
 
+        actor.metaClass.onTimeout = {-> timeoutFlag.set(true)}
+
         latch.await(90, TimeUnit.SECONDS)
         assert flag.get()
         assert receiveFlag.get()
-        assertNull result.get()
+        assert timeoutFlag.get()
+        assert Actor.TIMEOUT == result.get()
     }
 
     public void testInterruption() {
