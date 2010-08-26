@@ -31,7 +31,6 @@ public abstract class ActorException extends RuntimeException {
     public static final ActorException CONTINUE = new ActorContinuationException();
     public static final ActorException TERMINATE = new ActorTerminationException();
     public static final ActorException STOP = new ActorStopException();
-    public static final ActorException TIMEOUT = new ActorTimeoutException();
 
     ActorException() {
     }

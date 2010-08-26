@@ -1,6 +1,7 @@
 The actor support in gpars were inspired by the Actors library in Scala but have meanwhile gone beyond that.
 
-Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can help developers avoid issues like deadlocks, live-locks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
+Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state.
+Actors can help developers avoid issues like deadlocks, live-locks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
 A nice wrap-up of the key "concepts behind actors":http://ruben.savanne.be/articles/concurrency-in-erlang-scala was written recently by Ruben Vermeersch.
 Actors guarantee that always *at most one thread processes the actor's body* at a time and also under the covers the memory gets synchronized
 each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
@@ -8,10 +9,29 @@ Ideally actor's code should *never be invoked* directly from outside so all the 
 handling the last received message and so all the actor's code is *implicitly thread-safe* .
 If any of the actor's methods is allowed to be called by other objects directly, the thread-safety guarantee for the actor's code and state are *no longer valid* .
 
+h2. Types of actors
 
-Actors can share a relatively small thread pool. This can go as far as having many concurrent actors that share a single pooled thread. They avoid the threading limitations of the JVM.
+In general, you can find two types of actors in the wild - ones that hold no *implicit state* and those, who do. GPars gives you both options.
+*Stateless* actors, represented in *GPars* by the _DynamicDispatchActor_ and the _ReactiveActor_ classes, keep no track of what messages have arrived previously.
+You may thing of these as flat message handlers, which process messages as they come. Any state-based behavior has to be implemented by the user.
 
-Actor code is processed in chunks separated by quiet periods of waiting for new events (messages). This can be naturally modeled through _continuations_ . As JVM doesn't support continuations directly, they have to be simulated in the actors frameworks, which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
+The *stateful* actors, represented by here by the _AbstractPooledActor_ class, allow the user to handle implicit state directly.
+After receiving a message the actor moves into a new state with different ways to handle future messages.
+To give you an example, a freshly started actor may only accept some types of messages, e.g. encrypted messages for decryption,
+only after it has received the encryption keys. The stateful actors allow to encode such dependencies directly in the structure
+of the message-handling code.
+Implicit state management, however, comes at a performance cost, mainly due to the lack of continuations support on JVM.
+
+h2. Actor threading model
+
+Since actors are detached from the system threads, a great number of actors can share a relatively small thread pool.
+This can go as far as having many concurrent actors that share a single pooled thread. This architecture allows to avoid
+some of the threading limitations of the JVM. In general, while the JVM can only give you a limited number of threads (typically around a couple of thousands),
+the number of actors is only limited by the available memory. If an actor has no work to do, it doesn't consume threads.
+
+Actor code is processed in chunks separated by quiet periods of waiting for new events (messages).
+This can be naturally modeled through _continuations_ . As JVM doesn't support continuations directly, they have to be simulated in the actors frameworks,
+which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
 
 {code}
 import groovyx.gpars.actor.AbstractPooledActor
@@ -242,19 +262,24 @@ actor {
 }
 {code}
 
-Here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates.
+Here's an example of an actor that waits for up to 30 seconds to receive a reply to its message.
 
 {code}
 import static groovyx.gpars.actor.Actors.*
 
 def me = actor {
-    delegate.metaClass.onTimeout = {-> friend.send('I see, busy as usual. Never mind.')}
-
     friend.send('Hi')
-    react(30.seconds) {
-        //continue conversation
+    react(30.seconds) {msg ->
+        if (msg == Actor.TIMEOUT) {
+            friend.send('I see, busy as usual. Never mind.')
+            stop()
+        } else {
+            //continue conversation
+        }
     }
 }
+
+me.join()
 {code}
 
 h2. Undelivered messages

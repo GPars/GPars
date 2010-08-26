@@ -31,17 +31,25 @@ import org.codehaus.groovy.runtime.TimeCategory
 public class TimeCategoryActorsTest extends GroovyTestCase {
     public void testReceive() {
         volatile def result = ''
+        volatile boolean timeoutFlag = false
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = Actors.actor {
-            use(TimeCategory) {
-                result = receive(3.seconds)
+
+            delegate.metaClass {
+                onTimeout = {-> timeoutFlag = true; terminate() }
+                afterStop = {messages -> latch.countDown() }
             }
-            latch.countDown()
+
+            use(TimeCategory) {
+                result = receive(1.seconds)
+                println 'Continues'
+            }
         }
 
         latch.await(90, TimeUnit.SECONDS)
-        assertNull(result)
+        assert '' == result
+        assert timeoutFlag
     }
 
     public void testTimeCategoryNotAvailable() {
@@ -64,7 +72,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
             }
         }
 
-        actor.join ()
+        actor.join()
         latch.await()
         assertEquals 2, exceptions
     }
@@ -83,6 +91,6 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         }
 
         latch.await(90, TimeUnit.SECONDS)
-        assertNull(result)
+        assert Actor.TIMEOUT == result
     }
 }

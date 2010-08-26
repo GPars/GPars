@@ -16,6 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
@@ -36,24 +37,72 @@ public class TimeoutTest extends GroovyTestCase {
 
     public void testTimeout() {
         final def barrier = new CyclicBarrier(2)
-        final AtomicBoolean codeFlag = new AtomicBoolean(false)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        final def actor = actor {
+        actor {
+            react(1000) {
+                if (it == Actor.TIMEOUT) timeoutFlag.set(true)
+                barrier.await()
+                stop()
+            }
+        }
+
+        barrier.await()
+        assert timeoutFlag.get()
+    }
+
+    public void testTimeoutWithString() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
+
+        actor {
+            react(1000) {
+                if (it == 'TIMEOUT') timeoutFlag.set(true)
+                barrier.await()
+                stop()
+            }
+        }
+
+        barrier.await()
+        assert timeoutFlag.get()
+    }
+
+    public void testTimeoutWithLoop() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
+
+        actor {
             loop {
                 react(1000) {
-                    codeFlag.set(true)  //should never reach
+                    if (it == Actor.TIMEOUT) timeoutFlag.set(true)
+                    barrier.await()
+                    stop()
                 }
             }
         }
 
-        actor.metaClass {
-            onTimeout = {-> timeoutFlag.set(true) }
-            afterStop = {messages -> barrier.await() }
+        barrier.await()
+        assert timeoutFlag.get()
+    }
+
+    public void testOnTimeoutHandler() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
+
+        def actor = actor {
+            loop {
+                react(1000) {
+                    barrier.await()
+                    stop()
+                }
+            }
+        }
+
+        actor.metaClass.onTimeout = {->
+            timeoutFlag.set(true)
         }
 
         barrier.await()
-        assertFalse codeFlag.get()
         assert timeoutFlag.get()
     }
 
@@ -62,6 +111,7 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicBoolean codeFlag = new AtomicBoolean(false)
         final AtomicBoolean nestedCodeFlag = new AtomicBoolean(false)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
+        volatile def nestedMessage = null
 
         final def actor = actor {
             loop {
@@ -69,7 +119,9 @@ public class TimeoutTest extends GroovyTestCase {
                 react(5000) {
                     codeFlag.set(true)
                     react(1000) {
-                        nestedCodeFlag.set(true)  //should never reach
+                        nestedCodeFlag.set(true)
+                        nestedMessage = it
+                        stop()
                     }
                 }
             }
@@ -85,8 +137,9 @@ public class TimeoutTest extends GroovyTestCase {
 
         barrier.await()
         assert codeFlag.get()
-        assertFalse nestedCodeFlag.get()
+        assert nestedCodeFlag.get()
         assert timeoutFlag.get()
+        assert nestedMessage == Actor.TIMEOUT
     }
 
     public void testTimeoutInLoop() {
@@ -104,7 +157,7 @@ public class TimeoutTest extends GroovyTestCase {
         }
 
         actor.metaClass {
-            onTimeout = {-> timeoutFlag.set(true) }
+            onTimeout = {-> timeoutFlag.set(true); stop() }
             afterStop = {messages -> barrier.await() }
         }
 
@@ -113,7 +166,7 @@ public class TimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
-        assertEquals(1, codeCounter.get())
+        assertEquals(2, codeCounter.get())
         assert timeoutFlag.get()
     }
 }

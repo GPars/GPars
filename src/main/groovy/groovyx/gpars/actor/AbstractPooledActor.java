@@ -28,8 +28,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * AbstractPooledActor provides the default Actor implementation. It represents a standalone active object (actor),
- * which reacts asynchronously to messages sent to it from outside through the send() method.
+ * AbstractPooledActor provides the default implementation of a stateful actor. Refer to DynamicDispatchActor or ReactiveActor for examples of stateless actors.
+ * It represents a standalone active object (actor),
+ * which reacts asynchronously to messages sent to it from outside through the send() method, which preserving its internal implicit state.
  * Each Actor has its own message queue and a thread pool shared with other Actors by means of an instance
  * of the PGroup, which they have in common.
  * The PGroup instance is responsible for the pool creation, management and shutdown.
@@ -75,12 +76,6 @@ import java.util.concurrent.TimeUnit;
  *     //this line will never be reached
  * }.start()
  * </pre>
- * The react method can accept multiple messages in the passed-in closure
- * <pre>
- * react {Integer a, String b ->
- *     ...
- * }
- * </pre>
  * The closures passed to the react() method can call reply() or replyIfExists(), which will send a message back to
  * the originator of the currently processed message. The replyIfExists() method unlike the reply() method will not fail
  * if the original message wasn't sent by an actor nor if the original sender actor is no longer running.
@@ -94,14 +89,14 @@ import java.util.concurrent.TimeUnit;
  * }
  * </pre>
  * <p/>
- * The react() method accepts timeout specified using the TimeCategory DSL.
+ * The react() method accepts timeouts as well.
  * <pre>
- * react(10.MINUTES) {
+ * react(10, TimeUnit.MINUTES) {
  *     println 'Received message: ' + it
  * }
  * </pre>
  * If no message arrives within the given timeout, the onTimeout() lifecycle handler is invoked, if exists,
- * and the actor terminates.
+ * and the Actor.TIMEOUT message is returned.
  * Each Actor has at any point in time at most one active instance of ActorAction associated, which abstracts
  * the current chunk of actor's work to perform. Once a thread is assigned to the ActorAction, it moves the actor forward
  * till loop() or react() is called. These methods schedule another ActorAction for processing and throw dedicated exception

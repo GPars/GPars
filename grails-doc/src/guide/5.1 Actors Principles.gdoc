@@ -1,4 +1,7 @@
-Actors share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them. The threads are returned back to the pool once a message has been processed and the actor is idle waiting for some more messages to arrive. Actors become detached from the underlying threads and so a relatively small thread pool can serve potentially unlimited number of actors. Virtually unlimited scalability in number of actors is the main advantage of _event-based actors_, which are detached from the underlying physical threads.
+Actors share a *pool* of threads, which are dynamically assigned to actors when the actors need to *react* to messages sent to them.
+The threads are returned back to the pool once a message has been processed and the actor is idle waiting for some more messages to arrive.
+Actors become detached from the underlying threads and so a relatively small thread pool can serve potentially unlimited number of actors.
+Virtually unlimited scalability in number of actors is the main advantage of _event-based actors_ , which are detached from the underlying physical threads.
 
 Here are some examples of how to use actors. This is how you create an actor that prints out all messages that it receives.
 
@@ -15,7 +18,7 @@ def console = actor {
 
 Notice the _loop()_ method call, which ensures that the actor doesn't stop after having processed the first message.
 
-As an alternative you can extend the AbstractPooledActor class and override the _act()_ method. Once you instantiate the actor, you need to start it so that it attaches itself to the thread pool and can start accepting messages.
+As an alternative you can extend the _AbstractPooledActor_ class and override the _act()_ method. Once you instantiate the actor, you need to start it so that it attaches itself to the thread pool and can start accepting messages.
 The _actor()_ factory method will take care of starting the actor.
 
 {code}
@@ -65,24 +68,58 @@ def console = actor {
 console.join()
 {code}
 
-As you can see, you create new actors with the _actor()_ method passing in the actor's body as a closure parameter. Inside the actor's body you can use _loop()_ to iterate, _react()_ to receive messages and _reply()_ to send a message to the actor, which has sent the currently processed message. When the decryptor actor doesn't find a message in its message queue, the _react()_ method gives up the thread and returns it back to the thread pool for other actors to pick up. Only after a new message arrives to the actor's message queue, the closure of the _react()_ method gets scheduled for processing with the pool. Event-based actors internally simulate continuations - actor's work is split into sequentially run chunks, which get invoked once a message is available in the inbox. Each chunk for a single actor can be performed by different thread from the thread pool.
+As you can see, you create new actors with the _actor()_ method passing in the actor's body as a closure parameter. Inside
+the actor's body you can use _loop()_ to iterate, _react()_ to receive messages and _reply()_ to send a message to the actor,
+which has sent the currently processed message. When the decryptor actor doesn't find a message in its message queue,
+the _react()_ method gives up the thread and returns it back to the thread pool for other actors to pick up.
+Only after a new message arrives to the actor's message queue, the closure of the _react()_ method gets scheduled for processing with the pool.
+Event-based actors internally simulate continuations - actor's work is split into sequentially run chunks, which get invoked
+once a message is available in the inbox. Each chunk for a single actor can be performed by different thread from the thread pool.
 
-Groovy flexible syntax with closures allows our library to offer multiple ways to define actors. For instance, here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates. Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method.
+Groovy flexible syntax with closures allows our library to offer multiple ways to define actors.
+For instance, here's an example of an actor that waits for up to 30 seconds to receive a reply to its message.
+Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class to be used for timeout specification to the _react()_ method,
+provided the user wraps the call within a _TimeCategory_ use block.
 
 {code}
 import static groovyx.gpars.actor.Actors.*
 
 def me = actor {
-    delegate.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
+    friend.send('Hi')
+    react(30.seconds) {msg ->
+        if (msg == Actor.TIMEOUT) {
+            friend.send('I see, busy as usual. Never mind.')
+            stop()
+        } else {
+            //continue conversation
+        }
+    }
+}
+
+me.join()
+{code}
+
+When a timeout expires when waiting for a message, the Actor.TIMEOUT message arrives instead. Also the _onTimeout()_ handler
+is invoked, if present on the actor:
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def me = actor {
+    delegate.metaClass.onTimeout = {->
+        friend.send('I see, busy as usual. Never mind.')
+        stop()
+    }
 
     friend.send('Hi')
-    react(10.seconds) {
+    react(30.seconds) {
         //continue conversation
     }
 }
 
 me.join()
 {code}
+
 Notice the possibility to use Groovy meta-programming to define actor's lifecycle notification methods (e.g. _onTimeout()_ ) dynamically.
 
 h3. Actors guarantee thread-safety for non-thread-safe code

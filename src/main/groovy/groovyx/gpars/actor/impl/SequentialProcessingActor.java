@@ -44,7 +44,6 @@ import java.util.concurrent.locks.LockSupport;
 import static groovyx.gpars.actor.impl.ActorException.CONTINUE;
 import static groovyx.gpars.actor.impl.ActorException.STOP;
 import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
-import static groovyx.gpars.actor.impl.ActorException.TIMEOUT;
 
 /**
  * @author Alex Tkachman, Vaclav Pech
@@ -212,7 +211,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             if (message != null) return message;
         } while (System.nanoTime() < endTime);
 
-        return null;
+        handleTimeout();
+        return TIMEOUT_MESSAGE;
     }
 
     /**
@@ -964,7 +964,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 @Override
                 public void run() {
                     if (!isReady()) {
-                        actor.send(new ActorMessage(TIMEOUT, null));
+                        actor.send(TIMEOUT_MESSAGE);
                     }
                 }
             }, timeout);

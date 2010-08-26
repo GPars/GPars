@@ -42,7 +42,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
 
         actor {
             delegate.metaClass {
-                onTimeout = {-> timeoutFlag.set(true) }
+                onTimeout = {-> timeoutFlag.set(true); terminate() }
                 afterStop = {messages -> barrier.await() }
             }
 
@@ -99,7 +99,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
                         use(TimeCategory) {
                             codeFlag.set(true)
                             react(1.second) {
-                                nestedCodeFlag.set(true)  //should never reach
+                                nestedCodeFlag.set(true)
                             }
                         }
                     }
@@ -117,7 +117,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
 
         barrier.await()
         assert codeFlag.get()
-        assertFalse nestedCodeFlag.get()
+        assert nestedCodeFlag.get()
         assert timeoutFlag.get()
     }
 
@@ -138,7 +138,36 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         }
 
         actor.metaClass {
-            onTimeout = {-> timeoutFlag.set(true) }
+            onTimeout = {-> timeoutFlag.set(true); stop() }
+            afterStop = {messages -> barrier.await() }
+        }
+
+        barrier.await()
+        actor.send 'message'
+        barrier.await()
+
+        barrier.await()
+        assertEquals(2, codeCounter.get())
+        assert timeoutFlag.get()
+    }
+
+    public void testTimeoutInLoopWithTermination() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicInteger codeCounter = new AtomicInteger(0)
+
+        final def actor = actor {
+            loop {
+                use(TimeCategory) {
+                    barrier.await()
+                    react(1.second) {
+                        codeCounter.incrementAndGet()
+                    }
+                }
+            }
+        }
+
+        actor.metaClass {
+            onTimeout = {-> terminate() }
             afterStop = {messages -> barrier.await() }
         }
 
@@ -148,6 +177,5 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
 
         barrier.await()
         assertEquals(1, codeCounter.get())
-        assert timeoutFlag.get()
     }
 }

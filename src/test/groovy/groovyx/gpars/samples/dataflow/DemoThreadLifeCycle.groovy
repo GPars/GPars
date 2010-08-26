@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.actor.AbstractPooledActor
+import java.util.concurrent.TimeUnit
 import static groovyx.gpars.dataflow.DataFlow.start
 
 /**
@@ -30,7 +31,7 @@ start {
     println("Running thread")
     if (throwException) throw new RuntimeException('test')
     else {
-        react(10.milliseconds) {}  //will timeout
+        react(10, TimeUnit.MILLISECONDS) {}  //will timeout
     }
 }
 
