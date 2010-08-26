@@ -27,6 +27,7 @@ import java.util.UUID;
  * @author Alex Tkachman, Vaclav Pech
  */
 public abstract class SerialMsg implements Serializable {
+    private static final long serialVersionUID = 1L ;
     public UUID hostId;
 
     protected SerialMsg() {

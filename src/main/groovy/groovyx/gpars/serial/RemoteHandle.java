@@ -26,6 +26,7 @@ import java.util.UUID;
  * @author Alex Tkachman
  */
 public abstract class RemoteHandle implements Serializable {
+    private static final long serialVersionUID = 1L ;
     protected final UUID serialId;
     protected final UUID hostId;
 
