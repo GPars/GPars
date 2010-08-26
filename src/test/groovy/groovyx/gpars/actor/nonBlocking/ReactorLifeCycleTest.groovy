@@ -259,7 +259,7 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
 
         final Actor actor = group.reactor {
             barrier.await()
-            Thread.sleep(10000)
+            Thread.sleep(30000)
             counter.incrementAndGet()  //never reached
         }
 
@@ -294,7 +294,7 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
 
         final Actor actor = group.fairReactor {
             barrier.await()
-            Thread.sleep(10000)
+            Thread.sleep(30000)
         }
 
         actor.metaClass {
