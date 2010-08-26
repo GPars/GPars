@@ -276,7 +276,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         final Actor actor = group.messageHandler {
             when {message ->
                 barrier.await()
-                Thread.sleep(10000)
+                Thread.sleep(30000)
                 counter.incrementAndGet()  //never reached
             }
         }
@@ -313,7 +313,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         final Actor actor = group.fairMessageHandler {
             when {message ->
                 barrier.await()
-                Thread.sleep(10000)
+                Thread.sleep(30000)
             }
         }
 
