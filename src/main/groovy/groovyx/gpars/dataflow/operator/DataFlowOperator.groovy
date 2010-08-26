@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.ReactiveActor
+import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -124,36 +124,31 @@ public final class DataFlowOperator {
  * Iteratively waits for enough values from inputs.
  * Once all required inputs are available (received as messages), the operator's body is run.
  */
-private class DataFlowOperatorActor extends ReactiveActor {
+private class DataFlowOperatorActor extends DynamicDispatchActor {
     final List inputs
     final List outputs
     final Closure code
     final def owningOperator
-
-    private final static Closure createBody() {
-        Map values = [:]
-
-        return {msg ->
-            println 'AAAAAAAAAAAAAAAAA ' + msg
-            if ((msg == null) || (!msg.hasProperty('attachment'))) return
-            values[msg.attachment] = msg.result
-            assert values.size() <= inputs.size()
-            if (values.size() == inputs.size()) {
-                def results = values.sort {msg.key}.values() as List
-                startTask(results)
-                values = [:]
-                queryInputs()
-            }
-        }
-    }
+    Map values = [:]
 
     def DataFlowOperatorActor(owningOperator, outputs, inputs, code) {
-        super(createBody())
+        super(null)
 
         this.owningOperator = owningOperator
         this.outputs = outputs
         this.inputs = inputs
         this.code = code
+    }
+
+    void onMessage(def message) {
+        values[message.attachment] = message.result
+        assert values.size() <= inputs.size()
+        if (values.size() == inputs.size()) {
+            def results = values.sort {message.key}.values() as List
+            startTask(results)
+            values = [:]
+            queryInputs()
+        }
     }
 
     final void afterStart() {
