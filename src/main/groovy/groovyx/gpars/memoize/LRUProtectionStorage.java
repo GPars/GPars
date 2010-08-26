@@ -29,6 +29,8 @@ import java.util.Map;
  *         Date: Jun 22, 2010
  */
 public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
+  private static final long serialVersionUID = 1L ;
+
     private final int maxSize;
 
     public LRUProtectionStorage(final int maxSize) {

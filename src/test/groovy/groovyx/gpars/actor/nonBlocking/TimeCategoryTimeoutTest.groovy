@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import org.codehaus.groovy.runtime.TimeCategory
+import groovy.time.TimeCategory
 import static groovyx.gpars.actor.Actors.actor
 
 /**

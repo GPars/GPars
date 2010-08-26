@@ -333,7 +333,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         this.value = value;
         state = S_INITIALIZED;
 
-        @SuppressWarnings({"unchecked"})
         final WaitingThread waitingQueue = waitingUpdater.getAndSet(this, dummyWaitingThread);
 
         // no more new waiting threads since that point
@@ -369,10 +368,11 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param hostId The local host id
      */
-    private void notifyRemote(final UUID hostId) {
+        private void notifyRemote(final UUID hostId) {
         if (serialHandle != null) {
-            Actors.defaultActorPGroup.getThreadPool().execute(new Runnable() {
-                public void run() {
+          Actors.defaultActorPGroup.getThreadPool().execute(new Runnable() {
+            @SuppressWarnings ( "unchecked" )
+            public void run() {
                     final Object sub = serialHandle.getSubscribers();
                     if (sub instanceof RemoteHost) {
                         final RemoteHost host = (RemoteHost) sub;
@@ -380,11 +380,9 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                             host.write(new BindDataFlow(DataFlowExpression.this, value, host.getLocalHost().getId()));
                         }
                     }
-
                     if (sub instanceof List) {
                         //noinspection SynchronizeOnNonFinalField
                         synchronized (serialHandle) {
-                            //noinspection unchecked
                             for (final SerialContext host : (List<SerialContext>) sub) {
                                 if (hostId == null || !host.getHostId().equals(hostId)) {
                                     host.write(new BindDataFlow(DataFlowExpression.this, value, host.getLocalHostId()));
@@ -450,25 +448,21 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         getValAsync(stream);
     }
 
-    @SuppressWarnings("unchecked")
     public static <V> DataFlowExpression<V> transform(final Object another, final Closure closure) {
         final int pnum = closure.getMaximumNumberOfParameters();
         if (pnum == 0) {
             throw new IllegalArgumentException("Closure should have parameters");
         }
-
         if (pnum == 1) {
             return new TransformOne<V>(another, closure);
         } else {
             if (another instanceof Collection) {
-                final Collection collection = (Collection) another;
+                final Collection<?> collection = (Collection<?>) another;
                 if (collection.size() != pnum) {
                     throw new IllegalArgumentException("Closure parameters don't match #of arguments");
                 }
-
                 return new TransformMany<V>(collection, closure);
             }
-
             throw new IllegalArgumentException("Collection expected");
         }
     }
@@ -501,7 +495,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
             return new DataFlowInvocationExpression(this, name, (Object[]) args);
         }
         return InvokerHelper.invokeMethod(this, name, args);
-
     }
 
     /**
@@ -516,8 +509,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         if (metaProperty != null) {
             return metaProperty.getProperty(this);
         }
-
-        return new DataFlowGetPropertyExpression(this, propertyName);
+        return new DataFlowGetPropertyExpression<T>(this, propertyName);
     }
 
     public void setMetaClass(final MetaClass metaClass) {
@@ -552,7 +544,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                 return element;
             }
 
-            final DataFlowExpression dataFlowExpression = (DataFlowExpression) element;
+            final DataFlowExpression<?> dataFlowExpression = (DataFlowExpression<?>) element;
             if (dataFlowExpression.state == S_INITIALIZED) {
                 return dataFlowExpression.value;
             }
@@ -587,9 +579,9 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
 
         @Override
+        @SuppressWarnings ( "unchecked" )
         protected V evaluate() {
-            //noinspection unchecked
-            return (V) closure.call(arg instanceof DataFlowExpression ? ((DataFlowExpression) arg).value : arg);
+            return (V) closure.call(arg instanceof DataFlowExpression<?> ? ((DataFlowExpression<?>) arg).value : arg);
         }
 
         @Override
@@ -602,21 +594,21 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         private static final long serialVersionUID = 4115456542358280855L;
         private final Closure closure;
 
-        private TransformMany(final Collection collection, final Closure closure) {
+        private TransformMany(final Collection<?> collection, final Closure closure) {
             super(collection.toArray());
             this.closure = closure;
             subscribe();
         }
 
         @Override
+        @SuppressWarnings ( "unchecked" )
         protected V evaluate() {
             super.evaluate();
-            //noinspection unchecked
             return (V) closure.call(args);
         }
     }
 
-    //todo sort out generics
+    // TODO: sort out generics
 
     /**
      * Represents a remote message binding a value to a remoted DataFlowExpression
@@ -625,7 +617,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         private static final long serialVersionUID = -8674023870562062769L;
         private final DataFlowExpression expr;
         private final Object message;
-
         /**
          * @param expr    The local DataFlowExpression instance
          * @param message The actual value to bind
@@ -636,13 +627,13 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
             this.expr = expr;
             this.message = message;
         }
-
         /**
          * Performs the actual bind on the remote host
          *
          * @param conn The connection object
          */
         @Override
+        @SuppressWarnings ( "unchecked" )
         public void execute(final RemoteConnection conn) {
             expr.doBindRemote(hostId, message);
         }

@@ -36,13 +36,12 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression<Obje
     }
 
     @Override
+    @SuppressWarnings ( "unchecked" )
     protected Object evaluate() {
         if (receiver instanceof DataFlowExpression) {
             receiver = ((DataFlowExpression<Object>) receiver).value;
         }
-
         super.evaluate();
-
         return InvokerHelper.invokeMethod(receiver, methodName, args);
     }
 
@@ -51,7 +50,6 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression<Obje
         if (receiver instanceof DataFlowExpression) {
             receiver = listener.subscribe(receiver);
         }
-
         super.subscribe(listener);
     }
 }

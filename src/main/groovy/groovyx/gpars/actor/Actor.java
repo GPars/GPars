@@ -82,7 +82,7 @@ public abstract class Actor extends ReplyingMessageStream {
     protected static final String ACTOR_HAS_ALREADY_BEEN_STARTED = "Actor has already been started.";
 
     protected Actor() {
-        this(new DataFlowVariable());
+        this(new DataFlowVariable<Object>());
     }
 
     /**

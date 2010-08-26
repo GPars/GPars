@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import org.codehaus.groovy.runtime.TimeCategory
+import groovy.time.TimeCategory
 
 /**
  *
