@@ -11,11 +11,11 @@ If any of the actor's methods is allowed to be called by other objects directly,
 
 h2. Types of actors
 
-In general, you can find two types of actors in the wild = ones that hold no implicit state and those, who do. GPars gives you both options.
-Stateless actors, represented in GPars by the DynamicDispatchActor and the ReactiveActor classes, keep no track of what messages have arrived previously.
+In general, you can find two types of actors in the wild - ones that hold no *implicit state* and those, who do. GPars gives you both options.
+*Stateless* actors, represented in *GPars* by the _DynamicDispatchActor_ and the _ReactiveActor_ classes, keep no track of what messages have arrived previously.
 You may thing of these as flat message handlers, which process messages as they come. Any state-based behavior has to be implemented by the user.
 
-The stateful actors, represented by here by the AbstractPooledActor class, allow the user to handle implicit state directly.
+The *stateful* actors, represented by here by the _AbstractPooledActor_ class, allow the user to handle implicit state directly.
 After receiving a message the actor moves into a new state with different ways to handle future messages.
 To give you an example, a freshly started actor may only accept some types of messages, e.g. encrypted messages for decryption,
 only after it has received the encryption keys. The stateful actors allow to encode such dependencies directly in the structure

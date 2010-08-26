@@ -39,10 +39,34 @@ h3. Timeouts
 import static groovyx.gpars.actor.Actors.*
 
 def me = actor {
-    delegate.metaClass.onTimeout = {->friend.send('I see, busy as usual. Never mind.')}
+    friend.send('Hi')
+    react(30.seconds) {msg ->
+        if (msg == Actor.TIMEOUT) {
+            friend.send('I see, busy as usual. Never mind.')
+            stop()
+        } else {
+            //continue conversation
+        }
+    }
+}
+
+me.join()
+{code}
+
+When a timeout expires when waiting for a message, the Actor.TIMEOUT message arrives instead. Also the _onTimeout()_ handler
+is invoked, if present on the actor:
+
+{code}
+import static groovyx.gpars.actor.Actors.*
+
+def me = actor {
+    delegate.metaClass.onTimeout = {->
+        friend.send('I see, busy as usual. Never mind.')
+        stop()
+    }
 
     friend.send('Hi')
-    react(10.seconds) {
+    react(30.seconds) {
         //continue conversation
     }
 }

@@ -222,9 +222,9 @@ System.in.read()
 {code}
 h2. Word sort
 
-Given a folder name, the script will sort words in all files in the folder. The _SortMaster_ actor creates a given number of _WordSortActors_, splits among them the files to sort words in and collects the results.
+Given a folder name, the script will sort words in all files in the folder. The _SortMaster_ actor creates a given number of _WordSortActors_ , splits among them the files to sort words in and collects the results.
 
-"Inspired by [Scala Concurrency blog post by Michael Galpin":http://fupeg.blogspot.com/2009/06/scala-concurrency.html
+"Inspired by Scala Concurrency blog post by Michael Galpin":http://fupeg.blogspot.com/2009/06/scala-concurrency.html
 
 {code}//Messages
 private final class FileToSort { String fileName }
