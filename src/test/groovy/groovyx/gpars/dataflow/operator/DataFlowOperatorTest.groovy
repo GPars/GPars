@@ -16,10 +16,10 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.dataflow.DataFlow.operator
 
 /**
@@ -179,12 +179,14 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
-        def op1 = group.operator(inputs: [], outputs: [b]) {->
-            flag = true
-            stop()
+        shouldFail(IllegalArgumentException) {
+            def op1 = group.operator(inputs: [], outputs: [b]) {->
+                flag = true
+                stop()
+            }
+            op1.join()
         }
-        op1.join()
-        assert flag
+        assert !flag
     }
 
     public void testOutputs() {
