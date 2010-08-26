@@ -118,6 +118,7 @@ public abstract class AbstractLoopingActor extends Actor {
         stoppedFlag = false;
         terminatedFlag = false;
         terminatingFlag = false;
+        handleStart();
         return this;
     }
 

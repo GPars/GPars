@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -51,6 +51,7 @@ public final class DataFlowOperator {
         final int parameters = code.maximumNumberOfParameters
         if (!channels || (channels.inputs == null) || (parameters != channels.inputs.size()))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
+        if (channels.inputs.size() == 0) throw new IllegalArgumentException("The operator body must take some inputs. The provided list of input channels is empty.")
 
         code.delegate = this
         if (channels.maxForks != null && channels.maxForks != 1) {
@@ -119,42 +120,43 @@ public final class DataFlowOperator {
 
 /**
  * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
+ *
+ * Iteratively waits for enough values from inputs.
+ * Once all required inputs are available (received as messages), the operator's body is run.
  */
-private class DataFlowOperatorActor extends AbstractPooledActor {
+private class DataFlowOperatorActor extends DynamicDispatchActor {
     final List inputs
     final List outputs
     final Closure code
     final def owningOperator
+    Map values = [:]
 
     def DataFlowOperatorActor(owningOperator, outputs, inputs, code) {
+        super(null)
+
         this.owningOperator = owningOperator
         this.outputs = outputs
         this.inputs = inputs
         this.code = code
     }
 
-    protected final void act() {
-        loop {
-            inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
-            def values = [:]
-            handleValueMessage(values, inputs.size())
+    void onMessage(def message) {
+        values[message.attachment] = message.result
+        assert values.size() <= inputs.size()
+        if (values.size() == inputs.size()) {
+            def results = values.sort {message.key}.values() as List
+            startTask(results)
+            values = [:]
+            queryInputs()
         }
     }
 
-    /**
-     * Calls itself recursively within a react() call, if more input values are still needed.
-     * Once all required inputs are available (received as messages), the operator's body is run.
-     */
-    final void handleValueMessage(Map values, count) {
-        if (values.size() < count) {
-            react {
-                values[it.attachment] = it.result
-                handleValueMessage(values, count)
-            }
-        } else {
-            def results = values.sort {it.key}.values() as List
-            startTask(results)
-        }
+    final void afterStart() {
+        queryInputs()
+    }
+
+    private def queryInputs() {
+        return inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
     }
 
     def startTask(results) {
@@ -180,7 +182,7 @@ private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
 
     def ForkingDataFlowOperatorActor(owningOperator, outputs, inputs, code, maxForks) {
         super(owningOperator, outputs, inputs, code)
-        this.semaphore = new Semaphore(5)
+        this.semaphore = new Semaphore(maxForks)
     }
 
     def startTask(results) {

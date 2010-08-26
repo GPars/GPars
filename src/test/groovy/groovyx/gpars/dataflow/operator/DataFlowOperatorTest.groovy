@@ -16,10 +16,10 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.dataflow.DataFlow.operator
 
 /**
@@ -106,6 +106,32 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         op.stop()
     }
 
+    public void testSimpleOperators() {
+        final DefaultPGroup group = new DefaultPGroup(1)
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        a << 1
+        a << 2
+        a << 3
+        a << 4
+        a << 5
+
+        def op1 = group.operator(inputs: [a], outputs: [b]) {v ->
+            bindOutput 2 * v
+        }
+
+        def op2 = group.operator(inputs: [b], outputs: [c]) {v ->
+            bindOutput v + 1
+        }
+        assertEquals 3, c.val
+        assertEquals 5, c.val
+        assertEquals 7, c.val
+        assertEquals 9, c.val
+        assertEquals 11, c.val
+        [op1, op2]*.stop()
+    }
+
     public void testCombinedOperators() {
         final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
@@ -179,12 +205,14 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
-        def op1 = group.operator(inputs: [], outputs: [b]) {->
-            flag = true
-            stop()
+        shouldFail(IllegalArgumentException) {
+            def op1 = group.operator(inputs: [], outputs: [b]) {->
+                flag = true
+                stop()
+            }
+            op1.join()
         }
-        op1.join()
-        assert flag
+        assert !flag
     }
 
     public void testOutputs() {
