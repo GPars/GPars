@@ -1,6 +1,7 @@
 The actor support in gpars were inspired by the Actors library in Scala but have meanwhile gone beyond that.
 
-Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state. Actors can help developers avoid issues like deadlocks, live-locks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
+Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state.
+Actors can help developers avoid issues like deadlocks, live-locks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
 A nice wrap-up of the key "concepts behind actors":http://ruben.savanne.be/articles/concurrency-in-erlang-scala was written recently by Ruben Vermeersch.
 Actors guarantee that always *at most one thread processes the actor's body* at a time and also under the covers the memory gets synchronized
 each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
@@ -242,19 +243,24 @@ actor {
 }
 {code}
 
-Here's an example of an actor that waits for up to 30 seconds to receive a message, prints it out and terminates.
+Here's an example of an actor that waits for up to 30 seconds to receive a reply to its message.
 
 {code}
 import static groovyx.gpars.actor.Actors.*
 
 def me = actor {
-    delegate.metaClass.onTimeout = {-> friend.send('I see, busy as usual. Never mind.')}
-
     friend.send('Hi')
-    react(30.seconds) {
-        //continue conversation
+    react(30.seconds) {msg ->
+        if (msg == Actor.TIMEOUT) {
+            friend.send('I see, busy as usual. Never mind.')
+            stop()
+        } else {
+            //continue conversation
+        }
     }
 }
+
+me.join()
 {code}
 
 h2. Undelivered messages
