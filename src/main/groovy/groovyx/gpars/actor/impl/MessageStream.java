@@ -257,7 +257,7 @@ public abstract class MessageStream extends WithSerialId {
         }
     }
 
-    public static class SendTo<T> extends SerialMsg {
+    public static class SendTo extends SerialMsg {
         private static final long serialVersionUID = 1989120447646342520L;
         private final MessageStream to;
         private final ActorMessage message;
