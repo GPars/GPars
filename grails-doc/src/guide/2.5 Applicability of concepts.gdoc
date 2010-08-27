@@ -1,0 +1,22 @@
+Here you could find basic guide-lines helping you decide on which GPars abstraction to apply to your code at hands.
+
+ # You're looking at a collection, which needs to be *iterated* or processed using one of the many beautiful Groovy collections method, like _each()_ , _collect()_ , _find()_ and such. Proposing that processing each element of the collection is independent of the other items, using GPars *parallel collections* can be recommended.
+
+ # If you have a *long-lasting calculation* , which may safely run in the background, use the *asynchronous invocation support* in GPars. You can also benefit, if your long-calculating closures need to be passed around and yet you'd like them not to block the main application thread.
+
+ # You need to *parallelize* an algorithm at hand. You can identify *sub-tasks* and you're happy to explicitly express the options for parallelization. You create internally sequential tasks, each of which can run concurrently with the others, providing they all have a way to exchange data at some well-defined moments through communication channels with safe semantics. Use GPars *dataflow tasks, variables and streams*.
+
+ # You can't avoid *shared mutable state*. Multiple threads will be accessing shared data and (some of them) modifying the data. Traditional locking and synchronized approach feels too risky or unfamiliar. Go for *agents*, which will wrap your data and serialize all access to it.
+
+ # You're building a system with high concurrency demands. Tweaking a data structure here or task there won't cut it. You need to build the architecture from the ground up with concurrency in mind. *Message-passing* might be the way to go.
+
+ ## *Groovy CSP* will give you highly deterministic and composable model for concurrent processes.
+
+ ## If you're trying to solve a complex data-processing problem, consider GPars *dataflow operator* to build a data flow network.
+
+ ## *Actors* will shine if you need to build a general-purpose, highly concurrent and scalable architecture.
+
+ Now you may have a better idea of what concepts to use on your current project. Go and check out more details on them in the User Guide.
+ 
+
+
