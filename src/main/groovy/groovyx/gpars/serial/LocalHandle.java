@@ -32,7 +32,7 @@ public final class LocalHandle implements Serializable {
     }
 
     @SuppressWarnings({"UnusedDeclaration", "ProtectedMemberInFinalClass"})
-    protected Object readResolve() throws ObjectStreamException {
+    protected Object readResolve() {
         return SerialContext.get().get(id).get();
     }
 

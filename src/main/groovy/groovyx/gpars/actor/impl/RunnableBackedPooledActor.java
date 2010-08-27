@@ -60,6 +60,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         }
     }
 
+    @SuppressWarnings ( "rawtypes" )
     @Override
     protected void act() {
         if (action != null) {

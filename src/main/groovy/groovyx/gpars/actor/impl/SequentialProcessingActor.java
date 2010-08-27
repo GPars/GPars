@@ -616,6 +616,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             return 1;
         }
 
+        @SuppressWarnings ( "rawtypes" )
         @Override
         public Class[] getParameterTypes() {
             return new Class[]{Object.class};
@@ -845,6 +846,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
         loopCondition = condition;
         loopCode = new Runnable() {
+            @SuppressWarnings ( "rawtypes" )
             public void run() {
                 getSenders().clear();
                 obj2Sender.clear();

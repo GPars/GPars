@@ -127,6 +127,7 @@ public class LocalHost extends SerialHandles {
         LocalHostRegistry.removeLocalHost(this);
     }
 
+    @Override
     public SerialContext getSerialHost(final UUID hostId, final Object conn) {
         final RemoteConnection connection = (RemoteConnection) conn;
         synchronized (remoteHosts) {

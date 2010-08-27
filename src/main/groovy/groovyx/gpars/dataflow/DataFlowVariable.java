@@ -68,7 +68,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
     }
 
     @Override
-    @SuppressWarnings ( "unchecked" )
+    @SuppressWarnings ( { "unchecked" , "rawtypes" } )
     public Class<RemoteDataFlowVariable> getRemoteClass() {
         return RemoteDataFlowVariable.class;
     }

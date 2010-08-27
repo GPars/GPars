@@ -58,12 +58,14 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * Updater for the state field
      */
+    @SuppressWarnings ( "rawtypes" )
     protected static final AtomicIntegerFieldUpdater<DataFlowExpression> stateUpdater
             = AtomicIntegerFieldUpdater.newUpdater(DataFlowExpression.class, "state");
 
     /**
      * Updater for the waiting field
      */
+    @SuppressWarnings ( "rawtypes" )
     protected static final AtomicReferenceFieldUpdater<DataFlowExpression, WaitingThread> waitingUpdater
             = AtomicReferenceFieldUpdater.newUpdater(DataFlowExpression.class, WaitingThread.class, "waiting");
 
@@ -615,6 +617,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      */
     public static class BindDataFlow extends SerialMsg {
         private static final long serialVersionUID = -8674023870562062769L;
+        @SuppressWarnings ( "rawtypes" )
         private final DataFlowExpression expr;
         private final Object message;
         /**
@@ -622,7 +625,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
          * @param message The actual value to bind
          * @param hostId  The identification of the host to send the bind information to
          */
-        public BindDataFlow(final DataFlowExpression expr, final Object message, final UUID hostId) {
+        public BindDataFlow(@SuppressWarnings ( "rawtypes" ) final DataFlowExpression expr, final Object message, final UUID hostId) {
             super(hostId);
             this.expr = expr;
             this.message = message;

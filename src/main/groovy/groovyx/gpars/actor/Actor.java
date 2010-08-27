@@ -266,6 +266,7 @@ public abstract class Actor extends ReplyingMessageStream {
 
     protected abstract boolean hasBeenStopped();
 
+    @SuppressWarnings ( "rawtypes" )
     protected final void runEnhancedWithReplies(final ActorMessage message, final Closure code) {
         assert message != null;
 
@@ -282,6 +283,7 @@ public abstract class Actor extends ReplyingMessageStream {
         return new MyRemoteHandle(handle, host, joinLatch);
     }
 
+    @SuppressWarnings ( "unchecked" )
     protected void handleStart() {
         final Object list = InvokerHelper.invokeMethod(this, RESPONDS_TO, new Object[]{AFTER_START});
         if (list != null && !((Collection<Object>) list).isEmpty()) {
@@ -354,6 +356,7 @@ public abstract class Actor extends ReplyingMessageStream {
      *
      * @return The messages stored in the queue
      */
+    @SuppressWarnings ( "unchecked" )
     final List<ActorMessage> sweepQueue() {
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
 

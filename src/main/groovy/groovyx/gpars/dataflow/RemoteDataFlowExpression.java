@@ -33,6 +33,7 @@ public class RemoteDataFlowExpression<T> extends DataFlowExpression<T> implement
         getValAsync(new MessageStream() {
             private static final long serialVersionUID = -8868544599311892034L;
 
+            @Override
             public MessageStream send(final Object message) {
                 remoteHost.write(new BindDataFlow(RemoteDataFlowExpression.this, message, remoteHost.getHostId()));
                 return this;
@@ -40,10 +41,12 @@ public class RemoteDataFlowExpression<T> extends DataFlowExpression<T> implement
         });
     }
 
+    @Override
     protected T evaluate() {
         return value;
     }
 
+    @Override
     protected void subscribe(final DataFlowExpression<T>.DataFlowExpressionsCollector listener) {
         listener.subscribe(this);
     }

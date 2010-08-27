@@ -38,7 +38,7 @@ public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
     }
 
     @Override
-    protected boolean removeEldestEntry(final Map.Entry eldest) {
+    protected boolean removeEldestEntry(@SuppressWarnings ( "rawtypes" ) final Map.Entry eldest) {
         return size() > maxSize;
     }
 
