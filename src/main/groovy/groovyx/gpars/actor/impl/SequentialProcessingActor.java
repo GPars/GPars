@@ -66,6 +66,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Stored incoming messages. The most recently received message is in the head of the list.
      */
+    @SuppressWarnings({"UnusedDeclaration"})
+    //modified through inputQueryUpdater
     private volatile Node inputQueue;
 
     /**
@@ -79,6 +81,8 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Counter of messages in the queues
      */
+    @SuppressWarnings({"UnusedDeclaration"})
+    //modified through countUpdater
     private volatile int count;
 
     private static final AtomicReferenceFieldUpdater<SequentialProcessingActor, Node> inputQueueUpdater = AtomicReferenceFieldUpdater.newUpdater(SequentialProcessingActor.class, Node.class, "inputQueue");
@@ -616,7 +620,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
             return 1;
         }
 
-        @SuppressWarnings ( "rawtypes" )
+        @SuppressWarnings("rawtypes")
         @Override
         public Class[] getParameterTypes() {
             return new Class[]{Object.class};
@@ -846,7 +850,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
         loopCondition = condition;
         loopCode = new Runnable() {
-            @SuppressWarnings ( "rawtypes" )
+            @SuppressWarnings("rawtypes")
             public void run() {
                 getSenders().clear();
                 obj2Sender.clear();

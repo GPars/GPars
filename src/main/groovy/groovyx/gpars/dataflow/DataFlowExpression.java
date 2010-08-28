@@ -58,14 +58,14 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * Updater for the state field
      */
-    @SuppressWarnings ( "rawtypes" )
+    @SuppressWarnings("rawtypes")
     protected static final AtomicIntegerFieldUpdater<DataFlowExpression> stateUpdater
             = AtomicIntegerFieldUpdater.newUpdater(DataFlowExpression.class, "state");
 
     /**
      * Updater for the waiting field
      */
-    @SuppressWarnings ( "rawtypes" )
+    @SuppressWarnings("rawtypes")
     protected static final AtomicReferenceFieldUpdater<DataFlowExpression, WaitingThread> waitingUpdater
             = AtomicReferenceFieldUpdater.newUpdater(DataFlowExpression.class, WaitingThread.class, "waiting");
 
@@ -83,11 +83,13 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * Holds the current state of the variable
      */
-    protected volatile int state;
+    protected volatile int state;  //modified through stateUpdater
 
     /**
      * Points to the head of the chain of requests waiting for a value to be bound
      */
+    @SuppressWarnings({"UnusedDeclaration"})
+    //modified through stateUpdater
     private volatile WaitingThread waiting;
 
     /**
@@ -370,11 +372,11 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param hostId The local host id
      */
-        private void notifyRemote(final UUID hostId) {
+    private void notifyRemote(final UUID hostId) {
         if (serialHandle != null) {
-          Actors.defaultActorPGroup.getThreadPool().execute(new Runnable() {
-            @SuppressWarnings ( "unchecked" )
-            public void run() {
+            Actors.defaultActorPGroup.getThreadPool().execute(new Runnable() {
+                @SuppressWarnings("unchecked")
+                public void run() {
                     final Object sub = serialHandle.getSubscribers();
                     if (sub instanceof RemoteHost) {
                         final RemoteHost host = (RemoteHost) sub;
@@ -581,7 +583,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
 
         @Override
-        @SuppressWarnings ( "unchecked" )
+        @SuppressWarnings("unchecked")
         protected V evaluate() {
             return (V) closure.call(arg instanceof DataFlowExpression<?> ? ((DataFlowExpression<?>) arg).value : arg);
         }
@@ -603,7 +605,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
 
         @Override
-        @SuppressWarnings ( "unchecked" )
+        @SuppressWarnings("unchecked")
         protected V evaluate() {
             super.evaluate();
             return (V) closure.call(args);
@@ -617,26 +619,28 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      */
     public static class BindDataFlow extends SerialMsg {
         private static final long serialVersionUID = -8674023870562062769L;
-        @SuppressWarnings ( "rawtypes" )
+        @SuppressWarnings("rawtypes")
         private final DataFlowExpression expr;
         private final Object message;
+
         /**
          * @param expr    The local DataFlowExpression instance
          * @param message The actual value to bind
          * @param hostId  The identification of the host to send the bind information to
          */
-        public BindDataFlow(@SuppressWarnings ( "rawtypes" ) final DataFlowExpression expr, final Object message, final UUID hostId) {
+        public BindDataFlow(@SuppressWarnings("rawtypes") final DataFlowExpression expr, final Object message, final UUID hostId) {
             super(hostId);
             this.expr = expr;
             this.message = message;
         }
+
         /**
          * Performs the actual bind on the remote host
          *
          * @param conn The connection object
          */
         @Override
-        @SuppressWarnings ( "unchecked" )
+        @SuppressWarnings("unchecked")
         public void execute(final RemoteConnection conn) {
             expr.doBindRemote(hostId, message);
         }
