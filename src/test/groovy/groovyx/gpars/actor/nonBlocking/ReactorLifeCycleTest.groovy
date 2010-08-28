@@ -156,7 +156,7 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
 
         final Actor actor = new NonDaemonPGroup(1).reactor {
             barrier.await()
-            Thread.sleep 10000
+            Thread.sleep 30000
             counter.set 10
             10
         }
@@ -194,7 +194,7 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
         actor.stop()
         latch.await()
         assertEquals 1, counter.intValue()
-        assertFalse actor.isActive()
+        assertFalse actor.hasBeenStopped()
     }
 
     public void testStopWithoutMessageSent() {

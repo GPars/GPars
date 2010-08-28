@@ -165,7 +165,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         final Actor actor = new NonDaemonPGroup(1).messageHandler {
             when {message ->
                 barrier.await()
-                Thread.sleep 10000
+                Thread.sleep 30000
                 counter.set 10
                 10
             }
@@ -206,7 +206,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         actor.stop()
         latch.await()
         assertEquals 1, counter.intValue()
-        assertFalse actor.isActive()
+        assert actor.hasBeenStopped()
     }
 
     public void testStopWithoutMessageSent() {
