@@ -25,6 +25,7 @@ import java.util.concurrent.ThreadFactory;
  *         Date: 13.4.2010
  */
 final class AgentThreadFactory implements ThreadFactory {
+    @Override
     public Thread newThread(final Runnable r) {
         final Thread thread = new Thread(r);
         thread.setDaemon(true);

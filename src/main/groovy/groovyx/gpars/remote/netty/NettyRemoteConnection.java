@@ -60,10 +60,12 @@ public class NettyRemoteConnection extends RemoteConnection {
         private static final long serialVersionUID = -3054880716233778157L;
         public volatile NettyHandler handler;
 
+        @Override
         public void operationComplete(final ChannelFuture future) throws Exception {
             if (decrementAndGet() == 0 && handler != null) {
                 final CountDownLatch cdl = new CountDownLatch(1);
                 handler.getChannel().close().addListener(new ChannelFutureListener() {
+                    @Override
                     @SuppressWarnings({"AnonymousClassVariableHidesContainingMethodVariable"})
                     public void operationComplete(final ChannelFuture future) throws Exception {
                         cdl.countDown();

@@ -54,6 +54,7 @@ public final class Scheduler implements Pool {
         }
     }
 
+    @Override
     public void execute(final Runnable task) {
         if (terminating) {
             throw new RuntimeException("Scheduler is shutting down");
@@ -71,6 +72,7 @@ public final class Scheduler implements Pool {
 
     public Runnable loop(final Runnable operation) {
         return new Runnable() {
+            @Override
             public void run() {
                 operation.run();
                 if (!terminating) {
@@ -85,14 +87,17 @@ public final class Scheduler implements Pool {
         new WorkerThread().start();
     }
 
+    @Override
     public void resize(final int poolSize) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void resetDefaultSize() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     @SuppressWarnings({"ObjectAllocationInLoop"})
     public void shutdown() {
         terminating = true;
@@ -100,6 +105,7 @@ public final class Scheduler implements Pool {
         for (int i = 0; i != count; ++i) {
             try {
                 queue.put(new Runnable() {
+                    @Override
                     public void run() {
                         throw Scheduler.TERMINATE;
                     }

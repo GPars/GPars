@@ -52,7 +52,8 @@ public final class ResizeableFJPool extends FJPool {
      *
      * @param task The task to schedule
      */
-    @Override public void execute(final Runnable task) {
+    @Override
+    public void execute(final Runnable task) {
         synchronized (lock) {
             final int currentPoolSize = pool.getPoolSize();
             final int submissionCount = pool.getActiveSubmissionCount();
@@ -66,6 +67,7 @@ public final class ResizeableFJPool extends FJPool {
             }
         }
         super.execute(new Runnable() {
+            @Override
             public void run() {
                 task.run();
                 synchronized (ResizeableFJPool.this.lock) {

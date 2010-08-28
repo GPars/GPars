@@ -66,10 +66,12 @@ public final class ResizeablePool extends DefaultPool {
     private static ThreadPoolExecutor createResizeablePool(final boolean daemon, final int poolSize) {
         assert poolSize > 0;
         return new ThreadPoolExecutor(poolSize, 1000, ResizeablePool.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
+            @Override
             public Thread newThread(final Runnable r) {
                 final Thread thread = new Thread(r, DefaultPool.createThreadName());
                 thread.setDaemon(daemon);
                 thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @Override
                     public void uncaughtException(final Thread t, final Throwable e) {
                         System.err.println();
                         e.printStackTrace(System.err);
@@ -78,6 +80,7 @@ public final class ResizeablePool extends DefaultPool {
                 return thread;
             }
         }, new RejectedExecutionHandler() {
+            @Override
             public void rejectedExecution(final Runnable r, final ThreadPoolExecutor executor) {
                 final int currentPoolSize = executor.getPoolSize();
                 final int maximumPoolSize = executor.getMaximumPoolSize();

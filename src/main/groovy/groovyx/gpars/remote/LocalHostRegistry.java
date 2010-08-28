@@ -42,6 +42,7 @@ public class LocalHostRegistry {
     public static synchronized void disconnect(final LocalNode node) {
         for (final LocalHost transportProvider : LocalHostRegistry.localHosts) {
             node.getScheduler().execute(new Runnable() {
+                @Override
                 public void run() {
                     transportProvider.disconnect(node);
                 }

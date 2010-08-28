@@ -70,10 +70,12 @@ public class LocalNode {
                 new ThreadFactory() {
                     ThreadFactory threadFactory = Executors.defaultThreadFactory();
 
+                    @Override
                     public Thread newThread(final Runnable r) {
                         final Thread thread = threadFactory.newThread(r);
                         thread.setDaemon(true);
                         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                            @Override
                             public void uncaughtException(final Thread t, final Throwable e) {
                                 System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                                 e.printStackTrace(System.err);
@@ -111,6 +113,7 @@ public class LocalNode {
 
     public void connect(final LocalHost provider) {
         scheduler.execute(new Runnable() {
+            @Override
             public void run() {
                 provider.connect(LocalNode.this);
             }
@@ -126,6 +129,7 @@ public class LocalNode {
             LocalHostRegistry.disconnect(this);
         } else {
             scheduler.execute(new Runnable() {
+                @Override
                 public void run() {
                     localHost.disconnect(LocalNode.this);
                 }
@@ -148,6 +152,7 @@ public class LocalNode {
     public void onConnect(final RemoteNode node) {
         for (final RemoteNodeDiscoveryListener listener : listeners) {
             scheduler.execute(new Runnable() {
+                @Override
                 public void run() {
                     listener.onConnect(node);
                 }
@@ -158,6 +163,7 @@ public class LocalNode {
     public void onDisconnect(final RemoteNode node) {
         for (final RemoteNodeDiscoveryListener listener : listeners) {
             scheduler.execute(new Runnable() {
+                @Override
                 public void run() {
                     listener.onDisconnect(node);
                 }

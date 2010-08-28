@@ -133,6 +133,7 @@ public class NettyTransportProvider extends LocalHost {
         public void stop() {
             final CountDownLatch latch = new CountDownLatch(1);
             channel.close().addListener(new ChannelFutureListener() {
+                @Override
                 public void operationComplete(final ChannelFuture future) throws Exception {
                     bootstrap.getFactory().releaseExternalResources();
                     latch.countDown();
@@ -174,6 +175,7 @@ public class NettyTransportProvider extends LocalHost {
 
         public void stop() {
             channelFuture.getChannel().close().addListener(new ChannelFutureListener() {
+                @Override
                 public void operationComplete(final ChannelFuture future) throws Exception {
                     factory.releaseExternalResources();
                 }
@@ -188,6 +190,7 @@ public class NettyTransportProvider extends LocalHost {
             this.provider = provider;
         }
 
+        @Override
         public ChannelPipeline getPipeline() throws Exception {
             final ChannelPipeline pipeline = Channels.pipeline();
             pipeline.addLast("handler", new NettyHandler(provider));
@@ -217,10 +220,12 @@ public class NettyTransportProvider extends LocalHost {
     private static class MyThreadFactory implements ThreadFactory {
         static MyThreadFactory instance = new MyThreadFactory();
 
+        @Override
         public Thread newThread(final Runnable r) {
             final Thread thread = new Thread(r);
             thread.setDaemon(true);
             thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
                 public void uncaughtException(final Thread t, final Throwable e) {
                     e.printStackTrace();
                 }

@@ -117,6 +117,7 @@ public abstract class AsyncMessagingCore implements Runnable {
     /**
      * Handles a single message from the message queue
      */
+    @Override
     @SuppressWarnings({"CatchGenericClass", "ThrowCaughtLocally"})
     public final void run() {
         try {

@@ -652,6 +652,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    @Override
     @SuppressWarnings({"ThrowCaughtLocally", "OverlyLongMethod"})
     public void run() {
         boolean shouldTerminate = false;
@@ -770,6 +771,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         loop(new Callable<Boolean>() {
             private int counter = 0;
 
+            @Override
             public Boolean call() {
                 counter++;
                 //noinspection UnnecessaryBoxing
@@ -790,6 +792,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         loop(new Callable<Boolean>() {
             private int counter = 0;
 
+            @Override
             public Boolean call() {
                 counter++;
                 //noinspection UnnecessaryBoxing
@@ -807,6 +810,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     protected final void loop(final Closure condition, final Runnable code) {
         loop(new Callable<Boolean>() {
+            @Override
             public Boolean call() {
                 return (Boolean) condition.call();
             }
@@ -824,6 +828,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      */
     protected final void loop(final Closure condition, final Closure afterLoopCode, final Runnable code) {
         loop(new Callable<Boolean>() {
+            @Override
             public Boolean call() {
                 return (Boolean) condition.call();
             }
@@ -850,6 +855,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
         loopCondition = condition;
         loopCode = new Runnable() {
+            @Override
             @SuppressWarnings("rawtypes")
             public void run() {
                 getSenders().clear();

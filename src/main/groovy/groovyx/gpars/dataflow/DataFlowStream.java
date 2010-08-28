@@ -242,10 +242,12 @@ public final class DataFlowStream<T> {
         final Iterator<DataFlowVariable<T>> iterator = queue.iterator();
         return new Iterator<T>() {
 
+            @Override
             public boolean hasNext() {
                 return iterator.hasNext();
             }
 
+            @Override
             public T next() {
                 try {
                     return iterator.next().getVal();
@@ -254,6 +256,7 @@ public final class DataFlowStream<T> {
                 }
             }
 
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException("Remove not available");
             }
