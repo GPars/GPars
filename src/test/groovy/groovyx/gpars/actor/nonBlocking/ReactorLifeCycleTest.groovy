@@ -194,7 +194,7 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
         actor.stop()
         latch.await()
         assertEquals 1, counter.intValue()
-        assertFalse actor.hasBeenStopped()
+        assert actor.hasBeenStopped()
     }
 
     public void testStopWithoutMessageSent() {
