@@ -28,7 +28,7 @@ public class SpeculationTest extends GroovyTestCase {
 
     def alternatives = [
             {
-                Thread.sleep 10000
+                Thread.sleep 30000
                 neverReachedFlag.set(true)
                 10
             },
