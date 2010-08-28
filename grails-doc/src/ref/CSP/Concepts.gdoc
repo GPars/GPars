@@ -1,0 +1,13 @@
+h3. Concepts
+
+h4. GroovyCSP
+
+The CSP (Communicating Sequential Processes) concurrency concept provides a message-passing model with synchronous rendezvous-type
+communication. It is valued mainly for its high level of determinism and the ability to compose parallel processes.
+GPars' GroovyCSP wraps the "JCSP library":http://www.cs.kent.ac.uk/projects/ofa/jcsp/ and builds on the work of
+"Jon Kerridge":http://www.iidi.napier.ac.uk/people/op/onepeople/peopleid/51 .
+For more information about the CSP concurrency model, checkout the CSP section of the User Guide or refer to the links below:
+
+ * "CSP definition":http://en.wikipedia.org/wiki/Communicating_sequential_processes
+ * "Google's Go programming language with CSP-style concurrency":http://golang.org/
+
