@@ -60,7 +60,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         }
     }
 
-    @SuppressWarnings ( "rawtypes" )
+    @SuppressWarnings("rawtypes")
     @Override
     protected void act() {
         if (action != null) {
@@ -86,28 +86,28 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
             try {
                 return InvokerHelper.invokeMethod(first, name, args);
             }
-            catch (MissingMethodException mme) {
+            catch (MissingMethodException ignore) {
                 return InvokerHelper.invokeMethod(second, name, args);
             }
         }
 
         @Override
-        public Object getProperty(final String propertyName) {
+        public Object getProperty(final String property) {
             try {
-                return InvokerHelper.getProperty(first, propertyName);
+                return InvokerHelper.getProperty(first, property);
             }
-            catch (MissingPropertyException mpe) {
-                return InvokerHelper.getProperty(second, propertyName);
+            catch (MissingPropertyException ignore) {
+                return InvokerHelper.getProperty(second, property);
             }
         }
 
         @Override
-        public void setProperty(final String propertyName, final Object newValue) {
+        public void setProperty(final String property, final Object newValue) {
             try {
-                InvokerHelper.setProperty(first, propertyName, newValue);
+                InvokerHelper.setProperty(first, property, newValue);
             }
-            catch (MissingPropertyException mpe) {
-                InvokerHelper.setProperty(second, propertyName, newValue);
+            catch (MissingPropertyException ignore) {
+                InvokerHelper.setProperty(second, property, newValue);
             }
         }
     }

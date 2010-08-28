@@ -29,13 +29,13 @@ public abstract class RemoteConnection {
 
     private RemoteHost host;
 
-    public RemoteConnection(final LocalHost provider) {
+    protected RemoteConnection(final LocalHost provider) {
         this.localHost = provider;
     }
 
     public void onMessage(final SerialMsg msg) {
         if (host == null) {
-            final HostIdMsg idMsg = (HostIdMsg) msg;
+            final SerialMsg idMsg = (HostIdMsg) msg;
             host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
         } else {
             throw new IllegalStateException("Unexpected message: " + msg);

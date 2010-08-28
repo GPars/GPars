@@ -1189,7 +1189,7 @@
         <inspection_tool class="GroovyMapPutCanBeKeyedAccess" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyMethodWithMoreThanThreeNegations" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyMultipleReturnPointsPerMethod" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_limit" value="1" />
+          <option name="m_limit" value="3" />
         </inspection_tool>
         <inspection_tool class="GroovyNegatedConditional" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyNegatedIf" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1390,7 +1390,6 @@
         <inspection_tool class="MethodOverridesPrivateMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MethodOverridesStaticMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MethodReturnAlwaysConstant" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="MethodWithMultipleLoops" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MimeType" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="MinMaxValuesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MisorderedAssertEqualsParameters" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1635,12 +1634,6 @@
         <inspection_tool class="StaticVariableInitialization" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignorePrimitives" value="false" />
         </inspection_tool>
-        <inspection_tool class="StaticVariableNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="checkMutableFinals" value="false" />
-          <option name="m_regex" value="s_[a-z][A-Za-z\d]*" />
-          <option name="m_minLength" value="5" />
-          <option name="m_maxLength" value="32" />
-        </inspection_tool>
         <inspection_tool class="StaticVariableUninitializedUse" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignorePrimitives" value="false" />
         </inspection_tool>
@@ -1747,7 +1740,6 @@
           <option name="m_maxLength" value="1" />
         </inspection_tool>
         <inspection_tool class="UnaryPlus" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="UncheckedExceptionClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnconditionalWait" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnconstructableTestCase" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UndeclaredTests" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -4565,6 +4557,7 @@
         <w>chans</w>
         <w>classpathentry</w>
         <w>cobertura</w>
+        <w>composable</w>
         <w>conv</w>
         <w>csize</w>
         <w>dest</w>
@@ -4593,6 +4586,7 @@
         <w>parallelization</w>
         <w>pilsner</w>
         <w>protobuf</w>
+        <w>rawtypes</w>
         <w>regex</w>
         <w>restarter</w>
         <w>spockframework</w>

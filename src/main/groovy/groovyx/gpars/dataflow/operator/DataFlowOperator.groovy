@@ -49,17 +49,25 @@ public final class DataFlowOperator {
      */
     private def DataFlowOperator(final Map channels, final Closure code) {
         final int parameters = code.maximumNumberOfParameters
-        if (!channels || (channels.inputs == null) || (parameters != channels.inputs.size()))
+        if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
         if (channels.inputs.size() == 0) throw new IllegalArgumentException("The operator body must take some inputs. The provided list of input channels is empty.")
 
         code.delegate = this
-        if (channels.maxForks != null && channels.maxForks != 1) {
+        if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
             this.actor = new ForkingDataFlowOperatorActor(this, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
         } else {
             this.actor = new DataFlowOperatorActor(this, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
         }
+    }
+
+    private boolean shouldBeMultiThreaded(Map channels) {
+        return channels.maxForks != null && channels.maxForks != 1
+    }
+
+    private boolean verifyChannelParameters(Map channels, int parameters) {
+        return !channels || (channels.inputs == null) || (parameters != channels.inputs.size())
     }
 
     /**

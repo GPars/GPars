@@ -23,7 +23,7 @@ public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T>
     protected Object[] args;
 
     protected DataFlowComplexExpression(final Object... elements) {
-        this.args = elements;
+        this.args = elements.clone();
     }
 
     @Override

@@ -29,7 +29,7 @@ import java.util.Map;
  *         Date: Jun 22, 2010
  */
 public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
-  private static final long serialVersionUID = 1L ;
+    private static final long serialVersionUID = 1L;
 
     private final int maxSize;
 
@@ -38,7 +38,7 @@ public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
     }
 
     @Override
-    protected boolean removeEldestEntry(@SuppressWarnings ( "rawtypes" ) final Map.Entry eldest) {
+    protected boolean removeEldestEntry(@SuppressWarnings("rawtypes") final Map.Entry eldest) {
         return size() > maxSize;
     }
 
@@ -53,4 +53,15 @@ public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
         remove(key);
         put(key, value);
     }
+
+    /**
+     * Performs shallor clone
+     *
+     * @return The cloned instance
+     */
+    @Override
+    public Object clone() {
+        return (LRUProtectionStorage) super.clone();
+    }
+
 }

@@ -37,7 +37,7 @@ class ForkJoinTest extends GroovyTestCase {
         withPool(1) {
             final TestSortWorker worker = new TestSortWorker(numbers)
             assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), runForkJoin(worker).toArray())
-            assert [] == worker.getChildrenResults()
+            assert [] == worker.childrenResults
         }
     }
 
@@ -50,22 +50,22 @@ class ForkJoinTest extends GroovyTestCase {
                 runForkJoin(worker)
             }
         }
-        assert [] == worker.getChildrenResults()
+        assert [] == worker.childrenResults
     }
 
     public void testChildrenCollection() {
         TestSortWorker worker = new TestSortWorker([] as List<Integer>)
-        assert [] == worker.getChildrenResults()
+        assert [] == worker.childrenResults
         assert [] == worker.compute()
-        assert [] == worker.getChildrenResults()
+        assert [] == worker.childrenResults
 
         worker = new TestSortWorker([1, 2, 3, 4, 5] as List<Integer>)
-        assert [] == worker.getChildrenResults()
+        assert [] == worker.childrenResults
     }
 }
 
 public final class TestSortWorker extends AbstractForkJoinWorker<List<Integer>> {
-    private final List numbers
+    private final List<Integer> numbers
 
     def TestSortWorker(final List<Integer> numbers) {
         this.numbers = numbers.asImmutable()

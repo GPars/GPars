@@ -16,7 +16,6 @@
 
 package groovyx.gpars.serial;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.UUID;
 

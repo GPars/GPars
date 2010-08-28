@@ -59,7 +59,7 @@ def mainNode = new LocalNode(transport, {
             node.mainActor << [command: "print", line: welcome, id: id]
 
             // let us remember who we connected with
-            connected.put(node.id, node)
+            connected[node.id] = node
         }
         else {
             // disconnected, so log and forget it

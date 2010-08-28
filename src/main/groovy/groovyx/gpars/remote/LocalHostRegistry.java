@@ -25,9 +25,13 @@ import java.util.Set;
  *
  * @author Alex Tkachman
  */
+@SuppressWarnings({"UtilityClass"})
 public class LocalHostRegistry {
     public static final Set<LocalHost> localHosts
             = Collections.synchronizedSet(new HashSet<LocalHost>());
+
+    private LocalHostRegistry() {
+    }
 
     public static synchronized void connect(final LocalNode node) {
         for (final LocalHost transportProvider : LocalHostRegistry.localHosts) {

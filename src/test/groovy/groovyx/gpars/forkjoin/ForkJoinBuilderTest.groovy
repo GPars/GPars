@@ -83,7 +83,7 @@ class ForkJoinBuilderTest extends GroovyTestCase {
         withPool(1) {
             final TestSortWorker worker = new TestSortWorker(numbers)
             assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), runForkJoin(numbers, mergeSortCode).toArray())
-            assert [] == worker.getChildrenResults()
+            assert [] == worker.childrenResults
         }
     }
 

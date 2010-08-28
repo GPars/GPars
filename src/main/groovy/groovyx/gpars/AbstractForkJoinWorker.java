@@ -70,7 +70,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
      *
      * @return A list of results returned from the child tasks
      */
-    protected final List<T> getChildrenResults() {
+    public final List<T> getChildrenResults() {
         if (children == null) return Collections.emptyList();
         final List<T> results = new ArrayList<T>(children.size());
         for (final AbstractForkJoinWorker<T> worker : children) {

@@ -31,24 +31,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class Scheduler implements Pool {
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 
-    AtomicInteger threadCount = new AtomicInteger();
+    private final AtomicInteger threadCount = new AtomicInteger();
 
-    volatile long lastTaskPoke = -10L;
+    private volatile long lastTaskPoke = -POKE_INTERVAL;
 
-    volatile long schedulerTime;
+    private volatile long schedulerTime;
 
-    volatile boolean terminating;
-
-    private final int coreSize;
+    private volatile boolean terminating;
 
     static final RuntimeException TERMINATE = new RuntimeException("terminate");
+    private static final long POKE_INTERVAL = 10L;
 
     public Scheduler() {
         this(0);
     }
 
     public Scheduler(final int coreSize) {
-        this.coreSize = coreSize;
         new WatchdogThread().start();
 
         for (int i = 0; i != coreSize; ++i) {
@@ -122,7 +120,7 @@ public final class Scheduler implements Pool {
             try {
                 try {
                     while (!terminating) {
-                        final Runnable task = queue.poll(10L, TimeUnit.SECONDS);
+                        final Runnable task = queue.poll(POKE_INTERVAL, TimeUnit.SECONDS);
                         if (task == null) {
                             return;
                         }
@@ -148,6 +146,8 @@ public final class Scheduler implements Pool {
     }
 
     private class WatchdogThread extends Thread {
+        private static final long SLEEP_INTERVAL = 50L;
+
         {
             setDaemon(true);
         }
@@ -157,11 +157,11 @@ public final class Scheduler implements Pool {
             while (!terminating) {
                 try {
                     schedulerTime++;
-                    if (schedulerTime > lastTaskPoke + 10L) {
+                    if (schedulerTime > lastTaskPoke + POKE_INTERVAL) {
                         startNewThread();
                     }
-                    Thread.sleep(50L);
-                } catch (InterruptedException e) {
+                    Thread.sleep(SLEEP_INTERVAL);
+                } catch (InterruptedException ignore) {
                     break;
                 }
             }

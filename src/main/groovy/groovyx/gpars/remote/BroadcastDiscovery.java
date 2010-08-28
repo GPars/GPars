@@ -30,7 +30,8 @@ import java.net.UnknownHostException;
 import java.util.UUID;
 
 public class BroadcastDiscovery {
-    private static InetAddress GROUP;
+    @SuppressWarnings({"StaticNonFinalField"})
+    private static InetAddress group;
     private static final int PORT = 4239;
     private static final long MAGIC = 0x23982391L;
     private final UUID uid;
@@ -42,9 +43,9 @@ public class BroadcastDiscovery {
 
     static {
         try {
-            GROUP = InetAddress.getByName("230.0.0.239");
+            group = InetAddress.getByName("230.0.0.239");
         } catch (UnknownHostException ignored) {
-            GROUP = null;
+            group = null;
         }
     }
 
@@ -56,8 +57,7 @@ public class BroadcastDiscovery {
     public void start() {
         try {
             socket = new MulticastSocket(PORT);
-            final InetAddress group = GROUP;
-            socket.joinGroup(group);
+            socket.joinGroup(BroadcastDiscovery.group);
 
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final DataOutputStream stream = new DataOutputStream(out);
@@ -79,11 +79,11 @@ public class BroadcastDiscovery {
                     while (!stopped) {
                         try {
                             Thread.sleep(1000L);
-                        } catch (InterruptedException e) {
+                        } catch (InterruptedException ignore) {
                         }
 
                         try {
-                            final DatagramPacket packet = new DatagramPacket(bytes, bytes.length, GROUP, PORT);
+                            final DatagramPacket packet = new DatagramPacket(bytes, bytes.length, BroadcastDiscovery.group, PORT);
                             socket.send(packet);
                         } catch (IOException e) {
                             e.printStackTrace();

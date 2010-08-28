@@ -113,11 +113,12 @@ public class NettyTransportProvider extends LocalHost {
             return address;
         }
 
+        @SuppressWarnings({"UnnecessaryBoxing"})
         public void start(final NettyTransportProvider provider) {
             pipelineFactory = new ServerPipelineFactory(provider);
             bootstrap.setPipelineFactory(pipelineFactory);
-            bootstrap.setOption("child.tcpNoDelay", true);
-            bootstrap.setOption("child.keepAlive", true);
+            bootstrap.setOption("child.tcpNoDelay", Boolean.valueOf(true));
+            bootstrap.setOption("child.keepAlive", Boolean.valueOf(true));
 
             channel = bootstrap.bind(new InetSocketAddress(0));
             InetAddress inetAddress;
@@ -153,6 +154,7 @@ public class NettyTransportProvider extends LocalHost {
 
         final ChannelFactory factory;
 
+        @SuppressWarnings({"UnnecessaryBoxing"})
         public Client(final NettyTransportProvider provider, final SocketAddress address, final UUID id) {
             this.provider = provider;
             factory = new NioClientSocketChannelFactory(
@@ -164,8 +166,8 @@ public class NettyTransportProvider extends LocalHost {
             final NettyHandler handler = new ClientHandler(this.provider, id);
 
             bootstrap.getPipeline().addLast("handler", handler);
-            bootstrap.setOption("tcpNoDelay", true);
-            bootstrap.setOption("keepAlive", true);
+            bootstrap.setOption("tcpNoDelay", Boolean.valueOf(true));
+            bootstrap.setOption("keepAlive", Boolean.valueOf(true));
 
             channelFuture = bootstrap.connect(address);
         }

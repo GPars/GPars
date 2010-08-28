@@ -58,9 +58,8 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
         }
 
         initialize({msg ->
-            if (msg == null)
-                msg = NullObject.nullObject
-            onMessage msg
+            //noinspection GroovyConditionalCanBeElvis
+            onMessage msg != null ? msg : NullObject.nullObject  //Groovy truth won't let us use Elvis for numbers, strings and collections correctly
         })
     }
 

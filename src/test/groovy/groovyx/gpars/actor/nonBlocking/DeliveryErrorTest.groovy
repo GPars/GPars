@@ -98,7 +98,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
             barrier.await()
             react {
                 barrier.await()
-                if (true) throw new RuntimeException('test')
+                throw new RuntimeException('test')
             }
         }
 

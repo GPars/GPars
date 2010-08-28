@@ -91,7 +91,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
 
             final def a = receive()
             barrier.await()
-            if (true) throw new RuntimeException('test')
+            throw new RuntimeException('test')
         }
 
         def message1 = 1

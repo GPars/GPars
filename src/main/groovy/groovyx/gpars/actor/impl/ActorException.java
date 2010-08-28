@@ -26,8 +26,8 @@ package groovyx.gpars.actor.impl;
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Feb 17, 2009
  */
-public abstract class ActorException extends RuntimeException {
-    private static final long serialVersionUID = 1L ;
+public class ActorException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
 
     public static final ActorException CONTINUE = new ActorContinuationException();
     public static final ActorException TERMINATE = new ActorTerminationException();

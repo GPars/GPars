@@ -652,7 +652,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
-    @SuppressWarnings({"ThrowCaughtLocally"})
+    @SuppressWarnings({"ThrowCaughtLocally", "OverlyLongMethod"})
     public void run() {
         boolean shouldTerminate = false;
         //noinspection OverlyBroadCatchBlock

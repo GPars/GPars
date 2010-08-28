@@ -68,9 +68,9 @@ public class LocalHost extends SerialHandles {
         }
 
         synchronized (remoteNodes) {
-            for (final RemoteNode n : remoteNodes.values()) {
-                if (!n.getId().equals(node.getId())) {
-                    node.onConnect(n);
+            for (final RemoteNode remoteNode : remoteNodes.values()) {
+                if (!remoteNode.getId().equals(node.getId())) {
+                    node.onConnect(remoteNode);
                 }
             }
         }
@@ -95,9 +95,9 @@ public class LocalHost extends SerialHandles {
         }
 
         synchronized (remoteNodes) {
-            for (final RemoteNode n : remoteNodes.values()) {
-                if (!n.getId().equals(node.getId())) {
-                    node.onDisconnect(n);
+            for (final RemoteNode remoteNode : remoteNodes.values()) {
+                if (!remoteNode.getId().equals(node.getId())) {
+                    node.onDisconnect(remoteNode);
                 }
             }
         }
@@ -109,7 +109,7 @@ public class LocalHost extends SerialHandles {
 
     public void disconnect() {
         synchronized (localNodes) {
-            final ArrayList<LocalNode> copy = new ArrayList<LocalNode>(localNodes.values());
+            final Iterable<LocalNode> copy = new ArrayList<LocalNode>(localNodes.values());
             localNodes.clear();
             for (final LocalNode localNode : copy) {
                 disconnect(localNode);
@@ -117,7 +117,7 @@ public class LocalHost extends SerialHandles {
         }
 
         synchronized (remoteHosts) {
-            final ArrayList<RemoteHost> copy = new ArrayList<RemoteHost>(remoteHosts.values());
+            final Iterable<RemoteHost> copy = new ArrayList<RemoteHost>(remoteHosts.values());
             remoteHosts.clear();
             for (final RemoteHost remoteHost : copy) {
                 remoteHost.disconnect();
@@ -128,8 +128,8 @@ public class LocalHost extends SerialHandles {
     }
 
     @Override
-    public SerialContext getSerialHost(final UUID hostId, final Object conn) {
-        final RemoteConnection connection = (RemoteConnection) conn;
+    public SerialContext getSerialHost(final UUID hostId, final Object attachment) {
+        final RemoteConnection connection = (RemoteConnection) attachment;
         synchronized (remoteHosts) {
             RemoteHost host = remoteHosts.get(hostId);
             if (host == null) {

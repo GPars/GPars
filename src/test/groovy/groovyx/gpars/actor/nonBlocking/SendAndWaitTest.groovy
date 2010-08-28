@@ -109,7 +109,7 @@ public class SendAndWaitTest extends GroovyTestCase {
                 reply 2
                 barrier.await()
                 Thread.sleep 3000  //give the second message time to hit the queue
-                if (true) throw new RuntimeException('test')
+                throw new RuntimeException('test')
             }
         }
 

@@ -20,24 +20,24 @@ import static groovyx.gpars.actor.Actors.reactor
 
 public class MessageTypesTest extends GroovyTestCase {
 
-  void testMessages() {
-    [
-      'normal string message',
-      new Object(),
-      1,
-      1.5d,
-      1.5,
-      [1,2,3],
-      [],
-      [foo:1, bar:2],
-      [:]
-    ].each { message ->
-      def gotClass
-      def actor = reactor { gotClass = it?.getClass() }
-      actor.sendAndWait message
-      assertEquals "Failed get the proper class for $message", message?.getClass(), gotClass
-      actor.stop()
+    void testMessages() {
+        [
+                'normal string message',
+                new Object(),
+                1,
+                1.5d,
+                1.5,
+                [1, 2, 3],
+                [],
+                [foo: 1, bar: 2],
+                [:]
+        ].each { message ->
+            def gotClass = null
+            def actor = reactor { gotClass = it.class }
+            actor.sendAndWait message
+            assertEquals "Failed get the proper class for $message", message.class, gotClass
+            actor.stop()
+        }
     }
-  }
 
 }

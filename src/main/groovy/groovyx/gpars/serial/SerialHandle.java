@@ -25,6 +25,7 @@ import org.codehaus.groovy.util.ReferenceType;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -114,14 +115,14 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
             } else {
                 if (subscribers instanceof SerialContext) {
                     if (subscribers != context) {
-                        final ArrayList<SerialContext> list = new ArrayList<SerialContext>(2);
+                        final Collection<SerialContext> list = new ArrayList<SerialContext>(2);
                         list.add((SerialContext) subscribers);
                         list.add(context);
                         subscribers = list;
                     }
                 } else {
                     @SuppressWarnings({"unchecked"})
-                    final List<SerialContext> list = (List<SerialContext>) subscribers;
+                    final Collection<SerialContext> list = (Collection<SerialContext>) subscribers;
                     for (final SerialContext remoteHost : list) {
                         if (remoteHost == context) {
                             return;
@@ -168,7 +169,7 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
 
 
     private static class LocalSerialHandle extends SerialHandle {
-        public LocalSerialHandle(final WithSerialId obj, final UUID uuid) {
+        private LocalSerialHandle(final WithSerialId obj, final UUID uuid) {
             super(obj, uuid);
         }
     }

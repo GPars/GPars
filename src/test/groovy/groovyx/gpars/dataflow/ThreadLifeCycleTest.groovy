@@ -51,7 +51,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         final def thread = start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
-            if (true) throw new RuntimeException('test')
+            throw new RuntimeException('test')
         }
         latch.await()
         assertEquals 3, counter.get()

@@ -25,7 +25,7 @@ h3. GroovyCSP
 
 h3. Dataflow
 
-* Fixed issues with reusing the same parallel group in the DataFlowVariable's whenBound() handlers
+* Fixed issues with reusing the same parallel group in the DataFlowVariable whenBound() handlers
 * Tasks can return values and can be joined
 
 h3. Agent
