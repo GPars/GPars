@@ -152,7 +152,7 @@ private class DataFlowOperatorActor extends DynamicDispatchActor {
         values[message.attachment] = message.result
         assert values.size() <= inputs.size()
         if (values.size() == inputs.size()) {
-            def results = values.sort {message.key}.values() as List
+            def results = values.sort {it.key}.values() as List
             startTask(results)
             values = [:]
             queryInputs()

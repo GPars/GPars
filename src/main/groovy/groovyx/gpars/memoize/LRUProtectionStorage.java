@@ -55,7 +55,7 @@ public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
     }
 
     /**
-     * Performs shallor clone
+     * Performs a shallow clone
      *
      * @return The cloned instance
      */
