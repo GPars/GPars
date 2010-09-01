@@ -58,14 +58,14 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * Updater for the state field
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
     protected static final AtomicIntegerFieldUpdater<DataFlowExpression> stateUpdater
             = AtomicIntegerFieldUpdater.newUpdater(DataFlowExpression.class, "state");
 
     /**
      * Updater for the waiting field
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
     protected static final AtomicReferenceFieldUpdater<DataFlowExpression, WaitingThread> waitingUpdater
             = AtomicReferenceFieldUpdater.newUpdater(DataFlowExpression.class, WaitingThread.class, "waiting");
 
@@ -612,23 +612,21 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         }
     }
 
-    // TODO: sort out generics
-
     /**
      * Represents a remote message binding a value to a remoted DataFlowExpression
      */
-    public static class BindDataFlow extends SerialMsg {
+    public static class BindDataFlow<T> extends SerialMsg {
         private static final long serialVersionUID = -8674023870562062769L;
         @SuppressWarnings("rawtypes")
-        private final DataFlowExpression expr;
-        private final Object message;
+        private final DataFlowExpression<T> expr;
+        private final T message;
 
         /**
          * @param expr    The local DataFlowExpression instance
          * @param message The actual value to bind
          * @param hostId  The identification of the host to send the bind information to
          */
-        public BindDataFlow(@SuppressWarnings("rawtypes") final DataFlowExpression expr, final Object message, final UUID hostId) {
+        public BindDataFlow(@SuppressWarnings("rawtypes") final DataFlowExpression<T> expr, final T message, final UUID hostId) {
             super(hostId);
             this.expr = expr;
             this.message = message;

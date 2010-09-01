@@ -39,7 +39,7 @@ println "ForkJoinPool $time"
 long measureSequential(iterations, List list) {
     final long t1 = System.currentTimeMillis()
     for (i in iterations) {
-        int result
+        def result
         list.each {result = it}
         def elements = list.collect {it}
         result = elements[-1]
