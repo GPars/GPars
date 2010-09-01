@@ -65,6 +65,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
     protected void act() {
         if (action != null) {
             if (action instanceof Closure) {
+                //noinspection RawUseOfParameterizedType
                 GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) action);
             } else {
                 action.run();

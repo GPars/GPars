@@ -622,7 +622,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
         @SuppressWarnings("rawtypes")
         @Override
-        public Class[] getParameterTypes() {
+        public Class<?>[] getParameterTypes() {
             return new Class[]{Object.class};
         }
 
@@ -864,6 +864,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 if (code instanceof Closure)
                 //noinspection deprecation
                 {
+                    //noinspection RawUseOfParameterizedType
                     GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) code);
                 } else {
                     code.run();
