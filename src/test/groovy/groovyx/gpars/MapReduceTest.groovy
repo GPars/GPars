@@ -119,4 +119,28 @@ public class MapReduceTest extends GroovyTestCase {
         }
     }
 
+    public void testSort() {
+        GParsPool.withPool(5) {
+            final List sortedNums = [1, 2, 3, 4, 5]
+            assertEquals(sortedNums, [1, 2, 3, 4, 5].parallel.map {it}.sort {a, b -> a - b}.collection)
+            assertEquals(sortedNums, [3, 5, 1, 2, 4].parallel.map {it}.sort {a, b -> a - b}.collection)
+            assertEquals sortedNums, [3, 5, 1, 4, 2].parallel.map {it}.sort {it}.collection
+            assertEquals sortedNums, [3, 5, 1, 2, 4].parallel.map {it}.sort().collection
+            assertEquals 'abc', 'cba'.parallel.map {it}.sort().collection.join()
+            assertEquals 'abc', 'bac'.parallel.map {it}.sort().collection.join()
+        }
+    }
+
+    public void testGroupBy() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            assert [1, 2, 3, 4, 5].parallel.groupBy {it > 2}.size() == 2
+            assert [4, 2, 3, 1, 5].parallel.groupBy {Number number -> 1}.size() == 1
+            assert [2, 4, 5, 1, 3].parallel.groupBy {Number number -> number}.size() == 5
+            final def groups = [1, 2, 3, 4, 5].parallel.groupBy {Number number -> number % 2}
+            assert groups.size() == 2
+            assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
+            assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
+
+        }
+    }
 }

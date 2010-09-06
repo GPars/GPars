@@ -985,6 +985,46 @@ abstract class AbstractPAWrapper<T> {
     }
 
     /**
+     * Returns a sorted parallel collection
+     * If the supplied closure takes two arguments it is used directly as a comparator.
+     * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
+     * @param cl A one or two-argument closure
+     * @return A sorted collection holding all the elements
+     */
+    public final AbstractPAWrapper sort(Closure cl = {it}) {
+        def npa = pa.all()
+        npa.sort(GParsPoolUtil.createComparator(cl) as Comparator)
+        return new PAWrapper(npa)
+    }
+
+    /**
+     * Performs parallel groupBy operation.
+     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * Elements in the same group gave identical results when the supplied closure was invoked on them.
+     * Please note that the method returns a regular map, not a PAWrapper instance.
+     * You can use the "getParallel()" method on the returned map to turn it into a parallel collection again.
+     * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
+     * @return A map following the Groovy specification for groupBy
+     */
+    public Map groupBy(Closure cl) {
+        def result = reduce {a, b ->
+            if (a in GroupByHolder) {
+                if (b in GroupByHolder) return a.merge(b)
+                else return a.addToMap(b, cl(b))
+            } else {
+                def aKey = cl(a)
+                if (b in GroupByHolder) return b.addToMap(a, aKey)
+                else {
+                    def bKey = cl(b)
+                    if (cl(a) == cl(b)) return [(aKey): [a, b]] as GroupByHolder
+                    else return [(aKey): [a], (bKey): [b]] as GroupByHolder
+                }
+            }
+        }
+        return result.getContent()
+    }
+
+    /**
      * Applies concurrently the supplied function to all elements in the collection, returning a collection containing
      * the transformed values.
      * @param A closure calculating a transformed value from the original one
@@ -1001,6 +1041,40 @@ abstract class AbstractPAWrapper<T> {
      */
     public AbstractPAWrapper filter(Closure cl) {
         new PAWrapper(pa.withFilter({cl(it)} as Predicate))
+    }
+}
+
+/**
+ * Holds a temporary reduce result for groupBy
+ */
+final private class GroupByHolder {
+    @Delegate final Map content
+
+    def GroupByHolder(final content) {
+        this.content = content;
+    }
+
+    GroupByHolder merge(GroupByHolder other) {
+        for (item in other.entrySet()) {
+            for (value in item.value) {
+                addToMap(value, item.key)
+            }
+        }
+        return this
+    }
+
+    Map addToMap(item, key) {
+        def currentCount = content[key]
+        if (currentCount == null) {
+            currentCount = []
+            content[key] = currentCount
+        }
+        currentCount << item
+        return this
+    }
+
+    def String toString() {
+        return "groovyx.gpars.GroupByHolder: " + super.toString();
     }
 }
 

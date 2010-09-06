@@ -23,6 +23,8 @@ Then you can chain all required methods like:
 * sum()
 * min()
 * max()
+* sort()
+* groupBy()
 
 Returning back to a plain Groovy collection instance is always just a matter of retrieving the _collection_ property.
 
@@ -37,3 +39,24 @@ Once again we need to warn you. To avoid nasty surprises, please, keep your clos
 h3. Availability
 
 This feature is only available when using in the Fork/Join-based _GParsPool_ , not in _GParsExecutorsPool_ .
+
+h3. Classical Example
+
+A classical example, inspired by http://github.com/thevery, counting occurencies of words in a string:
+
+{code}
+import static groovyx.gpars.GParsPool.withPool
+
+def words = "This is just a plain text to count words in"
+print count(words)
+
+def count(arg) {
+  withPool {
+    return arg.parallel
+      .map{[it, 1]}
+      .groupBy{it[0]}.getParallel()
+      .map {it.value=it.value.size();it}
+      .sort{-it.value}.collection
+  }
+}
+{code}
