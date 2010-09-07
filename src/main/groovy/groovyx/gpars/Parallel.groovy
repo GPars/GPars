@@ -34,7 +34,7 @@ final class Parallel {
      */
     public def eachParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.eachParallel(mixedIn[Object], cl)
+            GParsPoolUtil.eachParallel(getRealSelf(), cl)
         }
     }
 
@@ -48,7 +48,7 @@ final class Parallel {
      */
     public def eachWithIndexParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.eachWithIndexParallel(mixedIn[Object], cl)
+            GParsPoolUtil.eachWithIndexParallel(getRealSelf(), cl)
         }
     }
 
@@ -61,7 +61,7 @@ final class Parallel {
      * */
     public def collectParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(GParsPoolUtil.collectParallel(mixedIn[Object], cl))
+            enhance(GParsPoolUtil.collectParallel(getRealSelf(), cl))
         }
     }
 
@@ -74,7 +74,7 @@ final class Parallel {
      */
     public def findAllParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(GParsPoolUtil.findAllParallel(mixedIn[Object], cl))
+            enhance(GParsPoolUtil.findAllParallel(getRealSelf(), cl))
         }
     }
 
@@ -87,7 +87,7 @@ final class Parallel {
      */
     public def grepParallel(Object filter) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(GParsPoolUtil.grepParallel(mixedIn[Object], filter))
+            enhance(GParsPoolUtil.grepParallel(getRealSelf(), filter))
         }
     }
 
@@ -100,7 +100,7 @@ final class Parallel {
      */
     public def splitParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(GParsPoolUtil.splitParallel(mixedIn[Object], cl))
+            enhance(GParsPoolUtil.splitParallel(getRealSelf(), cl))
         }
     }
 
@@ -113,7 +113,7 @@ final class Parallel {
      */
     public def countParallel(Object filter) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            enhance(GParsPoolUtil.countParallel(mixedIn[Object], filter))
+            enhance(GParsPoolUtil.countParallel(getRealSelf(), filter))
         }
     }
 
@@ -126,7 +126,7 @@ final class Parallel {
      */
     public def findParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.findParallel(mixedIn[Object], cl)
+            GParsPoolUtil.findParallel(getRealSelf(), cl)
         }
     }
 
@@ -142,7 +142,7 @@ final class Parallel {
      */
     public def findAnyParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.findAnyParallel(mixedIn[Object], cl)
+            GParsPoolUtil.findAnyParallel(getRealSelf(), cl)
         }
     }
 
@@ -155,7 +155,7 @@ final class Parallel {
      */
     public boolean everyParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.everyParallel(mixedIn[Object], cl)
+            GParsPoolUtil.everyParallel(getRealSelf(), cl)
         }
     }
 
@@ -170,7 +170,7 @@ final class Parallel {
      */
     public boolean anyParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.anyParallel(mixedIn[Object], cl)
+            GParsPoolUtil.anyParallel(getRealSelf(), cl)
         }
     }
 
@@ -183,7 +183,7 @@ final class Parallel {
      */
     public def groupByParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.groupByParallel(mixedIn[Object], cl)
+            GParsPoolUtil.groupByParallel(getRealSelf(), cl)
         }
     }
 
@@ -201,7 +201,7 @@ final class Parallel {
      */
     public def minParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.minParallel(mixedIn[Object], cl)
+            GParsPoolUtil.minParallel(getRealSelf(), cl)
         }
     }
 
@@ -214,7 +214,7 @@ final class Parallel {
      */
     public def minParallel() {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.minParallel(mixedIn[Object])
+            GParsPoolUtil.minParallel(getRealSelf())
         }
     }
 
@@ -232,7 +232,7 @@ final class Parallel {
      */
     public def maxParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.maxParallel(mixedIn[Object], cl)
+            GParsPoolUtil.maxParallel(getRealSelf(), cl)
         }
     }
 
@@ -245,7 +245,7 @@ final class Parallel {
      */
     public def maxParallel() {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.maxParallel(mixedIn[Object])
+            GParsPoolUtil.maxParallel(getRealSelf())
         }
     }
 
@@ -259,7 +259,7 @@ final class Parallel {
      */
     public def sumParallel() {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.sumParallel(mixedIn[Object])
+            GParsPoolUtil.sumParallel(getRealSelf())
         }
     }
 
@@ -274,7 +274,7 @@ final class Parallel {
      */
     public def foldParallel(Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.foldParallel(mixedIn[Object], cl)
+            GParsPoolUtil.foldParallel(getRealSelf(), cl)
         }
     }
 
@@ -290,7 +290,7 @@ final class Parallel {
      */
     public def foldParallel(seed, Closure cl) {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.foldParallel(mixedIn[Object], seed, cl)
+            GParsPoolUtil.foldParallel(getRealSelf(), seed, cl)
         }
     }
 
@@ -301,7 +301,7 @@ final class Parallel {
      */
     public PAWrapper getParallel() {
         GParsPool.ensurePool(ParallelEnhancer.threadPool.forkJoinPool) {
-            GParsPoolUtil.getParallel(mixedIn[Object])
+            GParsPoolUtil.getParallel(getRealSelf())
         }
     }
 
@@ -329,5 +329,16 @@ final class Parallel {
     @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
     private static def enhance(Object collection) {
         ParallelEnhancer.enhanceInstance(collection)
+    }
+
+    /**
+     * Retrieves the mixed it parent and potentially casts it dynamically to a Map.
+     * The cast to Map is needed since Maps additionally accept a two-argument closures in iterative methods.
+     * @return The mixin parent, optionally converted into a Map
+     */
+    private def getRealSelf() {
+        final def self = mixedIn[Object]
+        if (Map.isAssignableFrom(self.getClass())) return self as Map
+        return self
     }
 }

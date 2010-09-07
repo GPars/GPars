@@ -162,4 +162,108 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
             assert map.findAll {k, v -> v.value > 3} == ['d': 4, 'e': 5]
         }
     }
+
+    public void testEnhancerForEach() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        ParallelEnhancer.enhanceInstance map
+        volatile def keyResults = [].asSynchronized()
+        volatile def valueResults = [].asSynchronized()
+        map.eachParallel {item -> keyResults << item.key; valueResults << item.value}
+        processResults(keyResults, valueResults)
+
+        map.eachParallel {k, v -> keyResults << k; valueResults << v}
+        processResults(keyResults, valueResults)
+    }
+
+    public void testEnhancerForEachWithIndex() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        ParallelEnhancer.enhanceInstance map
+        volatile def keyResults = [].asSynchronized()
+        volatile def valueResults = [].asSynchronized()
+        map.eachWithIndexParallel {item, index -> keyResults << item.key; valueResults << item.value}
+        processResults(keyResults, valueResults)
+
+        map.eachWithIndexParallel {k, v, index -> keyResults << k; valueResults << v}
+        processResults(keyResults, valueResults)
+    }
+
+    public void testEnhancerForCollect() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        ParallelEnhancer.enhanceInstance map
+        volatile def keyResults = [].asSynchronized()
+        volatile def valueResults = [].asSynchronized()
+
+        keyResults = map.collectParallel {item -> item.key}
+        valueResults = map.collectParallel {item -> item.value}
+        processResults(keyResults, valueResults)
+
+        keyResults = map.collectParallel {k, v -> k}
+        valueResults = map.collectParallel {k, v -> v}
+        processResults(keyResults, valueResults)
+    }
+
+    public void testEnhancerForAny() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
+        ParallelEnhancer.enhanceInstance map
+        assert map.anyParallel {item -> item.key == 'c'}
+        assert map.anyParallel {k, v -> k == 'c'}
+        assert map.anyParallel {item -> item.value > 3}
+        assert map.anyParallel {k, v -> v > 3}
+    }
+
+    public void testEnhancerForEvery() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
+        ParallelEnhancer.enhanceInstance map
+        assert !map.everyParallel {item -> item.key == 'c'}
+        assert !map.everyParallel {k, v -> k == 'c'}
+        assert map.everyParallel {item -> item.value > 0}
+        assert map.everyParallel {k, v -> v > 0}
+    }
+
+    public void testEnhancerForFindAny() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
+        ParallelEnhancer.enhanceInstance map
+        assert map.findAnyParallel {item -> item.key == 'c'}.key == 'c'
+        assert map.findAnyParallel {k, v -> k == 'c'}.value == 3
+        assert map.findAnyParallel {item -> item.value > 3}.key in ['d', 'e']
+        assert map.findAnyParallel {k, v -> v.value > 3}.value in [4, 5]
+    }
+
+    public void testEnhancerForFind() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
+        ParallelEnhancer.enhanceInstance map
+        assert map.findParallel {item -> item.key == 'c'}.key == 'c'
+        assert map.findParallel {k, v -> k == 'c'}.value == 3
+        assert map.findParallel {item -> item.value > 3}.key == 'd'
+        assert map.findParallel {k, v -> v.value > 3}.value == 4
+    }
+
+    public void testEnhancerForFindAll() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
+        ParallelEnhancer.enhanceInstance map
+        assert map.findAllParallel {item -> item.key == 'c'} == ['c': 3]
+        assert map.findAllParallel {k, v -> k == 'c'} == ['c': 3]
+        assert map.findAllParallel {item -> item.value > 3} == ['d': 4, 'e': 5]
+        assert map.findAllParallel {k, v -> v.value > 3} == ['d': 4, 'e': 5]
+    }
+
+    public void testEnhancerForGrep() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        ParallelEnhancer.enhanceInstance map
+        assert map.grepParallel {item -> item.key == 'c'} == ['c': 3]
+        assert map.grepParallel {k, v -> k == 'c'} == ['c': 3]
+        assert map.grepParallel {item -> item.value > 3} == ['d': 4, 'e': 5]
+        assert map.grepParallel {k, v -> v.value > 3} == ['d': 4, 'e': 5]
+        assert map.grepParallel(['d': 4].entrySet().iterator().next()) == ['d': 4]
+    }
+
+    public void testEnhancerForTransparentFindAll() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        ParallelEnhancer.enhanceInstance map
+        map = map.makeTransparent()
+        assert map.findAll {item -> item.key == 'c'} == ['c': 3]
+        assert map.findAll {k, v -> k == 'c'} == ['c': 3]
+        assert map.findAll {item -> item.value > 3} == ['d': 4, 'e': 5]
+        assert map.findAll {k, v -> v.value > 3} == ['d': 4, 'e': 5]
+    }
 }
