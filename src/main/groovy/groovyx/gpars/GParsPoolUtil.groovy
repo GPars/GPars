@@ -30,6 +30,10 @@ import jsr166y.forkjoin.Ops.Predicate
 import jsr166y.forkjoin.Ops.Reducer
 import jsr166y.forkjoin.ParallelArray
 import jsr166y.forkjoin.RecursiveTask
+import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMaps
+import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMapsWithIndex
+import static groovyx.gpars.util.ParallelCollectionsUtil.buildResultMap
+import static groovyx.gpars.util.ParallelCollectionsUtil.createCollection
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsPool</i>. The static methods of <i>GParsPoolUtil</i>
@@ -48,7 +52,7 @@ public class GParsPoolUtil {
     /**
      * Allows timeouts for async operations
      */
-    private static final Timer timer = new Timer('GParsExecutorsTimeoutTimer', true)
+    private static final Timer timer = new Timer('GParsTimeoutTimer', true)
 
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = groovyx.gpars.GParsPool.retrieveCurrentPool()
@@ -236,12 +240,6 @@ public class GParsPoolUtil {
         return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
     }
 
-    static java.util.Collection createCollection(Object object) {
-        def collection = []
-        for (element in object) collection << element
-        return collection
-    }
-
     /**
      * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
      * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
@@ -252,7 +250,8 @@ public class GParsPoolUtil {
      */
     public static Object makeTransparent(Object collection) {
         if (!(collection.respondsTo('isTransparent'))) throw new IllegalStateException("Cannot make the object transparently parallel. Apparently we're not inside a GParsPool.withPool() block nor the collection hasn't been enhanced with ParallelEnhancer.enhance().")
-        if (!collection.isTransparent()) collection.metaClass.mixin(TransparentParallel)
+        //noinspection GroovyGetterCallCanBePropertyAccess
+        if (!collection.isTransparent()) collection.getMetaClass().mixin(TransparentParallel)
         return collection
     }
 
@@ -294,6 +293,24 @@ public class GParsPoolUtil {
      */
     public static Object eachParallel(Object collection, Closure cl) {
         eachParallel(createCollection(collection), cl)
+        return collection
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied map and invokes the withMapping() method using the supplied
+     * closure as the transformation operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>eachParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool {*     def result = new ConcurrentSkipListSet()
+     *     [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
+     */
+    public static Object eachParallel(Map collection, Closure cl) {
+        eachParallel(createCollection(collection), buildClosureForMaps(cl))
         return collection
     }
 
@@ -340,6 +357,14 @@ public class GParsPoolUtil {
     }
 
     /**
+     * Does parallel eachWithIndex on maps
+     */
+    public static Object eachWithIndexParallel(Map collection, Closure cl) {
+        eachWithIndexParallel(createCollection(collection), buildClosureForMapsWithIndex(cl))
+        return collection
+    }
+
+    /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the transformation operation.
      * The closure will be effectively invoked concurrently on the elements of the collection.
@@ -370,6 +395,21 @@ public class GParsPoolUtil {
     }
 
     /**
+     * Creates a Parallel Array out of the supplied map and invokes the withMapping() method using the supplied
+     * closure as the transformation operation.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>collectParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+     *}*/
+    public static Collection<Object> collectParallel(Map collection, Closure cl) {
+        return collectParallel(createCollection(collection), buildClosureForMaps(cl))
+    }
+
+    /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
@@ -396,7 +436,23 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static Collection<Object> findAllParallel(Object collection, Closure cl) {
+        //noinspection GroovyAssignabilityCheck
         return findAllParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied map and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>findAllParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
+     *}*/
+    public static <K, V> Map<K, V> findAllParallel(Map<K, V> collection, Closure cl) {
+        return buildResultMap(findAllParallel(createCollection(collection), buildClosureForMaps(cl)))
     }
 
     /**
@@ -429,6 +485,22 @@ public class GParsPoolUtil {
      *}*/
     public static Object findParallel(Object collection, Closure cl) {
         return findParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied map and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a value from the resulting Parallel Array with the minimum index.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     *}*/
+    public static <K, V> Map.Entry<K, V> findParallel(Map<K, V> collection, Closure cl) {
+        //noinspection GroovyAssignabilityCheck
+        return findParallel(createCollection(collection), buildClosureForMaps(cl))
     }
 
     /**
@@ -468,6 +540,24 @@ public class GParsPoolUtil {
     }
 
     /**
+     * Creates a Parallel Array out of the supplied map and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * Unlike with the <i>find</i> method, findAnyParallel() does not guarantee
+     * that the a matching element with the lowest index is returned.
+     * The findAnyParallel() method evaluates elements lazily and stops processing further elements of the collection once a match has been found.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a random value from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     *}*/
+    public static Object findAnyParallel(Map collection, Closure cl) {
+        return findAnyParallel(createCollection(collection), buildClosureForMaps(cl))
+    }
+
+    /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * rule as the filter predicate.
      * The filter will be effectively used concurrently on the elements of the collection.
@@ -497,6 +587,22 @@ public class GParsPoolUtil {
      *}*/
     public static Object grepParallel(Object collection, filter) {
         return grepParallel(createCollection(collection), filter)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied map and invokes the withFilter() method using the supplied
+     * rule as the filter predicate.
+     * The filter will be effectively used concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a collection of values from the resulting Parallel Array.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].grepParallel(4..6)
+     *     assertEquals(new HashSet([4, 5]), result)
+     *}*/
+    public static <K, V> Map<K, V> grepParallel(Map<K, V> collection, filter) {
+        return buildResultMap(grepParallel(createCollection(collection), filter in Closure ? buildClosureForMaps(filter) : filter))
     }
 
     /**
@@ -602,6 +708,23 @@ public class GParsPoolUtil {
     }
 
     /**
+     * Creates a Parallel Array out of the supplied map and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * The anyParallel() method is lazy and once a positive answer has been given by at least one element, it avoids running
+     * the supplied closure on subsequent elements.
+     * After all the elements have been processed, the method returns a boolean value indicating, whether at least
+     * one element of the collection meets the predicate.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>anyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
+    public static boolean anyParallel(Map collection, Closure cl) {
+        return anyParallel(createCollection(collection), buildClosureForMaps(cl))
+    }
+
+    /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withFilter() method using the supplied
      * closure as the filter predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
@@ -629,6 +752,21 @@ public class GParsPoolUtil {
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static boolean everyParallel(Object collection, Closure cl) {
         return everyParallel(createCollection(collection), cl)
+    }
+
+    /**
+     * Creates a Parallel Array out of the supplied map and invokes the withFilter() method using the supplied
+     * closure as the filter predicate.
+     * The closure will be effectively invoked concurrently on the elements of the collection.
+     * After all the elements have been processed, the method returns a boolean value indicating, whether all the elements
+     * of the collection meet the predicate.
+     * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
+     * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
+     * have a new <i>everyParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
+     * Example:
+     * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
+    public static boolean everyParallel(Map collection, Closure cl) {
+        return everyParallel(createCollection(collection), buildClosureForMaps(cl))
     }
 
     /**

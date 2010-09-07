@@ -25,6 +25,10 @@ import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMaps
+import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMapsWithIndex
+import static groovyx.gpars.util.ParallelCollectionsUtil.buildResultMap
+import static groovyx.gpars.util.ParallelCollectionsUtil.createCollection
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
@@ -140,6 +144,14 @@ public class GParsExecutorsPoolUtil {
     }
 
     /**
+     * Does parallel each on maps
+     */
+    public static Object eachParallel(Map collection, Closure cl) {
+        eachParallel(createCollection(collection), buildClosureForMaps(cl))
+        return collection
+    }
+
+    /**
      * Iterates over a collection/object with the <i>eachWithIndex()</i> method using an asynchronous variant of the supplied closure
      * to evaluate each collection's element. A Semaphore is used to make the calling thread wait for all the results.
      * After this method returns, all the closures have been finished and all the potential shared resources have been updated
@@ -180,6 +192,14 @@ public class GParsExecutorsPoolUtil {
     }
 
     /**
+     * Does parallel eachWithIndex on maps
+     */
+    public static Object eachWithIndexParallel(Map collection, Closure cl) {
+        eachWithIndexParallel(createCollection(collection), buildClosureForMapsWithIndex(cl))
+        return collection
+    }
+
+    /**
      * Iterates over a collection/object with the <i>collect()</i> method using an asynchronous variant of the supplied closure
      * to evaluate each collection's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
@@ -198,6 +218,13 @@ public class GParsExecutorsPoolUtil {
     }
 
     /**
+     * Does parallel collect on a map
+     */
+    public static Collection<Object> collectParallel(Map collection, Closure cl) {
+        return collectParallel(createCollection(collection), buildClosureForMaps(cl))
+    }
+
+    /**
      * Performs the <i>findAll()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
@@ -213,6 +240,13 @@ public class GParsExecutorsPoolUtil {
      */
     public static def findAllParallel(Object collection, Closure cl) {
         collectParallel(collection, {if (cl(it)) return it else return null}).findAll {it != null}
+    }
+
+    /**
+     * Does parallel findAll on a map returning a map of found items
+     */
+    public static <K, V> Map<K, V> findAllParallel(Map<K, V> collection, Closure cl) {
+        return buildResultMap(findAllParallel(createCollection(collection), buildClosureForMaps(cl)))
     }
 
     /**
@@ -236,6 +270,13 @@ public class GParsExecutorsPoolUtil {
     }
 
     /**
+     * Does parallel grep on a map
+     */
+    public static <K, V> Map<K, V> grepParallel(Map<K, V> collection, filter) {
+        return buildResultMap(grepParallel(createCollection(collection), filter in Closure ? buildClosureForMaps(filter) : filter))
+    }
+
+    /**
      * Performs the <i>find()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
@@ -251,6 +292,14 @@ public class GParsExecutorsPoolUtil {
      */
     public static def findParallel(Object collection, Closure cl) {
         collectParallel(collection, {if (cl(it)) return it else return null}).find {it != null}
+    }
+
+    /**
+     * Does parallel find on a map
+     */
+    public static <K, V> Map.Entry<K, V> findParallel(Map<K, V> collection, Closure cl) {
+        //noinspection GroovyAssignabilityCheck
+        return findParallel(createCollection(collection), buildClosureForMaps(cl))
     }
 
     /**
@@ -275,6 +324,13 @@ public class GParsExecutorsPoolUtil {
     }
 
     /**
+     * Does parallel findAny on a map
+     */
+    public static Object findAnyParallel(Map collection, Closure cl) {
+        return findAnyParallel(createCollection(collection), buildClosureForMaps(cl))
+    }
+
+    /**
      * Performs the <i>all()</i> operation using an asynchronous variant of the supplied closure
      * to evaluate each collection's/object's element.
      * After this method returns, all the closures have been finished and the caller can safely use the result.
@@ -290,6 +346,13 @@ public class GParsExecutorsPoolUtil {
         final AtomicBoolean flag = new AtomicBoolean(true)
         eachParallel(collection, {value -> if (!cl(value)) flag.set(false)})
         return flag.get()
+    }
+
+    /**
+     * Does parallel every on a map
+     */
+    public static boolean everyParallel(Map collection, Closure cl) {
+        return everyParallel(createCollection(collection), buildClosureForMaps(cl))
     }
 
     /**
@@ -310,6 +373,13 @@ public class GParsExecutorsPoolUtil {
         final AtomicBoolean flag = new AtomicBoolean(false)
         eachParallel(collection, {if ((!flag.get()) && cl(it)) flag.set(true)})
         return flag.get()
+    }
+
+    /**
+     * Does parallel any on a map
+     */
+    public static boolean anyParallel(Map collection, Closure cl) {
+        return anyParallel(createCollection(collection), buildClosureForMaps(cl))
     }
 
     /**
