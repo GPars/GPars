@@ -15,7 +15,7 @@
 // limitations under the License.
 
 /**
- * A classical example of map/reduce counting word occurrences in text.
+ * A classical example of map/reduce counting word occurrences in text, implemented in two ways.
  *
  */
 
@@ -24,11 +24,26 @@ package groovyx.gpars.samples
 import static groovyx.gpars.GParsPool.withPool
 
 def words = """The xxxParallel() methods have to follow the contract of their non-parallel peers. So a collectParallel() method must return a legal collection of items, which you can again treat as a Groovy collection. Internally the parallel collect method builds an efficient parallel structure, called parallel array, performs the required operation concurrently and before returning destroys the Parallel Array building the collection of results to return to you. A potential call to let say findAllParallel() on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers. With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly. Invoking the parallel property on a collection will build a Parallel Array for the collection and return a thin wrapper around the Parallel Array instance. Then you can chain all required methods like:""".tokenize()
-print count(words)
+println count(words)
+println directCount(words)
 
 def count(arg) {
     withPool {
         return arg.parallel.map {[it, 1]}.groupBy {it[0]}.getParallel().map {it.value = it.value.size(); it}.sort {-it.value}.collection
+    }
+}
+
+
+def directCount(arg) {
+    withPool {
+        return arg.parallel.map {[(it): 1]}.reduce {a, b ->
+            b.each {k, v ->
+                def value = a[k]
+                if (value == null) a[k] = v
+                else a[k] = value + v
+            }
+            a
+        }.getParallel().sort {-it.value}.collection
     }
 }
 
