@@ -1145,17 +1145,47 @@ abstract class AbstractPAWrapper<T> {
      * @return A map following the Groovy specification for groupBy
      */
     public Map groupBy(Closure cl) {
+        return combineImpl(cl, {it}, {[]}, {list, item -> list << item})
+    }
+
+    /**
+     * Performs parallel combine operation.
+     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * Elements in the same group gave identical results when the supplied closure was invoked on them.
+     * Please note that the method returns a regular map, not a PAWrapper instance.
+     * You can use the "getParallel()" method on the returned map to turn it into a parallel collection again.
+     * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
+     * @return A map following the Groovy specification for groupBy
+     */
+    //todo javadoc, docs, test
+    //todo use Map.Entry
+
+    public Map combine(Closure initialValue, Closure cl) {
+        combineImpl({it[0]}, {it[1]}, initialValue, cl)
+    }
+
+    public Map combineImpl(extractKey, extractValue, initialValue, Closure cl) {
         def result = reduce {a, b ->
-            if (a in GroupByHolder) {
-                if (b in GroupByHolder) return a.merge(b)
-                else return a.addToMap(b, cl(b))
+            if (a in CombineHolder) {
+                if (b in CombineHolder) return a.merge(b)
+                else return a.addToMap(extractKey(b), extractValue(b))
             } else {
-                def aKey = cl(a)
-                if (b in GroupByHolder) return b.addToMap(a, aKey)
+                def aKey = extractKey(a)
+                final Object aValue = extractValue(a)
+                if (b in CombineHolder) return b.addToMap(aKey, aValue)
                 else {
-                    def bKey = cl(b)
-                    if (cl(a) == cl(b)) return [(aKey): [a, b]] as GroupByHolder
-                    else return [(aKey): [a], (bKey): [b]] as GroupByHolder
+                    def bKey = extractKey(b)
+                    final Object bValue = extractValue(b)
+
+                    if (aKey == bKey) {
+                        def c = cl(cl(initialValue(), aValue), bValue)
+                        return [initialValue, cl, [(aKey): c]] as CombineHolder
+                    }
+                    else {
+                        def c = cl(initialValue(), aValue)
+                        def holder = [initialValue, cl, [(aKey): c]] as CombineHolder
+                        return holder.addToMap(bKey, bValue)
+                    }
                 }
             }
         }
@@ -1185,34 +1215,39 @@ abstract class AbstractPAWrapper<T> {
 /**
  * Holds a temporary reduce result for groupBy
  */
-final private class GroupByHolder {
-    @Delegate final Map content
+//private class GroupByHolder extends CombineHolder {
+//
+//    def GroupByHolder(final content) {
+//        super([], {List a, List b -> a.addAll(b)}, content)
+//    }
+//}
 
-    def GroupByHolder(final content) {
+private class CombineHolder {
+
+    @Delegate final Map content
+    //todo pass in as arguments to methods
+    def Closure code
+    def Closure initialValue
+
+    def CombineHolder(final initialValue, final code, final content) {
         this.content = content;
+        this.initialValue = initialValue
+        this.code = code;
     }
 
-    GroupByHolder merge(GroupByHolder other) {
+    final CombineHolder merge(CombineHolder other) {
         for (item in other.entrySet()) {
             for (value in item.value) {
-                addToMap(value, item.key)
+                addToMap(item.key, value)
             }
         }
         return this
     }
 
-    Map addToMap(item, key) {
-        def currentCount = content[key]
-        if (currentCount == null) {
-            currentCount = []
-            content[key] = currentCount
-        }
-        currentCount << item
+    def Map addToMap(Object key, Object item) {
+        def currentValue = content[key] ?: initialValue()
+        content[key] = code(currentValue, item)
         return this
-    }
-
-    def String toString() {
-        return "groovyx.gpars.GroupByHolder: " + super.toString();
     }
 }
 
