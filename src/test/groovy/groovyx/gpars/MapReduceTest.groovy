@@ -143,4 +143,17 @@ public class MapReduceTest extends GroovyTestCase {
 
         }
     }
+
+    public void _testCombine() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            assert [1, 2, 3, 4, 5].parallel.combine({0}, {}) {it > 2}.size() == 2
+            assert [4, 2, 3, 1, 5].parallel.groupBy {Number number -> 1}.size() == 1
+            assert [2, 4, 5, 1, 3].parallel.groupBy {Number number -> number}.size() == 5
+            final def groups = [1, 2, 3, 4, 5].parallel.groupBy {Number number -> number % 2}
+            assert groups.size() == 2
+            assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
+            assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
+
+        }
+    }
 }

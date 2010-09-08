@@ -27,6 +27,7 @@ import jsr166y.forkjoin.ForkJoinExecutor
 import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.Ops.Mapper
 import jsr166y.forkjoin.Ops.Predicate
+import jsr166y.forkjoin.Ops.Procedure
 import jsr166y.forkjoin.Ops.Reducer
 import jsr166y.forkjoin.ParallelArray
 import jsr166y.forkjoin.RecursiveTask
@@ -274,7 +275,7 @@ public class GParsPoolUtil {
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
     public static <T> Collection<T> eachParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withMapping({cl(it)} as Mapper).all()
+        createPA(collection, retrievePool()).apply({cl(it)} as Procedure)
         return collection
     }
 
@@ -1144,6 +1145,8 @@ abstract class AbstractPAWrapper<T> {
      * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
      * @return A map following the Groovy specification for groupBy
      */
+    //todo return a collection of Map.Entry
+
     public Map groupBy(Closure cl) {
         return combineImpl(cl, {it}, {[]}, {list, item -> list << item})
     }
@@ -1159,6 +1162,7 @@ abstract class AbstractPAWrapper<T> {
      */
     //todo javadoc, docs, test
     //todo use Map.Entry
+    //todo combine, cumulate
 
     public Map combine(Closure initialValue, Closure cl) {
         combineImpl({it[0]}, {it[1]}, initialValue, cl)

@@ -53,6 +53,8 @@ def directCount(arg) {
 def directCombineCount(arg) {
     withPool {
         return arg.parallel.map {[it, 1]}.combine({0}, {a, b -> a + b}).getParallel().sort {-it.value}.collection
+//        return arg.parallel.map{[it, 1]}.combine({[]}, {list, value -> list << value}).getParallel().map{it.value = it.value.size();it}.sort{-it.value}.collection
+//        arg.parallel.map{[it, 1]}.combine([]){list, value -> list+=value}.reduce{value->value.sum()}
     }
 }
 

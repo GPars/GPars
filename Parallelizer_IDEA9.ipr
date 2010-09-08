@@ -4565,6 +4565,7 @@
         <w>composable</w>
         <w>conv</w>
         <w>csize</w>
+        <w>cumulate</w>
         <w>dest</w>
         <w>dgpars</w>
         <w>dists</w>
