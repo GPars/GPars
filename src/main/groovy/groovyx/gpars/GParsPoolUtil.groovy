@@ -774,7 +774,7 @@ public class GParsPoolUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the mapping predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * After all the elements have been processed, the method returns a map of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
@@ -798,7 +798,7 @@ public class GParsPoolUtil {
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied
      * closure as the mapping predicate.
      * The closure will be effectively invoked concurrently on the elements of the collection.
-     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * After all the elements have been processed, the method returns a map of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
@@ -1138,22 +1138,20 @@ abstract class AbstractPAWrapper<T> {
 
     /**
      * Performs parallel groupBy operation.
-     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * After all the elements have been processed, the method returns a map of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
      * Please note that the method returns a regular map, not a PAWrapper instance.
      * You can use the "getParallel()" method on the returned map to turn it into a parallel collection again.
      * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
      * @return A map following the Groovy specification for groupBy
      */
-    //todo return a collection of Map.Entry
-
     public Map groupBy(Closure cl) {
         return combineImpl(cl, {it}, {[]}, {list, item -> list << item})
     }
 
     /**
      * Performs parallel combine operation.
-     * After all the elements have been processed, the method returns a list of groups of the original elements.
+     * After all the elements have been processed, the method returns a map of groups of the original elements.
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
      * Please note that the method returns a regular map, not a PAWrapper instance.
      * You can use the "getParallel()" method on the returned map to turn it into a parallel collection again.
@@ -1164,31 +1162,43 @@ abstract class AbstractPAWrapper<T> {
     //todo use Map.Entry
     //todo combine, cumulate
 
-    public Map combine(Closure initialValue, Closure cl) {
-        combineImpl({it[0]}, {it[1]}, initialValue, cl)
+    public Map combine(Closure initialValue, Closure accumulation) {
+        combineImpl({it[0]}, {it[1]}, initialValue, accumulation)
     }
 
-    public Map combineImpl(extractKey, extractValue, initialValue, Closure cl) {
+    public Map combine(Cloneable initialValue, Closure accumulation) {
+        Closure initialValueClosure = {initialValue.clone()}
+        if (initialValue instanceof Closure) {
+            initialValueClosure = initialValue
+        }
+        combineImpl({it[0]}, {it[1]}, initialValueClosure, accumulation)
+    }
+
+    public Map combine(Object initialValue, Closure accumulation) {
+        combineImpl({it[0]}, {it[1]}, {initialValue}, accumulation)
+    }
+
+    public Map combineImpl(extractKey, extractValue, Closure initialValue, Closure accumulation) {
         def result = reduce {a, b ->
             if (a in CombineHolder) {
-                if (b in CombineHolder) return a.merge(b)
-                else return a.addToMap(extractKey(b), extractValue(b))
+                if (b in CombineHolder) return a.merge(b, accumulation, initialValue)
+                else return a.addToMap(extractKey(b), extractValue(b), accumulation, initialValue)
             } else {
                 def aKey = extractKey(a)
                 final Object aValue = extractValue(a)
-                if (b in CombineHolder) return b.addToMap(aKey, aValue)
+                if (b in CombineHolder) return b.addToMap(aKey, aValue, accumulation, initialValue)
                 else {
                     def bKey = extractKey(b)
                     final Object bValue = extractValue(b)
 
                     if (aKey == bKey) {
-                        def c = cl(cl(initialValue(), aValue), bValue)
-                        return [initialValue, cl, [(aKey): c]] as CombineHolder
+                        def c = accumulation(accumulation(initialValue(), aValue), bValue)
+                        return [(aKey): c] as CombineHolder
                     }
                     else {
-                        def c = cl(initialValue(), aValue)
-                        def holder = [initialValue, cl, [(aKey): c]] as CombineHolder
-                        return holder.addToMap(bKey, bValue)
+                        def c = accumulation(initialValue(), aValue)
+                        def holder = [(aKey): c] as CombineHolder
+                        return holder.addToMap(bKey, bValue, accumulation, initialValue)
                     }
                 }
             }
@@ -1229,28 +1239,23 @@ abstract class AbstractPAWrapper<T> {
 private class CombineHolder {
 
     @Delegate final Map content
-    //todo pass in as arguments to methods
-    def Closure code
-    def Closure initialValue
 
-    def CombineHolder(final initialValue, final code, final content) {
+    def CombineHolder(final content) {
         this.content = content;
-        this.initialValue = initialValue
-        this.code = code;
     }
 
-    final CombineHolder merge(CombineHolder other) {
+    final CombineHolder merge(CombineHolder other, final Closure accumulation, final Closure initialValue) {
         for (item in other.entrySet()) {
             for (value in item.value) {
-                addToMap(item.key, value)
+                addToMap(item.key, value, accumulation, initialValue)
             }
         }
         return this
     }
 
-    def Map addToMap(Object key, Object item) {
+    def CombineHolder addToMap(final Object key, final Object item, final Closure accumulation, final Closure initialValue) {
         def currentValue = content[key] ?: initialValue()
-        content[key] = code(currentValue, item)
+        content[key] = accumulation(currentValue, item)
         return this
     }
 }

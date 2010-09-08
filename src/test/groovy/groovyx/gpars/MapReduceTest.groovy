@@ -126,8 +126,8 @@ public class MapReduceTest extends GroovyTestCase {
             assertEquals(sortedNums, [3, 5, 1, 2, 4].parallel.map {it}.sort {a, b -> a - b}.collection)
             assertEquals sortedNums, [3, 5, 1, 4, 2].parallel.map {it}.sort {it}.collection
             assertEquals sortedNums, [3, 5, 1, 2, 4].parallel.map {it}.sort().collection
-            assertEquals 'abc', 'cba'.parallel.map {it}.sort().collection.join()
-            assertEquals 'abc', 'bac'.parallel.map {it}.sort().collection.join()
+            assertEquals 'abc', 'cba'.parallel.map {it}.sort().collection.join('')
+            assertEquals 'abc', 'bac'.parallel.map {it}.sort().collection.join('')
         }
     }
 
@@ -144,16 +144,18 @@ public class MapReduceTest extends GroovyTestCase {
         }
     }
 
-    public void _testCombine() {
+    public void testCombine() {
+        def words = """The xxxParallel() methods have to follow the contract of their non-parallel peers. So a collectParallel() method must return a legal collection of items, which you can again treat as a Groovy collection. Internally the parallel collect method builds an efficient parallel structure, called parallel array, performs the required operation concurrently and before returning destroys the Parallel Array building the collection of results to return to you. A potential call to let say findAllParallel() on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers. With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly. Invoking the parallel property on a collection will build a Parallel Array for the collection and return a thin wrapper around the Parallel Array instance. Then you can chain all required methods like:""".tokenize()
         groovyx.gpars.GParsPool.withPool(5) {
-            assert [1, 2, 3, 4, 5].parallel.combine({0}, {}) {it > 2}.size() == 2
-            assert [4, 2, 3, 1, 5].parallel.groupBy {Number number -> 1}.size() == 1
-            assert [2, 4, 5, 1, 3].parallel.groupBy {Number number -> number}.size() == 5
-            final def groups = [1, 2, 3, 4, 5].parallel.groupBy {Number number -> number % 2}
-            assert groups.size() == 2
-            assert (groups[0].containsAll([2, 4]) && groups[0].size() == 2) || (groups[0].containsAll([1, 3, 5]) && groups[0].size() == 3)
-            assert (groups[1].containsAll([2, 4]) && groups[1].size() == 2) || (groups[1].containsAll([1, 3, 5]) && groups[1].size() == 3)
+            def result1 = words.parallel.map {[it, 1]}.combine(0, {a, b -> a + b}).getParallel().sort {-it.value}.collection
+            def result2 = words.parallel.map {[it, 1]}.combine({0}, {a, b -> a + b}).getParallel().sort {-it.value}.collection
+            def result3 = words.parallel.map {[it, 1]}.combine([], {list, value -> list << value}).getParallel().map {it.value = it.value.size(); it}.sort {-it.value}.collection
 
+            assert [result1, result2, result3]*.size() == [101, 101, 101]
+            assert result1 == result2
+            assert result1 == result3
+            assert result1[0].key == 'the'
+            assert result1[0].value == 12
         }
     }
 }
