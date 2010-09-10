@@ -68,6 +68,7 @@ def combineCount1(arg) {
 def combineCount2(arg) {
     withPool {
         arg.parallel.map {[it, 1]}.combine([], {list, value -> list << value}).getParallel().map {it.value = it.value.size(); it}.sort {-it.value}.collection
+//        arg.parallel.map {[it, 1]}.combine([], {list, value -> list << value}).getParallel().map {k, v -> v = v.value.size(); it}.sort {-it.value}.collection
     }
 }
 
