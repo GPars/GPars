@@ -14,30 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * A classical example of map/reduce counting word occurrences in text, implemented in two ways.
- *
- */
-
 package groovyx.gpars.samples
 
-import groovyx.gpars.PAWrapper
 import static groovyx.gpars.GParsPool.withPool
 
-def words = """The xxxParallel() methods have to follow the contract of their non-parallel peers. So a collectParallel() method must return a legal collection of items, which you can again treat as a Groovy collection. Internally the parallel collect method builds an efficient parallel structure, called parallel array, performs the required operation concurrently and before returning destroys the Parallel Array building the collection of results to return to you. A potential call to let say findAllParallel() on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers. With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly. Invoking the parallel property on a collection will build a Parallel Array for the collection and return a thin wrapper around the Parallel Array instance. Then you can chain all required methods like:""".tokenize()
-//println count(words)
-//println directCount(words)
-//println combineCount(words)
-println directCombineCount(words)
+/**
+ * A classical example of map/reduce counting word occurrences in text, implemented in several slightly different ways.
+ */
 
-def count(arg) {
+def words = """The xxxParallel() methods have to follow the contract of their non-parallel peers. So a collectParallel() method must return a legal collection of items, which you can again treat as a Groovy collection. Internally the parallel collect method builds an efficient parallel structure, called parallel array, performs the required operation concurrently and before returning destroys the Parallel Array building the collection of results to return to you. A potential call to let say findAllParallel() on the resulting collection would repeat the whole process of construction and destruction of a Parallel Array instance under the covers. With Map/Reduce you turn your collection into a Parallel Array and back only once. The Map/Reduce family of methods do not return Groovy collections, but are free to pass along the internal Parallel Arrays directly. Invoking the parallel property on a collection will build a Parallel Array for the collection and return a thin wrapper around the Parallel Array instance. Then you can chain all required methods like:""".tokenize()
+println groupByCount(words)
+println mapReduceCount(words)
+println combineCount1(words)
+println combineCount2(words)
+
+/**
+ * Uses the groupBy operation to join elements with the same key into a list and then, as a separate step, joins all the values associated around the same key
+ */
+def groupByCount(arg) {
     withPool {
         return arg.parallel.map {[it, 1]}.groupBy {it[0]}.getParallel().map {it.value = it.value.size(); it}.sort {-it.value}.collection
     }
 }
 
-
-def directCount(arg) {
+/**
+ * Directly turns each tuple into a hash map and and then reduces by merging the maps
+ */
+def mapReduceCount(arg) {
     withPool {
         return arg.parallel.map {[(it): 1]}.reduce {a, b ->
             b.each {k, v ->
@@ -50,65 +53,21 @@ def directCount(arg) {
     }
 }
 
-def directCombineCount(arg) {
+/**
+ * Uses the combine operation to join elements with the same key and also, at the same time, joins all the values associated around the same key using the provided accumulation function
+ */
+def combineCount1(arg) {
     withPool {
-//        return arg.parallel.map {[it, 1]}.combine(0, {a, b -> a + b}).getParallel().sort {-it.value}.collection
-        return arg.parallel.map {[it, 1]}.combine([], {list, value -> list << value}).getParallel().map {it.value = it.value.size(); it}.sort {-it.value}.collection
-//        arg.parallel.map{[it, 1]}.combine([]){list, value -> list+=value}.reduce{value->value.sum()}
+        arg.parallel.map {[it, 1]}.combine(0, {a, b -> a + b}).getParallel().sort {-it.value}.collection
     }
 }
 
-def combineCount(arg) {
+/**
+ * Uses the combine operation to join elements with the same key into a list and then, as a separate step, joins all the values associated around the same key using the provided accumulation operation
+ */
+def combineCount2(arg) {
     withPool {
-        def myCombiner = new Combiner() {
-
-            def Object createKey(Object element) {
-                return element
-            }
-
-            def Object createValue(Object element) {
-                return 1
-            }
-
-            def Object combine(Object a, Object b) {
-                return a + b
-            }
-
-        }
-
-        final PAWrapper parallel = arg.parallel
-        return combine(parallel, myCombiner).getParallel().sort {-it.value}.collection
-//        return arg.parallel.map{[it, 1]}.combine {a, b -> a + b}.getParallel().sort {-it.value}.collection
+        arg.parallel.map {[it, 1]}.combine([], {list, value -> list << value}).getParallel().map {it.value = it.value.size(); it}.sort {-it.value}.collection
     }
 }
 
-private def combine(PAWrapper pa, myCombiner) {
-    return pa.map {[(myCombiner.createKey(it)): myCombiner.createValue(it)]}.reduce {a, b ->
-        b.each {k, v ->
-            def value = a[k]
-            if (value == null) a[k] = v
-            else a[k] = myCombiner.combine(v, value)
-        }
-        a
-    }
-}
-
-interface Combiner {
-    Object createKey(element)
-
-    Object createValue(element)
-
-    Object combine(a, b)
-}
-
-
-def foo(Closure cl) {
-    println 'Closure'
-}
-
-def foo(Cloneable cl) {
-    println 'Cloneable'
-}
-
-final Closure cl = {-> 0}
-foo(cl)
