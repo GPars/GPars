@@ -534,7 +534,7 @@ public class GParsPoolUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findAnyParallel(Object collection, Closure cl) {
         return findAnyParallel(createCollection(collection), cl)
@@ -552,7 +552,7 @@ public class GParsPoolUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>findParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * Example:
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
+     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findAnyParallel(Map collection, Closure cl) {
         return findAnyParallel(createCollection(collection), buildClosureForMaps(cl))
@@ -614,12 +614,7 @@ public class GParsPoolUtil {
      * It's important to protect any shared resources used by the supplied closure from race conditions caused by multi-threaded access.
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>grepParallel(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
-     * Example:
-     * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].splitParallel(it > 3)
-     *            assert [3, 4, 5] as Set == result[0] as Set
-     *            assert [1, 2] as Set == result[1] as Set
-
-     *}*/
+     */
     public static <T> Collection<T> splitParallel(Collection<T> collection, filter) {
         final def groups = groupByParallel(collection, filter)
         return [groups[true] ?: [], groups[false] ?: []]
@@ -1142,7 +1137,7 @@ abstract class AbstractPAWrapper<T> {
      * Elements in the same group gave identical results when the supplied closure was invoked on them.
      * Please note that the method returns a regular map, not a PAWrapper instance.
      * You can use the "getParallel()" method on the returned map to turn it into a parallel collection again.
-     * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
+     * @param cl A single-argument closure returning the value to use for grouping (the key in the resulting map).
      * @return A map following the Groovy specification for groupBy
      */
     public Map groupBy(Closure cl) {
@@ -1150,35 +1145,44 @@ abstract class AbstractPAWrapper<T> {
     }
 
     /**
-     * Performs parallel combine operation.
-     * After all the elements have been processed, the method returns a map of groups of the original elements.
-     * Elements in the same group gave identical results when the supplied closure was invoked on them.
+     * Performs a parallel combine operation.
+     * The operation accepts a collection of tuples (two-element lists). The element at position 0 is treated as a key,
+     * while the element at position 1 is considered to be the value.
+     * By running 'combine' on such a collection of tuples, you'll back a map of get items with the same keys (the key is represented by tuple[0])
+     * to be combined into a single element under their common key.
+     * E.g. [[a, b], [c, d], [a, e], [c, f]] will be combined into [a : b+e, c : d+f], while the '+' operation on the values needs to be provided by the user as the accumulation closure.
+     *
+     * The 'accumulation function' argument needs to specify a function to use for combining (accumulating) the values belonging to the same key.
+     * An 'initial accumulator value' needs to be provided as well. Since the 'combine' method processes items in parallel, the 'initial accumulator value' will be reused multiple times.
+     * Thus the provided value must allow for reuse. It should be either a cloneable or immutable value or a closure returning a fresh initial accumulator each time requested.
+     * Good combinations of accumulator functions and reusable initial values include:
+     * <br/>accumulator = {List acc, value -> acc << value} initialValue = []
+     * <br/>accumulator = {List acc, value -> acc << value} initialValue = {-> []}* <br/>accumulator = {int sum, int value -> acc + value} initialValue = 0
+     * <br/>accumulator = {int sum, int value -> sum + value} initialValue = {-> 0}* <br/>accumulator = {ShoppingCart cart, Item value -> cart.addItem(value)} initialValue = {-> new ShoppingCart()}* <br/>
+     * The return type is a map.
+     * E.g. [['he', 1], ['she', 2], ['he', 2], ['me', 1], ['she, 5], ['he', 1] with the initial value provided a 0 will be combined into
+     * ['he' : 4, 'she' : 7, 'he', : 2, 'me' : 1]
+     *
      * Please note that the method returns a regular map, not a PAWrapper instance.
      * You can use the "getParallel()" method on the returned map to turn it into a parallel collection again.
-     * @param cl A two-argument closure merging two elements into one. The return value of the closure will replace the original two elements.
-     * @return A map following the Groovy specification for groupBy
+     * @param initialValue The initial value for an accumulator. Since it will be used repeatadly, it should be either an unmodifiable value, a cloneable instance or a closure returning a fresh initial/empty accumulator each time requested
+     * @param accumulator A two-argument closure, first argument being the accumulator and second holding the currently processed value. The closure is supposed to returned a modified accumulator after accumulating the value.
+     * @return A map holding the final accumulated values for each unique key in the original collection of tuples.
      */
-    //todo javadoc, docs, test
-    //todo use Map.Entry
-    //todo combine, cumulate
+    public Map combine(Object initialValue, Closure accumulation) {
+        switch (initialValue) {
+            case Closure: return combineImpl((Closure) initialValue, accumulation)
+            case Cloneable: return combineImpl({initialValue.clone()}, accumulation)
+            default: return combineImpl({initialValue}, accumulation)
+        }
+    }
 
-    public Map combine(Closure initialValue, Closure accumulation) {
+    public Map combineImpl(Closure initialValue, Closure accumulation) {
         combineImpl({it[0]}, {it[1]}, initialValue, accumulation)
     }
 
-    public Map combine(Cloneable initialValue, Closure accumulation) {
-        Closure initialValueClosure = {initialValue.clone()}
-        if (initialValue instanceof Closure) {
-            initialValueClosure = initialValue
-        }
-        combineImpl({it[0]}, {it[1]}, initialValueClosure, accumulation)
-    }
-
-    public Map combine(Object initialValue, Closure accumulation) {
-        combineImpl({it[0]}, {it[1]}, {initialValue}, accumulation)
-    }
-
     public Map combineImpl(extractKey, extractValue, Closure initialValue, Closure accumulation) {
+
         def result = reduce {a, b ->
             if (a in CombineHolder) {
                 if (b in CombineHolder) return a.merge(b, accumulation, initialValue)

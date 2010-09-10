@@ -25,6 +25,7 @@ Then you can chain all required methods like:
 * max()
 * sort()
 * groupBy()
+* combine()
 
 Returning back to a plain Groovy collection instance is always just a matter of retrieving the _collection_ property.
 
@@ -60,3 +61,40 @@ def count(arg) {
   }
 }
 {code}
+
+The same example, now implemented the more general _combine_ operation:
+
+{code}
+def words = "This is just a plain text to count words in"
+print count(words)
+
+def count(arg) {
+  withPool {
+    return arg.parallel
+      .map{[it, 1]}
+      .combine(0) {sum, value -> sum + value}.getParallel()
+      .sort{-it.value}.collection
+  }
+}
+{code}
+
+h3. Combine
+
+The _combine_ operation expects on its input a list of tuples (two-element lists) considered to be key-value pairs (such as [ [key1, value1], [key2, value2], [key1, value3], [key3, value4] ... ] )
+with potentially repeating keys. When invoked, _combine_ merges the values for identical keys using the provided accumulator function and produces a map mapping the original (unique) keys to their accumulated values.
+E.g. [[a, b], [c, d], [a, e], [c, f]] will be combined into [a : b+e, c : d+f], while the '+' operation on the values needs to be provided by the user as the accumulation closure.
+The _accumulation function_ argument needs to specify a function to use for combining (accumulating) the values belonging to the same key.
+An _initial accumulator value_ needs to be provided as well. Since the _combine_ method processes items in parallel, the _initial accumulator value_ will be reused multiple times.
+Thus the provided value must allow for reuse. It should be either a *cloneable* or *immutable* value or a *closure* returning a fresh initial accumulator each time requested.
+Good combinations of accumulator functions and reusable initial values include:
+{code}
+accumulator = {List acc, value -> acc << value} initialValue = []
+accumulator = {List acc, value -> acc << value} initialValue = {-> []}
+accumulator = {int sum, int value -> acc + value} initialValue = 0
+accumulator = {int sum, int value -> sum + value} initialValue = {-> 0}
+accumulator = {ShoppingCart cart, Item value -> cart.addItem(value)} initialValue = {-> new ShoppingCart()}
+{code}
+
+The return type is a map.
+E.g. [['he', 1], ['she', 2], ['he', 2], ['me', 1], ['she, 5], ['he', 1] with the initial value provided a 0 will be combined into
+['he' : 4, 'she' : 7, 'he', : 2, 'me' : 1]
