@@ -1,5 +1,6 @@
 The *Dataflow tasks* give you an easy-to-grasp abstraction of mutually-independent logical tasks or threads, which can run
 concurrently and exchange data solely through Dataflow Variables and Streams.
+DataFlow tasks with their easy-to-express mutual dependencies and inherently sequential body could also be used as a practical implementation of UML _Activity Diagrams_ .
 
 Check out the examples.
 

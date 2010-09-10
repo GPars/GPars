@@ -87,15 +87,17 @@ def alternative4 = {
     'http://dzone.com/'.toURL().text
 }
 
-final DataFlowStream resultStream = new DataFlowStream()
+//Pick either one of the following, both will work:
+final def result = new DataFlowStream()
+//  final def result = new DataFlowVariable()
 
 [alternative1, alternative2, alternative3, alternative4].each {code ->
     task {
         try {
-            resultStream << code()
+            result << code()
         } catch (ignore) { }  //We deliberately ignore unsuccessful urls
     }
 }
 
-println resultStream.val.contains('groovy')
+println result.val.contains('groovy')
 {code}
