@@ -174,4 +174,43 @@ public class DataFlowVariableTest extends GroovyTestCase {
         assert System.currentTimeMillis() - t1 < 60000
     }
 
+    public void testEqualValueRebind() {
+        final DataFlowVariable variable = new DataFlowVariable()
+        variable.bind([1, 2, 3])
+        variable.bind([1, 2, 3])
+        variable.bindSafely([1, 2, 3])
+        variable << [1, 2, 3]
+        shouldFail(IllegalStateException) {
+            variable.bind([1, 2, 3, 4, 5])
+        }
+        shouldFail(IllegalStateException) {
+            variable << [1, 2, 3, 4, 5]
+        }
+        shouldFail(IllegalStateException) {
+            variable.bindUnique([1, 2, 3])
+        }
+        shouldFail(IllegalStateException) {
+            variable.bindUnique([1, 2, 3, 4, 5])
+        }
+    }
+
+    public void testNullValueRebind() {
+        final DataFlowVariable variable = new DataFlowVariable()
+        variable.bind(null)
+        variable.bind(null)
+        variable.bindSafely(null)
+        variable << null
+        shouldFail(IllegalStateException) {
+            variable.bind(10)
+        }
+        shouldFail(IllegalStateException) {
+            variable << 20
+        }
+        shouldFail(IllegalStateException) {
+            variable.bindUnique(null)
+        }
+        shouldFail(IllegalStateException) {
+            variable.bindUnique(30)
+        }
+    }
 }

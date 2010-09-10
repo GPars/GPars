@@ -61,7 +61,7 @@ public abstract class AbstractLoopingActor extends Actor {
                 if (terminatingFlag || message == stopMessage) {
                     handleTermination();
                     terminatedFlag = true;
-                    getJoinLatch().bind(null);
+                    getJoinLatch().bindUnique(null);
                 } else {
                     final ActorMessage actorMessage = (ActorMessage) message;
                     try {
@@ -141,7 +141,7 @@ public abstract class AbstractLoopingActor extends Actor {
             if (isActorThread()) {
                 terminatedFlag = true;
                 handleTermination();
-                getJoinLatch().bind(null);
+                getJoinLatch().bindUnique(null);
             }
             //noinspection CallToThreadYield
             Thread.yield();

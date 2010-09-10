@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
@@ -26,7 +26,9 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * In the sample we're willing to check whether there's an article on 'groovy' on DZone and we're using 4 urls, which resolve to the same page being downloaded.
  * Using the speculate approach we increased our chances to get the result even if some of the urls do not work or work considerably slower than others.
  *
- * This demo uses a DataFlowVariable to get the first result. 
+ * This demo uses a DataFlowVariable to get the first result. We're silently leveraging the ability of DataFlowVariable
+ * to accept re-binding to the same value.
+ *
  * @author Vaclav Pech
  * Date: Sep 10th 2010
  */
@@ -46,7 +48,7 @@ def alternative4 = {
     'http://dzone.com/'.toURL().text
 }
 
-final def result = new DataFlowStream()
+final def result = new DataFlowVariable()
 
 [alternative1, alternative2, alternative3, alternative4].each {code ->
     task {

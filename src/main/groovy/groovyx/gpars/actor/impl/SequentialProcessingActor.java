@@ -366,7 +366,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         try {
             super.handleTermination();
         } finally {
-            getJoinLatch().bind(null);
+            getJoinLatch().bindUnique(null);
         }
     }
 

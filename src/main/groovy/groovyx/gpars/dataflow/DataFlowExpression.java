@@ -310,14 +310,38 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable.
+     * Allows attempts to bind to equal values.
      * Throws exception if invoked on an already bound variable.
      *
      * @param value The value to assign
      */
     public void bind(final T value) {
         if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
-            throw new IllegalStateException("A DataFlowVariable can only be assigned once.");
+            try {
+                final Object boundValue = getVal();
+                if (value == null && boundValue == null) return;
+                if (value != null) {
+                    if (value.equals(boundValue)) return;
+                }
+            } catch (InterruptedException ignore) {
+            }  //Can ignore since will throw an IllegalStateException below
+            throw new IllegalStateException("A DataFlowVariable can only be assigned once. Only re-assignments to an equal value are allowed.");
+        }
+
+        doBind(value);
+    }
+
+    /**
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * Doesn't allow attempts to bind to equal values.
+     * Throws exception if invoked on an already bound variable.
+     *
+     * @param value The value to assign
+     */
+    public void bindUnique(final T value) {
+        if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
+            throw new IllegalStateException("A DataFlowVariable can only be assigned once. Use bind() to allow for equal values to be passed into already-bound variables.");
         }
 
         doBind(value);
