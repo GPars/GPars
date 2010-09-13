@@ -35,7 +35,7 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public final class DataFlowOperator {
+public class DataFlowOperator {
 
     /**
      * The internal actor performing on behalf of the operator
