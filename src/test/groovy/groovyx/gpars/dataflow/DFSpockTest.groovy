@@ -14,25 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars
+package groovyx.gpars.dataflow
 
 import spock.lang.Specification
-import static groovyx.gpars.GParsPool.withPool
 
-/**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 19.5.2010
- * Time: 17:48:51
- * To change this template use File | Settings | File Templates.
- */
-class SpockTest extends Specification {
-    def "sample test"() {
-        def res
-        withPool() {
-            res = [1, 2, 3, 4, 5].parallel.reduce {a, b -> Math.min(a, b)}
-        }
-        expect:
-        res == 1
+class DFSpockTest extends Specification {
+
+    def "data flow variable gets assigned"() {
+        def result = new DataFlowVariable()
+        when: result << 10
+        then:
+        result.val == 10
+        result.isBound()
+    }
+
+    def "data flow variable cannot be re-assigned"() {
+        def result = new DataFlowVariable()
+        given: result << 10
+        when: result << 20
+        then:
+        thrown(IllegalStateException)
+        result.val == 10
+        result.isBound()
     }
 }
