@@ -49,7 +49,7 @@ public class SpeculationTest extends GroovyTestCase {
             },
 
             {
-                Thread.sleep 5000
+                Thread.sleep 25000
                 50
             }]
 
