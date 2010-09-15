@@ -52,8 +52,8 @@ public class GParsExecutorsPoolEnhancerTest extends GroovyTestCase {
     }
 
     public void testMapClassEnhancement() {
-        GParsExecutorsPoolEnhancer.enhanceClass HashMap
-        final Map map = new HashMap([1: 1, 2: 2, 3: 3, 4: 4, 5: 5])
+        GParsExecutorsPoolEnhancer.enhanceClass TreeMap
+        final Map map = new TreeMap([1: 1, 2: 2, 3: 3, 4: 4, 5: 5])
         assert map.anyParallel {it.key > 4}
         assert map.everyParallel {it.value > 0}
     }

@@ -136,7 +136,7 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     }
 
     public void testMapSpecificsForTransparentCollect() {
-        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsPool.withPool {
             volatile def keyResults = [].asSynchronized()
             volatile def valueResults = [].asSynchronized()
@@ -153,7 +153,7 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     }
 
     public void testMapSpecificsForTransparentFindAll() {
-        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsPool.withPool {
             map = map.makeTransparent()
             assert map.findAll {item -> item.key == 'c'} == ['c': 3]
@@ -164,7 +164,7 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     }
 
     public void testEnhancerForEach() {
-        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
         volatile def keyResults = [].asSynchronized()
         volatile def valueResults = [].asSynchronized()
@@ -176,7 +176,7 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     }
 
     public void testEnhancerForEachWithIndex() {
-        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
         volatile def keyResults = [].asSynchronized()
         volatile def valueResults = [].asSynchronized()
@@ -188,7 +188,7 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     }
 
     public void testEnhancerForCollect() {
-        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
         volatile def keyResults = [].asSynchronized()
         volatile def valueResults = [].asSynchronized()
@@ -248,7 +248,7 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     }
 
     public void testEnhancerForGrep() {
-        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
         assert map.grepParallel {item -> item.key == 'c'} == ['c': 3]
         assert map.grepParallel {k, v -> k == 'c'} == ['c': 3]
@@ -258,7 +258,7 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     }
 
     public void testEnhancerForTransparentFindAll() {
-        def map = [a: 1, b: 2, c: 3, d: 4, e: 5] as TreeMap
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
         map = map.makeTransparent()
         assert map.findAll {item -> item.key == 'c'} == ['c': 3]
