@@ -123,7 +123,7 @@ h3. A physical calculation example
 Dataflow programs naturally scale with the number of processors. Up to a certain level, the more processors you have the faster the program runs.
 Check out, for example, the following script, which calculates parameters of a simple physical experiment and prints out the results. Each task performs its part of the calculation and may depend on values calculated by some other tasks as well as its result might be needed by some of the other tasks. With Dataflow Concurrency you can split the work between tasks or reorder the tasks themselves as you like and the dataflow mechanics will ensure the calculation will be accomplished correctly.
 
-{code}import groovyx.gpars.dataflow.DataFlowActor
+{code}
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.task
 

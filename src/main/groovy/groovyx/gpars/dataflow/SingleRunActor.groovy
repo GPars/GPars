@@ -16,13 +16,22 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.AbstractPooledActor
+
 /**
  * An actor representing a dataflow thread. Runs the supplied block of code inside the act() actor method once.
  *
  * @author Vaclav Pech, Dierk Koenig
  * Date: Jun 5, 2009
  */
-final class SingleRunActor extends DataFlowActor {
+final class SingleRunActor extends AbstractPooledActor {
+
+    /**
+     * Sets the default Dataflow Concurrency actor group on the actor.
+     */
+    def SingleRunActor() {
+        this.parallelGroup = DataFlow.DATA_FLOW_GROUP
+    }
 
     Closure body
 
