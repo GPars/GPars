@@ -18,16 +18,12 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.ResizeablePool
 
 /**
- * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks
+ * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks and operators
  */
 
-/**
- * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowStream.val
- */
-group = new DefaultPGroup(new ResizeablePool(true))
+group = new DefaultPGroup()
 
 final int requestedPrimeNumberCount = 1000
 
@@ -51,12 +47,9 @@ group.task {
 def filter(inChannel, int prime) {
     def outChannel = new DataFlowStream()
 
-    group.task {
-        while (true) {
-            def number = inChannel.val
-            if (number % prime != 0) {
-                outChannel << number
-            }
+    group.operator([inputs: [inChannel], outputs: [outChannel]]) {
+        if (it % prime != 0) {
+            bindOutput it
         }
     }
     return outChannel

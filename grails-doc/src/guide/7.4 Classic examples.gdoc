@@ -1,14 +1,14 @@
-h3. The Sieve of Eratosthenes implementation using dataflow
+h3. The Sieve of Eratosthenes implementation using dataflow tasks
 
 {code}
 import groovyx.gpars.dataflow.DataFlowStream
-import groovyx.gpars.group.DefaultPGroup
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
- * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow
+ * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks
  */
 
-final int requestedPrimeNumberCount = 100
+final int requestedPrimeNumberCount = 1000
 
 final DataFlowStream initialChannel = new DataFlowStream()
 
@@ -30,9 +30,12 @@ task {
 def filter(inChannel, int prime) {
     def outChannel = new DataFlowStream()
 
-    operator([inputs: [inChannel], outputs: [outChannel]]) {
-        if (it % prime != 0) {
-            bindOutput it
+    task {
+        while (true) {
+            def number = inChannel.val
+            if (number % prime != 0) {
+                outChannel << number
+            }
         }
     }
     return outChannel
@@ -47,5 +50,56 @@ requestedPrimeNumberCount.times {
     println "Found: $prime"
     currentOutput = filter(currentOutput, prime)
 }
+{code}
 
+h3. The Sieve of Eratosthenes implementation using a combination of dataflow tasks and operators
+
+{code}
+       import groovyx.gpars.dataflow.DataFlowStream
+       import static groovyx.gpars.dataflow.DataFlow.operator
+       import static groovyx.gpars.dataflow.DataFlow.task
+
+       /**
+        * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks and operators
+        */
+
+       final int requestedPrimeNumberCount = 100
+
+       final DataFlowStream initialChannel = new DataFlowStream()
+
+       /**
+        * Generating candidate numbers
+        */
+       task {
+           (2..1000).each {
+               initialChannel << it
+           }
+       }
+
+       /**
+        * Chain a new filter for a particular prime number to the end of the Sieve
+        * @param inChannel The current end channel to consume
+        * @param prime The prime number to divide future prime candidates with
+        * @return A new channel ending the whole chain
+        */
+       def filter(inChannel, int prime) {
+           def outChannel = new DataFlowStream()
+
+           operator([inputs: [inChannel], outputs: [outChannel]]) {
+               if (it % prime != 0) {
+                   bindOutput it
+               }
+           }
+           return outChannel
+       }
+
+       /**
+        * Consume Sieve output and add additional filters for all found primes
+        */
+       def currentOutput = initialChannel
+       requestedPrimeNumberCount.times {
+           int prime = currentOutput.val
+           println "Found: $prime"
+           currentOutput = filter(currentOutput, prime)
+       }
 {code}
