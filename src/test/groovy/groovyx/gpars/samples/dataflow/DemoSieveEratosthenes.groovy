@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.group.DefaultPGroup
 
 /**
- * Demonstrated concurrent implementation Sieve of Eratosthenes using dataflow operators
+ * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow operators
  */
 
 group = new DefaultPGroup()
