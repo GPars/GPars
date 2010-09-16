@@ -47,7 +47,7 @@ public class DataFlowOperator {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    private def DataFlowOperator(final Map channels, final Closure code) {
+    private def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
@@ -56,9 +56,9 @@ public class DataFlowOperator {
         code.delegate = this
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
-            this.actor = new ForkingDataFlowOperatorActor(this, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
+            this.actor = new ForkingDataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
         } else {
-            this.actor = new DataFlowOperatorActor(this, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
+            this.actor = new DataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
         }
     }
 
@@ -139,8 +139,9 @@ private class DataFlowOperatorActor extends DynamicDispatchActor {
     final def owningOperator
     Map values = [:]
 
-    def DataFlowOperatorActor(owningOperator, outputs, inputs, code) {
+    def DataFlowOperatorActor(owningOperator, group, outputs, inputs, code) {
         super(null)
+        parallelGroup = group
 
         this.owningOperator = owningOperator
         this.outputs = outputs
@@ -188,8 +189,8 @@ private class DataFlowOperatorActor extends DynamicDispatchActor {
 private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
     final Semaphore semaphore
 
-    def ForkingDataFlowOperatorActor(owningOperator, outputs, inputs, code, maxForks) {
-        super(owningOperator, outputs, inputs, code)
+    def ForkingDataFlowOperatorActor(owningOperator, group, outputs, inputs, code, maxForks) {
+        super(owningOperator, group, outputs, inputs, code)
         this.semaphore = new Semaphore(maxForks)
     }
 

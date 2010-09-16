@@ -70,7 +70,6 @@ withPool {
 //    perfectNumbers = (33550300..33550400).findAll {isPerfectWithDF it}
 //    println("Perfect numbers: $perfectNumbers")
 }
-//DataFlowActor.DATA_FLOW_GROUP.shutdown()
 System.exit 0
 
 

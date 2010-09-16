@@ -17,6 +17,7 @@ package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.util.AsyncMessagingCore;
 import org.codehaus.groovy.runtime.CurriedClosure;
 
@@ -36,6 +37,10 @@ public abstract class AbstractLoopingActor extends Actor {
      * Holds the particular instance of async messaging core to use
      */
     private AsyncMessagingCore core;
+
+    final AsyncMessagingCore getCore() {
+        return core;
+    }
 
     /**
      * Builds the async messaging core using the supplied code handler
@@ -176,5 +181,11 @@ public abstract class AbstractLoopingActor extends Actor {
     public final MessageStream send(final Object message) {
         core.store(createActorMessage(message));
         return this;
+    }
+
+    @Override
+    public void setParallelGroup(final PGroup group) {
+        super.setParallelGroup(group);
+        core.attachToThreadPool(group.getThreadPool());
     }
 }

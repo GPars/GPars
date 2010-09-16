@@ -51,6 +51,10 @@ public abstract class AsyncMessagingCore implements Runnable {
         this.threadPool = threadPool;
     }
 
+    Pool getThreadPool() {
+        return threadPool;
+    }
+
     /**
      * Retrieves the agent's fairness flag
      * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.

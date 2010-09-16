@@ -18,6 +18,7 @@ package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowExpression
+import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.group.DefaultPGroup
@@ -65,6 +66,66 @@ class ParallelGroupTest extends GroovyTestCase {
                 results.group2 = DataFlowExpression.activeParallelGroup.get()
             }
             variable << 'Foo'
+        }
+        assert results.group1 == results.group2
+        assert results.group1 == group
+    }
+
+    public void testDataflowContinuationsOnStreams() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlows results = new DataFlows()
+        DataFlow.task {
+            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            stream.whenBound {
+                results.group2 = DataFlowExpression.activeParallelGroup.get()
+            }
+            stream << 'Foo'
+        }
+        assert results.group1 == results.group2
+        assert results.group1 == DataFlow.DATA_FLOW_GROUP
+    }
+
+    public void testDataflowContinuationsWithCustomGroupOnStreams() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlows results = new DataFlows()
+
+        final DefaultPGroup group = new DefaultPGroup()
+        group.task {
+            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            stream.whenBound {
+                results.group2 = DataFlowExpression.activeParallelGroup.get()
+            }
+            stream << 'Foo'
+        }
+        assert results.group1 == results.group2
+        assert results.group1 == group
+    }
+
+    public void testDataflowWhenNextBoundOnStreams() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlows results = new DataFlows()
+        DataFlow.task {
+            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            stream.whenNextBound {
+                results.group2 = DataFlowExpression.activeParallelGroup.get()
+            }
+            stream << 'Foo'
+        }
+        assert results.group1 == results.group2
+        assert results.group1 == DataFlow.DATA_FLOW_GROUP
+    }
+
+    public void testDataflowWhenNextBoundWithCustomGroupOnStreams() {
+        final DataFlowStream stream = new DataFlowStream()
+        final DataFlows results = new DataFlows()
+
+        final DefaultPGroup group = new DefaultPGroup()
+        group.task {
+            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            stream.whenNextBound {
+                results.group2 = DataFlowExpression.activeParallelGroup.get()
+            }
+            stream << 'Foo'
         }
         assert results.group1 == results.group2
         assert results.group1 == group

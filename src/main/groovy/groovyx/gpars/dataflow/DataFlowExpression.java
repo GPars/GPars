@@ -463,9 +463,18 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data available
      */
     public void whenBound(final Closure closure) {
+        getValAsync(new DataCallback(closure, retrieveCurrentDFPGroup()));
+    }
+
+    /**
+     * Retrieves the thread-local value of the active PGroup or the default DataFlowGroup
+     *
+     * @return The PGroup to use for DF within the current thread
+     */
+    static PGroup retrieveCurrentDFPGroup() {
         PGroup pGroup = activeParallelGroup.get();
         if (pGroup == null) pGroup = DataFlow.DATA_FLOW_GROUP;
-        getValAsync(new DataCallback(closure, pGroup));
+        return pGroup;
     }
 
     /**

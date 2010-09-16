@@ -192,6 +192,6 @@ public abstract class PGroup {
      * @param code The operator's body to run each time all inputs have a value to read
      */
     public DataFlowOperator operator(final Map channels, final Closure code) {
-        return new DataFlowOperator(channels, code).start(this)
+        return new DataFlowOperator(this, channels, code).start(this)
     }
 }
