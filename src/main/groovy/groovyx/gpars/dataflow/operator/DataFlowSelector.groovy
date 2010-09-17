@@ -35,15 +35,15 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public final class DataFlowOperator extends DataFlowProcessor {
+public class DataFlowSelector extends DataFlowProcessor {
 
     /**
-     * Creates an operator
-     * After creation the operator needs to be started using the start() method.
+     * Creates a selector
+     * After creation the selector needs to be started using the start() method.
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
-     * @param code The operator's body to run each time all inputs have a value to read
+     * @param code The selector's body to run each time all inputs have a value to read
      */
-    protected def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
+    protected def DataFlowSelector(final PGroup group, final Map channels, final Closure code) {
         super(group, channels, code)
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
@@ -57,25 +57,25 @@ public final class DataFlowOperator extends DataFlowProcessor {
      * Is invoked in case the actor throws an exception.
      */
     protected void reportError(Throwable e) {
-        System.err.println "The dataflow operator experienced an exception and is about to terminate. $e"
+        System.err.println "The dataflow selector experienced an exception and is about to terminate. $e"
         stop()
     }
 }
 
 /**
- * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
+ * An selector's internal actor. Repeatedly polls inputs and once they're all available it performs the selector's body.
  *
  * Iteratively waits for enough values from inputs.
- * Once all required inputs are available (received as messages), the operator's body is run.
+ * Once all required inputs are available (received as messages), the selector's body is run.
  */
-private class DataFlowOperatorActor extends DynamicDispatchActor {
+private class DataFlowSelectorActor extends DynamicDispatchActor {
     private final List inputs
     protected final List outputs
     protected final Closure code
     private final def owningOperator
     private Map values = [:]
 
-    def DataFlowOperatorActor(owningOperator, group, outputs, inputs, code) {
+    def DataFlowSelectorActor(owningOperator, group, outputs, inputs, code) {
         super(null)
         parallelGroup = group
 
@@ -118,15 +118,15 @@ private class DataFlowOperatorActor extends DynamicDispatchActor {
 }
 
 /**
- * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
- * The operator's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
+ * An selector's internal actor. Repeatedly polls inputs and once they're all available it performs the selector's body.
+ * The selector's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
  * The maxForks property guards the maximum number or concurrently run copies.
  */
-private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
+private final class ForkingDataFlowSelectorActor extends DataFlowSelectorActor {
     private final Semaphore semaphore
     private final def threadPool
 
-    def ForkingDataFlowOperatorActor(owningOperator, group, outputs, inputs, code, maxForks) {
+    def ForkingDataFlowSelectorActor(owningOperator, group, outputs, inputs, code, maxForks) {
         super(owningOperator, group, outputs, inputs, code)
         this.semaphore = new Semaphore(maxForks)
         this.threadPool = group.threadPool
@@ -145,3 +145,4 @@ private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
         }
     }
 }
+
