@@ -16,37 +16,61 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
-import static groovyx.gpars.dataflow.DataFlow.operator
+import java.util.concurrent.CyclicBarrier
+import static groovyx.gpars.dataflow.DataFlow.selector
 
 /**
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
 
-public class DataFlowOperatorTest extends GroovyTestCase {
+public class DataFlowSelectorTest extends GroovyTestCase {
 
-    public void testOperator() {
+    public void testSelector() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
         final DataFlowStream c = new DataFlowStream()
-        final DataFlowVariable d = new DataFlowVariable()
+        final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
-            bindOutput 0, x + y + z
-            bindOutput 1, x * y * z
+        def op = selector(inputs: [a, b, c], outputs: [d, e]) {x ->
+            bindOutput 0, x
+            bindOutput 1, 2 * x
         }
 
-        DataFlow.task { a << 5 }
-        DataFlow.task { b << 20 }
-        DataFlow.task { c << 40 }
+        a << 5
+        b << 20
+        c << 40
 
-        assertEquals 65, d.val
-        assertEquals 4000, e.val
+        assert [d.val, d.val, d.val] == [5, 20, 40]
+        assert [e.val, e.val, e.val] == [10, 40, 80]
+
+        op.stop()
+    }
+
+    public void testSelectorWithIndex() {
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+        final DataFlowStream e = new DataFlowStream()
+
+        def op = selector(inputs: [a, b, c], outputs: [d, e]) {x, index ->
+            bindOutput 0, x
+            bindOutput 1, index
+        }
+
+        a << 5
+        b << 20
+        c << 40
+        b << 50
+        c << 60
+
+        assert [d.val, d.val, d.val, d.val, d.val] == [5, 20, 40, 50, 60]
+        assert [e.val, e.val, e.val, e.val, e.val] == [0, 1, 2, 1, 2]
 
         op.stop()
     }
@@ -55,8 +79,8 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
 
-        def op = operator(inputs: [a, a], outputs: [b]) {x, y ->
-            bindOutput 0, x + y
+        def op = selector(inputs: [a, a], outputs: [b]) {x ->
+            bindOutput 0, x
         }
 
         a << 1
@@ -64,105 +88,9 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         a << 3
         a << 4
 
-        assertEquals 3, b.val
-        assertEquals 7, b.val
+        assert [b.val, b.val, b.val, b.val] == [1, 2, 3, 4]
 
         op.stop()
-    }
-
-    public void testNonCommutativeOperator() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-
-        def op = operator(inputs: [a, b], outputs: [c]) {x, y ->
-            bindOutput 0, 2 * x + y
-        }
-
-        DataFlow.task { a << 5 }
-        DataFlow.task { b << 20 }
-
-        assertEquals 30, c.val
-
-        op.stop()
-    }
-
-    public void testGroupingOperatorsAndTasks() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-
-        final DefaultPGroup group = new DefaultPGroup()
-
-        def op = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
-            bindOutput 0, 2 * x + y
-        }
-
-        group.task { a << 5 }
-        group.task { b << 20 }
-
-        assertEquals 30, c.val
-
-        op.stop()
-    }
-
-    public void testSimpleOperators() {
-        final DefaultPGroup group = new DefaultPGroup(1)
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-        a << 1
-        a << 2
-        a << 3
-        a << 4
-        a << 5
-
-        def op1 = group.operator(inputs: [a], outputs: [b]) {v ->
-            bindOutput 2 * v
-        }
-
-        def op2 = group.operator(inputs: [b], outputs: [c]) {v ->
-            bindOutput v + 1
-        }
-        assertEquals 3, c.val
-        assertEquals 5, c.val
-        assertEquals 7, c.val
-        assertEquals 9, c.val
-        assertEquals 11, c.val
-        [op1, op2]*.stop()
-    }
-
-    public void testCombinedOperators() {
-        final DefaultPGroup group = new DefaultPGroup(1)
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-        a << 1
-        a << 2
-        a << 3
-        b << 4
-        b << 5
-        b << 6
-        b << 7
-
-        final DataFlowStream x = new DataFlowStream()
-        def op1 = group.operator(inputs: [a], outputs: [x]) {v ->
-            bindOutput v * v
-        }
-
-        final DataFlowStream y = new DataFlowStream()
-        def op2 = group.operator(inputs: [b], outputs: [y]) {v ->
-            bindOutput v * v
-        }
-
-        def op3 = group.operator(inputs: [x, y], outputs: [c]) {v1, v2 ->
-            bindOutput v1 + v2
-        }
-
-        assertEquals 17, c.val
-        assertEquals 29, c.val
-        assertEquals 45, c.val
-        [op1, op2, op3]*.stop()
     }
 
     public void testStop() {
@@ -170,15 +98,20 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
-        volatile boolean flag = false
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+        volatile int counter = 0
 
-        def op1 = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
-            flag = true
+        def op1 = group.selector(inputs: [a, b], outputs: [c]) {x ->
+            counter++
+            barrier.await()
+
         }
+        a << 'Delivered'
         a << 'Never delivered'
         op1.stop()
+        barrier.await()
         op1.join()
-        assertFalse flag
+        assert counter == 1
     }
 
     public void testInterrupt() {
@@ -187,7 +120,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
-        def op1 = group.operator(inputs: [a], outputs: [b]) {v ->
+        def op1 = group.selector(inputs: [a], outputs: [b]) {v ->
             Thread.currentThread().interrupt()
             flag = true
             bindOutput 'a'
@@ -206,7 +139,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         volatile boolean flag = false
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [], outputs: [b]) {->
+            def op1 = group.selector(inputs: [], outputs: [b]) {->
                 flag = true
                 stop()
             }
@@ -222,7 +155,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         volatile boolean flag = false
 
-        def op1 = group.operator(inputs: [a], outputs: [b, c]) {
+        def op1 = group.selector(inputs: [a], outputs: [b, c]) {
             flag = (output == b) && (outputs[0] == b) && (outputs[1] == c)
             stop()
         }
@@ -238,7 +171,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
-        def op1 = group.operator(inputs: [b], outputs: []) {
+        def op1 = group.selector(inputs: [b], outputs: []) {
             flag = (output == null)
             stop()
         }
@@ -255,35 +188,27 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
+        group.selector(inputs: [a, b], outputs: [d]) {}.stop()
+        group.selector(inputs: [a, b], outputs: [d]) {x ->}.stop()
+        group.selector(inputs: [a, b], outputs: [d]) {x, y ->}.stop()
+
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b, c], outputs: [d]) {v -> }
+            def op1 = group.selector(inputs: [a, b, c], outputs: [d]) {x, y, z -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b], outputs: [d]) {v -> }
+            def op1 = group.selector(inputs: [], outputs: [d]) { }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b], outputs: [d]) {x, y, z -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b], outputs: [d]) {}
-        }
-        shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a], outputs: [d]) {x, y -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [], outputs: [d]) { }
-        }
-        shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a], outputs: [d]) {-> }
+            def op1 = group.selector(inputs: [a], outputs: [d]) {-> }
         }
 
-        def op1 = group.operator(inputs: [a], outputs: [d]) { }
+        def op1 = group.selector(inputs: [a], outputs: [d]) { }
         op1.stop()
 
-        op1 = group.operator(inputs: [a], outputs: [d]) {x -> }
+        op1 = group.selector(inputs: [a], outputs: [d]) {x -> }
         op1.stop()
 
-        op1 = group.operator(inputs: [a, b], outputs: [d]) {x, y -> }
+        op1 = group.selector(inputs: [a, b], outputs: [d]) {x, y -> }
         op1.stop()
     }
 
@@ -293,9 +218,9 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        group.operator(inputs: [a], outputs: []) {v -> stop()}
-        group.operator(inputs: [a]) {v -> stop()}
-        group.operator(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
+        group.selector(inputs: [a], outputs: []) {v -> stop()}
+        group.selector(inputs: [a]) {v -> stop()}
+        group.selector(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
 
         a << 'value'
         a << 'value'
@@ -310,13 +235,10 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs1: [a], outputs: [d]) {v -> }
+            def op1 = group.selector(outputs: [d]) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(outputs: [d]) {v -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            def op1 = group.operator([:]) {v -> }
+            def op1 = group.selector([:]) {v -> }
         }
     }
 
@@ -324,7 +246,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = operator(inputs: [stream], outputs: []) {
+        def op = selector(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
         }
         op.metaClass.reportError = {Throwable e ->
@@ -339,7 +261,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = operator(inputs: [stream], outputs: []) {
+        def op = selector(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')
         }
         stream << 'value'

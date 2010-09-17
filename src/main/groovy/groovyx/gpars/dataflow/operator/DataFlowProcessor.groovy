@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.PGroup
 
 /**
@@ -48,11 +49,7 @@ abstract class DataFlowProcessor {
      * @param code The processor's body to run each time all inputs have a value to read
      */
     protected def DataFlowProcessor(final PGroup group, final Map channels, final Closure code) {
-        final int parameters = code.maximumNumberOfParameters
-        if (verifyChannelParameters(channels, parameters))
-            throw new IllegalArgumentException("The processor's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
-        if (channels.inputs.size() == 0) throw new IllegalArgumentException("The processor body must take some inputs. The provided list of input channels is empty.")
-
+        if (channels?.inputs?.size() == 0) throw new IllegalArgumentException("The processor body must take some inputs. The provided list of input channels is empty.")
         code.delegate = this
     }
 
@@ -60,15 +57,11 @@ abstract class DataFlowProcessor {
         return channels.maxForks != null && channels.maxForks != 1
     }
 
-    private boolean verifyChannelParameters(Map channels, int parameters) {
-        return !channels || (channels.inputs == null) || (parameters != channels.inputs.size())
-    }
-
     /**
      * Starts a processor using the specified parallel group
      * @param group The parallel group to use with the processor
      */
-    final protected DataFlowProcessor start(PGroup group) {
+    final public DataFlowProcessor start(PGroup group) {
         actor.parallelGroup = group
         actor.start()
         return this
@@ -117,4 +110,37 @@ abstract class DataFlowProcessor {
     protected abstract void reportError(Throwable e)
 
     ;
+}
+
+protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
+    protected final List inputs
+    protected final List outputs
+    protected final Closure code
+    private final def owningProcessor
+
+    def DataFlowProcessorActor(owningProcessor, group, outputs, inputs, code) {
+        super(null)
+        parallelGroup = group
+
+        this.owningProcessor = owningProcessor
+        this.outputs = outputs
+        this.inputs = inputs
+        this.code = code
+    }
+
+    abstract void onMessage(def message)
+
+    ;
+
+    final void afterStart() {
+        queryInputs()
+    }
+
+    protected final def queryInputs() {
+        return inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
+    }
+
+    final reportException(Throwable e) {
+        owningProcessor.reportError(e)
+    }
 }

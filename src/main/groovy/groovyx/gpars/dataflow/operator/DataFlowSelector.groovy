@@ -16,7 +16,6 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -45,12 +44,19 @@ public class DataFlowSelector extends DataFlowProcessor {
      */
     protected def DataFlowSelector(final PGroup group, final Map channels, final Closure code) {
         super(group, channels, code)
+        final int parameters = code.maximumNumberOfParameters
+        if (verifyChannelParameters(channels, parameters))
+            throw new IllegalArgumentException("The selector's body must accept 1 or two parameters, while it currently requests ${parameters} parameters.")
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
-            this.actor = new ForkingDataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
+            this.actor = new ForkingDataFlowSelectorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
         } else {
-            this.actor = new DataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
+            this.actor = new DataFlowSelectorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
         }
+    }
+
+    private boolean verifyChannelParameters(Map channels, int parameters) {
+        return !channels || (channels.inputs == null) || !(parameters in [1, 2])
     }
 
     /**
@@ -68,52 +74,32 @@ public class DataFlowSelector extends DataFlowProcessor {
  * Iteratively waits for enough values from inputs.
  * Once all required inputs are available (received as messages), the selector's body is run.
  */
-private class DataFlowSelectorActor extends DynamicDispatchActor {
-    private final List inputs
-    protected final List outputs
-    protected final Closure code
-    private final def owningOperator
-    private Map values = [:]
+private class DataFlowSelectorActor extends DataFlowProcessorActor {
+    protected final boolean passIndex = false
 
     def DataFlowSelectorActor(owningOperator, group, outputs, inputs, code) {
-        super(null)
-        parallelGroup = group
-
-        this.owningOperator = owningOperator
-        this.outputs = outputs
-        this.inputs = inputs
-        this.code = code
+        super(owningOperator, group, outputs, inputs, code)
+        if (code.maximumNumberOfParameters == 2) {
+            passIndex = true
+        }
     }
 
     final void onMessage(def message) {
-        values[message.attachment] = message.result
-        assert values.size() <= inputs.size()
-        if (values.size() == inputs.size()) {
-            def results = values.sort {it.key}.values() as List
-            startTask(results)
-            values = [:]
-            queryInputs()
-        }
+        final def index = message.attachment
+        startTask(index, message.result)
+        inputs[index].getValAsync(index, this)
     }
 
-    final void afterStart() {
-        queryInputs()
-    }
-
-    private def queryInputs() {
-        return inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
-    }
-
-    def startTask(results) {
+    def startTask(index, result) {
         try {
-            code.call(* results)
+            if (passIndex) {
+                code.call(result, index)
+            } else {
+                code.call(result)
+            }
         } catch (Throwable e) {
             reportException(e)
         }
-    }
-
-    final reportException(Throwable e) {
-        owningOperator.reportError(e)
     }
 }
 
@@ -132,11 +118,11 @@ private final class ForkingDataFlowSelectorActor extends DataFlowSelectorActor {
         this.threadPool = group.threadPool
     }
 
-    def startTask(results) {
+    def startTask(index, result) {
         semaphore.acquire()
         threadPool.execute {
             try {
-                code.call(* results)
+                super.startTask(index, result)
             } catch (Throwable e) {
                 reportException(e)
             } finally {

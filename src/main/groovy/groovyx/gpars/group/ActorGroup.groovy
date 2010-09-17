@@ -25,6 +25,8 @@ import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.operator.DataFlowOperator
+import groovyx.gpars.dataflow.operator.DataFlowProcessor
+import groovyx.gpars.dataflow.operator.DataFlowSelector
 import groovyx.gpars.scheduler.Pool
 
 /**
@@ -191,7 +193,16 @@ public abstract class PGroup {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    public DataFlowOperator operator(final Map channels, final Closure code) {
+    public DataFlowProcessor operator(final Map channels, final Closure code) {
         return new DataFlowOperator(this, channels, code).start(this)
+    }
+
+    /**
+     * Creates a selector using the default dataflow parallel group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The selector's body to run each time a value is available in any of the inputs channels
+     */
+    public DataFlowProcessor selector(final Map channels, final Closure code) {
+        return new DataFlowSelector(this, channels, code).start(this)
     }
 }

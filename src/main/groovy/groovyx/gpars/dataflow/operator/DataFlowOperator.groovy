@@ -16,7 +16,6 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -45,12 +44,19 @@ public final class DataFlowOperator extends DataFlowProcessor {
      */
     protected def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
         super(group, channels, code)
+        final int parameters = code.maximumNumberOfParameters
+        if (verifyChannelParameters(channels, parameters))
+            throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
             this.actor = new ForkingDataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
         } else {
             this.actor = new DataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
         }
+    }
+
+    private boolean verifyChannelParameters(Map channels, int parameters) {
+        return !channels || (channels.inputs == null) || (parameters != channels.inputs.size())
     }
 
     /**
@@ -68,21 +74,11 @@ public final class DataFlowOperator extends DataFlowProcessor {
  * Iteratively waits for enough values from inputs.
  * Once all required inputs are available (received as messages), the operator's body is run.
  */
-private class DataFlowOperatorActor extends DynamicDispatchActor {
-    private final List inputs
-    protected final List outputs
-    protected final Closure code
-    private final def owningOperator
+private class DataFlowOperatorActor extends DataFlowProcessorActor {
     private Map values = [:]
 
     def DataFlowOperatorActor(owningOperator, group, outputs, inputs, code) {
-        super(null)
-        parallelGroup = group
-
-        this.owningOperator = owningOperator
-        this.outputs = outputs
-        this.inputs = inputs
-        this.code = code
+        super(owningOperator, group, outputs, inputs, code)
     }
 
     final void onMessage(def message) {
@@ -96,24 +92,12 @@ private class DataFlowOperatorActor extends DynamicDispatchActor {
         }
     }
 
-    final void afterStart() {
-        queryInputs()
-    }
-
-    private def queryInputs() {
-        return inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
-    }
-
     def startTask(results) {
         try {
             code.call(* results)
         } catch (Throwable e) {
             reportException(e)
         }
-    }
-
-    final reportException(Throwable e) {
-        owningOperator.reportError(e)
     }
 }
 
@@ -136,7 +120,7 @@ private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
         semaphore.acquire()
         threadPool.execute {
             try {
-                code.call(* results)
+                super.startTask(results)
             } catch (Throwable e) {
                 reportException(e)
             } finally {

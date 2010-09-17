@@ -17,7 +17,7 @@
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.dataflow.operator.DataFlowOperator
+import groovyx.gpars.dataflow.operator.DataFlowProcessor
 
 /**
  * Contains factory methods to create dataflow actors and starting them.
@@ -57,11 +57,20 @@ public abstract class DataFlow {
     }
 
     /**
-     * Creates an operator using the default operator actor group
+     * Creates an operator using the default dataflow parallel group
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    public static DataFlowOperator operator(final Map channels, final Closure code) {
+    public static DataFlowProcessor operator(final Map channels, final Closure code) {
         DataFlow.DATA_FLOW_GROUP.operator(channels, code)
+
+    }
+    /**
+     * Creates a selector using the default dataflow parallel group
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param code The selector's body to run each time a value is available in any of the inputs channels
+     */
+    public static DataFlowProcessor selector(final Map channels, final Closure code) {
+        DataFlow.DATA_FLOW_GROUP.selector(channels, code)
     }
 }
