@@ -43,3 +43,5 @@ def t2 = System.currentTimeMillis()
 //operator.stop()
 
 println t2 - t1
+
+System.exit(0)

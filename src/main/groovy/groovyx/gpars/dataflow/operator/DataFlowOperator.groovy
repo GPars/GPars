@@ -44,10 +44,11 @@ public class DataFlowOperator {
 
     /**
      * Creates an operator
+     * After creation the operator needs to be started using the start() method.
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    private def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
+    protected def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
@@ -74,7 +75,7 @@ public class DataFlowOperator {
      * Starts an operator using the specified operator actor group
      * @param group The operator actor group to use with the operator
      */
-    DataFlowOperator start(PGroup group) {
+    final protected DataFlowOperator start(PGroup group) {
         actor.parallelGroup = group
         actor.start()
         return this
@@ -83,39 +84,39 @@ public class DataFlowOperator {
     /**
      * Stops the operator
      */
-    public void stop() { actor.stop() }
+    public final void stop() { actor.stop() }
 
     /**
      * Joins the operator waiting for it to finish
      */
-    public void join() { actor.join() }
+    public final void join() { actor.join() }
 
     /**
      * Used by the operator's body to send a value to the given output channel
      */
-    void bindOutput(final int idx, final value) {
+    final void bindOutput(final int idx, final value) {
         actor.outputs[idx] << value
     }
 
     /**
      * Used by the operator's body to send a value to the first / only output channel
      */
-    void bindOutput(final value) { bindOutput 0, value }
+    final void bindOutput(final value) { bindOutput 0, value }
 
     /**
      * The operator's output channel of the given index
      */
-    public getOutputs(int idx) { actor.outputs[idx] }
+    public final getOutputs(int idx) { actor.outputs[idx] }
 
     /**
      * The operator's output channel of the given index
      */
-    public getOutputs() { actor.outputs }
+    public final getOutputs() { actor.outputs }
 
     /**
      * The operator's first / only output channel
      */
-    public getOutput() { actor.outputs[0] }
+    public final getOutput() { actor.outputs[0] }
 
     /**
      * Is invoked in case the actor throws an exception.
@@ -133,11 +134,11 @@ public class DataFlowOperator {
  * Once all required inputs are available (received as messages), the operator's body is run.
  */
 private class DataFlowOperatorActor extends DynamicDispatchActor {
-    final List inputs
-    final List outputs
-    final Closure code
-    final def owningOperator
-    Map values = [:]
+    private final List inputs
+    private final List outputs
+    private final Closure code
+    private final def owningOperator
+    private Map values = [:]
 
     def DataFlowOperatorActor(owningOperator, group, outputs, inputs, code) {
         super(null)
@@ -149,7 +150,7 @@ private class DataFlowOperatorActor extends DynamicDispatchActor {
         this.code = code
     }
 
-    void onMessage(def message) {
+    final void onMessage(def message) {
         values[message.attachment] = message.result
         assert values.size() <= inputs.size()
         if (values.size() == inputs.size()) {
