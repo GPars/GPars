@@ -90,7 +90,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: forks) {x, y, z ->
             sleep 1000
             bindOutput 0, x + y + z
-            bindOutput 1, Thread.currentThread().name
+            bindOutput 1, Thread.currentThread().hashCode()
         }
 
         DataFlow.start { a << 5 }
