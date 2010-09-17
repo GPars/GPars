@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
+import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -87,7 +88,7 @@ private class DataFlowSelectorActor extends DataFlowProcessorActor {
     final void onMessage(def message) {
         final def index = message.attachment
         startTask(index, message.result)
-        inputs[index].getValAsync(index, this)
+        if (!(inputs[index] instanceof DataFlowVariable)) inputs[index].getValAsync(index, this)
     }
 
     def startTask(index, result) {

@@ -51,6 +51,28 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         op.stop()
     }
 
+    public void testSelectorNotResubscribesOnDFVs() {
+        final DataFlowVariable a = new DataFlowVariable()
+        final DataFlowVariable b = new DataFlowVariable()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op = selector(inputs: [a, b, c], outputs: [d]) {x ->
+            bindOutput 0, x
+        }
+
+        a << 5
+        b << 20
+        c << 40
+        c << 50
+        sleep 1000
+        c << 60
+
+        assert [d.val, d.val, d.val, d.val, d.val] == [5, 20, 40, 50, 60]
+
+        op.stop()
+    }
+
     public void testDefaultCopySelector() {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
