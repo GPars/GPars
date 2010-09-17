@@ -1,6 +1,11 @@
-Dataflow Operators provide a full Dataflow implementation with all the usual ceremony.
+Dataflow Operators and Selectors provide a full Dataflow implementation with all the usual ceremony.
 
 h3. Concepts
+
+Full dataflow concurrency builds on the concept of channels connecting operators and selectors, which consume
+values coming through input channels, transform them into new values and output the new values into their output channels.
+While _Operators_ wait for *all* input channels to have a value available for read before they start process them,
+_Selectors_ are triggered by a value available on *any* of the input channels.
 
 {code}
 operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
@@ -105,3 +110,39 @@ using DefaultPGroup or by providing your own thread factory to a thread pool con
 or in case your thread pools use non-daemon threads, such as when using the NonDaemonPGroup group class, make sure you shutdown the group or the thread pool explicitly by calling its shutdown() method,
 otherwise your applications will not exit.
 {note}
+
+h2. Selectors
+
+Selector's body should be a closure consuming either one or two arguments.
+{code}
+selector ([inputs : [a, b, c], outputs : [d, e]) {value ->
+    ....
+}
+{code}
+
+The two-argument closure will get a value plus an index of the input channel, the value of which is currently being processed.
+This allows the selector to distinguish between values coming through different input channels.
+
+{code}
+selector ([inputs : [a, b, c], outputs : [d, e]) {value, index ->
+    ....
+}
+{code}
+
+h3. Join selector
+
+A selector without a body closure specified will copy incoming values to all output channels.
+
+{code}
+def join = selector ([inputs : [programmers, analysis, managers], outputs : [employees, colleagues])
+{code}
+
+h3. Internal parallelism
+
+The _maxForks_ attribute allowing for internal selectors parallelism is also available.
+
+{code}
+selector ([inputs : [a, b, c], outputs : [d, e], maxForks : 5) {value ->
+    ....
+}
+{code}
