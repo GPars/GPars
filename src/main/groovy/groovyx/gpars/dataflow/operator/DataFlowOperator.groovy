@@ -121,8 +121,6 @@ private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
         threadPool.execute {
             try {
                 super.startTask(results)
-            } catch (Throwable e) {
-                reportException(e)
             } finally {
                 semaphore.release()
             }

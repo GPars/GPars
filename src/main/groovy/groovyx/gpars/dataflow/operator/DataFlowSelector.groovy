@@ -124,8 +124,6 @@ private final class ForkingDataFlowSelectorActor extends DataFlowSelectorActor {
         threadPool.execute {
             try {
                 super.startTask(index, result)
-            } catch (Throwable e) {
-                reportException(e)
             } finally {
                 semaphore.release()
             }
