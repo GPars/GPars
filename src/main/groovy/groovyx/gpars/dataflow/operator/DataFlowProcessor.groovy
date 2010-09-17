@@ -90,6 +90,12 @@ abstract class DataFlowProcessor {
     final void bindOutput(final value) { bindOutput 0, value }
 
     /**
+     * Used by the processor's body to send a value to the first / only output channel
+     */
+    @SuppressWarnings("GroovySynchronizedMethod")
+    final synchronized void bindAllOutputs(final value) { outputs.each {it << value} }
+
+    /**
      * The processor's output channel of the given index
      */
     public final getOutputs(int idx) { actor.outputs[idx] }

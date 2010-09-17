@@ -212,6 +212,6 @@ public abstract class PGroup {
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
     public DataFlowProcessor selector(final Map channels) {
-        return new DataFlowSelector(this, channels, {message -> outputs.each {it << message}}).start(this)
+        return new DataFlowSelector(this, channels, {bindAllOutputs it}).start(this)
     }
 }
