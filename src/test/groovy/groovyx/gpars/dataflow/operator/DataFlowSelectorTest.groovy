@@ -30,8 +30,8 @@ import static groovyx.gpars.dataflow.DataFlow.selector
 public class DataFlowSelectorTest extends GroovyTestCase {
 
     public void testSelector() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
@@ -47,6 +47,26 @@ public class DataFlowSelectorTest extends GroovyTestCase {
 
         assert [d.val, d.val, d.val] == [5, 20, 40]
         assert [e.val, e.val, e.val] == [10, 40, 80]
+
+        op.stop()
+    }
+
+    public void testDefaultCopySelector() {
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+        final DataFlowStream e = new DataFlowStream()
+
+        def op = selector(inputs: [a, b, c], outputs: [d, e])
+
+        a << 5
+        b << 20
+        c << 40
+        b << 50
+
+        assert [d.val, d.val, d.val, d.val] == [5, 20, 40, 50]
+        assert [e.val, e.val, e.val, e.val] == [5, 20, 40, 50]
 
         op.stop()
     }

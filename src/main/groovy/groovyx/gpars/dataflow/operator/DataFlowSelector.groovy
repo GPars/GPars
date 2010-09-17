@@ -21,8 +21,8 @@ import java.util.concurrent.Semaphore
 
 /**
  * Dataflow selectors and operators (processors) form the basic units in dataflow networks. They are typically combined into oriented graphs that transform data.
- * They accept a set of input and output dataflow channels so that once values are available to be consumed in all
- * the input channels the processor's body is triggered on the values, potentially generating values for the output channels.
+ * They accept a set of input and output dataflow channels so that once values are available to be consumed in any
+ * of the input channels the selector's body is triggered on the values, potentially generating values to be written into the output channels.
  * The output channels at the same time are suitable to be used as input channels by some other dataflow processors.
  * The channels allow processors to communicate.
  *
@@ -34,7 +34,7 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public class DataFlowSelector extends DataFlowProcessor {
+public final class DataFlowSelector extends DataFlowProcessor {
 
     /**
      * Creates a selector

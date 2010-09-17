@@ -143,7 +143,6 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
         shouldFail(IllegalArgumentException) {
@@ -174,7 +173,6 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
 
     public void testExceptionWithDefaultHandler() {
         final DataFlowStream stream = new DataFlowStream()
-        final DataFlowVariable a = new DataFlowVariable()
 
         def op = operator(inputs: [stream], outputs: [], maxFork: 3) {
             if (it == 'invalidValue') throw new RuntimeException('test')
