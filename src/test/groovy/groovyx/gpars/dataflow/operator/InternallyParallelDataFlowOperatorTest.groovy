@@ -103,7 +103,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
 
         def threads = (1..10).collect {e.val}
         assertEquals 10, threads.size()
-        assert threads.unique().size() in ((poolSize - 1)..forks)
+        assert threads.unique().size() in (([poolSize, forks].min() - 1)..[poolSize, forks].max())
 
         op.stop()
         group.shutdown()
