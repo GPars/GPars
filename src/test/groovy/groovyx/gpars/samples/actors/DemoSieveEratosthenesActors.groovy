@@ -75,6 +75,4 @@ final class FilterActor extends DynamicDispatchActor {
             reply 'Done'
         }
     }
-
-
 }
