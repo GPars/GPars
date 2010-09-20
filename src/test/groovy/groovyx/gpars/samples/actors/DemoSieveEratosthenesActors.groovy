@@ -17,7 +17,6 @@
 package groovyx.gpars.samples.actors
 
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.group.NonDaemonPGroup
 
 /**
  * Demonstrates concurrent implementation of the Sieve of Eratosthenes using actors
@@ -28,60 +27,54 @@ import groovyx.gpars.group.NonDaemonPGroup
  * The chain is built (grows) on the fly, whenever a new prime is found
  */
 
-/**
- * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowStream.val
- */
-class FooGroup {
-    static def group = new NonDaemonPGroup(8)
-}
-
 int requestedPrimeNumberBoundary = 1000
 
 final def firstFilter = new FilterActor(2).start()
 
 /**
- * Generating candidate numbers
+ * Generating candidate numbers and sending them to the actor chain
  */
-FooGroup.group.task {
-    (2..requestedPrimeNumberBoundary).each {
-        firstFilter it
-    }
-    firstFilter null
+(2..requestedPrimeNumberBoundary).each {
+    firstFilter it
 }
+firstFilter.sendAndWait 'Poisson'
 
 /**
- * Chain a new filter for a particular prime number to the end of the Sieve
- * @param inChannel The current end channel to consume
- * @param prime The prime number to divide future prime candidates with
- * @return A new channel ending the whole chain
+ * Filter out numbers that can be divided by a single prime number
  */
-
-/**
- * Consume Sieve output and add additional filters for all found primes
- */
-
 final class FilterActor extends DynamicDispatchActor {
     private final int myPrime
     private def follower
 
-    def FilterActor(final myPrime) {
-        this.myPrime = myPrime;
-        this.parallelGroup = FooGroup.group
-    }
+    def FilterActor(final myPrime) { this.myPrime = myPrime; }
 
+    /**
+     * Try to divide the received number with the prime. If the number cannot be divided, send it along the chain.
+     * If there's no-one to send it to, I'm the last in the chain, the number is a prime and so I will create and chain
+     * a new actor responsible for filtering by this newly found prime number.
+     */
     def onMessage(int value) {
         if (value % myPrime != 0) {
             if (follower) follower value
             else {
-                follower = new FilterActor(value).start()
                 println "Found $value"
+                follower = new FilterActor(value).start()
             }
         }
     }
 
+    /**
+     * Stop the actor on poisson reception
+     */
     def onMessage(def poisson) {
-        follower?.send poisson
-        stop()
-        if (!follower) this.parallelGroup.shutdown()
+        if (follower) {
+            def sender = poisson.sender
+            follower.sendAndContinue(poisson, {this.stop(); sender?.send('Done')})  //Pass the poisson along and stop after a reply
+        } else {  //I am the last in the chain
+            stop()
+            reply 'Done'
+        }
     }
+
+
 }
