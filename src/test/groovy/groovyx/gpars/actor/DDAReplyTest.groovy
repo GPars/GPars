@@ -1,0 +1,41 @@
+// GPars - Groovy Parallel Systems
+//
+// Copyright © 2008-10  The original author or authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package groovyx.gpars.actor
+
+import groovyx.gpars.dataflow.DataFlows
+
+class DDAReplyTest extends GroovyTestCase {
+    public void testSender() {
+        final DataFlows df = new DataFlows()
+
+        def dda = new DynamicDispatchActor({
+            when {msg ->
+                df.sender = msg.sender
+                msg.reply 10
+                reply 20
+            }
+        }).start()
+        def actor = Actors.actor {
+            dda new Object()
+            df.reply1 = receive()
+            df.reply2 = receive()
+        }
+        assert df.sender == actor
+        assert df.reply1 == 10
+        assert df.reply2 == 20
+    }
+}
