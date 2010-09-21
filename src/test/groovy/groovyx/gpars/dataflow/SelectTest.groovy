@@ -56,6 +56,18 @@ class SelectTest extends Specification {
         select.val == 10
     }
 
+    def "selecting from three df streams using the select's output channel"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = DataFlow.select(a, b, c)
+        when:
+        b << 10
+        then:
+        select.outputChannel.val == 10
+    }
+
     def "selecting from three df streams with a value being bound prior to selector creation"() {
         given:
         def a = new DataFlowStream()
@@ -134,7 +146,7 @@ class SelectTest extends Specification {
         when:
         select.close()
         then:
-        !select.selector.actor.isActive()
+        select.selector.actor.hasBeenStopped()
     }
 
     def "closing a fresh select will release the internal actor"() {
@@ -147,6 +159,6 @@ class SelectTest extends Specification {
         when:
         select.close()
         then:
-        !select.selector.actor.isActive()
+        select.selector.actor.hasBeenStopped()
     }
 }

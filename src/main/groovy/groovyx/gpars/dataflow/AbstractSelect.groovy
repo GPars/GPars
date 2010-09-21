@@ -16,29 +16,43 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.group.PGroup
+import groovyx.gpars.dataflow.operator.DataFlowProcessor
 
 /**
  *
  * @author Vaclav Pech
  * Date: 21st Sep 2010
  */
-final class Select extends AbstractSelect {
-    final DataFlowStream outputChannel
+abstract protected class AbstractSelect {
+    protected DataFlowProcessor selector
+    private volatile boolean active = true
 
-    def Select(final PGroup parallelGroup, final DataFlowChannel... channels) {
-        outputChannel = new DataFlowStream()
-        //todo javadoc
-        //todo java
-        //todo demo, user guide
-        selector = parallelGroup.selector([inputs: Arrays.asList(channels), outputs: [outputChannel]])
+    protected def Select() { }
+
+    abstract def select()
+
+    ;
+
+    public abstract DataFlowChannel getOutputChannel()
+
+    ;
+
+    final public def call() {
+        if (!active) throw new IllegalStateException("The Select has been stopped already.")
+        select()
     }
 
-    def select() {
-        outputChannel.val
+    final public def getVal() {
+        if (!active) throw new IllegalStateException("The Select has been stopped already.")
+        select()
     }
 
-    public DataFlowChannel getOutputChannel() {
-        outputChannel
+    final public void close() {
+        selector.stop()
+        active = false
+    }
+
+    final protected void finalize() {
+        close()
     }
 }

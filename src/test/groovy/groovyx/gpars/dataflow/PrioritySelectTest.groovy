@@ -25,7 +25,7 @@ class PrioritySelectTest extends Specification {
         def a = new DataFlowVariable()
         def b = new DataFlowVariable()
         def c = new DataFlowVariable()
-        def select = DataFlow.select(a, b, c)
+        def select = DataFlow.prioritySelect(a, b, c)
         when:
         b << 10
         then:
@@ -39,7 +39,7 @@ class PrioritySelectTest extends Specification {
         def c = new DataFlowVariable()
         c << 20
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = DataFlow.prioritySelect(a, b, c)
         then:
         select() == 20
     }
@@ -49,7 +49,7 @@ class PrioritySelectTest extends Specification {
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream()
-        def select = DataFlow.select(a, b, c)
+        def select = DataFlow.prioritySelect(a, b, c)
         when:
         b << 10
         then:
@@ -63,7 +63,7 @@ class PrioritySelectTest extends Specification {
         def c = new DataFlowStream()
         c << 20
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = DataFlow.prioritySelect(a, b, c)
         then:
         select() == 20
     }
@@ -73,7 +73,7 @@ class PrioritySelectTest extends Specification {
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream()
-        def select = DataFlow.select(a, b, c)
+        def select = DataFlow.prioritySelect(a, b, c)
         when:
         b << 10
         b << 20
@@ -84,23 +84,21 @@ class PrioritySelectTest extends Specification {
         select.val == 30
     }
 
-    def "selecting preserves order across streams"() {
+    def "selecting prioritizes across streams"() {
         given:
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream()
-        def select = DataFlow.select(a, b, c)
+        def select = DataFlow.prioritySelect(a, b, c)
         when:
         b << 10
-        sleep 3000
-        a << 20
-        sleep 3000
-        b << 30
-        sleep 3000
         c << 40
+        a << 20
+        b << 30
+        sleep 5000
         then:
-        select.val == 10
         select.val == 20
+        select.val == 10
         select.val == 30
         select.val == 40
     }
@@ -110,7 +108,7 @@ class PrioritySelectTest extends Specification {
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream()
-        def select = DataFlow.select(a, b, c)
+        def select = DataFlow.prioritySelect(a, b, c)
         b << 10
         select.val
         c << 20
@@ -127,14 +125,14 @@ class PrioritySelectTest extends Specification {
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream()
-        def select = group.select(a, b, c)
+        def select = group.prioritySelect(a, b, c)
         b << 10
         select.val
         c << 20
         when:
         select.close()
         then:
-        !select.selector.actor.isActive()
+        select.selector.actor.hasBeenStopped()
     }
 
     def "closing a fresh select will release the internal actor"() {
@@ -143,10 +141,10 @@ class PrioritySelectTest extends Specification {
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream()
-        def select = group.select(a, b, c)
+        def select = group.prioritySelect(a, b, c)
         when:
         select.close()
         then:
-        !select.selector.actor.isActive()
+        select.selector.actor.hasBeenStopped()
     }
 }

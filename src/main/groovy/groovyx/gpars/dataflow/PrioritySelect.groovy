@@ -16,43 +16,36 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.dataflow.operator.DataFlowSelector
 import groovyx.gpars.group.PGroup
+import java.util.concurrent.PriorityBlockingQueue
 
 /**
  *
  * @author Vaclav Pech
  * Date: 21st Sep 2010
  */
-final class PrioritySelect {
-    final DataFlowSelector selector
-    final PGroup parallelGroup
-    final DataFlowStream outputChannel
+final class PrioritySelect extends AbstractSelect {
+    long counter = 0
+    final PriorityBlockingQueue queue = new PriorityBlockingQueue(11, {a, b -> a.index <=> b.index ?: a.counter <=> b.counter} as Comparator)
 
     def PrioritySelect(final PGroup parallelGroup, final DataFlowChannel... channels) {
-        def inputChannels = Arrays.asList(channels)
-        outputChannel = new DataFlowStream()
-        //todo inheritance
-        //todo priority queue
-        //todo shutdown
-        selector = new DataFlowSelector(parallelGroup, [inputs: inputChannels, outputs: [outputChannel]], {bindOutput it})
+        selector = parallelGroup.selector([inputs: Arrays.asList(channels), outputs: []], {item, index -> queue.add([item: item, index: index, counter: counter++])})
     }
 
-    public def select() {
-        outputChannel.val
+    def select() {
+        queue.take().item
     }
 
-    public def call() {
-        select()
+    public DataFlowChannel getOutputChannel() {
+        new PrioritySelectChannel(queue)
     }
+}
 
-    public void close() {
-        selector.stop()
+//todo output channel enhancements and tests
+private class PrioritySelectChannel implements DataFlowChannel {
+    private PriorityQueue queue
+
+    def PrioritySelectChannel(final queue) {
+        this.queue = queue;
     }
-
-    protected void finalize() {
-        close()
-    }
-
-
 }
