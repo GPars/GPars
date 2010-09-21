@@ -271,10 +271,8 @@ public abstract class Actor extends ReplyingMessageStream {
         assert message != null;
 
         if (message == TIMEOUT_MESSAGE) handleTimeout();
-        if (message.getPayLoad() != null) {
-            getSenders().add(message.getSender());
-            obj2Sender.put(message.getPayLoad(), message.getSender());
-        }
+        getSenders().add(message.getSender());
+        obj2Sender.put(message.getPayLoad(), message.getSender());
 
         //noinspection deprecation,RawUseOfParameterizedType
         GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
