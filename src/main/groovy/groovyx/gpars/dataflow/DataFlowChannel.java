@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
  *         Date: 21st Sep 2010
  */
 public interface DataFlowChannel<T> {
+    String ATTACHMENT = "attachment";
+    String RESULT = "result";
 
     /**
      * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message

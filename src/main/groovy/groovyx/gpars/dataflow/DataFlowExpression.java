@@ -442,8 +442,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
             callback.send(value);
         } else {
             final Map<String, Object> message = new HashMap<String, Object>(2);
-            message.put("attachment", attachment);
-            message.put("result", value);
+            message.put(ATTACHMENT, attachment);
+            message.put(RESULT, value);
             callback.send(message);
         }
     }

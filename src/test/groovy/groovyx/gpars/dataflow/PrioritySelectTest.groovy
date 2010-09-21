@@ -187,12 +187,16 @@ class PrioritySelectTest extends Specification {
         select.outputChannel.getValAsync handler
         sleep 3000
         c << 50
+        select.outputChannel.getValAsync handler
+        a << 60
+
         then:
         result.val == 40
         result.val == 10
         result.val == 20
         result.val == [attachment: 'attachment', result: 30]
         result.val == 50
+        result.val == 60
         cleanup:
         handler.stop()
     }

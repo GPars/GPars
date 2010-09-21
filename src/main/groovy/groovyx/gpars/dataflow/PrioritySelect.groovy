@@ -16,10 +16,8 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.impl.MessageStream
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.PriorityBlockingQueue
-import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -48,57 +46,5 @@ public final class PrioritySelect extends AbstractSelect {
     @Override
     public DataFlowChannel getOutputChannel() {
         outputChannel
-    }
-}
-
-//todo java
-//todo output channel enhancements and tests
-//Different threads may call the callbacks
-//synchronous and asynchronous value retrievals may not be ordered
-private class PrioritySelectChannel implements DataFlowChannel {
-    private PriorityBlockingQueue queue
-    private final List queuedCallbacks = []
-
-    def PrioritySelectChannel(final queue) {
-        this.queue = queue;
-    }
-
-    void valueArrived() {
-        def callback
-        def value
-        synchronized (queuedCallbacks) {
-            callback = queuedCallbacks[0]
-            if (callback == null) return
-            value = queue.poll()
-            if (value == null) return
-            queuedCallbacks.remove(0)          //We hold the callback already
-        }
-        if (callback[0] == null) {  //no attachment
-            callback[1].send(value.item)
-        } else {
-            callback[1].send([attachment: callback[0], result: value.item])
-        }
-    }
-
-    @Override
-    public void getValAsync(final MessageStream callback) {
-        getValAsync null, callback
-    }
-
-    @Override
-    public void getValAsync(Object attachment, MessageStream callback) {
-        synchronized (queuedCallbacks) {
-            queuedCallbacks.add([attachment, callback])
-            valueArrived()
-        }
-    }
-
-    @Override
-    Object getVal() {
-        return queue.take().item
-    }
-
-    Object getVal(long timeout, TimeUnit units) {
-        return queue.poll(timeout, units)?.item
     }
 }
