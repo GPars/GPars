@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.group.NonDaemonPGroup
 import spock.lang.Specification
 
@@ -158,5 +159,41 @@ class PrioritySelectTest extends Specification {
         b << 10
         then:
         select.outputChannel.val == 10
+    }
+
+    def "selecting from three df streams using the output channel's getValAsync() method"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = DataFlow.prioritySelect(a, b, c)
+        final DataFlowStream result = new DataFlowStream()
+
+        def handler = Actors.actor {
+            loop {
+                result << receive()
+            }
+        }
+        when:
+        b << 10
+        b << 20
+        c << 30
+        a << 40
+        sleep 3000
+        select.outputChannel.getValAsync handler
+        select.outputChannel.getValAsync handler
+        select.outputChannel.getValAsync handler
+        select.outputChannel.getValAsync('attachment', handler)
+        select.outputChannel.getValAsync handler
+        sleep 3000
+        c << 50
+        then:
+        result.val == 40
+        result.val == 10
+        result.val == 20
+        result.val == [attachment: 'attachment', result: 30]
+        result.val == 50
+        cleanup:
+        handler.stop()
     }
 }

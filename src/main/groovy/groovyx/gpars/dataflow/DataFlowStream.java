@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a thread-safe data flow stream. Values or DataFlowVariables are added using the '<<' operator
@@ -132,8 +133,22 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      * @return The value bound to the DFV at the head of the stream
      * @throws InterruptedException If the current thread is interrupted
      */
+    @Override
     public T getVal() throws InterruptedException {
         return retrieveOrCreateVariable().getVal();
+    }
+
+    /**
+     * Retrieves the value at the head of the buffer. Blocks until a value is available.
+     *
+     * @param timeout The timeout value
+     * @param units   Units for the timeout
+     * @return The value bound to the DFV at the head of the stream
+     * @throws InterruptedException If the current thread is interrupted
+     */
+    @Override
+    public Object getVal(final long timeout, final TimeUnit units) throws InterruptedException {
+        return retrieveOrCreateVariable().getVal(timeout, units);
     }
 
     /**
@@ -142,10 +157,11 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
      *
-     * @param messageStream The actor to notify when a value is bound
+     * @param callback The actor to notify when a value is bound
      */
-    public void getValAsync(final MessageStream messageStream) {
-        getValAsync(null, messageStream);
+    @Override
+    public void getValAsync(final MessageStream callback) {
+        getValAsync(null, callback);
     }
 
     /**
@@ -155,11 +171,12 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
      * with the value of the Dataflow Variable.
      *
-     * @param attachment    An arbitrary value to identify operator channels and so match requests and replies
-     * @param messageStream The actor / operator to notify when a value is bound
+     * @param attachment An arbitrary value to identify operator channels and so match requests and replies
+     * @param callback   The actor / operator to notify when a value is bound
      */
-    public void getValAsync(final Object attachment, final MessageStream messageStream) {
-        retrieveOrCreateVariable().getValAsync(attachment, messageStream);
+    @Override
+    public void getValAsync(final Object attachment, final MessageStream callback) {
+        retrieveOrCreateVariable().getValAsync(attachment, callback);
     }
 
     /**

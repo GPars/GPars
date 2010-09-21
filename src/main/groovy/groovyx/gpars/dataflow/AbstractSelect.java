@@ -32,7 +32,7 @@ abstract class AbstractSelect {
 
     abstract Object doSelect() throws InterruptedException;
 
-    public abstract DataFlowChannel getOutputChannel();
+    public abstract DataFlowChannel<?> getOutputChannel();
 
     public final Object call() throws InterruptedException {
         if (!active) throw new IllegalStateException(THE_SELECT_HAS_BEEN_STOPPED_ALREADY);

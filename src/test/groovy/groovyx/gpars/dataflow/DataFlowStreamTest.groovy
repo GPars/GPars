@@ -20,6 +20,7 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 public class DataFlowStreamTest extends GroovyTestCase {
 
@@ -206,5 +207,31 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assert [10, 20, 30, 40] as Set == [dfs1.val, dfs1.val, dfs1.val, dfs1.val] as Set
         assert [10, 20, 30, 40] as Set == [dfs2.val, dfs2.val, dfs2.val, dfs2.val] as Set
         assert [10, 20, 30, 40] as Set == [dfs3.val, dfs3.val, dfs3.val, dfs3.val] as Set
+    }
+
+    public void testAsyncValueRetrieval() {
+        def result = new DataFlows()
+        final DataFlowStream stream = new DataFlowStream()
+        Actors.actor {
+            stream << 10
+        }
+        def handler = Actors.actor {
+            react {result.value = it}
+        }
+        stream.getValAsync(handler)
+        assert result.value == 10
+    }
+
+    public void testGetValWithTimeout() {
+        final DataFlowStream stream = new DataFlowStream()
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+        Actors.actor {
+            stream << 10
+            barrier.await()
+        }
+        barrier.await()
+        assert stream.getVal(10, TimeUnit.DAYS) == 10
+        assert stream.getVal(3, TimeUnit.SECONDS) == null
+        assert stream.getVal(3, TimeUnit.SECONDS) == null
     }
 }

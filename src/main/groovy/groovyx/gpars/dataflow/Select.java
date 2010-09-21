@@ -27,13 +27,14 @@ import java.util.Map;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
+@SuppressWarnings({"RawUseOfParameterizedType"})
 public final class Select extends AbstractSelect {
     private final DataFlowStream<Object> outputChannel;
 
     Select(final PGroup parallelGroup, final DataFlowChannel... channels) {
         outputChannel = new DataFlowStream<Object>();
         //todo javadoc
-        //todo demo, user guide
+        //todo demo on prioritizing real and speculative input, user guide
         final Map<String, List<? extends DataFlowChannel>> params = new HashMap<String, List<? extends DataFlowChannel>>(2);
         params.put("inputs", Arrays.asList(channels));
         params.put("outputs", Arrays.asList(outputChannel));
@@ -46,7 +47,7 @@ public final class Select extends AbstractSelect {
     }
 
     @Override
-    public DataFlowChannel getOutputChannel() {
+    public DataFlowChannel<?> getOutputChannel() {
         return outputChannel;
     }
 }

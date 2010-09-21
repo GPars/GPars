@@ -33,7 +33,7 @@ import groovyx.gpars.serial.RemoteSerialized;
  * @param <T> Type of values to bind with the DataFlowVariable
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
-public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFlowChannel {
+public class DataFlowVariable<T> extends DataFlowExpression<T> {
     private static final long serialVersionUID = 1340439210749936258L;
 
     /**

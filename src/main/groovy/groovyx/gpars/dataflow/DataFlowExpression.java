@@ -48,7 +48,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author Alex Tkachman, Vaclav Pech
  */
 @SuppressWarnings({"UnqualifiedStaticUsage", "CallToSimpleGetterFromWithinClass", "ConstantDeclaredInAbstractClass"})
-public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject {
+public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject, DataFlowChannel<T> {
 
     /**
      * Maps threads/tasks to parallel groups they belong to
@@ -154,6 +154,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param callback An actor to send the bound value to.
      */
+    @Override
     public void getValAsync(final MessageStream callback) {
         getValAsync(null, callback);
     }
@@ -170,7 +171,8 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param attachment arbitrary non-null attachment if reader needs better identification of result
      * @param callback   An actor to send the bound value plus the supplied index to.
      */
-    void getValAsync(final Object attachment, final MessageStream callback) {
+    @Override
+    public void getValAsync(final Object attachment, final MessageStream callback) {
         if (callback == null) {
             throw new NullPointerException();
         }
@@ -223,6 +225,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
+    @Override
     public T getVal() throws InterruptedException {
         WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
@@ -258,6 +261,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
+    @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final long endNano = System.nanoTime() + units.toNanos(timeout);
         WaitingThread newWaiting = null;
