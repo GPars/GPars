@@ -48,7 +48,7 @@ abstract class DataFlowProcessor {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The processor's body to run each time all inputs have a value to read
      */
-    protected def DataFlowProcessor(final PGroup group, final Map channels, final Closure code) {
+    protected def DataFlowProcessor(final Map channels, final Closure code) {
         if (channels?.inputs?.size() == 0) throw new IllegalArgumentException("The processor body must take some inputs. The provided list of input channels is empty.")
         code.delegate = this
     }
@@ -63,6 +63,14 @@ abstract class DataFlowProcessor {
      */
     final public DataFlowProcessor start(PGroup group) {
         actor.parallelGroup = group
+        actor.start()
+        return this
+    }
+
+    /**
+     * Starts a processor using the specified parallel group
+     */
+    final public DataFlowProcessor start() {
         actor.start()
         return this
     }

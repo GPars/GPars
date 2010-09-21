@@ -37,7 +37,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"LawOfDemeter", "MethodReturnOfConcreteClass", "AnonymousInnerClass", "AnonymousInnerClassWithTooManyMethods"})
-public final class DataFlowStream<T> {
+public final class DataFlowStream<T> implements DataFlowChannel {
 
     /**
      * Internal lock

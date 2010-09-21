@@ -33,13 +33,14 @@ import groovyx.gpars.serial.RemoteSerialized;
  * @param <T> Type of values to bind with the DataFlowVariable
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
-public class DataFlowVariable<T> extends DataFlowExpression<T> {
+public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFlowChannel {
     private static final long serialVersionUID = 1340439210749936258L;
 
     /**
      * Creates a new unbound Dataflow Variable
      */
-    public DataFlowVariable() { }
+    public DataFlowVariable() {
+    }
 
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
@@ -60,7 +61,8 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -458384302762038543L;
 
-            @Override public MessageStream send(final Object message) {
+            @Override
+            public MessageStream send(final Object message) {
                 bind(ref.value);
                 return this;
             }
@@ -68,7 +70,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
     }
 
     @Override
-    @SuppressWarnings ( { "unchecked" , "rawtypes" } )
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Class<RemoteDataFlowVariable> getRemoteClass() {
         return RemoteDataFlowVariable.class;
     }
@@ -83,7 +85,8 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
             getValAsync(new MessageStream() {
                 private static final long serialVersionUID = 7968302123667353660L;
 
-                @Override public MessageStream send(final Object message) {
+                @Override
+                public MessageStream send(final Object message) {
                     if (!disconnected) {
                         remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));
                     }

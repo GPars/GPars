@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.dataflow.operator.DataFlowProcessor
+import groovyx.gpars.dataflow.operator.DataFlowSelector
 import groovyx.gpars.group.PGroup
 
 /**
@@ -24,16 +24,18 @@ import groovyx.gpars.group.PGroup
  * @author Vaclav Pech
  * Date: 21st Sep 2010
  */
-final class Select {
-    final DataFlowProcessor selector
+final class PrioritySelect {
+    final DataFlowSelector selector
     final PGroup parallelGroup
     final DataFlowStream outputChannel
 
-    def Select(final PGroup parallelGroup, final DataFlowChannel... channels) {
+    def PrioritySelect(final PGroup parallelGroup, final DataFlowChannel... channels) {
         def inputChannels = Arrays.asList(channels)
         outputChannel = new DataFlowStream()
+        //todo inheritance
+        //todo priority queue
         //todo shutdown
-        selector = parallelGroup.selector([inputs: inputChannels, outputs: [outputChannel]])
+        selector = new DataFlowSelector(parallelGroup, [inputs: inputChannels, outputs: [outputChannel]], {bindOutput it})
     }
 
     public def select() {
@@ -41,10 +43,6 @@ final class Select {
     }
 
     public def call() {
-        select()
-    }
-
-    public def getVal() {
         select()
     }
 

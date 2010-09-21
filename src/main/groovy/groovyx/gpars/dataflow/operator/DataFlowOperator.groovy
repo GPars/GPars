@@ -43,7 +43,7 @@ public final class DataFlowOperator extends DataFlowProcessor {
      * @param code The operator's body to run each time all inputs have a value to read
      */
     protected def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
-        super(group, channels, code)
+        super(channels, code)
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")

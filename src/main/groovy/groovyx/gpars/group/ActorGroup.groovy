@@ -22,8 +22,11 @@ import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
+import groovyx.gpars.dataflow.DataFlowChannel
 import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.PrioritySelect
+import groovyx.gpars.dataflow.Select
 import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.dataflow.operator.DataFlowProcessor
 import groovyx.gpars.dataflow.operator.DataFlowSelector
@@ -194,7 +197,7 @@ public abstract class PGroup {
      * @param code The operator's body to run each time all inputs have a value to read
      */
     public DataFlowProcessor operator(final Map channels, final Closure code) {
-        return new DataFlowOperator(this, channels, code).start(this)
+        return new DataFlowOperator(this, channels, code).start()
     }
 
     /**
@@ -203,7 +206,7 @@ public abstract class PGroup {
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
     public DataFlowProcessor selector(final Map channels, final Closure code) {
-        return new DataFlowSelector(this, channels, code).start(this)
+        return new DataFlowSelector(this, channels, code).start()
     }
 
     /**
@@ -212,6 +215,25 @@ public abstract class PGroup {
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
     public DataFlowProcessor selector(final Map channels) {
-        return new DataFlowSelector(this, channels, {bindAllOutputs it}).start(this)
+        return new DataFlowSelector(this, channels, {bindAllOutputs it}).start()
+    }
+
+    /**
+     * Creates a select using the default dataflow parallel group. The returns Select instance will allow the user to
+     * obtain values from the supplied dataflow variables or streams as they become available.
+     * @param channels Dataflow variables or streams to wait for values on
+     */
+    public Select select(final DataFlowChannel... channels) {
+        return new Select(this, channels)
+    }
+
+    /**
+     * Creates a priority select using the default dataflow parallel group. The returns PrioritySelect instance will allow the user to
+     * obtain values from the supplied dataflow variables or streams as they become available, prioritizing by the channel index,
+     * giving lower indices higher priority.
+     * @param channels Dataflow variables or streams to wait for values on, with priority decreasing with increasing index value
+     */
+    public PrioritySelect prioritySelect(final DataFlowChannel... channels) {
+        return new PrioritySelect(this, channels)
     }
 }

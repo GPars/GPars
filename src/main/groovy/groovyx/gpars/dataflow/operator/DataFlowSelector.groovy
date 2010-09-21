@@ -44,7 +44,7 @@ public final class DataFlowSelector extends DataFlowProcessor {
      * @param code The selector's body to run each time all inputs have a value to read
      */
     protected def DataFlowSelector(final PGroup group, final Map channels, final Closure code) {
-        super(group, channels, code)
+        super(channels, code)
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The selector's body must accept 1 or two parameters, while it currently requests ${parameters} parameters.")
