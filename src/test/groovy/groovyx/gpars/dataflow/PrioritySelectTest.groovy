@@ -147,4 +147,16 @@ class PrioritySelectTest extends Specification {
         then:
         select.selector.actor.hasBeenStopped()
     }
+
+    def "selecting from three df streams using the select's output channel"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = DataFlow.prioritySelect(a, b, c)
+        when:
+        b << 10
+        then:
+        select.outputChannel.val == 10
+    }
 }

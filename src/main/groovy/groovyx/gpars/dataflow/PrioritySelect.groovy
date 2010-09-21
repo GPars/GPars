@@ -24,7 +24,7 @@ import java.util.concurrent.PriorityBlockingQueue
  * @author Vaclav Pech
  * Date: 21st Sep 2010
  */
-final class PrioritySelect extends AbstractSelect {
+public final class PrioritySelect extends AbstractSelect {
     long counter = 0
     final PriorityBlockingQueue queue = new PriorityBlockingQueue(11, {a, b -> a.index <=> b.index ?: a.counter <=> b.counter} as Comparator)
 
@@ -32,15 +32,18 @@ final class PrioritySelect extends AbstractSelect {
         selector = parallelGroup.selector([inputs: Arrays.asList(channels), outputs: []], {item, index -> queue.add([item: item, index: index, counter: counter++])})
     }
 
-    def select() {
+    @Override
+    def doSelect() {
         queue.take().item
     }
 
+    @Override
     public DataFlowChannel getOutputChannel() {
         new PrioritySelectChannel(queue)
     }
 }
 
+//todo java
 //todo output channel enhancements and tests
 private class PrioritySelectChannel implements DataFlowChannel {
     private PriorityQueue queue
