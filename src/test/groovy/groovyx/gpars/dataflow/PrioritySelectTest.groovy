@@ -161,7 +161,7 @@ class PrioritySelectTest extends Specification {
         select.outputChannel.val == 10
     }
 
-    def "selecting from three df streams using the output channel's getValAsync() method"() {
+    def "selecting from three df streams using the getValAsync() method"() {
         given:
         def a = new DataFlowStream()
         def b = new DataFlowStream()
@@ -180,11 +180,11 @@ class PrioritySelectTest extends Specification {
         c << 30
         a << 40
         sleep 3000
-        select.outputChannel.getValAsync handler
-        select.outputChannel.getValAsync handler
-        select.outputChannel.getValAsync handler
-        select.outputChannel.getValAsync('attachment', handler)
-        select.outputChannel.getValAsync handler
+        select.getValAsync handler
+        select.getValAsync handler
+        select.getValAsync handler
+        select.getValAsync('attachment', handler)
+        select.getValAsync handler
         sleep 3000
         c << 50
         select.outputChannel.getValAsync handler

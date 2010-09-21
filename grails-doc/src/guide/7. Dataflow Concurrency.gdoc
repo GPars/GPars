@@ -95,7 +95,8 @@ And these are the three essential rules your programs have to follow:
 
 h2. Dataflow Streams
 
-Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams to have a full picture of Dataflow Concurrency. Except for dataflow variables there's also a concept of _DataFlowStreams_ that you can leverage. You may think of them as thread-safe buffers or queues. Check out a typical producer-consumer demo:
+Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams to have a full picture of Dataflow Concurrency. Except for dataflow variables there's also a concept of _DataFlowStreams_ that you can leverage.
+You may think of them as thread-safe buffers or queues. Check out a typical producer-consumer demo:
 
 {code}import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -112,6 +113,10 @@ task {
     while(true) println buffer.val  //read from the buffer in a loop
 }
 {code}
+
+Both _DataFlowVariables_ and _DataFlowStreams_ implement the _DataFlowChannel_ interface with common methods allowing users
+to read values from them. The ability to treat both types identically through the _DataFlowChannel_ interface comes in handy
+once you start using them to wire _tasks_, _operators_ or _selectors_ together.
 
 h2. Bind handlers
 

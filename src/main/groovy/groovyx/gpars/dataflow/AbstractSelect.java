@@ -16,7 +16,10 @@
 
 package groovyx.gpars.dataflow;
 
+import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Allows repeatedly receive a value across multiple dataflow channels.
@@ -32,10 +35,10 @@ import groovyx.gpars.dataflow.operator.DataFlowProcessor;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-class AbstractSelect {
+class AbstractSelect<T> implements DataFlowChannel<T> {
     protected DataFlowProcessor selector;
     private volatile boolean active = true;
-    protected DataFlowChannel<?> outputChannel = null;
+    protected DataFlowChannel<T> outputChannel = null;
     private static final String THE_SELECT_HAS_BEEN_STOPPED_ALREADY = "The Select has been stopped already.";
 
     protected AbstractSelect() {
@@ -47,7 +50,7 @@ class AbstractSelect {
      * @return The value received from one of the input channels, which is now to be consumed by the user
      * @throws InterruptedException If the current thread gets interrupted inside the method call
      */
-    private Object doSelect() throws InterruptedException {
+    private T doSelect() throws InterruptedException {
         return outputChannel.getVal();
     }
 
@@ -58,8 +61,39 @@ class AbstractSelect {
      * @throws InterruptedException If the current thread gets interrupted inside the method call
      */
     public final Object call() throws InterruptedException {
-        if (!active) throw new IllegalStateException(THE_SELECT_HAS_BEEN_STOPPED_ALREADY);
+        checkAlive();
         return doSelect();
+    }
+
+    /**
+     * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message
+     * back the the supplied actor once the value has been bound.
+     * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
+     * with the value of the Dataflow channel.
+     *
+     * @param callback An actor to send the bound value to.
+     */
+    @Override
+    public final void getValAsync(final MessageStream callback) {
+        checkAlive();
+        outputChannel.getValAsync(callback);
+    }
+
+    /**
+     * Asynchronously retrieves the value from the channel. Sends a message back the the supplied MessageStream
+     * with a map holding the supplied attachment under the 'attachment' key and the actual value of the channel under
+     * the 'result' key once the value has been bound.
+     * Attachment is an arbitrary value helping the actor.operator match its request with the reply.
+     * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
+     * with the value of the Dataflow channel.
+     *
+     * @param attachment arbitrary non-null attachment if reader needs better identification of result
+     * @param callback   An actor to send the bound value plus the supplied index to.
+     */
+    @Override
+    public final void getValAsync(final Object attachment, final MessageStream callback) {
+        checkAlive();
+        outputChannel.getValAsync(attachment, callback);
     }
 
     /**
@@ -68,9 +102,28 @@ class AbstractSelect {
      * @return The value received from one of the input channels, which is now to be consumed by the user
      * @throws InterruptedException If the current thread gets interrupted inside the method call
      */
-    public final Object getVal() throws InterruptedException {
-        if (!active) throw new IllegalStateException(THE_SELECT_HAS_BEEN_STOPPED_ALREADY);
+    @Override
+    public final T getVal() throws InterruptedException {
+        checkAlive();
         return doSelect();
+    }
+
+    /**
+     * Reads the current value of the channel. Blocks up to given timeout, if the value has not been assigned yet.
+     *
+     * @param timeout The timeout value
+     * @param units   Units for the timeout
+     * @return The actual value
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
+     */
+    @Override
+    public final T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
+        checkAlive();
+        return outputChannel.getVal(timeout, units);
+    }
+
+    private void checkAlive() {
+        if (!active) throw new IllegalStateException(THE_SELECT_HAS_BEEN_STOPPED_ALREADY);
     }
 
     /**

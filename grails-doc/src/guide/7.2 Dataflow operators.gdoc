@@ -188,10 +188,13 @@ def select = select(a, b, c)
 println "The fastest result is ${select.val}"
 {code}
 
-There are multiple ways to read values from a Select:
+There are multiple ways to read values from a Select, leveraging the implemented _DataFlowChannel_ interface or the contained _outputChannel_ property:
 
 {code}
 def value = select.val                              //Compatible with other dataflow channels (variables or streams)
+def value = select.getVal(10, TimeUnit.SECONDS)     //Compatible with other dataflow channels (variables or streams)
+def value = select.getValAsync(actor)               //Compatible with other dataflow channels (variables or streams)
+def value = select.getValAsync(requestId, actor)    //Compatible with other dataflow channels (variables or streams)
 def value = select()                                //Calling the default call() method on Select
 def value = select.outputChannel.val                //Using the output dataflow channel of the Select directly
 def value = select.outputChannel.getValAsync(...)   //The Select output is a good old dataflow stream with all its handy methods for both synchronous and asynchronous value retrieval

@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.group.NonDaemonPGroup
 import spock.lang.Specification
 
@@ -160,5 +161,46 @@ class SelectTest extends Specification {
         select.close()
         then:
         select.selector.actor.hasBeenStopped()
+    }
+
+    def "selecting from three df streams using the getValAsync() method"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = DataFlow.select(a, b, c)
+        final DataFlowStream result = new DataFlowStream()
+
+        def handler = Actors.actor {
+            loop {
+                result << receive()
+            }
+        }
+        when:
+        b << 10
+        b << 20
+        sleep 1000
+        c << 30
+        sleep 1000
+        a << 40
+        sleep 1000
+        select.getValAsync handler
+        select.getValAsync handler
+        select.getValAsync handler
+        select.getValAsync('attachment', handler)
+        select.getValAsync handler
+        c << 50
+        select.outputChannel.getValAsync handler
+        a << 60
+
+        then:
+        result.val == 10
+        result.val == 20
+        result.val == 30
+        result.val == [attachment: 'attachment', result: 40]
+        result.val == 50
+        result.val == 60
+        cleanup:
+        handler.stop()
     }
 }
