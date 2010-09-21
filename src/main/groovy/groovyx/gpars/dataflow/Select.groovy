@@ -28,15 +28,18 @@ final class Select {
     final DataFlowProcessor selector
     final PGroup parallelGroup
     final DataFlowStream outputChannel
+    private volatile boolean active = true
 
     def Select(final PGroup parallelGroup, final DataFlowChannel... channels) {
         def inputChannels = Arrays.asList(channels)
         outputChannel = new DataFlowStream()
         //todo shutdown
+        //todo demo, user guide
         selector = parallelGroup.selector([inputs: inputChannels, outputs: [outputChannel]])
     }
 
     public def select() {
+        if (!active) throw new IllegalStateException("The Select has been stopped already.")
         outputChannel.val
     }
 
@@ -50,6 +53,7 @@ final class Select {
 
     public void close() {
         selector.stop()
+        active = false
     }
 
     protected void finalize() {

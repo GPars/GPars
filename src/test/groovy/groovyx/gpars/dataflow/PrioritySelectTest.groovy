@@ -16,9 +16,10 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.group.NonDaemonPGroup
 import spock.lang.Specification
 
-class SelectorTest extends Specification {
+class PrioritySelectTest extends Specification {
     def "selecting from three df variables"() {
         given:
         def a = new DataFlowVariable()
@@ -91,16 +92,61 @@ class SelectorTest extends Specification {
         def select = DataFlow.select(a, b, c)
         when:
         b << 10
-        sleep 5000
+        sleep 3000
         a << 20
-        sleep 5000
+        sleep 3000
         b << 30
-        sleep 5000
+        sleep 3000
         c << 40
         then:
         select.val == 10
         select.val == 20
         select.val == 30
         select.val == 40
+    }
+
+    def "closing a select will reject further requests"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = DataFlow.select(a, b, c)
+        b << 10
+        select.val
+        c << 20
+        select.close()
+        when:
+        select.val
+        then:
+        thrown(IllegalStateException)
+    }
+
+    def "closing a select will release the internal actor"() {
+        given:
+        def group = new NonDaemonPGroup()
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = group.select(a, b, c)
+        b << 10
+        select.val
+        c << 20
+        when:
+        select.close()
+        then:
+        !select.selector.actor.isActive()
+    }
+
+    def "closing a fresh select will release the internal actor"() {
+        given:
+        def group = new NonDaemonPGroup()
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = group.select(a, b, c)
+        when:
+        select.close()
+        then:
+        !select.selector.actor.isActive()
     }
 }
