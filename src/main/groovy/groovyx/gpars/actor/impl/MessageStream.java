@@ -46,7 +46,7 @@ public abstract class MessageStream extends WithSerialId {
      *
      * @return always return message stream itself
      */
-    public MessageStream send() {
+    public final MessageStream send() {
         return send(new Object());
     }
 
@@ -128,7 +128,7 @@ public abstract class MessageStream extends WithSerialId {
     }
 
     @Override
-    @SuppressWarnings ( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Class<RemoteMessageStream> getRemoteClass() {
         return RemoteMessageStream.class;
     }
@@ -185,7 +185,7 @@ public abstract class MessageStream extends WithSerialId {
          * @return The received message
          * @throws InterruptedException If the thread gets interrupted
          */
-        @SuppressWarnings ( "unchecked" )
+        @SuppressWarnings("unchecked")
         public V getResult() throws InterruptedException {
             while (!isSet) {
                 LockSupport.park();

@@ -20,15 +20,30 @@ import groovyx.gpars.group.PGroup
 import java.util.concurrent.PriorityBlockingQueue
 
 /**
+ * Allows repeatedly receive a value across multiple dataflow channels.
+ * Whenever a value is available in any of the channels, the vallu becomes available on the Select itself
+ * through its val property.
+ * Alternatively timed getVal method can be used, as well as getValAsync() for asynchronous value retrieval
+ * or the call() method for nicer syntax.
+ *
+ * The output values can also be consumed through the channel obtained from the getOutputChannel method.
+ *
+ * This implementation will preserve order of values coming through the same channel, while values coming through
+ * different channels will be prioritized based on the index of their input channel.
+ * The lower the index of the input channel, the higher priority the values coming through it have.
  *
  * @author Vaclav Pech
- * Date: 21st Sep 2010
+ *         Date: 21st Sep 2010
  */
 public final class PrioritySelect extends AbstractSelect {
-    long counter = 0
-    final PriorityBlockingQueue queue = new PriorityBlockingQueue(11, {a, b -> a.index <=> b.index ?: a.counter <=> b.counter} as Comparator)
-    final PrioritySelectChannel outputChannel
+    private long counter = 0L
+    private final PriorityBlockingQueue queue = new PriorityBlockingQueue(11, {a, b -> a.index <=> b.index ?: a.counter <=> b.counter} as Comparator)
 
+    /**
+     * Creates a new PrioritySelect instance scanning the input channels using threads from the given parallel group's thread pool
+     * @param parallelGroup The group to attach to the internal actor
+     * @param channels The channels to monitor for values, considering channels with lower index to have higher priority
+     */
     def PrioritySelect(final PGroup parallelGroup, final DataFlowChannel... channels) {
         outputChannel = new PrioritySelectChannel(queue)
         selector = parallelGroup.selector([inputs: Arrays.asList(channels), outputs: []],
@@ -36,15 +51,5 @@ public final class PrioritySelect extends AbstractSelect {
                     queue.add([item: item, index: index, counter: counter++])
                     outputChannel.valueArrived()
                 })
-    }
-
-    @Override
-    def doSelect() {
-        outputChannel.val
-    }
-
-    @Override
-    public DataFlowChannel getOutputChannel() {
-        outputChannel
     }
 }

@@ -28,8 +28,12 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Arrays.asList;
 
 /**
- * Different threads may call the callbacks
- * synchronous and asynchronous value retrievals may not be ordered
+ * Implements a dataflow channel for values output from a PrioritySelect class.
+ * <p/>
+ * Limitations:
+ * Different threads may call end-up calling the callbacks provided into the getValAsync() method. It can either be the selector's actor thread
+ * or the caller calling getValAsync itself.
+ * Subsequent synchronous and asynchronous value retrievals may not receive values in the order of their respective calls.
  *
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
@@ -43,6 +47,9 @@ class PrioritySelectChannel implements DataFlowChannel<Object> {
         this.queue = queue;
     }
 
+    /**
+     * Attempts to deliver a value to a queued callback
+     */
     void valueArrived() {
         final List<Object> callback;
         final Map<String, Object> value;
@@ -62,11 +69,30 @@ class PrioritySelectChannel implements DataFlowChannel<Object> {
         }
     }
 
+    /**
+     * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message
+     * back the the supplied actor once the value has been bound.
+     * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
+     * with the value of the Dataflow channel.
+     *
+     * @param callback An actor to send the bound value to.
+     */
     @Override
     public void getValAsync(final MessageStream callback) {
         getValAsync(null, callback);
     }
 
+    /**
+     * Asynchronously retrieves the value from the channel. Sends a message back the the supplied MessageStream
+     * with a map holding the supplied attachment under the 'attachment' key and the actual value of the channel under
+     * the 'result' key once the value has been bound.
+     * Attachment is an arbitrary value helping the actor.operator match its request with the reply.
+     * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
+     * with the value of the Dataflow channel.
+     *
+     * @param attachment arbitrary non-null attachment if reader needs better identification of result
+     * @param callback   An actor to send the bound value plus the supplied index to.
+     */
     @Override
     public void getValAsync(final Object attachment, final MessageStream callback) {
         synchronized (queuedCallbacks) {
@@ -75,11 +101,25 @@ class PrioritySelectChannel implements DataFlowChannel<Object> {
         }
     }
 
+    /**
+     * Reads the current value of the channel. Blocks, if the value has not been assigned yet.
+     *
+     * @return The actual value
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
+     */
     @Override
     public Object getVal() throws InterruptedException {
         return queue.take().get("item");
     }
 
+    /**
+     * Reads the current value of the channel. Blocks up to given timeout, if the value has not been assigned yet.
+     *
+     * @param timeout The timeout value
+     * @param units   Units for the timeout
+     * @return The actual value
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
+     */
     @Override
     public Object getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final Map<String, Object> value = queue.poll(timeout, units);

@@ -24,30 +24,34 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Allows repeatedly receive a value across multiple dataflow channels.
+ * Whenever a value is available in any of the channels, the value becomes available on the Select itself
+ * through its val property.
+ * Alternatively timed getVal method can be used, as well as getValAsync() for asynchronous value retrieval
+ * or the call() method for nicer syntax.
+ * <p/>
+ * The output values can also be consumed through the channel obtained from the getOutputChannel method.
+ * <p/>
+ * This implementation will preserve order of values coming through the same channel, while doesn't give any guaranties
+ * about order of messages coming through different channels.
+ *
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
 @SuppressWarnings({"RawUseOfParameterizedType"})
 public final class Select extends AbstractSelect {
-    private final DataFlowStream<Object> outputChannel;
 
+    /**
+     * Creates a new Select instance scanning the input channels using threads from the given parallel group's thread pool
+     *
+     * @param parallelGroup The group to attach to the internal actor
+     * @param channels      The channels to monitor for values
+     */
     Select(final PGroup parallelGroup, final DataFlowChannel... channels) {
         outputChannel = new DataFlowStream<Object>();
-        //todo javadoc
-        //todo demo on prioritizing real and speculative input, user guide
         final Map<String, List<? extends DataFlowChannel>> params = new HashMap<String, List<? extends DataFlowChannel>>(2);
         params.put("inputs", Arrays.asList(channels));
         params.put("outputs", Arrays.asList(outputChannel));
         selector = parallelGroup.selector(params);
-    }
-
-    @Override
-    Object doSelect() throws InterruptedException {
-        return outputChannel.getVal();
-    }
-
-    @Override
-    public DataFlowChannel<?> getOutputChannel() {
-        return outputChannel;
     }
 }
