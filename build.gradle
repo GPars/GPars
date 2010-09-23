@@ -254,6 +254,8 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'FibonacciV1',                                //Never stops
             'FibonacciV2',                                //Never stops
             'DemoSieveEratosthenesCSP',                   //Never stops
+            'DemoSieveEratosthenesTheGoWay',              //Never stops
+            'DemoSieveEratosthenesTheGoWayWithOperators', //Never stops
             'DemoThreading',                              //Never stops
             'RunReset',                                   //Starts UI
     ]
