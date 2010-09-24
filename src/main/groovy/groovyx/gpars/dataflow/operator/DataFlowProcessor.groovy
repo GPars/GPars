@@ -78,7 +78,7 @@ abstract class DataFlowProcessor {
     /**
      * Stops the processor
      */
-    public final void stop() { actor.stop() }
+    public void stop() { actor.stop() }
 
     /**
      * Joins the processor waiting for it to finish
@@ -143,8 +143,6 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
     }
 
     abstract void onMessage(def message)
-
-    ;
 
     final void afterStart() {
         queryInputs()

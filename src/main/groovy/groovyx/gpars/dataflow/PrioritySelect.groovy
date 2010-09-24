@@ -43,12 +43,13 @@ public final class PrioritySelect extends AbstractSelect {
      * Creates a new PrioritySelect instance scanning the input channels using threads from the given parallel group's thread pool
      * @param parallelGroup The group to attach to the internal actor
      * @param channels The channels to monitor for values, considering channels with lower index to have higher priority
+     * @param itemFactory An optional factory creating items to output out of the received items and their index. The default implementation only propagates the obtained values and ignores the index
      */
-    def PrioritySelect(final PGroup parallelGroup, final DataFlowChannel... channels) {
+    def PrioritySelect(final Closure itemFactory = {item, index -> item}, final PGroup parallelGroup, final DataFlowChannel... channels) {
         outputChannel = new PrioritySelectChannel(queue)
         selector = parallelGroup.selector([inputs: Arrays.asList(channels), outputs: []],
                 {item, index ->
-                    queue.add([item: item, index: index, counter: counter++])
+                    queue.add([item: itemFactory(item, index), index: index, counter: counter++])
                     outputChannel.valueArrived()
                 })
     }

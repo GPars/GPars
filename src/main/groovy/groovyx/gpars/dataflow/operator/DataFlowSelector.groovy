@@ -35,7 +35,7 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public final class DataFlowSelector extends DataFlowProcessor {
+public class DataFlowSelector extends DataFlowProcessor {
 
     /**
      * Creates a selector
@@ -63,7 +63,7 @@ public final class DataFlowSelector extends DataFlowProcessor {
     /**
      * Is invoked in case the actor throws an exception.
      */
-    protected void reportError(Throwable e) {
+    protected final void reportError(Throwable e) {
         System.err.println "The dataflow selector experienced an exception and is about to terminate. $e"
         stop()
     }

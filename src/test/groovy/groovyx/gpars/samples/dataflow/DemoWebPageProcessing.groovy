@@ -36,7 +36,8 @@ final DataFlowStream urlsRequests = new DataFlowStream()
 final DataFlowStream urls = new DataFlowStream()
 final DataFlowStream pagesForGroovy = new DataFlowStream()
 final DataFlowStream pagesForScala = new DataFlowStream()
-final DataFlowStream results = new DataFlowStream()
+final DataFlowStream resultsFromGroovy = new DataFlowStream()
+final DataFlowStream resultsFromScala = new DataFlowStream()
 final DataFlowStream reports = new DataFlowStream()
 
 def urlResolver = operator(inputs: [urlsRequests], outputs: [urls]) {
@@ -49,32 +50,30 @@ def downloader = operator(inputs: [urls], outputs: [pagesForGroovy, pagesForScal
     bindAllOutputs it
 }
 
-def groovyScanner = operator(inputs: [pagesForGroovy], outputs: [results]) {
+def groovyScanner = operator(inputs: [pagesForGroovy], outputs: [resultsFromGroovy]) {
     def foundWord = it.content.toLowerCase().contains('groovy') ? 'groovy' : ''
     bindOutput([url: it.url, foundWord: foundWord])
 }
-def scalaScanner = operator(inputs: [pagesForScala], outputs: [results]) {
+def scalaScanner = operator(inputs: [pagesForScala], outputs: [resultsFromScala]) {
     def foundWord = it.content.toLowerCase().contains('scala') ? 'scala' : ''
     bindOutput([url: it.url, foundWord: foundWord])
 }
 
-def reportsInProgress = [:]
-
-def reporter = operator(inputs: [results], outputs: [reports]) {
-    def relatedReportInProgress = reportsInProgress[it.url]
-    if (relatedReportInProgress != null) {
-        def result
-        if (relatedReportInProgress) {
-            result = it.foundWord ? relatedReportInProgress + " and ${it.foundWord}" : relatedReportInProgress
-        } else {
-            result = it.foundWord ?: 'No interesting words'
-        }
-        reportsInProgress.remove(it.url)
-        bindOutput "$result found at ${it.url}"
-
-    } else {
-        reportsInProgress[it.url] = it.foundWord
+def reporter = operator(inputs: [resultsFromGroovy, resultsFromScala], outputs: [reports]) {g, s ->
+    assert g.url == s.url
+    def words = [g.foundWord, s.foundWord].findAll {it}
+    def result
+    switch (words.size()) {
+        case 2:
+            result = "${g.foundWord} and ${s.foundWord}"
+            break
+        case 1:
+            result = words[0]
+            break
+        default:
+            result = 'No interesting words'
     }
+    bindOutput "$result found at ${g.url}"
 }
 
 task {
