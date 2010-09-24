@@ -12,6 +12,7 @@ See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
 h3. Parallel collections
 
 * Added a speculate() method to concurrently run multiple functions each representing a different path to achieve the required goal, while harvesting the first calculated result
+* Added the _combine_ method into the map/reduce family of functions
 
 h3. Fork / Join
 
@@ -25,6 +26,11 @@ h3. GroovyCSP
 
 h3. Dataflow
 
+* New specialized operators - selector, prioritySelector and splitter
+* Added select and prioritySelect methods to select a value from multiple channels
+* Introduced dataflow queues
+* Unified the interface for dataflow variables, streams and queues
+* MEthods for atomic update to multiple operator's output channels
 * Fixed issues with reusing the same parallel group in the DataFlowVariable whenBound() handlers
 * Tasks can return values and can be joined
 

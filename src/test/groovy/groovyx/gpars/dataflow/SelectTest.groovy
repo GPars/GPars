@@ -33,18 +33,6 @@ class SelectTest extends Specification {
         select.val == 10
     }
 
-    def "selecting from three df variables using custom item factory"() {
-        given:
-        def a = new DataFlowVariable()
-        def b = new DataFlowVariable()
-        def c = new DataFlowVariable()
-        def select = DataFlow.select({item, index -> [value: item, index: index]}, a, b, c)
-        when:
-        b << 10
-        then:
-        select.val == [value: 10, index: 1]
-    }
-
     def "selecting from three df variables with a value being bound prior to selector creation"() {
         given:
         def a = new DataFlowVariable()

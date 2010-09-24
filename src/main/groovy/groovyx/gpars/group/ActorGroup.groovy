@@ -267,16 +267,6 @@ public abstract class PGroup {
     }
 
     /**
-     * Creates a select using the current parallel group. The returns Select instance will allow the user to
-     * obtain values from the supplied dataflow variables or streams as they become available.
-     * @param channels Dataflow variables or streams to wait for values on
-     * @param itemFactory An optional factory creating items to output out of the received items and their index. The default implementation only propagates the obtained values and ignores the index
-     */
-    public Select select(final Closure itemFactory, final DataFlowChannel... channels) {
-        return new Select(itemFactory, this, channels)
-    }
-
-    /**
      * Creates a priority select using the current parallel group. The returns PrioritySelect instance will allow the user to
      * obtain values from the supplied dataflow variables or streams as they become available, prioritizing by the channel index,
      * giving lower index higher priority.
