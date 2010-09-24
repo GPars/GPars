@@ -129,6 +129,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         a << 2
         a << 3
         a << 4
+        sleep 3000
 
         assert [b.val, b.val, b.val, b.val] == [1, 2, 3, 4]
 
