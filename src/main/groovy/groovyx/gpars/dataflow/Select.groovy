@@ -16,12 +16,8 @@
 
 package groovyx.gpars.dataflow;
 
-import groovyx.gpars.group.PGroup;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import groovyx.gpars.group.PGroup
 
 /**
  * Allows repeatedly receive a value across multiple dataflow channels.
@@ -38,20 +34,19 @@ import java.util.Map;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-@SuppressWarnings({"RawUseOfParameterizedType"})
 public final class Select extends AbstractSelect {
 
     /**
      * Creates a new Select instance scanning the input channels using threads from the given parallel group's thread pool
      *
      * @param parallelGroup The group to attach to the internal actor
-     * @param channels      The channels to monitor for values
+     * @param channels The channels to monitor for values
      */
-    Select(final PGroup parallelGroup, final DataFlowChannel... channels) {
+    Select(final Closure itemFactory = {item, index -> item}, final PGroup parallelGroup, final DataFlowChannel... channels) {
         outputChannel = new DataFlowStream<Object>();
-        final Map<String, List<? extends DataFlowChannel>> params = new HashMap<String, List<? extends DataFlowChannel>>(2);
-        params.put("inputs", Arrays.asList(channels));
-        params.put("outputs", Arrays.asList(outputChannel));
-        selector = parallelGroup.selector(params);
+        selector = parallelGroup.selector([inputs: Arrays.asList(channels), outputs: [outputChannel]],
+                {item, index ->
+                    bindOutput itemFactory(item, index)
+                })
     }
 }
