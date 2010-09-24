@@ -377,7 +377,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
-            bindAllOutputValues([x, x, x])
+            bindAllOutputValues x, x, x
         }
         final IntRange range = 1..100
         range.each {a << it}
@@ -424,7 +424,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
-            bindAllOutputValuesAtomically([x, x, x])
+            bindAllOutputValuesAtomically x, x, x
         }
         final IntRange range = 1..10
         range.each {a << it}
@@ -449,7 +449,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
-            bindAllOutputValuesAtomically([x, 2 * x, 3 * x])
+            bindAllOutputValuesAtomically x, 2 * x, 3 * x
         }
         final IntRange range = 1..10
         range.each {a << it}

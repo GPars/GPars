@@ -106,13 +106,15 @@ abstract class DataFlowProcessor {
     final void bindAllOutputs(final value) { outputs.each {it << value} }
 
     /**
-     * Used by the processor's body to send a value to all output channels.
+     * Used by the processor's body to send a value to all output channels. The values passed as arguments will each be sent
+     * to an output channel with identical position index.
+     *
      * If the maxForks value is set to a value greater than 1, calls to bindAllOutputs may result in values written to different
      * channels to be in different order. If this is a problem for the application logic, the bindAllOutputsAtomically
      * method should be considered instead.
-     * @param values A list of values to send to output channels of the same position index
+     * @param values Values to send to output channels of the same position index
      */
-    final void bindAllOutputValues(final List values) { outputs.eachWithIndex {channel, index ->  channel << values[index]} }
+    final void bindAllOutputValues(final ... values) { outputs.eachWithIndex {channel, index ->  channel << values[index]} }
 
     /**
      * Used by the processor's body to send a value to all output channels, while guaranteeing atomicity of the operation
@@ -124,10 +126,12 @@ abstract class DataFlowProcessor {
     /**
      * Used by the processor's body to send a value to all output channels, while guaranteeing atomicity of the operation
      * and preventing other calls to bindAllOutputsAtomically() from interfering with one another.
-     * @param values A list of values to send to output channels of the same position index
+     * The values passed as arguments will each be sent to an output channel with identical position index.
+
+     * @param values Values to send to output channels of the same position index
      */
     @SuppressWarnings("GroovySynchronizedMethod")
-    final synchronized void bindAllOutputValuesAtomically(final List values) { outputs.eachWithIndex {channel, index ->  channel << values[index]} }
+    final synchronized void bindAllOutputValuesAtomically(final ... values) { outputs.eachWithIndex {channel, index ->  channel << values[index]} }
 
     /**
      * The processor's output channel of the given index
