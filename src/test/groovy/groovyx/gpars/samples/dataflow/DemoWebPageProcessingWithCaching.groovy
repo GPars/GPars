@@ -18,7 +18,7 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
 import static groovyx.gpars.dataflow.DataFlow.operator
-import static groovyx.gpars.dataflow.DataFlow.selector
+import static groovyx.gpars.dataflow.DataFlow.prioritySelector
 import static groovyx.gpars.dataflow.DataFlow.splitter
 import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -46,23 +46,24 @@ final DataFlowStream confirmations = new DataFlowStream()
 final DataFlowStream reports = new DataFlowStream()
 final DataFlowStream contentForCache = new DataFlowStream()
 
-//todo polish
-//todo resolve confirmation on real data
-//todo test prioritySelector based on selector
 def long counter = 0L
 def urlResolver = operator(inputs: [urlsRequests], outputs: [urls, urlsForSpeculation]) {
     bindAllOutputs([id: counter++, url: "http://www.${it}.com"])
 }
 
 def downloader = operator(inputs: [urls], outputs: [pages, confirmations, contentForCache]) {
-    def content = it.url.toURL().text
-    it.content = content
+    try {
+        def content = it.url.toURL().text
+        it.content = content
+    } catch (ignore) {
+        it.content = 'Could not download'
+    }
     bindAllOutputsAtomically it
 }
 
 def cache = ['http://www.jetbrains.com': 'groovy scala kfjhskfhsk']
 
-def speculator = selector(inputs: [urlsForSpeculation, contentForCache], outputs: [pages]) {msg, index ->
+def speculator = prioritySelector(inputs: [urlsForSpeculation, contentForCache], outputs: [pages]) {msg, index ->
     if (index == 0) {
         def content = cache[msg.url]
         if (content) bindAllOutputs([id: msg.id, url: msg.url, speculation: true, content: content])
@@ -106,9 +107,9 @@ def unconfirmedSpeculativeReports = [:]
 def deliveredConfirmations = [:]
 def processedIds = new HashSet()
 
-def confirm = selector(inputs: [downloader.outputs[1], reporter.output], outputs: [reports]) {msg ->
+def confirm = prioritySelector(inputs: [downloader.outputs[1], reporter.output], outputs: [reports]) {msg, index ->
     if (msg.id in processedIds) return
-    if (msg.result != null) {  //differentiate between inputs serialized by the priority select
+    if (index == 1) {
         final boolean isSpeculation = msg.speculation
         if (isSpeculation) {
             final def confirmation = deliveredConfirmations[msg.id]
@@ -162,6 +163,6 @@ task {
 sleep 10000
 println 'Cache ' + cache.keySet()
 
-['dzone', 'infoq', 'jetbrains', 'oracle'].each {
+['dzone', 'infoq', 'invalidUrl_', 'jetbrains', 'oracle'].each {
     urlsRequests << it
 }
