@@ -129,7 +129,7 @@ public abstract class DataFlow {
      * giving lower index higher priority.
      * @param channels Dataflow variables or streams to wait for values on, with priority decreasing with increasing index value
      */
-    public static PrioritySelect prioritySelect1(final DataFlowChannel... channels) {
+    public static PrioritySelect prioritySelect(final DataFlowChannel... channels) {
         DataFlow.DATA_FLOW_GROUP.prioritySelect(channels)
     }
 

@@ -156,7 +156,7 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
     protected final List inputs
     protected final List outputs
     protected final Closure code
-    private final def owningProcessor
+    protected final def owningProcessor
 
     def DataFlowProcessorActor(owningProcessor, group, outputs, inputs, code) {
         super(null)

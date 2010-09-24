@@ -115,7 +115,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         c << 60
 
         assert [d.val, d.val, d.val, d.val, d.val] == [5, 20, 40, 50, 60]
-        assert [e.val, e.val, e.val, e.val, e.val] == [0, 1, 1, 2, 2]
+        assert [e.val, e.val, e.val, e.val, e.val] == [0, 1, 2, 1, 2]
 
         op.stop()
     }

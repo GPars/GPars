@@ -67,6 +67,20 @@ public class DataFlowSelector extends DataFlowProcessor {
         System.err.println "The dataflow selector experienced an exception and is about to terminate. $e"
         stop()
     }
+
+    /**
+     * Extracts the index of the channel to pass to the client closure
+     */
+    protected def extractIndex(message) {
+        message.attachment
+    }
+
+    /**
+     * Extracts the value to pass to the client closure
+     */
+    protected def extractValue(message) {
+        message.result
+    }
 }
 
 /**
@@ -86,8 +100,10 @@ private class DataFlowSelectorActor extends DataFlowProcessorActor {
     }
 
     final void onMessage(def message) {
+        final def originalChannelIndex = owningProcessor.extractIndex(message)
         final def index = message.attachment
-        startTask(index, message.result)
+        final def value = owningProcessor.extractValue(message)
+        startTask(originalChannelIndex, value)
         if (!(inputs[index] instanceof DataFlowVariable)) inputs[index].getValAsync(index, this)
     }
 

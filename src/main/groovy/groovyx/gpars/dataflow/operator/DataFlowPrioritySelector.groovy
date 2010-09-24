@@ -42,11 +42,34 @@ public final class DataFlowPrioritySelector extends DataFlowSelector {
      * Creates a priority selector
      * After creation the selector needs to be started using the start() method.
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param select A PrioritySelect instance prioritizing incoming values by the input channel, wrapping them into a map, which holds the original index and the message value
      * @param code The selector's body to run each time all inputs have a value to read
      */
     protected def DataFlowPrioritySelector(final PGroup group, final Map channels, final PrioritySelect select, final Closure code) {
         super(group, channels, code)
         this.select = select
+    }
+
+    /**
+     * Extracts the index of the channel to pass to the client closure.
+     * With PrioritySelect shielding the DataFlowPrioritySelector instance
+     * the information about the original input channel index and the message value itself
+     * must be stored in a message wrapper so that the original index could be consumed by the prioritySelector's body
+     * DataFlowPrioritySelector unwraps both the index and the value in the extractIndex() and extractValue methods.
+     */
+    protected final def extractIndex(message) {
+        message.result.index
+    }
+
+    /**
+     * Extracts the value to pass to the client closure
+     * With PrioritySelect shielding the DataFlowPrioritySelector instance
+     * the information about the original input channel index and the message value itself
+     * must be stored in a message wrapper so that the original index could be consumed by the prioritySelector's body
+     * DataFlowPrioritySelector unwraps both the index and the value in the extractIndex() and extractValue methods.
+     */
+    protected final def extractValue(message) {
+        message.result.value
     }
 
     /**
