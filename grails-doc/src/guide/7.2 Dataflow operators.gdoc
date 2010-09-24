@@ -73,7 +73,7 @@ There are specialized versions of operators serving specific purposes:
 
   * operator - the basic general-purpose operator
   * selector - operator that is triggered by a value being available in any of its input channels
-  * prioritySelect - a selector that prefers delivering messages from lower-indexed input channels over higher-indexed ones
+  * prioritySelector - a selector that prefers delivering messages from lower-indexed input channels over higher-indexed ones
   * splitter - a single-input operator copying its input values to all of its output channels
 
 h4. Chaining operators
@@ -86,7 +86,7 @@ splitter(c, [e, f])
 selector(inputs:[e, d]: outputs:[]) {...}
 {code}
 
-You may alternatively refer to output channels through operators:
+You may alternatively refer to output channels through operators themselves:
 
 {code}
 def op1 = operator(inputs:[a, b], outputs:[c, d]) {...}
@@ -103,58 +103,79 @@ you need to avoid or protect shared resources from multi-threaded access.
 To enable multiple threads to run the operator's body concurrently, pass an extra _maxForks_ parameter when creating an operator:
 
 {code}
-    def op = operator(inputs: [a, b, c], outputs: [d, e], maxForks: 2) {x, y, z ->
-        bindOutput 0, x + y + z
-        bindOutput 1, x * y * z
-    }
+def op = operator(inputs: [a, b, c], outputs: [d, e], maxForks: 2) {x, y, z ->
+    bindOutput 0, x + y + z
+    bindOutput 1, x * y * z
+}
 {code}
 
 The value of the _maxForks_ parameter indicates the maximum of threads running the operator concurrently. Only positive
 numbers are allowed with value 1 being the default.
+
+{note}
+Please always make sure the *group* serving the operator holds enough threads to support all requested forks.
+
+{code}
+def group = new DefaultPGroup(10)
+group.operator((inputs: [a, b, c], outputs: [d, e], maxForks: 5) {x, y, z -> ...}
+{code}
+
+The default group uses a resizeable thread pool as so will never run out of threads.
+{note}
 
 h4. Synchronizing the output
 
 When enabling internal parallelization of an operator by setting the value for _maxForks_ to a value greater than 1
 it is important to remember that without explicit or implicit synchronization in the operators' body race-conditions may occur.
 Especially bear in mind that values written to multiple output channels are not guarantied to be written atomically in the same order to all the channels
- {code}
-    operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
-        bindOutput 0, msg
-        bindOutput 1, msg
-    }
-    inputChannel << 1
-    inputChannel << 2
-    inputChannel << 3
-    inputChannel << 4
-    inputChannel << 5
- {code}
- May result output streams having the values mixed-up something like:
- a -> 1, 3, 2, 4, 5
- b -> 2, 1, 3, 5, 4
+{code}
+operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
+    bindOutput 0, msg
+    bindOutput 1, msg
+}
+inputChannel << 1
+inputChannel << 2
+inputChannel << 3
+inputChannel << 4
+inputChannel << 5
+{code}
+ May result in output streams having the values mixed-up something like:
+{code}
+a -> 1, 3, 2, 4, 5
+b -> 2, 1, 3, 5, 4
+{code}
 
  Explicit synchronization is one way to get correctly bound all output channels and protect operator not-thread local state:
- {code}
-    def lock = new Object()
-    operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
-        doStuffThatIsThreadSafe()
+{code}
+def lock = new Object()
+operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
+    doStuffThatIsThreadSafe()
 
-        synchronized(lock) {
-            doSomethingThatMustNotBeAccessedByMultipleThreadsAtTheSameTime()
-            bindOutput 0, msg
-            bindOutput 1, 2*msg
-        }
+    synchronized(lock) {
+        doSomethingThatMustNotBeAccessedByMultipleThreadsAtTheSameTime()
+        bindOutput 0, msg
+        bindOutput 1, 2*msg
     }
- {code}
+}
+{code}
 
-Obviously you need to weight the pros and cons here, since synchronization defeats the purpose of setting _maxForks_ to a value greater than 1.
+Obviously you need to weight the pros and cons here, since synchronization may defeat the purpose of setting _maxForks_ to a value greater than 1.
 
-To set values to all of the output channels, you may also consider calling either the _bindAllOutputsAtomically_ method, passing in
-a single value to write to all output channels or the _bindAllOutputsAtomically_ method, which takes a list of values, each of which will be written
+To set values of all the operator's output channels in one atomic step, you may also consider calling either the _bindAllOutputsAtomically_ method, passing in
+a single value to write to all output channels or the _bindAllOutputsAtomically_ method, which takes a multiple values, each of which will be written
 to the output channel with the same position index.
 
+{code}
+operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
+    doStuffThatIsThreadSafe()
+        bindAllOutputValuesAtomically msg, 2*msg
+    }
+}
+{code}
+
 {note}
- Using the _bindAllOutputs_ method will not guarantee atomicity of writes across al the output channels when using internal parallelism.
- If preserving the order of messages in multiple output streams is not an issue, _bindAllOutputs_ will provide better performance over the atomic variants.
+ Using the _bindAllOutputs_ or the _bindAllOutputValues_ methods will not guarantee atomicity of writes across al the output channels when using internal parallelism.
+ If preserving the order of messages in multiple output streams is not an issue, _bindAllOutputs_ as well as _bindAllOutputValues_ will provide better performance over the atomic variants.
 {note}
  
 h3. Grouping operators
