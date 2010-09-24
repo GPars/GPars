@@ -18,7 +18,6 @@ package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowStream
 import static groovyx.gpars.dataflow.DataFlow.operator
-import static groovyx.gpars.dataflow.DataFlow.prioritySelector
 import static groovyx.gpars.dataflow.DataFlow.selector
 import static groovyx.gpars.dataflow.DataFlow.splitter
 import static groovyx.gpars.dataflow.DataFlow.task
@@ -58,7 +57,7 @@ def urlResolver = operator(inputs: [urlsRequests], outputs: [urls, urlsForSpecul
 def downloader = operator(inputs: [urls], outputs: [pages, confirmations, contentForCache]) {
     def content = it.url.toURL().text
     it.content = content
-    bindAllOutputs it
+    bindAllOutputsAtomically it
 }
 
 def cache = ['http://www.jetbrains.com': 'groovy scala kfjhskfhsk']
@@ -84,7 +83,7 @@ def scalaScanner = operator(inputs: [pagesForScala], outputs: [resultsFromScala]
     bindOutput([id: it.id, url: it.url, foundWord: foundWord, speculation: it.speculation])
 }
 
-def reporter = operator(inputs: [resultsFromGroovy, resultsFromScala], outputs: [unconfirmedReports]) {g, s ->
+def reporter = operator(inputs: [groovyScanner.output, scalaScanner.output], outputs: [unconfirmedReports]) {g, s ->
     assert g.url == s.url
     assert g.id == s.id
     assert g.speculation == s.speculation
@@ -107,7 +106,7 @@ def unconfirmedSpeculativeReports = [:]
 def deliveredConfirmations = [:]
 def processedIds = new HashSet()
 
-def confirm = prioritySelector(inputs: [confirmations, unconfirmedReports], outputs: [reports]) {msg ->
+def confirm = selector(inputs: [downloader.outputs[1], reporter.output], outputs: [reports]) {msg ->
     if (msg.id in processedIds) return
     if (msg.result != null) {  //differentiate between inputs serialized by the priority select
         final boolean isSpeculation = msg.speculation
@@ -150,8 +149,9 @@ private boolean compareSpeculationWithRealContent(msg1, msg2) {
 }
 
 task {
+    final Object incomingReports = confirm.output
     for (;;) {
-        println reports.val
+        println incomingReports.val
     }
 }
 

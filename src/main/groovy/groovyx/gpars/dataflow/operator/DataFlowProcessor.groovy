@@ -98,10 +98,36 @@ abstract class DataFlowProcessor {
     final void bindOutput(final value) { bindOutput 0, value }
 
     /**
-     * Used by the processor's body to send a value to the first / only output channel
+     * Used by the processor's body to send a value to all output channels.
+     * If the maxForks value is set to a value greater than 1, calls to bindAllOutputs may result in values written to different
+     * channels to be in different order. If this is a problem for the application logic, the bindAllOutputsAtomically
+     * method should be considered instead.
+     */
+    final void bindAllOutputs(final value) { outputs.each {it << value} }
+
+    /**
+     * Used by the processor's body to send a value to all output channels.
+     * If the maxForks value is set to a value greater than 1, calls to bindAllOutputs may result in values written to different
+     * channels to be in different order. If this is a problem for the application logic, the bindAllOutputsAtomically
+     * method should be considered instead.
+     * @param values A list of values to send to output channels of the same position index
+     */
+    final void bindAllOutputValues(final List values) { outputs.eachWithIndex {channel, index ->  channel << values[index]} }
+
+    /**
+     * Used by the processor's body to send a value to all output channels, while guaranteeing atomicity of the operation
+     * and preventing other calls to bindAllOutputsAtomically() from interfering with one another.
      */
     @SuppressWarnings("GroovySynchronizedMethod")
-    final synchronized void bindAllOutputs(final value) { outputs.each {it << value} }
+    final synchronized void bindAllOutputsAtomically(final value) { outputs.each {it << value} }
+
+    /**
+     * Used by the processor's body to send a value to all output channels, while guaranteeing atomicity of the operation
+     * and preventing other calls to bindAllOutputsAtomically() from interfering with one another.
+     * @param values A list of values to send to output channels of the same position index
+     */
+    @SuppressWarnings("GroovySynchronizedMethod")
+    final synchronized void bindAllOutputValuesAtomically(final List values) { outputs.eachWithIndex {channel, index ->  channel << values[index]} }
 
     /**
      * The processor's output channel of the given index

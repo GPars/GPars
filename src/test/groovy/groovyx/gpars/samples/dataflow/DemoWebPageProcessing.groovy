@@ -47,7 +47,7 @@ def urlResolver = operator(inputs: [urlsRequests], outputs: [urls]) {
 def downloader = operator(inputs: [urls], outputs: [pagesForGroovy, pagesForScala]) {
     def content = it.url.toURL().text
     it.content = content
-    bindAllOutputs it
+    bindAllOutputsAtomically it
 }
 
 def groovyScanner = operator(inputs: [pagesForGroovy], outputs: [resultsFromGroovy]) {

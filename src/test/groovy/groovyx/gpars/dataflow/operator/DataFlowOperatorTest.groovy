@@ -346,4 +346,122 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         stream << 'invalidValue'
         op.join()
     }
+
+    public void testBindAllOutputs() {
+        final DefaultPGroup group = new DefaultPGroup()
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
+            bindAllOutputs x
+        }
+        final IntRange range = 1..100
+        range.each {a << it}
+        def bs = range.collect {b.val}
+        def cs = range.collect {c.val}
+        def ds = range.collect {d.val}
+        assert bs.size() == range.to
+        assert cs.size() == range.to
+        assert ds.size() == range.to
+        op1.stop()
+        op1.join()
+    }
+
+    public void testBindAllOutputValues() {
+        final DefaultPGroup group = new DefaultPGroup()
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
+            bindAllOutputValues([x, x, x])
+        }
+        final IntRange range = 1..100
+        range.each {a << it}
+        def bs = range.collect {b.val}
+        def cs = range.collect {c.val}
+        def ds = range.collect {d.val}
+        assert bs.size() == range.to
+        assert cs.size() == range.to
+        assert ds.size() == range.to
+        op1.stop()
+        op1.join()
+    }
+
+    public void testBindAllOutputsAtomically() {
+        final DefaultPGroup group = new DefaultPGroup()
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
+            bindAllOutputsAtomically x
+        }
+        final IntRange range = 1..10
+        range.each {a << it}
+        def bs = range.collect {b.val}
+        def cs = range.collect {c.val}
+        def ds = range.collect {d.val}
+        assert bs.size() == range.to
+        assert cs.size() == range.to
+        assert ds.size() == range.to
+        assert bs == cs
+        assert bs == ds
+        assert cs == ds
+        op1.stop()
+        op1.join()
+    }
+
+    public void testBindAllOutputValuesAtomically() {
+        final DefaultPGroup group = new DefaultPGroup()
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
+            bindAllOutputValuesAtomically([x, x, x])
+        }
+        final IntRange range = 1..10
+        range.each {a << it}
+        def bs = range.collect {b.val}
+        def cs = range.collect {c.val}
+        def ds = range.collect {d.val}
+        assert bs.size() == range.to
+        assert cs.size() == range.to
+        assert ds.size() == range.to
+        assert bs == cs
+        assert bs == ds
+        assert cs == ds
+        op1.stop()
+        op1.join()
+    }
+
+    public void testBindAllOutputValuesAtomicallyWithDifferentValues() {
+        final DefaultPGroup group = new DefaultPGroup()
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
+            bindAllOutputValuesAtomically([x, 2 * x, 3 * x])
+        }
+        final IntRange range = 1..10
+        range.each {a << it}
+        def bs = range.collect {b.val}
+        def cs = range.collect {c.val}
+        def ds = range.collect {d.val}
+        assert bs.size() == range.to
+        assert cs.size() == range.to
+        assert ds.size() == range.to
+        assert cs == bs.collect {2 * it}
+        assert ds == bs.collect {3 * it}
+        op1.stop()
+        op1.join()
+    }
 }
