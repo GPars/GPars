@@ -123,16 +123,20 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     public void testOperatorWithDoubleWaitOnChannel() {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
+        final CyclicBarrier barrier = new CyclicBarrier(2)
 
         def op = prioritySelector(inputs: [a, a], outputs: [b]) {x ->
             bindOutput 0, x
+            barrier.await()
         }
 
         a << 1
+        barrier.await()
         a << 2
+        barrier.await()
         a << 3
+        barrier.await()
         a << 4
-        sleep 3000
 
         assert [b.val, b.val, b.val, b.val] == [1, 2, 3, 4]
 
