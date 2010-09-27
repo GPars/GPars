@@ -53,7 +53,7 @@ def urlResolver = operator(inputs: [urlsRequests], outputs: [urls, urlsForSpecul
     bindAllOutputs([id: counter++, url: "http://www.${it}.com"])
 }
 
-def downloader = operator(inputs: [urls], outputs: [downloadedPages, contentForCache]) {
+def downloader = operator(inputs: [urls], outputs: [downloadedPages, contentForCache], maxForks: 4) {
     try {
         def content = it.url.toURL().text
         it.content = content
@@ -110,7 +110,7 @@ def scalaScanner = operator(inputs: [pagesForScala], outputs: [resultsFromScala]
     bindOutput([id: it.id, url: it.url, foundWord: foundWord, speculation: it.speculation])
 }
 
-def reporter = operator(inputs: [groovyScanner.output, scalaScanner.output], outputs: [unconfirmedReports]) {g, s ->
+def reporter = operator(inputs: [groovyScanner.output, scalaScanner.output], outputs: [unconfirmedReports], maxForks: 4) {g, s ->
     assert g.url == s.url
     assert g.id == s.id
     assert g.speculation == s.speculation
@@ -158,10 +158,8 @@ def confirm = prioritySelector(inputs: [approvals, unconfirmedReports], outputs:
     }
 }
 
-private boolean compareSpeculationWithRealContent(msg1, msg2) {
-    //todo enable
-//    return msg1?.content?.size() == msg2?.content?.size()
-    true
+private boolean compareSpeculationWithRealContent(content1, content2) {
+    return content1?.size() == content2?.size()
 }
 
 task {
