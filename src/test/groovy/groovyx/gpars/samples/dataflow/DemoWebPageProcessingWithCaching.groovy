@@ -37,12 +37,14 @@ final DataFlowStream urlsRequests = new DataFlowStream()
 final DataFlowStream urls = new DataFlowStream()
 final DataFlowStream urlsForSpeculation = new DataFlowStream()
 final DataFlowStream pages = new DataFlowStream()
+final DataFlowStream downloadedPages = new DataFlowStream()
+final DataFlowStream speculativePages = new DataFlowStream()
 final DataFlowStream pagesForGroovy = new DataFlowStream()
 final DataFlowStream pagesForScala = new DataFlowStream()
 final DataFlowStream resultsFromGroovy = new DataFlowStream()
 final DataFlowStream resultsFromScala = new DataFlowStream()
 final DataFlowStream unconfirmedReports = new DataFlowStream()
-final DataFlowStream confirmations = new DataFlowStream()
+final DataFlowStream approvals = new DataFlowStream()
 final DataFlowStream reports = new DataFlowStream()
 final DataFlowStream contentForCache = new DataFlowStream()
 
@@ -51,7 +53,7 @@ def urlResolver = operator(inputs: [urlsRequests], outputs: [urls, urlsForSpecul
     bindAllOutputs([id: counter++, url: "http://www.${it}.com"])
 }
 
-def downloader = operator(inputs: [urls], outputs: [pages, confirmations, contentForCache]) {
+def downloader = operator(inputs: [urls], outputs: [downloadedPages, contentForCache]) {
     try {
         def content = it.url.toURL().text
         it.content = content
@@ -63,12 +65,36 @@ def downloader = operator(inputs: [urls], outputs: [pages, confirmations, conten
 
 def cache = ['http://www.jetbrains.com': 'groovy scala kfjhskfhsk']
 
-def speculator = prioritySelector(inputs: [urlsForSpeculation, contentForCache], outputs: [pages]) {msg, index ->
+def speculator = prioritySelector(inputs: [urlsForSpeculation, contentForCache], outputs: [speculativePages]) {msg, index ->
     if (index == 0) {
         def content = cache[msg.url]
         if (content) bindAllOutputs([id: msg.id, url: msg.url, speculation: true, content: content])
     } else {
         cache[msg.url] = msg.content
+    }
+}
+
+def unconfirmedSpeculations = [:]
+def processedIds = new HashSet()
+
+def evaluator = prioritySelector(inputs: [downloadedPages, speculativePages], outputs: [pages, approvals]) {msg, index ->
+    if (msg.id in processedIds) return  //ignore all messages for finished ids
+    if (index == 0) {
+        processedIds << msg.id
+        final Object speculativeReport = unconfirmedSpeculations.remove(msg.id)
+        if (speculativeReport) {
+            if (compareSpeculationWithRealContent(speculativeReport, msg.content)) {
+                bindOutput 1, [id: msg.id]  //confirm the earlier speculation
+            } else {
+                bindOutput 0, msg  //speculation turned out to be false, send the real content along
+            }
+        } else {
+            bindOutput msg  //no speculation has been attempted, send on the real content
+        }
+    } else {
+        assert msg.speculation
+        unconfirmedSpeculations[msg.id] = msg.content
+        bindOutput msg  //send the speculation on
     }
 }
 
@@ -100,24 +126,17 @@ def reporter = operator(inputs: [groovyScanner.output, scalaScanner.output], out
         default:
             result = 'No interesting words'
     }
-    bindOutput([id: g.id, url: g.url, content: g.content, speculation: g.speculation, result: ("$result found at ${g.url}" + (g.speculation ? ' based on speculation' : ''))])
+    bindOutput([id: g.id, speculation: g.speculation, result: ("$result found at ${g.url}" + (g.speculation ? ' based on speculation' : ''))])
 }
 
 def unconfirmedSpeculativeReports = [:]
 def deliveredConfirmations = [:]
-def processedIds = new HashSet()
 
-def confirm = prioritySelector(inputs: [downloader.outputs[1], reporter.output], outputs: [reports]) {msg, index ->
-    if (msg.id in processedIds) return
+def confirm = prioritySelector(inputs: [approvals, unconfirmedReports], outputs: [reports]) {msg, index ->
     if (index == 1) {
-        final boolean isSpeculation = msg.speculation
-        if (isSpeculation) {
-            final def confirmation = deliveredConfirmations[msg.id]
-            if (confirmation) {
-                if (compareSpeculationWithRealContent(confirmation, msg)) {
-                    bindOutput msg.result
-                    processedIds << msg.id
-                }
+        if (msg.speculation) {
+            if (deliveredConfirmations[msg.id]) {
+                bindOutput msg.result
                 deliveredConfirmations.remove(msg.id)
             } else {
                 unconfirmedSpeculativeReports[msg.id] = msg
@@ -125,17 +144,13 @@ def confirm = prioritySelector(inputs: [downloader.outputs[1], reporter.output],
         }
         else {
             bindOutput msg.result
-            processedIds << msg.id
             unconfirmedSpeculativeReports.remove(msg.id)
             deliveredConfirmations.remove(msg.id)
         }
     } else {
         final Object speculativeReport = unconfirmedSpeculativeReports[msg.id]
         if (speculativeReport) {
-            if (compareSpeculationWithRealContent(speculativeReport, msg)) {
-                bindOutput speculativeReport.result
-                processedIds << msg.id
-            }
+            bindOutput speculativeReport.result
             unconfirmedSpeculativeReports.remove(msg.id)
         } else {
             deliveredConfirmations[msg.id] = msg
