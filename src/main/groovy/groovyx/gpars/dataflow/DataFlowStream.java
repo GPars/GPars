@@ -58,7 +58,7 @@ public final class DataFlowStream<T> implements DataFlowChannel {
     /**
      * A collection of listeners who need to be informed each time the stream is bound to a value
      */
-    private final Collection<MessageStream> whenBoundListeners = new CopyOnWriteArrayList<MessageStream>();
+    private final Collection<MessageStream> wheneverBoundListeners = new CopyOnWriteArrayList<MessageStream>();
 
     /**
      * Adds a DataFlowVariable to the buffer.
@@ -70,7 +70,7 @@ public final class DataFlowStream<T> implements DataFlowChannel {
     @SuppressWarnings("unchecked")
     public void leftShift(final DataFlowExpression<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
-        hookWhenBoundListeners(originalRef);
+        hookWheneverBoundListeners(originalRef);
 
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -4966523895011173569L;
@@ -89,7 +89,7 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      * @param value The value to bind to the head of the stream
      */
     public void leftShift(final T value) {
-        hookWhenBoundListeners(retrieveForBind()).bind(value);
+        hookWheneverBoundListeners(retrieveForBind()).bind(value);
     }
 
     /**
@@ -98,8 +98,8 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      * @param expr The expression to hook all the when bound listeners to
      * @return The supplied expression handler to allow method chaining
      */
-    private DataFlowExpression<T> hookWhenBoundListeners(final DataFlowExpression<T> expr) {
-        for (final MessageStream listener : whenBoundListeners) {
+    private DataFlowExpression<T> hookWheneverBoundListeners(final DataFlowExpression<T> expr) {
+        for (final MessageStream listener : wheneverBoundListeners) {
             expr.whenBound(listener);
         }
         return expr;
@@ -186,8 +186,9 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param closure closure to execute when data available
      */
+    @Override
     public void rightShift(final Closure closure) {
-        whenNextBound(closure);
+        whenBound(closure);
     }
 
     /**
@@ -197,7 +198,8 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param closure closure to execute when data available
      */
-    public void whenNextBound(final Closure closure) {
+    @Override
+    public void whenBound(final Closure closure) {
         getValAsync(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
     }
 
@@ -206,7 +208,8 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param stream stream where to send result
      */
-    public void whenNextBound(final MessageStream stream) {
+    @Override
+    public void whenBound(final MessageStream stream) {
         getValAsync(stream);
     }
 
@@ -217,8 +220,8 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param closure closure to execute when data available
      */
-    public void whenBound(final Closure closure) {
-        whenBoundListeners.add(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
+    public void wheneverBound(final Closure closure) {
+        wheneverBoundListeners.add(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
     }
 
     /**
@@ -226,8 +229,8 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param stream stream where to send result
      */
-    public void whenBound(final MessageStream stream) {
-        whenBoundListeners.add(stream);
+    public void wheneverBound(final MessageStream stream) {
+        wheneverBoundListeners.add(stream);
     }
 
     /**

@@ -52,7 +52,7 @@ group.task {
  */
 def filter(inChannel, int prime) {
     def outChannel = new DataFlowStream()
-    inChannel.whenNextBound {
+    inChannel.whenBound {
         doFilter(it, prime, inChannel, outChannel)
     }
     return outChannel
@@ -62,7 +62,7 @@ def doFilter(number, prime, inChannel, outChannel) {
     if (number % prime != 0) {
         outChannel << number
     }
-    inChannel.whenNextBound {
+    inChannel.whenBound {
         doFilter(it, prime, inChannel, outChannel)
     }
 

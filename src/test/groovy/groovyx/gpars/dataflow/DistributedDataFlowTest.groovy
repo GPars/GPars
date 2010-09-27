@@ -49,7 +49,7 @@ public abstract class DistributedDataFlowTest extends GroovyTestCase {
 
                             case "dataFlow":  // 1
                                 msg.actor << [command: "setDataFlow", dataFlow: msg.dataFlow, value: node]
-                                msg.dataFlow.whenNextBound {v ->
+                                msg.dataFlow.whenBound {v ->
                                     df."$node" = v
                                 }
                                 msg.dataFlow << node

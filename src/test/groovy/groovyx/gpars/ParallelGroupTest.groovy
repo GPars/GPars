@@ -101,12 +101,12 @@ class ParallelGroupTest extends GroovyTestCase {
         assert results.group1 == group
     }
 
-    public void testDataflowWhenNextBoundOnStreams() {
+    public void testDataflowWhenBoundOnStreams() {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlows results = new DataFlows()
         DataFlow.task {
             results.group1 = DataFlowExpression.activeParallelGroup.get()
-            stream.whenNextBound {
+            stream.whenBound {
                 results.group2 = DataFlowExpression.activeParallelGroup.get()
             }
             stream << 'Foo'
@@ -115,14 +115,14 @@ class ParallelGroupTest extends GroovyTestCase {
         assert results.group1 == DataFlow.DATA_FLOW_GROUP
     }
 
-    public void testDataflowWhenNextBoundWithCustomGroupOnStreams() {
+    public void testDataflowWhenBoundWithCustomGroupOnStreams() {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlows results = new DataFlows()
 
         final DefaultPGroup group = new DefaultPGroup()
         group.task {
             results.group1 = DataFlowExpression.activeParallelGroup.get()
-            stream.whenNextBound {
+            stream.whenBound {
                 results.group2 = DataFlowExpression.activeParallelGroup.get()
             }
             stream << 'Foo'

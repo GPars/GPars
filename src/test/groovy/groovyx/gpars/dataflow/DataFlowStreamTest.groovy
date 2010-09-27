@@ -157,7 +157,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assertEquals 'DataFlowStream(queue=[])', stream.toString()
     }
 
-    public void testWhenNextBound() {
+    public void testWhenBound() {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlows df = new DataFlows()
         stream >> {df.x1 = it}
@@ -167,7 +167,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
                 df.x3 = it
             }
         }
-        stream.whenNextBound(actor)
+        stream.whenBound(actor)
         stream << 10
         stream << 20
         stream << 30
@@ -176,13 +176,13 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assertEquals 30, df.x3
     }
 
-    public void testWhenBound() {
+    public void testWheneverBound() {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowStream dfs1 = new DataFlowStream()
         final DataFlowStream dfs2 = new DataFlowStream()
         final DataFlowStream dfs3 = new DataFlowStream()
-        stream.whenBound {dfs1 << it}
-        stream.whenBound {dfs2 << it}
+        stream.wheneverBound {dfs1 << it}
+        stream.wheneverBound {dfs2 << it}
         def actor = Actors.actor {
             react {
                 dfs3 << it
@@ -197,7 +197,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
                 }
             }
         }
-        stream.whenBound(actor)
+        stream.wheneverBound(actor)
         stream << 10
         stream << 20
         stream << 30

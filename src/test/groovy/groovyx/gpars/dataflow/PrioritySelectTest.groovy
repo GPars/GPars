@@ -212,4 +212,45 @@ class PrioritySelectTest extends Specification {
         cleanup:
         handler.stop()
     }
+
+    def "selecting from three df streams using the whenBound() method"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = DataFlow.prioritySelect(a, b, c)
+        final DataFlowStream result = new DataFlowStream()
+
+        def handler = Actors.actor {
+            loop {
+                result << receive()
+            }
+        }
+        when:
+        b << 10
+        b << 20
+        c << 30
+        a << 40
+        sleep 3000
+        select.whenBound {result << it}
+        sleep 3000
+        select.rightShift {result << it}
+        sleep 3000
+        select.whenBound handler
+        select.outputChannel.whenBound handler
+        select.whenBound handler
+        c << 50
+        select.outputChannel.whenBound handler
+        a << 60
+
+        then:
+        result.val == 40
+        result.val == 10
+        result.val == 20
+        result.val == 30
+        result.val == 50
+        result.val == 60
+        cleanup:
+        handler.stop()
+    }
 }

@@ -455,6 +455,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param closure closure to execute when data available
      */
+    @Override
     public void rightShift(final Closure closure) {
         whenBound(closure);
     }
@@ -466,6 +467,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param closure closure to execute when data available
      */
+    @Override
     public void whenBound(final Closure closure) {
         getValAsync(new DataCallback(closure, retrieveCurrentDFPGroup()));
     }
@@ -486,6 +488,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param stream stream where to send result
      */
+    @Override
     public void whenBound(final MessageStream stream) {
         getValAsync(stream);
     }

@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow;
 
+import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.operator.DataFlowProcessor;
 
@@ -120,6 +121,40 @@ class AbstractSelect<T> implements DataFlowChannel<T> {
     public final T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         checkAlive();
         return outputChannel.getVal(timeout, units);
+    }
+
+    /**
+     * Schedule closure to be executed by pooled actor after data became available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled
+     *
+     * @param closure closure to execute when data available
+     */
+    @Override
+    public final void rightShift(final Closure closure) {
+        whenBound(closure);
+    }
+
+    /**
+     * Schedule closure to be executed by pooled actor after data becomes available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param closure closure to execute when data available
+     */
+    @Override
+    public final void whenBound(final Closure closure) {
+        getValAsync(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
+    }
+
+    /**
+     * Send the bound data to provided stream when it becomes available
+     *
+     * @param stream stream where to send result
+     */
+    @Override
+    public final void whenBound(final MessageStream stream) {
+        getValAsync(stream);
     }
 
     private void checkAlive() {
