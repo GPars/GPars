@@ -43,6 +43,22 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
         }
     }
 
+    public void testNullResult() {
+        volatile int counter = 0
+        groovyx.gpars.GParsPool.withPool(5) {
+            Closure cl = {counter++; if (it == 5) return null else return 2}
+            Closure mem = cl.memoize()
+            assert counter == 0
+            assertEquals null, mem(5)
+            assert counter == 1
+            assertEquals 2, mem(2)
+            assert counter == 2
+            assertEquals null, mem(5)
+            assertEquals 2, mem(2)
+            assert counter == 2
+        }
+    }
+
     public void testNoParams() {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {-> 2}
