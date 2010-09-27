@@ -50,6 +50,27 @@ public class SplitterTest extends GroovyTestCase {
         op.stop()
     }
 
+    public void testSplitWithMultipleForks() {
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op = splitter(a, [b, c, d], 5)
+
+        a << 1
+        a << 2
+        a << 3
+        a << 4
+        a << 5
+
+        assert [b.val, b.val, b.val, b.val, b.val].containsAll([1, 2, 3, 4, 5])
+        assert [c.val, c.val, c.val, c.val, c.val].containsAll([1, 2, 3, 4, 5])
+        assert [d.val, d.val, d.val, d.val, d.val].containsAll([1, 2, 3, 4, 5])
+
+        op.stop()
+    }
+
     public void testStop() {
         final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()

@@ -111,7 +111,17 @@ public abstract class DataFlow {
      */
     public static DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels) {
         DataFlow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels)
+    }
 
+    /**
+     * Creates a splitter copying its single input channel into all of its output channels. The created splitter will be part of this parallel group
+     * Input with lower position index have higher priority.
+     * @param inputChannel The channel to  read values from
+     * @param outputChannels A list of channels to output to
+     * @param maxForks Number of threads running the splitter's body, defaults to 1
+     */
+    public static DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels, int maxForks) {
+        DataFlow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels, maxForks)
     }
 
     /**

@@ -246,7 +246,19 @@ public abstract class PGroup {
      */
     public DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels) {
         if (inputChannel == null || !outputChannels) throw new IllegalArgumentException("A splitter needs an input channel and at keast one output channel to be created.")
-        return new DataFlowSelector(this, [inputs: [inputChannel], outputs: outputChannels], {bindAllOutputsAtomically it}).start()
+        return new DataFlowSelector(this, [inputs: [inputChannel], outputs: outputChannels], {bindAllOutputs it}).start()
+    }
+
+    /**
+     * Creates a splitter copying its single input channel into all of its output channels. The created splitter will be part of this parallel group
+     * Input with lower position index have higher priority.
+     * @param inputChannel The channel to  read values from
+     * @param outputChannels A list of channels to output to
+     * @param maxForks Number of threads running the splitter's body, defaults to 1
+     */
+    public DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels, int maxForks) {
+        if (inputChannel == null || !outputChannels) throw new IllegalArgumentException("A splitter needs an input channel and at keast one output channel to be created.")
+        return new DataFlowSelector(this, [inputs: [inputChannel], outputs: outputChannels, maxForks: maxForks], {bindAllOutputsAtomically it}).start()
     }
 
     private PrioritySelect buildPrioritySelect(Map channels) {
