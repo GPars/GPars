@@ -65,6 +65,28 @@ public abstract class DataFlow {
         DataFlow.DATA_FLOW_GROUP.operator(channels, code)
 
     }
+
+    /**
+     * Creates an operator using the current parallel group
+     * @param input a dataflow channel to use for input
+     * @param output a dataflow channel to use for output
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowProcessor operator(final DataFlowChannel input, final DataFlowChannel output, final Closure code) {
+        DataFlow.DATA_FLOW_GROUP.operator(input, output, code)
+    }
+
+    /**
+     * Creates an operator using the current parallel group
+     * @param input a dataflow channel to use for input
+     * @param output a dataflow channel to use for output
+     * @param maxForks Number of parallel threads running operator's body, defaults to 1
+     * @param code The operator's body to run each time all inputs have a value to read
+     */
+    public static DataFlowProcessor operator(final DataFlowChannel input, final DataFlowChannel output, final int maxForks, final Closure code) {
+        DataFlow.DATA_FLOW_GROUP.operator(input, output, maxForks, code)
+    }
+
     /**
      * Creates a selector using the default dataflow parallel group
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs

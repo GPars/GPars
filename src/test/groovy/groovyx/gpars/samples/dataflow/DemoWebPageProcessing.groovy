@@ -40,7 +40,7 @@ final DataFlowStream resultsFromGroovy = new DataFlowStream()
 final DataFlowStream resultsFromScala = new DataFlowStream()
 final DataFlowStream reports = new DataFlowStream()
 
-def urlResolver = operator(inputs: [urlsRequests], outputs: [urls]) {
+def urlResolver = operator(urlsRequests, urls) {
     bindOutput([url: "http://www.${it}.com"])
 }
 
@@ -50,11 +50,11 @@ def downloader = operator(inputs: [urls], outputs: [pagesForGroovy, pagesForScal
     bindAllOutputsAtomically it
 }
 
-def groovyScanner = operator(inputs: [pagesForGroovy], outputs: [resultsFromGroovy]) {
+def groovyScanner = operator(pagesForGroovy, resultsFromGroovy) {
     def foundWord = it.content.toLowerCase().contains('groovy') ? 'groovy' : ''
     bindOutput([url: it.url, foundWord: foundWord])
 }
-def scalaScanner = operator(inputs: [pagesForScala], outputs: [resultsFromScala]) {
+def scalaScanner = operator(pagesForScala, resultsFromScala) {
     def foundWord = it.content.toLowerCase().contains('scala') ? 'scala' : ''
     bindOutput([url: it.url, foundWord: foundWord])
 }

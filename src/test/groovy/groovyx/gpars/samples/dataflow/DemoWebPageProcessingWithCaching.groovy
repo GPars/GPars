@@ -100,12 +100,12 @@ def evaluator = prioritySelector(inputs: [downloadedPages, speculativePages], ou
 
 def splitter = splitter(pages, [pagesForGroovy, pagesForScala])
 
-def groovyScanner = operator(inputs: [pagesForGroovy], outputs: [resultsFromGroovy]) {
+def groovyScanner = operator(pagesForGroovy, resultsFromGroovy) {
     def foundWord = it.content.toLowerCase().contains('groovy') ? 'groovy' : ''
     bindOutput([id: it.id, url: it.url, foundWord: foundWord, speculation: it.speculation])
 }
 
-def scalaScanner = operator(inputs: [pagesForScala], outputs: [resultsFromScala]) {
+def scalaScanner = operator(pagesForScala, resultsFromScala) {
     def foundWord = it.content.toLowerCase().contains('scala') ? 'scala' : ''
     bindOutput([id: it.id, url: it.url, foundWord: foundWord, speculation: it.speculation])
 }
