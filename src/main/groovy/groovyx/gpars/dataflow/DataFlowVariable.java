@@ -33,7 +33,7 @@ import groovyx.gpars.serial.RemoteSerialized;
  * @param <T> Type of values to bind with the DataFlowVariable
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
-public class DataFlowVariable<T> extends DataFlowExpression<T> {
+public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFlowChannel<T> {
     private static final long serialVersionUID = 1340439210749936258L;
 
     /**
@@ -42,11 +42,13 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
     public DataFlowVariable() {
     }
 
+
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
      *
      * @param value The value to assign
      */
+    @Override
     public void leftShift(final T value) {
         bind(value);
     }
@@ -57,13 +59,15 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> {
      *
      * @param ref The DataFlowVariable instance the value of which to bind
      */
-    public void leftShift(final DataFlowExpression<T> ref) {
+    @Override
+    public void leftShift(final DataFlowReadChannel<T> ref) {
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -458384302762038543L;
 
             @Override
             public MessageStream send(final Object message) {
-                bind(ref.value);
+                //noinspection unchecked
+                bind((T) message);
                 return this;
             }
         });

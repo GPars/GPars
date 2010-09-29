@@ -17,10 +17,25 @@
 package groovyx.gpars.dataflow;
 
 /**
- * A common interface for all dataflow variables, streams or queues
+ * A common interface for all writable dataflow variables, streams or queues
  *
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-public interface DataFlowChannel<T> extends DataFlowReadChannel<T>, DataFlowWriteChannel<T> {
+public interface DataFlowWriteChannel<T> {
+
+    /**
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     *
+     * @param value The value to assign
+     */
+    void leftShift(final T value);
+
+    /**
+     * Assigns a value from one DataFlowVariable instance to this variable.
+     * Can only be invoked once on each instance of DataFlowVariable
+     *
+     * @param ref The DataFlowVariable instance the value of which to bind
+     */
+    void leftShift(final DataFlowReadChannel<T> ref);
 }

@@ -19,56 +19,15 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Arrays.asList;
-
 /**
- * Implements a dataflow channel for values output from a PrioritySelect class.
- * <p/>
- * Limitations:
- * Different threads may call end-up calling the callbacks provided into the getValAsync() method. It can either be the selector's actor thread
- * or the caller calling getValAsync itself.
- * Subsequent synchronous and asynchronous value retrievals may not receive values in the order of their respective calls.
+ * A common interface for all dataflow variables, streams or queues
  *
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-class PrioritySelectChannel implements DataFlowReadChannel<Object> {
-    private final PriorityBlockingQueue<Map<String, Object>> queue;
-    private final List<List<Object>> queuedCallbacks = new ArrayList<List<Object>>(10);
-
-    PrioritySelectChannel(final PriorityBlockingQueue<Map<String, Object>> queue) {
-        //noinspection AssignmentToCollectionOrArrayFieldFromParameter
-        this.queue = queue;
-    }
-
-    /**
-     * Attempts to deliver a value to a queued callback
-     */
-    void valueArrived() {
-        final List<Object> callback;
-        final Map<String, Object> value;
-        synchronized (queuedCallbacks) {
-            if (queuedCallbacks.isEmpty()) return;
-            value = queue.poll();
-            if (value == null) return;
-            callback = queuedCallbacks.remove(0);
-        }
-        if (callback.get(0) == null) {  //no attachment
-            ((MessageStream) callback.get(1)).send(value.get("item"));
-        } else {
-            final Map<String, Object> message = new HashMap<String, Object>(2);
-            message.put(DataFlowExpression.ATTACHMENT, callback.get(0));
-            message.put(DataFlowExpression.RESULT, value.get("item"));
-            ((MessageStream) callback.get(1)).send(message);
-        }
-    }
+public interface DataFlowReadChannel<T> {
 
     /**
      * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message
@@ -78,10 +37,7 @@ class PrioritySelectChannel implements DataFlowReadChannel<Object> {
      *
      * @param callback An actor to send the bound value to.
      */
-    @Override
-    public void getValAsync(final MessageStream callback) {
-        getValAsync(null, callback);
-    }
+    void getValAsync(final MessageStream callback);
 
     /**
      * Asynchronously retrieves the value from the channel. Sends a message back the the supplied MessageStream
@@ -94,13 +50,7 @@ class PrioritySelectChannel implements DataFlowReadChannel<Object> {
      * @param attachment arbitrary non-null attachment if reader needs better identification of result
      * @param callback   An actor to send the bound value plus the supplied index to.
      */
-    @Override
-    public void getValAsync(final Object attachment, final MessageStream callback) {
-        synchronized (queuedCallbacks) {
-            queuedCallbacks.add(asList(attachment, callback));
-            valueArrived();
-        }
-    }
+    void getValAsync(final Object attachment, final MessageStream callback);
 
     /**
      * Reads the current value of the channel. Blocks, if the value has not been assigned yet.
@@ -108,10 +58,7 @@ class PrioritySelectChannel implements DataFlowReadChannel<Object> {
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
      */
-    @Override
-    public Object getVal() throws InterruptedException {
-        return queue.take().get("item");
-    }
+    T getVal() throws InterruptedException;
 
     /**
      * Reads the current value of the channel. Blocks up to given timeout, if the value has not been assigned yet.
@@ -121,12 +68,7 @@ class PrioritySelectChannel implements DataFlowReadChannel<Object> {
      * @return The actual value
      * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
      */
-    @Override
-    public Object getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        final Map<String, Object> value = queue.poll(timeout, units);
-        if (value != null) return value.get("item");
-        else return null;
-    }
+    T getVal(final long timeout, final TimeUnit units) throws InterruptedException;
 
     /**
      * Schedule closure to be executed by pooled actor after data became available
@@ -135,10 +77,7 @@ class PrioritySelectChannel implements DataFlowReadChannel<Object> {
      *
      * @param closure closure to execute when data available
      */
-    @Override
-    public void rightShift(final Closure closure) {
-        whenBound(closure);
-    }
+    void rightShift(final Closure closure);
 
     /**
      * Schedule closure to be executed by pooled actor after data becomes available
@@ -147,33 +86,33 @@ class PrioritySelectChannel implements DataFlowReadChannel<Object> {
      *
      * @param closure closure to execute when data available
      */
-    @Override
-    public final void whenBound(final Closure closure) {
-        getValAsync(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
-    }
+    void whenBound(final Closure closure);
 
     /**
      * Send the bound data to provided stream when it becomes available
      *
      * @param stream stream where to send result
      */
-    @Override
-    public final void whenBound(final MessageStream stream) {
-        getValAsync(stream);
-    }
+    void whenBound(final MessageStream stream);
 
-    @Override
-    public void wheneverBound(final Closure closure) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+    /**
+     * Send all pieces of data bound in the future to the provided stream when it becomes available     *
+     *
+     * @param closure closure to execute when data available
+     */
+    void wheneverBound(final Closure closure);
 
-    @Override
-    public void wheneverBound(final MessageStream stream) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+    /**
+     * Send all pieces of data bound in the future to the provided stream when it becomes available
+     *
+     * @param stream stream where to send result
+     */
+    void wheneverBound(final MessageStream stream);
 
-    @Override
-    public boolean isBound() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+    /**
+     * Check if value has been set already for this expression
+     *
+     * @return true if bound already
+     */
+    boolean isBound();
 }

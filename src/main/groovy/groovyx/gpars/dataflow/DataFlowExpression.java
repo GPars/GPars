@@ -48,7 +48,10 @@ import java.util.concurrent.locks.LockSupport;
  * @author Alex Tkachman, Vaclav Pech
  */
 @SuppressWarnings({"UnqualifiedStaticUsage", "CallToSimpleGetterFromWithinClass", "ConstantDeclaredInAbstractClass"})
-public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject, DataFlowChannel<T> {
+public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject, DataFlowReadChannel<T> {
+
+    static final String ATTACHMENT = "attachment";
+    static final String RESULT = "result";
 
     /**
      * Maps threads/tasks to parallel groups they belong to
@@ -142,6 +145,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @return true if bound already
      */
+    @Override
     public boolean isBound() {
         return state == S_INITIALIZED;
     }
@@ -491,6 +495,26 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     @Override
     public void whenBound(final MessageStream stream) {
         getValAsync(stream);
+    }
+
+    /**
+     * Send all pieces of data bound in the future to the provided stream when it becomes available     *
+     *
+     * @param closure closure to execute when data available
+     */
+    @Override
+    public void wheneverBound(final Closure closure) {
+        whenBound(closure);
+    }
+
+    /**
+     * Send all pieces of data bound in the future to the provided stream when it becomes available
+     *
+     * @param stream stream where to send result
+     */
+    @Override
+    public void wheneverBound(final MessageStream stream) {
+        whenBound(stream);
     }
 
     public static <V> DataFlowExpression<V> transform(final Object another, final Closure closure) {

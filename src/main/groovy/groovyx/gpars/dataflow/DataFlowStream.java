@@ -22,6 +22,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"LawOfDemeter", "MethodReturnOfConcreteClass", "AnonymousInnerClass", "AnonymousInnerClassWithTooManyMethods"})
-public final class DataFlowStream<T> implements DataFlowChannel {
+public final class DataFlowStream<T> implements DataFlowChannel<T> {
 
     /**
      * Internal lock
@@ -67,8 +68,9 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param ref The DFV to add to the stream
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public void leftShift(final DataFlowExpression<T> ref) {
+    public void leftShift(final DataFlowReadChannel<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
         hookWheneverBoundListeners(originalRef);
 
@@ -88,6 +90,7 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param value The value to bind to the head of the stream
      */
+    @Override
     public void leftShift(final T value) {
         hookWheneverBoundListeners(retrieveForBind()).bind(value);
     }
@@ -115,7 +118,7 @@ public final class DataFlowStream<T> implements DataFlowChannel {
         return copyDFV(requests, queue);
     }
 
-    private DataFlowVariable<T> copyDFV(final LinkedBlockingQueue<DataFlowVariable<T>> from, final LinkedBlockingQueue<DataFlowVariable<T>> to) {
+    private DataFlowVariable<T> copyDFV(final LinkedBlockingQueue<DataFlowVariable<T>> from, final Queue<DataFlowVariable<T>> to) {
         DataFlowVariable<T> ref;
         synchronized (queueLock) {
             ref = from.poll();
@@ -147,7 +150,7 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      * @throws InterruptedException If the current thread is interrupted
      */
     @Override
-    public Object getVal(final long timeout, final TimeUnit units) throws InterruptedException {
+    public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         return retrieveOrCreateVariable().getVal(timeout, units);
     }
 
@@ -214,12 +217,11 @@ public final class DataFlowStream<T> implements DataFlowChannel {
     }
 
     /**
-     * Schedule closure to be executed by pooled actor each time after data becomes available
-     * It is important to notice that even if data already available the execution of closure
-     * will not happen immediately but will be scheduled.
+     * Send all pieces of data bound in the future to the provided stream when it becomes available     *
      *
      * @param closure closure to execute when data available
      */
+    @Override
     public void wheneverBound(final Closure closure) {
         wheneverBoundListeners.add(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
     }
@@ -229,8 +231,19 @@ public final class DataFlowStream<T> implements DataFlowChannel {
      *
      * @param stream stream where to send result
      */
+    @Override
     public void wheneverBound(final MessageStream stream) {
         wheneverBoundListeners.add(stream);
+    }
+
+    /**
+     * Check if value has been set already for this expression
+     *
+     * @return true if bound already
+     */
+    @Override
+    public boolean isBound() {
+        return !queue.isEmpty();
     }
 
     /**

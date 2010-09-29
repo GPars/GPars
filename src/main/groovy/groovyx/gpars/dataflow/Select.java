@@ -49,7 +49,7 @@ public final class Select extends AbstractSelect {
      */
     Select(final PGroup parallelGroup, final DataFlowChannel... channels) {
         outputChannel = new DataFlowStream<Object>();
-        final Map<String, List<? extends DataFlowChannel>> params = new HashMap<String, List<? extends DataFlowChannel>>(2);
+        final Map<String, List<? extends Object>> params = new HashMap<String, List<? extends Object>>(2);
         params.put("inputs", Arrays.asList(channels));
         params.put("outputs", Arrays.asList(outputChannel));
         selector = parallelGroup.selector(params);

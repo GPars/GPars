@@ -36,10 +36,10 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-class AbstractSelect<T> implements DataFlowChannel<T> {
+class AbstractSelect<T> implements DataFlowReadChannel<T> {
     protected DataFlowProcessor selector;
     private volatile boolean active = true;
-    protected DataFlowChannel<T> outputChannel = null;
+    protected DataFlowReadChannel<T> outputChannel = null;
     private static final String THE_SELECT_HAS_BEEN_STOPPED_ALREADY = "The Select has been stopped already.";
 
     protected AbstractSelect() {
@@ -157,6 +157,21 @@ class AbstractSelect<T> implements DataFlowChannel<T> {
         getValAsync(stream);
     }
 
+    @Override
+    public void wheneverBound(final Closure closure) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void wheneverBound(final MessageStream stream) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isBound() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     private void checkAlive() {
         if (!active) throw new IllegalStateException(THE_SELECT_HAS_BEEN_STOPPED_ALREADY);
     }
@@ -166,7 +181,7 @@ class AbstractSelect<T> implements DataFlowChannel<T> {
      *
      * @return The dataflow channel delivering all output values
      */
-    public final DataFlowChannel<?> getOutputChannel() {
+    public final DataFlowReadChannel<?> getOutputChannel() {
         return outputChannel;
     }
 
