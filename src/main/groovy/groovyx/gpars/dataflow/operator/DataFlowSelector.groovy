@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.MessagingSelect
+import groovyx.gpars.dataflow.Select
 import groovyx.gpars.dataflow.SelectResult
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
@@ -33,16 +33,21 @@ import java.util.concurrent.Semaphore
  * Since selectors and operators internally leverage the actor implementation, they reuse a pool of threads and so the actual number of threads
  * used by the calculation can be kept much lower than the actual number of processors used in the network.
  *
+ * Selectors select a random value from the values available in the input channels. Optionally the selector's guards mask
+ * can be altered to limit the number of channels considered for selection.
+ *
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
 public class DataFlowSelector extends DataFlowProcessor {
 
-    protected final MessagingSelect select
+    protected final Select select
+    protected final List<Boolean> guards
 
     /**
      * Creates a selector
      * After creation the selector needs to be started using the start() method.
+     * @param group A parallel group to use threads from in the internal actor
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The selector's body to run each time all inputs have a value to read
      */
@@ -60,7 +65,9 @@ public class DataFlowSelector extends DataFlowProcessor {
         } else {
             this.actor = new DataFlowSelectorActor(this, group, outputs, inputs, code.clone())
         }
-        select = new MessagingSelect(inputs)
+        select = new Select(group, inputs)
+        guards = Collections.synchronizedList(new ArrayList<Boolean>((int) inputs.size()))
+        for (int i = 0; i < inputs.size(); i++) guards.add(Boolean.TRUE)
     }
 
     private boolean verifyChannelParameters(Map channels, int parameters) {
@@ -75,8 +82,21 @@ public class DataFlowSelector extends DataFlowProcessor {
         stop()
     }
 
+    /**
+     * Used to enable/disable individual input channels from next selections
+     * @param index The index of the channel to enable/disable
+     * @param flag True, if the channel shoudl be included in selection, false otherwise
+     */
+    public final void setGuard(int index, boolean flag) {
+        guards[index] = flag
+    }
+
+    /**
+     * Ask for another select operation on the internal select instance.
+     * The selector's guards are applied to the selection.
+     */
     protected void doSelect() {
-        select(this.actor)
+        select(this.actor, guards)
     }
 }
 

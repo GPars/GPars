@@ -30,6 +30,8 @@ import groovyx.gpars.group.PGroup
  * Since selectors and operators internally leverage the actor implementation, they reuse a pool of threads and so the actual number of threads
  * used by the calculation can be kept much lower than the actual number of processors used in the network.
  *
+ * Priority selectors prefer to select messages from channels with lower position index.
+ *
  * @author Vaclav Pech
  * Date: Sep 23, 2009
  */
@@ -38,17 +40,21 @@ public final class DataFlowPrioritySelector extends DataFlowSelector {
     /**
      * Creates a priority selector
      * After creation the selector needs to be started using the start() method.
+     * @param group A parallel group to use threads from in the internal actor
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
-     * @param select A PrioritySelect instance prioritizing incoming values by the input channel, wrapping them into a map, which holds the original index and the message value
      * @param code The selector's body to run each time all inputs have a value to read
      */
     protected def DataFlowPrioritySelector(final PGroup group, final Map channels, final Closure code) {
         super(group, channels, code)
     }
 
+    /**
+     * Ask for another select operation on the internal select instance.
+     * The selector's guards are applied to the selection.
+     */
     @Override
     protected void doSelect() {
-        select.prioritySelect(this.actor)
+        select.prioritySelect(this.actor, guards)
     }
 }
 

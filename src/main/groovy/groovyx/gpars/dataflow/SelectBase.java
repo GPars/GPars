@@ -16,6 +16,8 @@
 
 package groovyx.gpars.dataflow;
 
+import groovyx.gpars.group.PGroup;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,17 +54,24 @@ public final class SelectBase<T> {
     /**
      * Stores the input channel and registers for the wheneverBound() event on each
      *
+     * @param pGroup   The group, the thread pool of which should be used for notification message handlers
      * @param channels All the input channels to select on
      */
-    SelectBase(final List<DataFlowReadChannel<? extends T>> channels) {
+    SelectBase(final PGroup pGroup, final List<DataFlowReadChannel<? extends T>> channels) {
         this.channels = Collections.unmodifiableList(channels);
         numberOfChannels = channels.size();
         disabledDFVs = new boolean[numberOfChannels];
         Arrays.fill(disabledDFVs, false);
         for (int i = 0; i < numberOfChannels; i++) {
             final DataFlowReadChannel<? extends T> channel = channels.get(i);
-            //noinspection ThisEscapedInObjectConstruction
-            channel.wheneverBound(new SelectCallback<T>(this, i, channel));
+            final PGroup originalGroup = DataFlowExpression.retrieveCurrentDFPGroup();
+            try {
+                DataFlowExpression.activeParallelGroup.set(pGroup);
+                //noinspection ThisEscapedInObjectConstruction
+                channel.wheneverBound(new SelectCallback<T>(this, i, channel));
+            } finally {
+                DataFlowExpression.activeParallelGroup.set(originalGroup);
+            }
         }
     }
 

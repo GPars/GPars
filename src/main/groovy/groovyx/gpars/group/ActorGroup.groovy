@@ -288,6 +288,6 @@ public abstract class PGroup {
      * @param channels Dataflow variables or streams to wait for values on
      */
     public Select select(final DataFlowChannel... channels) {
-        return new Select(channels)
+        return new Select(this, channels)
     }
 }

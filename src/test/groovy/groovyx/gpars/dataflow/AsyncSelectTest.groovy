@@ -27,7 +27,7 @@ class AsyncSelectTest extends Specification {
         def c = new DataFlowVariable()
 
         final def result = new DataFlows()
-        def select = new MessagingSelect(a, b, c)
+        def select = DataFlow.select(a, b, c)
 
         def actor
         actor = Actors.actor {
@@ -50,7 +50,7 @@ class AsyncSelectTest extends Specification {
         def b = new DataFlowStream()
         def c = new DataFlowStream()
         final def result = new DataFlows()
-        def select = new MessagingSelect(a, b, c)
+        def select = DataFlow.select(a, b, c)
 
         def actor
         actor = Actors.actor {
@@ -77,7 +77,7 @@ class AsyncSelectTest extends Specification {
         c << 20
         def result = new DataFlows()
 
-        def select = new MessagingSelect(a, b, c)
+        def select = DataFlow.select(a, b, c)
         def actor
         actor = Actors.actor {
             result.res1 = receive()
@@ -95,7 +95,7 @@ class AsyncSelectTest extends Specification {
         def c = new DataFlowStream()
         def result = new DataFlows()
 
-        def select = new MessagingSelect(a, b, c)
+        def select = DataFlow.select(a, b, c)
         def actor
         actor = Actors.actor {
             result.res1 = receive()

@@ -19,9 +19,7 @@ package groovyx.gpars.dataflow
 import spock.lang.Ignore
 import spock.lang.Specification
 
-//todo test priorities, guards, selector + guards, prioritySelector + guards
-//todo make sure the list of requests gets cleaned up
-class AltSelectTest extends Specification {
+class SelectTest extends Specification {
     def "selecting from three df variables"() {
         given:
         def a = new DataFlowVariable()

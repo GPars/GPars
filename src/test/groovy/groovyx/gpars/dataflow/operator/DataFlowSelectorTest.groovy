@@ -329,4 +329,33 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         stream << 'invalidValue'
         op.join()
     }
+
+    public void testGuards() {
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op = selector(inputs: [a, b, c], outputs: [d]) {
+            if (it == 1) setGuard(0, false)
+            if (it == 3) setGuard(2, false)
+            if (it == 4) setGuard(0, true)
+            if (it == 5) setGuard(2, true)
+            bindOutput it
+        }
+        a << 1
+        sleep 500
+        a << 2
+        sleep 500
+        b << 3
+        sleep 500
+        c << 4
+        sleep 500
+        b << 5
+
+        assert [d.val, d.val, d.val, d.val, d.val] == [1, 3, 5, 4, 2]
+        op.stop()
+        op.join()
+
+    }
 }
