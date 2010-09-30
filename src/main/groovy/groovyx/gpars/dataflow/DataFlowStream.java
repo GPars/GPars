@@ -155,6 +155,17 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
     }
 
     /**
+     * Retrieves the value at the head of the buffer. Returns null, if no value is available.
+     *
+     * @return The value bound to the DFV at the head of the stream or null
+     * @throws InterruptedException If the current thread is interrupted
+     */
+    @Override
+    public T poll() throws InterruptedException {
+        return queue.poll().getVal();
+    }
+
+    /**
      * Asynchronously retrieves the value at the head of the buffer. Sends the actual value of the variable as a message
      * back the the supplied actor once the value has been bound.
      * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message

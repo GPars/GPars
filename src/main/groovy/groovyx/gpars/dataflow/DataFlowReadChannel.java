@@ -115,4 +115,12 @@ public interface DataFlowReadChannel<T> {
      * @return true if bound already
      */
     boolean isBound();
+
+    /**
+     * Retrieves the value at the head of the buffer. Returns null, if no value is available.
+     *
+     * @return The value bound to the DFV at the head of the stream or null
+     * @throws InterruptedException If the current thread is interrupted
+     */
+    T poll() throws InterruptedException;
 }

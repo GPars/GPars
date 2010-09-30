@@ -176,4 +176,9 @@ class PrioritySelectChannel implements DataFlowReadChannel<Object> {
     public boolean isBound() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public Object poll() throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

@@ -18,8 +18,12 @@ package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+import org.codehaus.groovy.runtime.MethodClosure;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,18 +35,86 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * The output values can also be consumed through the channel obtained from the getOutputChannel method.
  * <p/>
- * Implementations may vary in how they order incoming values on their output.
+ * This implementation will preserve order of values coming through the same channel, while doesn't give any guaranties
+ * about order of messages coming through different channels.
  *
  * @author Vaclav Pech
- *         Date: 21st Sep 2010
+ *         Date: 29th Sep 2010
  */
-class AbstractSelect<T> implements DataFlowReadChannel<T> {
-    protected DataFlowProcessor selector;
-    private volatile boolean active = true;
-    protected DataFlowReadChannel<T> outputChannel = null;
-    private static final String THE_SELECT_HAS_BEEN_STOPPED_ALREADY = "The Select has been stopped already.";
+@SuppressWarnings({"RawUseOfParameterizedType"})
+public abstract class AbstractAltSelect<T> {
 
-    protected AbstractSelect() {
+    private final List<DataFlowReadChannel<? extends T>> channels;
+    private final int numberOfChannels;
+    private boolean waitingForValue = false;
+
+    @SuppressWarnings({"UnsecureRandomNumberGeneration"})
+    private final Random position = new Random();
+
+    public AbstractAltSelect(final DataFlowReadChannel<? extends T>... channels) {
+        this.channels = Collections.unmodifiableList(Arrays.asList(channels));
+        numberOfChannels = channels.length;
+        for (int i = 0; i < channels.length; i++) {
+            final DataFlowReadChannel<? extends T> channel = channels[i];
+            final int index = i;
+            channel.wheneverBound(new MethodClosure(new Runnable() {
+                @Override
+                public void run() {
+                    boundNotification(index, channel);
+
+                }
+            }, "run"));
+        }
+    }
+
+    public final void boundNotification(final int index, final DataFlowReadChannel<? extends T> channel) {
+        synchronized (channels) {
+            if (waitingForValue) {
+                try {
+                    final T value = channel.poll();
+                    if (value != null) {
+                        propagateValue(index, value);
+                        waitingForValue = false;
+                    }
+                } catch (InterruptedException e) {
+                    //todo test poll
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        }
+
+    }
+
+    abstract void propagateValue(final int index, final T value);
+
+    public T select() {
+
+
+    }
+
+    public T select(final List<Boolean> mask) throws InterruptedException {
+        final int startPosition = position.nextInt(numberOfChannels);
+
+        synchronized (channels) {
+            for (int i = 0; i < numberOfChannels; i++) {
+                final int currentPosition = (startPosition + i) % numberOfChannels;
+                if (mask.get(currentPosition)) {
+                    final T value = channels.get(currentPosition).poll();
+                    if (value != null) return value;
+                }
+            }
+
+            //todo propagate the mask
+            waitingForValue = true;
+        }
+    }
+
+    public T prioritySelect() {
+
+    }
+
+    public T prioritySelect(final List<Boolean> mask) {
+
     }
 
     /**
@@ -170,11 +242,6 @@ class AbstractSelect<T> implements DataFlowReadChannel<T> {
     @Override
     public boolean isBound() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public T poll() throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private void checkAlive() {

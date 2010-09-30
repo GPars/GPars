@@ -105,7 +105,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     /**
      * A logical representation of a synchronous or asynchronous request to read the value once it is bound.
      */
-    private static class WaitingThread extends AtomicBoolean {
+    private static final class WaitingThread extends AtomicBoolean {
         private static final long serialVersionUID = 8909974768784947460L;
         private final Thread thread;
         private volatile WaitingThread previous;
@@ -146,7 +146,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @return true if bound already
      */
     @Override
-    public boolean isBound() {
+    public final boolean isBound() {
         return state == S_INITIALIZED;
     }
 
@@ -159,7 +159,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param callback An actor to send the bound value to.
      */
     @Override
-    public void getValAsync(final MessageStream callback) {
+    public final void getValAsync(final MessageStream callback) {
         getValAsync(null, callback);
     }
 
@@ -176,7 +176,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param callback   An actor to send the bound value plus the supplied index to.
      */
     @Override
-    public void getValAsync(final Object attachment, final MessageStream callback) {
+    public final void getValAsync(final Object attachment, final MessageStream callback) {
         if (callback == null) {
             throw new NullPointerException();
         }
@@ -208,7 +208,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
-    public void join() throws InterruptedException {
+    public final void join() throws InterruptedException {
         getVal();
     }
 
@@ -219,7 +219,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param units   Units for the timeout
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
-    public void join(final long timeout, final TimeUnit units) throws InterruptedException {
+    public final void join(final long timeout, final TimeUnit units) throws InterruptedException {
         getVal(timeout, units);
     }
 
@@ -230,7 +230,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     @Override
-    public T getVal() throws InterruptedException {
+    public final T getVal() throws InterruptedException {
         WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
             if (newWaiting == null) {
@@ -266,7 +266,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     @Override
-    public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
+    public final T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final long endNano = System.nanoTime() + units.toNanos(timeout);
         WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
@@ -300,6 +300,18 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
         return value;
     }
 
+    /**
+     * Retrieves the bound value. Returns null, if no value is available.
+     *
+     * @return The value bound to the DFV or null
+     * @throws InterruptedException If the current thread is interrupted
+     */
+    @Override
+    public final T poll() throws InterruptedException {
+        if (isBound()) return getVal();
+        else return null;
+    }
+
     private static void handleInterruption(final AtomicBoolean newWaiting) throws InterruptedException {
         newWaiting.set(true); // don't unpark please
         throw new InterruptedException();
@@ -310,7 +322,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param value The value to assign
      */
-    public void bindSafely(final T value) {
+    public final void bindSafely(final T value) {
         if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
             return;
         }
@@ -324,7 +336,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param value The value to assign
      */
-    public void bind(final T value) {
+    public final void bind(final T value) {
         if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
             try {
                 final Object boundValue = getVal();
@@ -347,7 +359,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      *
      * @param value The value to assign
      */
-    public void bindUnique(final T value) {
+    public final void bindUnique(final T value) {
         if (!stateUpdater.compareAndSet(this, S_NOT_INITIALIZED, S_INITIALIZING)) {
             throw new IllegalStateException("A DataFlowVariable can only be assigned once. Use bind() to allow for equal values to be passed into already-bound variables.");
         }
@@ -394,7 +406,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param hostId  Id of the bind originator host
      * @param message The value to bind
      */
-    public void doBindRemote(final UUID hostId, final T message) {
+    public final void doBindRemote(final UUID hostId, final T message) {
         doBindImpl(message);
         notifyRemote(hostId);
     }
@@ -460,7 +472,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data available
      */
     @Override
-    public void rightShift(final Closure closure) {
+    public final void rightShift(final Closure closure) {
         whenBound(closure);
     }
 
@@ -472,7 +484,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data available
      */
     @Override
-    public void whenBound(final Closure closure) {
+    public final void whenBound(final Closure closure) {
         getValAsync(new DataCallback(closure, retrieveCurrentDFPGroup()));
     }
 
@@ -493,7 +505,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param stream stream where to send result
      */
     @Override
-    public void whenBound(final MessageStream stream) {
+    public final void whenBound(final MessageStream stream) {
         getValAsync(stream);
     }
 
@@ -503,7 +515,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data available
      */
     @Override
-    public void wheneverBound(final Closure closure) {
+    public final void wheneverBound(final Closure closure) {
         whenBound(closure);
     }
 
@@ -513,7 +525,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @param stream stream where to send result
      */
     @Override
-    public void wheneverBound(final MessageStream stream) {
+    public final void wheneverBound(final MessageStream stream) {
         whenBound(stream);
     }
 
@@ -560,7 +572,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
-    public Object invokeMethod(final String name, final Object args) {
+    public final Object invokeMethod(final String name, final Object args) {
         if (getMetaClass().respondsTo(this, name).isEmpty()) {
             return new DataFlowInvocationExpression(this, name, (Object[]) args);
         }
@@ -575,7 +587,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @return The property value, instance of DataFlowGetPropertyExpression
      */
     @Override
-    public Object getProperty(final String propertyName) {
+    public final Object getProperty(final String propertyName) {
         final MetaProperty metaProperty = getMetaClass().hasProperty(this, propertyName);
         if (metaProperty != null) {
             return metaProperty.getProperty(this);
@@ -584,17 +596,17 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
-    public void setMetaClass(final MetaClass metaClass) {
+    public final void setMetaClass(final MetaClass metaClass) {
         this.metaClass = metaClass;
     }
 
     @Override
-    public void setProperty(final String propertyName, final Object newValue) {
+    public final void setProperty(final String propertyName, final Object newValue) {
         metaClass.setProperty(this, propertyName, newValue);
     }
 
     @Override
-    public MetaClass getMetaClass() {
+    public final MetaClass getMetaClass() {
         return metaClass;
     }
 
