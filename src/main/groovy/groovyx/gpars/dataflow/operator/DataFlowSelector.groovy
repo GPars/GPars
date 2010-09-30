@@ -16,7 +16,8 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.MessagingAltSelect
+import groovyx.gpars.dataflow.SelectResult
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -37,6 +38,8 @@ import java.util.concurrent.Semaphore
  */
 public class DataFlowSelector extends DataFlowProcessor {
 
+    protected final MessagingAltSelect select
+
     /**
      * Creates a selector
      * After creation the selector needs to be started using the start() method.
@@ -48,12 +51,16 @@ public class DataFlowSelector extends DataFlowProcessor {
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The selector's body must accept 1 or two parameters, while it currently requests ${parameters} parameters.")
+        final def inputs = channels.inputs.asImmutable()
+        final def outputs = channels.outputs?.asImmutable()
+
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
-            this.actor = new ForkingDataFlowSelectorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
+            this.actor = new ForkingDataFlowSelectorActor(this, group, outputs, inputs, code.clone(), channels.maxForks)
         } else {
-            this.actor = new DataFlowSelectorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
+            this.actor = new DataFlowSelectorActor(this, group, outputs, inputs, code.clone())
         }
+        select = new MessagingAltSelect(inputs)
     }
 
     private boolean verifyChannelParameters(Map channels, int parameters) {
@@ -68,18 +75,8 @@ public class DataFlowSelector extends DataFlowProcessor {
         stop()
     }
 
-    /**
-     * Extracts the index of the channel to pass to the client closure
-     */
-    protected def extractIndex(message) {
-        message.attachment
-    }
-
-    /**
-     * Extracts the value to pass to the client closure
-     */
-    protected def extractValue(message) {
-        message.result
+    protected void doSelect() {
+        select(this.actor)
     }
 }
 
@@ -99,12 +96,16 @@ private class DataFlowSelectorActor extends DataFlowProcessorActor {
         }
     }
 
-    final void onMessage(def message) {
-        final def originalChannelIndex = owningProcessor.extractIndex(message)
-        final def index = message.attachment
-        final def value = owningProcessor.extractValue(message)
-        startTask(originalChannelIndex, value)
-        if (!(inputs[index] instanceof DataFlowVariable)) inputs[index].getValAsync(index, this)
+    void afterStart() {
+        owningProcessor.doSelect()
+    }
+
+    @Override
+    final void onMessage(SelectResult message) {
+        final def index = message.index
+        final def value = message.value
+        startTask(index, value)
+        owningProcessor.doSelect()
     }
 
     def startTask(index, result) {
@@ -135,6 +136,7 @@ private final class ForkingDataFlowSelectorActor extends DataFlowSelectorActor {
         this.threadPool = group.threadPool
     }
 
+    @Override
     def startTask(index, result) {
         semaphore.acquire()
         threadPool.execute {

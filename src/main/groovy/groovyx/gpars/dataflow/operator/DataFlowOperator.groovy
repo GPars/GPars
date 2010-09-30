@@ -81,6 +81,15 @@ private class DataFlowOperatorActor extends DataFlowProcessorActor {
         super(owningOperator, group, outputs, inputs, code)
     }
 
+    final void afterStart() {
+        queryInputs()
+    }
+
+    private final def queryInputs() {
+        return inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
+    }
+
+    @Override
     final void onMessage(def message) {
         values[message.attachment] = message.result
         assert values.size() <= inputs.size()
@@ -116,6 +125,7 @@ private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
         this.threadPool = group.threadPool
     }
 
+    @Override
     def startTask(results) {
         semaphore.acquire()
         threadPool.execute {

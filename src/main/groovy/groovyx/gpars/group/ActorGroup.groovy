@@ -26,7 +26,7 @@ import groovyx.gpars.dataflow.AltSelect
 import groovyx.gpars.dataflow.DataFlowChannel
 import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowVariable
-import groovyx.gpars.dataflow.PrioritySelect
+import groovyx.gpars.dataflow.DataFlowWriteChannel
 import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.dataflow.operator.DataFlowPrioritySelector
 import groovyx.gpars.dataflow.operator.DataFlowProcessor
@@ -247,7 +247,7 @@ public abstract class PGroup {
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
     public DataFlowProcessor prioritySelector(final Map channels, final Closure code) {
-        return new DataFlowPrioritySelector(this, channels, buildPrioritySelect(channels), code).start()
+        return new DataFlowPrioritySelector(this, channels, code).start()
     }
 
     /**
@@ -256,7 +256,7 @@ public abstract class PGroup {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      */
     public DataFlowProcessor prioritySelector(final Map channels) {
-        return new DataFlowPrioritySelector(this, channels, buildPrioritySelect(channels), {bindAllOutputsAtomically it}).start()
+        return new DataFlowPrioritySelector(this, channels, {bindAllOutputsAtomically it}).start()
     }
 
     /**
@@ -265,9 +265,9 @@ public abstract class PGroup {
      * @param inputChannel The channel to  read values from
      * @param outputChannels A list of channels to output to
      */
-    public DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels) {
+    public DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowWriteChannel> outputChannels) {
         if (inputChannel == null || !outputChannels) throw new IllegalArgumentException("A splitter needs an input channel and at keast one output channel to be created.")
-        return new DataFlowSelector(this, [inputs: [inputChannel], outputs: outputChannels], {bindAllOutputs it}).start()
+        return new DataFlowOperator(this, [inputs: [inputChannel], outputs: outputChannels], {bindAllOutputs it}).start()
     }
 
     /**
@@ -279,15 +279,7 @@ public abstract class PGroup {
      */
     public DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels, int maxForks) {
         if (inputChannel == null || !outputChannels) throw new IllegalArgumentException("A splitter needs an input channel and at keast one output channel to be created.")
-        return new DataFlowSelector(this, [inputs: [inputChannel], outputs: outputChannels, maxForks: maxForks], {bindAllOutputsAtomically it}).start()
-    }
-
-    private PrioritySelect buildPrioritySelect(Map channels) {
-        final List inputs = channels.inputs
-        if (!inputs) throw new IllegalArgumentException("Cannot create a prioritySelector for an empty input channel list.")
-        final PrioritySelect select = new PrioritySelect({item, index -> [value: item, index: index]}, this, * inputs)
-        channels.inputs = [select.outputChannel]
-        return select
+        return new DataFlowOperator(this, [inputs: [inputChannel], outputs: outputChannels, maxForks: maxForks], {bindAllOutputsAtomically it}).start()
     }
 
     /**

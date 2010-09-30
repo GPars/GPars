@@ -16,7 +16,6 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.PrioritySelect
 import groovyx.gpars.group.PGroup
 
 /**
@@ -36,8 +35,6 @@ import groovyx.gpars.group.PGroup
  */
 public final class DataFlowPrioritySelector extends DataFlowSelector {
 
-    private PrioritySelect select
-
     /**
      * Creates a priority selector
      * After creation the selector needs to be started using the start() method.
@@ -45,40 +42,13 @@ public final class DataFlowPrioritySelector extends DataFlowSelector {
      * @param select A PrioritySelect instance prioritizing incoming values by the input channel, wrapping them into a map, which holds the original index and the message value
      * @param code The selector's body to run each time all inputs have a value to read
      */
-    protected def DataFlowPrioritySelector(final PGroup group, final Map channels, final PrioritySelect select, final Closure code) {
+    protected def DataFlowPrioritySelector(final PGroup group, final Map channels, final Closure code) {
         super(group, channels, code)
-        this.select = select
     }
 
-    /**
-     * Extracts the index of the channel to pass to the client closure.
-     * With PrioritySelect shielding the DataFlowPrioritySelector instance
-     * the information about the original input channel index and the message value itself
-     * must be stored in a message wrapper so that the original index could be consumed by the prioritySelector's body
-     * DataFlowPrioritySelector unwraps both the index and the value in the extractIndex() and extractValue methods.
-     */
-    protected final def extractIndex(message) {
-        message.result.index
-    }
-
-    /**
-     * Extracts the value to pass to the client closure
-     * With PrioritySelect shielding the DataFlowPrioritySelector instance
-     * the information about the original input channel index and the message value itself
-     * must be stored in a message wrapper so that the original index could be consumed by the prioritySelector's body
-     * DataFlowPrioritySelector unwraps both the index and the value in the extractIndex() and extractValue methods.
-     */
-    protected final def extractValue(message) {
-        message.result.value
-    }
-
-    /**
-     * Stops the internal actor as well as the PrioritySelect instance
-     */
     @Override
-    def void stop() {
-        super.stop()
-        select.close()
+    protected void doSelect() {
+        select.prioritySelect(this.actor)
     }
 }
 

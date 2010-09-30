@@ -26,7 +26,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * available on its output irrespective of their original input channel.
  * Note that dataflow variables and streams can be combined for Select.
  *
- * You might also consider checking out the PrioritySelect class, which prioritizes values by the index of their input channel
+ * You might also consider checking out the prioritySelect method, which prioritizes values by the index of their input channel
  */
 def a = new DataFlowVariable()
 def b = new DataFlowVariable()
@@ -48,6 +48,4 @@ task {
 }
 
 def select = select(a, b, c)
-println "The fastest result is ${select.val}"
-
-//select.close()  A Select can be explicitly closed to stop the underlying actor immediately
+println "The fastest result is ${select()}"

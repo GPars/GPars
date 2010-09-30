@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow;
 
 import groovyx.gpars.actor.impl.MessageStream;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,7 +29,13 @@ public class MessagingAltSelect<T> {
 
     private final SelectBase<T> selectBase;
 
-    public MessagingAltSelect(final DataFlowReadChannel<T>... channels) {
+    @SuppressWarnings({"OverloadedVarargsMethod"})
+    public MessagingAltSelect(final DataFlowReadChannel<? extends T>... channels) {
+        selectBase = new SelectBase<T>(Arrays.asList(channels));
+    }
+
+    public MessagingAltSelect(final List<DataFlowReadChannel<? extends T>> channels) {
+        //noinspection unchecked
         selectBase = new SelectBase<T>(channels);
     }
 
@@ -57,7 +64,7 @@ public class MessagingAltSelect<T> {
     }
 
     private void select(final MessageStream messageStream, final int startIndex, final List<Boolean> mask) throws InterruptedException {
-        selectBase.doSelect(startIndex, new MaskSelectRequest<T>(mask) {
+        selectBase.doSelect(startIndex, new GuardedSelectRequest<T>(mask) {
             @Override
             public void valueFound(final int index, final T value) {
                 messageStream.send(new SelectResult<T>(index, value));

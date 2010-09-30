@@ -19,6 +19,9 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 
 /**
+ * A closure registerred with all the input channels on the wheneverBound() event to inform the Select
+ * about a value being available in a particular channel.
+ *
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
@@ -26,12 +29,23 @@ public final class SelectCallback<T> extends Closure {
     private final int index;
     private final DataFlowReadChannel<? extends T> channel;
 
+    /**
+     * @param owner   The SelectBase instance to notify
+     * @param index   The index of the channel this SelectCallback instance represents
+     * @param channel The channel represented by this SelectCallback instance
+     */
     public SelectCallback(final Object owner, final int index, final DataFlowReadChannel<? extends T> channel) {
         super(owner);
         this.index = index;
         this.channel = channel;
     }
 
+    /**
+     * Invoked by the channel when a value has been bound to it and is available for consumption
+     *
+     * @param args Holds the value, but we do not work with the value here
+     * @return A dummy string, since the caller doesn't check the return value
+     */
     @SuppressWarnings({"unchecked"})
     @Override
     public Object call(final Object[] args) {

@@ -19,19 +19,28 @@ package groovyx.gpars.dataflow;
 import java.util.List;
 
 /**
+ * The base implementation of the SelectRequest interface, providing a useful default masking (guarding) functionality.
+ * Whenever invoking a select, guards can be specified, reducing the set of all input channels of the Select to consider in the given request.
+ *
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
-abstract class MaskSelectRequest<T> implements SelectRequest<T> {
+abstract class GuardedSelectRequest<T> implements SelectRequest<T> {
     private final List<Boolean> mask;
 
     /**
-     * @param mask The list of boolean flags indicating shich position should be matched against. All indexes match against a null mask
+     * @param mask The list of boolean flags indicating which position should be matched against. All indexes match against a null mask
      */
-    MaskSelectRequest(final List<Boolean> mask) {
+    GuardedSelectRequest(final List<Boolean> mask) {
         this.mask = mask;
     }
 
+    /**
+     * Detects, whether the channel at the given index is guarded or not.
+     *
+     * @param index The index of the input channel to check for guard
+     * @return True, if the channel's guard is true or no guards were set and so the channel should be included in the current select operation
+     */
     @Override
     public boolean matchesMask(final int index) {
         if (mask == null) return true;

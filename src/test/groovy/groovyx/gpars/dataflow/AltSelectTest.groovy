@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import spock.lang.Ignore
 import spock.lang.Specification
 
 //todo test priorities, guards, selector + guards, prioritySelector + guards
@@ -76,6 +77,35 @@ class AltSelectTest extends Specification {
         b << 10
         then:
         select() == [1, 10] as SelectResult
+    }
+
+    @Ignore
+    def "selecting a null value"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def select = DataFlow.select(a, b, c)
+        when:
+        b << null
+        then:
+        select() == [1, null] as SelectResult
+    }
+
+    @Ignore
+    def "selecting a previously bound null value"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        Thread.start {
+            sleep 3000
+            b << null
+        }
+        when:
+        def fselect = DataFlow.select(a, b, c)
+        then:
+        select() == [1, null] as SelectResult
     }
 
     def "selecting from three df streams with value being bound is a separate thread"() {

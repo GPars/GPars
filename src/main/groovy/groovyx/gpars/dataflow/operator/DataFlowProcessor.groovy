@@ -78,7 +78,7 @@ abstract class DataFlowProcessor {
     /**
      * Stops the processor
      */
-    public void stop() { actor.stop() }
+    public final void stop() { actor.stop() }
 
     /**
      * Joins the processor waiting for it to finish
@@ -172,14 +172,8 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
         this.code = code
     }
 
-    abstract void onMessage(def message)
-
-    final void afterStart() {
-        queryInputs()
-    }
-
-    protected final def queryInputs() {
-        return inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
+    void onMessage(def message) {
+        throw new IllegalStateException("The dataflow actor doesn't recognize the message $message")
     }
 
     final reportException(Throwable e) {

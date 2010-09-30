@@ -27,6 +27,12 @@ public final class SelectResult<T> {
     private final int index;
     private final T value;
 
+    /**
+     * Stores the result of a select operation
+     *
+     * @param index The index of the read input channel
+     * @param value The value read
+     */
     SelectResult(final int index, final T value) {
         this.index = index;
         this.value = value;

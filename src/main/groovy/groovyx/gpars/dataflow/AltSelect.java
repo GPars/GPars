@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -27,7 +28,13 @@ public class AltSelect<T> {
 
     private final SelectBase<T> selectBase;
 
-    public AltSelect(final DataFlowReadChannel<T>... channels) {
+    @SuppressWarnings({"OverloadedVarargsMethod"})
+    public AltSelect(final DataFlowReadChannel<? extends T>... channels) {
+        selectBase = new SelectBase<T>(Arrays.asList(channels));
+    }
+
+    public AltSelect(final List<DataFlowReadChannel<? extends T>> channels) {
+        //noinspection unchecked
         selectBase = new SelectBase<T>(channels);
     }
 
@@ -38,8 +45,6 @@ public class AltSelect<T> {
     public SelectResult<T> select(final List<Boolean> mask) throws InterruptedException {
         return select(-1, mask);
     }
-
-    //todo timeout select
 
     public SelectResult<T> prioritySelect() throws InterruptedException {
         return select(0, null);
@@ -63,7 +68,7 @@ public class AltSelect<T> {
     /**
      * Reads the next value to output
      *
-     * @param mask
+     * @param mask A list of boolean values indicating, which channel should be attempted to read and which not
      * @return The value received from one of the input channels, which is now to be consumed by the user
      * @throws InterruptedException If the current thread gets interrupted inside the method call
      */
@@ -76,10 +81,9 @@ public class AltSelect<T> {
         final int[] foundIndex = new int[1];
         @SuppressWarnings({"unchecked"}) final T[] foundValue = (T[]) new Object[1];
 
-        selectBase.doSelect(startIndex, new MaskSelectRequest<T>(mask) {
+        selectBase.doSelect(startIndex, new GuardedSelectRequest<T>(mask) {
             @Override
             public void valueFound(final int index, final T value) {
-                System.out.println("4 " + index + ":" + value);
                 foundIndex[0] = index;
                 foundValue[0] = value;
                 latch.countDown();

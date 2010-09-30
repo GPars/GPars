@@ -166,7 +166,11 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
             final DataFlowVariable<T> df = queue.peek();
             if (df != null && df.isBound()) {
                 queue.poll();
-                return df.getVal();
+                System.out.println("Returning null value");
+                final T value = df.getVal();
+                //todo resolve
+//                if (value==null) return NullObject.getNullObject();
+                return value;
             }
             return null;
         }

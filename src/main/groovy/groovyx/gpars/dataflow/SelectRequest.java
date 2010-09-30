@@ -17,11 +17,28 @@
 package groovyx.gpars.dataflow;
 
 /**
+ * Represents a request for value from a select.
+ * Each request holds a list of guards (boolean flags) to indicate, which input channels of the select should be queried,
+ * and a routine to invoke once a value is available.
+ *
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
 public interface SelectRequest<T> {
+
+    /**
+     * Checks, whether the given index should be queried for value or not.
+     *
+     * @param index The index of the input channel to check for guard
+     * @return True, it the select user is interested in values from the channel represented by the provided index
+     */
     boolean matchesMask(int index);
 
+    /**
+     * Invoked, when a value has been found bound to any of the input channels monitored by the select.
+     *
+     * @param index The index of the input channel
+     * @param value The value obtained from the channel
+     */
     void valueFound(int index, T value);
 }

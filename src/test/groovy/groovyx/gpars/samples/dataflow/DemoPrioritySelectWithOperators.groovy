@@ -19,15 +19,13 @@ package groovyx.gpars.samples.dataflow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.operator
-import static groovyx.gpars.dataflow.DataFlow.prioritySelect
+import static groovyx.gpars.dataflow.DataFlow.prioritySelector
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
- * Shows a possible way to combine operators with PrioritySelect.
- * PrioritySelect monitors a set of input channels for values and makes these values
- * available on its output irrespective of their original input channel.
- * Note that dataflow variables and streams can be combined for Select.
- * Unlike plain Select, the PrioritySelect class gives precedence to input channels with lower index.
+ * Shows a possible way to combine operators with PrioritySelectors.
+ * Note that dataflow variables and streams can be combined for Selectors.
+ * Unlike plain Selector, the PrioritySelector class gives precedence to input channels with lower index.
  * Available messages from high priority channels will be served before messages from lower-priority channels.
  * Messages received through a single input channel will have their mutual order preserved.
  *
@@ -59,13 +57,14 @@ task {
     whoCares << 'The sound has disappeared'
 }
 
-def select = prioritySelect(critical, ordinary, whoCares)
+def selected = new DataFlowStream()
+def selector = prioritySelector(inputs: [critical, ordinary, whoCares], outputs: [selected])
 def results = new DataFlowStream()
-def op = operator([inputs: [select.outputChannel], outputs: [results]], {bindOutput it})
+def op = operator(selected, results, {bindOutput it})
 
 println 'Starting to monitor our IT department'
 sleep 3000
 10.times {println "Received: ${results.val}"}
 
-select.close()  //A Select can be explicitly closed to stop the underlying actor immediately
+selector.stop()
 op.stop()
