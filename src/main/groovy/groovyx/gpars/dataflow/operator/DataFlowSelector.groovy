@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.MessagingAltSelect
+import groovyx.gpars.dataflow.MessagingSelect
 import groovyx.gpars.dataflow.SelectResult
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
@@ -38,7 +38,7 @@ import java.util.concurrent.Semaphore
  */
 public class DataFlowSelector extends DataFlowProcessor {
 
-    protected final MessagingAltSelect select
+    protected final MessagingSelect select
 
     /**
      * Creates a selector
@@ -60,7 +60,7 @@ public class DataFlowSelector extends DataFlowProcessor {
         } else {
             this.actor = new DataFlowSelectorActor(this, group, outputs, inputs, code.clone())
         }
-        select = new MessagingAltSelect(inputs)
+        select = new MessagingSelect(inputs)
     }
 
     private boolean verifyChannelParameters(Map channels, int parameters) {

@@ -25,16 +25,16 @@ import java.util.List;
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
-public class MessagingAltSelect<T> {
+public class MessagingSelect<T> {
 
     private final SelectBase<T> selectBase;
 
     @SuppressWarnings({"OverloadedVarargsMethod"})
-    public MessagingAltSelect(final DataFlowReadChannel<? extends T>... channels) {
+    public MessagingSelect(final DataFlowReadChannel<? extends T>... channels) {
         selectBase = new SelectBase<T>(Arrays.asList(channels));
     }
 
-    public MessagingAltSelect(final List<DataFlowReadChannel<? extends T>> channels) {
+    public MessagingSelect(final List<DataFlowReadChannel<? extends T>> channels) {
         //noinspection unchecked
         selectBase = new SelectBase<T>(channels);
     }

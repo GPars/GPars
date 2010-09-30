@@ -22,11 +22,11 @@ import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
-import groovyx.gpars.dataflow.AltSelect
 import groovyx.gpars.dataflow.DataFlowChannel
 import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlowWriteChannel
+import groovyx.gpars.dataflow.Select
 import groovyx.gpars.dataflow.operator.DataFlowOperator
 import groovyx.gpars.dataflow.operator.DataFlowPrioritySelector
 import groovyx.gpars.dataflow.operator.DataFlowProcessor
@@ -287,7 +287,7 @@ public abstract class PGroup {
      * obtain values from the supplied dataflow variables or streams as they become available.
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public AltSelect select(final DataFlowChannel... channels) {
-        return new AltSelect(channels)
+    public Select select(final DataFlowChannel... channels) {
+        return new Select(channels)
     }
 }

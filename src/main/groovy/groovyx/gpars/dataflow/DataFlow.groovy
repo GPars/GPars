@@ -151,7 +151,7 @@ public abstract class DataFlow {
      * obtain values from the supplied dataflow variables or streams as they become available.
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public static AltSelect select(final DataFlowChannel... channels) {
+    public static Select select(final DataFlowChannel... channels) {
         DataFlow.DATA_FLOW_GROUP.select(channels)
     }
 }

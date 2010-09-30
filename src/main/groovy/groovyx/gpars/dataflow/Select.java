@@ -24,16 +24,16 @@ import java.util.concurrent.CountDownLatch;
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
-public class AltSelect<T> {
+public class Select<T> {
 
     private final SelectBase<T> selectBase;
 
     @SuppressWarnings({"OverloadedVarargsMethod"})
-    public AltSelect(final DataFlowReadChannel<? extends T>... channels) {
+    public Select(final DataFlowReadChannel<? extends T>... channels) {
         selectBase = new SelectBase<T>(Arrays.asList(channels));
     }
 
-    public AltSelect(final List<DataFlowReadChannel<? extends T>> channels) {
+    public Select(final List<DataFlowReadChannel<? extends T>> channels) {
         //noinspection unchecked
         selectBase = new SelectBase<T>(channels);
     }
