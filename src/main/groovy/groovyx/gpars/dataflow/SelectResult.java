@@ -20,8 +20,8 @@ package groovyx.gpars.dataflow;
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
-public interface SelectRequest<T> {
-    boolean matchesMask(int index);
+public interface SelectResult<T> {
+    int getIndex();
 
-    void valueFound(int index, T value);
+    T getValue();
 }

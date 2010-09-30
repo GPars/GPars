@@ -16,12 +16,26 @@
 
 package groovyx.gpars.dataflow;
 
+import java.util.List;
+
 /**
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
-public interface SelectRequest<T> {
-    boolean matchesMask(int index);
+abstract class MaskSelectRequest<T> implements SelectRequest<T> {
+    private final List<Boolean> mask;
 
-    void valueFound(int index, T value);
+    /**
+     * @param mask The list of boolean flags indicating shich position should be matched against. All indexes match against a null mask
+     */
+    MaskSelectRequest(final List<Boolean> mask) {
+        this.mask = mask;
+    }
+
+    @Override
+    public boolean matchesMask(final int index) {
+        if (mask == null) return true;
+        //noinspection AutoUnboxing
+        return mask.get(index);
+    }
 }

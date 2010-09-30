@@ -16,15 +16,14 @@
 
 package groovyx.gpars.dataflow;
 
-import groovy.lang.Closure;
-import groovyx.gpars.actor.impl.MessageStream;
 import org.codehaus.groovy.runtime.MethodClosure;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Allows repeatedly receive a value across multiple dataflow channels.
@@ -42,16 +41,18 @@ import java.util.concurrent.TimeUnit;
  *         Date: 29th Sep 2010
  */
 @SuppressWarnings({"RawUseOfParameterizedType"})
-public abstract class AbstractAltSelect<T> {
+public final class AbstractAltSelect<T> {
 
     private final List<DataFlowReadChannel<? extends T>> channels;
     private final int numberOfChannels;
-    private boolean waitingForValue = false;
+    private final Collection<SelectRequest<T>> pendingRequests = new ArrayList<SelectRequest<T>>();
 
     @SuppressWarnings({"UnsecureRandomNumberGeneration"})
     private final Random position = new Random();
 
-    public AbstractAltSelect(final DataFlowReadChannel<? extends T>... channels) {
+    //todo test poll
+
+    AbstractAltSelect(final DataFlowReadChannel<? extends T>... channels) {
         this.channels = Collections.unmodifiableList(Arrays.asList(channels));
         numberOfChannels = channels.length;
         for (int i = 0; i < channels.length; i++) {
@@ -60,215 +61,47 @@ public abstract class AbstractAltSelect<T> {
             channel.wheneverBound(new MethodClosure(new Runnable() {
                 @Override
                 public void run() {
-                    boundNotification(index, channel);
+                    try {
+                        boundNotification(index, channel);
+                    } catch (InterruptedException ignore) {
+                    }
 
                 }
             }, "run"));
         }
     }
 
-    public final void boundNotification(final int index, final DataFlowReadChannel<? extends T> channel) {
+    @SuppressWarnings({"MethodOnlyUsedFromInnerClass"})
+    private void boundNotification(final int index, final DataFlowReadChannel<? extends T> channel) throws InterruptedException {
         synchronized (channels) {
-            if (waitingForValue) {
-                try {
+            for (final SelectRequest<T> selectRequest : pendingRequests) {
+                if (selectRequest.matchesMask(index)) {
                     final T value = channel.poll();
                     if (value != null) {
-                        propagateValue(index, value);
-                        waitingForValue = false;
+                        pendingRequests.remove(selectRequest);
+                        selectRequest.valueFound(index, value);
+                        return;
                     }
-                } catch (InterruptedException e) {
-                    //todo test poll
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
         }
-
     }
 
-    abstract void propagateValue(final int index, final T value);
-
-    public T select() {
-
-
-    }
-
-    public T select(final List<Boolean> mask) throws InterruptedException {
-        final int startPosition = position.nextInt(numberOfChannels);
+    void doSelect(final int startIndex, final SelectRequest<T> selectRequest) throws InterruptedException {
+        final int startPosition = startIndex == -1 ? position.nextInt(numberOfChannels) : startIndex;
 
         synchronized (channels) {
             for (int i = 0; i < numberOfChannels; i++) {
                 final int currentPosition = (startPosition + i) % numberOfChannels;
-                if (mask.get(currentPosition)) {
+                if (selectRequest.matchesMask(currentPosition)) {
                     final T value = channels.get(currentPosition).poll();
-                    if (value != null) return value;
+                    if (value != null) {
+                        selectRequest.valueFound(currentPosition, value);
+                        return;
+                    }
                 }
             }
-
-            //todo propagate the mask
-            waitingForValue = true;
+            pendingRequests.add(selectRequest);
         }
-    }
-
-    public T prioritySelect() {
-
-    }
-
-    public T prioritySelect(final List<Boolean> mask) {
-
-    }
-
-    /**
-     * Reads the next value to output
-     *
-     * @return The value received from one of the input channels, which is now to be consumed by the user
-     * @throws InterruptedException If the current thread gets interrupted inside the method call
-     */
-    private T doSelect() throws InterruptedException {
-        return outputChannel.getVal();
-    }
-
-    /**
-     * Reads the next value to output
-     *
-     * @return The value received from one of the input channels, which is now to be consumed by the user
-     * @throws InterruptedException If the current thread gets interrupted inside the method call
-     */
-    public final Object call() throws InterruptedException {
-        checkAlive();
-        return doSelect();
-    }
-
-    /**
-     * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message
-     * back the the supplied actor once the value has been bound.
-     * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
-     * with the value of the Dataflow channel.
-     *
-     * @param callback An actor to send the bound value to.
-     */
-    @Override
-    public final void getValAsync(final MessageStream callback) {
-        checkAlive();
-        outputChannel.getValAsync(callback);
-    }
-
-    /**
-     * Asynchronously retrieves the value from the channel. Sends a message back the the supplied MessageStream
-     * with a map holding the supplied attachment under the 'attachment' key and the actual value of the channel under
-     * the 'result' key once the value has been bound.
-     * Attachment is an arbitrary value helping the actor.operator match its request with the reply.
-     * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
-     * with the value of the Dataflow channel.
-     *
-     * @param attachment arbitrary non-null attachment if reader needs better identification of result
-     * @param callback   An actor to send the bound value plus the supplied index to.
-     */
-    @Override
-    public final void getValAsync(final Object attachment, final MessageStream callback) {
-        checkAlive();
-        outputChannel.getValAsync(attachment, callback);
-    }
-
-    /**
-     * Reads the next value to output
-     *
-     * @return The value received from one of the input channels, which is now to be consumed by the user
-     * @throws InterruptedException If the current thread gets interrupted inside the method call
-     */
-    @Override
-    public final T getVal() throws InterruptedException {
-        checkAlive();
-        return doSelect();
-    }
-
-    /**
-     * Reads the current value of the channel. Blocks up to given timeout, if the value has not been assigned yet.
-     *
-     * @param timeout The timeout value
-     * @param units   Units for the timeout
-     * @return The actual value
-     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
-     */
-    @Override
-    public final T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        checkAlive();
-        return outputChannel.getVal(timeout, units);
-    }
-
-    /**
-     * Schedule closure to be executed by pooled actor after data became available
-     * It is important to notice that even if data already available the execution of closure
-     * will not happen immediately but will be scheduled
-     *
-     * @param closure closure to execute when data available
-     */
-    @Override
-    public final void rightShift(final Closure closure) {
-        whenBound(closure);
-    }
-
-    /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
-     * will not happen immediately but will be scheduled.
-     *
-     * @param closure closure to execute when data available
-     */
-    @Override
-    public final void whenBound(final Closure closure) {
-        getValAsync(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
-    }
-
-    /**
-     * Send the bound data to provided stream when it becomes available
-     *
-     * @param stream stream where to send result
-     */
-    @Override
-    public final void whenBound(final MessageStream stream) {
-        getValAsync(stream);
-    }
-
-    @Override
-    public void wheneverBound(final Closure closure) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void wheneverBound(final MessageStream stream) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean isBound() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    private void checkAlive() {
-        if (!active) throw new IllegalStateException(THE_SELECT_HAS_BEEN_STOPPED_ALREADY);
-    }
-
-    /**
-     * Retrieves a dataflow channel through which all values are output
-     *
-     * @return The dataflow channel delivering all output values
-     */
-    public final DataFlowReadChannel<?> getOutputChannel() {
-        return outputChannel;
-    }
-
-    /**
-     * Stops the internal machinery of the Select instance
-     */
-    public final void close() {
-        selector.stop();
-        active = false;
-    }
-
-    @SuppressWarnings({"FinalizeDeclaration", "ProhibitedExceptionDeclared"})
-    @Override
-    protected final void finalize() throws Throwable {
-        close();
-        super.finalize();
     }
 }
