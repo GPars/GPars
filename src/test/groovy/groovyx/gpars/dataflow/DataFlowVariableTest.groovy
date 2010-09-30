@@ -134,6 +134,24 @@ public class DataFlowVariableTest extends GroovyTestCase {
         assertEquals 10, result.val
     }
 
+    public void testVariablePoll() {
+        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
+        volatile def result = new DataFlowVariable()
+
+        assert variable.poll() == null
+        assert variable.poll() == null
+        variable >> {
+            result << variable.poll()
+        }
+        DataFlow.start {
+            variable << 10
+        }
+
+        assertEquals 10, variable.val
+        assertEquals 10, result.val
+        assertEquals 10, result.poll()
+    }
+
     public void testJoin() {
         final DataFlowVariable variable = new DataFlowVariable()
 

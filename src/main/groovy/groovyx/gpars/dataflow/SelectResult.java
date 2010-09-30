@@ -17,11 +17,55 @@
 package groovyx.gpars.dataflow;
 
 /**
+ * A bean representing the result of the select operation on a Select.
+ * It holds the index of the input channel, which was read, and the obtained value.
+ *
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
-public interface SelectResult<T> {
-    int getIndex();
+public final class SelectResult<T> {
+    private final int index;
+    private final T value;
 
-    T getValue();
+    SelectResult(final int index, final T value) {
+        this.index = index;
+        this.value = value;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public T getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "SelectResult{" +
+                "index=" + index +
+                ", value=" + value +
+                '}';
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        @SuppressWarnings({"RawUseOfParameterizedType"}) final SelectResult other = (SelectResult) obj;
+
+        //noinspection AccessingNonPublicFieldOfAnotherObject
+        if (index != other.index) return false;
+        //noinspection AccessingNonPublicFieldOfAnotherObject
+        return !(value != null ? !value.equals(other.value) : other.value != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = index;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
 }

@@ -26,46 +26,41 @@ import java.util.List;
  */
 public class MessagingAltSelect<T> {
 
-    private final AbstractAltSelect<T> altSelect = new AbstractAltSelect<T>();
+    private final SelectBase<T> selectBase;
 
-    private final MessageStream messageStream;
-
-    public MessagingAltSelect(final MessageStream messageStream) {
-        this.messageStream = messageStream;
+    public MessagingAltSelect(final DataFlowReadChannel<T>... channels) {
+        selectBase = new SelectBase<T>(channels);
     }
 
-    public void select() throws InterruptedException {
-        select(-1, null);
+    public void select(final MessageStream messageStream) throws InterruptedException {
+        select(messageStream, -1, null);
     }
 
-    public void select(final List<Boolean> mask) throws InterruptedException {
-        select(-1, mask);
+    public void select(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {
+        select(messageStream, -1, mask);
     }
 
-    public void prioritySelect() throws InterruptedException {
-        select(0, null);
+    public void prioritySelect(final MessageStream messageStream) throws InterruptedException {
+        select(messageStream, 0, null);
     }
 
-    public void prioritySelect(final List<Boolean> mask) throws InterruptedException {
-        select(0, mask);
+    public void prioritySelect(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {
+        select(messageStream, 0, mask);
     }
 
-    private void select(final int startIndex, final List<Boolean> mask) throws InterruptedException {
-        altSelect.doSelect(startIndex, new MaskSelectRequest<T>(mask) {
+    public final void call(final MessageStream messageStream) throws InterruptedException {
+        select(messageStream);
+    }
+
+    public final void call(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {
+        select(messageStream, mask);
+    }
+
+    private void select(final MessageStream messageStream, final int startIndex, final List<Boolean> mask) throws InterruptedException {
+        selectBase.doSelect(startIndex, new MaskSelectRequest<T>(mask) {
             @Override
             public void valueFound(final int index, final T value) {
-                messageStream.send(new SelectResult() {
-                    @Override
-                    public int getIndex() {
-                        return index;
-                    }
-
-                    @Override
-                    public T getValue() {
-                        return value;
-                    }
-                }
-                );
+                messageStream.send(new SelectResult<T>(index, value));
             }
         });
     }

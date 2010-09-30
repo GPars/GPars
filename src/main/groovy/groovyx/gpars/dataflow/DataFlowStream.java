@@ -162,7 +162,14 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
      */
     @Override
     public T poll() throws InterruptedException {
-        return queue.poll().getVal();
+        synchronized (queueLock) {
+            final DataFlowVariable<T> df = queue.peek();
+            if (df != null && df.isBound()) {
+                queue.poll();
+                return df.getVal();
+            }
+            return null;
+        }
     }
 
     /**

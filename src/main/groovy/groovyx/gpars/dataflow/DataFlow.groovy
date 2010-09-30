@@ -151,28 +151,7 @@ public abstract class DataFlow {
      * obtain values from the supplied dataflow variables or streams as they become available.
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public static Select select(final DataFlowChannel... channels) {
+    public static AltSelect select(final DataFlowChannel... channels) {
         DataFlow.DATA_FLOW_GROUP.select(channels)
-    }
-
-    /**
-     * Creates a priority select using the default dataflow parallel group. The returns PrioritySelect instance will allow the user to
-     * obtain values from the supplied dataflow variables or streams as they become available, prioritizing by the channel index,
-     * giving lower index higher priority.
-     * @param channels Dataflow variables or streams to wait for values on, with priority decreasing with increasing index value
-     */
-    public static PrioritySelect prioritySelect(final DataFlowChannel... channels) {
-        DataFlow.DATA_FLOW_GROUP.prioritySelect(channels)
-    }
-
-    /**
-     * Creates a priority select using the default dataflow parallel group. The returns PrioritySelect instance will allow the user to
-     * obtain values from the supplied dataflow variables or streams as they become available, prioritizing by the channel index,
-     * giving lower index higher priority.
-     * @param channels Dataflow variables or streams to wait for values on, with priority decreasing with increasing index value
-     * @param itemFactory An optional factory creating items to output out of the received items and their index. The default implementation only propagates the obtained values and ignores the index
-     */
-    public static PrioritySelect prioritySelect(final Closure itemFactory, final DataFlowChannel... channels) {
-        DataFlow.DATA_FLOW_GROUP.prioritySelect(itemFactory, channels)
     }
 }

@@ -16,8 +16,6 @@
 
 package groovyx.gpars.dataflow;
 
-import org.codehaus.groovy.runtime.MethodClosure;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,7 +39,7 @@ import java.util.Random;
  *         Date: 29th Sep 2010
  */
 @SuppressWarnings({"RawUseOfParameterizedType"})
-public final class AbstractAltSelect<T> {
+public final class SelectBase<T> {
 
     private final List<DataFlowReadChannel<? extends T>> channels;
     private final int numberOfChannels;
@@ -50,29 +48,18 @@ public final class AbstractAltSelect<T> {
     @SuppressWarnings({"UnsecureRandomNumberGeneration"})
     private final Random position = new Random();
 
-    //todo test poll
-
-    AbstractAltSelect(final DataFlowReadChannel<? extends T>... channels) {
+    SelectBase(final DataFlowReadChannel<? extends T>... channels) {
         this.channels = Collections.unmodifiableList(Arrays.asList(channels));
         numberOfChannels = channels.length;
         for (int i = 0; i < channels.length; i++) {
             final DataFlowReadChannel<? extends T> channel = channels[i];
-            final int index = i;
-            channel.wheneverBound(new MethodClosure(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        boundNotification(index, channel);
-                    } catch (InterruptedException ignore) {
-                    }
-
-                }
-            }, "run"));
+            //noinspection ThisEscapedInObjectConstruction
+            channel.wheneverBound(new SelectCallback<T>(this, i, channel));
         }
     }
 
     @SuppressWarnings({"MethodOnlyUsedFromInnerClass"})
-    private void boundNotification(final int index, final DataFlowReadChannel<? extends T> channel) throws InterruptedException {
+    void boundNotification(final int index, final DataFlowReadChannel<? extends T> channel) throws InterruptedException {
         synchronized (channels) {
             for (final SelectRequest<T> selectRequest : pendingRequests) {
                 if (selectRequest.matchesMask(index)) {
@@ -80,6 +67,7 @@ public final class AbstractAltSelect<T> {
                     if (value != null) {
                         pendingRequests.remove(selectRequest);
                         selectRequest.valueFound(index, value);
+                        System.out.println("AAAAAAAAAAAAAAAAAAAAa");
                         return;
                     }
                 }
@@ -93,9 +81,12 @@ public final class AbstractAltSelect<T> {
         synchronized (channels) {
             for (int i = 0; i < numberOfChannels; i++) {
                 final int currentPosition = (startPosition + i) % numberOfChannels;
-                if (selectRequest.matchesMask(currentPosition)) {
+                System.out.println("1");
+                if (selectRequest.matchesMask(currentPosition) && !(channels.get(currentPosition) instanceof DataFlowVariable)) {
+                    System.out.println("2");
                     final T value = channels.get(currentPosition).poll();
                     if (value != null) {
+                        System.out.println("3 " + value);
                         selectRequest.valueFound(currentPosition, value);
                         return;
                     }

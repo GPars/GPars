@@ -25,7 +25,11 @@ import java.util.concurrent.CountDownLatch;
  */
 public class AltSelect<T> {
 
-    private final AbstractAltSelect<T> altSelect = new AbstractAltSelect<T>();
+    private final SelectBase<T> selectBase;
+
+    public AltSelect(final DataFlowReadChannel<T>... channels) {
+        selectBase = new SelectBase<T>(channels);
+    }
 
     public SelectResult<T> select() throws InterruptedException {
         return select(-1, null);
@@ -72,25 +76,16 @@ public class AltSelect<T> {
         final int[] foundIndex = new int[1];
         @SuppressWarnings({"unchecked"}) final T[] foundValue = (T[]) new Object[1];
 
-        altSelect.doSelect(startIndex, new MaskSelectRequest<T>(mask) {
+        selectBase.doSelect(startIndex, new MaskSelectRequest<T>(mask) {
             @Override
             public void valueFound(final int index, final T value) {
+                System.out.println("4 " + index + ":" + value);
                 foundIndex[0] = index;
                 foundValue[0] = value;
                 latch.countDown();
             }
         });
         latch.await();
-        return new SelectResult<T>() {
-            @Override
-            public int getIndex() {
-                return foundIndex[0];
-            }
-
-            @Override
-            public T getValue() {
-                return foundValue[0];
-            }
-        };
+        return new SelectResult<T>(foundIndex[0], foundValue[0]);
     }
 }

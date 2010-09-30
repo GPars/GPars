@@ -47,6 +47,39 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assertEquals 0, stream.length()
     }
 
+    public void testStreamPoll() {
+        final CountDownLatch latch = new CountDownLatch(1)
+
+        final DataFlowStream stream = new DataFlowStream()
+        assert stream.poll() == null
+        assert stream.poll() == null
+        stream << 1
+        assert stream.poll() == 1
+        assert stream.poll() == null
+        stream << 2
+        assert stream.poll() == 2
+        assert stream.poll() == null
+        final Actor thread = DataFlow.start {
+            stream << 10
+            final DataFlowVariable variable = new DataFlowVariable()
+            stream << variable
+            latch.countDown()
+            react {
+                variable << 20
+            }
+        }
+
+        latch.await()
+        assertEquals 2, stream.length()
+        assertEquals 10, stream.poll()
+        assertEquals 1, stream.length()
+        assert stream.poll() == null
+        thread << 'Proceed'
+        assertEquals 20, stream.val
+        assertEquals 0, stream.length()
+        assert stream.poll() == null
+    }
+
     public void testNullValues() {
         final CountDownLatch latch = new CountDownLatch(1)
 
