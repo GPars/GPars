@@ -232,7 +232,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         assert !flag
     }
 
-    public void _testOutputs() {
+    public void testOutputs() {
         final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
@@ -250,7 +250,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         assert (op1.getOutput() == b) && (op1.getOutputs(0) == b) && (op1.getOutputs(1) == c)
     }
 
-    public void _testEmptyOutputs() {
+    public void testEmptyOutputs() {
         final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false

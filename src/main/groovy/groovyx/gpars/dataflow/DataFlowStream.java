@@ -161,15 +161,12 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
      * @throws InterruptedException If the current thread is interrupted
      */
     @Override
-    public T poll() throws InterruptedException {
+    public DataFlowExpression<T> poll() throws InterruptedException {
         synchronized (queueLock) {
             final DataFlowVariable<T> df = queue.peek();
             if (df != null && df.isBound()) {
                 queue.poll();
-                final T value = df.getVal();
-                //todo resolve
-//                if (value==null) return NullObject.getNullObject();
-                return value;
+                return df;
             }
             return null;
         }

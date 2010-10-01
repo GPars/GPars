@@ -17,7 +17,6 @@
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.group.DefaultPGroup
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class SelectTest extends Specification {
@@ -78,7 +77,6 @@ class SelectTest extends Specification {
         select() == [1, 10] as SelectResult
     }
 
-    @Ignore
     def "selecting a null value"() {
         given:
         def a = new DataFlowStream()
@@ -91,7 +89,6 @@ class SelectTest extends Specification {
         select() == [1, null] as SelectResult
     }
 
-    @Ignore
     def "selecting a previously bound null value"() {
         given:
         def a = new DataFlowStream()
@@ -102,7 +99,7 @@ class SelectTest extends Specification {
             b << null
         }
         when:
-        def fselect = DataFlow.select(a, b, c)
+        def select = DataFlow.select(a, b, c)
         then:
         select() == [1, null] as SelectResult
     }

@@ -149,7 +149,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
 
         assertEquals 10, variable.val
         assertEquals 10, result.val
-        assertEquals 10, result.poll()
+        assertEquals 10, result.poll().val
     }
 
     public void testJoin() {
