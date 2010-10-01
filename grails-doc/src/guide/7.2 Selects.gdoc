@@ -1,0 +1,169 @@
+Frequently a value needs to be obtained from one of several dataflow channels (variables or streams). The _Select_ class
+is suitable for such scenarios.
+_Select_ can scan multiple dataflow channels and pick one channel from all the input channels, which currently have a value available for read.
+The value from that channels is read and returned to the caller together with the index of the originating channel.
+Picking the channel is either random, or based on channel priority, in which case channels with lower position index in the _Select_ constructor
+have higher priority.
+
+h2. Selecting a value from multiple channels
+
+{code}
+import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowVariable
+import static groovyx.gpars.dataflow.DataFlow.select
+import static groovyx.gpars.dataflow.DataFlow.task
+
+/**
+ * Shows a basic use of Select, which monitors a set of input channels for values and makes these values
+ * available on its output irrespective of their original input channel.
+ * Note that dataflow variables and streams can be combined for Select.
+ *
+ * You might also consider checking out the prioritySelect method, which prioritizes values by the index of their input channel
+ */
+def a = new DataFlowVariable()
+def b = new DataFlowVariable()
+def c = new DataFlowStream()
+
+task {
+    sleep 3000
+    a << 10
+}
+
+task {
+    sleep 1000
+    b << 20
+}
+
+task {
+    sleep 5000
+    c << 30
+}
+
+def select = select(a, b, c)
+println "The fastest result is ${select().value}"
+{code}
+
+{note}
+Note that the return type from _select()_ is _SelectResult_ , holding the value as well as the originating channel index.
+{note}
+
+There are multiple ways to read values from a Select:
+
+{code}
+def sel = select(a, b, c, d)
+def result = sel.select()                                       //Random selection
+def result = sel()                                              //Random selection (a short-hand variant)
+def result = sel.select([true, true, false, true])              //Random selection with guards specified
+def result = sel([true, true, false, true])                     //Random selection with guards specified (a short-hand variant)
+def result = sel.prioritySelect()                               //Priority selection
+def result = sel.prioritySelect([true, true, false, true])      //Priority selection with guards specifies
+{code}
+
+By default the _Select_ blocks the caller until a value to read is available. Alternatively, _Select_ allows to have the value sent
+to a provided _MessageStream_ (e.g. an actor) without blocking the caller.
+
+{code}
+def handler = actor {...}
+def sel = select(a, b, c, d)
+
+sel.select(handler)                                         //Random selection
+sel(handler)                                                //Random selection (a short-hand variant)
+sel.select(handler, [true, true, false, true])              //Random selection with guards specified
+sel(handler, [true, true, false, true])                     //Random selection with guards specified (a short-hand variant)
+sel.prioritySelect(handler)                                 //Priority selection
+sel.prioritySelect(handler, [true, true, false, true])      //Priority selection with guards specifies
+{code}
+
+h3. Guards
+
+Guards allow the caller to omit some input channels from the selection. Guards are specified as a List of boolean flags
+passed to the _select()_ or _prioritySelect()_ methods.
+
+{code}
+def sel = select(leaders, seniors, experts, juniors)
+def teamLead = sel([true, true, false, false]).value        //Only 'leaders' and 'seniors' qualify for becoming a teamLead here
+{code}
+
+A typical use for guards is to make Selects flexible to adopt to the changes in the user state.
+
+{code}
+import groovyx.gpars.dataflow.DataFlowStream
+import static groovyx.gpars.dataflow.DataFlow.select
+import static groovyx.gpars.dataflow.DataFlow.task
+
+/**
+ * Demonstrates the ability to enable/disable channels during a value selection on a select by providing boolean guards.
+ */
+final DataFlowStream operations = new DataFlowStream()
+final DataFlowStream numbers = new DataFlowStream()
+
+task {
+    final def select = select(operations, numbers)
+    3.times {
+        def instruction = select([true, false]).value
+        def num1 = select([false, true]).value
+        def num2 = select([false, true]).value
+        final def formula = "$num1 $instruction $num2"
+        println "$formula = ${new GroovyShell().evaluate(formula)}"
+    }
+}
+
+task {
+    operations << '+'
+    operations << '+'
+    operations << '*'
+}
+
+task {
+    numbers << 10
+    numbers << 20
+    numbers << 30
+    numbers << 40
+    numbers << 50
+    numbers << 60
+}
+{code}
+
+h3. Priority Select
+
+When certain channels should have precedence over others when selecting, the prioritySelect methods should be used instead.
+
+{code}
+/**
+ * Shows a basic use of Priority Select, which monitors a set of input channels for values and makes these values
+ * available on its output irrespective of their original input channel.
+ * Note that dataflow variables and streams can be combined for Select.
+ * Unlike plain select method call, the prioritySelect call gives precedence to input channels with lower index.
+ * Available messages from high priority channels will be served before messages from lower-priority channels.
+ * Messages received through a single input channel will have their mutual order preserved.
+ *
+ */
+def critical = new DataFlowVariable()
+def ordinary = new DataFlowStream()
+def whoCares = new DataFlowStream()
+
+task {
+    ordinary << 'All working fine'
+    whoCares << 'I feel a bit tired'
+    ordinary << 'We are on target'
+}
+
+task {
+    ordinary << 'I have just started my work. Busy. Will come back later...'
+    sleep 5000
+    ordinary << 'I am done for now'
+}
+
+task {
+    whoCares << 'Huh, what is that noise'
+    ordinary << 'Here I am to do some clean-up work'
+    whoCares << 'I wonder whether unplugging this cable will eliminate that nasty sound.'
+    critical << 'The server room goes on UPS!'
+    whoCares << 'The sound has disappeared'
+}
+
+def select = select(critical, ordinary, whoCares)
+println 'Starting to monitor our IT department'
+sleep 3000
+10.times {println "Received: ${select.prioritySelect().value}"}
+{code}

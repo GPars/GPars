@@ -29,14 +29,15 @@ final DataFlowStream numbers = new DataFlowStream()
 def instruction
 def nums = []
 
-selector(inputs: [operations, numbers], outputs: [], guards: [true, false]) {value, index ->
+selector(inputs: [operations, numbers], outputs: [], guards: [true, false]) {value, index ->   //initial guards is set here
     if (index == 0) {
         instruction = value
-        setGuards([false, true])
+        setGuard(0, false)  //setGuard() used here
+        setGuard(1, true)
     }
     else nums << value
     if (nums.size() == 2) {
-        setGuards([true, false])
+        setGuards([true, false])                                    //setGuards() used here
         final def formula = "${nums[0]} $instruction ${nums[1]}"
         println "$formula = ${new GroovyShell().evaluate(formula)}"
         nums.clear()

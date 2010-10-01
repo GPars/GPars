@@ -22,7 +22,7 @@ import static groovyx.gpars.dataflow.DataFlow.select
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
- * Shows a basic use of PrioritySelect, which monitors a set of input channels for values and makes these values
+ * Shows a basic use of Priority Select, which monitors a set of input channels for values and makes these values
  * available on its output irrespective of their original input channel.
  * Note that dataflow variables and streams can be combined for Select.
  * Unlike plain select method call, the prioritySelect call gives precedence to input channels with lower index.

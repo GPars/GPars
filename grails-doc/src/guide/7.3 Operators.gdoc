@@ -222,9 +222,21 @@ selector ([inputs : [a, b, c], outputs : [d, e]) {value, index ->
 }
 {code}
 
+h3. Priority Selector
+
+When priorities need to be preserved among input channels, a _DataFlowPrioritySelector_ should be used.
+
+{code}
+prioritySelector[inputs : [a, b, c], outputs : [d, e]) {value, index ->
+    ...
+}
+{code}
+
+The priority selector will always prefer values from channels with lower position index over values coming through the channels with higher position index.
+
 h3. Join selector
 
-A selector without a body closure specified will copy incoming values to all output channels.
+A selector without a body closure specified will copy all incoming values to all of its output channels.
 
 {code}
 def join = selector ([inputs : [programmers, analysis, managers], outputs : [employees, colleagues])
@@ -240,102 +252,58 @@ selector ([inputs : [a, b, c], outputs : [d, e], maxForks : 5) {value ->
 }
 {code}
 
-h2. Selecting a value from multiple channels
+h3. Guards
 
-Frequently a value needs to be obtained from one of several dataflow channels (variables or streams). The _Select_ construct
-is suitable for such scenarios.
+Just like _Selects_ , _Selectors_ also allow the users to temporarily include/exclude individual input channels from selection.
+The _guards_ input property can be used to set the initial mask on all input channels and the _setGuards_ and _setGuard_ methods
+are then available in the selector's body.
 
 {code}
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.select
-import static groovyx.gpars.dataflow.DataFlow.task
 import groovyx.gpars.dataflow.DataFlowStream
+import static groovyx.gpars.dataflow.DataFlow.selector
+import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
-* Shows a basic use of Select, which monitors a set of input channels for values and makes these values
-* available on its output irrespective of their original input channel.
-* Note that dataflow variables and streams can be combined for Select.
-*
-* You might also consider checking out the PrioritySelect class, which prioritizes values by the index of their input channel
-*/
-def a = new DataFlowVariable()
-def b = new DataFlowVariable()
-def c = new DataFlowStream()
-
-task {
-  sleep 3000
-  a << 10
-}
-
-task {
-  sleep 1000
-  b << 20
-}
-
-task {
-  sleep 5000
-  c << 30
-}
-
-def select = select(a, b, c)
-println "The fastest result is ${select.val}"
-{code}
-
-There are multiple ways to read values from a Select, leveraging the implemented _DataFlowChannel_ interface or the contained _outputChannel_ property:
-
-{code}
-def value = select.val                              //Compatible with other dataflow channels (variables or streams)
-def value = select.getVal(10, TimeUnit.SECONDS)     //Compatible with other dataflow channels (variables or streams)
-def value = select.getValAsync(actor)               //Compatible with other dataflow channels (variables or streams)
-def value = select.getValAsync(requestId, actor)    //Compatible with other dataflow channels (variables or streams)
-def value = select()                                //Calling the default call() method on Select
-def value = select.outputChannel.val                //Using the output dataflow channel of the Select directly
-def value = select.outputChannel.getValAsync(...)   //The Select output is a good old dataflow stream with all its handy methods for both synchronous and asynchronous value retrieval
-{code}
-
-h3. Priority Select
-
-When certain channels should have precedence over others used by Select, the PrioritySelect construct should be used instead.
-
-{code}
-/**
- * Shows a basic use of PrioritySelect, which monitors a set of input channels for values and makes these values
- * available on its output irrespective of their original input channel.
- * Note that dataflow variables and streams can be combined for Select.
- * Unlike plain Select, the PrioritySelect class gives precedence to input channels with lower index.
- * Available messages from high priority channels will be served before messages from lower-priority channels.
- * Messages received through a single input channel will have their mutual order preserved.
- *
+ * Demonstrates the ability to enable/disable channels during a value selection on a select by providing boolean guards.
  */
-def critical = new DataFlowVariable()
-def ordinary = new DataFlowStream()
-def whoCares = new DataFlowStream()
+final DataFlowStream operations = new DataFlowStream()
+final DataFlowStream numbers = new DataFlowStream()
 
-task {
-    ordinary << 'All working fine'
-    whoCares << 'I feel a bit tired'
-    ordinary << 'We are on target'
+def instruction
+def nums = []
+
+selector(inputs: [operations, numbers], outputs: [], guards: [true, false]) {value, index ->   //initial guards is set here
+    if (index == 0) {
+        instruction = value
+        setGuard(0, false)  //setGuard() used here
+        setGuard(1, true)
+    }
+    else nums << value
+    if (nums.size() == 2) {
+        setGuards([true, false])                                    //setGuards() used here
+        final def formula = "${nums[0]} $instruction ${nums[1]}"
+        println "$formula = ${new GroovyShell().evaluate(formula)}"
+        nums.clear()
+    }
 }
 
 task {
-    ordinary << 'I have just started work. Will come back later...'
-    sleep 5000
-    ordinary << 'I am done for now'
+    operations << '+'
+    operations << '+'
+    operations << '*'
 }
 
 task {
-    whoCares << 'Huh, what is that noise'
-    ordinary << 'Here I am to do some clean-up work'
-    whoCares << 'I wonder whether unplugging this cable will eliminate that nasty sound.'
-    critical << 'The server room goes on UPS!'
-    whoCares << 'The sound has disappeared'
+    numbers << 10
+    numbers << 20
+    numbers << 30
+    numbers << 40
+    numbers << 50
+    numbers << 60
 }
-
-def select = prioritySelect(critical, ordinary, whoCares)
-println 'Starting to monitor our IT department'
-sleep 3000
-10.times {println "Received: ${select.val}"}
 {code}
 
-Since both _Select_ and _PrioritySelect_ make their output channels accessible through the _outputChannel_ property,
-they can be combined into dataflow networks with dataflow operators and selectors, which opens the door to many interesting implementations.
+{note}
+Avoid combining _guards_ and _maxForks_ greater than 1. Although the _Selector_ is thread-safe and won't be damaged in any way, the guards are likely not to be set
+the way you expect. The multiple threads running selector's body concurrently will tend to over-write each-other's settings to the _guards_ property.
+{note}
