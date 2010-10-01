@@ -22,7 +22,6 @@ import groovy.lang.MetaClass;
 import groovy.lang.MetaProperty;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.SerialContext;
@@ -52,11 +51,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
 
     static final String ATTACHMENT = "attachment";
     static final String RESULT = "result";
-
-    /**
-     * Maps threads/tasks to parallel groups they belong to
-     */
-    static final ThreadLocal<PGroup> activeParallelGroup = new ThreadLocal<PGroup>();
 
     /**
      * Updater for the state field
@@ -485,18 +479,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      */
     @Override
     public final void whenBound(final Closure closure) {
-        getValAsync(new DataCallback(closure, retrieveCurrentDFPGroup()));
-    }
-
-    /**
-     * Retrieves the thread-local value of the active PGroup or the default DataFlowGroup
-     *
-     * @return The PGroup to use for DF within the current thread
-     */
-    static PGroup retrieveCurrentDFPGroup() {
-        PGroup pGroup = activeParallelGroup.get();
-        if (pGroup == null) pGroup = DataFlow.DATA_FLOW_GROUP;
-        return pGroup;
+        getValAsync(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
     }
 
     /**

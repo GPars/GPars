@@ -22,8 +22,8 @@ import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
+import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlowWriteChannel
 import groovyx.gpars.dataflow.Select
@@ -182,11 +182,11 @@ public abstract class PGroup {
         final DataFlowVariable result = new DataFlowVariable()
         def cloned = code.clone()
         threadPool.execute {->
-            DataFlowExpression.activeParallelGroup.set this
+            DataFlow.activeParallelGroup.set this
             try {
                 result.bind cloned()
             } finally {
-                DataFlowExpression.activeParallelGroup.remove()
+                DataFlow.activeParallelGroup.remove()
             }
         }
         return result

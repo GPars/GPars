@@ -14,9 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow;
+package groovyx.gpars.dataflow.impl;
 
 import groovy.lang.Closure;
+import groovyx.gpars.dataflow.DataFlowReadChannel;
 
 /**
  * A closure registerred with all the input channels on the wheneverBound() event to inform the Select

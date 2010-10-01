@@ -17,6 +17,8 @@
 package groovyx.gpars.dataflow;
 
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.impl.GuardedSelectRequest;
+import groovyx.gpars.dataflow.impl.SelectBase;
 import groovyx.gpars.group.PGroup;
 
 import java.util.Arrays;

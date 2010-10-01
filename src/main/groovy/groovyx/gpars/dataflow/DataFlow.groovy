@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.dataflow.operator.DataFlowProcessor
+import groovyx.gpars.group.PGroup
 
 /**
  * Contains factory methods to create dataflow actors and starting them.
@@ -31,6 +32,24 @@ public abstract class DataFlow {
      * The parallel group used by all Dataflow Concurrency actors by default.
      */
     public static final DataFlowPGroup DATA_FLOW_GROUP = new DataFlowPGroup(1)
+
+    /**
+     * Maps threads/tasks to parallel groups they belong to
+     */
+    public static final ThreadLocal<PGroup> activeParallelGroup = new ThreadLocal<PGroup>();
+
+    /**
+     * Retrieves the thread-local value of the active PGroup or the default DataFlowGroup
+     *
+     * @return The PGroup to use for DF within the current thread
+     */
+    public static PGroup retrieveCurrentDFPGroup() {
+        PGroup pGroup = activeParallelGroup.get();
+        if (pGroup == null) {
+            pGroup = DataFlow.DATA_FLOW_GROUP;
+        }
+        return pGroup;
+    }
 
     /**
      * Tasks need no channels

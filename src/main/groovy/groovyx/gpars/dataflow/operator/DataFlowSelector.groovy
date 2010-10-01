@@ -67,7 +67,12 @@ public class DataFlowSelector extends DataFlowProcessor {
         }
         select = new Select(group, inputs)
         guards = Collections.synchronizedList(new ArrayList<Boolean>((int) inputs.size()))
-        for (int i = 0; i < inputs.size(); i++) guards.add(Boolean.TRUE)
+        //fill in the provided or default guard flags
+        if (channels.guards) {
+            channels.guards.eachWithIndex {flag, index -> guards[index] = flag}
+        } else {
+            for (int i = 0; i < inputs.size(); i++) guards.add(Boolean.TRUE)
+        }
     }
 
     private boolean verifyChannelParameters(Map channels, int parameters) {
@@ -89,6 +94,15 @@ public class DataFlowSelector extends DataFlowProcessor {
      */
     public final void setGuard(int index, boolean flag) {
         guards[index] = flag
+    }
+
+    /**
+     * Used to enable/disable individual input channels from next selections
+     * @param index The index of the channel to enable/disable
+     * @param flag True, if the channel shoudl be included in selection, false otherwise
+     */
+    public final void setGuards(List<Boolean> flags) {
+        flags.eachWithIndex {flag, int index -> guards[index] = flag}
     }
 
     /**

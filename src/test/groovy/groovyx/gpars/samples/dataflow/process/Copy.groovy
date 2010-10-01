@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow.process
 
+import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.group.PGroup
 
 final class Copy {
@@ -33,7 +33,7 @@ final class Copy {
 
     public Closure call() {
         {->
-            final PGroup group = DataFlowExpression.retrieveCurrentDFPGroup()
+            final PGroup group = DataFlow.retrieveCurrentDFPGroup()
             while (true) {
                 def i = inChannel.val
                 group.task {

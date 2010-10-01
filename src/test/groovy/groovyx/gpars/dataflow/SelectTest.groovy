@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.group.DefaultPGroup
 import spock.lang.Ignore
 import spock.lang.Specification
 
@@ -248,5 +249,37 @@ class SelectTest extends Specification {
         def select = DataFlow.select(a, b, c)
         then:
         select.prioritySelect() == [2, 20] as SelectResult
+    }
+
+    def "active parallel group doesn't get changed"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def group = new DefaultPGroup()
+        def selectGroup = new DefaultPGroup()
+        DataFlow.activeParallelGroup.set group
+        when:
+        group.shutdown()
+        selectGroup.select(a, b, c)
+        then:
+        DataFlow.retrieveCurrentDFPGroup() == group
+    }
+
+    def "select uses corrent parallel group"() {
+        given:
+        def a = new DataFlowStream()
+        def b = new DataFlowStream()
+        def c = new DataFlowStream()
+        def group = new DefaultPGroup()
+        def selectGroup = new DefaultPGroup()
+        DataFlow.activeParallelGroup.set group
+        c << 20
+        when:
+        group.shutdown()
+        def select = selectGroup.select(a, b, c)
+        then:
+        select().value == 20
+        DataFlow.retrieveCurrentDFPGroup() == group
     }
 }

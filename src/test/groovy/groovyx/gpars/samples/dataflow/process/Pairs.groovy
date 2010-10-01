@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow.process
 
+import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowStream
 
 final class Pairs {
@@ -35,7 +35,7 @@ final class Pairs {
         def c = new DataFlowStream();
 
         {->
-            def group = DataFlowExpression.retrieveCurrentDFPGroup()
+            def group = DataFlow.retrieveCurrentDFPGroup()
             [
                     new Plus(a, c, outChannel),
                     new Copy(inChannel, a, b),

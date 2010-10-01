@@ -224,7 +224,7 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
      */
     @Override
     public void whenBound(final Closure closure) {
-        getValAsync(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
+        getValAsync(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
     }
 
     /**
@@ -244,7 +244,7 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
      */
     @Override
     public void wheneverBound(final Closure closure) {
-        wheneverBoundListeners.add(new DataCallback(closure, DataFlowExpression.retrieveCurrentDFPGroup()));
+        wheneverBoundListeners.add(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
     }
 
     /**

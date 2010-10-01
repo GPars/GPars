@@ -14,8 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow;
+package groovyx.gpars.dataflow.impl;
 
+import groovyx.gpars.dataflow.DataFlow;
+import groovyx.gpars.dataflow.DataFlowReadChannel;
+import groovyx.gpars.dataflow.DataFlowVariable;
 import groovyx.gpars.group.PGroup;
 
 import java.util.ArrayList;
@@ -57,20 +60,20 @@ public final class SelectBase<T> {
      * @param pGroup   The group, the thread pool of which should be used for notification message handlers
      * @param channels All the input channels to select on
      */
-    SelectBase(final PGroup pGroup, final List<DataFlowReadChannel<? extends T>> channels) {
+    public SelectBase(final PGroup pGroup, final List<DataFlowReadChannel<? extends T>> channels) {
         this.channels = Collections.unmodifiableList(channels);
         numberOfChannels = channels.size();
         disabledDFVs = new boolean[numberOfChannels];
         Arrays.fill(disabledDFVs, false);
         for (int i = 0; i < numberOfChannels; i++) {
             final DataFlowReadChannel<? extends T> channel = channels.get(i);
-            final PGroup originalGroup = DataFlowExpression.retrieveCurrentDFPGroup();
+            final PGroup originalGroup = DataFlow.retrieveCurrentDFPGroup();
             try {
-                DataFlowExpression.activeParallelGroup.set(pGroup);
+                DataFlow.activeParallelGroup.set(pGroup);
                 //noinspection ThisEscapedInObjectConstruction
                 channel.wheneverBound(new SelectCallback<T>(this, i, channel));
             } finally {
-                DataFlowExpression.activeParallelGroup.set(originalGroup);
+                DataFlow.activeParallelGroup.set(originalGroup);
             }
         }
     }
@@ -108,7 +111,7 @@ public final class SelectBase<T> {
      * @param selectRequest The request that holds the guards and expects a notification once a value is selected
      * @throws InterruptedException If the thread gets interrupted while reading messages from the channels
      */
-    void doSelect(final int startIndex, final SelectRequest<T> selectRequest) throws InterruptedException {
+    public void doSelect(final int startIndex, final SelectRequest<T> selectRequest) throws InterruptedException {
         final int startPosition = startIndex == -1 ? position.nextInt(numberOfChannels) : startIndex;
 
         synchronized (channels) {

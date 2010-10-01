@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow;
+package groovyx.gpars.dataflow.impl;
 
 import java.util.List;
 
@@ -25,13 +25,14 @@ import java.util.List;
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
-abstract class GuardedSelectRequest<T> implements SelectRequest<T> {
+public abstract class GuardedSelectRequest<T> implements SelectRequest<T> {
     private final List<Boolean> mask;
 
     /**
      * @param mask The list of boolean flags indicating which position should be matched against. All indexes match against a null mask
      */
-    GuardedSelectRequest(final List<Boolean> mask) {
+    @SuppressWarnings({"ConstructorNotProtectedInAbstractClass", "AssignmentToCollectionOrArrayFieldFromParameter"})
+    public GuardedSelectRequest(final List<Boolean> mask) {
         this.mask = mask;
     }
 

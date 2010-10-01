@@ -51,11 +51,11 @@ final class DataCallback extends MessageStream {
     @Override
     public MessageStream send(Object message) {
         parallelGroup.threadPool.execute {->
-            DataFlowExpression.activeParallelGroup.set parallelGroup
+            DataFlow.activeParallelGroup.set parallelGroup
             try {
                 code.call message
             } finally {
-                DataFlowExpression.activeParallelGroup.remove()
+                DataFlow.activeParallelGroup.remove()
             }
         };
         return this;

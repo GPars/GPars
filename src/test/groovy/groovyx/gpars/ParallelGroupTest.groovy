@@ -17,7 +17,6 @@
 package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowExpression
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
@@ -45,9 +44,9 @@ class ParallelGroupTest extends GroovyTestCase {
         final DataFlowVariable variable = new DataFlowVariable()
         final DataFlows results = new DataFlows()
         DataFlow.task {
-            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            results.group1 = DataFlow.activeParallelGroup.get()
             variable.whenBound {
-                results.group2 = DataFlowExpression.activeParallelGroup.get()
+                results.group2 = DataFlow.activeParallelGroup.get()
             }
             variable << 'Foo'
         }
@@ -61,9 +60,9 @@ class ParallelGroupTest extends GroovyTestCase {
 
         final DefaultPGroup group = new DefaultPGroup()
         group.task {
-            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            results.group1 = DataFlow.activeParallelGroup.get()
             variable.whenBound {
-                results.group2 = DataFlowExpression.activeParallelGroup.get()
+                results.group2 = DataFlow.activeParallelGroup.get()
             }
             variable << 'Foo'
         }
@@ -75,9 +74,9 @@ class ParallelGroupTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlows results = new DataFlows()
         DataFlow.task {
-            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            results.group1 = DataFlow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlowExpression.activeParallelGroup.get()
+                results.group2 = DataFlow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }
@@ -91,9 +90,9 @@ class ParallelGroupTest extends GroovyTestCase {
 
         final DefaultPGroup group = new DefaultPGroup()
         group.task {
-            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            results.group1 = DataFlow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlowExpression.activeParallelGroup.get()
+                results.group2 = DataFlow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }
@@ -105,9 +104,9 @@ class ParallelGroupTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlows results = new DataFlows()
         DataFlow.task {
-            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            results.group1 = DataFlow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlowExpression.activeParallelGroup.get()
+                results.group2 = DataFlow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }
@@ -121,9 +120,9 @@ class ParallelGroupTest extends GroovyTestCase {
 
         final DefaultPGroup group = new DefaultPGroup()
         group.task {
-            results.group1 = DataFlowExpression.activeParallelGroup.get()
+            results.group1 = DataFlow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlowExpression.activeParallelGroup.get()
+                results.group2 = DataFlow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }

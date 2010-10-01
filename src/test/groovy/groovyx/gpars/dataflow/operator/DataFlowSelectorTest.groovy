@@ -358,4 +358,29 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         op.join()
 
     }
+
+    public void testInitialGuards() {
+        final DataFlowStream a = new DataFlowStream()
+        final DataFlowStream b = new DataFlowStream()
+        final DataFlowStream c = new DataFlowStream()
+        final DataFlowStream d = new DataFlowStream()
+
+        def op = selector(inputs: [a, b, c], outputs: [d], guards: [false, true, true]) {
+            if (it == 3) setGuards([true, false, false])
+            if (it == 2) setGuard(2, true)
+            bindOutput it
+        }
+        a << 1
+        sleep 500
+        b << 3
+        sleep 500
+        c << 4
+        sleep 500
+        a << 2
+
+        assert [d.val, d.val, d.val, d.val] == [3, 1, 2, 4]
+        op.stop()
+        op.join()
+
+    }
 }
