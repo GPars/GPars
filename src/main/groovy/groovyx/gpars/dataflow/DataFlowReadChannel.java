@@ -122,5 +122,6 @@ public interface DataFlowReadChannel<T> {
      * @return The value bound to the DFV at the head of the stream or null
      * @throws InterruptedException If the current thread is interrupted
      */
-    T poll() throws InterruptedException;
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    DataFlowExpression<T> poll() throws InterruptedException;
 }

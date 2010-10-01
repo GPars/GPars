@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow.impl;
 
 import groovyx.gpars.dataflow.DataFlow;
+import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowReadChannel;
 import groovyx.gpars.dataflow.DataFlowVariable;
 import groovyx.gpars.group.PGroup;
@@ -90,11 +91,11 @@ public final class SelectBase<T> {
         synchronized (channels) {
             for (final SelectRequest<T> selectRequest : pendingRequests) {
                 if (selectRequest.matchesMask(index) && !disabledDFVs[index]) {
-                    final T value = channel.poll();
+                    final DataFlowExpression<? extends T> value = channel.poll();
                     if (value != null) {
                         pendingRequests.remove(selectRequest);
                         disableDFV(index, channel);
-                        selectRequest.valueFound(index, value);
+                        selectRequest.valueFound(index, value.getVal());
                         return;
                     }
                 }
@@ -119,10 +120,10 @@ public final class SelectBase<T> {
                 final int currentPosition = (startPosition + i) % numberOfChannels;
                 if (selectRequest.matchesMask(currentPosition) && !disabledDFVs[currentPosition]) {
                     final DataFlowReadChannel<? extends T> channel = channels.get(currentPosition);
-                    final T value = channel.poll();
+                    final DataFlowExpression<? extends T> value = channel.poll();
                     if (value != null) {
                         disableDFV(currentPosition, channel);
-                        selectRequest.valueFound(currentPosition, value);
+                        selectRequest.valueFound(currentPosition, value.getVal());
                         return;
                     }
                 }

@@ -54,11 +54,11 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assert stream.poll() == null
         assert stream.poll() == null
         stream << 1
-        assert stream.poll() == 1
-        assert stream.poll() == null
+        assert stream.poll()?.val == 1
+        assert stream.poll()?.val == null
         stream << 2
-        assert stream.poll() == 2
-        assert stream.poll() == null
+        assert stream.poll()?.val == 2
+        assert stream.poll()?.val == null
         final Actor thread = DataFlow.start {
             stream << 10
             final DataFlowVariable variable = new DataFlowVariable()
@@ -71,7 +71,7 @@ public class DataFlowStreamTest extends GroovyTestCase {
 
         latch.await()
         assertEquals 2, stream.length()
-        assertEquals 10, stream.poll()
+        assertEquals 10, stream.poll()?.val
         assertEquals 1, stream.length()
         assert stream.poll() == null
         thread << 'Proceed'
