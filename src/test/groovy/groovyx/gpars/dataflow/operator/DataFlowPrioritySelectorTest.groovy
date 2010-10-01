@@ -42,9 +42,11 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         }
 
         a << 5
+        sleep 500
         b << 20
+        sleep 500
         c << 40
-        sleep 3000
+        sleep 500
         b << 50
 
         assert [d.val, d.val, d.val, d.val] == [5, 20, 40, 50]
