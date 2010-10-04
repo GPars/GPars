@@ -28,10 +28,12 @@ public interface FList<T> extends Iterable<T> {
 
     FList<T> filter(Closure filterClosure);
 
-    FList<?> map(Closure mapClosure);
+    FList<Object> map(Closure mapClosure);
 
     Object reduce(Closure reduceClosure);
 
     Object reduce(T seed, Closure reduceClosure);
+
+    String appendingString();
 }
 

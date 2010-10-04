@@ -24,16 +24,18 @@ import java.util.Iterator;
 //todo - thread-safe, potential laziness, proper interface, performance characteristics, generics
 
 //todo test empty and one-element map and filter
-@SuppressWarnings({"TailRecursion"})
+@SuppressWarnings({"TailRecursion", "CallToSimpleGetterFromWithinClass"})
 public class Cons<T> implements FList<T> {
 
+    @SuppressWarnings({"RawUseOfParameterizedType"})
     static final FList EMPTY = new EmptyList();
 
     private final T first;
     private final FList<T> rest;
 
     public static <T> FList<T> from(final Collection<T> coll) {
-        return from((T[]) coll.toArray(), coll.size(), Cons.EMPTY);
+        //noinspection unchecked
+        return from(coll.toArray(), coll.size(), Cons.EMPTY);
     }
 
     private static <T> FList<T> from(final T[] array, final int index, final FList<T> result) {
@@ -62,19 +64,20 @@ public class Cons<T> implements FList<T> {
         return false;
     }
 
+    @SuppressWarnings({"AutoUnboxing"})
     @Override
     public FList<T> filter(final Closure filterClosure) {
-        final boolean accept = (Boolean) filterClosure.call(new Object[]{getFirst()});
+        final Boolean accept = (Boolean) filterClosure.call(new Object[]{getFirst()});
         if (accept)
-            return new Cons(getFirst(), getRest().filter(filterClosure));
+            return new Cons<T>(getFirst(), getRest().filter(filterClosure));
         else
             return getRest().filter(filterClosure);
     }
 
     @Override
-    public FList<?> map(final Closure mapClosure) {
+    public FList<Object> map(final Closure mapClosure) {
         final Object mapped = mapClosure.call(new Object[]{getFirst()});
-        return new Cons(mapped, getRest().map(mapClosure));
+        return new Cons<Object>(mapped, getRest().map(mapClosure));
     }
 
     @Override
@@ -85,6 +88,7 @@ public class Cons<T> implements FList<T> {
     private T reduce(final T current, final FList<T> rest, final Closure reduceClosure) {
         if (rest.isEmpty())
             return current;
+        @SuppressWarnings({"unchecked"})
         final T aggregate = (T) reduceClosure.call(new Object[]{current, rest.getFirst()});
         return reduce(aggregate, rest.getRest(), reduceClosure);
     }
@@ -101,11 +105,12 @@ public class Cons<T> implements FList<T> {
 
     @Override
     public String toString() {
-        return "Cons[" + first + ((Cons) rest).appendingString() + ']';
+        return "Cons[" + first + rest.appendingString() + ']';
     }
 
-    protected String appendingString() {
-        return ", " + first + ((Cons) rest).appendingString();
+    @Override
+    public String appendingString() {
+        return ", " + first + rest.appendingString();
     }
 
     @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "RawUseOfParameterizedType"})
@@ -126,40 +131,5 @@ public class Cons<T> implements FList<T> {
         int result = first != null ? first.hashCode() : 0;
         result = 31 * result + (rest != null ? rest.hashCode() : 0);
         return result;
-    }
-
-}
-
-//todo is it meant to be public?
-
-//todo do we need to inherit the fields?
-class EmptyList extends Cons {
-    EmptyList() {
-        super(null, null);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return true;
-    }
-
-    @Override
-    protected String appendingString() {
-        return "";
-    }
-
-    @Override
-    public FList<?> filter(final Closure filterClosure) {
-        return this;
-    }
-
-    @Override
-    public FList<?> map(final Closure mapClosure) {
-        return this;
-    }
-
-    @Override
-    public Object reduce(final Closure reduceClosure) {
-        return null;
     }
 }

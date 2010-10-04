@@ -135,8 +135,8 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
     }
 
     @Override
-    public FList<?> map(final Closure mapClosure) {
-        final Stream<?> newStream = new Stream();
+    public FList<Object> map(final Closure mapClosure) {
+        final Stream<Object> newStream = new Stream<Object>();
         map(this, mapClosure, newStream);
         return newStream;
     }
@@ -184,7 +184,8 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         return "Stream[" + getFirst() + ((Stream) getRest()).appendingString() + ']';
     }
 
-    private String appendingString() {
+    @Override
+    public String appendingString() {
         if (!first.isBound())
             return ", ?";
         if (isEmpty())
