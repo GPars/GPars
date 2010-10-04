@@ -21,6 +21,9 @@ import groovy.lang.Closure;
 import java.util.Collection;
 import java.util.Iterator;
 
+//todo - thread-safe, potential laziness, proper interface, performance characteristics, generics
+
+//todo test empty and one-element map and filter
 @SuppressWarnings({"TailRecursion"})
 public class Cons<T> implements FList<T> {
 
@@ -33,13 +36,13 @@ public class Cons<T> implements FList<T> {
         return from((T[]) coll.toArray(), coll.size(), Cons.EMPTY);
     }
 
-    private static <T> FList<T> from(final T[] array, final int index, final FList result) {
+    private static <T> FList<T> from(final T[] array, final int index, final FList<T> result) {
         if (index == 0)
             return result;
-        return from(array, index - 1, new Cons(array[index - 1], result));
+        return from(array, index - 1, new Cons<T>(array[index - 1], result));
     }
 
-    public Cons(final T first, final FList rest) {
+    public Cons(final T first, final FList<T> rest) {
         this.first = first;
         this.rest = rest;
     }
@@ -128,6 +131,8 @@ public class Cons<T> implements FList<T> {
 }
 
 //todo is it meant to be public?
+
+//todo do we need to inherit the fields?
 class EmptyList extends Cons {
     EmptyList() {
         super(null, null);

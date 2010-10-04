@@ -19,14 +19,17 @@ package groovyx.gpars.dataflow.stream;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataFlowChannel;
+import groovyx.gpars.dataflow.DataFlowExpression;
+import groovyx.gpars.dataflow.DataFlowReadChannel;
 import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.DataFlowWriteChannel;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings({"TailRecursion"})
-public class Stream<T> implements FList<T>, DataFlowChannel {
+public class Stream<T> implements FList<T>, DataFlowChannel<T> {
 
     private final DataFlowVariable<T> first = new DataFlowVariable<T>();
     private final AtomicReference<Stream<T>> rest = new AtomicReference<Stream<T>>();
@@ -57,13 +60,13 @@ public class Stream<T> implements FList<T>, DataFlowChannel {
         return this;
     }
 
-    private void generateNext(final T value, final Stream<T> stream, final Closure generator, final Closure condition) {
+    private void generateNext(final T value, final DataFlowWriteChannel<T> stream, final Closure generator, final Closure condition) {
         final boolean addValue = (Boolean) condition.call(new Object[]{value});
         if (!addValue) {
             stream.leftShift(Stream.<T>eos());
             return;
         }
-        final Stream<T> next = stream.leftShift(value);
+        final DataFlowWriteChannel<T> next = stream.leftShift(value);
         final T nextValue = (T) eval(generator.call(new Object[]{value}));
         generateNext(nextValue, next, generator, condition);
     }
@@ -73,13 +76,21 @@ public class Stream<T> implements FList<T>, DataFlowChannel {
         return this;
     }
 
-    public Stream<T> leftShift(final DataFlowVariable<T> df) throws InterruptedException {
-        return leftShift(df.getVal());
+    @Override
+    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> df) {
+        try {
+            return leftShift(df.getVal());
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            //todo perhaps use getValAsync here
+            return null;
+        }
     }
 
-    public Stream<T> leftShift(final T value) {
+    @Override
+    public DataFlowWriteChannel<T> leftShift(final T value) {
         first.leftShift(value);
-        return (Stream<T>) getRest();
+        return (DataFlowWriteChannel<T>) getRest();
     }
 
     @Override
@@ -111,7 +122,7 @@ public class Stream<T> implements FList<T>, DataFlowChannel {
     }
 
     //todo shouldn't we be lazy here?
-    private void filter(final Stream<T> rest, final Closure filterClosure, final Stream<T> result) {
+    private void filter(final Stream<T> rest, final Closure filterClosure, final DataFlowWriteChannel<T> result) {
         if (rest.isEmpty()) {
             result.leftShift(Stream.<T>eos());
             return;
@@ -130,13 +141,13 @@ public class Stream<T> implements FList<T>, DataFlowChannel {
         return newStream;
     }
 
-    private void map(final Stream rest, final Closure mapClosure, final Stream result) {
+    private void map(final Stream rest, final Closure mapClosure, final DataFlowWriteChannel result) {
         if (rest.isEmpty()) {
             result.leftShift(Stream.eos());
             return;
         }
         final Object mapped = mapClosure.call(new Object[]{rest.getFirst()});
-        final Stream newResult = result.leftShift(eval(mapped));
+        final DataFlowWriteChannel newResult = result.leftShift(eval(mapped));
         map((Stream) rest.getRest(), mapClosure, newResult);
     }
 
@@ -234,6 +245,27 @@ public class Stream<T> implements FList<T>, DataFlowChannel {
     @Override
     public void whenBound(final MessageStream stream) {
         first.whenBound(stream);
+    }
+
+    //todo provide implementation
+    @Override
+    public void wheneverBound(final Closure closure) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void wheneverBound(final MessageStream stream) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isBound() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public DataFlowExpression poll() throws InterruptedException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
 
