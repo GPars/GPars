@@ -69,7 +69,7 @@ public class Cons<T> implements FList<T> {
     public FList<T> filter(final Closure filterClosure) {
         final Boolean accept = (Boolean) filterClosure.call(new Object[]{getFirst()});
         if (accept)
-            return new Cons<T>(getFirst(), getRest().filter(filterClosure));
+            return new FilterCons<T>(getFirst(), getRest(), filterClosure);
         else
             return getRest().filter(filterClosure);
     }
@@ -77,7 +77,7 @@ public class Cons<T> implements FList<T> {
     @Override
     public FList<Object> map(final Closure mapClosure) {
         final Object mapped = mapClosure.call(new Object[]{getFirst()});
-        return new Cons<Object>(mapped, getRest().map(mapClosure));
+        return new MapCons(mapped, (FList<Object>) getRest(), mapClosure);
     }
 
     @Override
@@ -119,17 +119,17 @@ public class Cons<T> implements FList<T> {
         if (this == obj) return true;
         if (!(obj instanceof Cons)) return false;
 
-        final Cons cons = (Cons) obj;
+        final FList cons = (FList) obj;
 
-        if (first != null ? !first.equals(cons.first) : cons.first != null) return false;
-        return !(rest != null ? !rest.equals(cons.rest) : cons.rest != null);
+        if (getFirst() != null ? !getFirst().equals(cons.getFirst()) : cons.getFirst() != null) return false;
+        return !(getRest() != null ? !getRest().equals(cons.getRest()) : cons.getRest() != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = first != null ? first.hashCode() : 0;
-        result = 31 * result + (rest != null ? rest.hashCode() : 0);
+        int result = getFirst() != null ? getFirst().hashCode() : 0;
+        result = 31 * result + (getRest() != null ? getRest().hashCode() : 0);
         return result;
     }
 }

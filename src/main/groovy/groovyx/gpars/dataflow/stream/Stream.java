@@ -77,12 +77,12 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
     }
 
     @Override
-    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> df) {
+    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
         try {
-            return leftShift(df.getVal());
+            return leftShift(ref.getVal());
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            //todo perhaps use getValAsync here
+            //todo perhaps use getValAsync here to avoid declaring the exception
             return null;
         }
     }
@@ -261,12 +261,13 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
 
     @Override
     public boolean isBound() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return first.isBound();
     }
 
     @Override
-    public DataFlowExpression poll() throws InterruptedException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public DataFlowExpression<T> poll() throws InterruptedException {
+        if (first.isBound()) return first;
+        else return null;
     }
 }
 
