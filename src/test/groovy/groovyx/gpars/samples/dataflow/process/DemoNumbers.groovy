@@ -27,14 +27,14 @@ def numbers(DataFlowChannel out) {
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream()
-        group.task new Prefix(c, a, 0)()
-        group.task new Copy(a, b, out)()
-        group.task new Successor(b, c)()
+        group.task new Prefix(c, a, 0)
+        group.task new Copy(a, b, out)
+        group.task new Successor(b, c)
     }
 }
 
 final DataFlowStream ch = new DataFlowStream()
-group.task new Print('Numbers', ch)()
+group.task new Print('Numbers', ch)
 numbers(ch)
 
 sleep 10000

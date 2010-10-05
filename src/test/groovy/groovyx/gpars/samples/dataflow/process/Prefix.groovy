@@ -17,8 +17,9 @@
 package groovyx.gpars.samples.dataflow.process
 
 import groovyx.gpars.dataflow.DataFlowChannel
+import java.util.concurrent.Callable
 
-final class Prefix {
+final class Prefix implements Callable {
     private final DataFlowChannel inChannel
     private final DataFlowChannel outChannel
     private final def prefix
@@ -29,13 +30,11 @@ final class Prefix {
         this.prefix = prefix
     }
 
-    public Closure call() {
-        {->
-            outChannel << prefix
-            while (true) {
-                outChannel << inChannel.val
-                sleep 200
-            }
+    public def call() {
+        outChannel << prefix
+        while (true) {
+            sleep 200
+            outChannel << inChannel.val
         }
     }
 }

@@ -19,8 +19,9 @@ package groovyx.gpars.samples.dataflow.process
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
 import groovyx.gpars.group.PGroup
+import java.util.concurrent.Callable
 
-final class Copy {
+final class Copy implements Callable {
     private final DataFlowChannel inChannel
     private final DataFlowChannel outChannel1
     private final DataFlowChannel outChannel2
@@ -31,16 +32,14 @@ final class Copy {
         this.outChannel2 = outChannel2;
     }
 
-    public Closure call() {
-        {->
-            final PGroup group = DataFlow.retrieveCurrentDFPGroup()
-            while (true) {
-                def i = inChannel.val
-                group.task {
-                    outChannel1 << i
-                    outChannel2 << i
-                }
-            }
+    public def call() {
+        final PGroup group = DataFlow.retrieveCurrentDFPGroup()
+        while (true) {
+            def i = inChannel.val
+            group.task {
+                outChannel1 << i
+                outChannel2 << i
+            }.join()
         }
     }
 }

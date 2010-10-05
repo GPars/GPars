@@ -28,12 +28,12 @@ def fib(DataFlowChannel out) {
         def b = new DataFlowStream()
         def c = new DataFlowStream()
         def d = new DataFlowStream()
-        [new Prefix(d, a, 0), new Prefix(c, d, 1), new Copy(a, b, out), new StatePairs(b, c)].each { group.task it()}
+        [new Prefix(d, a, 0), new Prefix(c, d, 1), new Copy(a, b, out), new StatePairs(b, c)].each { group.task it}
     }
 }
 
 final DataFlowStream ch = new DataFlowStream()
-group.task new Print('Fibonnaci numbers', ch)()
+group.task new Print('Fibonnaci numbers', ch)
 fib(ch)
 
 sleep 10000
