@@ -98,6 +98,7 @@ private class DataFlowOperatorActor extends DataFlowProcessorActor {
 
     @Override
     final void onMessage(def message) {
+        checkPoisson(message.result)
         values[message.attachment] = message.result
         assert values.size() <= inputs.size()
         if (values.size() == inputs.size()) {

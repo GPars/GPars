@@ -172,8 +172,27 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
         this.code = code
     }
 
+    /**
+     * All messages unhandled by sub-classes will result in an exception being thrown
+     * @param message The unhandled message
+     */
     void onMessage(def message) {
         throw new IllegalStateException("The dataflow actor doesn't recognize the message $message")
+    }
+
+    /**
+     * Handles the poisson message.
+     * After receiving the poisson a dataflow operator will send the poisson to all its output channels and terminate.
+     * @param poisson The poisson to re-send
+     * return True, if poisson has been received
+     */
+    boolean checkPoisson(def data) {
+        if (data instanceof DataFlowPoisson) {
+            owningProcessor.bindAllOutputsAtomically data
+            owningProcessor.stop()
+            return true
+        }
+        return false
     }
 
     final reportException(Throwable e) {

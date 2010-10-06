@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
-import static groovyx.gpars.dataflow.DataFlow.operator
+import groovyx.gpars.group.PGroup
 
 /**
  * @author Vaclav Pech
@@ -29,6 +29,16 @@ import static groovyx.gpars.dataflow.DataFlow.operator
 
 public class DataFlowOperatorTest extends GroovyTestCase {
 
+    private PGroup group
+
+    protected void setUp() {
+        group = new DefaultPGroup(1)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
+    }
+
     public void testOperator() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
@@ -36,7 +46,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowVariable d = new DataFlowVariable()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
+        def op = group.operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
             bindOutput 0, x + y + z
             bindOutput 1, x * y * z
         }
@@ -55,7 +65,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
 
-        def op = operator(inputs: [a, a], outputs: [b]) {x, y ->
+        def op = group.operator(inputs: [a, a], outputs: [b]) {x, y ->
             bindOutput 0, x + y
         }
 
@@ -75,7 +85,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
 
-        def op = operator(inputs: [a, b], outputs: [c]) {x, y ->
+        def op = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
             bindOutput 0, 2 * x + y
         }
 
@@ -324,7 +334,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = operator(inputs: [stream], outputs: []) {
+        def op = group.operator(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
         }
         op.metaClass.reportError = {Throwable e ->
@@ -339,7 +349,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = operator(inputs: [stream], outputs: []) {
+        def op = group.operator(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')
         }
         stream << 'value'
@@ -348,7 +358,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testBindAllOutputs() {
-        final DefaultPGroup group = new DefaultPGroup()
+        def group = new DefaultPGroup(10)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -367,10 +377,11 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         assert ds.size() == range.to
         op1.stop()
         op1.join()
+        group.shutdown()
     }
 
     public void testBindAllOutputValues() {
-        final DefaultPGroup group = new DefaultPGroup()
+        def group = new DefaultPGroup(10)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -389,10 +400,11 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         assert ds.size() == range.to
         op1.stop()
         op1.join()
+        group.shutdown()
     }
 
     public void testBindAllOutputsAtomically() {
-        final DefaultPGroup group = new DefaultPGroup()
+        def group = new DefaultPGroup(10)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -414,10 +426,11 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         assert cs == ds
         op1.stop()
         op1.join()
+        group.shutdown()
     }
 
     public void testBindAllOutputValuesAtomically() {
-        final DefaultPGroup group = new DefaultPGroup()
+        def group = new DefaultPGroup(10)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -439,10 +452,11 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         assert cs == ds
         op1.stop()
         op1.join()
+        group.shutdown()
     }
 
     public void testBindAllOutputValuesAtomicallyWithDifferentValues() {
-        final DefaultPGroup group = new DefaultPGroup()
+        def group = new DefaultPGroup(10)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -463,5 +477,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         assert ds == bs.collect {3 * it}
         op1.stop()
         op1.join()
+        group.shutdown()
     }
 }

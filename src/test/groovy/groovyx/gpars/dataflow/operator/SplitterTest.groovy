@@ -19,8 +19,8 @@ package groovyx.gpars.dataflow.operator
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.TimeUnit
-import static groovyx.gpars.dataflow.DataFlow.splitter
 
 /**
  * @author Vaclav Pech
@@ -29,13 +29,23 @@ import static groovyx.gpars.dataflow.DataFlow.splitter
 
 public class SplitterTest extends GroovyTestCase {
 
+    private PGroup group
+
+    protected void setUp() {
+        group = new DefaultPGroup(1)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
+    }
+
     public void testSplit() {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        def op = splitter(a, [b, c, d])
+        def op = group.splitter(a, [b, c, d])
 
         a << 1
         a << 2
@@ -56,7 +66,7 @@ public class SplitterTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        def op = splitter(a, [b, c, d], 5)
+        def op = group.splitter(a, [b, c, d], 5)
 
         a << 1
         a << 2
@@ -72,7 +82,6 @@ public class SplitterTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -92,7 +101,6 @@ public class SplitterTest extends GroovyTestCase {
 
 
     public void testEmptyInputsOrOutputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         shouldFail(IllegalArgumentException) {
             group.splitter(null, [new DataFlowVariable()])
         }
