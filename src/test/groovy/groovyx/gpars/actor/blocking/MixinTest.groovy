@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DefaultPooledActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -39,7 +39,7 @@ public class MixinTest extends GroovyTestCase {
         final AtomicBoolean stopFlag = new AtomicBoolean(false)
 
         Company.metaClass {
-            mixin AbstractPooledActor
+            mixin DefaultPooledActor
 
             act = {->
                 receive {
@@ -73,7 +73,7 @@ public class MixinTest extends GroovyTestCase {
 
         final Corporation corp = new Corporation(name: 'Company1', employees: ['Joe', 'Dave', 'Alice'])
         corp.metaClass {
-            mixin AbstractPooledActor
+            mixin DefaultPooledActor
 
             act = {->
                 receive {
