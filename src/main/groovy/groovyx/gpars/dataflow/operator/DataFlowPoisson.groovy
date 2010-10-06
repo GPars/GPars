@@ -24,4 +24,4 @@ package groovyx.gpars.dataflow.operator
  * Date: Oct 6, 2010
  */
 @Singleton
-class DataflowPoisson2 {}
+class DataFlowPoisson {}

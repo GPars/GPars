@@ -48,9 +48,9 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         assertEquals 60, d.val
         assertEquals 6000, e.val
-        a << DataflowPoisson2.instance
-        assert d.val == DataflowPoisson2.instance
-        assert e.val == DataflowPoisson2.instance
+        a << DataFlowPoisson.instance
+        assert d.val == DataFlowPoisson.instance
+        assert e.val == DataFlowPoisson.instance
         op.join()
     }
 
@@ -65,9 +65,9 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         assertEquals 10, d.val
         assertEquals 10, e.val
-        a << DataflowPoisson2.instance
-        assert d.val == DataflowPoisson2.instance
-        assert e.val == DataflowPoisson2.instance
+        a << DataFlowPoisson.instance
+        assert d.val == DataFlowPoisson.instance
+        assert e.val == DataFlowPoisson.instance
         op.join()
     }
 
@@ -79,8 +79,8 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
             bindOutput x
         }
 
-        a << DataflowPoisson2.instance
-        assert d.val == DataflowPoisson2.instance
+        a << DataFlowPoisson.instance
+        assert d.val == DataFlowPoisson.instance
         op.join()
     }
 
@@ -99,9 +99,9 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         def op3 = operator(inputs: [e, f], outputs: [b]) {x, y -> }
 
-        a << DataflowPoisson2.instance
+        a << DataFlowPoisson.instance
 
-        assert out.val == DataflowPoisson2.instance
+        assert out.val == DataFlowPoisson.instance
         op1.join()
         op2.join()
         op3.join()
@@ -122,9 +122,9 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-        a << DataflowPoisson2.instance
+        a << DataFlowPoisson.instance
 
-        assert out.val == DataflowPoisson2.instance
+        assert out.val == DataFlowPoisson.instance
         op1.join()
         op2.join()
         op3.join()
