@@ -353,7 +353,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         op.join()
     }
 
-    public void _testPriority() {
+    public void testPriority() {
         final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
@@ -377,6 +377,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val, d.val] == [0, 0, 0, 1, 1]
         barrier.await()
         op1.stop()
-        op1.join()
+//        op1.join()
     }
 }
