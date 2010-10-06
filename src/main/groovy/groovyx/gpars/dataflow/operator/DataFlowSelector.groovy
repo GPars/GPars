@@ -90,7 +90,7 @@ public class DataFlowSelector extends DataFlowProcessor {
     /**
      * Used to enable/disable individual input channels from next selections
      * @param index The index of the channel to enable/disable
-     * @param flag True, if the channel shoudl be included in selection, false otherwise
+     * @param flag True, if the channel should be included in selection, false otherwise
      */
     public final void setGuard(int index, boolean flag) {
         guards[index] = flag
@@ -99,7 +99,7 @@ public class DataFlowSelector extends DataFlowProcessor {
     /**
      * Used to enable/disable individual input channels from next selections
      * @param index The index of the channel to enable/disable
-     * @param flag True, if the channel shoudl be included in selection, false otherwise
+     * @param flag True, if the channel should be included in selection, false otherwise
      */
     public final void setGuards(List<Boolean> flags) {
         flags.eachWithIndex {flag, int index -> guards[index] = flag}

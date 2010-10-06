@@ -375,8 +375,8 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         4.times {barrier.await()}
         assert [c.val, c.val, c.val, c.val, c.val] == [1, 2, 5, 3, 4]
         assert [d.val, d.val, d.val, d.val, d.val] == [0, 0, 0, 1, 1]
-        op1.stop()
         barrier.await()
+        op1.stop()
         op1.join()
     }
 }
