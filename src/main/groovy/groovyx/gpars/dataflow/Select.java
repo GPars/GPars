@@ -76,7 +76,7 @@ public class Select<T> {
      * Selects a value from a single randomly chosen input channel, which has a value available for read.
      * Only the channels marked with 'true' in the supplied mask will be considered.
      *
-     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the sepection or not
+     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
      * @return The read value. It will be of SelectResult type, holding the actual value as well as the channel index.
      * @throws InterruptedException If the current thread gets interrupted
      */
@@ -100,7 +100,7 @@ public class Select<T> {
      * The read value is send to the supplied messageStream
      *
      * @param messageStream A message stream accepting the selected value. The message will be of SelectResult type, holding the actual value as well as the channel index.
-     * @param mask          A list of boolean values indicating, whether the input channel with the same position index should be included in the sepection or not
+     * @param mask          A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
      * @throws InterruptedException If the current thread gets interrupted
      */
     public void select(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {
@@ -121,7 +121,7 @@ public class Select<T> {
      * Selects a value from a single input channel, which has a value available for read. Channels with lower position index are preferred.
      * Only the channels marked with 'true' in the supplied mask will be considered.
      *
-     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the sepection or not
+     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
      * @return The read value. It will be of SelectResult type, holding the actual value as well as the channel index.
      * @throws InterruptedException If the current thread gets interrupted
      */
@@ -145,7 +145,7 @@ public class Select<T> {
      * The read value is send to the supplied messageStream
      *
      * @param messageStream A message stream accepting the selected value. The message will be of SelectResult type, holding the actual value as well as the channel index.
-     * @param mask          A list of boolean values indicating, whether the input channel with the same position index should be included in the sepection or not
+     * @param mask          A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
      * @throws InterruptedException If the current thread gets interrupted
      */
     public void prioritySelect(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {
@@ -166,7 +166,7 @@ public class Select<T> {
      * Selects a value from a single randomly chosen input channel, which has a value available for read.
      * Only the channels marked with 'true' in the supplied mask will be considered.
      *
-     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the sepection or not
+     * @param mask A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
      * @return The read value. It will be of SelectResult type, holding the actual value as well as the channel index.
      * @throws InterruptedException If the current thread gets interrupted
      */
@@ -190,7 +190,7 @@ public class Select<T> {
      * The read value is send to the supplied messageStream
      *
      * @param messageStream A message stream accepting the selected value. The message will be of SelectResult type, holding the actual value as well as the channel index.
-     * @param mask          A list of boolean values indicating, whether the input channel with the same position index should be included in the sepection or not
+     * @param mask          A list of boolean values indicating, whether the input channel with the same position index should be included in the selection or not
      * @throws InterruptedException If the current thread gets interrupted
      */
     public final void call(final MessageStream messageStream, final List<Boolean> mask) throws InterruptedException {

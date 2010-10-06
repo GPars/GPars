@@ -1165,7 +1165,7 @@ abstract class AbstractPAWrapper<T> {
      *
      * Please note that the method returns a regular map, not a PAWrapper instance.
      * You can use the "getParallel()" method on the returned map to turn it into a parallel collection again.
-     * @param initialValue The initial value for an accumulator. Since it will be used repeatadly, it should be either an unmodifiable value, a cloneable instance or a closure returning a fresh initial/empty accumulator each time requested
+     * @param initialValue The initial value for an accumulator. Since it will be used repeatedly, it should be either an unmodifiable value, a cloneable instance or a closure returning a fresh initial/empty accumulator each time requested
      * @param accumulator A two-argument closure, first argument being the accumulator and second holding the currently processed value. The closure is supposed to returned a modified accumulator after accumulating the value.
      * @return A map holding the final accumulated values for each unique key in the original collection of tuples.
      */

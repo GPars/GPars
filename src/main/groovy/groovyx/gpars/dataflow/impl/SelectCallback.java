@@ -20,7 +20,7 @@ import groovy.lang.Closure;
 import groovyx.gpars.dataflow.DataFlowReadChannel;
 
 /**
- * A closure registerred with all the input channels on the wheneverBound() event to inform the Select
+ * A closure registered with all the input channels on the wheneverBound() event to inform the Select
  * about a value being available in a particular channel.
  *
  * @author Vaclav Pech
