@@ -27,7 +27,7 @@ import static groovyx.gpars.dataflow.DataFlow.prioritySelector
  * Date: Sep 9, 2009
  */
 
-public abstract class DataFlowPrioritySelectorTest extends GroovyTestCase {
+public class DataFlowPrioritySelectorTest extends GroovyTestCase {
 
     public void testSelector() {
         final DataFlowStream a = new DataFlowStream()
