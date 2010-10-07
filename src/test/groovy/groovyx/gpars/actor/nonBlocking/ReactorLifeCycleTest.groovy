@@ -154,7 +154,8 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = new NonDaemonPGroup(1).reactor {
+        final def group = new NonDaemonPGroup(1)
+        final Actor actor = group.reactor {
             barrier.await()
             Thread.sleep 30000
             counter.set 10
@@ -171,6 +172,7 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
         shouldFail(IllegalStateException) {
             actor.send 'message'
         }
+        group.shutdown()
     }
 
     public void testReentrantStop() {

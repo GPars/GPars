@@ -31,9 +31,10 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 
 public class ArraySumTest extends GroovyTestCase {
-    PGroup group = new DefaultPGroup(10)
 
     public void testArraySummaryUsingActorMethod() {
+        PGroup group = new DefaultPGroup(10)
+
         AtomicInteger result = new AtomicInteger(0)
         CountDownLatch latch = new CountDownLatch(1)
 
@@ -48,13 +49,16 @@ public class ArraySumTest extends GroovyTestCase {
 
         latch.await(90, TimeUnit.SECONDS)
         assertEquals 15, result
+        group.shutdown()
     }
 
     public void testArraySummary() {
+        PGroup group = new DefaultPGroup(10)
         final ArrayCalculator calculator = new ArrayCalculator([1, 2, 3, 4, 5], group).start()
 
         calculator.latch.await(90, TimeUnit.SECONDS)
         assertEquals 15, calculator.result
+        group.shutdown()
     }
 }
 

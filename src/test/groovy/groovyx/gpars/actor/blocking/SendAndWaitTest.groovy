@@ -208,5 +208,6 @@ public class SendAndWaitTest extends GroovyTestCase {
 
         latch.await()
         assertEquals 2, result
+        group.shutdown()
     }
 }

@@ -18,9 +18,9 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.impl.ActorReplyException
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
@@ -157,6 +157,7 @@ public class ReplyTest extends GroovyTestCase {
         assert replies1.containsAll([3, 5, 4, 8])
         assertEquals 4, replies2.size()
         assert replies2.containsAll([21, 59, 31, 39])
+        group.shutdown()
     }
 
     public void testReplyWithoutSender() {

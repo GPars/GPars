@@ -218,6 +218,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         final DefaultPGroup group = new DefaultPGroup()
         final DynamicDispatchActor handler = group.messageHandler {}
         assertSame group, handler.parallelGroup
+        group.shutdown()
     }
 
     public void testReplies() {

@@ -24,12 +24,16 @@ class AbstractLoopingActorTest extends Specification {
     def "changing parallel group on a DDA and reactor changes the core thread pool"() {
         given:
         def group = new DefaultPGroup()
+
         when:
         actor.parallelGroup = group
         then:
         actor.core.threadPool == group.threadPool
+
+        cleanup:
+        group.shutdown()
+
         where:
         actor << [new DynamicDispatchActor(), new ReactiveActor({}), Actors.messageHandler {}, Actors.reactor {}]
-
     }
 }

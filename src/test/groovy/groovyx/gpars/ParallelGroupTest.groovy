@@ -21,13 +21,24 @@ import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 
 /**
  * @author Vaclav Pech
  */
 class ParallelGroupTest extends GroovyTestCase {
+    private PGroup group
+
+    protected void setUp() {
+        group = new DefaultPGroup()
+    }
+
+    protected void tearDown() {
+        group.shutdown()
+    }
+
+
     public void testParallelGroup() {
-        final DefaultPGroup group = new DefaultPGroup()
         final DataFlows results = new DataFlows()
         def actor = group.actor {
             results.group1 = parallelGroup
@@ -58,7 +69,6 @@ class ParallelGroupTest extends GroovyTestCase {
         final DataFlowVariable variable = new DataFlowVariable()
         final DataFlows results = new DataFlows()
 
-        final DefaultPGroup group = new DefaultPGroup()
         group.task {
             results.group1 = DataFlow.activeParallelGroup.get()
             variable.whenBound {
@@ -88,7 +98,6 @@ class ParallelGroupTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlows results = new DataFlows()
 
-        final DefaultPGroup group = new DefaultPGroup()
         group.task {
             results.group1 = DataFlow.activeParallelGroup.get()
             stream.whenBound {
@@ -118,7 +127,6 @@ class ParallelGroupTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlows results = new DataFlows()
 
-        final DefaultPGroup group = new DefaultPGroup()
         group.task {
             results.group1 = DataFlow.activeParallelGroup.get()
             stream.whenBound {
@@ -150,6 +158,7 @@ class ParallelGroupTest extends GroovyTestCase {
         }
         assert results.t1 == results.t2
         assert (1..4).collect {results.t1} == [results.t1, results.t2, results.t3, results.t4]
+        group.shutdown()
     }
 
     public void testSendAndContinue() {
@@ -166,5 +175,6 @@ class ParallelGroupTest extends GroovyTestCase {
         actor.sendAndContinue(1) {results.t3 = Thread.currentThread();}
         assert results.t1 == results.t2
         assert results.t1 == results.t3
+        group.shutdown()
     }
 }

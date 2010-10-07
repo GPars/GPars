@@ -61,7 +61,7 @@ public class AgentTest extends GroovyTestCase {
         jugMembers.await()
         assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
 
-        group.threadPool.shutdown()
+        group.shutdown()
         shouldFail RejectedExecutionException, {
             jugMembers.send 10
         }
@@ -82,6 +82,7 @@ public class AgentTest extends GroovyTestCase {
         shouldFail RejectedExecutionException, {
             jugMembers.send 10
         }
+        group.shutdown()
     }
 
     public void testFairAgent() {

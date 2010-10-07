@@ -85,6 +85,7 @@ public class LocalNode {
                     }
                 });
 
+        //todo who is the group's owner?
         final PGroup group = new DefaultPGroup(new DefaultPool(scheduler));
 
         if (runnable != null) {

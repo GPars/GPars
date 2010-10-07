@@ -162,7 +162,8 @@ public class DDALifeCycleTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = new NonDaemonPGroup(1).messageHandler {
+        final def group = new NonDaemonPGroup(1)
+        final Actor actor = group.messageHandler {
             when {message ->
                 barrier.await()
                 Thread.sleep 30000
@@ -181,6 +182,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         shouldFail(IllegalStateException) {
             actor.send 'message'
         }
+        group.shutdown()
     }
 
     public void testReentrantStop() {

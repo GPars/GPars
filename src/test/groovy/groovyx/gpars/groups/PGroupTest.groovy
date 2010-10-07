@@ -155,6 +155,11 @@ public class PGroupTest extends GroovyTestCase { /**
         assert nonDaemonGroup1.threadPool != daemonGroup2.threadPool
         assert nonDaemonGroup1.threadPool != nonDaemonGroup2.threadPool
         assert nonDaemonGroup1.threadPool != defaultGroup.threadPool
+        daemonGroup1.shutdown()
+        daemonGroup2.shutdown()
+        nonDaemonGroup1.shutdown()
+        nonDaemonGroup2.shutdown()
+        defaultGroup.shutdown()
     }
 }
 

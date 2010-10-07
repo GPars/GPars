@@ -87,12 +87,14 @@ public class ReactorTest extends GroovyTestCase {
 
         processor.stop()
         processor.join()
+        group.shutdown()
     }
 
     public void testGroup() {
         final DefaultPGroup group = new DefaultPGroup()
         final ReactiveActor reactor = group.reactor {}
         assertSame group, reactor.parallelGroup
+        group.shutdown()
     }
 
     public void testNullMessage() {

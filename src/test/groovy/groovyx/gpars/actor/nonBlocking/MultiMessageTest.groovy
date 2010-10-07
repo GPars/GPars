@@ -119,6 +119,7 @@ public abstract class MultiMessageTest extends GroovyTestCase {
         latch.await(90, TimeUnit.SECONDS)
 
         assertEquals 1113, result.get()
+        group.shutdown()
     }
 
     public void testActorReply() {
@@ -141,6 +142,7 @@ public abstract class MultiMessageTest extends GroovyTestCase {
         latch.await(90, TimeUnit.SECONDS)
 
         assertEquals 60, result.get()
+        group.shutdown()
     }
 
     def createReplyActor(DefaultPGroup group, Actor actor, int num,

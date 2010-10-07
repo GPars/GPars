@@ -261,6 +261,9 @@ class SelectTest extends Specification {
         selectGroup.select(a, b, c)
         then:
         DataFlow.retrieveCurrentDFPGroup() == group
+
+        cleanup:
+        selectGroup.shutdown()
     }
 
     def "select uses corrent parallel group"() {
@@ -278,5 +281,8 @@ class SelectTest extends Specification {
         then:
         select().value == 20
         DataFlow.retrieveCurrentDFPGroup() == group
+
+        cleanup:
+        selectGroup.shutdown()
     }
 }

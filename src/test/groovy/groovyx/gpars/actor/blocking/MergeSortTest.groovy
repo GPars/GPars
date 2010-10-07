@@ -29,6 +29,11 @@ import java.util.concurrent.TimeUnit
  */
 public class MergeSortTest extends GroovyTestCase {
 
+    protected void tearDown() {
+        group.shutdown()
+    }
+
+
     private def split(List<Integer> list) {
         int listSize = list.size()
         int middleIndex = listSize / 2

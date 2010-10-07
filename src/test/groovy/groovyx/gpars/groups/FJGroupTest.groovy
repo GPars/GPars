@@ -37,6 +37,7 @@ public class FJGroupTest extends GroovyTestCase {
 
         latch.await()
         assert result
+        group.shutdown()
     }
 
     public void testNonFJGroup() {
@@ -52,6 +53,7 @@ public class FJGroupTest extends GroovyTestCase {
 
         latch.await()
         assertFalse result
+        group.shutdown()
     }
 
     public void testFJNonFJGroupCommunication() {
