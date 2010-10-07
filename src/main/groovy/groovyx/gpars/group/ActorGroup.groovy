@@ -290,4 +290,12 @@ public abstract class PGroup {
     public Select select(final DataFlowChannel... channels) {
         return new Select(this, channels)
     }
+
+    /**
+     * Shutdown the thread pool gracefully
+     */
+    protected void finalize() {
+        this.threadPool.shutdown()
+        super.finalize()
+    }
 }
