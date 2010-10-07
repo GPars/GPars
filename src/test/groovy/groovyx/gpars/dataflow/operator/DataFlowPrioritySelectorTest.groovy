@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow.operator
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
 import static groovyx.gpars.dataflow.DataFlow.prioritySelector
 
@@ -29,6 +30,16 @@ import static groovyx.gpars.dataflow.DataFlow.prioritySelector
 
 public class DataFlowPrioritySelectorTest extends GroovyTestCase {
 
+    private PGroup group
+
+    protected void setUp() {
+        group = new DefaultPGroup(1)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
+    }
+
     public void testSelector() {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
@@ -36,7 +47,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = prioritySelector(inputs: [a, b, c], outputs: [d, e]) {x ->
+        def op = group.prioritySelector(inputs: [a, b, c], outputs: [d, e]) {x ->
             bindOutput 0, x
             bindOutput 1, 2 * x
         }
@@ -67,7 +78,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         c << 40
         b << 50
 
-        def op = prioritySelector(inputs: [a, b, c], outputs: [d, e]) {x ->
+        def op = group.prioritySelector(inputs: [a, b, c], outputs: [d, e]) {x ->
             bindOutput 0, x
             bindOutput 1, 2 * x
         }
@@ -84,7 +95,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        def op = prioritySelector(inputs: [a, b, c], outputs: [d]) {x ->
+        def op = group.prioritySelector(inputs: [a, b, c], outputs: [d]) {x ->
             bindOutput 0, x
         }
 
@@ -113,7 +124,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         b << 20
         c << 40
 
-        def op = prioritySelector(inputs: [a, b, c], outputs: [d, e])
+        def op = group.prioritySelector(inputs: [a, b, c], outputs: [d, e])
 
         sleep 3000
         b << 50
@@ -135,7 +146,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         b << 20
         c << 40
 
-        def op = prioritySelector(inputs: [a, b, c], outputs: [d, e]) {x, index ->
+        def op = group.prioritySelector(inputs: [a, b, c], outputs: [d, e]) {x, index ->
             bindOutput 0, x
             bindOutput 1, index
         }
@@ -156,7 +167,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        def op = prioritySelector(inputs: [a, a], outputs: [b]) {x ->
+        def op = group.prioritySelector(inputs: [a, a], outputs: [b]) {x ->
             bindOutput 0, x
             barrier.await()
         }
@@ -168,6 +179,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         a << 3
         barrier.await()
         a << 4
+        barrier.await()
 
         assert [b.val, b.val, b.val, b.val] == [1, 2, 3, 4]
 
@@ -175,7 +187,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -199,7 +210,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testInterrupt() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
@@ -218,7 +228,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testEmptyInputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -233,7 +242,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testOutputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -251,7 +259,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testEmptyOutputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -266,7 +273,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testInputNumber() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -297,7 +303,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
@@ -312,7 +317,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -330,7 +334,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = prioritySelector(inputs: [stream], outputs: []) {
+        def op = group.prioritySelector(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
         }
         op.metaClass.reportError = {Throwable e ->
@@ -354,7 +358,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testPriority() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()

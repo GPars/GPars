@@ -32,6 +32,7 @@ import groovyx.gpars.dataflow.operator.DataFlowPrioritySelector
 import groovyx.gpars.dataflow.operator.DataFlowProcessor
 import groovyx.gpars.dataflow.operator.DataFlowSelector
 import groovyx.gpars.scheduler.Pool
+import java.util.concurrent.Callable
 
 /**
  * Provides a common super class of pooled parallel groups.
@@ -174,17 +175,28 @@ public abstract class PGroup {
      * Creates a new task assigned to a thread from the current parallel group.
      * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
      * but can only exchange data using explicit DataFlowVariables and Streams.
-     * Registers itself with DataFlowExpressions for nested 'whenBound' handlers to use the same group.
+     * Registers itself with DataFlow for nested 'whenBound' handlers to use the same group.
      * @param code The task body to run
      * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
      */
     public DataFlowVariable task(final Closure code) {
+        return task(code.clone() as Callable)
+    }
+
+    /**
+     * Creates a new task assigned to a thread from the current parallel group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * Registers itself with DataFlow for nested 'whenBound' handlers to use the same group.
+     * @param callable The task body to run
+     * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
+     */
+    public DataFlowVariable task(final Callable callable) {
         final DataFlowVariable result = new DataFlowVariable()
-        def cloned = code.clone()
         threadPool.execute {->
             DataFlow.activeParallelGroup.set this
             try {
-                result.bind cloned()
+                result.bind callable.call()
             } finally {
                 DataFlow.activeParallelGroup.remove()
             }

@@ -14,27 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow.process
+package groovyx.gpars.dataflow.stream;
 
-import groovyx.gpars.dataflow.DataFlowChannel
-import java.util.concurrent.Callable
+import groovy.lang.Closure;
 
-final class StatePairs implements Callable {
-    private final DataFlowChannel inChannel
-    private final DataFlowChannel outChannel
+public class FilterCons<T> extends Cons<T> {
+    private final Closure filterClosure;
+    private FList<T> filteredRest;
+    //todo consider multi-threaded context
 
-    def StatePairs(final inChannel, final outChannel) {
-        this.inChannel = inChannel;
-        this.outChannel = outChannel;
+    public FilterCons(final T first, final FList<T> rest, final Closure filterClosure) {
+        super(first, rest);
+        this.filterClosure = filterClosure;
     }
 
-    public def call() {
-        def n1 = inChannel.val
-        def n2 = inChannel.val
-        while (true) {
-            outChannel << (n1 + n2)
-            n1 = n2
-            n2 = inChannel.val
+    @Override
+    public FList<T> getRest() {
+        if (filteredRest == null) {
+            final FList<T> nextElement = super.getRest();
+            filteredRest = nextElement.filter(filterClosure);
         }
+        return filteredRest;
     }
 }

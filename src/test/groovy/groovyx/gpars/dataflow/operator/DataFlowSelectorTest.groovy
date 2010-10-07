@@ -19,8 +19,8 @@ package groovyx.gpars.dataflow.operator
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
-import static groovyx.gpars.dataflow.DataFlow.selector
 
 /**
  * @author Vaclav Pech
@@ -29,6 +29,16 @@ import static groovyx.gpars.dataflow.DataFlow.selector
 
 public class DataFlowSelectorTest extends GroovyTestCase {
 
+    private PGroup group
+
+    protected void setUp() {
+        group = new DefaultPGroup(1)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
+    }
+
     public void testSelector() {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
@@ -36,7 +46,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d, e]) {x ->
+        def op = group.selector(inputs: [a, b, c], outputs: [d, e]) {x ->
             bindOutput 0, x
             bindOutput 1, 2 * x
         }
@@ -59,7 +69,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d]) {x ->
+        def op = group.selector(inputs: [a, b, c], outputs: [d]) {x ->
             bindOutput 0, x
         }
 
@@ -85,7 +95,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d, e])
+        def op = group.selector(inputs: [a, b, c], outputs: [d, e])
 
         a << 5
         sleep 500
@@ -108,7 +118,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d, e]) {x, index ->
+        def op = group.selector(inputs: [a, b, c], outputs: [d, e]) {x, index ->
             bindOutput 0, x
             bindOutput 1, index
         }
@@ -134,7 +144,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        def op = selector(inputs: [a, a], outputs: [b]) {x ->
+        def op = group.selector(inputs: [a, a], outputs: [b]) {x ->
             bindOutput 0, x
             barrier.await()
         }
@@ -146,7 +156,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         a << 3
         barrier.await()
         a << 4
-        sleep 3000
+        barrier.await()
 
         assert [b.val, b.val, b.val, b.val] == [1, 2, 3, 4]
 
@@ -154,7 +164,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -176,7 +185,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testInterrupt() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
@@ -195,7 +203,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testEmptyInputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -210,7 +217,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testOutputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -228,7 +234,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testEmptyOutputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -243,7 +248,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testInputNumber() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -274,7 +278,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
@@ -289,7 +292,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -307,7 +309,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = selector(inputs: [stream], outputs: []) {
+        def op = group.selector(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
         }
         op.metaClass.reportError = {Throwable e ->
@@ -322,7 +324,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = selector(inputs: [stream], outputs: []) {
+        def op = group.selector(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')
         }
         stream << 'value'
@@ -336,7 +338,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d]) {
+        def op = group.selector(inputs: [a, b, c], outputs: [d]) {
             if (it == 1) setGuard(0, false)
             if (it == 3) setGuard(2, false)
             if (it == 4) setGuard(0, true)
@@ -365,7 +367,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream c = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d], guards: [false, true, true]) {
+        def op = group.selector(inputs: [a, b, c], outputs: [d], guards: [false, true, true]) {
             if (it == 3) setGuards([true, false, false])
             if (it == 2) setGuard(2, true)
             bindOutput it

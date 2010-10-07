@@ -17,8 +17,9 @@
 package groovyx.gpars.samples.dataflow.process
 
 import groovyx.gpars.dataflow.DataFlowChannel
+import java.util.concurrent.Callable
 
-final class Print {
+final class Print implements Callable {
     private final String heading
     private final DataFlowChannel inChannel
     private final long delay = 200
@@ -28,13 +29,11 @@ final class Print {
         this.inChannel = inChannel;
     }
 
-    public Closure call() {
-        {->
-            println "${heading}"
-            while (true) {
-                println inChannel.val.toString()
-                sleep(delay)
-            }
+    public def call() {
+        println "${heading}"
+        while (true) {
+            println inChannel.val.toString()
+            sleep(delay)
         }
     }
 }

@@ -19,8 +19,9 @@ package groovyx.gpars.samples.dataflow.process
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
 import groovyx.gpars.dataflow.DataFlowStream
+import java.util.concurrent.Callable
 
-final class Pairs {
+final class Pairs implements Callable {
     private final DataFlowChannel inChannel
     private final DataFlowChannel outChannel
 
@@ -29,18 +30,16 @@ final class Pairs {
         this.outChannel = outChannel;
     }
 
-    public Closure call() {
+    public def call() {
         def a = new DataFlowStream()
         def b = new DataFlowStream()
         def c = new DataFlowStream();
 
-        {->
-            def group = DataFlow.retrieveCurrentDFPGroup()
-            [
-                    new Plus(a, c, outChannel),
-                    new Copy(inChannel, a, b),
-                    new Tail(b, c)
-            ].each {group.task it()}
-        }
+        def group = DataFlow.retrieveCurrentDFPGroup()
+        [
+                new Plus(a, c, outChannel),
+                new Copy(inChannel, a, b),
+                new Tail(b, c)
+        ].each {group.task it}
     }
 }

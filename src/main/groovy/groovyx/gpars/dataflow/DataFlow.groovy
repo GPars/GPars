@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.dataflow.operator.DataFlowProcessor
 import groovyx.gpars.group.PGroup
+import java.util.concurrent.Callable
 
 /**
  * Contains factory methods to create dataflow actors and starting them.
@@ -73,6 +74,18 @@ public abstract class DataFlow {
      */
     public static DataFlowVariable task(final Closure code) {
         DataFlow.DATA_FLOW_GROUP.task code
+    }
+
+    /**
+     * Creates a new task assigned to a thread from the current parallel group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * Registers itself with DataFlow for nested 'whenBound' handlers to use the same group.
+     * @param callable The task body to run
+     * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
+     */
+    public DataFlowVariable task(final Callable callable) {
+        DataFlow.DATA_FLOW_GROUP.task callable
     }
 
     /**

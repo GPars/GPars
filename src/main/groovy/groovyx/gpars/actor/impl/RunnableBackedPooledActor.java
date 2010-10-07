@@ -62,7 +62,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
 
     @SuppressWarnings("rawtypes")
     @Override
-    protected void act() {
+    protected final void act() {
         if (action != null) {
             if (action instanceof Closure) {
                 //noinspection RawUseOfParameterizedType

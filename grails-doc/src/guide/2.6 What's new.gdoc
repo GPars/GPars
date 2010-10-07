@@ -28,6 +28,7 @@ h3. Dataflow
 
 * New specialized operators - _selector_, _prioritySelector_ and _splitter_
 * Added _select_ and _prioritySelect_ methods to select a value from multiple channels
+* Dataflow tasks accept Callable as parameters on top of Closures
 * Introduced dataflow queues
 * Unified the interface for dataflow variables, streams and queues - _DataFlowChannel_
 * Methods for atomic update to multiple operator's output channels

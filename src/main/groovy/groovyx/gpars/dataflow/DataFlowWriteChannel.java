@@ -28,14 +28,16 @@ public interface DataFlowWriteChannel<T> {
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
      *
      * @param value The value to assign
+     * @return The current channel instance
      */
-    void leftShift(final T value);
+    DataFlowWriteChannel<T> leftShift(final T value);
 
     /**
      * Assigns a value from one DataFlowVariable instance to this variable.
      * Can only be invoked once on each instance of DataFlowVariable
      *
      * @param ref The DataFlowVariable instance the value of which to bind
+     * @return The current channel instance
      */
-    void leftShift(final DataFlowReadChannel<T> ref);
+    DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref);
 }

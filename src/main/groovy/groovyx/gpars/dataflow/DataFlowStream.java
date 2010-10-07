@@ -70,7 +70,7 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void leftShift(final DataFlowReadChannel<T> ref) {
+    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
         final DataFlowVariable<T> originalRef = retrieveForBind();
         hookWheneverBoundListeners(originalRef);
 
@@ -83,6 +83,7 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
                 return this;
             }
         });
+        return this;
     }
 
     /**
@@ -91,8 +92,9 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
      * @param value The value to bind to the head of the stream
      */
     @Override
-    public void leftShift(final T value) {
+    public DataFlowWriteChannel<T> leftShift(final T value) {
         hookWheneverBoundListeners(retrieveForBind()).bind(value);
+        return this;
     }
 
     /**

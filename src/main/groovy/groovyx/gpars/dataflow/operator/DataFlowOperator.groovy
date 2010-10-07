@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
+import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -75,29 +76,36 @@ public final class DataFlowOperator extends DataFlowProcessor {
  * Once all required inputs are available (received as messages), the operator's body is run.
  */
 private class DataFlowOperatorActor extends DataFlowProcessorActor {
-    private Map values = [:]
+    Map values = [:]
 
     def DataFlowOperatorActor(owningOperator, group, outputs, inputs, code) {
         super(owningOperator, group, outputs, inputs, code)
     }
 
     final void afterStart() {
-        queryInputs()
+        queryInputs(true)
     }
 
-    private final def queryInputs() {
-        return inputs.eachWithIndex {input, index -> input.getValAsync(index, this)}
+    private final def queryInputs(final boolean initialRun) {
+        return inputs.eachWithIndex {input, index ->
+            if (initialRun || !(input instanceof DataFlowVariable)) {
+                input.getValAsync(index, this)
+            } else {
+                values[index] = input.val
+            }
+        }
     }
 
     @Override
     final void onMessage(def message) {
+        checkPoisson(message.result)
         values[message.attachment] = message.result
         assert values.size() <= inputs.size()
         if (values.size() == inputs.size()) {
             def results = values.sort {it.key}.values() as List
             startTask(results)
             values = [:]
-            queryInputs()
+            queryInputs(false)
         }
     }
 

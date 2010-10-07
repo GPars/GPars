@@ -14,27 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow.process
+package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowChannel
-import java.util.concurrent.Callable
-
-final class StatePairs implements Callable {
-    private final DataFlowChannel inChannel
-    private final DataFlowChannel outChannel
-
-    def StatePairs(final inChannel, final outChannel) {
-        this.inChannel = inChannel;
-        this.outChannel = outChannel;
-    }
-
-    public def call() {
-        def n1 = inChannel.val
-        def n2 = inChannel.val
-        while (true) {
-            outChannel << (n1 + n2)
-            n1 = n2
-            n2 = inChannel.val
-        }
-    }
-}
+/**
+ * Represents the poisson for dataflow operators.
+ * After receiving the poisson a dataflow operator will send the poisson to all its output channels and terminate.
+ *
+ * @author Vaclav Pech
+ * Date: Oct 6, 2010
+ */
+@Singleton
+class DataFlowPoisson {}

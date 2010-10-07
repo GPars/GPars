@@ -19,7 +19,7 @@ package groovyx.gpars.dataflow.operator
 import groovyx.gpars.dataflow.DataFlowStream
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
-import static groovyx.gpars.dataflow.DataFlow.selector
+import groovyx.gpars.group.PGroup
 
 /**
  * @author Vaclav Pech
@@ -28,6 +28,16 @@ import static groovyx.gpars.dataflow.DataFlow.selector
 
 public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
 
+    private PGroup group
+
+    protected void setUp() {
+        group = new DefaultPGroup(10)
+    }
+
+    protected void tearDown() {
+        group.shutdown()
+    }
+
     public void testSelector() {
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
@@ -35,7 +45,7 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d, e], maxForks: 2) {x ->
+        def op = group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: 2) {x ->
             bindOutput 0, x
             bindOutput 1, 2 * x
         }
@@ -57,7 +67,7 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream d = new DataFlowStream()
         final DataFlowStream e = new DataFlowStream()
 
-        def op = selector(inputs: [a, b, c], outputs: [d, e], maxForks: 2)
+        def op = group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: 2)
 
         a << 5
         b << 20
@@ -78,15 +88,14 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream e = new DataFlowStream()
 
         shouldFail(IllegalArgumentException) {
-            def op = selector(inputs: [a, b, c], outputs: [d, e], maxForks: 0) {x, y, z -> }
+            def op = group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: 0) {x, y, z -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op = selector(inputs: [a, b, c], outputs: [d, e], maxForks: -1) {x, y, z -> }
+            def op = group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: -1) {x, y, z -> }
         }
     }
 
     public void testOutputNumber() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
@@ -101,7 +110,6 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
@@ -121,7 +129,7 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream stream = new DataFlowStream()
         final DataFlowVariable a = new DataFlowVariable()
 
-        def op = selector(inputs: [stream], outputs: [], maxFork: 3) {
+        def op = group.selector(inputs: [stream], outputs: [], maxFork: 3) {
             throw new RuntimeException('test')
         }
         op.metaClass.reportError = {Throwable e ->
@@ -135,7 +143,7 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
     public void testExceptionWithDefaultHandler() {
         final DataFlowStream stream = new DataFlowStream()
 
-        def op = selector(inputs: [stream], outputs: [], maxFork: 3) {
+        def op = group.selector(inputs: [stream], outputs: [], maxFork: 3) {
             if (it == 'invalidValue') throw new RuntimeException('test')
         }
         stream << 'value'

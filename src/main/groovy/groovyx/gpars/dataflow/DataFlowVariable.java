@@ -49,8 +49,9 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
      * @param value The value to assign
      */
     @Override
-    public void leftShift(final T value) {
+    public DataFlowWriteChannel<T> leftShift(final T value) {
         bind(value);
+        return this;
     }
 
     /**
@@ -60,7 +61,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
      * @param ref The DataFlowVariable instance the value of which to bind
      */
     @Override
-    public void leftShift(final DataFlowReadChannel<T> ref) {
+    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -458384302762038543L;
 
@@ -71,6 +72,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
                 return this;
             }
         });
+        return this;
     }
 
     @Override

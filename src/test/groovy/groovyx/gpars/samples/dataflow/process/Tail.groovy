@@ -17,8 +17,9 @@
 package groovyx.gpars.samples.dataflow.process
 
 import groovyx.gpars.dataflow.DataFlowChannel
+import java.util.concurrent.Callable
 
-final class Tail {
+final class Tail implements Callable {
     private final DataFlowChannel inChannel
     private final DataFlowChannel outChannel
 
@@ -27,12 +28,10 @@ final class Tail {
         this.outChannel = outChannel;
     }
 
-    public Closure call() {
-        {->
-            inChannel.val
-            while (true) {
-                outChannel << inChannel.val
-            }
+    public def call() {
+        inChannel.val
+        while (true) {
+            outChannel << inChannel.val
         }
     }
 }
