@@ -45,7 +45,6 @@ public abstract class GuardedSelectRequest<T> implements SelectRequest<T> {
     @Override
     public boolean matchesMask(final int index) {
         if (mask == null) return true;
-        //noinspection AutoUnboxing
         return mask.get(index);
     }
 }

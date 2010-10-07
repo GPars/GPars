@@ -64,7 +64,6 @@ public class Cons<T> implements FList<T> {
         return false;
     }
 
-    @SuppressWarnings({"AutoUnboxing"})
     @Override
     public FList<T> filter(final Closure filterClosure) {
         final Boolean accept = (Boolean) filterClosure.call(new Object[]{getFirst()});
