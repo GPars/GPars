@@ -175,6 +175,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
+        actor.join()
         assertEquals(1, codeCounter.get())
         assert !actor.isActive()
     }

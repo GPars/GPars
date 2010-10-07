@@ -192,6 +192,7 @@ public class TimeoutTest extends GroovyTestCase {
 
         assertEquals(0, codeCounter.get())
         assert exceptionFlag.get()
+        actor.join()
         assert !actor.isActive()
 
     }
