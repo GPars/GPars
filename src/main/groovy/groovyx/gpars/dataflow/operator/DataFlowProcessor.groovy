@@ -188,7 +188,10 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
      */
     boolean checkPoisson(def data) {
         if (data instanceof DataFlowPoisson) {
-            owningProcessor.bindAllOutputsAtomically data
+            //noinspection GroovyEmptyCatchBlock
+            try {
+                owningProcessor.bindAllOutputsAtomically data
+            } catch (IllegalStateException ignore) { }  //Ignore stopped operators down the chain
             owningProcessor.stop()
             return true
         }

@@ -177,7 +177,45 @@ operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
  Using the _bindAllOutputs_ or the _bindAllOutputValues_ methods will not guarantee atomicity of writes across al the output channels when using internal parallelism.
  If preserving the order of messages in multiple output streams is not an issue, _bindAllOutputs_ as well as _bindAllOutputValues_ will provide better performance over the atomic variants.
 {note}
- 
+
+h4. Stopping operators
+
+Dataflow operators and selectors can be stopped in two ways:
+# by calling the stop() method on all operators that need to be stopped
+# by sending a poisson message.
+
+Using the stop() method:
+{code}
+def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
+
+def op2 = selector(inputs: [d], outputs: [f, out]) { }
+
+def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+[op1, op2, op3]*.stop()  //Stop all operators by calling the stop() method on them
+op1.join()
+op2.join()
+op3.join()
+{code}
+
+Using the poisson message:
+
+{code}
+def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
+
+def op2 = selector(inputs: [d], outputs: [f, out]) { }
+
+def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+a << DataFlowPoisson.instance  //Send the poisson
+
+op1.join()
+op2.join()
+op3.join()
+{code}
+
+After receiving a poisson an operator stops. It only makes sure the poisson is first sent to all its output channels, so that the poisson can spread to the connected operators.
+
 h3. Grouping operators
 
 Dataflow operators can be organized into groups to allow for performance fine-tuning. Groups provide a handy _operator()_ factory method
