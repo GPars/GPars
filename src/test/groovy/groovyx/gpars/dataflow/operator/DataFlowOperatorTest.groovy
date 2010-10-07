@@ -102,8 +102,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
 
-        final DefaultPGroup group = new DefaultPGroup()
-
         def op = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
             bindOutput 0, 2 * x + y
         }
@@ -117,7 +115,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testSimpleOperators() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -143,7 +140,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testCombinedOperators() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -176,7 +172,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -192,7 +187,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testInterrupt() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
@@ -211,7 +205,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testEmptyInputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -226,7 +219,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -244,7 +236,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testEmptyOutputs() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream b = new DataFlowStream()
         volatile boolean flag = false
 
@@ -259,7 +250,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testInputNumber() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()
@@ -298,7 +288,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
@@ -313,7 +302,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DefaultPGroup group = new DefaultPGroup(1)
         final DataFlowStream a = new DataFlowStream()
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream c = new DataFlowStream()

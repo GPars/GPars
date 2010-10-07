@@ -383,6 +383,5 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val] == [3, 1, 2, 4]
         op.stop()
         op.join()
-
     }
 }
