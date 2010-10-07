@@ -156,5 +156,8 @@ public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
             }
             assert GParsExecutorsPool.retrieveCurrentPool() == pool1
         }
+        pool1.shutdown()
+        pool2.shutdown()
+        pool3.shutdown()
     }
 }

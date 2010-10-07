@@ -254,6 +254,9 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             }
             assert groovyx.gpars.GParsPool.retrieveCurrentPool() == pool1
         }
+        pool1.shutdown()
+        pool2.shutdown()
+        pool3.shutdown()
     }
 
     public void testExceptionHandler() {

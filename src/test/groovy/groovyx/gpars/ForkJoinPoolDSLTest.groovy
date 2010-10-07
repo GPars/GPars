@@ -48,10 +48,12 @@ public class ForkJoinPoolDSLTest extends GroovyTestCase {
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
 
-        withExistingPool(new ForkJoinPool(5)) {
+        final def pool = new ForkJoinPool(5)
+        withExistingPool(pool) {
             assert ([2, 4, 6, 8, 10] == [1, 2, 3, 4, 5].collectParallel {it * 2})
             assert [1, 2, 3, 4, 5].everyParallel {it > 0}
             assert [1, 2, 3, 4, 5].findParallel {Number number -> number > 2} in [3, 4, 5]
         }
+        pool.shutdown()
     }
 }
