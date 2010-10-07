@@ -118,7 +118,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     /**
      * Timer holding timeouts for react methods
      */
-    private static final Timer timer = new Timer(true);
+    private static final Timer timer = new Timer("GPars Actor Timer", true);
     private static final String SHOULD_NOT_REACH_HERE = "Should not reach here";
     private static final String ERROR_EVALUATING_LOOP_CONDITION = "Error evaluating loop condition";
 
@@ -977,7 +977,12 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                 @Override
                 public void run() {
                     if (!isReady()) {
-                        actor.send(TIMEOUT_MESSAGE);
+                        //noinspection CatchGenericClass
+                        try {
+                            actor.send(TIMEOUT_MESSAGE);
+                        } catch (Exception e) {
+                            actor.handleException(e);
+                        }
                     }
                 }
             }, timeout);

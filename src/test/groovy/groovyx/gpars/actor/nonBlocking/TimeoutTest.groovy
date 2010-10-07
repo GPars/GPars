@@ -132,8 +132,8 @@ public class TimeoutTest extends GroovyTestCase {
             afterStop = {messages -> barrier.await() }
         }
 
-        barrier.await()
         actor.send 'message'
+        barrier.await()
 
         barrier.await()
         assert codeFlag.get()
@@ -157,16 +157,42 @@ public class TimeoutTest extends GroovyTestCase {
         }
 
         actor.metaClass {
-            onTimeout = {-> timeoutFlag.set(true); stop() }
-            afterStop = {messages -> barrier.await() }
+            onTimeout = {-> timeoutFlag.set(true)}
+        }
+
+        actor.send 'message'
+        barrier.await()
+        barrier.await()
+
+        barrier.await()
+        actor.stop()
+        assertEquals(2, codeCounter.get())
+        assert timeoutFlag.get()
+    }
+
+    public void testExceptionInTimeout() {
+        final def barrier = new CyclicBarrier(2)
+        final AtomicInteger codeCounter = new AtomicInteger(0)
+        final AtomicBoolean exceptionFlag = new AtomicBoolean(false)
+
+        final def actor = actor {
+            barrier.await()
+            react(3000) {
+                codeCounter.incrementAndGet()
+            }
+        }
+
+        actor.metaClass {
+            onException = {exceptionFlag.set(true); barrier.await()}
         }
 
         barrier.await()
-        actor.send 'message'
+        actor.stop()
         barrier.await()
 
-        barrier.await()
-        assertEquals(2, codeCounter.get())
-        assert timeoutFlag.get()
+        assertEquals(0, codeCounter.get())
+        assert exceptionFlag.get()
+        assert !actor.isActive()
+
     }
 }

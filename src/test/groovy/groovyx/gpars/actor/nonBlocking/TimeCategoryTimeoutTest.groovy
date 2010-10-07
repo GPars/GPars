@@ -16,12 +16,12 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovy.time.TimeCategory
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import groovy.time.TimeCategory
 import static groovyx.gpars.actor.Actors.actor
 
 /**
@@ -109,16 +109,16 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
 
         actor.metaClass {
             onTimeout = {-> timeoutFlag.set(true) }
-            afterStop = {messages -> barrier.await() }
         }
 
-        barrier.await()
         actor.send 'message'
+        barrier.await()
 
         barrier.await()
         assert codeFlag.get()
         assert nestedCodeFlag.get()
         assert timeoutFlag.get()
+        actor.terminate()
     }
 
     public void testTimeoutInLoop() {
@@ -138,15 +138,15 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         }
 
         actor.metaClass {
-            onTimeout = {-> timeoutFlag.set(true); stop() }
-            afterStop = {messages -> barrier.await() }
+            onTimeout = {-> timeoutFlag.set(true) }
         }
 
-        barrier.await()
         actor.send 'message'
+        barrier.await()
         barrier.await()
 
         barrier.await()
+        actor.stop()
         assertEquals(2, codeCounter.get())
         assert timeoutFlag.get()
     }
@@ -167,15 +167,15 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         }
 
         actor.metaClass {
-            onTimeout = {-> terminate() }
-            afterStop = {messages -> barrier.await() }
+            onTimeout = {-> barrier.await(); terminate() }
         }
 
-        barrier.await()
         actor.send 'message'
+        barrier.await()
         barrier.await()
 
         barrier.await()
         assertEquals(1, codeCounter.get())
+        assert !actor.isActive()
     }
 }
