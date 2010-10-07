@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.actor.impl.MessageStream
 import groovyx.gpars.group.PGroup
 
 /**
@@ -173,6 +174,21 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
     }
 
     /**
+     * Sends the message, ignoring exceptions caused by the actor not being active anymore
+     * @param message The message to send
+     * @return The current actor
+     */
+    @Override
+    public MessageStream send(Object message) {
+        try {
+            super.send(message)
+        } catch (IllegalStateException e) {
+            if (!hasBeenStopped()) throw e
+        }
+        return this
+    }
+
+    /**
      * All messages unhandled by sub-classes will result in an exception being thrown
      * @param message The unhandled message
      */
@@ -188,10 +204,7 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
      */
     boolean checkPoisson(def data) {
         if (data instanceof DataFlowPoisson) {
-            //noinspection GroovyEmptyCatchBlock
-            try {
-                owningProcessor.bindAllOutputsAtomically data
-            } catch (IllegalStateException ignore) { }  //Ignore stopped operators down the chain
+            owningProcessor.bindAllOutputsAtomically data
             owningProcessor.stop()
             return true
         }

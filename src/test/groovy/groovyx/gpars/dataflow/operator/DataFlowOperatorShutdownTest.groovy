@@ -97,10 +97,11 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         def op2 = operator(inputs: [d], outputs: [f, out]) { }
 
-        def op3 = operator(inputs: [e, f], outputs: [b]) {x, y -> }
+        def op3 = operator(inputs: [e, f], outputs: [b, out]) {x, y -> }
 
         a << DataFlowPoisson.instance
 
+        assert out.val == DataFlowPoisson.instance
         assert out.val == DataFlowPoisson.instance
         op1.join()
         op2.join()

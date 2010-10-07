@@ -178,7 +178,7 @@ public abstract class AbstractLoopingActor extends Actor {
     }
 
     @Override
-    public final MessageStream send(final Object message) {
+    public MessageStream send(final Object message) {
         core.store(createActorMessage(message));
         return this;
     }
