@@ -16,8 +16,9 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowPGroup
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.ResizeablePool
 
 /**
  * Demonstrates pool resizing. The code would end up deadlocked if the pool didn't resize, since the first two tasks
@@ -26,7 +27,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
  * @author Vaclav Pech
  */
 
-final DataFlowPGroup group = new DataFlowPGroup(1)
+final def group = new DefaultPGroup(new ResizeablePool(false))
 
 final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
@@ -46,5 +47,6 @@ group.with {
     task {
         a << 10
     }
-
 }
+
+group.shutdown()
