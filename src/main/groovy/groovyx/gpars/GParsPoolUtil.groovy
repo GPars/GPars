@@ -20,6 +20,7 @@ import groovy.time.Duration
 import groovyx.gpars.memoize.LRUProtectionStorage
 import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
+import java.lang.ref.ReferenceQueue
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
@@ -48,7 +49,7 @@ import static groovyx.gpars.util.ParallelCollectionsUtil.createCollection
  */
 public class GParsPoolUtil {
 
-    final static String MEMOIZE_NULL = new NullValue()
+    final static def MEMOIZE_NULL = new NullValue()
 
     /**
      * Allows timeouts for async operations
@@ -122,13 +123,16 @@ public class GParsPoolUtil {
      * Creates a caching variant of the supplied closure.
      * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache
      * making subsequent calls with the same arguments fast.
-     * This variant will keep all values forever.
+     * This variant will keep all values forever, i.e. till the closure gets garbage-collected.
      * The returned function can be safely used concurrently from multiple threads, however, the implementation
      * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
      * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     *
+     * The cache gets garbage-collected together with the memoized closure.
+     * @return A new function forwarding to the original one while caching the results
      */
-    public static Closure memoize(Closure cl) {
+    public static Closure memoize(final Closure cl) {
         return buildMemoizeFunction([:] as ConcurrentHashMap, cl)
     }
 
@@ -142,8 +146,12 @@ public class GParsPoolUtil {
      * values high average-scenario performance and so concurrent calls on the memoized function with identical argument values
      * may not necessarily be able to benefit from each other's cached return value. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     *
+     * The cache gets garbage-collected together with the memoized closure.
+     * @param maxCacheSize The maximum size the cache can grow to
+     * @return A new function forwarding to the original one while caching the results
      */
-    public static Closure memoizeAtMost(Closure cl, int maxCacheSize) {
+    public static Closure memoizeAtMost(final Closure cl, int maxCacheSize) {
         if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeAtMost.")
 
         return buildMemoizeFunction(new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
@@ -151,7 +159,7 @@ public class GParsPoolUtil {
 
     private static def buildMemoizeFunction(cache, Closure cl) {
         return {Object... args ->
-            def key = args.collect {it}
+            final def key = args?.toList() ?: []
             Object result = cache[key]
             if (result == null) {
                 result = cl.call(* args)
@@ -178,8 +186,10 @@ public class GParsPoolUtil {
      * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
      * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     *
+     * The cache gets garbage-collected together with the memoized closure.
      */
-    public static Closure memoizeAtLeast(Closure cl, int protectedCacheSize) {
+    public static Closure memoizeAtLeast(final Closure cl, int protectedCacheSize) {
         if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeAtLeast.")
 
         return buildSoftReferenceMemoizeFunction(protectedCacheSize, [:] as ConcurrentHashMap, cl)
@@ -203,8 +213,10 @@ public class GParsPoolUtil {
      * may not necessarily be able to benefit from each other's cached return value. Also the protectedCacheSize parameter
      * might not be respected accurately in such scenarios for some periods of time. With this having been mentioned,
      * the performance trade-off still makes concurrent use of memoized functions safe and highly recommended.
+     *
+     * The cache gets garbage-collected together with the memoized closure.
      */
-    public static Closure memoizeBetween(Closure cl, int protectedCacheSize, int maxCacheSize) {
+    public static Closure memoizeBetween(final Closure cl, int protectedCacheSize, int maxCacheSize) {
         if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeBetween.")
         if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeBetween.")
         if (protectedCacheSize > maxCacheSize) throw new IllegalArgumentException("The maxCacheSize parameter to memoizeBetween is required to be greater or equal to the protectedCacheSize parameter.")
@@ -217,27 +229,32 @@ public class GParsPoolUtil {
             new LRUProtectionStorage(protectedCacheSize) :
             new NullProtectionStorage() //Nothing should be done when no elements need protection against eviction
 
+        final ReferenceQueue queue = new ReferenceQueue()
+
         return {Object... args ->
-            cleanUpNullReferences(cache)
-            def key = args.collect {it}
+            if (queue.poll() != null) cleanUpNullReferences(cache, queue)  //if something has been evicted, do a clean-up
+            final def key = args?.toList() ?: []
             def result = cache[key]?.get()
             if (result == null) {
                 result = cl.call(* args)
                 if (result == null) {
-                    result = new NullValue()
+                    result = MEMOIZE_NULL
                 }
-                cache[key] = new SoftReference(result)
+                cache[key] = new SoftReference(result, queue)
             }
             lruProtectionStorage.touch(key, result)
             result == MEMOIZE_NULL ? null : result
         }
     }
 
-    private static void cleanUpNullReferences(cache) {
+    private static void cleanUpNullReferences(final cache, final queue) {
+        //noinspection GroovyEmptyStatementBody
+        while (queue.poll() != null) {
+        }  //empty the reference queue
         cache.findAllParallel({entry -> entry.value.get() == null}).eachParallel {entry -> cache.remove entry.key}
     }
 
-    private static <T> ParallelArray<T> createPA(Collection<T> collection, ForkJoinExecutor pool) {
+    private static <T> ParallelArray<T> createPA(final Collection<T> collection, final ForkJoinExecutor pool) {
         return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
     }
 

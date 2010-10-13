@@ -18,12 +18,11 @@ package groovyx.gpars.memoize;
 
 /**
  * Doesn't protect any resources.
- * Used when the user agrees to have the whole cache emptied by gc.
+ * Used when the user agrees to have the whole cache eventually emptied by gc.
  *
  * @author Vaclav Pech
  *         Date: Jun 22, 2010
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public final class NullProtectionStorage {
 
     /**
