@@ -176,7 +176,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor 3
         actor 4
         actor 5
-        actor 6
+        try {actor 6} catch (all) {}
         actor.join()
         assert result == 5
     }
@@ -195,7 +195,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor 3
         actor 4
         actor 5
-        actor 6
+        try {actor 6} catch (all) {}
         actor.join()
         assert result == 5
     }
@@ -267,9 +267,11 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor 3
         actor 4
         actor 5
-        actor 6
-        actor 7
-        actor 8
+        try {
+            actor 6
+            actor 7
+            actor 8
+        } catch (all) {}
         actor.join()
         assert result == 18
     }
@@ -299,9 +301,11 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor 3
         actor 4
         actor 5
-        actor 6
-        actor 7
-        actor 8
+        try {
+            actor 6
+            actor 7
+            actor 8
+        } catch (all) {}
         actor.join()
         assert result == 5
         assert exception in IllegalStateException
