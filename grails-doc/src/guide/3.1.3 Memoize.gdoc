@@ -3,6 +3,10 @@ will, instead of invoking the calculation encoded in the original function, retr
 Provided the calculation is considerably slower than retrieving a cached value from the cache, this allows users to trade-off memory for performance.
 Checkout out the example, where we attempt to scan multiple websites for particular content:
 
+The memoize functionality of GPars has been contributed to Groovy in version 1.8 and if you run on Groovy 1.8 or later, it is recommended to use the Groovy functionality.
+Memoize in GPars is almost identical, except that it searches the memoize caches concurrently using the surrounding thread pool and so may give
+performance benefits in some scenarios.
+
 h2. Examples of use
 {code}
 GParsPool.withPool {
