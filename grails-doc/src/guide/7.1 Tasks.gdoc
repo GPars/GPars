@@ -211,7 +211,8 @@ h2. DataFlows map
 
 As a handy shortcut the _DataFlows_ class can help you reduce the amount of code you have to write to leverage Dataflow variables.
 
-{code}def df = new DataFlows()
+{code}
+def df = new DataFlows()
 df.x = 'value1'
 assert df.x == 'value1'
 
@@ -220,6 +221,22 @@ DataFlow.task {df.y = 'value2}
 assert df.y == 'value2'
 {code}
 Think of DataFlows as a map with Dataflow Variables as keys storing their bound values as appropriate map values. The semantics of reading a value (e.g. df.x) and binding a value (e.g. df.x = 'value') remain identical to the semantics of plain Dataflow Variables (x.val and x << 'value' respectively).
+
+h3. Mixing _DataFlows_ and Groovy _with_ blocks
+
+When inside a _with_ block of a DataFlows instance, the dataflow variables stored inside the DataFlows instance can be accessed directly
+without the need to prefix them with the DataFlows instance identifier.
+
+{code}
+new DataFlows().with {
+    x = 'value1'
+    assert x == 'value1'
+
+    DataFlow.task {y = 'value2}
+
+    assert y == 'value2'
+}
+{code}
 
 h2. Returning a value from a task
 
