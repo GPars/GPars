@@ -313,6 +313,7 @@ public abstract class Actor extends ReplyingMessageStream {
     }
 
 
+    @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
     protected void handleException(final Throwable exception) {
         if (!callDynamic("onException", new Object[]{exception})) {
             System.err.println("An exception occurred in the Actor thread " + Thread.currentThread().getName());
@@ -320,6 +321,7 @@ public abstract class Actor extends ReplyingMessageStream {
         }
     }
 
+    @SuppressWarnings({"TypeMayBeWeakened", "UseOfSystemOutOrSystemErr"})
     protected void handleInterrupt(final InterruptedException exception) {
         Thread.interrupted();
         if (!callDynamic("onInterrupt", new Object[]{exception})) {
