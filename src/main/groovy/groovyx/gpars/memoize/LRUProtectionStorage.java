@@ -54,6 +54,13 @@ public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
         put(key, value);
     }
 
+    @Override
+    public Object get(final Object key) {
+        final Object value = remove(key);
+        if (value != null) put(key, value);
+        return value;
+    }
+
     /**
      * Performs a shallow clone
      *
