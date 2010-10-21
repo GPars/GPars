@@ -749,7 +749,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static <T> boolean everyParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().size() == collection.size()
+        createPA(collection, retrievePool()).withFilter({!(cl(it) as Boolean)} as Predicate).any() == null
     }
 
     /**
