@@ -105,7 +105,7 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
     @Override
     public FList<T> getRest() {
         if (rest.get() == null)
-            rest.compareAndSet(null, new Stream());
+            rest.compareAndSet(null, new Stream<T>());
         return rest.get();
     }
 
@@ -141,14 +141,14 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         return newStream;
     }
 
-    private void map(final Stream rest, final Closure mapClosure, final DataFlowWriteChannel result) {
+    private void map(final Stream<T> rest, final Closure mapClosure, final DataFlowWriteChannel result) {
         if (rest.isEmpty()) {
             result.leftShift(Stream.eos());
             return;
         }
         final Object mapped = mapClosure.call(new Object[]{rest.getFirst()});
         final DataFlowWriteChannel newResult = result.leftShift(eval(mapped));
-        map((Stream) rest.getRest(), mapClosure, newResult);
+        map((Stream<T>) rest.getRest(), mapClosure, newResult);
     }
 
     @Override

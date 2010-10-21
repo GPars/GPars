@@ -264,6 +264,7 @@ class SelectTest extends Specification {
 
         cleanup:
         selectGroup.shutdown()
+        DataFlow.activeParallelGroup.remove()
     }
 
     def "select uses corrent parallel group"() {
@@ -284,5 +285,6 @@ class SelectTest extends Specification {
 
         cleanup:
         selectGroup.shutdown()
+        DataFlow.activeParallelGroup.remove()
     }
 }

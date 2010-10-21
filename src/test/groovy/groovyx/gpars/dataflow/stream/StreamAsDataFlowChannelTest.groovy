@@ -16,12 +16,12 @@
 
 package groovyx.gpars.dataflow.stream
 
-import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.dataflow.DataFlow.task
 
-abstract class StreamAsDataFlowChannelTest extends GroovyTestCase {
+class StreamAsDataFlowChannelTest extends GroovyTestCase {
 
     public void testInterfaceImplemented() {
         def stream = new Stream()
@@ -41,8 +41,6 @@ abstract class StreamAsDataFlowChannelTest extends GroovyTestCase {
         def result = new DataFlowVariable()
         stream >> {result << it}
         task {
-            println 'Active group ' + DataFlow.activeParallelGroup?.get()
-            println 'Default DF group ' + DataFlow.DATA_FLOW_GROUP
             stream << 1
         }
         assert result.val == 1
@@ -52,7 +50,7 @@ abstract class StreamAsDataFlowChannelTest extends GroovyTestCase {
         def stream = new Stream()
         def result = new DataFlowVariable()
         stream.whenBound() {result << it}
-        task {
+        new DefaultPGroup().task {
             stream << 1
         }
         assert result.val == 1
