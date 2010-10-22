@@ -28,7 +28,7 @@ import groovyx.gpars.GParsPool
 
 GParsPool.withPool {
     Closure fib
-    fib = {n -> n > 1 ? fib(n - 1) + fib(n - 2) : n}.memoizeAtMost(2)  //try to remove the memoize() method call to get the original slow exponential complexity behavior
+    fib = {n -> n > 1 ? fib(n - 2) + fib(n - 1) : n}.memoizeAtMost(2)  //try to remove the memoize() method call to get the original slow exponential complexity behavior
     println "Fib for 0: ${fib(0)}"
     println "Fib for 1: ${fib(1)}"
     println "Fib for 2: ${fib(2)}"
