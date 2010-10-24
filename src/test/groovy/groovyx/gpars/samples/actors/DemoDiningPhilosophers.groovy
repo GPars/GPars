@@ -43,7 +43,7 @@ final class Philosopher extends AbstractPooledActor {
                         [a, b].find {Accepted.isCase it}?.reply new Finished()
                     } else {
                         eat()
-                        reply new Finished()
+                        [a, b]*.reply new Finished()
                     }
                 }
             }
