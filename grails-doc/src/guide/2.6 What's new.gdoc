@@ -13,6 +13,7 @@ h3. Parallel collections
 
 * Added a speculate() method to concurrently run multiple functions each representing a different path to achieve the required goal, while harvesting the first calculated result
 * Added the _combine_ method into the map/reduce family of functions
+* General speed-up of Parallel Array construction
 
 h3. Fork / Join
 
