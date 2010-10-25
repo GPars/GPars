@@ -20,6 +20,7 @@ import groovy.time.Duration
 import groovyx.gpars.memoize.LRUProtectionStorage
 import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
+import groovyx.gpars.util.PAUtils
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
@@ -254,8 +255,37 @@ public class GParsPoolUtil {
         cache.findAllParallel({entry -> entry.value.get() == null}).eachParallel {entry -> cache.remove entry.key}
     }
 
-    private static <T> ParallelArray<T> createPA(final Collection<T> collection, final ForkJoinExecutor pool) {
+    @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
+    private static <T> ParallelArray<T> createPA(final Object collection, final ForkJoinExecutor pool) {
+        if (collection instanceof Object[]) {
+            return createPAFromArray(collection, pool)
+        }
+        if (collection instanceof Map) {
+            return createPAFromArray(PAUtils.createArray((Map) collection), pool)
+        }
+        if (collection.respondsTo('toArray')) {
+            return createPAFromCollection(collection, pool)
+        }
+        if (collection instanceof CharSequence) {
+            return createPAFromArray(PAUtils.createArray((CharSequence) collection), pool)
+        }
+        if (collection instanceof Iterable) {
+            return createPAFromCollection(PAUtils.createCollection((Iterable) collection), pool)
+        }
+        if (collection instanceof Iterator) {
+            return createPAFromCollection(PAUtils.createCollection((Iterator) collection), pool)
+        }
+        return createPAFromCollection(createCollection(collection), pool)
+        //todo generics should not cause warnings
+        //todo finish all methods
+    }
+
+    private static <T> ParallelArray<T> createPAFromCollection(final def collection, final ForkJoinExecutor pool) {
         return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
+    }
+
+    private static <T> ParallelArray<T> createPAFromArray(final T[] array, final ForkJoinExecutor pool) {
+        return ParallelArray.createFromCopy(array, pool)
     }
 
     /**
@@ -292,7 +322,7 @@ public class GParsPoolUtil {
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
     public static <T> Collection<T> eachParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).apply({cl(it)} as Procedure)
+        eachParallelPA(createPAFromCollection(collection, retrievePool()), cl)
         return collection
     }
 
@@ -310,7 +340,7 @@ public class GParsPoolUtil {
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
     public static Object eachParallel(Object collection, Closure cl) {
-        eachParallel(createCollection(collection), cl)
+        eachParallelPA(createPA(collection, retrievePool()), cl)
         return collection
     }
 
@@ -328,8 +358,12 @@ public class GParsPoolUtil {
      *}* Note that the <i>result</i> variable is synchronized to prevent race conditions between multiple threads.
      */
     public static Object eachParallel(Map collection, Closure cl) {
-        eachParallel(createCollection(collection), buildClosureForMaps(cl))
+        eachParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl))
         return collection
+    }
+
+    private static <T> void eachParallelPA(ParallelArray<T> pa, Closure cl) {
+        pa.apply({cl(it)} as Procedure)
     }
 
     /**
@@ -352,7 +386,7 @@ public class GParsPoolUtil {
             indexedCollection << [element, index]
             index++
         }
-        createPA(indexedCollection, retrievePool()).withMapping({cl(it[0], it[1])} as Mapper).all()
+        createPAFromCollection(indexedCollection, retrievePool()).withMapping({cl(it[0], it[1])} as Mapper).all()
         return collection
     }
 
@@ -394,7 +428,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static <T> Collection<T> collectParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withMapping({cl(it)} as Mapper).all().asList()
+        createPAFromCollection(collection, retrievePool()).withMapping({cl(it)} as Mapper).all().asList()
     }
 
     /**
@@ -409,7 +443,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static Collection<Object> collectParallel(Object collection, Closure cl) {
-        return collectParallel(createCollection(collection), cl)
+        createPA(collection, retrievePool()).withMapping({cl(it)} as Mapper).all().asList()
     }
 
     /**
@@ -424,7 +458,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static Collection<Object> collectParallel(Map collection, Closure cl) {
-        return collectParallel(createCollection(collection), buildClosureForMaps(cl))
+        createPA(collection, retrievePool()).withMapping(buildClosureForMaps(cl) as Mapper).all().asList()
     }
 
     /**
@@ -439,7 +473,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <T> Collection<T> findAllParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all().asList()
+        (Collection<T>) findAllParallelPA(createPAFromCollection(collection, retrievePool()), cl)
     }
 
     /**
@@ -454,8 +488,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static Collection<Object> findAllParallel(Object collection, Closure cl) {
-        //noinspection GroovyAssignabilityCheck
-        return findAllParallel(createCollection(collection), cl)
+        (Collection<Object>) findAllParallelPA(createPA(collection, retrievePool()), cl)
     }
 
     /**
@@ -470,7 +503,11 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}*     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <K, V> Map<K, V> findAllParallel(Map<K, V> collection, Closure cl) {
-        return buildResultMap(findAllParallel(createCollection(collection), buildClosureForMaps(cl)))
+        buildResultMap((List<Map.Entry<K, V>>) findAllParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl)))
+    }
+
+    private static <T> Collection<T> findAllParallelPA(ParallelArray<T> pa, Closure cl) {
+        (Collection<T>) pa.withFilter({cl(it) as Boolean} as Predicate).all().asList()
     }
 
     /**
@@ -484,10 +521,8 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
-    public static <T> Object findParallel(Collection<T> collection, Closure cl) {
-        final ParallelArray found = createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).all()
-        if (found.size() > 0) found.get(0)
-        else return null
+    public static <T> T findParallel(Collection<T> collection, Closure cl) {
+        findParallelPA(createPAFromCollection(collection, retrievePool()), cl)
     }
 
     /**
@@ -502,7 +537,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findParallel(Object collection, Closure cl) {
-        return findParallel(createCollection(collection), cl)
+        findParallelPA(createPA(collection, retrievePool()), cl)
     }
 
     /**
@@ -517,8 +552,13 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <K, V> Map.Entry<K, V> findParallel(Map<K, V> collection, Closure cl) {
-        //noinspection GroovyAssignabilityCheck
-        return findParallel(createCollection(collection), buildClosureForMaps(cl))
+        (Map.Entry<K, V>) findParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl))
+    }
+
+    private static <T> T findParallelPA(ParallelArray<T> pa, Closure cl) {
+        final ParallelArray found = pa.withFilter({cl(it) as Boolean} as Predicate).all()
+        if (found.size() > 0) found.get(0)
+        else return null
     }
 
     /**
@@ -536,7 +576,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static <T> Object findAnyParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any()
+        findAnyParallelPA(createPAFromCollection(collection, retrievePool()), cl)
     }
 
     /**
@@ -554,7 +594,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findAnyParallel(Object collection, Closure cl) {
-        return findAnyParallel(createCollection(collection), cl)
+        findAnyParallelPA(createPA(collection, retrievePool()), cl)
     }
 
     /**
@@ -572,7 +612,11 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findAnyParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
     public static Object findAnyParallel(Map collection, Closure cl) {
-        return findAnyParallel(createCollection(collection), buildClosureForMaps(cl))
+        findAnyParallelPA(createPA(collection, retrievePool()), buildClosureForMaps(cl))
+    }
+
+    private static <T> T findAnyParallelPA(ParallelArray<T> pa, Closure cl) {
+        pa.withFilter({cl(it) as Boolean} as Predicate).any()
     }
 
     /**
@@ -588,7 +632,7 @@ public class GParsPoolUtil {
      *     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <T> Collection<T> grepParallel(Collection<T> collection, filter) {
-        createPA(collection, retrievePool()).withFilter({filter.isCase it} as Predicate).all().asList()
+        (Collection<T>) grepParallelPA(createPAFromCollection(collection, retrievePool()), filter)
     }
 
     /**
@@ -604,7 +648,7 @@ public class GParsPoolUtil {
      *     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static Object grepParallel(Object collection, filter) {
-        return grepParallel(createCollection(collection), filter)
+        (Collection<Object>) grepParallelPA(createPA(collection, retrievePool()), filter)
     }
 
     /**
@@ -620,7 +664,11 @@ public class GParsPoolUtil {
      *     assertEquals(new HashSet([4, 5]), result)
      *}*/
     public static <K, V> Map<K, V> grepParallel(Map<K, V> collection, filter) {
-        return buildResultMap(grepParallel(createCollection(collection), filter in Closure ? buildClosureForMaps(filter) : filter))
+        (Map<K, V>) buildResultMap((List<Map.Entry<K, V>>) grepParallelPA(createPA(collection, retrievePool()), filter in Closure ? buildClosureForMaps(filter) : filter))
+    }
+
+    private static <T> Collection<T> grepParallelPA(ParallelArray<T> pa, filter) {
+        pa.withFilter({filter.isCase it} as Predicate).all().asList()
     }
 
     /**
@@ -634,7 +682,7 @@ public class GParsPoolUtil {
      */
     public static <T> Collection<T> splitParallel(Collection<T> collection, filter) {
         final def groups = groupByParallel(collection, filter)
-        return [groups[true] ?: [], groups[false] ?: []]
+        (Collection<T>) [groups[true] ?: [], groups[false] ?: []]
     }
 
     /**
@@ -651,7 +699,8 @@ public class GParsPoolUtil {
      *            assert [1, 2] as Set == result[1] as Set
      *}*/
     public static Object splitParallel(Object collection, filter) {
-        return splitParallel(createCollection(collection), filter)
+        final def groups = groupByParallelPA(createPA(collection, retrievePool()), filter)
+        (Collection<Object>) [groups[true] ?: [], groups[false] ?: []]
     }
 
     /**
@@ -667,7 +716,7 @@ public class GParsPoolUtil {
      *     assertEquals(1, result)
      *}*/
     public static <T> int countParallel(Collection<T> collection, filter) {
-        createPA(collection, retrievePool()).withFilter({filter == it} as Predicate).size()
+        createPAFromCollection(collection, retrievePool()).withFilter({filter == it} as Predicate).size()
     }
 
     /**
@@ -683,7 +732,7 @@ public class GParsPoolUtil {
      *     assertEquals(1, result)
      *}*/
     public static int countParallel(Object collection, filter) {
-        return countParallel(createCollection(collection), filter)
+        createPA(collection, retrievePool()).withFilter({filter == it} as Predicate).size()
     }
 
     /**
@@ -700,7 +749,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static <T> boolean anyParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
+        createPAFromCollection(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
     }
 
     /**
@@ -717,7 +766,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static boolean anyParallel(Object collection, Closure cl) {
-        return anyParallel(createCollection(collection), cl)
+        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
     }
 
     /**
@@ -734,7 +783,8 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static boolean anyParallel(Map collection, Closure cl) {
-        return anyParallel(createCollection(collection), buildClosureForMaps(cl))
+        final def mapClosure = buildClosureForMaps(cl)
+        createPA(collection, retrievePool()).withFilter({mapClosure(it) as Boolean} as Predicate).any() != null
     }
 
     /**
@@ -749,7 +799,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static <T> boolean everyParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({!(cl(it) as Boolean)} as Predicate).any() == null
+        createPAFromCollection(collection, retrievePool()).withFilter({!(cl(it) as Boolean)} as Predicate).any() == null
     }
 
     /**
@@ -764,7 +814,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static boolean everyParallel(Object collection, Closure cl) {
-        return everyParallel(createCollection(collection), cl)
+        createPA(collection, retrievePool()).withFilter({!(cl(it) as Boolean)} as Predicate).any() == null
     }
 
     /**
@@ -779,7 +829,8 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static boolean everyParallel(Map collection, Closure cl) {
-        return everyParallel(createCollection(collection), buildClosureForMaps(cl))
+        def mapClosure = buildClosureForMaps(cl)
+        createPA(collection, retrievePool()).withFilter({!(mapClosure(it) as Boolean)} as Predicate).any() == null
     }
 
     /**
@@ -795,15 +846,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      *}*/
     public static <T> Map groupByParallel(Collection<T> collection, Closure cl) {
-        final def map = new ConcurrentHashMap()
-        eachParallel(collection, {
-            def result = cl(it)
-            final def myList = [it].asSynchronized()
-            def list = map.putIfAbsent(result, myList)
-            if (list != null) list.add(it)
-        })
-        return map
-
+        return groupByParallelPA(createPAFromCollection(collection, retrievePool()), cl)
     }
 
     /**
@@ -819,7 +862,19 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      *}*/
     public static Map groupByParallel(Object collection, Closure cl) {
-        return groupByParallel(createCollection(collection), cl)
+        groupByParallelPA(createPA(collection, retrievePool()), cl)
+    }
+
+    private static <T> Map groupByParallelPA(ParallelArray<T> pa, Closure cl) {
+        final def map = new ConcurrentHashMap()
+        eachParallelPA(pa, {
+            def result = cl(it)
+            final def myList = [it].asSynchronized()
+            def list = map.putIfAbsent(result, myList)
+            if (list != null) list.add(it)
+        })
+        return map
+
     }
 
     /**
@@ -835,7 +890,7 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static <T> T minParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).min(createComparator(cl) as Comparator)
+        createPAFromCollection(collection, retrievePool()).min(createComparator(cl) as Comparator)
     }
 
     /**
@@ -851,7 +906,7 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static Object minParallel(Object collection, Closure cl) {
-        return minParallel(createCollection(collection), cl)
+        createPA(collection, retrievePool()).min(createComparator(cl) as Comparator)
     }
 
     /**
@@ -862,7 +917,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static <T> T minParallel(Collection<T> collection) {
-        createPA(collection, retrievePool()).min()
+        createPAFromCollection(collection, retrievePool()).min()
     }
 
     /**
@@ -873,7 +928,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static Object minParallel(Object collection) {
-        return minParallel(createCollection(collection))
+        createPA(collection, retrievePool()).min()
     }
 
     /**
@@ -889,7 +944,7 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static <T> T maxParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).max(createComparator(cl) as Comparator)
+        createPAFromCollection(collection, retrievePool()).max(createComparator(cl) as Comparator)
     }
 
     /**
@@ -905,7 +960,7 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static Object maxParallel(Object collection, Closure cl) {
-        return maxParallel(createCollection(collection), cl)
+        createPA(collection, retrievePool()).max(createComparator(cl) as Comparator)
     }
 
     /**
@@ -916,7 +971,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static <T> T maxParallel(Collection<T> collection) {
-        createPA(collection, retrievePool()).max()
+        createPAFromCollection(collection, retrievePool()).max()
     }
 
     /**
@@ -927,7 +982,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static Object maxParallel(Object collection) {
-        return maxParallel(createCollection(collection))
+        createPA(collection, retrievePool()).max()
     }
 
     /**
@@ -951,7 +1006,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static Object sumParallel(Object collection) {
-        return sumParallel(createCollection(collection))
+        foldParallel(collection) {a, b -> a + b}
     }
 
     /**
@@ -964,7 +1019,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static <T> T foldParallel(Collection<T> collection, Closure cl) {
-        createPA(collection, retrievePool()).reduce(cl as Reducer, null)
+        createPAFromCollection(collection, retrievePool()).reduce(cl as Reducer, null)
     }
 
     /**
@@ -977,7 +1032,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static Object foldParallel(Object collection, Closure cl) {
-        return foldParallel(createCollection(collection), cl)
+        createPA(collection, retrievePool()).reduce(cl as Reducer, null)
     }
 
     /**
@@ -991,7 +1046,7 @@ public class GParsPoolUtil {
      * @param seed A seed value to initialize the operation
      */
     public static <T> T foldParallel(Collection<T> collection, seed, Closure cl) {
-        createPA(collection.plus(seed), retrievePool()).reduce(cl as Reducer, null)
+        createPAFromCollection(collection.plus(seed), retrievePool()).reduce(cl as Reducer, null)
     }
 
     /**
@@ -1005,7 +1060,9 @@ public class GParsPoolUtil {
      * @param seed A seed value to initialize the operation
      */
     public static Object foldParallel(Object collection, seed, Closure cl) {
-        return foldParallel(createCollection(collection), seed, cl)
+        final ParallelArray pa = createPA(collection, retrievePool())
+        pa.appendElement(seed)
+        pa.reduce(cl as Reducer, null)
     }
 
     /**
@@ -1014,7 +1071,7 @@ public class GParsPoolUtil {
      * ParallelArray implementation.
      */
     public static <T> PAWrapper<T> getParallel(Collection<T> collection) {
-        new PAWrapper(createPA(collection, retrievePool()))
+        new PAWrapper(createPAFromCollection(collection, retrievePool()))
     }
 
     /**
@@ -1023,7 +1080,7 @@ public class GParsPoolUtil {
      * ParallelArray implementation.
      */
     public static PAWrapper getParallel(Object collection) {
-        return getParallel(createCollection(collection))
+        new PAWrapper(createPA(collection, retrievePool()))
     }
 
     /**
