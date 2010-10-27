@@ -27,6 +27,7 @@ import groovyx.gpars.dataflow.DataFlowReadChannel;
  *         Date: 30th Sep 2010
  */
 public final class SelectCallback<T> extends Closure {
+    private static final long serialVersionUID = 5953873495199115151L;
     private final int index;
     private final DataFlowReadChannel<? extends T> channel;
 

@@ -29,6 +29,7 @@ import org.codehaus.groovy.runtime.CurriedClosure;
  */
 public abstract class AbstractLoopingActor extends Actor {
 
+    private static final long serialVersionUID = -7638132628355085829L;
     private volatile boolean stoppedFlag = true;
     private volatile boolean terminatedFlag = true;
     private volatile boolean terminatingFlag = true;

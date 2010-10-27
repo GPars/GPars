@@ -65,6 +65,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
     protected static final AtomicReferenceFieldUpdater<DataFlowExpression, WaitingThread> waitingUpdater
             = AtomicReferenceFieldUpdater.newUpdater(DataFlowExpression.class, WaitingThread.class, "waiting");
+    private static final long serialVersionUID = 8961916630562820109L;
 
     /**
      * The current metaclass

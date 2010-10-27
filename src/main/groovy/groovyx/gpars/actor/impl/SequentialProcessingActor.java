@@ -51,6 +51,7 @@ import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
 @SuppressWarnings({"UnqualifiedStaticUsage"})
 public abstract class SequentialProcessingActor extends Actor implements Runnable {
 
+    private static final long serialVersionUID = 6479220959200502418L;
     /**
      * Code for the loop, if any
      */

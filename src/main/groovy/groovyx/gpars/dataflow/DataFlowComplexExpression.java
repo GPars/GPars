@@ -20,6 +20,7 @@ package groovyx.gpars.dataflow;
  * @author Alex Tkachman
  */
 public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T> {
+    private static final long serialVersionUID = 1527021112173826064L;
     protected Object[] args;
 
     protected DataFlowComplexExpression(final Object... elements) {

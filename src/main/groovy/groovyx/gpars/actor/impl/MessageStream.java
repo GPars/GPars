@@ -33,6 +33,8 @@ import java.util.concurrent.locks.LockSupport;
  * @author Alex Tkachman, Vaclav Pech, Dierk Koenig
  */
 public abstract class MessageStream extends WithSerialId {
+    private static final long serialVersionUID = 7644465423857532477L;
+
     /**
      * Send message to stream and return immediately
      *

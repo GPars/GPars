@@ -38,6 +38,7 @@ import java.io.Serializable;
  * @author Alex Tkachman
  */
 public abstract class WithSerialId implements Serializable {
+    private static final long serialVersionUID = 75514416530973469L;
     /**
      * See SerialHandle class for details
      */

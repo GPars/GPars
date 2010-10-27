@@ -59,6 +59,7 @@ public abstract class Actor extends ReplyingMessageStream {
      * Used in the send() method to remember the sender of each message for potential replies
      */
     private static final ThreadLocal<Actor> currentActorPerThread = new ThreadLocal<Actor>();
+    private static final long serialVersionUID = -3491276479442857422L;
 
     private final DataFlowExpression<Object> joinLatch;
 

@@ -119,6 +119,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
     private static final String THE_ACTOR_HAS_NOT_BEEN_STARTED = "The actor hasn't been started.";
     private static final String THE_ACTOR_HAS_BEEN_STOPPED = "The actor has been stopped.";
+    private static final long serialVersionUID = -6232655362494852540L;
 
     /**
      * This method represents the body of the actor. It is called upon actor's start and can exit either normally
@@ -276,8 +277,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
                 final Object[] args = retrievePayloadOfMessages(messages);
                 handler.call(args);
             }
-        }
-        finally {
+        } finally {
             getSenders().clear();
         }
     }

@@ -25,6 +25,7 @@ import java.util.WeakHashMap;
  */
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 public abstract class ReplyingMessageStream extends MessageStream {
+    private static final long serialVersionUID = -4660316352077009411L;
     /**
      * A list of senders for the currently processed messages
      */
@@ -58,8 +59,7 @@ public abstract class ReplyingMessageStream extends MessageStream {
                 if (sender != null) {
                     try {
                         sender.send(message);
-                    }
-                    catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         exceptions.add(e);
                     }
                 } else {
