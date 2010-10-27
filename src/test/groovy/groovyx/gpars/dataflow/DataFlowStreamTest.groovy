@@ -267,4 +267,32 @@ public class DataFlowStreamTest extends GroovyTestCase {
         assert stream.getVal(3, TimeUnit.SECONDS) == null
         assert stream.getVal(3, TimeUnit.SECONDS) == null
     }
+
+    public void testMissedTimeout() {
+        final DataFlowStream stream = new DataFlowStream()
+        assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
+        stream << 10
+        assert 10 == stream.getVal(10, TimeUnit.MILLISECONDS)
+        stream << 20
+        stream << 30
+        assert 20 == stream.getVal(10, TimeUnit.MILLISECONDS)
+        assert 30 == stream.getVal(10, TimeUnit.MILLISECONDS)
+        assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
+        stream << 40
+        assert 40 == stream.getVal(10, TimeUnit.MILLISECONDS)
+    }
+
+    public void testMissedTimeoutWithNull() {
+        final DataFlowStream stream = new DataFlowStream()
+        assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
+        stream << null
+        assert null == stream.getVal(10, TimeUnit.MINUTES)
+        stream << null
+        stream << 30
+        assert null == stream.getVal(10, TimeUnit.MILLISECONDS)
+        assert 30 == stream.getVal(10, TimeUnit.MILLISECONDS)
+        assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
+        stream << null
+        assert null == stream.getVal(10, TimeUnit.MILLISECONDS)
+    }
 }

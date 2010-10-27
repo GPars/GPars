@@ -153,7 +153,15 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
      */
     @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        return retrieveOrCreateVariable().getVal(timeout, units);
+        final DataFlowVariable<T> variable = retrieveOrCreateVariable();
+        variable.getVal(timeout, units);
+        synchronized (queueLock) {
+            if (!variable.isBound()) {
+                requests.remove(variable);
+                return null;
+            }
+        }
+        return variable.getVal();
     }
 
     /**
