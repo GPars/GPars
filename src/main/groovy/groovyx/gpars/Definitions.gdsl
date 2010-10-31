@@ -25,6 +25,7 @@ def parallelCollection = context(ctype: "java.lang.Object")
 
 contributor(parallelCollection) {
     property name: 'parallel', type: 'groovyx.gpars.PAWrapper'
+    property name: 'parallelArray', type: 'jsr166y.forkjoin.ParallelArray'
 
     method name: "eachParallel", type: "void", params: [closure: 'groovy.lang.Closure']
     method name: "eachWithIndexParallel", type: "void", params: [closure: 'groovy.lang.Closure']

@@ -1098,20 +1098,6 @@ public class GParsPoolUtil {
     }
 
     /**
-     * Creates a ParallelArray wrapping the elements of the original collection.
-     */
-    public static <T> ParallelArray<T> getPA(Collection<T> collection) {
-        createPAFromCollection(collection, retrievePool())
-    }
-
-    /**
-     * Creates a ParallelArray wrapping the elements of the original collection.
-     */
-    public static ParallelArray getPA(Object collection) {
-        createPA(collection, retrievePool())
-    }
-
-    /**
      * Builds a comparator depending on the number of arguments accepted by the supplied closure.
      */
     @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")

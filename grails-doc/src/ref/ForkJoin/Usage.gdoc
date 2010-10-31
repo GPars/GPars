@@ -1,5 +1,29 @@
 h3. Fork/Join convenience
 
+h4. Using the fork join builder
+
+{code}
+withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
+    println """Number of files: ${
+        runForkJoin(new File("./src")) {file ->
+            long count = 0
+            file.eachFile {
+                if (it.isDirectory()) {
+                    println "Forking a child task for $it"
+                    forkOffChild(it)           //fork a child task
+                } else {
+                    count++
+                }
+            }
+            return count + (childrenResults.sum(0))
+            //use results of children tasks to calculate and store own result
+        }
+    }"""
+}
+{code}
+
+h4. Extending the _AbstractForkJoinWorker_ class
+
 {code}
 public final class FileCounter extends AbstractForkJoinWorker<Long> {
     private final File file;

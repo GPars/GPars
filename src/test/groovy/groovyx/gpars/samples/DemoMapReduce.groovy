@@ -16,15 +16,12 @@
 
 /**
  * Demonstrates several parallel map/reduce algorithms using the GParsPool class and leveraging the underlying parallel array library.
- * Requires the jsr166y jar on the class path.
  *
  * @author Vaclav Pech
  * Date: Nov 6, 2009
  */
 
 package groovyx.gpars.samples
-
-def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 groovyx.gpars.GParsPool.withPool {
     assert 15 == [1, 2, 3, 4, 5].parallel.reduce {a, b -> a + b}                                        //summarize

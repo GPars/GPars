@@ -20,7 +20,6 @@ import groovyx.gpars.ParallelEnhancer
 
 /**
  * Demonstrates parallel collection processing using ParallelArrays through the ParallelEnhancer class.
- * Requires the jsr166y jar on the class path.
  */
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -38,11 +37,11 @@ iterator.each {
 }
 
 println "Minimum: ${list.min()}"
-println "Minimum: ${list.min{a, b -> a - b}}"
+println "Minimum: ${list.min {a, b -> a - b}}"
 println "Maximum: ${list.max()}"
-println "Maximum: ${list.max{a, b -> a - b}}"
+println "Maximum: ${list.max {a, b -> a - b}}"
 println "Sum: ${list.sum()}"
-println "Product: ${list.fold{a, b -> a * b}}"
+println "Product: ${list.fold {a, b -> a * b}}"
 
 final String text = 'want to be so big'
 ParallelEnhancer.enhanceInstance text
@@ -57,14 +56,13 @@ println(animals.every {it.contains('a')} ? 'All animals contain a' : 'Some anima
 
 //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
 // here use parallel implementation under the covers
-println animals.makeTransparent().collect{it.toUpperCase()}.groupBy{it.contains 'A'}
-
+println animals.makeTransparent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
 
 /**
  * A function implemented using standard sequential collect() and findAll() methods.
  */
 def selectImportantNames(names) {
-    names.collect {it.toUpperCase()}.findAll{it.size() > 4}
+    names.collect {it.toUpperCase()}.findAll {it.size() > 4}
 }
 
 def names = ['Joe', 'Alice', 'Dave', 'Jason']

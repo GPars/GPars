@@ -16,7 +16,6 @@
 
 /**
  * Demonstrates parallel collection processing using ParallelArrays through the GParsPool class.
- * Requires the jsr166y jar on the class path.
  */
 
 package groovyx.gpars.samples
