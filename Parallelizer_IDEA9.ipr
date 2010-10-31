@@ -5166,6 +5166,7 @@
         <w>staropramen</w>
         <w>topleft</w>
         <w>unsecure</w>
+        <w>unsynchronized</w>
         <w>varargs</w>
       </words>
     </dictionary>

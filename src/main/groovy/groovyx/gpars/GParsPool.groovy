@@ -17,6 +17,7 @@
 package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.forkjoin.AbstractForkJoinWorker
 import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future

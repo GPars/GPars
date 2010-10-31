@@ -22,7 +22,7 @@ package groovyx.gpars.samples.forkjoin
  * Date: Feb 19, 2010
  */
 
-import groovyx.gpars.AbstractForkJoinWorker
+import groovyx.gpars.forkjoin.AbstractForkJoinWorker
 import java.util.concurrent.ExecutionException
 import static groovyx.gpars.GParsPool.withPool
 
