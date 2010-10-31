@@ -113,7 +113,7 @@ public final class DataFlows extends GroovyObjectSupport {
         try {
             return ensureToContainVariable(property).getVal();
         } catch (InterruptedException e) {
-            throw new InvokerInvocationException(e);  //todo test unwrapping
+            throw new InvokerInvocationException(e);
         }
     }
 

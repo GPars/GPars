@@ -257,4 +257,21 @@ public class DataFlowsTest extends GroovyTestCase {
         assert data.every { it.key.size() == 1 }
         assert data.any { it.key.size() == 1 }
     }
+
+    public void testInterruption() {
+        final def flows = new DataFlows()
+        Thread t = Thread.start {
+            try {
+                flows.x = 1
+                flows.y
+            } catch (all) {
+                flows.e = all
+            }
+        }
+
+        flows.x
+        t.interrupt()
+        assert flows.e instanceof InterruptedException
+
+    }
 }
