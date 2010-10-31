@@ -18,10 +18,12 @@ package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.forkjoin.AbstractForkJoinWorker
+import groovyx.gpars.forkjoin.ForkJoinUtils
 import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
+import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.RecursiveTask
 
 /**
@@ -287,9 +289,7 @@ public class GParsPool {
      * @return The result of the whole calculation
      */
     public static <T> T runForkJoin(final AbstractForkJoinWorker<T> rootWorker) {
-        def pool = GParsPool.retrieveCurrentPool()
-        if (pool == null) throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a GParsPool.withPool() block.")
-        return pool.submit(rootWorker).get()
+        ForkJoinUtils.runForkJoin((ForkJoinPool) GParsPool.retrieveCurrentPool(), rootWorker)
     }
 
     /**
@@ -302,28 +302,7 @@ public class GParsPool {
         if (!(args[-1] instanceof Closure)) throw new IllegalArgumentException("A closure to run implementing the requested Fork/Join algorithm must be specified as the last argument passed to the runForkJoin() method.")
         Closure code = args[-1] as Closure
         if (args.size() - 1 != code.maximumNumberOfParameters) throw new IllegalArgumentException("The supplied Fork/Join closure expects ${code.maximumNumberOfParameters} arguments while only ${args.size()} arguments have been supplied to the orchestrate() method.")
-        return runForkJoin(new FJWorker<T>(args))
+        return ForkJoinUtils.runForkJoin((ForkJoinPool) GParsPool.retrieveCurrentPool(), args)
     }
 }
 
-final class FJWorker<T> extends AbstractForkJoinWorker<T> {
-    private final Closure code
-    private final Object[] args
-
-    def FJWorker(final Object... args) {
-        final def size = args.size()
-        assert size > 0
-        this.args = size > 1 ? args[0..-2] : ([] as Object[])
-        this.code = args[-1].clone();
-        this.code.delegate = this
-    }
-
-    protected void forkOffChild(Object... childArgs) {
-        if (childArgs.size() != args.size()) throw new IllegalArgumentException("The forkOffChild() method requires ${args.size()} arguments, but received ${childArgs.size()} parameters.")
-        forkOffChild new FJWorker(* childArgs, code)
-    }
-
-    protected T computeTask() {
-        return code.call(* args)
-    }
-}

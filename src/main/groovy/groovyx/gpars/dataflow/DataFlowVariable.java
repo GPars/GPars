@@ -65,9 +65,9 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -458384302762038543L;
 
+            @SuppressWarnings({"unchecked"})
             @Override
             public MessageStream send(final Object message) {
-                //noinspection unchecked
                 bind((T) message);
                 return this;
             }
@@ -91,6 +91,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
             getValAsync(new MessageStream() {
                 private static final long serialVersionUID = 7968302123667353660L;
 
+                @SuppressWarnings({"unchecked"})
                 @Override
                 public MessageStream send(final Object message) {
                     if (!disconnected) {

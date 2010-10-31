@@ -31,7 +31,6 @@ import java.util.List;
  * Author: Vaclav Pech
  * Date: Nov 1, 2009
  */
-@SuppressWarnings({"AbstractClassWithOnlyOneDirectInheritor", "CollectionWithoutInitialCapacity"})
 public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
 
     /**
