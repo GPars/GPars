@@ -14,30 +14,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow
+package groovyx.gpars.dataflow;
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovy.lang.Closure;
+import groovyx.gpars.actor.AbstractPooledActor;
 
 /**
  * An actor representing a dataflow thread. Runs the supplied block of code inside the act() actor method once.
  *
  * @author Vaclav Pech, Dierk Koenig
- * Date: Jun 5, 2009
+ *         Date: Jun 5, 2009
  */
-final class SingleRunActor extends AbstractPooledActor {
+public final class SingleRunActor extends AbstractPooledActor {
+    private static final long serialVersionUID = 516126583515361939L;
 
     /**
      * Sets the default Dataflow Concurrency actor group on the actor.
      */
-    def SingleRunActor() {
-        this.parallelGroup = DataFlow.DATA_FLOW_GROUP
+    public SingleRunActor() {
+        this.parallelGroup = DataFlow.DATA_FLOW_GROUP;
     }
 
-    Closure body
+    private Closure body;
 
-    void act() {
-        body.delegate = this
-        body()
+    @Override
+    protected void act() {
+        body.setDelegate(this);
+        body.call();
+    }
+
+    public void setBody(final Closure body) {
+        this.body = body;
     }
 }
 

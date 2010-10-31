@@ -25,10 +25,10 @@ import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMaps
-import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMapsWithIndex
-import static groovyx.gpars.util.ParallelCollectionsUtil.buildResultMap
-import static groovyx.gpars.util.ParallelCollectionsUtil.createCollection
+import static groovyx.gpars.util.PAGroovyUtils.createCollection
+import static groovyx.gpars.util.PAUtils.buildClosureForMaps
+import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
+import static groovyx.gpars.util.PAUtils.buildResultMap
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>

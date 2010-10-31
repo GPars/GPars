@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-@SuppressWarnings({"TailRecursion"})
+@SuppressWarnings({"TailRecursion", "RawUseOfParameterizedType"})
 public class Stream<T> implements FList<T>, DataFlowChannel<T> {
 
     private final DataFlowVariable<T> first = new DataFlowVariable<T>();

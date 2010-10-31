@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.group
+package groovyx.gpars.group;
 
-import groovyx.gpars.scheduler.DefaultPool
-import groovyx.gpars.scheduler.Pool
+import groovyx.gpars.scheduler.DefaultPool;
+import groovyx.gpars.scheduler.Pool;
 
 /**
  * Provides logical grouping for actors, agents and dataflow tasks and operators. Each group has an underlying thread pool, which will perform actions
@@ -27,58 +27,60 @@ import groovyx.gpars.scheduler.Pool
  * Uses a pool of non-daemon threads.
  * The DefaultPGroup class implements the Pool interface through @Delegate.
  * <pre>
- *
+ * <p/>
  * def group = new DefaultPGroup()
  * group.resize 1
- *
+ * <p/>
  * def actor = group.actor {*     react {message ->
  *         println message
- *}*}.start()
- *
+ * }*}.start()
+ * <p/>
  * actor.send 'Hi!'
  * ...
  * group.shutdown()
  * </pre>
- *
+ * <p/>
  * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.parallelGroup property,
  * which defaults to the Actors.defaultActorPGroup, can be set before the actor is started.
- *
+ * <p/>
  * <pre>
  * def group = new DefaultPGroup()
- *
+ * <p/>
  * def actor = new MyActor()
  * actor.parallelGroup = group
  * actor.start()
  * ...
  * group.shutdown()
- *
+ * <p/>
  * </pre>
  *
  * @author Vaclav Pech
- * Date: May 4, 2009
+ *         Date: May 4, 2009
  */
 public final class DefaultPGroup extends PGroup {
 
     /**
      * Creates a group for actors, agents, tasks and operators. The actors will share the supplied thread pool.
+     *
      * @param threadPool The thread pool to use for the group
      */
-    public def DefaultPGroup(final Pool threadPool) {
-        super(threadPool)
+    public DefaultPGroup(final Pool threadPool) {
+        super(threadPool);
     }
 
     /**
      * Creates a group for actors, agents, tasks and operators. The actors will share a common daemon thread pool.
      */
-    def DefaultPGroup() {
-        super(new DefaultPool(true))
+    public DefaultPGroup() {
+        super(new DefaultPool(true));
     }
 
     /**
      * Creates a group for actors, agents, tasks and operators. The actors will share a common daemon thread pool.
+     *
      * @param poolSize The initial size of the underlying thread pool
      */
-    def DefaultPGroup(final int poolSize) {
-        super(new DefaultPool(true, poolSize))
+    public DefaultPGroup(final int poolSize) {
+        super(new DefaultPool(true, poolSize));
     }
 }

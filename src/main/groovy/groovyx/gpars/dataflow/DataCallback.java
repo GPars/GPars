@@ -14,33 +14,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow
+package groovyx.gpars.dataflow;
 
-import groovyx.gpars.actor.impl.MessageStream
-import groovyx.gpars.group.PGroup
+import groovy.lang.Closure;
+import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.group.PGroup;
 
 /**
- *
  * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataFlowVariable and DataFlowStream,
  * as well as 'sendAndContinue()' on actors.
  * A task that waits asynchronously on the DFV to be bound. Once the DFV is bound,
  * upon receiving the message the actor runs the supplied closure / code with the DFV value as a parameter.
  *
  * @author Vaclav Pech, Alex Tkachman
- * Date: Sep 13, 2009
+ *         Date: Sep 13, 2009
  */
-final class DataCallback extends MessageStream {
+public final class DataCallback extends MessageStream {
     private static final long serialVersionUID = 6512046150477794254L;
-    private final Closure code
-    private PGroup parallelGroup
+    private final Closure code;
+    private final PGroup parallelGroup;
 
     /**
-     * @param code The closure to run
+     * @param code   The closure to run
+     * @param pGroup pGroup The parallel group to join
      */
-    DataCallback(final Closure code, PGroup pGroup) {
-        if (pGroup == null) throw new IllegalArgumentException("Cannot create a DataCallback without a parallelGroup parameter")
-        this.parallelGroup = pGroup
-        this.code = code
+    public DataCallback(final Closure code, final PGroup pGroup) {
+        if (pGroup == null)
+            throw new IllegalArgumentException("Cannot create a DataCallback without a parallelGroup parameter");
+        this.parallelGroup = pGroup;
+        this.code = code;
     }
 
     /**
@@ -49,15 +51,18 @@ final class DataCallback extends MessageStream {
      * Registers its parallel group with DataFlowExpressions for nested 'whenBound' handlers to use the same group.
      */
     @Override
-    public MessageStream send(Object message) {
-        parallelGroup.threadPool.execute {->
-            DataFlow.activeParallelGroup.set parallelGroup
-            try {
-                code.call message
-            } finally {
-                DataFlow.activeParallelGroup.remove()
+    public MessageStream send(final Object message) {
+        parallelGroup.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                DataFlow.activeParallelGroup.set(parallelGroup);
+                try {
+                    code.call(message);
+                } finally {
+                    DataFlow.activeParallelGroup.remove();
+                }
             }
-        };
+        });
         return this;
     }
 }

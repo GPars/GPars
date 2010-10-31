@@ -14,49 +14,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor
+package groovyx.gpars.actor;
 
-import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.ResizeablePool
+import groovy.lang.Closure;
+import groovyx.gpars.group.DefaultPGroup;
+import groovyx.gpars.scheduler.ResizeablePool;
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
  * Use static import to be able to call Actors methods without the need to prepend them with the Actors identifier.
  * <pre>
  * import static org.gpars.actor.Actors.*
- *
+ * <p/>
  * Actors.defaultActorPGroup.resize 1
- *
+ * <p/>
  * def actor = actor {*     react {message ->
  *         println message
- *}*     //this line will never be reached
- *}.start()
- *
+ * }*     //this line will never be reached
+ * }.start()
+ * <p/>
  * actor.send 'Hi!'
  * </pre>
- *
+ * <p/>
  * All actors created through the Actors class will belong to the same default actor group and run
  * on daemon threads.
  * The DefaultPGroup class should be used when actors need to be grouped into multiple groups or when non-daemon
  * threads are to be used.
+ *
  * @author Vaclav Pech, Alex Tkachman
- * Date: Feb 18, 2009
+ *         Date: Feb 18, 2009
  */
+@SuppressWarnings({"UtilityClass", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "ConstantDeclaredInAbstractClass"})
 public abstract class Actors {
 
     /**
      * The default actor group to share by all actors created through the Actors class.
      */
-    public final static DefaultPGroup defaultActorPGroup = new DefaultPGroup(new ResizeablePool(true))
+    public static final DefaultPGroup defaultActorPGroup = new DefaultPGroup(new ResizeablePool(true));
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
      * The created actor will be part of the default actor group.
+     *
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the AbstractPooledActor class
      */
-    public static AbstractPooledActor actor(Runnable handler) {
-        return defaultActorPGroup.actor(handler)
+    public static AbstractPooledActor actor(final Runnable handler) {
+        return defaultActorPGroup.actor(handler);
     }
 
     /**
@@ -64,11 +68,12 @@ public abstract class Actors {
      * When a reactor receives a message, the supplied block of code is run with the message
      * as a parameter and the result of the code is send in reply.
      * The created actor will be part of the default actor group.
-     * @param The code to invoke for each received message
+     *
+     * @param code The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
     public static Actor reactor(final Closure code) {
-        return defaultActorPGroup.reactor(code)
+        return defaultActorPGroup.reactor(code);
     }
 
     /**
@@ -77,27 +82,32 @@ public abstract class Actors {
      * When a reactor receives a message, the supplied block of code is run with the message
      * as a parameter and the result of the code is send in reply.
      * The created actor will be part of the default actor group.
-     * @param The code to invoke for each received message
+     *
+     * @param code The code to invoke for each received message
      * @return A new instance of ReactiveEventBasedThread
      */
     public static Actor fairReactor(final Closure code) {
-        return defaultActorPGroup.fairReactor(code)
+        return defaultActorPGroup.fairReactor(code);
     }
 
     /**
      * Creates an instance of DynamicDispatchActor.
+     *
      * @param code The closure specifying individual message handlers.
+     * @return A new started instance of a DynamicDispatchActor
      */
     public static Actor messageHandler(final Closure code) {
-        return defaultActorPGroup.messageHandler(code)
+        return defaultActorPGroup.messageHandler(code);
     }
 
     /**
      * Creates an instance of DynamicDispatchActor, which will cooperate in thread sharing with other Agent instances
      * in a fair manner.
+     *
      * @param code The closure specifying individual message handlers.
+     * @return A new started instance of a fair DynamicDispatchActor
      */
     public static Actor fairMessageHandler(final Closure code) {
-        return defaultActorPGroup.fairMessageHandler(code)
+        return defaultActorPGroup.fairMessageHandler(code);
     }
 }

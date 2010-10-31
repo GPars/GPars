@@ -14,9 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.util
+package groovyx.gpars.util;
 
-import java.util.concurrent.Semaphore
+import groovy.lang.Closure;
+
+import java.util.concurrent.Semaphore;
 
 /**
  * Extends Semaphore with a handy withSemaphore(Closure) method to safely acquire and release the Semaphore
@@ -24,31 +26,36 @@ import java.util.concurrent.Semaphore
  * Use:
  * def extendedSemaphore = new ExtendedSemaphore()
  * extendedSemaphore.withSemaphore() {*      //semaphore acquired here
- *}*
+ * }*
+ *
  * @author Vaclav Pech
- * Date: Jan 8, 2009
+ *         Date: Jan 8, 2009
  */
 public class EnhancedSemaphore extends Semaphore {
+    private static final long serialVersionUID = 7582324169075000859L;
 
     /**
      * Creates a new EnhancedSemaphore, delegating to the Semaphore class constructor.
+     *
      * @param permits Maximum number of concurrently accepted threads.
      */
-    def EnhancedSemaphore(final int permits) {
+    public EnhancedSemaphore(final int permits) {
         super(permits);
     }
 
     /**
      * Performs the passed-in closure with the Semaphore acquired and releases the Semaphore automatically
      * after the closure finishes.
+     *
      * @param cl The closure to perform with the Semaphore acquired
+     * @throws InterruptedException If the current thread gets interrupted
      */
-    public void withSemaphore(Closure cl) {
-        acquire()
+    public void withSemaphore(final Closure cl) throws InterruptedException {
+        acquire();
         try {
-            cl.call()
+            cl.call();
         } finally {
-            release()
+            release();
         }
     }
 }

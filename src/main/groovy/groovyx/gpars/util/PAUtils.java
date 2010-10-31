@@ -16,8 +16,11 @@
 
 package groovyx.gpars.util;
 
+import groovy.lang.Closure;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -62,5 +65,81 @@ public abstract class PAUtils {
             i++;
         }
         return result;
+    }
+
+    /**
+     * If the passed-in closure expects two arguments, it is considered to be a map-iterative code and is then wrapped
+     * with a single-argument closure, which unwraps the key:value pairs for the original closure.
+     * If the supplied closure doesn't expect two arguments, it is returned unchanged.
+     *
+     * @param cl The closure to use for parallel methods
+     * @return The original or an unwrapping closure
+     */
+    public static Closure buildClosureForMaps(final Closure cl) {
+        if (cl.getMaximumNumberOfParameters() == 2) return new Closure(cl.getOwner()) {
+            private static final long serialVersionUID = -7502769124461342939L;
+
+            @Override
+            public Object call(final Object arguments) {
+                @SuppressWarnings({"unchecked"})
+                final Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) arguments;
+                return cl.call(new Object[]{entry.getKey(), entry.getValue()});
+            }
+
+            @Override
+            public Object call(final Object[] args) {
+                return this.call(args[0]);
+            }
+        };
+        return cl;
+    }
+
+    /**
+     * If the passed-in closure expects three arguments, it is considered to be a map-iterative_with_index code and is then wrapped
+     * with a two-argument closure, which unwraps the key:value pairs for the original closure.
+     * If the supplied closure doesn't expect three arguments, it is returned unchanged.
+     *
+     * @param cl The closure to use for parallel methods
+     * @return The original or an unwrapping closure
+     */
+    public static Closure buildClosureForMapsWithIndex(final Closure cl) {
+        if (cl.getMaximumNumberOfParameters() == 3) return new Closure(cl.getOwner()) {
+            private static final long serialVersionUID = 4777456744250574403L;
+
+            @SuppressWarnings({"RawUseOfParameterizedType"})
+            @Override
+            public Class[] getParameterTypes() {
+                return new Class[]{Map.Entry.class, Integer.class};
+            }
+
+            @Override
+            public int getMaximumNumberOfParameters() {
+                return 2;
+            }
+
+            @Override
+            public Object call(final Object[] args) {
+                @SuppressWarnings({"unchecked"})
+                final Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) args[0];
+                final Integer index = (Integer) args[1];
+                return cl.call(new Object[]{entry.getKey(), entry.getValue(), index});
+            }
+        };
+
+        return cl;
+    }
+
+    /**
+     * Builds a resulting map out of an map entry collection
+     *
+     * @param result The collection containing map entries
+     * @return A corresponding map instance
+     */
+    public static <K, V> Map<K, V> buildResultMap(final Collection<Map.Entry<K, V>> result) {
+        final Map<K, V> map = new HashMap<K, V>(result.size());
+        for (final Map.Entry<K, V> item : result) {
+            map.put(item.getKey(), item.getValue());
+        }
+        return map;
     }
 }

@@ -33,10 +33,10 @@ import jsr166y.forkjoin.Ops.Procedure
 import jsr166y.forkjoin.Ops.Reducer
 import jsr166y.forkjoin.ParallelArray
 import jsr166y.forkjoin.RecursiveTask
-import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMaps
-import static groovyx.gpars.util.ParallelCollectionsUtil.buildClosureForMapsWithIndex
-import static groovyx.gpars.util.ParallelCollectionsUtil.buildResultMap
-import static groovyx.gpars.util.ParallelCollectionsUtil.createCollection
+import static groovyx.gpars.util.PAGroovyUtils.createCollection
+import static groovyx.gpars.util.PAUtils.buildClosureForMaps
+import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
+import static groovyx.gpars.util.PAUtils.buildResultMap
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsPool</i>. The static methods of <i>GParsPoolUtil</i>
@@ -1066,7 +1066,7 @@ public class GParsPoolUtil {
     }
 
     /**
-     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
+     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
@@ -1075,12 +1075,40 @@ public class GParsPoolUtil {
     }
 
     /**
-     * Creates a PAWrapper around a ParallelArray wrapping te elements of the original collection.
+     * Creates a PAWrapper around a ParallelArray wrapping the elements of the original collection.
      * This allows further parallel processing operations on the collection to chain and so effectively leverage the underlying
      * ParallelArray implementation.
      */
     public static PAWrapper getParallel(Object collection) {
         new PAWrapper(createPA(collection, retrievePool()))
+    }
+
+    /**
+     * Creates a ParallelArray wrapping the elements of the original collection.
+     */
+    public static <T> ParallelArray<T> getParallelArray(Collection<T> collection) {
+        createPAFromCollection(collection, retrievePool())
+    }
+
+    /**
+     * Creates a ParallelArray wrapping the elements of the original collection.
+     */
+    public static ParallelArray getParallelArray(Object collection) {
+        createPA(collection, retrievePool())
+    }
+
+    /**
+     * Creates a ParallelArray wrapping the elements of the original collection.
+     */
+    public static <T> ParallelArray<T> getPA(Collection<T> collection) {
+        createPAFromCollection(collection, retrievePool())
+    }
+
+    /**
+     * Creates a ParallelArray wrapping the elements of the original collection.
+     */
+    public static ParallelArray getPA(Object collection) {
+        createPA(collection, retrievePool())
     }
 
     /**
