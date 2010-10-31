@@ -22,7 +22,7 @@ import java.util.concurrent.Executors
 
 final LIMIT = 3 * 100 * 1000
 
-final df = new DataFlows(LIMIT + 1, 0.9f, DataFlows.MAX_SEGMENTS)
+final df = new DataFlows(LIMIT + 1, 0.9f, 16)
 
 final many = 1..LIMIT
 
