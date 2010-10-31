@@ -95,6 +95,16 @@ public class FJPool implements Pool {
     }
 
     /**
+     * Retrieves the current thread pool size
+     *
+     * @return The pool size
+     */
+    @Override
+    public int getPoolSize() {
+        return pool.getPoolSize();
+    }
+
+    /**
      * schedules a new task for processing with the pool
      *
      * @param task The task to schedule

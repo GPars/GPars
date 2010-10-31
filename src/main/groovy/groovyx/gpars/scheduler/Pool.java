@@ -39,6 +39,13 @@ public interface Pool {
     void resetDefaultSize();
 
     /**
+     * Retrieves the current thread pool size
+     *
+     * @return The pool size
+     */
+    int getPoolSize();
+
+    /**
      * schedules a new task for processing with the pool
      *
      * @param task The task to schedule

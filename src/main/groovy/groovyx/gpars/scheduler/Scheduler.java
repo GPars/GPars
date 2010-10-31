@@ -97,6 +97,16 @@ public final class Scheduler implements Pool {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Retrieves the current thread pool size
+     *
+     * @return The pool size
+     */
+    @Override
+    public int getPoolSize() {
+        return threadCount.get();
+    }
+
     @Override
     @SuppressWarnings({"ObjectAllocationInLoop"})
     public void shutdown() {
