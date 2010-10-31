@@ -9,4 +9,6 @@ then
     buildTask=$1
 fi
 
+export LC_ALL=en_GB.UTF-8
+
 ./gradlew -i clean $buildTask

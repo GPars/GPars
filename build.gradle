@@ -91,7 +91,7 @@ dependencies {
 }
 
 //  To get the details of the "unchecked" issues.
-compileGroovy.options.compilerArgs = ['-Xlint']
+compileGroovy.options.compilerArgs = [ '-Xlint' ]
 
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '256M')
 
