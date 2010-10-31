@@ -21,10 +21,12 @@ import groovy.lang.Closure;
 import java.util.Collection;
 import java.util.Iterator;
 
+//todo unchecked casts
+
 //todo - thread-safe, potential laziness, proper interface, performance characteristics, generics
 
 //todo test empty and one-element map and filter
-@SuppressWarnings({"TailRecursion", "CallToSimpleGetterFromWithinClass"})
+@SuppressWarnings({"TailRecursion", "CallToSimpleGetterFromWithinClass", "unchecked"})
 public class Cons<T> implements FList<T> {
 
     @SuppressWarnings({"RawUseOfParameterizedType"})
