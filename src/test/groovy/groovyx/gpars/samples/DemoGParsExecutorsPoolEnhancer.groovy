@@ -20,7 +20,6 @@ import groovyx.gpars.GParsExecutorsPoolEnhancer
 
 /**
  * Demonstrates parallel collection processing using ParallelArrays through the ParallelEnhancer class.
- * Requires the jsr166y jar on the class path.
  */
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
