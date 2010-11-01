@@ -69,7 +69,7 @@ public abstract class AgentCore {
     /**
      * Retrieves the agent's fairness flag
      * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
-     * Non-fair agents tends to perform better than fair ones.
+     * Non-fair agents tend to perform better than fair ones.
      *
      * @return True for fair agents, false for non-fair ones. Agents are non-fair by default.
      */
@@ -80,7 +80,7 @@ public abstract class AgentCore {
     /**
      * Makes the agent fair. Agents are non-fair by default.
      * Fair agents give up the thread after processing each message, non-fair agents keep a thread until their message queue is empty.
-     * Non-fair agents tends to perform better than fair ones.
+     * Non-fair agents tend to perform better than fair ones.
      */
     public void makeFair() {
         core.makeFair();

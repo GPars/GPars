@@ -101,7 +101,7 @@ public abstract class AbstractLoopingActor extends Actor {
     /**
      * Retrieves the actor's fairness flag
      * Fair actors give up the thread after processing each message, non-fair actors keep a thread until their message queue is empty.
-     * Non-fair actors tends to perform better than fair ones.
+     * Non-fair actors tend to perform better than fair ones.
      *
      * @return True for fair actors, false for non-fair ones. actors are non-fair by default.
      */
@@ -112,7 +112,7 @@ public abstract class AbstractLoopingActor extends Actor {
     /**
      * Makes the actor fair. Actors are non-fair by default.
      * Fair actors give up the thread after processing each message, non-fair actors keep a thread until their message queue is empty.
-     * Non-fair actors tends to perform better than fair ones.
+     * Non-fair actors tend to perform better than fair ones.
      */
     public final void makeFair() {
         core.makeFair();
