@@ -48,7 +48,7 @@ public class ActorMessage implements Serializable {
     /**
      * Constructor for serialization
      */
-    protected ActorMessage() { //
+    protected ActorMessage() {
     }
 
     public Object getPayLoad() {
