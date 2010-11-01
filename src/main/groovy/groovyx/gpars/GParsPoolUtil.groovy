@@ -281,8 +281,6 @@ public class GParsPoolUtil {
             return createPAFromCollection(PAUtils.createCollection((Iterator) collection), pool)
         }
         return createPAFromCollection(createCollection(collection), pool)
-        //todo generics should not cause warnings
-        //todo finish all methods
     }
 
     private static <T> ParallelArray<T> createPAFromCollection(final def collection, final ForkJoinExecutor pool) {
@@ -526,6 +524,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].findParallel {Number number -> number > 3}*     assert (result in [4, 5])
      *}*/
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T findParallel(Collection<T> collection, Closure cl) {
         findParallelPA(createPAFromCollection(collection, retrievePool()), cl)
     }
@@ -562,7 +561,7 @@ public class GParsPoolUtil {
 
     private static <T> T findParallelPA(ParallelArray<T> pa, Closure cl) {
         final ParallelArray found = pa.withFilter(new ClosurePredicate({cl(it) as Boolean})).all()
-        if (found.size() > 0) found.get(0)
+        if (found.size() > 0) return found.get(0)
         else return null
     }
 
@@ -889,8 +888,9 @@ public class GParsPoolUtil {
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
      * @param cl A one or two-argument closure
      */
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T minParallel(Collection<T> collection, Closure cl) {
-        createPAFromCollection(collection, retrievePool()).min(createComparator(cl) as Comparator)
+        createPAFromCollection(collection, retrievePool()).min(createComparator(cl))
     }
 
     /**
@@ -906,7 +906,7 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static Object minParallel(Object collection, Closure cl) {
-        createPA(collection, retrievePool()).min(createComparator(cl) as Comparator)
+        createPA(collection, retrievePool()).min(createComparator(cl))
     }
 
     /**
@@ -916,6 +916,7 @@ public class GParsPoolUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T minParallel(Collection<T> collection) {
         createPAFromCollection(collection, retrievePool()).min()
     }
@@ -943,8 +944,9 @@ public class GParsPoolUtil {
      * If the supplied closure takes one argument, the values returned by the supplied closure for individual elements are used for comparison by the implicit comparator.
      * @param cl A one or two-argument closure
      */
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T maxParallel(Collection<T> collection, Closure cl) {
-        createPAFromCollection(collection, retrievePool()).max(createComparator(cl) as Comparator)
+        createPAFromCollection(collection, retrievePool()).max(createComparator(cl))
     }
 
     /**
@@ -960,7 +962,7 @@ public class GParsPoolUtil {
      * @param cl A one or two-argument closure
      */
     public static Object maxParallel(Object collection, Closure cl) {
-        createPA(collection, retrievePool()).max(createComparator(cl) as Comparator)
+        createPA(collection, retrievePool()).max(createComparator(cl))
     }
 
     /**
@@ -970,6 +972,7 @@ public class GParsPoolUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T maxParallel(Collection<T> collection) {
         createPAFromCollection(collection, retrievePool()).max()
     }
@@ -1018,6 +1021,7 @@ public class GParsPoolUtil {
      * Alternatively a DSL can be used to simplify the code. All collections/objects within the <i>withPool</i> block
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T foldParallel(Collection<T> collection, Closure cl) {
         createPAFromCollection(collection, retrievePool()).reduce(new ClosureReducer(cl), null)
     }
@@ -1045,6 +1049,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      * @param seed A seed value to initialize the operation
      */
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T foldParallel(Collection<T> collection, seed, Closure cl) {
         createPAFromCollection(collection.plus(seed), retrievePool()).reduce(new ClosureReducer(cl), null)
     }
@@ -1061,7 +1066,7 @@ public class GParsPoolUtil {
      */
     public static Object foldParallel(Object collection, seed, Closure cl) {
         final ParallelArray pa = createPA(collection, retrievePool())
-        pa.appendElement(seed)
+        pa.appendElement seed
         pa.reduce(new ClosureReducer(cl), null)
     }
 
@@ -1086,6 +1091,7 @@ public class GParsPoolUtil {
     /**
      * Creates a ParallelArray wrapping the elements of the original collection.
      */
+    @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> ParallelArray<T> getParallelArray(Collection<T> collection) {
         createPAFromCollection(collection, retrievePool())
     }
@@ -1175,7 +1181,7 @@ abstract class AbstractPAWrapper<T> {
      * @return The minimum element of the collection
      */
     public final T min(Closure cl) {
-        return pa.min(createComparator(cl) as Comparator)
+        return pa.min(createComparator(cl))
     }
 
     /**
@@ -1194,7 +1200,7 @@ abstract class AbstractPAWrapper<T> {
      * @return The maximum element of the collection
      */
     public final T max(Closure cl) {
-        pa.max(createComparator(cl) as Comparator)
+        pa.max(createComparator(cl))
     }
 
     /**
@@ -1206,7 +1212,7 @@ abstract class AbstractPAWrapper<T> {
      */
     public final AbstractPAWrapper sort(Closure cl = {it}) {
         def npa = pa.all()
-        npa.sort(createComparator(cl) as Comparator)
+        npa.sort(createComparator(cl))
         return new PAWrapper(npa)
     }
 
