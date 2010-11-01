@@ -17,7 +17,6 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovy.time.TimeCategory
-import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
@@ -32,7 +31,6 @@ import static groovyx.gpars.actor.Actors.actor
 public class TimeCategoryTimeoutTest extends GroovyTestCase {
     protected void setUp() {
         super.setUp();
-        Actors.defaultActorPGroup.resize(5)
     }
 
     public void testTimeout() {

@@ -34,7 +34,6 @@ public class ReplyTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        Actors.defaultActorPGroup.resize(5)
     }
 
     public void testMultipleClients() {

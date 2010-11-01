@@ -17,22 +17,30 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 
 public class DeliveryErrorTest extends GroovyTestCase {
 
+    def group
+
     protected void setUp() {
         super.setUp();
-        Actors.defaultActorPGroup.resize 5
+        group = new DefaultPGroup(new DefaultPool(true, 5))
+    }
+
+    protected void tearDown() {
+        super.tearDown();
+        group.shutdown()
     }
 
     public void testSuccessfulMessages() {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = group.actor {
             react {}
         }
 
@@ -55,7 +63,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = group.actor {
             react {
                 barrier.await()
             }
@@ -89,7 +97,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = group.actor {
             delegate.metaClass.onException = {}
             delegate.metaClass.afterStop = {
                 latch.countDown()
@@ -126,7 +134,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = group.actor {
             latch.await()
         }
 
@@ -144,7 +152,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         volatile boolean flag = true
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = group.actor {
             latch.await()
             stop()
         }

@@ -1321,13 +1321,6 @@ abstract class AbstractPAWrapper<T> {
 /**
  * Holds a temporary reduce result for groupBy
  */
-//private class GroupByHolder extends CombineHolder {
-//
-//    def GroupByHolder(final content) {
-//        super([], {List a, List b -> a.addAll(b)}, content)
-//    }
-//}
-
 private class CombineHolder {
 
     @Delegate final Map content

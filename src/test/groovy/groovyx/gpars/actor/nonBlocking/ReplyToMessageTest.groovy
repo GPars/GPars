@@ -17,7 +17,6 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
@@ -27,7 +26,6 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        Actors.defaultActorPGroup.resize(5)
     }
 
     public void testMultipleClients() {

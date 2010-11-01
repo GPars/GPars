@@ -17,7 +17,6 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -32,7 +31,6 @@ public class TimeoutTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        Actors.defaultActorPGroup.resize(5)
     }
 
     public void testTimeout() {

@@ -17,22 +17,24 @@
 package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
-import static groovyx.gpars.actor.Actors.actor
 
 public class ReplyToMessageTest extends GroovyTestCase {
 
+    def group
+
     protected void setUp() {
         super.setUp();
-        Actors.defaultActorPGroup.resize 10
+        group = new DefaultPGroup(new DefaultPool(true, 10))
     }
 
     protected void tearDown() {
         super.tearDown();
-        Actors.defaultActorPGroup.resetDefaultSize()
+        group.shutdown()
     }
 
     public void testMultipleClients() {
@@ -41,7 +43,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def bouncer = Actors.actor {
+        final def bouncer = group.actor {
             loop {
                 receive {
                     it.reply it
@@ -52,7 +54,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         Thread.sleep 1000
 
-        actor {
+        group.actor {
             bouncer.send 1
             barrier.await()
             bouncer.send 2
@@ -68,7 +70,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        actor {
+        group.actor {
             bouncer.send 10
             barrier.await()
             bouncer.send 20
@@ -97,15 +99,15 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def incrementor = Actors.actor {
+        final def incrementor = group.actor {
             loop { receive { it.reply it + 1 }}
         }
 
-        final def decrementor = Actors.actor {
+        final def decrementor = group.actor {
             loop { receive { it.reply it - 1 }}
         }
 
-        actor {
+        group.actor {
             barrier.await()
             incrementor.send 2
             decrementor.send 6
@@ -126,7 +128,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        actor {
+        group.actor {
             barrier.await()
             incrementor.send 20
             decrementor.send 60
@@ -160,7 +162,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = group.actor {
             delegate.metaClass {
                 onException = {
                     flag.set(true)
@@ -186,13 +188,13 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor receiver = actor {
+        final Actor receiver = group.actor {
             receive {
                 it.replyIfExists it
             }
         }
 
-        actor {
+        group.actor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
@@ -209,7 +211,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = actor {
+        final Actor actor = group.actor {
             receive {
                 it.replyIfExists it
                 flag.set(true)
@@ -228,7 +230,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor replier = actor {
+        final Actor replier = group.actor {
             receive {
                 latch.await()
                 it.replyIfExists it
@@ -237,7 +239,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        final Actor sender = actor {
+        final Actor sender = group.actor {
             delegate.metaClass {
                 afterStop = {
                     latch.countDown()
@@ -259,7 +261,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def maxFinder = actor {
+        final def maxFinder = group.actor {
             barrier.await()
             receive {message1 ->
                 receive {message2 ->
@@ -271,7 +273,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         }
 
 
-        actor {
+        group.actor {
             barrier.await()
             maxFinder.send 2
             receive {
@@ -280,7 +282,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        actor {
+        group.actor {
             barrier.await()
             maxFinder.send 3
             receive {

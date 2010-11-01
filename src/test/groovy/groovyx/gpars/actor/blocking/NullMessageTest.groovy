@@ -19,6 +19,8 @@ package groovyx.gpars.actor.blocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
 
 public class NullMessageTest extends GroovyTestCase {
@@ -37,21 +39,22 @@ public class NullMessageTest extends GroovyTestCase {
     }
 
     public void testNullMessageFromActor() {
-        Actors.defaultActorPGroup.resize(100)
+        final def group = new DefaultPGroup(new DefaultPool(true, 100))
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final Actor actor = Actors.actor {
+        final Actor actor = group.actor {
             receive {
                 result = it
                 latch.countDown()
             }
         }
-        Actors.actor {
+        group.actor {
             actor << null
             latch.await()
         }
         latch.await()
         assertNull result
+        group.shutdown()
     }
 
     public void testNullMessageFromActorWithReply() {
