@@ -19,7 +19,10 @@ package groovyx.gpars.pa;
 import groovy.lang.Closure;
 import jsr166y.forkjoin.Ops;
 
-public final class ClosureReducer implements Ops.Reducer {
+/**
+ * A PA reducer built around a closure
+ */
+public final class ClosureReducer implements Ops.Reducer<Object> {
     private final Closure code;
 
     public ClosureReducer(final Closure code) {

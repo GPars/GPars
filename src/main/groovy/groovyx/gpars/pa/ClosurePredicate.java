@@ -19,7 +19,10 @@ package groovyx.gpars.pa;
 import groovy.lang.Closure;
 import jsr166y.forkjoin.Ops;
 
-public final class ClosurePredicate implements Ops.Predicate {
+/**
+ * A PA predicate built around a closure
+ */
+public final class ClosurePredicate implements Ops.Predicate<Object> {
     private final Closure code;
 
     public ClosurePredicate(final Closure code) {

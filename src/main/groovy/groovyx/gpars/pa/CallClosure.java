@@ -18,6 +18,9 @@ package groovyx.gpars.pa;
 
 import groovy.lang.Closure;
 
+/**
+ * A call-forwarding closure
+ */
 public final class CallClosure extends Closure {
     private final Closure target;
     private static final long serialVersionUID = 209099114666842715L;

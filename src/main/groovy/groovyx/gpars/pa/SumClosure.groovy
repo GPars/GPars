@@ -16,6 +16,9 @@
 
 package groovyx.gpars.pa
 
+/**
+ * Represents a {a, b -> a + b} closure
+ */
 @Singleton
 public final class SumClosure extends Closure {
     private static final long serialVersionUID = 209099114666842715L;

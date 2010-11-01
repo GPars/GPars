@@ -19,7 +19,10 @@ package groovyx.gpars.pa;
 import groovy.lang.Closure;
 import jsr166y.forkjoin.Ops;
 
-public final class ClosureMapper implements Ops.Mapper {
+/**
+ * A PA mapper built around a closure
+ */
+public final class ClosureMapper implements Ops.Mapper<Object, Object> {
     private final Closure code;
 
     public ClosureMapper(final Closure code) {
