@@ -20,9 +20,13 @@ import groovy.lang.Closure;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Handy methods build PA from different types
@@ -141,5 +145,52 @@ public abstract class PAUtils {
             map.put(item.getKey(), item.getValue());
         }
         return map;
+    }
+
+
+    /**
+     * Builds a comparator depending on the number of arguments accepted by the supplied closure.
+     *
+     * @param handler The one or two argument closure to build a comparator on
+     * @return A new Comparator to use
+     */
+    public static Comparator<Object> createComparator(final Closure handler) {
+        if (handler.getMaximumNumberOfParameters() == 2) return new Comparator<Object>() {
+            @Override
+            public int compare(final Object o1, final Object o2) {
+                return (Integer) handler.call(new Object[]{o1, o2});
+            }
+        };
+        else return new Comparator<Object>() {
+            @SuppressWarnings({"unchecked"})
+            @Override
+            public int compare(final Object o1, final Object o2) {
+                return ((Comparable<Object>) handler.call(o1)).compareTo(handler.call(o2));
+            }
+        };
+    }
+
+    /**
+     * Creates a closure that will insert elements in the appropriate group
+     *
+     * @param cl  The distinction closure
+     * @param map The map of groups to contribute to
+     * @return null
+     */
+    public static Closure createGroupByClosure(final Closure cl, final ConcurrentMap<Object, List<Object>> map) {
+        return new Closure(cl.getOwner(), cl.getDelegate()) {
+            private static final long serialVersionUID = 5495474569312257163L;
+
+            @Override
+            public Object call(final Object arguments) {
+                final Object result = cl.call(arguments);
+                final List<Object> localList = new ArrayList<Object>();
+                localList.add(arguments);
+                final List<Object> myList = Collections.synchronizedList(localList);
+                final Collection<Object> list = map.putIfAbsent(result, myList);
+                if (list != null) list.add(arguments);
+                return null;
+            }
+        };
     }
 }
