@@ -20,6 +20,11 @@ import groovy.time.Duration
 import groovyx.gpars.memoize.LRUProtectionStorage
 import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
+import groovyx.gpars.pa.CallClosure
+import groovyx.gpars.pa.ClosureMapper
+import groovyx.gpars.pa.ClosurePredicate
+import groovyx.gpars.pa.ClosureReducer
+import groovyx.gpars.pa.SumClosure
 import groovyx.gpars.util.PAUtils
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.SoftReference
@@ -28,15 +33,15 @@ import java.util.concurrent.Future
 import jsr166y.forkjoin.ForkJoinExecutor
 import jsr166y.forkjoin.ForkJoinPool
 import jsr166y.forkjoin.Ops.Mapper
-import jsr166y.forkjoin.Ops.Predicate
 import jsr166y.forkjoin.Ops.Procedure
-import jsr166y.forkjoin.Ops.Reducer
 import jsr166y.forkjoin.ParallelArray
 import jsr166y.forkjoin.RecursiveTask
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
 import static groovyx.gpars.util.PAUtils.buildClosureForMaps
 import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
 import static groovyx.gpars.util.PAUtils.buildResultMap
+import static groovyx.gpars.util.PAUtils.createComparator
+import static groovyx.gpars.util.PAUtils.createGroupByClosure
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsPool</i>. The static methods of <i>GParsPoolUtil</i>
@@ -428,7 +433,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static <T> Collection<T> collectParallel(Collection<T> collection, Closure cl) {
-        createPAFromCollection(collection, retrievePool()).withMapping({cl(it)} as Mapper).all().asList()
+        createPAFromCollection(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(cl))).all().asList()
     }
 
     /**
@@ -443,7 +448,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static Collection<Object> collectParallel(Object collection, Closure cl) {
-        createPA(collection, retrievePool()).withMapping({cl(it)} as Mapper).all().asList()
+        createPA(collection, retrievePool()).withMapping(new ClosureMapper(new CallClosure(cl))).all().asList()
     }
 
     /**
@@ -458,7 +463,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}*     assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
      *}*/
     public static Collection<Object> collectParallel(Map collection, Closure cl) {
-        createPA(collection, retrievePool()).withMapping(buildClosureForMaps(cl) as Mapper).all().asList()
+        createPA(collection, retrievePool()).withMapping(new ClosureMapper(buildClosureForMaps(cl))).all().asList()
     }
 
     /**
@@ -507,7 +512,7 @@ public class GParsPoolUtil {
     }
 
     private static <T> Collection<T> findAllParallelPA(ParallelArray<T> pa, Closure cl) {
-        (Collection<T>) pa.withFilter({cl(it) as Boolean} as Predicate).all().asList()
+        (Collection<T>) pa.withFilter(new ClosurePredicate({cl(it) as Boolean})).all().asList()
     }
 
     /**
@@ -556,7 +561,7 @@ public class GParsPoolUtil {
     }
 
     private static <T> T findParallelPA(ParallelArray<T> pa, Closure cl) {
-        final ParallelArray found = pa.withFilter({cl(it) as Boolean} as Predicate).all()
+        final ParallelArray found = pa.withFilter(new ClosurePredicate({cl(it) as Boolean})).all()
         if (found.size() > 0) found.get(0)
         else return null
     }
@@ -616,7 +621,7 @@ public class GParsPoolUtil {
     }
 
     private static <T> T findAnyParallelPA(ParallelArray<T> pa, Closure cl) {
-        pa.withFilter({cl(it) as Boolean} as Predicate).any()
+        pa.withFilter(new ClosurePredicate({cl(it) as Boolean})).any()
     }
 
     /**
@@ -668,7 +673,7 @@ public class GParsPoolUtil {
     }
 
     private static <T> Collection<T> grepParallelPA(ParallelArray<T> pa, filter) {
-        pa.withFilter({filter.isCase it} as Predicate).all().asList()
+        pa.withFilter(new ClosurePredicate({filter.isCase it})).all().asList()
     }
 
     /**
@@ -716,7 +721,7 @@ public class GParsPoolUtil {
      *     assertEquals(1, result)
      *}*/
     public static <T> int countParallel(Collection<T> collection, filter) {
-        createPAFromCollection(collection, retrievePool()).withFilter({filter == it} as Predicate).size()
+        createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate({filter == it})).size()
     }
 
     /**
@@ -732,7 +737,7 @@ public class GParsPoolUtil {
      *     assertEquals(1, result)
      *}*/
     public static int countParallel(Object collection, filter) {
-        createPA(collection, retrievePool()).withFilter({filter == it} as Predicate).size()
+        createPA(collection, retrievePool()).withFilter(new ClosurePredicate({filter == it})).size()
     }
 
     /**
@@ -749,7 +754,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static <T> boolean anyParallel(Collection<T> collection, Closure cl) {
-        createPAFromCollection(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
+        createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate({cl(it) as Boolean})).any() != null
     }
 
     /**
@@ -766,7 +771,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static boolean anyParallel(Object collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({cl(it) as Boolean} as Predicate).any() != null
+        createPA(collection, retrievePool()).withFilter(new ClosurePredicate({cl(it) as Boolean})).any() != null
     }
 
     /**
@@ -784,7 +789,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     assert [1, 2, 3, 4, 5].anyParallel {Number number -> number > 3}*     assert ![1, 2, 3].anyParallel {Number number -> number > 3}*}*/
     public static boolean anyParallel(Map collection, Closure cl) {
         final def mapClosure = buildClosureForMaps(cl)
-        createPA(collection, retrievePool()).withFilter({mapClosure(it) as Boolean} as Predicate).any() != null
+        createPA(collection, retrievePool()).withFilter(new ClosurePredicate({mapClosure(it) as Boolean})).any() != null
     }
 
     /**
@@ -799,7 +804,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static <T> boolean everyParallel(Collection<T> collection, Closure cl) {
-        createPAFromCollection(collection, retrievePool()).withFilter({!(cl(it) as Boolean)} as Predicate).any() == null
+        createPAFromCollection(collection, retrievePool()).withFilter(new ClosurePredicate({!(cl(it) as Boolean)})).any() == null
     }
 
     /**
@@ -814,7 +819,7 @@ public class GParsPoolUtil {
      * Example:
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static boolean everyParallel(Object collection, Closure cl) {
-        createPA(collection, retrievePool()).withFilter({!(cl(it) as Boolean)} as Predicate).any() == null
+        createPA(collection, retrievePool()).withFilter(new ClosurePredicate({!(cl(it) as Boolean)})).any() == null
     }
 
     /**
@@ -830,7 +835,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool(5) {*     assert ![1, 2, 3, 4, 5].everyParallel {Number number -> number > 3}*     assert [1, 2, 3].everyParallel() {Number number -> number <= 3}*}*/
     public static boolean everyParallel(Map collection, Closure cl) {
         def mapClosure = buildClosureForMaps(cl)
-        createPA(collection, retrievePool()).withFilter({!(mapClosure(it) as Boolean)} as Predicate).any() == null
+        createPA(collection, retrievePool()).withFilter(new ClosurePredicate({!(mapClosure(it) as Boolean)})).any() == null
     }
 
     /**
@@ -867,12 +872,7 @@ public class GParsPoolUtil {
 
     private static <T> Map groupByParallelPA(ParallelArray<T> pa, Closure cl) {
         final def map = new ConcurrentHashMap()
-        eachParallelPA(pa, {
-            def result = cl(it)
-            final def myList = [it].asSynchronized()
-            def list = map.putIfAbsent(result, myList)
-            if (list != null) list.add(it)
-        })
+        eachParallelPA(pa, createGroupByClosure(cl, map))
         return map
 
     }
@@ -994,7 +994,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static <T> T sumParallel(Collection<T> collection) {
-        foldParallel(collection) {a, b -> a + b}
+        foldParallel(collection, SumClosure.instance)
     }
 
     /**
@@ -1006,7 +1006,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static Object sumParallel(Object collection) {
-        foldParallel(collection) {a, b -> a + b}
+        foldParallel(collection, SumClosure.instance)
     }
 
     /**
@@ -1019,7 +1019,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static <T> T foldParallel(Collection<T> collection, Closure cl) {
-        createPAFromCollection(collection, retrievePool()).reduce(cl as Reducer, null)
+        createPAFromCollection(collection, retrievePool()).reduce(new ClosureReducer(cl), null)
     }
 
     /**
@@ -1032,7 +1032,7 @@ public class GParsPoolUtil {
      * have a new <i>min(Closure cl)</i> method, which delegates to the <i>GParsPoolUtil</i> class.
      */
     public static Object foldParallel(Object collection, Closure cl) {
-        createPA(collection, retrievePool()).reduce(cl as Reducer, null)
+        createPA(collection, retrievePool()).reduce(new ClosureReducer(cl), null)
     }
 
     /**
@@ -1046,7 +1046,7 @@ public class GParsPoolUtil {
      * @param seed A seed value to initialize the operation
      */
     public static <T> T foldParallel(Collection<T> collection, seed, Closure cl) {
-        createPAFromCollection(collection.plus(seed), retrievePool()).reduce(cl as Reducer, null)
+        createPAFromCollection(collection.plus(seed), retrievePool()).reduce(new ClosureReducer(cl), null)
     }
 
     /**
@@ -1062,7 +1062,7 @@ public class GParsPoolUtil {
     public static Object foldParallel(Object collection, seed, Closure cl) {
         final ParallelArray pa = createPA(collection, retrievePool())
         pa.appendElement(seed)
-        pa.reduce(cl as Reducer, null)
+        pa.reduce(new ClosureReducer(cl), null)
     }
 
     /**
@@ -1095,15 +1095,6 @@ public class GParsPoolUtil {
      */
     public static ParallelArray getParallelArray(Object collection) {
         createPA(collection, retrievePool())
-    }
-
-    /**
-     * Builds a comparator depending on the number of arguments accepted by the supplied closure.
-     */
-    @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
-    static Closure createComparator(final Closure handler) {
-        if (handler.maximumNumberOfParameters == 2) return handler
-        else return {a, b -> handler(a).compareTo(handler(b))}
     }
 }
 
@@ -1138,7 +1129,7 @@ abstract class AbstractPAWrapper<T> {
      * @return The product of reduction
      */
     public final T reduce(Closure cl) {
-        pa.all().reduce(cl as Reducer, null)
+        pa.all().reduce(new ClosureReducer(cl), null)
     }
 
     /**
@@ -1149,7 +1140,7 @@ abstract class AbstractPAWrapper<T> {
     public final T reduce(seed, Closure cl) {
         final def newPA = pa.all()
         newPA.appendElement(seed)
-        newPA.reduce(cl as Reducer, null)
+        newPA.reduce(new ClosureReducer(cl), null)
     }
 
     /**
@@ -1157,7 +1148,7 @@ abstract class AbstractPAWrapper<T> {
      * @return The summary od all elements in the collection
      */
     public final T sum() {
-        reduce {a, b -> a + b}
+        reduce(SumClosure.instance)
     }
 
     /**
@@ -1184,7 +1175,7 @@ abstract class AbstractPAWrapper<T> {
      * @return The minimum element of the collection
      */
     public final T min(Closure cl) {
-        return pa.min(GParsPoolUtil.createComparator(cl) as Comparator)
+        return pa.min(createComparator(cl) as Comparator)
     }
 
     /**
@@ -1203,7 +1194,7 @@ abstract class AbstractPAWrapper<T> {
      * @return The maximum element of the collection
      */
     public final T max(Closure cl) {
-        pa.max(GParsPoolUtil.createComparator(cl) as Comparator)
+        pa.max(createComparator(cl) as Comparator)
     }
 
     /**
@@ -1215,7 +1206,7 @@ abstract class AbstractPAWrapper<T> {
      */
     public final AbstractPAWrapper sort(Closure cl = {it}) {
         def npa = pa.all()
-        npa.sort(GParsPoolUtil.createComparator(cl) as Comparator)
+        npa.sort(createComparator(cl) as Comparator)
         return new PAWrapper(npa)
     }
 
@@ -1305,7 +1296,7 @@ abstract class AbstractPAWrapper<T> {
      * @return A collection holding the new values
      */
     public final AbstractPAWrapper map(Closure cl) {
-        new MappedPAWrapper(pa.withMapping({cl(it)} as Mapper))
+        new MappedPAWrapper(pa.withMapping(new ClosureMapper(new CallClosure(cl))))
     }
 
     /**
@@ -1314,7 +1305,8 @@ abstract class AbstractPAWrapper<T> {
      * @return A collection holding the allowed values
      */
     public AbstractPAWrapper filter(Closure cl) {
-        new PAWrapper(pa.withFilter({cl(it)} as Predicate))
+//        new PAWrapper(pa.withFilter({cl(it)} as Predicate))
+        new PAWrapper(pa.withFilter(new ClosurePredicate(new CallClosure(cl))))
     }
 }
 
@@ -1367,6 +1359,6 @@ final class MappedPAWrapper<T> extends AbstractPAWrapper {
      * @return A collection holding the allowed values
      */
     public final AbstractPAWrapper filter(Closure cl) {
-        new PAWrapper(pa.all().withFilter({cl(it)} as Predicate))
+        new PAWrapper(pa.all().withFilter(new ClosurePredicate(new CallClosure(cl))))
     }
 }

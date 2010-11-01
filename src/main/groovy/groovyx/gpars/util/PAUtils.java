@@ -20,9 +20,12 @@ import groovy.lang.Closure;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Handy methods build PA from different types
@@ -141,5 +144,35 @@ public abstract class PAUtils {
             map.put(item.getKey(), item.getValue());
         }
         return map;
+    }
+
+
+    /**
+     * Builds a comparator depending on the number of arguments accepted by the supplied closure.
+     */
+    public static Closure createComparator(final Closure handler) {
+        if (handler.getMaximumNumberOfParameters() == 2) return handler;
+        else return new Closure(handler.getOwner(), handler.getDelegate()) {
+            @SuppressWarnings({"unchecked", "AutoBoxing"})
+            @Override
+            public Object call(final Object[] args) {
+                return ((Comparable) handler.call(args[0])).compareTo(handler.call(args[1]));
+            }
+        };
+    }
+
+    public static Closure createGroupByClosure(final Closure cl, final ConcurrentMap<Object, List<Object>> map) {
+        return new Closure(cl.getOwner(), cl.getDelegate()) {
+            @Override
+            public Object call(final Object arguments) {
+                final Object result = cl.call(arguments);
+                final List<Object> localList = new ArrayList<Object>();
+                localList.add(arguments);
+                final List<Object> myList = Collections.synchronizedList(localList);
+                final Collection<Object> list = map.putIfAbsent(result, myList);
+                if (list != null) list.add(arguments);
+                return null;
+            }
+        };
     }
 }
