@@ -97,6 +97,19 @@ public abstract class DataFlow {
     }
 
     /**
+     * Creates a new task assigned to a thread from the current parallel group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * Registers itself with DataFlow for nested 'whenBound' handlers to use the same group.
+     *
+     * @param runnable The task body to run
+     * @return A DataFlowVariable, which gets bound to null once the supplied code finishes
+     */
+    public static DataFlowVariable task(final Runnable runnable) {
+        return DataFlow.DATA_FLOW_GROUP.task(runnable);
+    }
+
+    /**
      * Creates an operator using the default dataflow parallel group
      *
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs

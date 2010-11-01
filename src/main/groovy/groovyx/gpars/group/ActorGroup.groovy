@@ -205,6 +205,29 @@ public abstract class PGroup {
     }
 
     /**
+     * Creates a new task assigned to a thread from the current parallel group.
+     * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
+     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * Registers itself with DataFlow for nested 'whenBound' handlers to use the same group.
+     * @param code The task body to run
+     * @return A DataFlowVariable, which gets bound to null once the supplied code finishes
+     */
+    public DataFlowVariable task(final Runnable code) {
+        if (code instanceof Closure) return task(code.clone() as Callable)
+        final DataFlowVariable result = new DataFlowVariable()
+        threadPool.execute {->
+            DataFlow.activeParallelGroup.set this
+            try {
+                code.run()
+                result.bind null
+            } finally {
+                DataFlow.activeParallelGroup.remove()
+            }
+        }
+        return result
+    }
+
+    /**
      * Creates an operator using the current parallel group
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The operator's body to run each time all inputs have a value to read
