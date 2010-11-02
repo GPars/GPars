@@ -42,7 +42,7 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
     private static <T> T eval(final Object valueOrDataFlowVariable) {
         if (valueOrDataFlowVariable instanceof DataFlowVariable)
             try {
-                return ((DataFlowVariable<T>) valueOrDataFlowVariable).getVal();
+                return ((DataFlowReadChannel<T>) valueOrDataFlowVariable).getVal();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
