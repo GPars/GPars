@@ -128,7 +128,7 @@ public abstract class PGroup {
      * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public final Agent agent(final def state) {
+    public final <T> Agent<T> agent(final T state) {
         final Agent safe = new Agent(state)
         safe.attachToThreadPool threadPool
         return safe
@@ -140,7 +140,7 @@ public abstract class PGroup {
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      * @return The created instance
      */
-    public final Agent agent(final def state, final Closure copy) {
+    public final <T> Agent<T> agent(final T state, final Closure copy) {
         final Agent safe = new Agent(state, copy)
         safe.attachToThreadPool threadPool
         return safe
@@ -152,7 +152,7 @@ public abstract class PGroup {
      * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public final Agent fairAgent(final def state) {
+    public final <T> Agent<T> fairAgent(final T state) {
         final Agent safe = agent(state)
         safe.makeFair()
         return safe
@@ -165,7 +165,7 @@ public abstract class PGroup {
      * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public final Agent fairAgent(final def state, final Closure copy) {
+    public final <T> Agent<T> fairAgent(final T state, final Closure copy) {
         final Agent safe = agent(state, copy)
         safe.makeFair()
         return safe

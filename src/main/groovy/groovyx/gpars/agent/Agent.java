@@ -14,17 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.agent
+package groovyx.gpars.agent;
 
-import groovyx.gpars.actor.Actors
-import org.codehaus.groovy.runtime.NullObject
+import groovy.lang.Closure;
+import groovyx.gpars.actor.Actors;
+import org.codehaus.groovy.runtime.NullObject;
 
 /**
  * A special-purpose thread-safe non-blocking reference implementation inspired by Agents in Clojure.
  * Agents safe-guard mutable values by allowing only a single agent-managed thread to make modifications to them.
  * The mutable values are not directly accessible from outside, but instead requests have to be sent to the agent
  * and the agent guarantees to process the requests sequentially on behalf of the callers. Agents guarantee sequential
- * execution of all requests and so consistency of the values. 
+ * execution of all requests and so consistency of the values.
  * An agent wraps a reference to mutable state, held inside a single field, and accepts code (closures / commands)
  * as messages, which can be sent to the Agent just like to any other actor using the '<<' operator
  * or any of the send() methods.
@@ -43,38 +44,41 @@ import org.codehaus.groovy.runtime.NullObject
  * or a clone might be more appropriate.
  *
  * @author Vaclav Pech
- * Date: Jul 2, 2009
+ *         Date: Jul 2, 2009
  */
+@SuppressWarnings({"MethodNamesDifferingOnlyByCase"})
 public class Agent<T> extends AgentBase<T> {
 
     /**
      * Creates a new Agent with the internal state set to null
      */
-    def Agent() {
-        super(null)
+    public Agent() {
+        super(null);
     }
 
     /**
      * Creates a new Agent around the supplied modifiable object
+     *
      * @param data The object to use for storing the internal state of the variable
      */
-    def Agent(final T data) {
-        super(data)
+    public Agent(final T data) {
+        super(data);
     }
 
     /**
      * Creates a new Agent around the supplied modifiable object
+     *
      * @param data The object to use for storing the internal state of the variable
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      */
-    def Agent(final T data, final Closure copy) {
-        super(data, copy)
+    public Agent(final T data, final Closure copy) {
+        super(data, copy);
     }
 
     /**
      * Dynamically dispatches the method call
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked", "ChainOfInstanceofChecks"})
     @Override
     public void handleMessage(final Object message) {
         if (message instanceof Closure) onMessage((Closure) message);
@@ -85,44 +89,52 @@ public class Agent<T> extends AgentBase<T> {
     /**
      * Creates an agent instance initialized with the given state.
      * The instance will use the default thread pool.
+     *
      * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public static final Agent agent(final def state) {
-        Actors.defaultActorPGroup.agent(state)
+    @SuppressWarnings({"unchecked"})
+    public static <T> Agent<T> agent(final T state) {
+        return Actors.defaultActorPGroup.agent(state);
     }
 
     /**
      * Creates an agent instance initialized with the given state.
      * The instance will use the default thread pool.
+     *
      * @param state The initial internal state of the new Agent instance
-     * @param copy A closure to use to create a copy of the internal state when sending the internal state out
+     * @param copy  A closure to use to create a copy of the internal state when sending the internal state out
      * @return The created instance
      */
-    public static final Agent agent(final def state, final Closure copy) {
-        Actors.defaultActorPGroup.agent(state, copy)
+    @SuppressWarnings({"unchecked"})
+    public static <T> Agent<T> agent(final T state, final Closure copy) {
+        return Actors.defaultActorPGroup.agent(state, copy);
     }
 
     /**
      * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
      * in a fair manner.
      * The instance will use the default thread pool.
+     *
      * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
-    public static final Agent fairAgent(final def state) {
-        Actors.defaultActorPGroup.fairAgent(state)
+    @SuppressWarnings({"unchecked"})
+    public static <T> Agent<T> fairAgent(final T state) {
+        return Actors.defaultActorPGroup.fairAgent(state);
     }
 
     /**
      * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
      * in a fair manner.
      * The instance will use the default thread pool.
+     *
      * @param state The initial internal state of the new Agent instance
-     * @param copy A closure to use to create a copy of the internal state when sending the internal state out
+     * @param copy  A closure to use to create a copy of the internal state when sending the internal state out
      * @return The created instance
      */
-    public static final Agent fairAgent(final def state, final Closure copy) {
-        Actors.defaultActorPGroup.fairAgent(state, copy)
+    @SuppressWarnings({"unchecked"})
+    public static <T> Agent<T> fairAgent(final T state, final Closure copy) {
+        return Actors.defaultActorPGroup.fairAgent(state, copy);
     }
 }
