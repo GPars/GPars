@@ -16,7 +16,8 @@
 
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.agent.Agent
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
 import java.util.concurrent.CountDownLatch
@@ -26,25 +27,25 @@ final def concurrencyLevel = 8
 group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
 final def t1 = System.currentTimeMillis()
-final def cdl = new CountDownLatch(20000 * 500)
-def last = null
+final def cdl = new CountDownLatch(10000 * 500)
+final def channels = new Actor[10000]
 
 int i = 0
-while (i < 20000) {
-    final def channel = new Agent(new AgentState(last, cdl))
-    channel.attachToThreadPool group.threadPool
-//    channel.makeFair()
-    last = channel
+while (i < 10000) {
+    final def channel = new HandlerWithArray(channels, i, cdl)
+    channel.parallelGroup = group
+    channels[i] = channel
+    channel.start()
     i += 1
 }
 
-Closure message
-message = {it.relay(message)}
-
 i = 0
 while (i < 500) {
-    last.send(message)
+    channels[i].send("Hi")
     i += 1
+    for (int j = 0; j < i; j++) {
+        cdl.countDown()
+    }
 }
 
 cdl.await(1000, TimeUnit.SECONDS)
@@ -53,18 +54,21 @@ group.shutdown()
 final def t2 = System.currentTimeMillis()
 println(t2 - t1)
 
-final class AgentState {
+final class HandlerWithArray extends DynamicDispatchActor {
 
-    private final def soFarLast
+    final def channels
+    private final def index
     private final def cdl
 
-    def AgentState(final def soFarLast, final def cdl) {
-        this.soFarLast = soFarLast
+    def HandlerWithArray(final def channels, final def index, final def cdl) {
+        this.channels = channels
+        this.index = index
         this.cdl = cdl
+//        makeFair()
     }
 
-    def relay(final def msg) {
-        soFarLast?.send(msg)
+    def onMessage(final def msg) {
+        if (index < channels.length - 1) channels[index + 1].send(msg)
         cdl.countDown()
     }
 }

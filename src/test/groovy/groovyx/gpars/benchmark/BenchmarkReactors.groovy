@@ -16,18 +16,16 @@
 
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.GParsPool
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
-import java.util.concurrent.CountDownLatch
+
+def t1 = System.nanoTime()
 
 final def concurrencyLevel = 10
 final def numOfActors = 100
 final def iterations = 1000
-final def numOfMessages = 10
 group = new DefaultPGroup(new FJPool(concurrencyLevel))
-final def latch = new CountDownLatch(iterations * numOfMessages * numOfActors)
 
 def createReactor(final code) {
     group.reactor code
@@ -35,32 +33,25 @@ def createReactor(final code) {
 }
 
 def reactors = (1..numOfActors).collect {
-    createReactor {
-        latch.countDown()
-        it
-    }
+    createReactor { it }
 }
 
-
 def controller = Actors.reactor {
-    def t1 = System.nanoTime()
+    def sum = 0L
 
     iterations.times {
-        GParsPool.withPool(10) {
-            reactors.eachParallel {
-                numOfMessages.times {msg ->
-                    it.send(msg)
-                }
-            }
+        for (reactor in reactors) {
+            sum += reactor.sendAndWait(1)
         }
     }
 
-    latch.await()
-    def t2 = System.nanoTime()
-    println((t2 - t1) / 1000000)
     terminate()
+    println "Done $sum"
 }
 
 controller 'Start'
 controller.join()
 group.shutdown()
+
+def t2 = System.nanoTime()
+println((t2 - t1) / 1000000)

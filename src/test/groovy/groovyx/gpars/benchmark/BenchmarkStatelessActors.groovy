@@ -18,12 +18,12 @@ package groovyx.gpars.benchmark
 
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.FJPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-final def concurrencyLevel = 20
-group = new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
+final def concurrencyLevel = 8
+group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
 final def t1 = System.currentTimeMillis()
 final def cdl = new CountDownLatch(10000 * 500)
