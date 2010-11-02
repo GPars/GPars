@@ -18,6 +18,7 @@ package groovyx.gpars.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 
 /**
@@ -27,20 +28,39 @@ import java.util.List;
  */
 @SuppressWarnings({"SynchronizedMethod"})
 public final class MessagingQueue {
-    private final List<Object> queue = new ArrayList<Object>(INITIAL_CAPACITY);
 
-    public static final int INITIAL_CAPACITY = 50;
+    private List<Object> outside = new ArrayList<Object>(50);
+    private List<Object> inside = new ArrayList<Object>(50);
+    @SuppressWarnings({"UnusedDeclaration"})
+    private volatile int counter = 0;
+    private static final AtomicIntegerFieldUpdater<MessagingQueue> counterUpdater = AtomicIntegerFieldUpdater.newUpdater(
+            MessagingQueue.class, "counter");
 
-    synchronized boolean isEmpty() {
-        return queue.isEmpty();
+    boolean isEmpty() {
+        return counterUpdater.get(this) == 0;
     }
 
-    synchronized Object poll() {
-        return queue.isEmpty() ? null : queue.remove(0);
+    @SuppressWarnings({"SynchronizeOnThis"})
+    Object poll() {
+        if (!inside.isEmpty()) {
+            counterUpdater.decrementAndGet(this);
+            return inside.remove(0);
+        }
+        final List<Object> localQueue = inside;
+        inside = outside;
+        synchronized (this) {
+            outside = localQueue;
+        }
+        if (!inside.isEmpty()) {
+            counterUpdater.decrementAndGet(this);
+            return inside.remove(0);
+        }
+        return null;
     }
 
     synchronized void add(final Object element) {
-        queue.add(element);
+        outside.add(element);
+        counterUpdater.incrementAndGet(this);
     }
 }
 
