@@ -17,9 +17,6 @@
 package groovyx.gpars.agent
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
-import groovyx.gpars.util.EnhancedRWLock
-import java.util.concurrent.CopyOnWriteArrayList
 import org.codehaus.groovy.runtime.NullObject
 
 /**
@@ -48,42 +45,13 @@ import org.codehaus.groovy.runtime.NullObject
  * @author Vaclav Pech
  * Date: Jul 2, 2009
  */
-public class Agent<T> extends AgentCore {
-
-    /**
-     * Allows reads not to wait in the message queue.
-     * Writes and reads are mutually separated by using write or read locks respectively.
-     */
-    private EnhancedRWLock lock = new EnhancedRWLock()
-
-    /**
-     * Holds the internal mutable state
-     */
-    protected T data
-
-    /**
-     * Function converting the internal state during read to prevent internal state escape from
-     * the protected boundary of the agent
-     */
-    final Closure copy = {it}
-
-    /**
-     * Holds all listeners interested in state updates
-     * A listener should be a closure accepting the old and the new value in this order.
-     */
-    final List listeners = new CopyOnWriteArrayList()
-
-    /**
-     * Holds all validators checking the agent's state
-     * A validator should be a closure accepting the old and the new value in this order.
-     */
-    final List validators = new CopyOnWriteArrayList()
+public class Agent<T> extends AgentBase<T> {
 
     /**
      * Creates a new Agent with the internal state set to null
      */
     def Agent() {
-        this(null)
+        super(null)
     }
 
     /**
@@ -91,7 +59,7 @@ public class Agent<T> extends AgentCore {
      * @param data The object to use for storing the internal state of the variable
      */
     def Agent(final T data) {
-        this.data = data
+        super(data)
     }
 
     /**
@@ -100,136 +68,18 @@ public class Agent<T> extends AgentCore {
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      */
     def Agent(final T data, final Closure copy) {
-        this.data = data
-        this.copy = copy
-    }
-
-    /**
-     * Accepts a NullObject instance and sets the internal state to null
-     */
-    final void onMessage(NullObject obj) {
-        lock.withWriteLock {
-            updateValue null
-        }
-    }
-
-    /**
-     * Accepts and invokes the closure
-     */
-    final void onMessage(Closure code) {
-        lock.withWriteLock {
-            code.delegate = this
-            code.call(copy(data))
-        }
-    }
-
-    /**
-     * Other messages than closures are accepted as new values for the internal state
-     */
-    final void onMessage(T message) {
-        lock.withWriteLock {
-            updateValue message
-        }
-    }
-
-    /**
-     * Allows closures to set the new internal state as a whole
-     */
-    final void updateValue(T newValue) {
-        def oldValue = copy(data)
-
-        def validated = false
-        try {
-            for (validator in validators) validator(oldValue, newValue)
-            validated = true
-        } catch (Exception e) {
-            registerError e
-        }
-        if (validated) {
-            data = newValue
-            for (listener in listeners) listener(oldValue, newValue)
-        }
-    }
-
-    /**
-     * A shorthand method for safe message-based retrieval of the internal state.
-     * Retrieves the internal state immediately by-passing the queue of tasks waiting to be processed.
-     */
-    final public T getInstantVal() {
-        T result = null
-        lock.withReadLock { result = copy(data) }
-        return result
-    }
-
-    /**
-     * A shorthand method for safe message-based retrieval of the internal state.
-     * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
-     */
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    final public T getVal() {
-        sendAndWait { copy it }
-    }
-
-    /**
-     * A shorthand method for safe asynchronous message-based retrieval of the internal state.
-     * The request to retrieve a value is put into the message queue, so will wait for all messages delivered earlier to complete.
-     * @param callback A closure to invoke with the internal state as a parameter
-     */
-    final public void valAsync(Closure callback) {
-        send {callback.call(copy(it))}
-    }
-
-    /**
-     * Submits the closure waiting for the result
-     */
-    final def sendAndWait(Closure message) {
-        final DataFlowVariable result = new DataFlowVariable()
-        this.send {
-            result.bind message.call(it)
-        }
-        return result.val
-    }
-
-    /**
-     * Blocks until all messages in the queue prior to call to await() complete.
-     * Provides a means to synchronize with the Agent
-     */
-    final public void await() {
-        sendAndWait {}
+        super(data, copy)
     }
 
     /**
      * Dynamically dispatches the method call
      */
-    void handleMessage(final Object message) {
-        onMessage message
-    }
-
-    /**
-     * Adds a listener interested in state updates
-     * A listener should be a closure accepting the old and the new value in this order.
-     */
-    public void addListener(Closure listener) {
-        listeners.add checkClosure(listener)
-    }
-
-    /**
-     * Adds a validator checking the agent's state
-     * A validator should be a closure accepting the old and the new value in this order.
-     */
-    public void addValidator(Closure validator) {
-        validators.add checkClosure(validator)
-    }
-
-    /**
-     * Only two-argument closures are allowed
-     * @param code The passed-in closure
-     */
-    @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
-    private Closure checkClosure(Closure code) {
-        if (!(code.maximumNumberOfParameters in [2, 3])) throw new IllegalArgumentException("Agent listeners and validators can only take two argments plus optionally the current agent instance as the first argument.")
-        if (code.maximumNumberOfParameters == 3) return code.curry(this)
-        else return code
+    @SuppressWarnings({"unchecked"})
+    @Override
+    public void handleMessage(final Object message) {
+        if (message instanceof Closure) onMessage((Closure) message);
+        else if (message instanceof NullObject) onMessage((NullObject) message);
+        else onMessage((T) message);
     }
 
     /**

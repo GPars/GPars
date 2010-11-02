@@ -13,7 +13,7 @@ h3. Parallel collections
 
 * Added a speculate() method to concurrently run multiple functions each representing a different path to achieve the required goal, while harvesting the first calculated result
 * Added the _combine_ method into the map/reduce family of functions
-* General speed-up of Parallel Array construction
+* General speed-up of Parallel Array construction and execution
 
 h3. Fork / Join
 
@@ -22,6 +22,7 @@ h3. Actors
 * Conditional and counting loop
 * Changed the message timeout API
 * Refactored Reactor and DynamicDispatchActor achieving a 15x speed-up
+* Speed-up of actor messaging
 
 h3. GroovyCSP
 
@@ -40,6 +41,7 @@ h3. Dataflow
 h3. Agent
 
 * Added listeners and validators
+* Considerable speed-up
 
 h3. Other
 

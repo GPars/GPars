@@ -14,25 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa;
+package groovyx.gpars.util;
 
-import groovy.lang.Closure;
-import jsr166y.forkjoin.Ops;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A PA predicate built around a closure
+ * An implementation of the message queue for actor and agent messaging
  *
  * @author Vaclav Pech
  */
-public final class ClosurePredicate implements Ops.Predicate<Object> {
-    private final Closure code;
+public final class MessagingQueue {
+    private final List<Object> queue = new ArrayList<Object>(10);
 
-    public ClosurePredicate(final Closure code) {
-        this.code = code;
+    synchronized boolean isEmpty() {
+        return queue.isEmpty();
     }
 
-    @Override
-    public boolean evaluate(final Object o) {
-        return (Boolean) code.call(o);
+    synchronized Object poll() {
+        return queue.isEmpty() ? null : queue.remove(0);
+    }
+
+    synchronized void add(final Object element) {
+        queue.add(element);
     }
 }
+
+//todo test

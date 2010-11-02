@@ -20,6 +20,8 @@ import groovy.lang.Closure;
 
 /**
  * A call-forwarding closure
+ *
+ * @author Vaclav Pech
  */
 public final class CallClosure extends Closure {
     private final Closure target;

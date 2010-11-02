@@ -18,6 +18,8 @@ package groovyx.gpars.pa
 
 /**
  * Represents a {a, b -> a + b} closure
+ *
+ * @author Vaclav Pech
  */
 @Singleton
 public final class SumClosure extends Closure {

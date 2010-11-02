@@ -21,6 +21,8 @@ import jsr166y.forkjoin.Ops;
 
 /**
  * A PA reducer built around a closure
+ *
+ * @author Vaclav Pech
  */
 public final class ClosureReducer implements Ops.Reducer<Object> {
     private final Closure code;

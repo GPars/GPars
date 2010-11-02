@@ -20,8 +20,6 @@ import groovyx.gpars.scheduler.Pool;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
 import org.codehaus.groovy.runtime.NullObject;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
@@ -78,7 +76,7 @@ public abstract class AsyncMessagingCore implements Runnable {
     /**
      * Incoming messages
      */
-    private final Queue<Object> queue = new ConcurrentLinkedQueue<Object>();
+    private final MessagingQueue queue = new MessagingQueue();
 
     /**
      * Indicates, whether there's an active thread handling a message inside the agent's body

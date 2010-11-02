@@ -21,6 +21,8 @@ import jsr166y.forkjoin.Ops;
 
 /**
  * A PA mapper built around a closure
+ *
+ * @author Vaclav Pech
  */
 public final class ClosureMapper implements Ops.Mapper<Object, Object> {
     private final Closure code;
