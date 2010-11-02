@@ -34,8 +34,7 @@ final def barber = group.reactor {message ->
             println "Barber: Processing customer ${message.customer.name}"
             doTheHaircut(random)
             message.customer.send new Done()
-            message.reply new Next()
-            break
+            return new Next()
         case Wait:
             println "Barber: No customers. Going to have a sleep"
             break

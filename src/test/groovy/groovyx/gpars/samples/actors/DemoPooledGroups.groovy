@@ -34,7 +34,7 @@ println "Default group ${Actors.defaultActorPGroup}"
 println ""
 
 sampleGroup.actor {
-    println((getParallelGroup == Actors.defaultActorPGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
+    println((parallelGroup == Actors.defaultActorPGroup) ? "I am in the default pooled group" : "I am in the sample pooled group")
 }
 
 Thread.sleep 1000
