@@ -120,11 +120,12 @@ abstract class AgentBase<T> extends AgentCore {
 
     /**
      * Allows closures to set the new internal state as a whole
+     * Do not call this method directly from the outside. It is designed to be used from within the submitted closures.
      *
      * @param newValue The value to set the internal state to
      */
     @SuppressWarnings({"unchecked", "CatchGenericClass"})
-    final void updateValue(final T newValue) {
+    public final void updateValue(final T newValue) {
         final T oldValue = copy != null ? (T) copy.call(data) : data;
         boolean validated = false;
         try {
