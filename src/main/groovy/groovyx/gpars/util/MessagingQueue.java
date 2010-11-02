@@ -22,19 +22,22 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 
 /**
- * An implementation of the message queue for actor and agent messaging
+ * An implementation of the message queue for actor and agent messaging.
+ * It leverages the fact that in any moment there's only one reading thread accessing the queue
+ * and that potential read thread swap at the actor or agent thread pool synchronizes thread memory.
  *
  * @author Vaclav Pech
  */
-@SuppressWarnings({"SynchronizedMethod"})
+@SuppressWarnings({"SynchronizedMethod", "FieldAccessedSynchronizedAndUnsynchronized"})
 public final class MessagingQueue {
 
-    private List<Object> outside = new ArrayList<Object>(50);
-    private List<Object> inside = new ArrayList<Object>(50);
-    @SuppressWarnings({"UnusedDeclaration"})
+    private List<Object> outside = new ArrayList<Object>(INITIAL_CAPACITY);
+    private List<Object> inside = new ArrayList<Object>(INITIAL_CAPACITY);
+    @SuppressWarnings({"UnusedDeclaration", "FieldMayBeFinal"})
     private volatile int counter = 0;
     private static final AtomicIntegerFieldUpdater<MessagingQueue> counterUpdater = AtomicIntegerFieldUpdater.newUpdater(
             MessagingQueue.class, "counter");
+    private static final int INITIAL_CAPACITY = 50;
 
     boolean isEmpty() {
         return counterUpdater.get(this) == 0;
@@ -58,10 +61,9 @@ public final class MessagingQueue {
         return null;
     }
 
+    @SuppressWarnings({"AccessToStaticFieldLockedOnInstance"})
     synchronized void add(final Object element) {
         outside.add(element);
         counterUpdater.incrementAndGet(this);
     }
 }
-
-//todo test
