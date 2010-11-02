@@ -58,7 +58,7 @@ final class Handler extends DynamicDispatchActor {
     def Handler(final def soFarLast, final def cdl) {
         this.soFarLast = soFarLast
         this.cdl = cdl
-        makeFair()
+//        makeFair()
     }
 
     def onMessage(final def msg) {

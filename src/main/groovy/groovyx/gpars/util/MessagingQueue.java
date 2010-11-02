@@ -19,13 +19,17 @@ package groovyx.gpars.util;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * An implementation of the message queue for actor and agent messaging
  *
  * @author Vaclav Pech
  */
+@SuppressWarnings({"SynchronizedMethod"})
 public final class MessagingQueue {
-    private final List<Object> queue = new ArrayList<Object>(10);
+    private final List<Object> queue = new ArrayList<Object>(INITIAL_CAPACITY);
+
+    public static final int INITIAL_CAPACITY = 50;
 
     synchronized boolean isEmpty() {
         return queue.isEmpty();

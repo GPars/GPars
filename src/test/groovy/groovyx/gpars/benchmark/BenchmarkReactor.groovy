@@ -30,8 +30,8 @@ group = new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
 final def latch = new CountDownLatch(iterations * numOfMessages * numOfActors)
 
 def createReactor(final code) {
-//    group.reactor code
-    group.fairReactor code
+    group.reactor code
+//    group.fairReactor code
 }
 
 def reactors = (1..numOfActors).collect {
