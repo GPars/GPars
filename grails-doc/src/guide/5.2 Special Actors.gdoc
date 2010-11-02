@@ -1,6 +1,9 @@
 h3. Dynamic Dispatch Actor
 
-The _DynamicDispatchActor_ class is a pooled actor allowing for an alternative structure of the message handling code. In general _DynamicDispatchActor_ repeatedly scans for messages and dispatches arrived messages to one of the _onMessage(message)_ methods defined on the actor. The _DynamicDispatchActor_ leverages the Groovy dynamic method dispatch mechanism under the covers.
+The _DynamicDispatchActor_ class is an actor allowing for an alternative structure of the message handling code. In general _DynamicDispatchActor_ repeatedly scans for messages and dispatches arrived messages to one
+of the _onMessage(message)_ methods defined on the actor. The _DynamicDispatchActor_ leverages the Groovy dynamic method dispatch mechanism under the covers.
+Since, unlike _AbstractPooledActor_ descendants, a _DynamicDispatchActor_ not _ReactiveActor_ (discussed below) do not need to implicitly remember actor's state between subsequent
+message receptions, they provide much better performance characteristics, generally comparable to other actor frameworks, like e.g. Scala Actors.
 
 {code}
 import groovyx.gpars.actor.DynamicDispatchActor
@@ -13,10 +16,12 @@ final class MyActor extends DynamicDispatchActor {
 
     void onMessage(Integer message) {
         println 'Received integer'
+        reply 'Thanks!'
     }
 
     void onMessage(Object message) {
         println 'Received object'
+        sender.send 'Thanks!'
     }
 
     void onMessage(List message) {
@@ -79,7 +84,7 @@ final def actor = new MyActor({
 {code}
 
 {note}
-DynamicDispatchActor can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor
+_DynamicDispatchActor_ can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor
 either makes the thread available to other actors sharing the same parallel group (fair), or keeps the thread fot itself
 until the message queue gets empty (non-fair). Generally, non-fair actors perform 2 - 3 times better than fair ones.
 
@@ -170,7 +175,7 @@ public class ReactiveActor extends AbstractPooledActor {
 {code}
 
 {note}
-DynamicDispatchActor can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor
+_ReactiveActor_ can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor
 either makes the thread available to other actors sharing the same parallel group (fair), or keeps the thread fot itself
 until the message queue gets empty (non-fair). Generally, non-fair actors perform 2 - 3 times better than fair ones.
 

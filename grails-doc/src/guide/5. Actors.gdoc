@@ -168,7 +168,8 @@ Actors.actor {
 
 h2. Sending replies
 
-The _reply/replyIfExists_ methods are not only defined on the actors themselves, but also on the messages upon their reception, which is particularly handy when handling multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed message (the last one), whereas _reply()_ called on messages sends a reply to the author of the particular message only.
+The _reply/replyIfExists_ methods are not only defined on the actors themselves, but for _AbstractPooledActor_ (not available in _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages themselves
+upon their reception, which is particularly handy when handling multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed message (the last one), whereas _reply()_ called on messages sends a reply to the author of the particular message only.
 
 {code}
 react {offerA ->
@@ -189,10 +190,20 @@ react {offerA ->
 
 h3. The sender property
 
-Messages upon retrieval offer the sender property to identify the originator of the message
+Messages upon retrieval offer the sender property to identify the originator of the message. The property is available inside the Actor's closure:
+{code}
+react {tweet ->
+    if (isSpam(tweet)) ignoreTweetsFrom sender
+    sender.send 'Never write me again!'
+}
+{code}
+
+And for _AbstractPooledActor_ (not available in _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages:
+
 {code}
 react {tweet ->
     if (isSpam(tweet)) ignoreTweetsFrom tweet.sender
+    tweet.sender.send 'Never write me again!'
 }
 {code}
 
