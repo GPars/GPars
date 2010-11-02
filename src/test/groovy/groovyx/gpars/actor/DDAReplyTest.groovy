@@ -24,8 +24,8 @@ class DDAReplyTest extends GroovyTestCase {
 
         def dda = new DynamicDispatchActor({
             when {msg ->
-                df.sender = msg.sender
-                msg.reply 10
+                df.sender = sender
+                sender.send 10
                 reply 20
             }
         }).start()

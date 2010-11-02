@@ -18,6 +18,7 @@ package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.ReactiveActor
+import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
@@ -117,16 +118,18 @@ public class ReactorTest extends GroovyTestCase {
     public void testReplies() {
         def reactor = Actors.reactor {
             reply 10
-            it.reply 20
+            sender.send 20
             30
         }
 
+        def results = new DataFlowVariable()
+
         Actors.actor {
             reactor << 1
-            def results = (1..3).collect {receive(1000, TimeUnit.MILLISECONDS)}
-            assert results == [10, 20, 30]
+            results << (1..3).collect {receive(1000, TimeUnit.MILLISECONDS)}
             reactor.stop()
         }
+        assert results.val == [10, 20, 30]
     }
 
     public void testSendAndWait() {

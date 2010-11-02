@@ -267,15 +267,21 @@ public abstract class Actor extends ReplyingMessageStream {
 
     protected abstract boolean hasBeenStopped();
 
-    @SuppressWarnings("rawtypes")
-    protected final void runEnhancedWithReplies(final ActorMessage message, final Closure code) {
+    private void prepareReplies(final ActorMessage message) {
         assert message != null;
-
         if (message == TIMEOUT_MESSAGE) handleTimeout();
         getSenders().add(message.getSender());
-        obj2Sender.put(message.getPayLoad(), message.getSender());
+    }
 
-        //noinspection deprecation,RawUseOfParameterizedType
+    protected final void runEnhancedWithoutReplies(final ActorMessage message, final Closure code) {
+        prepareReplies(message);
+        code.call();
+    }
+
+    @SuppressWarnings("rawtypes")
+    protected final void runEnhancedWithReplies(final ActorMessage message, final Closure code) {
+        prepareReplies(message);
+        obj2Sender.put(message.getPayLoad(), message.getSender());
         GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
     }
 

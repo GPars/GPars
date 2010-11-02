@@ -19,6 +19,7 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.TimeUnit
@@ -225,16 +226,18 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         def dda = Actors.messageHandler {
             when {message ->
                 reply 10
-                message.reply 20
+                sender.send 20
             }
         }
 
+        def results = new DataFlowVariable()
+
         Actors.actor {
             dda << 1
-            def results = (1..2).collect {receive(1000, TimeUnit.MILLISECONDS)}
-            assert results == [10, 20]
+            results << (1..2).collect {receive(1000, TimeUnit.MILLISECONDS)}
             dda.stop()
         }
+        assert results.val == [10, 20]
     }
 
     public void testSendAndWait() {

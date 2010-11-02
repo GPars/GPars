@@ -39,11 +39,20 @@ public abstract class ReplyingMessageStream extends MessageStream {
     }
 
     /**
+     * Retrieves the sender actor of the currently processed message.
+     *
+     * @return The sender of the currently processed message or null, if the message was not sent by an actor
+     * @throws groovyx.gpars.actor.impl.ActorReplyException
+     *          If some of the replies failed to be sent.
+     */
+    protected final MessageStream getSender() {
+        assert senders != null;
+        return senders.isEmpty() ? null : senders.get(0);
+    }
+
+    /**
      * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
      * have not been sent by an actor. For such cases use replyIfExists().
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
      *
      * @param message reply message
      * @throws groovyx.gpars.actor.impl.ActorReplyException
@@ -75,9 +84,6 @@ public abstract class ReplyingMessageStream extends MessageStream {
     /**
      * Sends a reply to all currently processed messages, which have been sent by an actor.
      * Ignores potential errors when sending the replies, like no sender or sender already stopped.
-     * Calling reply()/replyIfExist() on the actor with disabled replying (through the disableSendingReplies() method)
-     * will result in IllegalStateException being thrown.
-     * Sending replies is enabled by default.
      *
      * @param message reply message
      */

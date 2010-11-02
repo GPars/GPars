@@ -71,7 +71,7 @@ public abstract class AbstractLoopingActor extends Actor {
                 } else {
                     final ActorMessage actorMessage = (ActorMessage) message;
                     try {
-                        runEnhancedWithReplies(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
+                        runEnhancedWithoutReplies(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
                     } finally {
                         getSenders().clear();
                         obj2Sender.clear();
