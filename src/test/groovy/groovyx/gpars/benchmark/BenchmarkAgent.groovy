@@ -16,7 +16,7 @@
 
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.agent.Agent
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
@@ -26,21 +26,24 @@ final def concurrencyLevel = 20
 group = new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
 
 final def t1 = System.currentTimeMillis()
-final def cdl = new CountDownLatch(10000 * 500)
+final def cdl = new CountDownLatch(20000 * 500)
 def last = null
 
 int i = 0
-while (i < 10000) {
-    final def channel = new Handler(last, cdl)
-    channel.parallelGroup = group
+while (i < 20000) {
+    final def channel = new Agent(new AgentState(last, cdl))
+    channel.attachToThreadPool group.threadPool
+//    channel.makeFair()
     last = channel
-    channel.start()
     i += 1
 }
 
+Closure message
+message = {it.relay(message)}
+
 i = 0
 while (i < 500) {
-    last.send("Hi")
+    last.send(message)
     i += 1
 }
 
@@ -50,18 +53,17 @@ group.shutdown()
 final def t2 = System.currentTimeMillis()
 println(t2 - t1)
 
-final class Handler extends DynamicDispatchActor {
+final class AgentState {
 
     private final def soFarLast
     private final def cdl
 
-    def Handler(final def soFarLast, final def cdl) {
+    def AgentState(final def soFarLast, final def cdl) {
         this.soFarLast = soFarLast
         this.cdl = cdl
-        makeFair()
     }
 
-    def onMessage(final def msg) {
+    def relay(final def msg) {
         soFarLast?.send(msg)
         cdl.countDown()
     }
