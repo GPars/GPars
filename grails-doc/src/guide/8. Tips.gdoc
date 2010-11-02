@@ -23,3 +23,7 @@ group1.with {
 When customizing the thread pools for groups, consider using the existing GPars implementations - the _DefaultPool_ or _ResizeablePool_ classes.
 Or you may create your own implementation of the _groovyx.gpars.scheduler.Pool_ interface to pass to the _DefaultPGroup_ or _NonDaemonPGroup_ constructors.
 {note}
+
+h3. Java API
+
+Most of GPars functionality can be used from Java just as well as from Groovy. Take GPars with you wherever you go!

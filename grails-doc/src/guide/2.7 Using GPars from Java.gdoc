@@ -1,0 +1,142 @@
+Using GPars is very addictive, I guarantee. Once you get hooked you won't be able to code without it.
+May the world force you to write code in Java, you will still be able to benefit from most of GPars features.
+
+h3. Actors
+
+The _DynamicDispatchActor_ as well as the _ReactiveActor_ classes can be used just like in Groovy:
+
+{code}
+import groovy.lang.Closure;
+import groovyx.gpars.actor.DynamicDispatchActor;
+
+public class StatelessActorDemo {
+    public static void main(String[] args) throws InterruptedException {
+        final MyStatelessActor actor = new MyStatelessActor();
+        actor.start();
+        actor.send("Hello");
+        actor.sendAndWait(10);
+        actor.sendAndContinue(10.0, new Closure(null) {
+            @Override public Object call(final Object arguments) {
+                System.out.println("Received a reply " + arguments);
+                return null;
+            }
+        });
+    }
+}
+
+class MyStatelessActor extends DynamicDispatchActor {
+    public void onMessage(final String msg) {
+        System.out.println("Received " + msg);
+        replyIfExists("Thank you");
+    }
+
+    public void onMessage(final Integer msg) {
+        System.out.println("Received a number " + msg);
+        replyIfExists("Thank you");
+    }
+
+    public void onMessage(final Object msg) {
+        System.out.println("Received an object " + msg);
+        replyIfExists("Thank you");
+    }
+}
+{code}
+
+Although there are not many differences between Groovy and Java GPars use, notice, the callbacks instantiating groovy Closures.
+
+{code}
+import groovy.lang.Closure;
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.ReactiveActor;
+
+public class ReactorDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final Closure handler = new Closure(null) {
+            @Override public Object call(final Object arguments) {
+                return ((Integer)arguments) * 2;
+            }
+        };
+        final Actor actor = new ReactiveActor(handler);
+        actor.start();
+
+        System.out.println("Result: " +  actor.sendAndWait(1));
+        System.out.println("Result: " +  actor.sendAndWait(2));
+        System.out.println("Result: " +  actor.sendAndWait(3));
+    }
+}
+{code}
+
+Obviously, all the essential factory methods are available where you'd expect them.
+
+h3. Agents
+
+{code}
+import groovy.lang.Closure;
+import groovyx.gpars.agent.Agent;
+
+public class AgentDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final Agent counter = new Agent<Integer>(0);
+        counter.send(10);
+        System.out.println("Current value: " + counter.getVal());
+        counter.send(new Closure(null) {
+            @Override public Object call(final Object arguments) {
+                counter.updateValue((Integer)arguments + 1);
+                return null;
+            }
+        });
+        System.out.println("Current value: " + counter.getVal());
+    }
+}
+{code}
+
+h3. Dataflow Concurrency
+
+Both _DataFlowVariables_ and _DataFlowStreams_ can be used from Java without any hiccups. Just avoid the handy overloaded operators
+and go straight to the methods, like _bind_ , _whenBound_, _getVal_ and other.
+You may also continue using dataflow _tasks_ passing to them instances of _Runnable_ or _Callable just like groovy _Closure_ .
+
+{code}
+import groovy.lang.Closure;
+import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.group.DefaultPGroup;
+
+import java.util.concurrent.Callable;
+
+public class DataFlowTaskDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final DefaultPGroup group = new DefaultPGroup(10);
+
+        final DataFlowVariable a = new DataFlowVariable();
+
+        group.task(new Runnable() {
+            public void run() {
+                a.bind(10);
+            }
+        });
+
+        final DataFlowVariable result = group.task(new Callable() {
+            public Object call() throws Exception {
+                return (Integer)a.getVal() + 10;
+            }
+        });
+
+        result.whenBound(new Closure(null) {
+            @Override public Object call(final Object arguments) {
+                System.out.println("arguments = " + arguments);
+                return null;
+            }
+        });
+
+        System.out.println("result = " + result.getVal());
+    }
+}
+{code}
+
+h3. Performance
+
+//todo
+
+h3. Prerequisites
+
+All the GPars integration rules apply to Java projects just like they do to Groovy projects. You only need to include the groovy distribution jar file in your project and all is clear to march ahead.
