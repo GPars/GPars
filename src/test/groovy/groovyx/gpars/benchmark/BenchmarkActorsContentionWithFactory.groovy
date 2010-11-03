@@ -38,17 +38,13 @@ int i = 0
 while (i < numOfAttackers) {
     final def weapon = i
     def attacker
-    attacker = attackGroup.actor(new Runnable() {
-
-        void run() {
-            attackSignal.await()
-            defender weapon
-            attacker.react {
-                retreatSignal.countDown()
-            }
+    attacker = attackGroup.actor {
+        attackSignal.await()
+        defender weapon
+        attacker.react {
+            retreatSignal.countDown()
         }
     }
-    )
     i += 1
 }
 

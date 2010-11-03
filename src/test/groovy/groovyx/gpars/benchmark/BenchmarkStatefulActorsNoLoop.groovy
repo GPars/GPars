@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 final def concurrencyLevel = 20
 group = new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
 
-class Handle {
+final class Handle {
     static def handle(actor, soFarLast, cdl) {
         actor.react {
             soFarLast?.send(it)
