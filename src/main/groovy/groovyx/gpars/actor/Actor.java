@@ -273,9 +273,9 @@ public abstract class Actor extends ReplyingMessageStream {
         else getSenders().add(message.getSender());
     }
 
-    protected final void runEnhancedWithoutRepliesOnMessages(final ActorMessage message, final Closure code) {
+    protected final void runEnhancedWithoutRepliesOnMessages(final ActorMessage message, final Closure code, final Object arguments) {
         prepareReplies(message);
-        code.call();
+        code.call(arguments);
     }
 
     @SuppressWarnings("rawtypes")

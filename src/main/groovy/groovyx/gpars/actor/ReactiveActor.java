@@ -14,30 +14,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor
+package groovyx.gpars.actor;
+
+import groovy.lang.Closure;
 
 /**
  * An actor representing a reactor. When it receives a message, the supplied block of code is run with the message
  * as a parameter and the result of the code is send in reply.
- *
+ * <p/>
  * <pre>
  * final def doubler = reactor {message ->
  *     2 * message
- *}*
+ * }*
  * def result = doubler.sendAndWait(10)
- *
+ * <p/>
  * </pre>
  *
  * @author Vaclav Pech, Alex Tkachman
- * Date: Jun 26, 2009
+ *         Date: Jun 26, 2009
  */
 public class ReactiveActor extends AbstractLoopingActor {
 
-    ReactiveActor(Closure body) {
+    public ReactiveActor(final Closure body) {
         final Closure cloned = (Closure) body.clone();
-        cloned.delegate = this;
-        cloned.resolveStrategy = Closure.DELEGATE_FIRST;
+        cloned.setDelegate(this);
+        cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
 
-        initialize({ replyIfExists cloned(it) })
+        initialize(new Closure(this) {
+            private static final long serialVersionUID = 4092639210342260198L;
+
+            @Override
+            public Object call(final Object arguments) {
+                ReactiveActor.this.replyIfExists(cloned.call(new Object[]{arguments}));
+                return null;
+            }
+        });
     }
 }

@@ -19,7 +19,6 @@ import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.util.AsyncMessagingCore;
-import org.codehaus.groovy.runtime.CurriedClosure;
 
 /**
  * Wraps all actors that repeatedly loop through incoming messages and hold no implicit state between subsequent messages.
@@ -71,7 +70,7 @@ public abstract class AbstractLoopingActor extends Actor {
                 } else {
                     final ActorMessage actorMessage = (ActorMessage) message;
                     try {
-                        runEnhancedWithoutRepliesOnMessages(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
+                        runEnhancedWithoutRepliesOnMessages(actorMessage, code, actorMessage.getPayLoad());
                     } finally {
                         getSenders().clear();
                         obj2Sender.clear();

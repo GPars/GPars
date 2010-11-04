@@ -16,8 +16,8 @@
 
 package groovyx.gpars.actor
 
+import groovyx.gpars.actor.impl.DDAClosure
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
-import org.codehaus.groovy.runtime.NullObject
 
 /**
  * A pooled actor allowing for an alternative structure of the message handling code.
@@ -49,7 +49,7 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
      * Creates an instance, processing all when{} calls in the supplied closure
      * @param closure A closure to run against te actor, typically to register handlers
      */
-    DynamicDispatchActor(Closure closure) {
+    DynamicDispatchActor(final Closure closure) {
         if (closure) {
             Closure cloned = (Closure) closure.clone()
             cloned.resolveStrategy = Closure.DELEGATE_FIRST
@@ -57,13 +57,10 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
             cloned.call()
         }
 
-        initialize({msg ->
-            //noinspection GroovyConditionalCanBeElvis
-            onMessage msg != null ? msg : NullObject.nullObject  //Groovy truth won't let us use Elvis for numbers, strings and collections correctly
-        })
+        initialize(new DDAClosure(this))
     }
 
-    void when(Closure closure) {
+    void when(final Closure closure) {
         DefaultGroovyMethods.getMetaClass(this).onMessage closure
     }
 }
