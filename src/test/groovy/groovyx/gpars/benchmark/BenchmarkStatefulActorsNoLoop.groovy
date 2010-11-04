@@ -21,6 +21,8 @@ import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+final def t1 = System.currentTimeMillis()
+
 final def concurrencyLevel = 20
 group = new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
 
@@ -34,7 +36,6 @@ final class Handle {
     }
 }
 
-final def t1 = System.currentTimeMillis()
 final def cdl = new CountDownLatch(10000 * 500)
 def last = null
 

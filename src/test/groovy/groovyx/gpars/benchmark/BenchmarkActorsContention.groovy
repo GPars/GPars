@@ -16,7 +16,7 @@
 
 package groovyx.gpars.benchmark
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.group.DefaultPGroup
@@ -53,7 +53,7 @@ defendGroup.shutdown()
 final def t2 = System.currentTimeMillis()
 println(t2 - t1)
 
-final class AttackActor extends AbstractPooledActor {
+final class AttackActor extends DefaultActor {
 
     final def attackSignal
     final def retreatSignal
@@ -69,7 +69,7 @@ final class AttackActor extends AbstractPooledActor {
 
     protected void act() {
         attackSignal.await()
-        defender weapon
+        defender.send(weapon)
         react {
             retreatSignal.countDown()
         }

@@ -16,34 +16,33 @@
 
 package groovyx.gpars.benchmark
 
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.FJPool
+import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 final def t1 = System.currentTimeMillis()
 
-final def concurrencyLevel = 8
-group = new DefaultPGroup(new FJPool(concurrencyLevel))
+final def concurrencyLevel = 20
+group = new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
+final def channels = new Actor[10000]
 
 final def cdl = new CountDownLatch(10000 * 500)
-def last = null
 
 for (int i = 0; i < 10000; i++) {
-    final def soFarLast = last
-    def channel = group.actor {
-        loop {
-            react {
-                soFarLast?.send(it)
-                cdl.countDown()
-            }
-        }
-    }
-    last = channel
+    final def channel = new DefaultActorHandlerWithArray(channels, i, cdl)
+    channel.parallelGroup = group
+    channels[i] = channel
+    channel.start()
 }
 
 for (int i = 0; i < 500; i++) {
-    last.send("Hi")
+    channels[i].send("Hi")
+    for (int j = 0; j < i; j++) {
+        cdl.countDown()
+    }
 }
 
 cdl.await(1000, TimeUnit.SECONDS)
@@ -51,3 +50,26 @@ cdl.await(1000, TimeUnit.SECONDS)
 group.shutdown()
 final def t2 = System.currentTimeMillis()
 println(t2 - t1)
+
+final class DefaultActorHandlerWithArray extends DefaultActor {
+
+    final def channels
+    private final def index
+    private final def cdl
+
+    def DefaultActorHandlerWithArray(final def channels, final def index, final def cdl) {
+        this.channels = channels
+        this.index = index
+        this.cdl = cdl
+//        makeFair()
+    }
+
+    void act() {
+        loop {
+            react {msg ->
+                if (index < channels.length - 1) channels[index + 1].send(msg)
+                cdl.countDown()
+            }
+        }
+    }
+}

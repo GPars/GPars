@@ -14,28 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor.impl
+package groovyx.gpars.actor;
 
-import groovyx.gpars.actor.DynamicDispatchActor
-import org.codehaus.groovy.runtime.NullObject
+import groovy.lang.Closure;
 
 /**
  * Represents the DDA closure to invoke appropriate message handlers based on message runtime type
  *
  * @author Vaclav Pech
  */
-public final class DDAClosure extends Closure {
+public final class DefaultActorClosure extends Closure {
 
-    private final DynamicDispatchActor dda
+    private final DefaultActor myActor;
+    private static final long serialVersionUID = 3009666814957486672L;
 
-    def DDAClosure(final DynamicDispatchActor dda) {
-        super(dda);
-        this.dda = dda
+    DefaultActorClosure(final DefaultActor actor) {
+        super(actor);
+        this.myActor = actor;
     }
 
-    @SuppressWarnings("GroovyConditionalCanBeElvis")
     @Override
-    Object call(Object msg) {
-        return dda.onMessage(msg != null ? msg : NullObject.nullObject)  //Groovy truth won't let us use Elvis for numbers, strings and collections correctly)
+    public Object call(final Object arguments) {
+        myActor.onMessage(arguments);
+        return null;
     }
 }

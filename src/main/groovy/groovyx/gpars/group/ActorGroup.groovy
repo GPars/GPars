@@ -16,11 +16,10 @@
 
 package groovyx.gpars.group
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
-import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
@@ -62,8 +61,8 @@ public abstract class PGroup {
      * @param handler The body of the newly created actor's act method.
      * @return A newly created instance of the AbstractPooledActor class
      */
-    public final AbstractPooledActor actor(Runnable handler) {
-        final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
+    public final DefaultActor actor(Runnable handler) {
+        final DefaultActor actor = new DefaultActor(handler)
         actor.parallelGroup = this
         actor.start()
         return actor
