@@ -910,7 +910,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     }
 
     final void runReaction(final ActorMessage message, final Closure code) {
-        runEnhancedWithReplies(message, code);
+        runEnhancedWithRepliesOnMessages(message, code);
         doLoopCall();
     }
 
