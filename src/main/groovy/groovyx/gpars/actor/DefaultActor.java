@@ -17,6 +17,7 @@
 package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
+import groovyx.gpars.actor.impl.ActorContinuationException;
 
 /**
  * @author Vaclav Pech
@@ -58,20 +59,26 @@ public class DefaultActor extends AbstractLoopingActor {
     }
 
     final void onMessage(final Object message) {
-        if (nextContinuation != null) {
-            final Closure closure = nextContinuation;
-            nextContinuation = null;
-            closure.call(message);
-        } else {
-            if (message == START_MESSAGE) handleStartMessage();
-            else
-                throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
+        try {
+            if (nextContinuation != null) {
+                final Closure closure = nextContinuation;
+                nextContinuation = null;
+                closure.call(message);
+            } else {
+                if (message == START_MESSAGE) handleStartMessage();
+                else
+                    throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
+            }
+        } catch (ActorContinuationException ignore) {
         }
         if (nextContinuation == null) {
-            if (loopCode == null)
-                if (loopClosure == null) terminate();
-                else loopClosure.call();
-            else loopCode.run();
+            try {
+                if (loopCode == null)
+                    if (loopClosure == null) terminate();
+                    else loopClosure.call();
+                else loopCode.run();
+            } catch (ActorContinuationException ignore) {
+            }
         }
     }
 
@@ -93,6 +100,7 @@ public class DefaultActor extends AbstractLoopingActor {
         checkForNull(code);
         checkForMessageHandlerArguments(code);
         nextContinuation = enhanceClosure(code);
+//        throw ActorException.CONTINUE;
     }
 
     @Override
@@ -112,7 +120,7 @@ public class DefaultActor extends AbstractLoopingActor {
                 }
             } else act();
             if (nextContinuation == null) terminate();
-        } catch (RuntimeException e) {
+        } catch (IllegalStateException e) {
             terminate();
             throw e;
         } finally {

@@ -69,6 +69,21 @@ public abstract class PGroup {
     }
 
     /**
+     * Creates a new instance of PooledActor, using the passed-in runnable/closure as the body of the actor's act() method.
+     * The actor will cooperate in thread sharing with other actors sharing the same thread pool in a fair manner.
+     * The created actor will belong to the pooled parallel group.
+     * @param handler The body of the newly created actor's act method.
+     * @return A newly created instance of the AbstractPooledActor class
+     */
+    public final DefaultActor fairActor(Runnable handler) {
+        final DefaultActor actor = new DefaultActor(handler)
+        actor.parallelGroup = this
+        actor.makeFair()
+        actor.start()
+        return actor
+    }
+
+    /**
      * Creates a reactor around the supplied code.
      * When a reactor receives a message, the supplied block of code is run with the message
      * as a parameter and the result of the code is send in reply.
@@ -83,8 +98,7 @@ public abstract class PGroup {
     }
 
     /**
-     * Creates a reactor around the supplied code, which will cooperate in thread sharing with other Agent instances
-     * in a fair manner.
+     * Creates a reactor around the supplied code, which will cooperate in thread sharing with other actors sharing the same thread pool
      * When a reactor receives a message, the supplied block of code is run with the message
      * as a parameter and the result of the code is send in reply.
      * @param The code to invoke for each received message
@@ -110,8 +124,7 @@ public abstract class PGroup {
     }
 
     /**
-     * Creates an instance of DynamicDispatchActor, which will cooperate in thread sharing with other Agent instances
-     * in a fair manner.
+     * Creates an instance of DynamicDispatchActor, which will cooperate in thread sharing with other actors sharing the same thread pool
      * @param code The closure specifying individual message handlers.
      */
     public final Actor fairMessageHandler(final Closure code) {
@@ -146,8 +159,7 @@ public abstract class PGroup {
     }
 
     /**
-     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
-     * in a fair manner.
+     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other agents and actors in a fair manner.
      * @param state The initial internal state of the new Agent instance
      * @return The created instance
      */
@@ -158,8 +170,7 @@ public abstract class PGroup {
     }
 
     /**
-     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
-     * in a fair manner.
+     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other agents and actors in a fair manner.
      * @param copy A closure to use to create a copy of the internal state when sending the internal state out
      * @param state The initial internal state of the new Agent instance
      * @return The created instance

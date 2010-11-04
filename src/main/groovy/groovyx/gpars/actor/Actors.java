@@ -64,6 +64,18 @@ public abstract class Actors {
     }
 
     /**
+     * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
+     * The created actor will be part of the default actor group.
+     * The actor will cooperate in thread sharing with other actors sharing the same thread pool in a fair manner.
+     *
+     * @param handler The body of the newly created actor's act method.
+     * @return A newly created instance of the AbstractPooledActor class
+     */
+    public static DefaultActor fairActor(final Runnable handler) {
+        return defaultActorPGroup.fairActor(handler);
+    }
+
+    /**
      * Creates a reactor around the supplied code.
      * When a reactor receives a message, the supplied block of code is run with the message
      * as a parameter and the result of the code is send in reply.
@@ -77,8 +89,7 @@ public abstract class Actors {
     }
 
     /**
-     * Creates a reactor around the supplied code, which will cooperate in thread sharing with other Agent instances
-     * in a fair manner.
+     * Creates a reactor around the supplied code, which will cooperate in thread sharing with other actors in a fair manner.
      * When a reactor receives a message, the supplied block of code is run with the message
      * as a parameter and the result of the code is send in reply.
      * The created actor will be part of the default actor group.
@@ -101,8 +112,7 @@ public abstract class Actors {
     }
 
     /**
-     * Creates an instance of DynamicDispatchActor, which will cooperate in thread sharing with other Agent instances
-     * in a fair manner.
+     * Creates an instance of DynamicDispatchActor, which will cooperate in thread sharing with other actors in a fair manner.
      *
      * @param code The closure specifying individual message handlers.
      * @return A new started instance of a fair DynamicDispatchActor

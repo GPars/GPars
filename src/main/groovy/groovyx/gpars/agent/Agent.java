@@ -125,8 +125,7 @@ public class Agent<T> extends AgentBase<T> {
     }
 
     /**
-     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other Agent instances
-     * in a fair manner.
+     * Creates an agent instance initialized with the given state, which will cooperate in thread sharing with other agents and actors in a fair manner.
      * The instance will use the default thread pool.
      *
      * @param state The initial internal state of the new Agent instance

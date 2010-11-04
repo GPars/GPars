@@ -212,4 +212,42 @@ class DefaultActorCreationTest extends GroovyTestCase {
         actor.join()
         assert !actor.isActive()
     }
+
+
+    public void testContinuationStyleWithAct() {
+        final def result = new DataFlowVariable()
+        final def continuationResult = new DataFlowVariable()
+        final def actor = new DefaultActor() {
+
+            protected void act() {
+                react {
+                    result << it
+                }
+                continuationResult << 'Reached'
+            }
+        }
+        actor.start()
+        actor 'Message'
+        assert result.val == 'Message'
+        actor.join()
+        assert !actor.isActive()
+        assert continuationResult.isBound()
+    }
+
+    public void testContinuationStyleWithContinuation() {
+        final def result = new DataFlowVariable()
+        final def continuationResult = new DataFlowVariable()
+        final def actor = new DefaultActor({
+            react {
+                result << it
+            }
+            continuationResult << 'Reached'
+        })
+        actor.start()
+        actor 'Message'
+        assert result.val == 'Message'
+        actor.join()
+        assert !actor.isActive()
+        assert continuationResult.isBound()
+    }
 }
