@@ -28,8 +28,7 @@ final def t1 = System.currentTimeMillis()
 final def cdl = new CountDownLatch(10000 * 500)
 def last = null
 
-int i = 0
-while (i < 10000) {
+for (int i = 0; i < 10000; i++) {
     final def soFarLast = last
     def channel = group.actor {
         loop {
@@ -40,13 +39,10 @@ while (i < 10000) {
         }
     }
     last = channel
-    i++
 }
 
-i = 0
-while (i < 500) {
+for (int i = 0; i < 500; i++) {
     last.send("Hi")
-    i += 1
 }
 
 cdl.await(1000, TimeUnit.SECONDS)

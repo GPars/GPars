@@ -30,19 +30,15 @@ final def t1 = System.currentTimeMillis()
 final def cdl = new CountDownLatch(10000 * 500)
 final def channels = new Actor[10000]
 
-int i = 0
-while (i < 10000) {
+for (int i = 0; i < 10000; i++) {
     final def channel = new HandlerWithArray(channels, i, cdl)
     channel.parallelGroup = group
     channels[i] = channel
     channel.start()
-    i += 1
 }
 
-i = 0
-while (i < 500) {
+for (int i = 0; i < 500; i++) {
     channels[i].send("Hi")
-    i += 1
     for (int j = 0; j < i; j++) {
         cdl.countDown()
     }
