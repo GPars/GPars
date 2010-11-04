@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 
@@ -26,9 +26,9 @@ public class ImmutableMessageTest extends GroovyTestCase {
         volatile String result
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor bouncer = Actors.actor {
+        final Actor bouncer = Actors.actor {
             react {
-                it.reply new TestMessage(it.value)
+                reply(new TestMessage(it.value))
             }
         }
 

@@ -16,7 +16,6 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
@@ -165,7 +164,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             delegate.metaClass {
                 onException = {
                     flag.set(true)
@@ -188,7 +187,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final AbstractPooledActor receiver = actor {
+        final Actor receiver = actor {
             react {
                 replyIfExists it
             }
@@ -211,7 +210,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             react {
                 replyIfExists it
                 flag.set(true)
@@ -230,7 +229,7 @@ public class ReplyTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor replier = actor {
+        final Actor replier = actor {
             react {
                 latch.await()
                 replyIfExists it
@@ -239,7 +238,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        final AbstractPooledActor sender = actor {
+        final Actor sender = actor {
             delegate.metaClass {
                 afterStop = {
                     latch.countDown()
@@ -260,13 +259,15 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor actor = Actors.actor {
+        final Actor actor = Actors.actor {
             react {
                 reply 'Message2'
-                it.reply 'Message3'
+                sender.send 'Message3'
                 react {a ->
+                    def senders = [sender]
                     react {b ->
-                        [a, b]*.reply 'Message6'
+                        senders << sender
+                        senders*.send 'Message6'
                         latch.await()
                     }
                 }
@@ -276,7 +277,7 @@ public class ReplyTest extends GroovyTestCase {
         Actors.actor {
             actor.send 'Message1'
             react {
-                it.reply 'Message4'
+                reply 'Message4'
                 react {
                     reply 'Message5'
                     react {a ->
@@ -300,7 +301,7 @@ public class ReplyTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = actor {
-            react {->
+            react {
                 reply 'Message2'
             }
         }
@@ -325,20 +326,29 @@ public class ReplyTest extends GroovyTestCase {
 
         final def bouncer = actor {
             latches[0].await()
+            def senders = []
             react {a ->
+                senders << sender
                 react {b ->
+                    senders << sender
                     react {c ->
-                        [a, b, c]*.replyIfExists 4
+                        senders << sender
+                        senders.findAll {it?.isActive()}*.send 4
                         latches[1].countDown()
 
                         latches[2].await()
+                        senders = []
                         react {x ->
+                            senders << sender
                             react {y ->
+                                senders << sender
                                 react {z ->
+                                    senders << sender
                                     try {
-                                        [z, x, y].each {message ->
+                                        senders.each {currentSender ->
                                             try {
-                                                message.reply 8
+                                                currentSender?.send 8
+                                                if (currentSender == null) issues << new IllegalStateException('Sender is not known')
                                             } catch (IllegalStateException e) {
                                                 issues << e
                                             }
@@ -355,7 +365,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         //send and terminate
-        final AbstractPooledActor actor1 = actor {
+        final Actor actor1 = actor {
             delegate.metaClass.afterStop = {
                 latches[0].countDown()
             }
@@ -364,7 +374,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         //wait, send and terminate
-        final AbstractPooledActor actor2 = actor {
+        final Actor actor2 = actor {
             delegate.metaClass.afterStop = {
                 latches[2].countDown()
             }
@@ -393,19 +403,17 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testOriginatorDetection() {
-        final CyclicBarrier barrier = new CyclicBarrier(2)
-        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
         final DataFlowVariable originator1 = new DataFlowVariable()
         final DataFlowVariable originator2 = new DataFlowVariable()
         final DataFlowVariable originator3 = new DataFlowVariable()
 
         final def bouncer = actor {
             react {msg1 ->
-                originator1 << msg1.sender
+                originator1 << sender
                 react {msg2 ->
-                    originator2 << msg2.sender
+                    originator2 << sender
                     react {msg3 ->
-                        originator3 << msg3.sender
+                        originator3 << sender
                     }
                 }
             }

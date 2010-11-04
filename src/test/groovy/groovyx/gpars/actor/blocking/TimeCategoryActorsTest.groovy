@@ -16,11 +16,11 @@
 
 package groovyx.gpars.actor.blocking
 
+import groovy.time.TimeCategory
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import groovy.time.TimeCategory
 
 /**
  *
@@ -34,7 +34,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile boolean timeoutFlag = false
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
 
             delegate.metaClass {
                 onTimeout = {-> timeoutFlag = true; terminate() }
@@ -56,7 +56,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             try {
                 receive(1.second) {}
             } catch (MissingPropertyException ignore) {exceptions++ }
@@ -81,7 +81,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def result = ''
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             use(TimeCategory) {
                 receive(2.seconds) {
                     result = it

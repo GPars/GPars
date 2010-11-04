@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
@@ -37,7 +37,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final def bouncer = actor {
             loop {
                 react {
-                    it.reply it
+                    reply it
                     barrier.await()
                 }
             }
@@ -92,13 +92,13 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         final def incrementor = actor {
             loop {
-                react { it.reply it + 1 }
+                react { reply it + 1 }
             }
         }
 
         final def decrementor = actor {
             loop {
-                react { it.reply it - 1 }
+                react { reply it - 1 }
             }
         }
 
@@ -157,7 +157,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             delegate.metaClass {
                 onException = {
                     flag.set(true)
@@ -166,7 +166,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
 
             react {
-                it.reply it
+                reply it
             }
         }
 
@@ -180,9 +180,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final AbstractPooledActor receiver = actor {
+        final Actor receiver = actor {
             react {
-                it.replyIfExists it
+                replyIfExists it
             }
         }
 
@@ -203,9 +203,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             react {
-                it.replyIfExists it
+                replyIfExists it
                 flag.set(true)
                 barrier.await()
             }
@@ -222,16 +222,16 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final AbstractPooledActor replier = actor {
+        final Actor replier = actor {
             react {
                 latch.await()
-                it.replyIfExists it
+                replyIfExists it
                 flag.set(true)
                 barrier.await()
             }
         }
 
-        final AbstractPooledActor sender = actor {
+        final Actor sender = actor {
             delegate.metaClass {
                 afterStop = {
                     latch.countDown()
@@ -256,10 +256,11 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final def maxFinder = actor {
             barrier.await()
             react {message1 ->
+                def sender1 = sender
                 react {message2 ->
                     def max = Math.max(message1, message2)
-                    message1.reply max
-                    message2.reply max
+                    sender1.send max
+                    sender.send max
                 }
             }
         }

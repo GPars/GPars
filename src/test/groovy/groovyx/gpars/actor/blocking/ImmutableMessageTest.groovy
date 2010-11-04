@@ -25,13 +25,13 @@ public class ImmutableMessageTest extends GroovyTestCase {
         volatile String result
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor bouncer = Actors.actor {
+        final Actor bouncer = Actors.oldActor {
             receive {
                 it.reply new TestMessage(it.value)
             }
         }
 
-        Actors.actor {
+        Actors.oldActor {
             bouncer << new TestMessage('Value')
             receive {
                 result = it.value

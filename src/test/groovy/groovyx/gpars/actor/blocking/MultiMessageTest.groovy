@@ -29,7 +29,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive {a, b, c ->
                 result = a + b + c
                 latch.countDown()
@@ -48,7 +48,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive {->
                 result = 1
                 latch.countDown()
@@ -65,7 +65,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive {
                 result = 1
                 latch.countDown()
@@ -82,7 +82,7 @@ public class MultiMessageTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive {a, b, c ->
                 result = a[2] + b + c
                 latch.countDown()
@@ -103,7 +103,7 @@ public class MultiMessageTest extends GroovyTestCase {
         volatile AtomicInteger result = new AtomicInteger(0)
         final def group = new DefaultPGroup(10)
 
-        def actor = group.actor {
+        def actor = group.oldActor {
             receive {a, b, c ->
                 a.reply(a + 1)
                 b.reply(b + 1)
@@ -127,7 +127,7 @@ public class MultiMessageTest extends GroovyTestCase {
         volatile AtomicInteger result = new AtomicInteger(0)
         final def group = new DefaultPGroup(10)
 
-        def actor = group.actor {
+        def actor = group.oldActor {
             receive {a, b, c ->
                 reply(20)
             }
@@ -144,7 +144,7 @@ public class MultiMessageTest extends GroovyTestCase {
     }
 
     Actor createReplyActor(Actor actor, int num, CyclicBarrier barrier, CountDownLatch latch, AtomicInteger result, group) {
-        group.actor {
+        group.oldActor {
             barrier.await()
             actor.send(num)
             receive {

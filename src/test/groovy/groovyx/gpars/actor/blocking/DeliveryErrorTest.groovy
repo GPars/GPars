@@ -26,7 +26,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             final def a = receive()
         }
 
@@ -50,7 +50,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             final def a = receive()
             barrier.await()
         }
@@ -83,7 +83,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass.onException = {}
             delegate.metaClass.afterStop = {
                 latch.countDown()
@@ -116,7 +116,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
         volatile boolean flag = false
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             latch.await()
         }
 

@@ -35,7 +35,7 @@ public class SharedMemoryTest extends GroovyTestCase {
                 react {
                     assert it == counter * 2
                     counter += 1
-                    it.reply counter.longValue() * 2
+                    reply counter.longValue() * 2
                 }
             }
         }

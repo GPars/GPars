@@ -28,7 +28,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testSuccessfulMessages() {
         CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass.afterStop = {
                 latch.countDown()
             }
@@ -47,7 +47,7 @@ public class SendAndWaitTest extends GroovyTestCase {
     public void testMessagesToStoppedActor() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass.afterStop = {
                 barrier.await()
             }
@@ -69,7 +69,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass.afterStop = {
                 latch.countDown()
             }
@@ -94,7 +94,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass {
                 onException = {}
                 afterStop = {
@@ -123,7 +123,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass.afterStop = {
                 latch.countDown()
             }
@@ -150,7 +150,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass.afterStop = {
                 latch.countDown()
             }
@@ -172,7 +172,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass.afterStop = {
                 latch.countDown()
             }
@@ -193,7 +193,7 @@ public class SendAndWaitTest extends GroovyTestCase {
 
         final DefaultPGroup group = new DefaultPGroup(3)
 
-        final Actor actor = group.actor {
+        final Actor actor = group.oldActor {
             receive {
                 reply 2
             }

@@ -16,9 +16,9 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.group.PGroup
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
@@ -45,7 +45,7 @@ public class LoopTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             loop {
                 react {
                     counter.incrementAndGet()
@@ -75,7 +75,7 @@ public class LoopTest extends GroovyTestCase {
         final def afterStopBarrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             loop {
                 barrier.await()
                 Thread.sleep 10000
@@ -105,7 +105,7 @@ public class LoopTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             loop {
                 barrier.await()
                 react {
@@ -138,7 +138,7 @@ public class LoopTest extends GroovyTestCase {
     public void testBeforeLoopStop() {
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             Thread.sleep 10000
             loop {
                 counter.incrementAndGet()

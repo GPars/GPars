@@ -64,8 +64,8 @@ class MessageStreamTest extends GroovyTestCase {
         def processor = Actors.actor {
             react {
                 reply '1'
-                it.reply '2'
-                it.sender.send '3'
+                reply '2'
+                sender.send '3'
             }
         }
 

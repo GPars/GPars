@@ -232,7 +232,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
         def results = new DataFlowVariable()
 
-        Actors.actor {
+        Actors.oldActor {
             dda << 1
             results << (1..2).collect {receive(1000, TimeUnit.MILLISECONDS)}
             dda.stop()

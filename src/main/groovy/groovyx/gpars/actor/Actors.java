@@ -63,6 +63,11 @@ public abstract class Actors {
         return defaultActorPGroup.actor(handler);
     }
 
+    @Deprecated
+    public static AbstractPooledActor oldActor(final Runnable handler) {
+        return defaultActorPGroup.oldActor(handler);
+    }
+
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
      * The created actor will be part of the default actor group.

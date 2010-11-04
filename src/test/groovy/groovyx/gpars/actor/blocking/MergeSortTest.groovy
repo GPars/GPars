@@ -75,8 +75,8 @@ public class MergeSortTest extends GroovyTestCase {
                     default:
                         def splitList = split(message)
 
-                        def child1 = group.actor(createMessageHandler(delegate))
-                        def child2 = group.actor(createMessageHandler(delegate))
+                        def child1 = group.oldActor(createMessageHandler(delegate))
+                        def child2 = group.oldActor(createMessageHandler(delegate))
                         child1.send(splitList[0])
                         child2.send(splitList[1])
 
@@ -91,12 +91,12 @@ public class MergeSortTest extends GroovyTestCase {
         volatile def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
-        def resultActor = Actors.actor {
+        def resultActor = Actors.oldActor {
             result = receive(90, TimeUnit.SECONDS)
             latch.countDown()
         }
 
-        def sorter = Actors.actor(createMessageHandler(resultActor))
+        def sorter = Actors.oldActor(createMessageHandler(resultActor))
         sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(90, TimeUnit.SECONDS)

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CountDownLatch
@@ -26,7 +26,7 @@ public class NullMessageTest extends GroovyTestCase {
     public void testNullMessage() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             react {
                 result = it
                 latch.countDown()
@@ -40,7 +40,7 @@ public class NullMessageTest extends GroovyTestCase {
     public void testNullMessageFromActor() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             react {
                 result = it
                 latch.countDown()
@@ -56,7 +56,7 @@ public class NullMessageTest extends GroovyTestCase {
 
     public void testNullMessageFromActorWithReply() {
         final def result = new DataFlowVariable()
-        final AbstractPooledActor actor = actor {
+        final Actor actor = actor {
             react {
                 reply 10
             }

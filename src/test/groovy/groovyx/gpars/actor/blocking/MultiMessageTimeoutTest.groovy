@@ -27,7 +27,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive(10, TimeUnit.SECONDS) {a, b, c ->
                 result = a + b + c
                 latch.countDown()
@@ -47,7 +47,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CyclicBarrier barrier = new CyclicBarrier(2)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             barrier.await()
             receive(0, TimeUnit.SECONDS) {a, b, c ->
                 result = a + b + c
@@ -69,7 +69,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CyclicBarrier barrier = new CyclicBarrier(2)
         List result = []
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             barrier.await()
             receive(0, TimeUnit.SECONDS) {a, b, c ->
                 result << a
@@ -90,7 +90,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CyclicBarrier barrier = new CyclicBarrier(2)
         volatile List result = []
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             barrier.await()
             receive(1, TimeUnit.SECONDS) {a, b, c ->
                 result << a
@@ -111,7 +111,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CyclicBarrier barrier = new CyclicBarrier(2)
         volatile List result = []
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             barrier.await()
             receive(2, TimeUnit.SECONDS) {a, b, c ->
                 result << a
@@ -133,7 +133,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive(10, TimeUnit.SECONDS) {->
                 result = 1
                 latch.countDown()
@@ -151,7 +151,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             barrier.await()
             receive(0, TimeUnit.SECONDS) {->
                 result = 1
@@ -170,7 +170,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive(0, TimeUnit.SECONDS) {->
                 result = 1
                 latch.countDown()
@@ -186,7 +186,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive(10, TimeUnit.SECONDS) {
                 result = 1
                 latch.countDown()
@@ -203,7 +203,7 @@ public class MultiMessageTimeoutTest extends GroovyTestCase {
         CountDownLatch latch = new CountDownLatch(1)
         volatile int result = 0
 
-        def actor = Actors.actor {
+        def actor = Actors.oldActor {
             receive(10, TimeUnit.SECONDS) {a, b, c ->
                 result = a[2] + b + c
                 latch.countDown()

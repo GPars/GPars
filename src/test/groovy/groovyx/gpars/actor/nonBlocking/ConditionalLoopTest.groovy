@@ -29,10 +29,22 @@ class ConditionalLoopTest extends GroovyTestCase {
             loop({-> false}) {
                 result = 1
             }
-            result = 2
+//            result = 2
         }
         actor.join()
         assert result == 0
+    }
+
+    public void testNoLoopWithTail() {
+        volatile int result = 0
+        def actor = actor {
+            loop({-> false}) {
+                result = 1
+            }
+            result = 2
+        }
+        actor.join()
+        assert result == 2
     }
 
     public void testNoLoopOnNumberOfIterations() {
@@ -41,7 +53,7 @@ class ConditionalLoopTest extends GroovyTestCase {
             loop(0) {
                 result = 1
             }
-            result = 2
+//            result = 2
         }
         actor.join()
         assert result == 0
@@ -56,7 +68,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 counter++
                 result++
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 1
@@ -68,7 +80,7 @@ class ConditionalLoopTest extends GroovyTestCase {
             loop(1) {
                 result++
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 1
@@ -83,7 +95,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 counter++
                 result++
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 5
@@ -95,7 +107,7 @@ class ConditionalLoopTest extends GroovyTestCase {
             loop(5) {
                 result++
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 5
@@ -111,10 +123,10 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 stop()
             }
-            result = 100
+//            result = 100
         }
         actor.join()
-        assert result == 1
+        assert result == 5
     }
 
     public void testRepeatedLoopOnNumberOfIterationsWithStop() {
@@ -124,10 +136,10 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 stop()
             }
-            result = 100
+//            result = 100
         }
         actor.join()
-        assert result == 1
+        assert result == 5
     }
 
     public void testRepeatedLoopWithTerminate() {
@@ -140,7 +152,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 terminate()
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 1
@@ -153,7 +165,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 terminate()
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 1
@@ -169,7 +181,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 react {}
             }
-            result = 100
+//            result = 100
         }
         actor 1
         actor 2
@@ -188,7 +200,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 react {}
             }
-            result = 100
+//            result = 100
         }
         actor 1
         actor 2
@@ -206,7 +218,7 @@ class ConditionalLoopTest extends GroovyTestCase {
             loop({-> false}, {-> result += 3}) {
                 result = 1
             }
-            result = 2
+//            result = 2
         }
         actor.join()
         assert result == 3
@@ -221,7 +233,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 counter++
                 result++
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 4
@@ -236,7 +248,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 counter++
                 result++
             }
-            result = 100
+//            result = 100
         }
         actor.join()
         assert result == 8
@@ -260,7 +272,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 react {}
             }
-            result = 100
+//            result = 100
         }
         actor 1
         actor 2
@@ -284,7 +296,7 @@ class ConditionalLoopTest extends GroovyTestCase {
 
             def afterLoopCode = {->
                 try {
-                    loop { }
+                    loop { stop()}
                 } catch (all) {
                     exception = all
                 }
@@ -294,7 +306,7 @@ class ConditionalLoopTest extends GroovyTestCase {
                 result++
                 react {}
             }
-            result = 100
+//            result = 100
         }
         actor 1
         actor 2

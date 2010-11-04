@@ -31,8 +31,12 @@ class DDAReplyTest extends GroovyTestCase {
         }).start()
         def actor = Actors.actor {
             dda new Object()
-            df.reply1 = receive()
-            df.reply2 = receive()
+            react {
+                df.reply1 = it
+                react {
+                    df.reply2 = it
+                }
+            }
         }
         assert df.sender == actor
         assert df.reply1 == 10

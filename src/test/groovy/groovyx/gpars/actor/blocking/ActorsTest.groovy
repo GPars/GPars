@@ -33,7 +33,7 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             loop {
                 final int value = counter.incrementAndGet()
                 if (value == 3) {
@@ -51,7 +51,7 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.actor {
+        Actors.oldActor {
             delegate.metaClass.afterStop = {
                 latch.countDown()
             }

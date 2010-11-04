@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
@@ -42,7 +42,7 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             counter.incrementAndGet()
             barrier.await()
             react {
@@ -71,7 +71,7 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             counter.incrementAndGet()
             barrier.await()
             react {
@@ -100,7 +100,7 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             counter.incrementAndGet()
             barrier.await()
             react {
@@ -129,7 +129,7 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             barrier.await()
             react {
                 counter.incrementAndGet()
@@ -167,7 +167,7 @@ public class MessagingTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             react {
                 counter.incrementAndGet()
                 barrier.await()

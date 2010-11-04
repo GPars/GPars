@@ -16,10 +16,10 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.group.PGroup
-import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
@@ -49,7 +49,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             barrier.await()
             counter.incrementAndGet()
             barrier.await()
@@ -68,7 +68,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         AtomicReference messagesReference = new AtomicReference(null)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             react {
                 barrier.await()
                 counter.incrementAndGet()
@@ -96,7 +96,7 @@ public class LifeCycleTest extends GroovyTestCase {
     public void testStop() {
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             Thread.sleep 2000
             react {
                 counter.incrementAndGet()
@@ -120,7 +120,7 @@ public class LifeCycleTest extends GroovyTestCase {
     public void testTerminate() {
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             Thread.sleep 10000
             react {
                 counter.incrementAndGet()
@@ -145,7 +145,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final def latch = new CountDownLatch(1)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             react {
             }
         }
@@ -172,7 +172,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         AtomicReference messagesReference = new AtomicReference(null)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             counter.incrementAndGet()
             barrier.await()
 
@@ -207,7 +207,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             react {
                 barrier.await()
                 Thread.sleep(10000)
@@ -240,9 +240,9 @@ public class LifeCycleTest extends GroovyTestCase {
 
     public void testStartedByFactory() {
         final def df = new DataFlows()
-        def a1 = group.actor {df.actor=true}
-        def a2 = group.reactor {df.reactor=true} << ''
-        def a3 = group.messageHandler {df.handler=true}
+        def a1 = group.actor {df.actor = true}
+        def a2 = group.reactor {df.reactor = true} << ''
+        def a3 = group.messageHandler {df.handler = true}
 
 
         assert df.actor
@@ -273,7 +273,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final AtomicBoolean onInterruptFlag = new AtomicBoolean(false)
         AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             react {
                 barrier.await()
                 Thread.sleep(10000)
@@ -307,7 +307,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final AtomicBoolean onExceptionFlag = new AtomicBoolean(false)
         AtomicReference<List> messagesReference = new AtomicReference<List>(null)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             react {
                 barrier.await()
                 throw new RuntimeException('test')
@@ -338,7 +338,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             barrier.await()
             counter.incrementAndGet()
             barrier.await()
@@ -352,7 +352,7 @@ public class LifeCycleTest extends GroovyTestCase {
         assertFalse actor.isActive()
 
         shouldFail(IllegalStateException) {
-          actor.start()
+            actor.start()
         }
     }
 
@@ -360,7 +360,7 @@ public class LifeCycleTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger counter = new AtomicInteger(0)
 
-        final AbstractPooledActor actor = group.actor {
+        final Actor actor = group.actor {
             barrier.await()
         }
 

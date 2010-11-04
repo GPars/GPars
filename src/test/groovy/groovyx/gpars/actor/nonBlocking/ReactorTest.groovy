@@ -124,7 +124,7 @@ public class ReactorTest extends GroovyTestCase {
 
         def results = new DataFlowVariable()
 
-        Actors.actor {
+        Actors.oldActor {
             reactor << 1
             results << (1..3).collect {receive(1000, TimeUnit.MILLISECONDS)}
             reactor.stop()

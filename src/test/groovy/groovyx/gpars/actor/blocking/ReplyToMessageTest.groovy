@@ -43,7 +43,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def bouncer = group.actor {
+        final def bouncer = group.oldActor {
             loop {
                 receive {
                     it.reply it
@@ -54,7 +54,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         Thread.sleep 1000
 
-        group.actor {
+        group.oldActor {
             bouncer.send 1
             barrier.await()
             bouncer.send 2
@@ -70,7 +70,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        group.actor {
+        group.oldActor {
             bouncer.send 10
             barrier.await()
             bouncer.send 20
@@ -99,15 +99,15 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def incrementor = group.actor {
+        final def incrementor = group.oldActor {
             loop { receive { it.reply it + 1 }}
         }
 
-        final def decrementor = group.actor {
+        final def decrementor = group.oldActor {
             loop { receive { it.reply it - 1 }}
         }
 
-        group.actor {
+        group.oldActor {
             barrier.await()
             incrementor.send 2
             decrementor.send 6
@@ -128,7 +128,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        group.actor {
+        group.oldActor {
             barrier.await()
             incrementor.send 20
             decrementor.send 60
@@ -162,7 +162,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = group.actor {
+        final Actor actor = group.oldActor {
             delegate.metaClass {
                 onException = {
                     flag.set(true)
@@ -188,13 +188,13 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor receiver = group.actor {
+        final Actor receiver = group.oldActor {
             receive {
                 it.replyIfExists it
             }
         }
 
-        group.actor {
+        group.oldActor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
@@ -211,7 +211,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = group.actor {
+        final Actor actor = group.oldActor {
             receive {
                 it.replyIfExists it
                 flag.set(true)
@@ -230,7 +230,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor replier = group.actor {
+        final Actor replier = group.oldActor {
             receive {
                 latch.await()
                 it.replyIfExists it
@@ -239,7 +239,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        final Actor sender = group.actor {
+        final Actor sender = group.oldActor {
             delegate.metaClass {
                 afterStop = {
                     latch.countDown()
@@ -261,7 +261,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def maxFinder = group.actor {
+        final def maxFinder = group.oldActor {
             barrier.await()
             receive {message1 ->
                 receive {message2 ->
@@ -273,7 +273,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         }
 
 
-        group.actor {
+        group.oldActor {
             barrier.await()
             maxFinder.send 2
             receive {
@@ -282,7 +282,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        group.actor {
+        group.oldActor {
             barrier.await()
             maxFinder.send 3
             receive {

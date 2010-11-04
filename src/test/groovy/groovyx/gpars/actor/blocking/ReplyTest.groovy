@@ -24,7 +24,7 @@ import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
-import static groovyx.gpars.actor.Actors.actor
+import static groovyx.gpars.actor.Actors.oldActor
 
 /**
  *
@@ -43,7 +43,7 @@ public class ReplyTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def bouncer = Actors.actor {
+        final def bouncer = Actors.oldActor {
             loop {
                 receive {
                     reply it
@@ -54,7 +54,7 @@ public class ReplyTest extends GroovyTestCase {
 
         Thread.sleep 1000
 
-        actor {
+        oldActor {
             bouncer.send 1
             barrier.await()
             bouncer.send 2
@@ -70,7 +70,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        actor {
+        oldActor {
             bouncer.send 10
             barrier.await()
             bouncer.send 20
@@ -100,15 +100,15 @@ public class ReplyTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def incrementor = group.actor {
+        final def incrementor = group.oldActor {
             loop { receive { reply it + 1 }}
         }
 
-        final def decrementor = group.actor {
+        final def decrementor = group.oldActor {
             loop { receive { reply it - 1 }}
         }
 
-        group.actor {
+        group.oldActor {
             barrier.await()
             incrementor.send 2
             decrementor.send 6
@@ -129,7 +129,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        group.actor {
+        group.oldActor {
             barrier.await()
             incrementor.send 20
             decrementor.send 60
@@ -164,7 +164,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             delegate.metaClass {
                 onException = {
                     flag.set(true)
@@ -191,13 +191,13 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor receiver = actor {
+        final Actor receiver = oldActor {
             receive {
                 replyIfExists it
             }
         }
 
-        actor {
+        oldActor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
@@ -214,7 +214,7 @@ public class ReplyTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = actor {
+        final Actor actor = oldActor {
             receive {
                 replyIfExists it
                 flag.set(true)
@@ -233,7 +233,7 @@ public class ReplyTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor replier = actor {
+        final Actor replier = oldActor {
             receive {
                 latch.await()
                 replyIfExists it
@@ -242,7 +242,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        final Actor sender = actor {
+        final Actor sender = oldActor {
             delegate.metaClass {
                 afterStop = {
                     latch.countDown()
@@ -263,7 +263,7 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             receive {
                 reply 'Message2'
                 it.reply 'Message3'
@@ -274,7 +274,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        Actors.actor {
+        Actors.oldActor {
             actor.send 'Message1'
             receive {
                 it.reply 'Message4'
@@ -298,13 +298,13 @@ public class ReplyTest extends GroovyTestCase {
 
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.actor {
+        final Actor actor = Actors.oldActor {
             receive {->
                 reply 'Message2'
             }
         }
 
-        Actors.actor {
+        Actors.oldActor {
             actor.send 'Message1'
             receive {
                 result = it
@@ -322,7 +322,7 @@ public class ReplyTest extends GroovyTestCase {
         final List<CountDownLatch> latches = [new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1)]
         def volatile issues
 
-        final def bouncer = actor {
+        final def bouncer = oldActor {
             latches[0].await()
             receive {a, b, c ->
                 replyIfExists 4
@@ -341,7 +341,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         //send and terminate
-        final Actor actor1 = actor {
+        final Actor actor1 = oldActor {
             delegate.metaClass.afterStop = {
                 latches[0].countDown()
             }
@@ -351,7 +351,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         //wait, send and terminate
-        final Actor actor2 = actor {
+        final Actor actor2 = oldActor {
             delegate.metaClass.afterStop = {
                 latches[2].countDown()
             }
@@ -362,7 +362,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         //keep conversation going
-        actor {
+        oldActor {
             bouncer << 2
             receive()
             bouncer << 6
@@ -386,7 +386,7 @@ public class ReplyTest extends GroovyTestCase {
         final DataFlowVariable originator3 = new DataFlowVariable()
         final DataFlowVariable originator4 = new DataFlowVariable()
 
-        final def bouncer = actor {
+        final def bouncer = oldActor {
             receive {msg1 ->
                 originator1 << msg1.sender
                 receive {msg2 ->
@@ -400,13 +400,13 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        final def actor1 = actor {
+        final def actor1 = oldActor {
             bouncer << 'msg1'
         }
 
         assert actor1 == originator1.val
 
-        final def actor2 = actor {
+        final def actor2 = oldActor {
             bouncer << 'msg2'
         }
 
@@ -416,7 +416,7 @@ public class ReplyTest extends GroovyTestCase {
 
         assertNull originator3.val
 
-        final def actor4 = actor {
+        final def actor4 = oldActor {
             bouncer << 'msg4'
         }
 
