@@ -29,22 +29,18 @@ final def t1 = System.currentTimeMillis()
 final def cdl = new CountDownLatch(20000 * 500)
 def last = null
 
-int i = 0
-while (i < 20000) {
+for (int i = 0; i < 20000; i++) {
     final def channel = new Agent(new AgentState(last, cdl))
     channel.attachToThreadPool group.threadPool
 //    channel.makeFair()
     last = channel
-    i += 1
 }
 
 Closure message
 message = {it.relay(message)}
 
-i = 0
-while (i < 500) {
+for (int i = 0; i < 500; i++) {
     last.send(message)
-    i += 1
 }
 
 cdl.await(1000, TimeUnit.SECONDS)
