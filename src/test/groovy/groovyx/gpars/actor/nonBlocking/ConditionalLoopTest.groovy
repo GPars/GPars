@@ -212,7 +212,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         assert result == 5
     }
 
-    public void _testNoLoopWithAfterLoopCode() {
+    public void testNoLoopWithAfterLoopCode() {
         volatile int result = 0
         def actor = actor {
             loop({-> false}, {-> result += 3}) {
@@ -224,7 +224,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         assert result == 3
     }
 
-    public void _testSingleLoopWithAfterLoopCode() {
+    public void testSingleLoopWithAfterLoopCode() {
         volatile int result = 0
         def actor = actor {
             int counter = 0
@@ -239,7 +239,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         assert result == 4
     }
 
-    public void _testRepeatedLoopWithAfterLoopCode() {
+    public void testRepeatedLoopWithAfterLoopCode() {
         volatile int result = 0
         def actor = actor {
             int counter = 0
@@ -254,7 +254,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         assert result == 8
     }
 
-    public void _testComplexAfterLoopCode() {
+    public void testComplexAfterLoopCode() {
         volatile int result = 0
         def actor = actor {
             int counter = 0
@@ -286,40 +286,5 @@ class ConditionalLoopTest extends GroovyTestCase {
         } catch (all) {}
         actor.join()
         assert result == 18
-    }
-
-    public void _testLoopingAfterLoopCode() {
-        volatile int result = 0
-        volatile exception = null
-        def actor = actor {
-            int counter = 0
-
-            def afterLoopCode = {->
-                try {
-                    loop { stop()}
-                } catch (all) {
-                    exception = all
-                }
-            }
-            loop({-> counter < 5}, afterLoopCode) {
-                counter++
-                result++
-                react {}
-            }
-//            result = 100
-        }
-        actor 1
-        actor 2
-        actor 3
-        actor 4
-        actor 5
-        try {
-            actor 6
-            actor 7
-            actor 8
-        } catch (all) {}
-        actor.join()
-        assert result == 5
-        assert exception in IllegalStateException
     }
 }

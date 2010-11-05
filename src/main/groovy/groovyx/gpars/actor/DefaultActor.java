@@ -30,11 +30,11 @@ import java.util.concurrent.TimeUnit;
 
 //todo javadoc
 //todo conditional loops
-//todo handle exceptions
 //todo timeout - also for DDA and Reactor
-//todo exceptions
+
 //todo receive
 //todo replies on objects
+//todo exception used for control
 //todo deprecate AbstractPoolActor
 //todo remove oldActor and deprecated classes - actors, exceptions
 public class DefaultActor extends AbstractLoopingActor {
@@ -81,21 +81,18 @@ public class DefaultActor extends AbstractLoopingActor {
         }
         if (nextContinuation == null) {
             try {
-                if (loopCondition == null || loopCondition.call()) {
+                if (loopCondition == null || evalLoopCondition()) {
                     if (loopCode == null)
                         if (loopClosure == null) terminate();
                         else loopClosure.call();
                     else loopCode.run();
                 } else {
                     if (afterLoopCode != null) {
-                        loopCondition = null;
-                        afterLoopCode.call();
+                        runAfterLoopCode(afterLoopCode);
                     }
-                    terminate();
+                    if (nextContinuation == null) terminate();
                 }
             } catch (ActorContinuationException ignore) {
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
     }
@@ -189,26 +186,44 @@ public class DefaultActor extends AbstractLoopingActor {
         }
         loopCondition = condition;
 
-        try {
-            if (code instanceof Closure) {
-                final Closure closure = (Closure) code;
-                checkForBodyArguments(closure);
-                final Closure enhancedClosure = enhanceClosure(closure);
-                this.loopClosure = enhancedClosure;
+        if (code instanceof Closure) {
+            final Closure closure = (Closure) code;
+            checkForBodyArguments(closure);
+            final Closure enhancedClosure = enhanceClosure(closure);
+            this.loopClosure = enhancedClosure;
 
-                assert nextContinuation == null;
-                while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || loopCondition.call())) {
-                    enhancedClosure.call();
-                }
-            } else {
-                this.loopCode = code;
-                assert nextContinuation == null;
-                while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || loopCondition.call())) {
-                    loopCode.run();
-                }
+            assert nextContinuation == null;
+            while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || evalLoopCondition())) {
+                enhancedClosure.call();
             }
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            if (!hasBeenStopped() && nextContinuation == null && afterLoopCode != null) {
+                runAfterLoopCode(afterLoopCode);
+            }
+        } else {
+            this.loopCode = code;
+            assert nextContinuation == null;
+            while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || evalLoopCondition())) {
+                loopCode.run();
+            }
+            if (!hasBeenStopped() && nextContinuation == null && afterLoopCode != null) {
+                runAfterLoopCode(afterLoopCode);
+            }
+        }
+    }
+
+    private void runAfterLoopCode(final Closure afterLoopCode) {
+        loopCondition = null;
+        loopCode = null;
+        loopClosure = null;
+        this.afterLoopCode = null;
+        afterLoopCode.call();
+    }
+
+    private boolean evalLoopCondition() {
+        try {
+            return loopCondition.call();
+        } catch (Exception ignored) {
+            return false;
         }
     }
 
