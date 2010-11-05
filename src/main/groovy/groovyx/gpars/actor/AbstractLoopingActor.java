@@ -16,6 +16,7 @@
 package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
+import groovyx.gpars.actor.impl.ActorReplyException;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.util.AsyncMessagingCore;
@@ -34,6 +35,7 @@ public abstract class AbstractLoopingActor extends Actor {
     private volatile boolean terminatingFlag = true;
     private ActorTimerTask currentTimerTask = null;
     private int timeoutCounter = 0;
+    private MessageStream currentSender;
 
     /**
      * Holds the particular instance of async messaging core to use
@@ -90,8 +92,7 @@ public abstract class AbstractLoopingActor extends Actor {
                         try {
                             runEnhancedWithoutRepliesOnMessages(actorMessage, code, actorMessage.getPayLoad());
                         } finally {
-                            getSenders().clear();
-                            obj2Sender.clear();
+                            currentSender = null;
                         }
                     }
                 }
@@ -240,5 +241,52 @@ public abstract class AbstractLoopingActor extends Actor {
     public void setParallelGroup(final PGroup group) {
         super.setParallelGroup(group);
         core.attachToThreadPool(group.getThreadPool());
+    }
+
+    /**
+     * Retrieves the sender actor of the currently processed message.
+     *
+     * @return The sender of the currently processed message or null, if the message was not sent by an actor
+     * @throws groovyx.gpars.actor.impl.ActorReplyException
+     *          If some of the replies failed to be sent.
+     */
+    protected final MessageStream getSender() {
+        return currentSender;
+    }
+
+    /**
+     * Sends a reply to all currently processed messages. Throws ActorReplyException if some messages
+     * have not been sent by an actor. For such cases use replyIfExists().
+     *
+     * @param message reply message
+     * @throws groovyx.gpars.actor.impl.ActorReplyException
+     *          If some of the replies failed to be sent.
+     */
+    protected final void reply(final Object message) {
+        if (currentSender == null) {
+            throw new ActorReplyException("Cannot send replies. No sender has been registered.");
+        } else {
+            currentSender.send(message);
+        }
+    }
+
+    /**
+     * Sends a reply to all currently processed messages, which have been sent by an actor.
+     * Ignores potential errors when sending the replies, like no sender or sender already stopped.
+     *
+     * @param message reply message
+     */
+    protected final void replyIfExists(final Object message) {
+        if (currentSender == null) return;
+        try {
+            currentSender.send(message);
+        } catch (IllegalStateException ignore) {
+        }
+    }
+
+    private void runEnhancedWithoutRepliesOnMessages(final ActorMessage message, final Closure code, final Object arguments) {
+        assert message != null;
+        currentSender = message.getSender();
+        code.call(arguments);
     }
 }

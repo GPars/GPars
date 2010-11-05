@@ -36,7 +36,7 @@ public final class ReplyCategory {
      * @return The message originator
      */
     public static MessageStream getSender(final Object original) {
-        final ReplyingMessageStream actor = Actor.threadBoundActor();
+        final ReplyingMessageStream actor = (ReplyingMessageStream) Actor.threadBoundActor();
         if (actor == null) {
             throw new IllegalStateException("message originator detection in a non-actor");
         }
@@ -55,7 +55,7 @@ public final class ReplyCategory {
             return;
         }
 
-        final ReplyingMessageStream actor = Actor.threadBoundActor();
+        final ReplyingMessageStream actor = (ReplyingMessageStream) Actor.threadBoundActor();
         if (actor == null) {
             throw new IllegalStateException("reply from non-actor");
         }
@@ -79,7 +79,7 @@ public final class ReplyCategory {
             return;
         }
 
-        final ReplyingMessageStream actor = Actor.threadBoundActor();
+        final ReplyingMessageStream actor = (ReplyingMessageStream) Actor.threadBoundActor();
         if (actor != null) {
             final MessageStream sender = actor.obj2Sender.get(original);
             if (sender != null) {

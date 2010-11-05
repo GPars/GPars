@@ -16,7 +16,13 @@
 
 package groovyx.gpars.actor.impl;
 
+import groovy.lang.Closure;
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.ActorMessage;
+import org.codehaus.groovy.runtime.GroovyCategorySupport;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -24,7 +30,7 @@ import java.util.WeakHashMap;
  * @author Alex Tkachman, Vaclav Pech
  */
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-public abstract class ReplyingMessageStream extends MessageStream {
+public abstract class ReplyingMessageStream extends Actor {
     private static final long serialVersionUID = -4660316352077009411L;
     /**
      * A list of senders for the currently processed messages
@@ -99,4 +105,12 @@ public abstract class ReplyingMessageStream extends MessageStream {
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
+        assert message != null;
+        if (message == TIMEOUT_MESSAGE) handleTimeout();
+        else getSenders().add(message.getSender());
+        obj2Sender.put(message.getPayLoad(), message.getSender());
+        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
+    }
 }

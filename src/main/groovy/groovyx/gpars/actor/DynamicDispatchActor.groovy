@@ -37,6 +37,7 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
  */
 
 public class DynamicDispatchActor extends AbstractLoopingActor {
+    private static final long serialVersionUID = 2709208258556647529L;
 
     /**
      * Creates a new instance without any when handlers registered

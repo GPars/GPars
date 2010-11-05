@@ -34,6 +34,7 @@ import groovy.lang.Closure;
  *         Date: Jun 26, 2009
  */
 public class ReactiveActor extends AbstractLoopingActor {
+    private static final long serialVersionUID = 2709208258556647528L;
 
     public ReactiveActor(final Closure body) {
         final Closure cloned = (Closure) body.clone();

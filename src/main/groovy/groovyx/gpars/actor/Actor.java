@@ -20,8 +20,6 @@ import groovy.lang.MetaClass;
 import groovy.lang.MetaMethod;
 import groovy.time.BaseDuration;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.actor.impl.ReplyCategory;
-import groovyx.gpars.actor.impl.ReplyingMessageStream;
 import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowVariable;
@@ -35,12 +33,10 @@ import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandle;
 import groovyx.gpars.serial.SerialMsg;
 import groovyx.gpars.serial.WithSerialId;
-import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
@@ -53,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Vaclav Pech, Alex Tkachman
  */
-public abstract class Actor extends ReplyingMessageStream {
+public abstract class Actor extends MessageStream {
 
     /**
      * Maps each thread to the actor it currently processes.
@@ -282,22 +278,6 @@ public abstract class Actor extends ReplyingMessageStream {
     }
 
     protected abstract boolean hasBeenStopped();
-
-    protected final void runEnhancedWithoutRepliesOnMessages(final ActorMessage message, final Closure code, final Object arguments) {
-        assert message != null;
-        final MessageStream sender = message.getSender();
-        if (sender != null) getSenders().add(sender);
-        code.call(arguments);
-    }
-
-    @SuppressWarnings("rawtypes")
-    protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
-        assert message != null;
-        if (message == TIMEOUT_MESSAGE) handleTimeout();
-        else getSenders().add(message.getSender());
-        obj2Sender.put(message.getPayLoad(), message.getSender());
-        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
-    }
 
     @Override
     protected RemoteHandle createRemoteHandle(final SerialHandle handle, final SerialContext host) {

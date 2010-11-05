@@ -48,7 +48,7 @@ import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
  * @author Alex Tkachman, Vaclav Pech
  */
 @SuppressWarnings({"UnqualifiedStaticUsage"})
-public abstract class SequentialProcessingActor extends Actor implements Runnable {
+public abstract class SequentialProcessingActor extends ReplyingMessageStream implements Runnable {
 
     private static final long serialVersionUID = 6479220959200502418L;
     /**
