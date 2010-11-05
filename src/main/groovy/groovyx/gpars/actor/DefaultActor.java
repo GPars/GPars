@@ -310,6 +310,7 @@ public class DefaultActor extends AbstractLoopingActor {
         checkForNull(code);
         checkForMessageHandlerArguments(code);
         nextContinuation = enhanceClosure(code);
+        if (timeout >= 0L) setTimeout(timeout);
 //        throw ActorException.CONTINUE;
     }
 

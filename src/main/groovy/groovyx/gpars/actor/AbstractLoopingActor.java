@@ -20,8 +20,6 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.util.AsyncMessagingCore;
 
-import java.util.TimerTask;
-
 /**
  * Wraps all actors that repeatedly loop through incoming messages and hold no implicit state between subsequent messages.
  *
@@ -34,7 +32,8 @@ public abstract class AbstractLoopingActor extends Actor {
     private volatile boolean stoppedFlag = true;
     private volatile boolean terminatedFlag = true;
     private volatile boolean terminatingFlag = true;
-    private TimerTask currentTimerTask = null;
+    private MyTimerTask currentTimerTask = null;
+    private int timeoutCounter = 0;
 
     /**
      * Holds the particular instance of async messaging core to use
@@ -68,9 +67,12 @@ public abstract class AbstractLoopingActor extends Actor {
             protected void handleMessage(final Object message) {
                 if (message == START_MESSAGE) handleStart();
                 else {
-                    cancelCurrentTimeoutTask();
                     if (message == TIMEOUT_MESSAGE) {
+                        if (currentTimerTask != null && timeoutCounter != currentTimerTask.getId()) return;
                         handleTimeout();
+                    } else {
+                        if (currentTimerTask != null) cancelCurrentTimeoutTask();
+                        timeoutCounter = (timeoutCounter + 1) % Integer.MAX_VALUE;
                     }
                     if (terminatingFlag || message == STOP_MESSAGE) {
                         handleTermination();
@@ -127,24 +129,14 @@ public abstract class AbstractLoopingActor extends Actor {
         core.makeFair();
     }
 
-//    protected final void setTimeout(final long timeout) {
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (!isReady()) {
-//                    noinspection CatchGenericClass
-//                    try {
-//                        actor.send(TIMEOUT_MESSAGE);
-//                    } catch (Exception e) {
-//                        actor.handleException(e);
-//                    }
-//                }
-//            }
-//        }, timeout);
-//    }
+    protected final void setTimeout(final long timeout) {
+        if (timeout < 0L) throw new IllegalArgumentException("Actor timeout must be a non-negative value");
+        timer.schedule(new MyTimerTask(this, timeoutCounter), timeout);
+    }
 
     private void cancelCurrentTimeoutTask() {
-        if (currentTimerTask != null) currentTimerTask.cancel();
+        assert currentTimerTask != null;
+        currentTimerTask.cancel();
     }
 
     /**

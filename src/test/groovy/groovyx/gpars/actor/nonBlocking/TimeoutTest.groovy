@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actor
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import static groovyx.gpars.actor.Actors.oldActor
+import static groovyx.gpars.actor.Actors.actor
 
 /**
  *
@@ -37,7 +37,7 @@ public class TimeoutTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        oldActor {
+        actor {
             react(1000) {
                 if (it == Actor.TIMEOUT) timeoutFlag.set(true)
                 barrier.await()
@@ -53,7 +53,7 @@ public class TimeoutTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        oldActor {
+        actor {
             react(1000) {
                 if (it == 'TIMEOUT') timeoutFlag.set(true)
                 barrier.await()
@@ -69,7 +69,7 @@ public class TimeoutTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        oldActor {
+        actor {
             loop {
                 react(1000) {
                     if (it == Actor.TIMEOUT) timeoutFlag.set(true)
@@ -87,7 +87,7 @@ public class TimeoutTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        def actor = oldActor {
+        def actor = actor {
             loop {
                 react(1000) {
                     barrier.await()
@@ -111,7 +111,7 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
         volatile def nestedMessage = null
 
-        final def actor = oldActor {
+        final def actor = actor {
             loop {
                 barrier.await()
                 react(5000) {
@@ -145,7 +145,7 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicInteger codeCounter = new AtomicInteger(0)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        final def actor = oldActor {
+        final def actor = actor {
             loop {
                 barrier.await()
                 react(1000) {
@@ -173,9 +173,9 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicInteger codeCounter = new AtomicInteger(0)
         final AtomicBoolean exceptionFlag = new AtomicBoolean(false)
 
-        final def actor = oldActor {
+        final def actor = actor {
             barrier.await()
-            react(3000) {
+            react(3000L) {
                 codeCounter.incrementAndGet()
             }
         }
