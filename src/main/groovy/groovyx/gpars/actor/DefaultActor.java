@@ -39,16 +39,6 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  *         Date: Nov 4th 2010
  */
-//todo timeout - also for DDA and Reactor
-//todo hanging tests
-
-//todo receive
-//todo replies on objects
-//todo exception used for control
-//todo demos
-//todo javadoc, user guide
-//todo deprecate AbstractPoolActor
-//todo remove oldActor and deprecated classes - actors, exceptions
 public class DefaultActor extends AbstractLoopingActor {
 
     private Closure nextContinuation;
