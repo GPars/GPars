@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -82,6 +83,10 @@ public abstract class Actor extends ReplyingMessageStream {
 
     protected volatile Thread currentThread;
     protected static final String ACTOR_HAS_ALREADY_BEEN_STARTED = "Actor has already been started.";
+    /**
+     * Timer holding timeouts for react methods
+     */
+    protected static final Timer timer = new Timer("GPars Actor Timer", true);
 
     protected Actor() {
         this(new DataFlowVariable<Object>());

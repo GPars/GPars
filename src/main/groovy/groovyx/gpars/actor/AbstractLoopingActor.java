@@ -20,6 +20,8 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.util.AsyncMessagingCore;
 
+import java.util.TimerTask;
+
 /**
  * Wraps all actors that repeatedly loop through incoming messages and hold no implicit state between subsequent messages.
  *
@@ -32,6 +34,7 @@ public abstract class AbstractLoopingActor extends Actor {
     private volatile boolean stoppedFlag = true;
     private volatile boolean terminatedFlag = true;
     private volatile boolean terminatingFlag = true;
+    private TimerTask currentTimerTask = null;
 
     /**
      * Holds the particular instance of async messaging core to use
@@ -64,17 +67,23 @@ public abstract class AbstractLoopingActor extends Actor {
             @Override
             protected void handleMessage(final Object message) {
                 if (message == START_MESSAGE) handleStart();
-                else if (terminatingFlag || message == STOP_MESSAGE) {
-                    handleTermination();
-                    terminatedFlag = true;
-                    getJoinLatch().bindUnique(null);
-                } else {
-                    final ActorMessage actorMessage = (ActorMessage) message;
-                    try {
-                        runEnhancedWithoutRepliesOnMessages(actorMessage, code, actorMessage.getPayLoad());
-                    } finally {
-                        getSenders().clear();
-                        obj2Sender.clear();
+                else {
+                    cancelCurrentTimeoutTask();
+                    if (message == TIMEOUT_MESSAGE) {
+                        handleTimeout();
+                    }
+                    if (terminatingFlag || message == STOP_MESSAGE) {
+                        handleTermination();
+                        terminatedFlag = true;
+                        getJoinLatch().bindUnique(null);
+                    } else {
+                        final ActorMessage actorMessage = (ActorMessage) message;
+                        try {
+                            runEnhancedWithoutRepliesOnMessages(actorMessage, code, actorMessage.getPayLoad());
+                        } finally {
+                            getSenders().clear();
+                            obj2Sender.clear();
+                        }
                     }
                 }
             }
@@ -116,6 +125,26 @@ public abstract class AbstractLoopingActor extends Actor {
      */
     public final void makeFair() {
         core.makeFair();
+    }
+
+//    protected final void setTimeout(final long timeout) {
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (!isReady()) {
+//                    noinspection CatchGenericClass
+//                    try {
+//                        actor.send(TIMEOUT_MESSAGE);
+//                    } catch (Exception e) {
+//                        actor.handleException(e);
+//                    }
+//                }
+//            }
+//        }, timeout);
+//    }
+
+    private void cancelCurrentTimeoutTask() {
+        if (currentTimerTask != null) currentTimerTask.cancel();
     }
 
     @Override

@@ -32,7 +32,6 @@ import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -116,10 +115,6 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
 
     protected static final AtomicIntegerFieldUpdater<SequentialProcessingActor> stopFlagUpdater = AtomicIntegerFieldUpdater.newUpdater(SequentialProcessingActor.class, "stopFlag");
 
-    /**
-     * Timer holding timeouts for react methods
-     */
-    private static final Timer timer = new Timer("GPars Actor Timer", true);
     private static final String SHOULD_NOT_REACH_HERE = "Should not reach here";
     private static final String ERROR_EVALUATING_LOOP_CONDITION = "Error evaluating loop condition";
 
