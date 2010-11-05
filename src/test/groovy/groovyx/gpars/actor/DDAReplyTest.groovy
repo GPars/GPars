@@ -30,7 +30,7 @@ class DDAReplyTest extends GroovyTestCase {
             }
         }).start()
         def actor = Actors.actor {
-            dda new Object()
+            dda << new Object()
             react {
                 df.reply1 = it
                 react {

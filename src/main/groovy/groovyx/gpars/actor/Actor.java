@@ -67,8 +67,9 @@ public abstract class Actor extends ReplyingMessageStream {
      * The parallel group to which the message stream belongs
      */
     protected volatile PGroup parallelGroup;
-    protected static final ActorMessage stopMessage = new ActorMessage("stopMessage", null);
-    protected static final ActorMessage terminateMessage = new ActorMessage("terminateMessage", null);
+    protected static final ActorMessage START_MESSAGE = new ActorMessage("Start", null);
+    protected static final ActorMessage STOP_MESSAGE = new ActorMessage("STOP_MESSAGE", null);
+    protected static final ActorMessage TERMINATE_MESSAGE = new ActorMessage("TERMINATE_MESSAGE", null);
     private static final String AFTER_START = "afterStart";
     private static final String RESPONDS_TO = "respondsTo";
     private static final String ON_DELIVERY_ERROR = "onDeliveryError";
@@ -140,7 +141,17 @@ public abstract class Actor extends ReplyingMessageStream {
     }
 
     /**
-     * Starts the Actor. No messages can be sent or received before an Actor is started.
+     * Starts the Actor without sending the START_MESSAGE message to speed the start-up.
+     * The potential custom afterStart handlers won't be run.
+     * No messages can be sent or received before an Actor is started.
+     *
+     * @return same actor
+     */
+    public abstract Actor silentStart();
+
+    /**
+     * Starts the Actor and sends it the START_MESSAGE to run any afterStart handlers.
+     * No messages can be sent or received before an Actor is started.
      *
      * @return same actor
      */
@@ -252,7 +263,7 @@ public abstract class Actor extends ReplyingMessageStream {
     protected final ActorMessage createActorMessage(final Object message) {
         if (hasBeenStopped()) {
             //noinspection ObjectEquality
-            if (message != terminateMessage && message != stopMessage)
+            if (message != TERMINATE_MESSAGE && message != STOP_MESSAGE)
                 throw new IllegalStateException("The actor cannot accept messages at this point.");
         }
 
@@ -370,7 +381,7 @@ public abstract class Actor extends ReplyingMessageStream {
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
 
         ActorMessage message = sweepNextMessage();
-        while (message != null && message != stopMessage) {
+        while (message != null && message != STOP_MESSAGE) {
             final Object payloadList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
             if (payloadList != null && !((Collection<Object>) payloadList).isEmpty()) {
                 InvokerHelper.invokeMethod(message.getPayLoad(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
@@ -418,6 +429,11 @@ public abstract class Actor extends ReplyingMessageStream {
         public RemoteActor(final SerialContext host, final DataFlowExpression<Object> jointLatch) {
             super(jointLatch);
             remoteHost = (RemoteHost) host;
+        }
+
+        @Override
+        public Actor silentStart() {
+            return null;
         }
 
         @Override

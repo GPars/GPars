@@ -63,7 +63,8 @@ public abstract class AbstractLoopingActor extends Actor {
 
             @Override
             protected void handleMessage(final Object message) {
-                if (terminatingFlag || message == stopMessage) {
+                if (message == START_MESSAGE) handleStart();
+                else if (terminatingFlag || message == STOP_MESSAGE) {
                     handleTermination();
                     terminatedFlag = true;
                     getJoinLatch().bindUnique(null);
@@ -118,19 +119,29 @@ public abstract class AbstractLoopingActor extends Actor {
     }
 
     @Override
-    public final Actor start() {
+    public Actor silentStart() {
+        return doStart();
+    }
+
+    @Override
+    public Actor start() {
+        doStart();
+        send(START_MESSAGE);
+        return this;
+    }
+
+    private Actor doStart() {
         if (!hasBeenStopped()) throw new IllegalStateException(ACTOR_HAS_ALREADY_BEEN_STARTED);
         stoppedFlag = false;
         terminatedFlag = false;
         terminatingFlag = false;
-        handleStart();
         return this;
     }
 
     @Override
     public final Actor stop() {
         if (!hasBeenStopped()) {
-            send(stopMessage);
+            send(STOP_MESSAGE);
             stoppedFlag = true;
         }
         return this;
@@ -152,7 +163,7 @@ public abstract class AbstractLoopingActor extends Actor {
             Thread.yield();
             if (!isActorThread() && currentThread != null) {
                 currentThread.interrupt();
-            } else send(terminateMessage);
+            } else send(TERMINATE_MESSAGE);
         }
         return this;
     }

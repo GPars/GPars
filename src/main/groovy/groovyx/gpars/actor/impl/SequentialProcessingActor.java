@@ -155,12 +155,12 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
      * @param toProcess The next message to process by the actors
      */
     private void throwIfNeeded(final ActorMessage toProcess) {
-        if (toProcess == stopMessage) {
+        if (toProcess == STOP_MESSAGE) {
             stopFlag = S_STOPPING;
             throw STOP;
         }
 
-        if (toProcess == terminateMessage) {
+        if (toProcess == TERMINATE_MESSAGE) {
             stopFlag = S_TERMINATING;
             throw TERMINATE;
         }
@@ -340,7 +340,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         transferQueues();
 
         if (outputQueue != null) {
-            if (outputQueue.msg == stopMessage) {
+            if (outputQueue.msg == STOP_MESSAGE) {
                 throw STOP;
             }
         }
@@ -371,6 +371,11 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
         }
     }
 
+    @Override
+    public Actor silentStart() {
+        throw new UnsupportedOperationException("Old actors cannot start silently. Use DefaultActor instead.");
+    }
+
     /**
      * Starts the Actor. No messages can be send or received before an Actor is started.
      *
@@ -396,7 +401,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
     @Override
     public final Actor stop() {
         if (stopFlagUpdater.compareAndSet(this, S_RUNNING, S_STOPPING)) {
-            send(stopMessage);
+            send(STOP_MESSAGE);
         }
         return this;
     }
@@ -428,7 +433,7 @@ public abstract class SequentialProcessingActor extends Actor implements Runnabl
                     } else {
                         // just to make sure that scheduled
                         try {
-                            send(terminateMessage);
+                            send(TERMINATE_MESSAGE);
                         } catch (IllegalStateException ignore) {
                         }
                     }

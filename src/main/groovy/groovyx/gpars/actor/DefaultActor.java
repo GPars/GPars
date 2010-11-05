@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 //todo javadoc
 //todo conditional loops
+//todo handle exceptions
 //todo timeout - also for DDA and Reactor
 //todo exceptions
 //todo receive
@@ -42,7 +43,6 @@ public class DefaultActor extends AbstractLoopingActor {
     private Runnable loopCode;
     private Closure loopClosure;
     private Runnable startCode;
-    private boolean hasBeenStarted = false;
     private static final long serialVersionUID = -439517926332934061L;
     private Closure afterLoopCode;
     private Callable<Boolean> loopCondition;
@@ -74,11 +74,8 @@ public class DefaultActor extends AbstractLoopingActor {
                 final Closure closure = nextContinuation;
                 nextContinuation = null;
                 closure.call(message);
-            } else {
-                if (message == START_MESSAGE) handleStartMessage();
-                else
-                    throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
-            }
+            } else
+                throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
         } catch (ActorContinuationException ignore) {
         }
         if (nextContinuation == null) {
@@ -182,6 +179,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param afterLoopCode Code to run after the main actor's loop finishes
      * @param code          The closure to invoke repeatedly
      */
+    @SuppressWarnings({"OverlyComplexBooleanExpression"})
     private void loop(final Callable<Boolean> condition, final Closure afterLoopCode, final Runnable code) {
         checkForNull(code);
 
@@ -198,13 +196,13 @@ public class DefaultActor extends AbstractLoopingActor {
                 this.loopClosure = enhancedClosure;
 
                 assert nextContinuation == null;
-                while (nextContinuation == null && (loopCondition == null || loopCondition.call())) {
+                while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || loopCondition.call())) {
                     enhancedClosure.call();
                 }
             } else {
                 this.loopCode = code;
                 assert nextContinuation == null;
-                while (nextContinuation == null && (loopCondition == null || loopCondition.call())) {
+                while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || loopCondition.call())) {
                     loopCode.run();
                 }
             }
@@ -273,14 +271,13 @@ public class DefaultActor extends AbstractLoopingActor {
     }
 
     @Override
-    protected final void handleStart() {
-        if (hasBeenStarted) throw new IllegalStateException("A DefaultActor cannot be restarted.");
-        hasBeenStarted = true;
-        send(START_MESSAGE);
+    public Actor silentStart() {
+        throw new UnsupportedOperationException("Old actors cannot start silently. Use DefaultActor instead.");
     }
 
-    @SuppressWarnings({"CatchGenericClass"})
-    private void handleStartMessage() {
+    @Override
+    protected void handleStart() {
+        super.handleStart();
         try {
             if (startCode != null) {
                 if (startCode instanceof Closure) {
@@ -322,5 +319,4 @@ public class DefaultActor extends AbstractLoopingActor {
     }
 
     private static final String EXPECTED = " expected.";
-    private static final String START_MESSAGE = "Start";
 }

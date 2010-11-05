@@ -34,7 +34,7 @@ for (int i = 0; i < 10000; i++) {
     final def channel = new HandlerWithArray(channels, i, cdl)
     channel.parallelGroup = group
     channels[i] = channel
-    channel.start()
+    channel.silentStart()
 }
 
 for (int i = 0; i < 500; i++) {
