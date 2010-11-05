@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import static groovyx.gpars.actor.Actors.oldActor
+import static groovyx.gpars.actor.Actors.actor
 
 /**
  *
@@ -38,7 +38,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final AtomicBoolean codeFlag = new AtomicBoolean(false)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        oldActor {
+        actor {
             delegate.metaClass {
                 onTimeout = {-> timeoutFlag.set(true); terminate() }
                 afterStop = {messages -> barrier.await() }
@@ -63,7 +63,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         volatile def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def actor = oldActor {
+        final def actor = actor {
             try {
                 react(1.second) {}
             } catch (MissingPropertyException ignore) {exceptions++ }
@@ -89,7 +89,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final AtomicBoolean nestedCodeFlag = new AtomicBoolean(false)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        final def actor = oldActor {
+        final def actor = actor {
             loop {
                 use(TimeCategory) {
                     barrier.await()
@@ -124,7 +124,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final AtomicInteger codeCounter = new AtomicInteger(0)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
-        final def actor = oldActor {
+        final def actor = actor {
             loop {
                 use(TimeCategory) {
                     barrier.await()
@@ -153,7 +153,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
         final AtomicInteger codeCounter = new AtomicInteger(0)
 
-        final def actor = oldActor {
+        final def actor = actor {
             loop {
                 use(TimeCategory) {
                     barrier.await()

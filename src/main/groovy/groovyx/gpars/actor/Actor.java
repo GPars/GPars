@@ -283,20 +283,18 @@ public abstract class Actor extends ReplyingMessageStream {
 
     protected abstract boolean hasBeenStopped();
 
-    private void prepareReplies(final ActorMessage message) {
-        assert message != null;
-        if (message == TIMEOUT_MESSAGE) handleTimeout();
-        else getSenders().add(message.getSender());
-    }
-
     protected final void runEnhancedWithoutRepliesOnMessages(final ActorMessage message, final Closure code, final Object arguments) {
-        prepareReplies(message);
+        assert message != null;
+        final MessageStream sender = message.getSender();
+        if (sender != null) getSenders().add(sender);
         code.call(arguments);
     }
 
     @SuppressWarnings("rawtypes")
     protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
-        prepareReplies(message);
+        assert message != null;
+        if (message == TIMEOUT_MESSAGE) handleTimeout();
+        else getSenders().add(message.getSender());
         obj2Sender.put(message.getPayLoad(), message.getSender());
         GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
     }

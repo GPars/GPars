@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.TimeUnit
 
 /**
@@ -61,7 +61,7 @@ Actors.actor {
 
 Thread.sleep 1000
 
-class PooledLifeCycleSampleActor extends AbstractPooledActor {
+class PooledLifeCycleSampleActor extends DefaultActor {
 
     protected void act() {
         println("Running actor2")

@@ -23,11 +23,11 @@ import java.util.TimerTask;
  *
  * @author Vaclav Pech
  */
-final class MyTimerTask extends TimerTask {
+final class ActorTimerTask extends TimerTask {
     private final AbstractLoopingActor actor;
     private final int id;
 
-    MyTimerTask(final AbstractLoopingActor actor, final int id) {
+    ActorTimerTask(final AbstractLoopingActor actor, final int id) {
         this.actor = actor;
         this.id = id;
     }

@@ -32,7 +32,7 @@ public abstract class AbstractLoopingActor extends Actor {
     private volatile boolean stoppedFlag = true;
     private volatile boolean terminatedFlag = true;
     private volatile boolean terminatingFlag = true;
-    private MyTimerTask currentTimerTask = null;
+    private ActorTimerTask currentTimerTask = null;
     private int timeoutCounter = 0;
 
     /**
@@ -68,16 +68,23 @@ public abstract class AbstractLoopingActor extends Actor {
                 if (message == START_MESSAGE) handleStart();
                 else {
                     if (message == TIMEOUT_MESSAGE) {
-                        if (currentTimerTask != null && timeoutCounter != currentTimerTask.getId()) return;
+                        final ActorTimerTask localTimerTask = currentTimerTask;
+                        if (localTimerTask != null) {
+                            cancelCurrentTimeoutTask();
+                            if (timeoutCounter != localTimerTask.getId()) return;  //ignore obsolete timeout messages
+                        } else return;
                         handleTimeout();
                     } else {
                         if (currentTimerTask != null) cancelCurrentTimeoutTask();
-                        timeoutCounter = (timeoutCounter + 1) % Integer.MAX_VALUE;
                     }
+                    timeoutCounter = (timeoutCounter + 1) % Integer.MAX_VALUE;
+
                     if (terminatingFlag || message == STOP_MESSAGE) {
-                        handleTermination();
-                        terminatedFlag = true;
-                        getJoinLatch().bindUnique(null);
+                        if (!terminatedFlag) {
+                            handleTermination();
+                            terminatedFlag = true;
+                            getJoinLatch().bindUnique(null);
+                        }
                     } else {
                         final ActorMessage actorMessage = (ActorMessage) message;
                         try {
@@ -131,7 +138,8 @@ public abstract class AbstractLoopingActor extends Actor {
 
     protected final void setTimeout(final long timeout) {
         if (timeout < 0L) throw new IllegalArgumentException("Actor timeout must be a non-negative value");
-        timer.schedule(new MyTimerTask(this, timeoutCounter), timeout);
+        currentTimerTask = new ActorTimerTask(this, timeoutCounter);
+        timer.schedule(currentTimerTask, timeout);
     }
 
     private void cancelCurrentTimeoutTask() {
@@ -175,8 +183,8 @@ public abstract class AbstractLoopingActor extends Actor {
     @Override
     public final Actor stop() {
         if (!hasBeenStopped()) {
-            send(STOP_MESSAGE);
             stoppedFlag = true;
+            send(STOP_MESSAGE);
         }
         return this;
     }

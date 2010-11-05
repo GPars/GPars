@@ -17,6 +17,8 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.DefaultActor
+import groovyx.gpars.actor.impl.MessageStream
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -173,25 +175,38 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicInteger codeCounter = new AtomicInteger(0)
         final AtomicBoolean exceptionFlag = new AtomicBoolean(false)
 
-        final def actor = actor {
+        final def actor = new ExceptionInTimeoutTestActor({
             barrier.await()
-            react(3000) {
+            react(1000) {
                 codeCounter.incrementAndGet()
             }
-        }
+        })
 
         actor.metaClass {
             onException = {exceptionFlag.set(true); barrier.await()}
         }
 
+        actor.start()
         barrier.await()
-        actor.stop()
         barrier.await()
 
         assertEquals(0, codeCounter.get())
         assert exceptionFlag.get()
+        actor.stop()
         actor.join()
         assert !actor.isActive()
 
+    }
+}
+
+class ExceptionInTimeoutTestActor extends DefaultActor {
+
+    def ExceptionInTimeoutTestActor(final code) {
+        super(code);
+    }
+
+    def MessageStream send(Object message) {
+        if (message == Actor.TIMEOUT_MESSAGE) throw new RuntimeException('test')
+        return super.send(message);
     }
 }

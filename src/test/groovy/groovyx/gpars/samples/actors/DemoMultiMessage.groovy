@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.DefaultPGroup
 import static java.util.concurrent.TimeUnit.SECONDS
 
@@ -35,7 +35,7 @@ class Messages {
     static def REPLY = 'Received your kind offer. Now processing it and comparing with others.'
 }
 
-final AbstractPooledActor actor = group.actor {
+final Actor actor = group.oldActor {
     react {offerA ->
         reply Messages.REPLY_TO_EARLY_BIRDS  //sent to all senders
         react {offerB ->

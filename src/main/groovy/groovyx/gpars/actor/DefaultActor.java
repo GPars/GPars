@@ -106,7 +106,7 @@ public class DefaultActor extends AbstractLoopingActor {
                 throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
         } catch (ActorContinuationException ignore) {
         }
-        if (nextContinuation == null) {
+        if (nextContinuation == null && !hasBeenStopped()) {
             try {
                 if (loopCondition == null || evalLoopCondition()) {
                     if (loopCode == null)
