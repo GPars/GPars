@@ -90,10 +90,10 @@ public class SplitterTest extends GroovyTestCase {
         def op = group.splitter(a, [b, c, d])
 
         a << 'Delivered'
+        assert b.val == 'Delivered'
         op.stop()
         a << 'Never delivered'
         op.join()
-        assert b.val == 'Delivered'
         assert c.val == 'Delivered'
         assert d.val == 'Delivered'
         assert d.getVal(10, TimeUnit.MILLISECONDS) == null

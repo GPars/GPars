@@ -46,6 +46,7 @@ public class DefaultActor extends AbstractLoopingActor {
     private static final long serialVersionUID = -439517926332934061L;
     private Closure afterLoopCode;
     private Callable<Boolean> loopCondition;
+    private boolean started = false;
 
     /**
      */
@@ -273,6 +274,13 @@ public class DefaultActor extends AbstractLoopingActor {
     @Override
     public Actor silentStart() {
         throw new UnsupportedOperationException("Old actors cannot start silently. Use DefaultActor instead.");
+    }
+
+    @Override
+    public Actor start() {
+        if (started) throw new IllegalStateException("The DefaultActor cannot be restarted.");
+        started = true;
+        return super.start();
     }
 
     @Override
