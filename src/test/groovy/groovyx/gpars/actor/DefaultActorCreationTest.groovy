@@ -26,13 +26,10 @@ class DefaultActorCreationTest extends GroovyTestCase {
     public void testCreationWithAct() {
         final def result = new DataFlowVariable()
         final def thread = new DataFlowVariable()
-        final def actor = new DefaultActor() {
-
-            protected void act() {
-                result << 'Received'
-                thread << Thread.currentThread()
-            }
-        }
+        final def actor = [act: {
+            result << 'Received'
+            thread << Thread.currentThread()
+        }] as DefaultActor
         actor.start()
         assert result.val == 'Received'
         assert thread.val != Thread.currentThread()
@@ -73,14 +70,12 @@ class DefaultActorCreationTest extends GroovyTestCase {
 
     public void testMessagingWithAct() {
         final def result = new DataFlowVariable()
-        final def actor = new DefaultActor() {
-
-            protected void act() {
-                react {
-                    result << it
-                }
+        final def actor
+        actor = [act: {
+            actor.react {
+                result << it
             }
-        }
+        }] as DefaultActor
         actor.start()
         actor 'Message'
         assert result.val == 'Message'
@@ -104,14 +99,12 @@ class DefaultActorCreationTest extends GroovyTestCase {
 
     public void testNullMessagingWithAct() {
         final def result = new DataFlowVariable()
-        final def actor = new DefaultActor() {
-
-            protected void act() {
-                react {
-                    result << it
-                }
+        final def actor
+        actor = [act: {
+            actor.react {
+                result << it
             }
-        }
+        }] as DefaultActor
         actor.start()
         actor null
         assert result.val == null
@@ -135,16 +128,14 @@ class DefaultActorCreationTest extends GroovyTestCase {
 
     public void testLoopingWithAct() {
         final def result = new DataFlowStream()
-        final def actor = new DefaultActor() {
-
-            protected void act() {
-                loop {
-                    react {
-                        result << it
-                    }
+        final def actor
+        actor = [act: {
+            actor.loop {
+                react {
+                    result << it
                 }
             }
-        }
+        }] as DefaultActor
         actor.start()
         actor 'Message1'
         actor 'Message2'
@@ -179,17 +170,15 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testRepliesWithAct() {
-        final def actor = new DefaultActor() {
-
-            protected void act() {
+        final def actor
+        actor = [act: {
+            actor.react {
+                reply it
                 react {
-                    reply it
-                    react {
-                        sender << it
-                    }
+                    sender << it
                 }
             }
-        }
+        }] as DefaultActor
         actor.start()
         assert 'Message1' == actor.sendAndWait('Message1')
         assert 'Message2' == actor.sendAndWait('Message2')
@@ -217,15 +206,13 @@ class DefaultActorCreationTest extends GroovyTestCase {
     public void testContinuationStyleWithAct() {
         final def result = new DataFlowVariable()
         final def continuationResult = new DataFlowVariable()
-        final def actor = new DefaultActor() {
-
-            protected void act() {
-                react {
-                    result << it
-                }
-                continuationResult << 'Reached'
+        final def actor
+        actor = [act: {
+            actor.react {
+                result << it
             }
-        }
+            continuationResult << 'Reached'
+        }] as DefaultActor
         actor.start()
         actor 'Message'
         assert result.val == 'Message'
@@ -234,7 +221,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
         assert continuationResult.isBound()
     }
 
-    public void testContinuationStyleWithContinuation() {
+    public void testContinuationStyleWithClosure() {
         final def result = new DataFlowVariable()
         final def continuationResult = new DataFlowVariable()
         final def actor = new DefaultActor({

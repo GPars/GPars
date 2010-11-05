@@ -147,11 +147,24 @@ public abstract class AbstractLoopingActor extends Actor {
         if (currentTimerTask != null) currentTimerTask.cancel();
     }
 
+    /**
+     * Starts the Actor without sending the START_MESSAGE message to speed the start-up.
+     * The potential custom afterStart handlers won't be run.
+     * No messages can be sent or received before an Actor is started.
+     *
+     * @return same actor
+     */
     @Override
     public Actor silentStart() {
         return doStart();
     }
 
+    /**
+     * Starts the Actor and sends it the START_MESSAGE to run any afterStart handlers.
+     * No messages can be sent or received before an Actor is started.
+     *
+     * @return same actor
+     */
     @Override
     public Actor start() {
         doStart();

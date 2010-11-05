@@ -24,51 +24,78 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * The DefaultActor class is teh base for all stateful actors, who need to maintain implicit state between subsequent message arrivals.
+ * Allowing the actor creator to structure code in a continuation-like style with message retrieval react commands mixed within normal code
+ * makes implementation of some algorithms particularly easy.
+ * <p/>
+ * The DefaultActor upon start-up will grab a thread from the associated actor thread pool and run its body.
+ * The body is either the parameter passed to the constructor, or the act() method, if no parameter has been set.
+ * The parameter takes precedence over the act() method.
+ * Once a react() method call is discovered within the actor's body, its Closure-typed parameter will be scheduled for processing on next message arrival.
+ * To preserve the actor principle of at-most-one active thread per actor, the next message, however, will only be handled once the currently run code finishes and frees the current thread.
+ * It is thus advisable to avoid code after call to react().
+ * The loop() method will ensure its body is executed repeatedly, until the actor either finishes or an optional loop condition is not met.
+ *
  * @author Vaclav Pech
  *         Date: Nov 4th 2010
  */
-
-//todo javadoc
-//todo conditional loops
 //todo timeout - also for DDA and Reactor
+//todo hanging tests
 
 //todo receive
 //todo replies on objects
 //todo exception used for control
+//todo demos
+//todo javadoc, user guide
 //todo deprecate AbstractPoolActor
 //todo remove oldActor and deprecated classes - actors, exceptions
 public class DefaultActor extends AbstractLoopingActor {
 
     private Closure nextContinuation;
-    private Runnable loopCode;
     private Closure loopClosure;
-    private Runnable startCode;
-    private static final long serialVersionUID = -439517926332934061L;
-    private Closure afterLoopCode;
-    private Callable<Boolean> loopCondition;
-    private boolean started = false;
 
     /**
+     * Misused also for the code to run at start-up
+     */
+    private Runnable loopCode;
+
+    private Callable<Boolean> loopCondition;
+    private Closure afterLoopCode;
+    private boolean started = false;
+    private static final long serialVersionUID = -439517926332934061L;
+
+    /**
+     * Creates an actor, which will execute its act() methods
      */
     public DefaultActor() {
         this(null);
     }
 
     /**
-     * @param code
+     * Creates an actor, which will execute the supplied code
+     *
+     * @param code A Runnable or Closure to be considerred the actor's body
      */
     public DefaultActor(final Runnable code) {
         if (code != null) {
             if (code instanceof Closure) checkForBodyArguments((Closure) code);
-            startCode = code;
+            loopCode = code;
         }
         initialize(new DefaultActorClosure(this));
     }
 
+    /**
+     * If no parameter is provided at construction time, the act() method becomes the actor's body
+     */
     protected void act() {
         throw new UnsupportedOperationException("The act method has not been overridden");
     }
 
+    /**
+     * Handles all incoming messages
+     *
+     * @param message The current message to process
+     */
     final void onMessage(final Object message) {
         try {
             if (nextContinuation != null) {
@@ -286,11 +313,22 @@ public class DefaultActor extends AbstractLoopingActor {
 //        throw ActorException.CONTINUE;
     }
 
+    /**
+     * Not supported by DefaultActor
+     *
+     * @return same actor
+     */
     @Override
     public Actor silentStart() {
         throw new UnsupportedOperationException("Old actors cannot start silently. Use DefaultActor instead.");
     }
 
+    /**
+     * Starts the Actor and sends it the START_MESSAGE to run any afterStart handlers.
+     * No messages can be sent or received before an Actor is started.
+     *
+     * @return same actor
+     */
     @Override
     public Actor start() {
         if (started) throw new IllegalStateException("The DefaultActor cannot be restarted.");
@@ -298,10 +336,16 @@ public class DefaultActor extends AbstractLoopingActor {
         return super.start();
     }
 
+    /**
+     * Called once the START_MESSAGE arrives.
+     * We need to run the actor's body here, letting it set nextContinuation to hols the next message handler
+     */
     @Override
     protected void handleStart() {
         super.handleStart();
         try {
+            final Runnable startCode = loopCode;
+            loopCode = null;
             if (startCode != null) {
                 if (startCode instanceof Closure) {
                     final Closure closure = enhanceClosure((Closure) startCode);
@@ -314,8 +358,6 @@ public class DefaultActor extends AbstractLoopingActor {
         } catch (IllegalStateException e) {
             terminate();
             throw e;
-        } finally {
-            startCode = null;
         }
     }
 
