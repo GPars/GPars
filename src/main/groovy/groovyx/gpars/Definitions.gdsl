@@ -65,6 +65,7 @@ contributor(actorBody) {
         if ((clazzName?.contains("PGROUP")) || (clazzName?.contains("ACTORS"))) {
             method name: "react", type: "void", params: [closure: 'groovy.lang.Closure']
             method name: "react", type: "void", params: [timeout: 'long', unit: 'java.util.concurrent.TimeUnit', closure: 'groovy.lang.Closure']
+            method name: "react", type: "void", params: [timeout: 'long', closure: 'groovy.lang.Closure']
             method name: "react", type: "void", params: [timeout: 'groovy.time.Duration', closure: 'groovy.lang.Closure']
             method name: "receive", type: "void", params: [closure: 'groovy.lang.Closure']
             method name: "receive", type: "void", params: [timeout: 'long', unit: 'java.util.concurrent.TimeUnit', closure: 'groovy.lang.Closure']
