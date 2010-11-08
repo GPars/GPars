@@ -68,6 +68,7 @@ public abstract class AbstractLoopingActor extends Actor {
             @Override
             protected void handleMessage(final Object message) {
                 if (message == START_MESSAGE) handleStart();
+                else if (message == FINISH_MESSAGE) stop();
                 else {
                     if (message == TIMEOUT_MESSAGE) {
                         final ActorTimerTask localTimerTask = currentTimerTask;

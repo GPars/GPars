@@ -65,6 +65,7 @@ public abstract class Actor extends MessageStream {
      */
     protected volatile PGroup parallelGroup;
     protected static final ActorMessage START_MESSAGE = new ActorMessage("Start", null);
+    protected static final ActorMessage FINISH_MESSAGE = new ActorMessage("FINISH_MESSAGE", null);
     protected static final ActorMessage STOP_MESSAGE = new ActorMessage("STOP_MESSAGE", null);
     protected static final ActorMessage TERMINATE_MESSAGE = new ActorMessage("TERMINATE_MESSAGE", null);
     private static final String AFTER_START = "afterStart";
@@ -159,7 +160,18 @@ public abstract class Actor extends MessageStream {
     public abstract Actor start();
 
     /**
-     * Send message to stop to the Actor. All messages already in queue will be processed first.
+     * Send message to the Actor to finish all so-far-received messages and stop. All messages already in queue will be processed first.
+     * Subsequently received messages will be eventually passed to the afterStop method, if such exists.
+     *
+     * @return same actor
+     */
+    public Actor finish() {
+        send(FINISH_MESSAGE);
+        return this;
+    }
+
+    /**
+     * Send message to stop to the Actor. The actor will finish processing the current message and all unprocessed messages will be passed to the afterStop method, if such exists.
      * No new messages will be accepted since that point.
      * Has no effect if the Actor is not started.
      *
