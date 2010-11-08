@@ -31,6 +31,7 @@ import java.util.Arrays;
  *
  * @author Alex Tkachman, Vaclav Pech
  */
+@Deprecated
 public class RunnableBackedPooledActor extends AbstractPooledActor {
     private static final long serialVersionUID = 8992135845484038961L;
 

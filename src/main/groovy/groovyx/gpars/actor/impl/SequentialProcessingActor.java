@@ -47,6 +47,7 @@ import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
 /**
  * @author Alex Tkachman, Vaclav Pech
  */
+@Deprecated
 @SuppressWarnings({"UnqualifiedStaticUsage"})
 public abstract class SequentialProcessingActor extends ReplyingMessageStream implements Runnable {
 

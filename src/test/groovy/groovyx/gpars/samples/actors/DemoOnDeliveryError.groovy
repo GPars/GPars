@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors
 
-import groovyx.gpars.actor.AbstractPooledActor
-import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CyclicBarrier
 
 /**
@@ -26,18 +26,20 @@ import java.util.concurrent.CyclicBarrier
  * The onDeliveryError() method can, for example, send a notification back to the original sender of the message.
  */
 
-Actors.defaultActorPGroup.resize 10
+final def group = new DefaultPGroup(2)
 final CyclicBarrier barrier = new CyclicBarrier(2)
 
-final AbstractPooledActor actor = Actors.actor {
+final Actor actor = group.actor {
     barrier.await()
     react {
         stop()
     }
 }
 
-final AbstractPooledActor me
-me = Actors.actor {
+println actor
+
+final Actor me
+me = group.actor {
     def message1 = 1
     def message2 = 2
     def message3 = 3
@@ -53,7 +55,6 @@ me = Actors.actor {
     actor << message1
     actor << message2
     actor << message3
-    Thread.sleep 1000
     barrier.await()
 
     react {a ->

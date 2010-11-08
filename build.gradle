@@ -264,6 +264,9 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoFibonacci2',                             //Needs classes from its source folder
             'DemoNumbers',                                //Needs classes from its source folder
             'RunReset',                                   //Starts UI
+
+
+            'DemoOnDeliveryError',                                   //Temporary
     ]
 
     classpath = sourceSets.main.runtimeClasspath
