@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.actors
+package groovyx.gpars.samples.actors.stateful
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.DefaultPGroup
