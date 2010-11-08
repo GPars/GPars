@@ -96,7 +96,7 @@ public class DefaultActor extends AbstractLoopingActor {
                 throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
         } catch (ActorContinuationException ignore) {
         }
-        if (nextContinuation == null && !hasBeenStopped()) {
+        if (nextContinuation == null && !terminatingFlag) {
             try {
                 if (loopCondition == null || evalLoopCondition()) {
                     if (loopCode == null)
@@ -210,19 +210,19 @@ public class DefaultActor extends AbstractLoopingActor {
             this.loopClosure = enhancedClosure;
 
             assert nextContinuation == null;
-            while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || evalLoopCondition())) {
+            while (!terminatingFlag && nextContinuation == null && (loopCondition == null || evalLoopCondition())) {
                 enhancedClosure.call();
             }
-            if (!hasBeenStopped() && nextContinuation == null && afterLoopCode != null) {
+            if (!terminatingFlag && nextContinuation == null && afterLoopCode != null) {
                 runAfterLoopCode(afterLoopCode);
             }
         } else {
             this.loopCode = code;
             assert nextContinuation == null;
-            while (!hasBeenStopped() && nextContinuation == null && (loopCondition == null || evalLoopCondition())) {
+            while (!terminatingFlag && nextContinuation == null && (loopCondition == null || evalLoopCondition())) {
                 loopCode.run();
             }
-            if (!hasBeenStopped() && nextContinuation == null && afterLoopCode != null) {
+            if (!terminatingFlag && nextContinuation == null && afterLoopCode != null) {
                 runAfterLoopCode(afterLoopCode);
             }
         }

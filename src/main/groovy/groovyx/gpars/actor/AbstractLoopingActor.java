@@ -32,7 +32,7 @@ public abstract class AbstractLoopingActor extends Actor {
     private static final long serialVersionUID = -7638132628355085829L;
     private volatile boolean stoppedFlag = true;
     private volatile boolean terminatedFlag = true;
-    private volatile boolean terminatingFlag = true;
+    volatile boolean terminatingFlag = true;
     private ActorTimerTask currentTimerTask = null;
     private int timeoutCounter = 0;
     private MessageStream currentSender;
@@ -68,7 +68,6 @@ public abstract class AbstractLoopingActor extends Actor {
             @Override
             protected void handleMessage(final Object message) {
                 if (message == START_MESSAGE) handleStart();
-                else if (message == FINISH_MESSAGE) stop();
                 else {
                     if (message == TIMEOUT_MESSAGE) {
                         final ActorTimerTask localTimerTask = currentTimerTask;

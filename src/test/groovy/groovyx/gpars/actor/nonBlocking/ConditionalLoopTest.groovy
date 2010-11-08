@@ -126,7 +126,7 @@ class ConditionalLoopTest extends GroovyTestCase {
 //            result = 100
         }
         actor.join()
-        assert result == 1
+        assert result == 5
     }
 
     public void testRepeatedLoopOnNumberOfIterationsWithStop() {
@@ -139,7 +139,7 @@ class ConditionalLoopTest extends GroovyTestCase {
 //            result = 100
         }
         actor.join()
-        assert result == 1
+        assert result == 5
     }
 
     public void testRepeatedLoopWithTerminate() {

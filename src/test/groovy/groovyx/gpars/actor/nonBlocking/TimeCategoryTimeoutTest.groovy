@@ -72,7 +72,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
                     try {
                         react(1.minute) {}
                     } catch (MissingPropertyException ignore) {exceptions++ }
-                    stop()
+                    terminate()
                 } finally {
                     latch.countDown()
                 }
