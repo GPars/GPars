@@ -17,6 +17,7 @@
 package groovyx.gpars;
 
 import groovy.lang.Closure;
+import groovyx.gpars.dataflow.operator.DataFlowProcessor;
 
 import java.util.Arrays;
 
@@ -41,6 +42,15 @@ public abstract class DataFlowMessagingRunnable extends Closure {
         this.numberOfParameters = numberOfParameters;
         this.defaultParamTypes = new Class[numberOfParameters];
         Arrays.fill(this.defaultParamTypes, Object.class);
+    }
+
+    /**
+     * Retrieves the owning processor (operator or selector) giving the DataFlowMessagingRunnable a way to call methods like bindOutput()
+     *
+     * @return The owning processor
+     */
+    public DataFlowProcessor getOwningProcessor() {
+        return (DataFlowProcessor) getDelegate();
     }
 
     @Override
