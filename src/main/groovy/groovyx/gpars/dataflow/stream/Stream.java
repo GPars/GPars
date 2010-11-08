@@ -95,6 +95,12 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
     }
 
     @Override
+    public void bind(final T value) {
+        first.leftShift(value);
+        getRest();
+    }
+
+    @Override
     public T getFirst() {
         try {
             return getVal();

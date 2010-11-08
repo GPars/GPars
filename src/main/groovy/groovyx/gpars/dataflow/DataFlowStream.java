@@ -98,6 +98,17 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
     }
 
     /**
+     * Adds a DataFlowVariable representing the passed in value to the buffer.
+     *
+     * @param value The value to bind to the head of the stream
+     * @return This operator instance
+     */
+    @Override
+    public void bind(final T value) {
+        hookWheneverBoundListeners(retrieveForBind()).bind(value);
+    }
+
+    /**
      * Hooks the registered when bound handlers to the supplied dataflow expression
      *
      * @param expr The expression to hook all the when bound listeners to
