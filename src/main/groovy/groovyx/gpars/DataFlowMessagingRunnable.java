@@ -27,15 +27,16 @@ import java.util.Arrays;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"RawUseOfParameterizedType"})
-public abstract class DFMessagingRunnable extends Closure {
+public abstract class DataFlowMessagingRunnable extends Closure {
     private static final long serialVersionUID = 4796783310470426395L;
     private final Class[] defaultParamTypes;
     private final int numberOfParameters;
 
-    protected DFMessagingRunnable(final int numberOfParameters) {
+    protected DataFlowMessagingRunnable(final int numberOfParameters) {
         this(null, numberOfParameters);
     }
-    protected DFMessagingRunnable(final Object owner, final int numberOfParameters) {
+
+    protected DataFlowMessagingRunnable(final Object owner, final int numberOfParameters) {
         super(owner);
         this.numberOfParameters = numberOfParameters;
         this.defaultParamTypes = new Class[numberOfParameters];
@@ -50,7 +51,8 @@ public abstract class DFMessagingRunnable extends Closure {
     /**
      * Returns types expected by the Runnable. By default instances of the Object class are demanded.
      * The size of the array must match the numberOfParameters parameter to the constructor.
-     * @return Types of expected arguments 
+     *
+     * @return Types of expected arguments
      */
     @Override
     public Class[] getParameterTypes() {
@@ -76,9 +78,8 @@ public abstract class DFMessagingRunnable extends Closure {
 
     /**
      * Defines the action performed by the Runnable
+     *
      * @param arguments The parameters passed from the caller to the closure
      */
     protected abstract void doRun(final Object[] arguments);
-
-    //todo test, document
 }

@@ -33,6 +33,7 @@ public abstract class ReactorMessagingRunnable<T, V> extends Closure {
     protected ReactorMessagingRunnable() {
         super(null);
     }
+
     protected ReactorMessagingRunnable(final Object owner) {
         super(owner);
     }
@@ -54,7 +55,8 @@ public abstract class ReactorMessagingRunnable<T, V> extends Closure {
 
     @Override
     public final Object call(final Object[] args) {
-        if (args.length != 1) throw new UnsupportedOperationException(REACTOR_MESSAGING_RUNNABLE_NEED_EXACTLY_ONE_ARGUMENT_TO_RUN);
+        if (args.length != 1)
+            throw new UnsupportedOperationException(REACTOR_MESSAGING_RUNNABLE_NEED_EXACTLY_ONE_ARGUMENT_TO_RUN);
         return doRun((T) args[0]);
     }
 
@@ -65,10 +67,9 @@ public abstract class ReactorMessagingRunnable<T, V> extends Closure {
 
     /**
      * Defines the action performed by the Runnable
+     *
      * @param argument The parameter passed from the caller to the closure
      * @return The result to return to the caller of the closure and thus to send as a reply from the ReactiveActor
      */
     protected abstract V doRun(final T argument);
-
-    //todo test, document, generify
 }
