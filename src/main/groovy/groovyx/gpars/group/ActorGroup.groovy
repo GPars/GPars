@@ -25,7 +25,6 @@ import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowReadChannel
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlowWriteChannel
 import groovyx.gpars.dataflow.Select
@@ -265,7 +264,7 @@ public abstract class PGroup {
      * @param code The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+    public DataFlowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
         return new DataFlowOperator(this, [inputs: inputChannels, outputs: outputChannels], code).start()
     }
 
@@ -278,7 +277,7 @@ public abstract class PGroup {
      * @param code The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final int maxForks, final Closure code) {
+    public DataFlowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
         return new DataFlowOperator(this, [inputs: inputChannels, outputs: outputChannels, maxForkd: maxForks], code).start()
     }
 
@@ -318,7 +317,7 @@ public abstract class PGroup {
      * @param outputChannels dataflow channels to use for output
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
-    public DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+    public DataFlowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
         return new DataFlowSelector(this, [inputs: inputChannels, outputs: outputChannels], code).start()
     }
 
@@ -337,7 +336,7 @@ public abstract class PGroup {
      * @param outputChannels dataflow channels to use for output
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
-    public DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+    public DataFlowProcessor selector(final List inputChannels, final List outputChannels) {
         return new DataFlowSelector(this, [inputs: inputChannels, outputs: outputChannels], {bindAllOutputsAtomically it}).start()
     }
 
@@ -358,7 +357,7 @@ public abstract class PGroup {
      * @param outputChannels dataflow channels to use for output
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
-    public DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+    public DataFlowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
         return new DataFlowPrioritySelector(this, [inputs: inputChannels, outputs: outputChannels], code).start()
     }
 
@@ -377,7 +376,7 @@ public abstract class PGroup {
      * @param inputChannels dataflow channels to use for input
      * @param outputChannels dataflow channels to use for output
      */
-    public DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+    public DataFlowProcessor prioritySelector(final List inputChannels, final List outputChannels) {
         return new DataFlowPrioritySelector(this, [inputs: inputChannels, outputs: outputChannels], {bindAllOutputsAtomically it}).start()
     }
 
