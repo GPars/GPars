@@ -1,4 +1,4 @@
-Once you got setup, try the following script to test that your setup is functional.
+Once you got setup, try the following Groovy script to test that your setup is functional. For Java, see below.
 {code}
 import static groovyx.gpars.actor.Actors.actor
 
@@ -34,3 +34,49 @@ def console = actor {
 {code}
 
 You should get a message "Decrypted message: Groovy is parallel" printed out on the console when you run the code.
+
+{note:Title=Java API}
+Although GPars has been primarily designed for the Groovy programming language, the solid technical foundation plus good performance characteristics
+make GPars a good Java library as well. Since most of GPars is written in Java, there is no extra performance penalty Java applications
+would pay when using GPars.
+
+For details please refer to the Java API section.
+{note}
+
+To quick-test your integration throughthe Java API, run the following Java actor code:
+
+{code}
+import groovyx.gpars.MessagingRunnable;
+import groovyx.gpars.actor.DynamicDispatchActor;
+
+public class StatelessActorDemo {
+    public static void main(String[] args) throws InterruptedException {
+        final MyStatelessActor actor = new MyStatelessActor();
+        actor.start();
+        actor.send("Hello");
+        actor.sendAndWait(10);
+        actor.sendAndContinue(10.0, new MessagingRunnable<String>() {
+            @Override protected void doRun(final String s) {
+                System.out.println("Received a reply " + s);
+            }
+        });
+    }
+}
+
+class MyStatelessActor extends DynamicDispatchActor {
+    public void onMessage(final String msg) {
+        System.out.println("Received " + msg);
+        replyIfExists("Thank you");
+    }
+
+    public void onMessage(final Integer msg) {
+        System.out.println("Received a number " + msg);
+        replyIfExists("Thank you");
+    }
+
+    public void onMessage(final Object msg) {
+        System.out.println("Received an object " + msg);
+        replyIfExists("Thank you");
+    }
+}
+{code}
