@@ -18,7 +18,7 @@ package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
 import groovyx.gpars.group.DefaultPGroup;
-import groovyx.gpars.scheduler.DefaultPool;
+import groovyx.gpars.scheduler.ResizeablePool;
 
 /**
  * Provides handy helper methods to create pooled actors and customize the underlying thread pool.
@@ -50,7 +50,7 @@ public abstract class Actors {
     /**
      * The default actor group to share by all actors created through the Actors class.
      */
-    public static final DefaultPGroup defaultActorPGroup = new DefaultPGroup(new DefaultPool(true, 20));
+    public static final DefaultPGroup defaultActorPGroup = new DefaultPGroup(new ResizeablePool(true));
 
     /**
      * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
