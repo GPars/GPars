@@ -31,7 +31,7 @@ import java.util.concurrent.Callable;
  * @author Vaclav Pech, Dierk Koenig
  *         Date: Jun 4, 2009
  */
-@SuppressWarnings({"RawUseOfParameterizedType", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "ConstantDeclaredInAbstractClass", "UtilityClass"})
+@SuppressWarnings({"RawUseOfParameterizedType", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "ConstantDeclaredInAbstractClass", "UtilityClass", "unchecked"})
 public abstract class DataFlow {
 
     /**
@@ -128,7 +128,7 @@ public abstract class DataFlow {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+    public static DataFlowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
         return DataFlow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, code);
     }
 
@@ -141,7 +141,7 @@ public abstract class DataFlow {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final int maxForks, final Closure code) {
+    public static DataFlowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
         return DataFlow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, maxForks, code);
     }
 
@@ -189,7 +189,7 @@ public abstract class DataFlow {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+    public static DataFlowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
         return DataFlow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels, code);
     }
 
@@ -210,7 +210,7 @@ public abstract class DataFlow {
      * @param outputChannels dataflow channels to use for output
      * @return A new active selector instance
      */
-    public static DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+    public static DataFlowProcessor selector(final List inputChannels, final List outputChannels) {
         return DataFlow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels);
     }
 
@@ -235,7 +235,7 @@ public abstract class DataFlow {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+    public static DataFlowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
         return DataFlow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels, code);
     }
 
@@ -258,7 +258,7 @@ public abstract class DataFlow {
      * @param outputChannels dataflow channels to use for output
      * @return A new active selector instance
      */
-    public static DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+    public static DataFlowProcessor prioritySelector(final List inputChannels, final List outputChannels) {
         return DataFlow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels);
     }
 
