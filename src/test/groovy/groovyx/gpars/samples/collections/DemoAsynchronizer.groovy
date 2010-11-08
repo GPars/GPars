@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples
+package groovyx.gpars.samples.collections
 
 import groovyx.gpars.GParsExecutorsPool
 

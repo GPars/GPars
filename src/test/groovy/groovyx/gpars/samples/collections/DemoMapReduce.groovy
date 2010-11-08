@@ -21,7 +21,7 @@
  * Date: Nov 6, 2009
  */
 
-package groovyx.gpars.samples
+package groovyx.gpars.samples.collections
 
 groovyx.gpars.GParsPool.withPool {
     assert 15 == [1, 2, 3, 4, 5].parallel.reduce {a, b -> a + b}                                        //summarize

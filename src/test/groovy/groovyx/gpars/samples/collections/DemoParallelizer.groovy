@@ -18,7 +18,7 @@
  * Demonstrates parallel collection processing using ParallelArrays through the GParsPool class.
  */
 
-package groovyx.gpars.samples
+package groovyx.gpars.samples.collections
 
 import groovyx.gpars.GParsPool
 

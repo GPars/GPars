@@ -21,7 +21,7 @@
  * Date: Oct 31, 2010
  */
 
-package groovyx.gpars.samples
+package groovyx.gpars.samples.collections
 
 import jsr166y.forkjoin.Ops.Mapper
 import jsr166y.forkjoin.Ops.Predicate

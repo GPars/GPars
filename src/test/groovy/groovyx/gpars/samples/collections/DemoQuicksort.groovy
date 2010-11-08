@@ -21,7 +21,7 @@
  * Date: Dec 11, 2008
  */
 
-package groovyx.gpars.samples
+package groovyx.gpars.samples.collections
 
 import static groovyx.gpars.GParsPool.withPool
 
