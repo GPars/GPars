@@ -159,7 +159,6 @@ public class PGroupTest extends GroovyTestCase { /**
         daemonGroup2.shutdown()
         nonDaemonGroup1.shutdown()
         nonDaemonGroup2.shutdown()
-        defaultGroup.shutdown()
     }
 }
 
