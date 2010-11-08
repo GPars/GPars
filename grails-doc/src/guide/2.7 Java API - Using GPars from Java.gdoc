@@ -85,7 +85,32 @@ public class ReactorDemo {
 }
 {code}
 
+h3. Convenience factory methods
+
 Obviously, all the essential factory methods to build actors quickly are available where you'd expect them.
+
+{code}
+
+import groovy.lang.Closure;
+import groovyx.gpars.ReactorMessagingRunnable;
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.Actors;
+
+public class ReactorDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final Closure handler = new ReactorMessagingRunnable<Integer, Integer>() {
+            @Override protected Integer doRun(final Integer integer) {
+                return integer * 2;
+            }
+        };
+        final Actor actor = Actors.reactor(handler);
+
+        System.out.println("Result: " +  actor.sendAndWait(1));
+        System.out.println("Result: " +  actor.sendAndWait(2));
+        System.out.println("Result: " +  actor.sendAndWait(3));
+    }
+}
+{code}
 
 h3. Agents
 
@@ -112,7 +137,7 @@ h3. Dataflow Concurrency
 
 Both _DataFlowVariables_ and _DataFlowStreams_ can be used from Java without any hiccups. Just avoid the handy overloaded operators
 and go straight to the methods, like _bind_ , _whenBound_, _getVal_ and other.
-You may also continue using dataflow _tasks_ passing to them instances of _Runnable_ or _Callable just like groovy _Closure_ .
+You may also continue using dataflow _tasks_ passing to them instances of _Runnable_ or _Callable_ just like groovy _Closure_ .
 
 {code}
 
@@ -153,9 +178,7 @@ public class DataFlowTaskDemo {
 
 h3. Dataflow operators
 
-{code}
-
-{code}
+//todo
 
 h3. Performance
 

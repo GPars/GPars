@@ -35,6 +35,7 @@ def console = actor {
 
 You should get a message "Decrypted message: Groovy is parallel" printed out on the console when you run the code.
 
+h4. GPars - a Java library
 {note:Title=Java API}
 Although GPars has been primarily designed for the Groovy programming language, the solid technical foundation plus good performance characteristics
 make GPars a good Java library as well. Since most of GPars is written in Java, there is no extra performance penalty Java applications
