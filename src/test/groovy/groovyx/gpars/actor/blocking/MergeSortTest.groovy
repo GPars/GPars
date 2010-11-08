@@ -29,6 +29,14 @@ import java.util.concurrent.TimeUnit
  */
 public class MergeSortTest extends GroovyTestCase {
 
+    def group
+
+    protected void setUp() {
+        super.setUp();    //To change body of overridden methods use File | Settings | File Templates.
+        group = new DefaultPGroup(new ResizeablePool(false, 50))
+    }
+
+
     protected void tearDown() {
         group.shutdown()
     }
@@ -56,8 +64,6 @@ public class MergeSortTest extends GroovyTestCase {
         else result.addAll(b[j..-1])
         return result
     }
-
-    def group = new DefaultPGroup(new ResizeablePool(false, 50))
 
     Closure createMessageHandler(def parentActor) {
         return {

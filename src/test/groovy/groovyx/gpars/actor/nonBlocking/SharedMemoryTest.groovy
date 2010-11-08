@@ -42,15 +42,16 @@ public class SharedMemoryTest extends GroovyTestCase {
 
         Actor actor2 = group.actor {
             loop {
-                if (counter < MAX_COUNTER) actor1.send counter.longValue() * 2
-                else {
+                if (counter < MAX_COUNTER) {
+                    actor1.send counter.longValue() * 2
+                    react {
+                        assert it == counter * 2
+                        counter += 1
+                    }
+                } else {
                     actor1.stop()
                     latch.countDown()
                     terminate()
-                }
-                react {
-                    assert it == counter * 2
-                    counter += 1
                 }
             }
         }
@@ -58,7 +59,6 @@ public class SharedMemoryTest extends GroovyTestCase {
 
         latch.await()
         [actor1, actor2]*.join()
-        group.shutdown()
         assertEquals MAX_COUNTER, counter
         group.shutdown()
     }

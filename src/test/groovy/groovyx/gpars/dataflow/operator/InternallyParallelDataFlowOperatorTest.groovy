@@ -104,9 +104,9 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
             bindOutput 1, Thread.currentThread().hashCode()
         }
 
-        DataFlow.start { a << 5 }
-        DataFlow.start { b << 10 }
-        DataFlow.start { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].each {c << it} }
+        DataFlow.task { a << 5 }
+        DataFlow.task { b << 10 }
+        DataFlow.task { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].each {c << it} }
 
         def results = (1..10).collect {d.val}
         assertEquals 10, results.size()
