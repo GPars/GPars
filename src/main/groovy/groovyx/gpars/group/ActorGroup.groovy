@@ -25,6 +25,7 @@ import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
+import groovyx.gpars.dataflow.DataFlowReadChannel
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlowWriteChannel
 import groovyx.gpars.dataflow.Select
@@ -258,6 +259,31 @@ public abstract class PGroup {
 
     /**
      * Creates an operator using the current parallel group
+     *
+     * @param inputChannels dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param code The operator's body to run each time all inputs have a value to read
+     * @return A new active operator instance
+     */
+    public DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+        return new DataFlowOperator(this, [inputs: inputChannels, outputs: outputChannels], code).start()
+    }
+
+    /**
+     * Creates an operator using the current parallel group
+     *
+     * @param inputChannels dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param maxForks Number of parallel threads running operator's body, defaults to 1
+     * @param code The operator's body to run each time all inputs have a value to read
+     * @return A new active operator instance
+     */
+    public DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final int maxForks, final Closure code) {
+        return new DataFlowOperator(this, [inputs: inputChannels, outputs: outputChannels, maxForkd: maxForks], code).start()
+    }
+
+    /**
+     * Creates an operator using the current parallel group
      * @param input a dataflow channel to use for input
      * @param output a dataflow channel to use for output
      * @param code The operator's body to run each time all inputs have a value to read
@@ -287,12 +313,32 @@ public abstract class PGroup {
     }
 
     /**
+     * Creates a selector using this parallel group
+     * @param inputChannels dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param code The selector's body to run each time a value is available in any of the inputs channels
+     */
+    public DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+        return new DataFlowSelector(this, [inputs: inputChannels, outputs: outputChannels], code).start()
+    }
+
+    /**
      * Creates a selector using this parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      * @param code The selector's body to run each time a value is available in any of the inputs channels
      */
     public DataFlowProcessor selector(final Map channels) {
         return new DataFlowSelector(this, channels, {bindAllOutputsAtomically it}).start()
+    }
+
+    /**
+     * Creates a selector using this parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
+     * @param inputChannels dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param code The selector's body to run each time a value is available in any of the inputs channels
+     */
+    public DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+        return new DataFlowSelector(this, [inputs: inputChannels, outputs: outputChannels], {bindAllOutputsAtomically it}).start()
     }
 
     /**
@@ -306,12 +352,33 @@ public abstract class PGroup {
     }
 
     /**
+     * Creates a prioritizing selector using the default dataflow parallel group
+     * Input with lower position index have higher priority.
+     * @param inputChannels dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param code The selector's body to run each time a value is available in any of the inputs channels
+     */
+    public DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+        return new DataFlowPrioritySelector(this, [inputs: inputChannels, outputs: outputChannels], code).start()
+    }
+
+    /**
      * Creates a prioritizing selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
      * Input with lower position index have higher priority.
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
      */
     public DataFlowProcessor prioritySelector(final Map channels) {
         return new DataFlowPrioritySelector(this, channels, {bindAllOutputsAtomically it}).start()
+    }
+
+    /**
+     * Creates a prioritizing selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
+     * Input with lower position index have higher priority.
+     * @param inputChannels dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     */
+    public DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+        return new DataFlowPrioritySelector(this, [inputs: inputChannels, outputs: outputChannels], {bindAllOutputsAtomically it}).start()
     }
 
     /**

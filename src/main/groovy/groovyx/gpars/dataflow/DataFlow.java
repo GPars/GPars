@@ -123,6 +123,31 @@ public abstract class DataFlow {
     /**
      * Creates an operator using the current parallel group
      *
+     * @param inputChannels  dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param code           The operator's body to run each time all inputs have a value to read
+     * @return A new active operator instance
+     */
+    public static DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+        return DataFlow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, code);
+    }
+
+    /**
+     * Creates an operator using the current parallel group
+     *
+     * @param inputChannels  dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param maxForks       Number of parallel threads running operator's body, defaults to 1
+     * @param code           The operator's body to run each time all inputs have a value to read
+     * @return A new active operator instance
+     */
+    public static DataFlowProcessor operator(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final int maxForks, final Closure code) {
+        return DataFlow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, maxForks, code);
+    }
+
+    /**
+     * Creates an operator using the current parallel group
+     *
      * @param input  a dataflow channel to use for input
      * @param output a dataflow channel to use for output
      * @param code   The operator's body to run each time all inputs have a value to read
@@ -157,6 +182,18 @@ public abstract class DataFlow {
     }
 
     /**
+     * Creates a selector using the default dataflow parallel group
+     *
+     * @param inputChannels  dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param code           The selector's body to run each time a value is available in any of the inputs channels
+     * @return A new active selector instance
+     */
+    public static DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+        return DataFlow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels, code);
+    }
+
+    /**
      * Creates a selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
      *
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
@@ -164,6 +201,17 @@ public abstract class DataFlow {
      */
     public static DataFlowProcessor selector(final Map channels) {
         return DataFlow.DATA_FLOW_GROUP.selector(channels);
+    }
+
+    /**
+     * Creates a selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
+     *
+     * @param inputChannels  dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @return A new active selector instance
+     */
+    public static DataFlowProcessor selector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+        return DataFlow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels);
     }
 
     /**
@@ -179,6 +227,19 @@ public abstract class DataFlow {
     }
 
     /**
+     * Creates a prioritizing selector using the default dataflow parallel group
+     * Input with lower position index have higher priority.
+     *
+     * @param inputChannels  dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @param code           The selector's body to run each time a value is available in any of the inputs channels
+     * @return A new active selector instance
+     */
+    public static DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels, final Closure code) {
+        return DataFlow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels, code);
+    }
+
+    /**
      * Creates a prioritizing selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
      * Input with lower position index have higher priority.
      *
@@ -187,6 +248,18 @@ public abstract class DataFlow {
      */
     public static DataFlowProcessor prioritySelector(final Map channels) {
         return DataFlow.DATA_FLOW_GROUP.prioritySelector(channels);
+    }
+
+    /**
+     * Creates a prioritizing selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
+     * Input with lower position index have higher priority.
+     *
+     * @param inputChannels  dataflow channels to use for input
+     * @param outputChannels dataflow channels to use for output
+     * @return A new active selector instance
+     */
+    public static DataFlowProcessor prioritySelector(final List<DataFlowReadChannel> inputChannels, final List<DataFlowWriteChannel> outputChannels) {
+        return DataFlow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels);
     }
 
     /**
