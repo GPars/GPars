@@ -5132,6 +5132,7 @@
         <w>egrep</w>
         <w>forkjoin</w>
         <w>galpin</w>
+        <w>gortatowsky</w>
         <w>groovyx</w>
         <w>intdiv</w>
         <w>iterable</w>
@@ -5140,8 +5141,11 @@
         <w>javax</w>
         <w>jboss</w>
         <w>jcsp</w>
+        <w>jiří</w>
         <w>junit</w>
         <w>kerridge</w>
+        <w>kropáček</w>
+        <w>laforge</w>
         <w>matemàtica</w>
         <w>matemàtiques</w>
         <w>memoize</w>
