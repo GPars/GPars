@@ -295,7 +295,7 @@ public class DefaultActor extends AbstractLoopingActor {
      */
     protected final void react(final long timeout, final Closure code) {
         if (!isActorThread()) {
-            throw new IllegalStateException("Cannot call react from thread which is not owned by the actor");
+            throw new IllegalStateException("Cannot call react from a thread which is not owned by the actor");
         }
         checkForNull(code);
         checkForMessageHandlerArguments(code);
