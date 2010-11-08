@@ -48,7 +48,7 @@ final Actor actor = group.actor {
                 messages.values()*.send Messages.REPLY  //sent to all senders
                 def winnerOffer = [offerA, offerB, offerC].min {it.price}
                 messages[winnerOffer].send 'I accept your reasonable offer'  //sent to the winner only
-                messages.findAll{it.key != winnerOffer}*.value*.send 'Maybe next time'  //sent to the losers only
+                messages.findAll {it.key != winnerOffer}*.value*.send 'Maybe next time'  //sent to the losers only
             }
         }
     }
@@ -82,7 +82,7 @@ final def a3 = group.actor {
 }
 
 actor.join()
-[a1, a2, a3]*.finish()
+[a1, a2, a3]*.stop()
 [a1, a2, a3]*.join()
 
 class Offer {

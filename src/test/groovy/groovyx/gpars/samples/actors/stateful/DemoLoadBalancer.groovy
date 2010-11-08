@@ -76,11 +76,10 @@ final class DemoWorker extends DefaultActor {
                     case WorkToDo:
                         processMessage(it)
                         break
-                    case EXIT: stop()
+                    case EXIT: terminate()
                 }
             }
         }
-
     }
 
     private void processMessage(message) {
