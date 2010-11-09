@@ -11,16 +11,16 @@ If any of the actor's methods is allowed to be called by other objects directly,
 
 h2. Types of actors
 
-In general, you can find two types of actors in the wild - ones that hold no *implicit state* and those, who do. GPars gives you both options.
+In general, you can find two types of actors in the wild - ones that hold *implicit state* and those, who don't. GPars gives you both options.
 *Stateless* actors, represented in *GPars* by the _DynamicDispatchActor_ and the _ReactiveActor_ classes, keep no track of what messages have arrived previously.
 You may thing of these as flat message handlers, which process messages as they come. Any state-based behavior has to be implemented by the user.
 
-The *stateful* actors, represented by here by the _AbstractPooledActor_ class, allow the user to handle implicit state directly.
+The *stateful* actors, represented in GPars by the _DefaultActor_ class (and previously also by the _AbstractPooledActor_ class), allow the user to handle implicit state directly.
 After receiving a message the actor moves into a new state with different ways to handle future messages.
 To give you an example, a freshly started actor may only accept some types of messages, e.g. encrypted messages for decryption,
 only after it has received the encryption keys. The stateful actors allow to encode such dependencies directly in the structure
 of the message-handling code.
-Implicit state management, however, comes at a performance cost, mainly due to the lack of continuations support on JVM.
+Implicit state management, however, comes at a slight performance cost, mainly due to the lack of continuations support on JVM.
 
 h2. Actor threading model
 
@@ -379,9 +379,18 @@ actor.join()
 The _After Loop Termination Code Handler_ can use actor's _react{}_ but not _loop()_ .
 {note}
 
+{note}
+_DefaultActor_ can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor
+either makes the thread available to other actors sharing the same parallel group (fair), or keeps the thread fot itself
+until the message queue gets empty (non-fair). Generally, non-fair actors perform 2 - 3 times better than fair ones.
+
+Use either the _fairActor()_ factory method or the actor's makeFair() method.
+
+{note}
+
 h2. Custom schedulers
 
 Actors leverage the standard JDK concurrency library by default.  To provide a custom thread scheduler use the appropriate constructor parameter when creating an actor group. The supplied scheduler will orchestrate threads in the group's thread pool.
 
 
-Please also see the numerous Actor [Demos].
+Please also see the numerous Actor Demos.
