@@ -41,11 +41,16 @@ class DefaultActorCreationTest extends GroovyTestCase {
         final def actor = new DefaultActor()
 
         final def error = new DataFlowVariable()
+        final def stopped = new DataFlowVariable()
         actor.metaClass.onException {
             error << it
         }
+        actor.metaClass.afterStop {
+            stopped << true
+        }
         actor.start()
         assert error.val instanceof UnsupportedOperationException
+        stopped.val
         assert !actor.isActive()
 
         shouldFail(IllegalStateException) {
