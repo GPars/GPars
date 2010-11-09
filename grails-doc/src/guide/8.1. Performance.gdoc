@@ -36,10 +36,8 @@ you may further slightly benefit from turning them into Java.
 
 h3. Actors
 
-GPars actors are fast. _DynamicDispatchActors_ and _ReactiveActors_ are currently way faster than the _AbstractPooledActors_ , since they don't have to maintain
-an implicit state between subsequent message arrivals. They are in fact on par in performance with actors in _Scala_ , which you can hardly hear of as being slow.
-
-Future effort will go into making the _AbstractPooledActors_ faster as well as into reducing the actors' memory footprint.
+GPars actors are fast. _DynamicDispatchActors_ and _ReactiveActors_ are about twice as fast as the _DefaultActors_ , since they don't have to maintain
+an implicit state between subsequent message arrivals. The _DefaultActors_ are in fact on par in performance with actors in _Scala_ , which you can hardly hear of as being slow.
 
 If top performance is what you're looking for, a good start is to identify the following patterns in your actor code:
 {code}
@@ -62,7 +60,7 @@ messageHandler {
 }
 {code}
 
-The _loop_ and _react_ methods are very costly to call.
+The _loop_ and _react_ methods are rather costly to call.
 
 Defining a _DynamicDispatchActor_ or _ReactiveActor_ as classes instead of using the _messageHandler_ and _reactor_ factory methods will also give you some more speed:
 
@@ -85,10 +83,10 @@ h4. Pool adjustment
 GPars allows you to group actors around thread pools, giving you the freedom to organize actors any way you like.
 It is always worthwhile to experiment with the actor pool size and type. _FJPool_ usually gives better characteristics that
 _DefaultPool_ , but seems to be more sensitive to the number of threads in the pool.
-Sometimes using a _ResizablePool_ or _ResizableFJPool_ could help performance by automatic eliminating unneeded threads.
+Sometimes using a _ResizeablePool_ or _ResizeableFJPool_ could help performance by automatic eliminating unneeded threads.
 
 {code}
-def attackerGroup = new DefaultPGroup(new ResizableFJPool(10))
+def attackerGroup = new DefaultPGroup(new ResizeableFJPool(10))
 def defenderGroup = new DefaultPGroup(new DefaultPool(5))
 
 def attacker = attackerGroup.actor {...}
@@ -104,4 +102,6 @@ With agents, you may also benefit from submitting Java-written closures as messa
 
 h3. Share your experience
 
-//todo 
+The more we hear about GPars uses in the wild the better we can tune it for the future. Let us know how you use GPars and how it performs.
+Send us your benchmarks, performance comparisons or profiling reports to help us tune GPars for you.
+
