@@ -23,6 +23,8 @@ h3. Actors
 * Changed the message timeout API
 * Refactored Reactor and DynamicDispatchActor achieving a 15x speed-up
 * Speed-up of actor messaging
+* Deprecated _AbstractPooledActor_
+* Added _DefaultActor_ as a new implementation of the stateful actor principle
 
 h3. GroovyCSP
 
@@ -49,4 +51,6 @@ h3. Other
 
 
 h3. Renaming hints
+
+* _AbstractPooledActor_ is now deprecated, use _DefaultActor_ instead
 

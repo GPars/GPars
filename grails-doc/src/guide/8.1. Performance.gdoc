@@ -102,6 +102,6 @@ With agents, you may also benefit from submitting Java-written closures as messa
 
 h3. Share your experience
 
-The more we hear about GPars uses in the wild the better we can tune it for the future. Let us know how you use GPars and how it performs.
+The more we hear about GPars uses in the wild the better we can adapt it for the future. Let us know how you use GPars and how it performs.
 Send us your benchmarks, performance comparisons or profiling reports to help us tune GPars for you.
 

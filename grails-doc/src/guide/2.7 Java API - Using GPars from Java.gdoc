@@ -178,7 +178,56 @@ public class DataFlowTaskDemo {
 
 h3. Dataflow operators
 
-//todo
+The sample below should illustrate the main differences between Groovy and Java API for dataflow operators.
+# Use the convenience factory methods accepting list of channels to create operators or selectors
+# Use _DataFlowMessagingRunnable_ to specify the operator body
+# Call _getOwningProcessor()_ to get hold of the operator from within the body in order to e.g. bind output values
+
+{code}
+
+import groovyx.gpars.DataFlowMessagingRunnable;
+import groovyx.gpars.dataflow.DataFlow;
+import groovyx.gpars.dataflow.DataFlowStream;
+import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class DataflowOperatorDemo {
+    public static void main(final String[] args) throws InterruptedException {
+        final DataFlowStream stream1 = new DataFlowStream();
+        final DataFlowStream stream2 = new DataFlowStream();
+        final DataFlowStream stream3 = new DataFlowStream();
+        final DataFlowStream stream4 = new DataFlowStream();
+
+        final DataFlowProcessor op1 = DataFlow.selector(Arrays.asList(stream1), Arrays.asList(stream2), new DataFlowMessagingRunnable(1) {
+            @Override protected void doRun(final Object[] objects) {
+                getOwningProcessor().bindOutput(2*(Integer)objects[0]);
+            }
+        });
+
+        final List secondOperatorInput = Arrays.asList(stream2, stream3);
+
+        final DataFlowProcessor op2 = DataFlow.operator(secondOperatorInput, Arrays.asList(stream4), new DataFlowMessagingRunnable(2) {
+            @Override protected void doRun(final Object[] objects) {
+                getOwningProcessor().bindOutput((Integer) objects[0] + (Integer) objects[1]);
+            }
+        });
+
+        stream1.bind(1);
+        stream1.bind(2);
+        stream1.bind(3);
+        stream3.bind(100);
+        stream3.bind(100);
+        stream3.bind(100);
+        System.out.println("Result: " + stream4.getVal());
+        System.out.println("Result: " + stream4.getVal());
+        System.out.println("Result: " + stream4.getVal());
+        op1.stop();
+        op2.stop();
+    }
+}
+{code}
 
 h3. Performance
 
