@@ -17,7 +17,6 @@
 package groovyx.gpars.util;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 
@@ -31,8 +30,8 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 @SuppressWarnings({"SynchronizedMethod", "FieldAccessedSynchronizedAndUnsynchronized"})
 public final class MessagingQueue {
 
-    private List<Object> outside = new LinkedList<Object>();
-    private List<Object> inside = new LinkedList<Object>();
+    private LinkedList<Object> outside = new LinkedList<Object>();
+    private LinkedList<Object> inside = new LinkedList<Object>();
     @SuppressWarnings({"UnusedDeclaration", "FieldMayBeFinal"})
     private volatile int counter = 0;
     private static final AtomicIntegerFieldUpdater<MessagingQueue> counterUpdater = AtomicIntegerFieldUpdater.newUpdater(
@@ -46,16 +45,16 @@ public final class MessagingQueue {
     Object poll() {
         if (!inside.isEmpty()) {
             counterUpdater.decrementAndGet(this);
-            return inside.remove(0);
+            return inside.removeFirst();
         }
-        final List<Object> localQueue = inside;
+        final LinkedList<Object> localQueue = inside;
         inside = outside;
         synchronized (this) {
             outside = localQueue;
         }
         if (!inside.isEmpty()) {
             counterUpdater.decrementAndGet(this);
-            return inside.remove(0);
+            return inside.removeFirst();
         }
         return null;
     }
