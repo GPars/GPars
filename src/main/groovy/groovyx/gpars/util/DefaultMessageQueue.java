@@ -29,7 +29,7 @@ import java.util.LinkedList;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"SynchronizedMethod", "ArithmeticOnVolatileField", "FieldAccessedSynchronizedAndUnsynchronized"})
-public final class DefaultMessageQueue implements MessagingQueue {
+public final class DefaultMessageQueue implements MessageQueue {
 
     private LinkedList<Object> outside = new LinkedList<Object>();
     private LinkedList<Object> inside = new LinkedList<Object>();

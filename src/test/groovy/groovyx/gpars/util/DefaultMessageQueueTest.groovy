@@ -14,17 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.util;
+package groovyx.gpars.util
 
-/**
- * The high-performance actor message queue
- *
- * @author Vaclav Pech
- */
-public interface MessagingQueue {
-    boolean isEmpty();
+class DefaultMessageQueueTest extends AbstractMessageQueueTest {
 
-    Object poll();
-
-    void add(Object element);
+    protected DefaultMessageQueue createMessageQueue() {
+        return new DefaultMessageQueue()
+    }
 }
