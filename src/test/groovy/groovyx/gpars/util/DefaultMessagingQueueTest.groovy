@@ -18,9 +18,9 @@ package groovyx.gpars.util
 
 import java.util.concurrent.CyclicBarrier
 
-class MessagingQueueTest extends GroovyTestCase {
+class DefaultMessagingQueueTest extends GroovyTestCase {
     public void testEmptyQueue() {
-        final def queue = new MessagingQueue()
+        final def queue = new DefaultMessageQueue()
         assert queue.isEmpty()
         assertNull queue.poll()
         assertNull queue.poll()
@@ -33,7 +33,7 @@ class MessagingQueueTest extends GroovyTestCase {
     }
 
     public void testOrder() {
-        final def queue = new MessagingQueue()
+        final def queue = new DefaultMessageQueue()
         queue.add 1
         queue.add 2
         queue.add 3
@@ -53,7 +53,7 @@ class MessagingQueueTest extends GroovyTestCase {
     }
 
     public void testThreading() {
-        final def queue = new MessagingQueue()
+        final def queue = new DefaultMessageQueue()
         long sum = 0L
         long targetSum = (1..400).sum()
 

@@ -16,52 +16,15 @@
 
 package groovyx.gpars.util;
 
-import java.util.LinkedList;
-
-
 /**
- * An implementation of the message queue for actor and agent messaging.
- * It leverages the fact that in any moment there's only one reading thread accessing the queue
- * and that potential read thread swap at the actor or agent thread pool synchronizes thread memory.
- * <p/>
- * We also count on writers not to call the isEmpty() method
+ * The high-performance actor message queue
  *
  * @author Vaclav Pech
  */
-@SuppressWarnings({"SynchronizedMethod", "FieldAccessedSynchronizedAndUnsynchronized"})
-public final class MessagingQueue {
+public interface MessagingQueue {
+    boolean isEmpty();
 
-    private LinkedList<Object> outside = new LinkedList<Object>();
-    private LinkedList<Object> inside = new LinkedList<Object>();
-    @SuppressWarnings({"UnusedDeclaration", "FieldMayBeFinal"})
-    private volatile int counter = 0;
+    Object poll();
 
-    boolean isEmpty() {
-        return inside.size() + counter == 0;
-    }
-
-    @SuppressWarnings({"SynchronizeOnThis"})
-    Object poll() {
-        if (!inside.isEmpty()) {
-            return inside.removeFirst();
-        }
-        final LinkedList<Object> localQueue = inside;
-        inside = outside;
-        swap(localQueue);
-        if (!inside.isEmpty()) {
-            return inside.removeFirst();
-        }
-        return null;
-    }
-
-    private synchronized void swap(final LinkedList<Object> localQueue) {
-        outside = localQueue;
-        counter = 0;
-    }
-
-    @SuppressWarnings({"AccessToStaticFieldLockedOnInstance"})
-    synchronized void add(final Object element) {
-        outside.add(element);
-        counter += 1;
-    }
+    void add(Object element);
 }
