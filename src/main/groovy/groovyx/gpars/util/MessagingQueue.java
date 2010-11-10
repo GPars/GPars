@@ -38,25 +38,26 @@ public final class MessagingQueue {
             MessagingQueue.class, "counter");
 
     boolean isEmpty() {
-        return counterUpdater.get(this) == 0;
+        return inside.size() + counterUpdater.get(this) == 0;
     }
 
     @SuppressWarnings({"SynchronizeOnThis"})
     Object poll() {
         if (!inside.isEmpty()) {
-            counterUpdater.decrementAndGet(this);
             return inside.removeFirst();
         }
         final LinkedList<Object> localQueue = inside;
         inside = outside;
-        synchronized (this) {
-            outside = localQueue;
-        }
+        swap(localQueue);
         if (!inside.isEmpty()) {
-            counterUpdater.decrementAndGet(this);
             return inside.removeFirst();
         }
         return null;
+    }
+
+    private synchronized void swap(final LinkedList<Object> localQueue) {
+        outside = localQueue;
+        counter = 0;
     }
 
     @SuppressWarnings({"AccessToStaticFieldLockedOnInstance"})
