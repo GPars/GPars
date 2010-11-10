@@ -95,7 +95,9 @@ public abstract class AsyncMessagingCore implements Runnable {
      */
     public void store(final Object message) {
         queue.add(message != null ? message : NullObject.getNullObject());
-        schedule();
+        if (activeUpdater.compareAndSet(this, PASSIVE, ACTIVE)) {  //we're not checking emptiness of the queue since the probability of useless scheduling is low and we avoid the overhead with the method call and synchronization on the inside queue size
+            threadPool.execute(this);
+        }
     }
 
     /**

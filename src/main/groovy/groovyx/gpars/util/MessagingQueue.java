@@ -17,13 +17,14 @@
 package groovyx.gpars.util;
 
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 
 /**
  * An implementation of the message queue for actor and agent messaging.
  * It leverages the fact that in any moment there's only one reading thread accessing the queue
  * and that potential read thread swap at the actor or agent thread pool synchronizes thread memory.
+ * <p/>
+ * We also count on writers not to call the isEmpty() method
  *
  * @author Vaclav Pech
  */
@@ -34,11 +35,9 @@ public final class MessagingQueue {
     private LinkedList<Object> inside = new LinkedList<Object>();
     @SuppressWarnings({"UnusedDeclaration", "FieldMayBeFinal"})
     private volatile int counter = 0;
-    private static final AtomicIntegerFieldUpdater<MessagingQueue> counterUpdater = AtomicIntegerFieldUpdater.newUpdater(
-            MessagingQueue.class, "counter");
 
     boolean isEmpty() {
-        return inside.size() + counterUpdater.get(this) == 0;
+        return inside.size() + counter == 0;
     }
 
     @SuppressWarnings({"SynchronizeOnThis"})
@@ -63,6 +62,6 @@ public final class MessagingQueue {
     @SuppressWarnings({"AccessToStaticFieldLockedOnInstance"})
     synchronized void add(final Object element) {
         outside.add(element);
-        counterUpdater.incrementAndGet(this);
+        counter += 1;
     }
 }
