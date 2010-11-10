@@ -139,8 +139,8 @@ public abstract class AsyncMessagingCore implements Runnable {
         } catch (Exception e) {
             registerError(e);
         } finally {
-            activeUpdater.set(this, PASSIVE);
             threadUnassigned();
+            activeUpdater.set(this, PASSIVE);
             if (continueProcessingMessages()) schedule();
         }
     }
