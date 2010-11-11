@@ -41,7 +41,6 @@ while (i < numOfAttackers) {
     attacker.parallelGroup = attackGroup
     attacker.start()
     i += 1
-    attacker.send(null)
 }
 
 attackSignal.countDown()
@@ -66,13 +65,12 @@ final class AttackReactor extends DynamicDispatchActor {
         this.defender = defender;
     }
 
-    public void onMessage(String start) {
+    protected void handleStart() {
+//        attackSignal.await()
+        defender.send(weapon)
     }
 
     public void onMessage(msg) {
-        if (msg == null) {
-            attackSignal.await()
-            defender.send(weapon)
-        } else retreatSignal.countDown()
+        retreatSignal.countDown()
     }
 }
