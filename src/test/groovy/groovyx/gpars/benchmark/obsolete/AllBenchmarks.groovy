@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.obsolete
 
 import groovyx.gpars.samples.dataflow.BenchmarkManyDataFlowVariables
 

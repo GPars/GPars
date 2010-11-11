@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.obsolete
 
 import java.util.concurrent.ArrayBlockingQueue
 
@@ -26,7 +26,7 @@ def execute(int actorCount) {
     final List computors = []
 //    final DataFlowStream stream = new DataFlowStream()
     final ArrayBlockingQueue queue = new ArrayBlockingQueue(actorCount)
-    final accumulator = new Thread ({
+    final accumulator = new Thread({
         double sum = 0.0d
         for (c in computors) {sum += queue.take()}
         final double pi = 4.0d * sum * delta
