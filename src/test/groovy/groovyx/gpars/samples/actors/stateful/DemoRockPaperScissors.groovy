@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors.stateful
 
-import groovyx.gpars.group.PGroup
 import groovyx.gpars.group.NonDaemonPGroup
+import groovyx.gpars.group.PGroup
 
 /**
  * A popular game implemented with actors.
@@ -67,8 +67,8 @@ def coordinator = pooled.actor {
     loop {
         count++
         if (count >= 120) {
-            [player1, player2, delegate]*.stop()
-            Thread.start { pooled.shutdown() }
+            [player1, player2, delegate]*.terminate()
+            terminate()
             return
         }
         react {
@@ -85,3 +85,5 @@ def coordinator = pooled.actor {
 }
 
 coordinator.send()
+coordinator.join()
+pooled.shutdown()
