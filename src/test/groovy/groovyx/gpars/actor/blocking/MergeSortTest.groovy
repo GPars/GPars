@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
  * @author Vaclav Pech
  * Date: Jan 12, 2009
  */
-public class MergeSortTest extends GroovyTestCase {
+abstract public class MergeSortTest extends GroovyTestCase {
 
     def group
 
