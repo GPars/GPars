@@ -116,7 +116,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         assert codeFlag.get()
         assert nestedCodeFlag.get()
         assert timeoutFlag.get()
-        actor.terminate()
+        actor.stop()
     }
 
     public void testTimeoutInLoop() {
