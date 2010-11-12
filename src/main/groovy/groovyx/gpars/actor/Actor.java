@@ -365,13 +365,13 @@ public abstract class Actor extends MessageStream {
 
         ActorMessage message = sweepNextMessage();
         while (message != null && message != STOP_MESSAGE) {
-            final Object payloadList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
-            if (payloadList != null && !((Collection<Object>) payloadList).isEmpty()) {
-                InvokerHelper.invokeMethod(message.getPayLoad(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
+            final Object senderMethodList = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
+            if (senderMethodList != null && !((Collection<Object>) senderMethodList).isEmpty()) {
+                InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
             } else {
-                final Object senderList = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
-                if (senderList != null && !((Collection<Object>) senderList).isEmpty()) {
-                    InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
+                final Object payloadMethodList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
+                if (payloadMethodList != null && !((Collection<Object>) payloadMethodList).isEmpty()) {
+                    InvokerHelper.invokeMethod(message.getPayLoad(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
                 }
             }
 
