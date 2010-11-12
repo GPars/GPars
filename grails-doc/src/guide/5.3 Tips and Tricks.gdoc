@@ -1,7 +1,7 @@
 h3. Structuring actor's code
-When extending the _AbstractPooledActor_ class, you can call any actor's methods from within the _act()_ method and use the _react()_ or _loop()_ methods in them.
+When extending the _DefaultActor_ class, you can call any actor's methods from within the _act()_ method and use the _react()_ or _loop()_ methods in them.
 {code}
-class MyActor extends AbstractPooledActor {
+class MyActor extends DefaultActor {
 
     protected void act() {
         handleA()
@@ -74,9 +74,9 @@ h3. Event-driven loops
 When coding event-driven actors you have to have in mind that calls to _react()_ and _loop()_ methods never return. This becomes a bit of a challenge once you try to implement any types of loops in your actors.
 On the other hand, if you leverage the fact that _react()_ never returns, you may call methods recursively without fear to fill up the stack. Look at the examples below, which respectively use the three described techniques for structuring actor's code.
 
-A subclass of _AbstractPooledActor_
+A subclass of _DefaultActor_
 {code}
-class MyLoopActor extends AbstractPooledActor {
+class MyLoopActor extends DefaultActor {
 
     protected void act() {
         outerLoop()
@@ -157,7 +157,7 @@ innerLoop.delegate = actor
 Plus don't forget about the possibility to use the actor's _loop()_ method to create a loop that never stops before the actor terminates.
 
 {code}
-class MyLoopActor extends AbstractPooledActor {
+class MyLoopActor extends DefaultActor {
 
     protected void act() {
         loop {

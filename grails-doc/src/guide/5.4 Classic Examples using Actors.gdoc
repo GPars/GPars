@@ -79,7 +79,7 @@ h2. Sleeping Barber
 "Problem description":http://en.wikipedia.org/wiki/Sleeping_barber_problem
 
 {code}import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.Actor
 
@@ -146,7 +146,7 @@ waitingRoom = group.actor {
 
 }.start()
 
-class Customer extends AbstractPooledActor {
+class Customer extends DefaultActor {
     String name
     Actor localBarbers
 
@@ -192,12 +192,12 @@ h2. Dining Philosophers
 
 "Problem description":http://en.wikipedia.org/wiki/Dining_philosophers_problem
 
-{code}import groovyx.gpars.actor.AbstractPooledActor
+{code}import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.Actors
 
 Actors.defaultActorPGroup.resize 5
 
-final class Philosopher extends AbstractPooledActor {
+final class Philosopher extends DefaultActor {
     private Random random = new Random()
 
     String name
@@ -235,7 +235,7 @@ final class Philosopher extends AbstractPooledActor {
     }
 }
 
-final class Fork extends AbstractPooledActor {
+final class Fork extends DefaultActor {
 
     String name
     boolean available = true
@@ -298,7 +298,7 @@ private final class FileToSort { String fileName }
 private final class SortResult { String fileName; List<String> words }
 
 //Worker actor
-final class WordSortActor extends AbstractPooledActor {
+final class WordSortActor extends DefaultActor {
 
     private List<String> sortedWords(String fileName) {
         parseFile(fileName).sort {it.toLowerCase()}
@@ -324,7 +324,7 @@ final class WordSortActor extends AbstractPooledActor {
 }
 
 //Master actor
-final class SortMaster extends AbstractPooledActor {
+final class SortMaster extends DefaultActor {
 
     String docRoot = '/'
     int numActors = 1
@@ -388,7 +388,7 @@ If the number of tasks in the task queue exceeds certain limit, a new worker is 
 
 {code}import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DefaultActor
 
 /**
  * Demonstrates work balancing among adaptable set of workers.
@@ -399,7 +399,7 @@ import groovyx.gpars.actor.AbstractPooledActor
  * to increase size of the worker pool.
  */
 
-final class LoadBalancer extends AbstractPooledActor {
+final class LoadBalancer extends DefaultActor {
     int workers = 0
     List taskQueue = []
     private static final QUEUE_SIZE_TRIGGER = 10
@@ -428,7 +428,7 @@ final class LoadBalancer extends AbstractPooledActor {
     }
 }
 
-final class DemoWorker extends AbstractPooledActor {
+final class DemoWorker extends DefaultActor {
     final static Object EXIT = new Object()
     private static final Random random = new Random()
 

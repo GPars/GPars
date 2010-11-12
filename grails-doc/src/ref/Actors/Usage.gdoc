@@ -9,9 +9,9 @@ def console = actor {
         }
     }
 {code}
-h3. Sub-classing the _AbstractPooledActor_ class
+h3. Sub-classing the _DefaultActor_ class
 {code}
-class CustomActor extends AbstractPooledActor {
+class CustomActor extends DefaultActor {
     @Override protected void act() {
         loop {
             react {

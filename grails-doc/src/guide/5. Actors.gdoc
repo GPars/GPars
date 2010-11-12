@@ -34,9 +34,9 @@ This can be naturally modeled through _continuations_ . As JVM doesn't support c
 which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
 
 {code}
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DefaultActor
 
-class GameMaster extends AbstractPooledActor {
+class GameMaster extends DefaultActor {
     int secretNum
 
     void afterStart() {
@@ -56,9 +56,9 @@ class GameMaster extends AbstractPooledActor {
                     System.exit 0
 }   }   }   }   }
 
-class Player extends AbstractPooledActor {
+class Player extends DefaultActor {
     String              name
-    AbstractPooledActor server
+    Actor               server
     int                 myNum
 
     void act() {
@@ -147,7 +147,7 @@ println 'Never reached'
 The _react()_ and _loop()_ methods never return normally and any code put after a call to either of the two methods will never be executed.
 The closure supplied to the _react()_ or _loop()_ methods is the code where the computation should *continue* . Thus *continuation style* .
  
-h3. Blocking message retrieval
+h3. Blocking message retrieval (deprecated)
 
 Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message.
 This allows for a *non-continuation style* code and also might have positive performance implications in certain scenarios.
@@ -155,7 +155,8 @@ This allows for a *non-continuation style* code and also might have positive per
 Mixing _react()_ and _receive()_ calls within a single actor is also possible.
 
 {code}
-Actors.actor {
+//todo remove, if receive becomes unsupported
+Actors.oldActor {
     def msg1 = receive()
     receive {msg2, msg3 ->
         [msg1, msg2, msg3]*.reply 'Hi!'
@@ -168,10 +169,11 @@ Actors.actor {
 
 h2. Sending replies
 
-The _reply/replyIfExists_ methods are not only defined on the actors themselves, but for _AbstractPooledActor_ (not available in _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages themselves
+The _reply/replyIfExists_ methods are not only defined on the actors themselves, but for _AbstractPooledActor_ (not available in _DefaultActor_ , _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages themselves
 upon their reception, which is particularly handy when handling multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed message (the last one), whereas _reply()_ called on messages sends a reply to the author of the particular message only.
 
 {code}
+//todo needs update (use the sender property instead)
 react {offerA ->
     react {offerB ->
         react {offerC ->
@@ -198,9 +200,11 @@ react {tweet ->
 }
 {code}
 
-And for _AbstractPooledActor_ (not available in _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages:
+//todo remove
+And for _AbstractPooledActor_ (not available in _DefaultActor_ , _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages:
 
 {code}
+//todo remove
 react {tweet ->
     if (isSpam(tweet)) ignoreTweetsFrom tweet.sender
     tweet.sender.send 'Never write me again!'
@@ -209,14 +213,13 @@ react {tweet ->
 
 h3. Forwarding
 
-When sending a message a different actor can be specified as the sender so that potential replies to the message will be forwarded to the specified actor and not to the actual originator.
+When sending a message, a different actor can be specified as the sender so that potential replies to the message will be forwarded to the specified actor and not to the actual originator.
 
 {code}
 def decryptor = actor {
     react {message ->
         reply message.reverse()
-//        message.reply message.reverse()  //Alternatives to send replies
-//        message.sender.send message.reverse()
+//        sender.send message.reverse()    //An alternative way to send replies
     }
 }
 
@@ -298,7 +301,7 @@ h2. Undelivered messages
 Sometimes messages cannot be delivered to the target actor. When special action needs to be taken for undelivered messages, at actor termination all unprocessed messages from its queue have their _onDeliveryError()_ method called. The _onDeliveryError()_ method or closure defined on the message can, for example, send a notification back to the original sender of the message.
 
 {code}
-final AbstractPooledActor me
+final DefaultActor me
 me = Actors.actor {
     def message1 = 1
     def message2 = 2
@@ -317,6 +320,22 @@ me = Actors.actor {
 }
 {code}
 
+Alternatively the _onDeliveryError()_ method can be specified on the sender itself.
+{code}
+final DefaultActor me
+me = Actors.actor {
+    def message1 = 1
+    def message2 = 2
+
+    delegate.metaClass.onDeliveryError = {->
+        me << "Could not deliver some messages"
+    }
+
+    actor1 << message1
+    actor2 << message1
+    ...
+}
+{code}
 h2. Joining actors
 
 Actors provide a _join()_ method to allow callers to wait for the actor to terminate. A variant accepting a timeout is also available. The Groovy _spread-dot_ operator comes in handy when joining multiple actors at a time.

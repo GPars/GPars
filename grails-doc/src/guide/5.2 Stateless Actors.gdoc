@@ -2,7 +2,7 @@ h3. Dynamic Dispatch Actor
 
 The _DynamicDispatchActor_ class is an actor allowing for an alternative structure of the message handling code. In general _DynamicDispatchActor_ repeatedly scans for messages and dispatches arrived messages to one
 of the _onMessage(message)_ methods defined on the actor. The _DynamicDispatchActor_ leverages the Groovy dynamic method dispatch mechanism under the covers.
-Since, unlike _AbstractPooledActor_ descendants, a _DynamicDispatchActor_ not _ReactiveActor_ (discussed below) do not need to implicitly remember actor's state between subsequent
+Since, unlike _DefaultActor_ descendants, a _DynamicDispatchActor_ not _ReactiveActor_ (discussed below) do not need to implicitly remember actor's state between subsequent
 message receptions, they provide much better performance characteristics, generally comparable to other actor frameworks, like e.g. Scala Actors.
 
 {code}
@@ -161,7 +161,7 @@ doubler.join()
 Essentially reactive actors provide a convenience shortcut for an actor that would wait for messages in a loop, process them and send back the result. This is schematically how the reactive actor looks inside:
 
 {code}
-public class ReactiveActor extends AbstractPooledActor {
+public class ReactiveActor extends DefaultActor {
     Closure body
 
     void act() {

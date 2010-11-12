@@ -25,9 +25,9 @@ Actors.actor {
 }
 {code}
 
-h3. Sub-classing the _AbstractPooledActor_ class
+h3. Sub-classing the _DefaultActor_ class
 {code}
-class PooledLifeCycleSampleActor extends AbstractPooledActor {
+class PooledLifeCycleSampleActor extends DefaultActor {
 
     protected void act() {
         println("Running actor2")

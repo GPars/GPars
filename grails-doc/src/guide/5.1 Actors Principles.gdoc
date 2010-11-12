@@ -18,11 +18,11 @@ def console = actor {
 
 Notice the _loop()_ method call, which ensures that the actor doesn't stop after having processed the first message.
 
-As an alternative you can extend the _AbstractPooledActor_ class and override the _act()_ method. Once you instantiate the actor, you need to start it so that it attaches itself to the thread pool and can start accepting messages.
+As an alternative you can extend the _DefaultActor_ class and override the _act()_ method. Once you instantiate the actor, you need to start it so that it attaches itself to the thread pool and can start accepting messages.
 The _actor()_ factory method will take care of starting the actor.
 
 {code}
-class CustomActor extends AbstractPooledActor {
+class CustomActor extends DefaultActor {
     @Override protected void act() {
         loop {
             react {
@@ -128,7 +128,7 @@ Actors guarantee that always at most one thread processes the actor's body at a 
 each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
 
 {code}
-class MyCounterActor extends AbstractPooledActor {
+class MyCounterActor extends DefaultActor {
     private Integer counter = 0
 
     protected void act() {
@@ -389,7 +389,7 @@ alternatively
 {code}
 def nonDaemonGroup = new NonDaemonPGroup()
 
-class MyActor extends AbstractPooledActor {
+class MyActor extends DefaultActor {
     def MyActor() {
         this.actorGroup = nonDaemonGroup
     }
