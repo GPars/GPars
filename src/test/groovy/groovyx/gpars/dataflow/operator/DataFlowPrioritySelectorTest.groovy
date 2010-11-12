@@ -219,6 +219,7 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
             flag = true
             bindOutput 'a'
         }
+        op1.actor.metaClass.onInterrupt = {}
         assertFalse flag
         a << 'Message'
         assertEquals 'a', b.val
@@ -307,13 +308,15 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        group.prioritySelector(inputs: [a], outputs: []) {v -> stop()}
-        group.prioritySelector(inputs: [a]) {v -> stop()}
-        group.prioritySelector(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
+        def selector1 = group.prioritySelector(inputs: [a], outputs: []) {v -> stop()}
+        def selector2 = group.prioritySelector(inputs: [a]) {v -> stop()}
+        def selector3 = group.prioritySelector(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
 
         a << 'value'
         a << 'value'
         a << 'value'
+        [selector1, selector2, selector3]*.stop()
+        [selector1, selector2, selector3]*.join()
     }
 
     public void testMissingChannels() {

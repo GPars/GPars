@@ -100,13 +100,15 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        group.selector(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
-        group.selector(inputs: [a], maxForks: 2) {v -> stop()}
-        group.selector(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> stop()}
+        def selector1 = group.selector(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
+        def selector2 = group.selector(inputs: [a], maxForks: 2) {v -> stop()}
+        def selector3 = group.selector(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> stop()}
 
         a << 'value'
         a << 'value'
         a << 'value'
+        [selector1, selector2, selector3]*.stop()
+        [selector1, selector2, selector3]*.join()
     }
 
     public void testMissingChannels() {

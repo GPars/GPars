@@ -196,6 +196,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
             flag = true
             bindOutput 'a'
         }
+        op1.actor.metaClass.onInterrupt = {}
         assertFalse flag
         a << 'Message'
         assertEquals 'a', b.val

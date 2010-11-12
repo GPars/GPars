@@ -194,6 +194,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
             flag = true
             bindOutput 'a'
         }
+        op1.actor.metaClass.onInterrupt = {}
         assertFalse flag
         a << 'Message'
         assertEquals 'a', b.val
@@ -282,13 +283,15 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        group.selector(inputs: [a], outputs: []) {v -> stop()}
-        group.selector(inputs: [a]) {v -> stop()}
-        group.selector(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
+        def selector1 = group.selector(inputs: [a], outputs: []) {v -> stop()}
+        def selector2 = group.selector(inputs: [a]) {v -> stop()}
+        def selector3 = group.selector(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
 
         a << 'value'
         a << 'value'
         a << 'value'
+        [selector1, selector2, selector3]*.stop()
+        [selector1, selector2, selector3]*.join()
     }
 
     public void testMissingChannels() {
@@ -327,6 +330,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         def op = group.selector(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')
         }
+        op.actor.metaClass.onException = {}
         stream << 'value'
         stream << 'invalidValue'
         op.join()

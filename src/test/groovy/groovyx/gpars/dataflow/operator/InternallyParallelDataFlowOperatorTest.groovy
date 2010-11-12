@@ -99,7 +99,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         final DefaultPGroup group = new DefaultPGroup(poolSize)
 
         def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: forks) {x, y, z ->
-            sleep 3000
+            sleep 1000
             bindOutput 0, x + y + z
             bindOutput 1, Thread.currentThread().hashCode()
         }
@@ -117,6 +117,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         assert threads.unique().size() in (([poolSize, forks].min() - 1)..[poolSize, forks].max())
 
         op.stop()
+        op.join()
         group.shutdown()
     }
 
@@ -140,13 +141,15 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         final DataFlowStream b = new DataFlowStream()
         final DataFlowStream d = new DataFlowStream()
 
-        group.operator(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
-        group.operator(inputs: [a], maxForks: 2) {v -> stop()}
-        group.operator(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> stop()}
+        def selector1 = group.operator(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
+        def selector2 = group.operator(inputs: [a], maxForks: 2) {v -> stop()}
+        def selector3 = group.operator(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> stop()}
 
         a << 'value'
         a << 'value'
         a << 'value'
+        [selector1, selector2, selector3]*.stop()
+        [selector1, selector2, selector3]*.join()
     }
 
     public void testMissingChannels() {
