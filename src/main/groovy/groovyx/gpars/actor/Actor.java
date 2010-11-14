@@ -367,7 +367,7 @@ public abstract class Actor extends MessageStream {
         while (message != null && message != STOP_MESSAGE) {
             final Object senderMethodList = InvokerHelper.invokeMethod(message.getSender(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
             if (senderMethodList != null && !((Collection<Object>) senderMethodList).isEmpty()) {
-                InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, EMPTY_ARGUMENTS);
+                InvokerHelper.invokeMethod(message.getSender(), ON_DELIVERY_ERROR, message.getPayLoad());
             } else {
                 final Object payloadMethodList = InvokerHelper.invokeMethod(message.getPayLoad(), RESPONDS_TO, new Object[]{ON_DELIVERY_ERROR});
                 if (payloadMethodList != null && !((Collection<Object>) payloadMethodList).isEmpty()) {
