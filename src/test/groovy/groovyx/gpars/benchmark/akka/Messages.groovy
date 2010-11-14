@@ -16,6 +16,10 @@
 
 package groovyx.gpars.benchmark.akka
 
+/**
+ * @author Jiri Mares, Vaclav Pech
+ */
+
 @Singleton
 class StartMessage {}
 @Singleton

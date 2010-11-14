@@ -22,13 +22,15 @@ import groovyx.gpars.scheduler.DefaultPool
 
 /**
  * https://github.com/jboner/akka-bench
+ *
+ * @author Jiri Mares, Vaclav Pech
  */
 final class PipelineBenchmark {
     Actor writer, indexer, downloader
     def actors = []
 
     def create() {
-        def concurrencyLevel = 20
+        def concurrencyLevel = 4
         new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
     }
 
@@ -41,16 +43,15 @@ final class PipelineBenchmark {
     }
 
     def benchmark() {
-        def t1 = System.currentTimeMillis()
+        final def t1 = System.currentTimeMillis()
 
-        for (i in 1..1000000) {
-            def message = "Requested " + i
-            downloader << message
+        for (int i = 0; i < 1000000; i++) {
+            downloader << ("Requested " + i)
         }
 
         downloader << StopMessage.instance
         actors*.join()
-        def t2 = System.currentTimeMillis()
+        final def t2 = System.currentTimeMillis()
 
         println t2 - t1
     }

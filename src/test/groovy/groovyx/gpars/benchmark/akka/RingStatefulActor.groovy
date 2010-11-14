@@ -19,6 +19,9 @@ package groovyx.gpars.benchmark.akka
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DefaultActor
 
+/**
+ * @author Jiri Mares, Vaclav Pech
+ */
 class TimerStatefulActor extends DefaultActor {
     boolean timing = false
     long startTime = 0

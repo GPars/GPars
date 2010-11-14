@@ -19,12 +19,13 @@ package groovyx.gpars.benchmark.akka
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DynamicDispatchActor
 
+/**
+ * @author Jiri Mares, Vaclav Pech
+ */
 abstract class StatefulDynamicDispatchActor extends DynamicDispatchActor {
     Actor follower
 
     abstract String handleMessage(String message)
-
-    ;
 
     void onMessage(String message) {
         follower?.send(handleMessage(message))

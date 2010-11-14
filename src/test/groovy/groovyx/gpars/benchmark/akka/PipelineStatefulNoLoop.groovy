@@ -16,6 +16,9 @@
 
 package groovyx.gpars.benchmark.akka
 
+/**
+ * @author Jiri Mares, Vaclav Pech
+ */
 abstract class PipelineHandler {
     abstract String handleMessage(String message)
 
