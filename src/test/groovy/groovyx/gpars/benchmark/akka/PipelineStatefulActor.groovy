@@ -47,19 +47,19 @@ abstract class StatefulActor extends DefaultActor {
 
 final class DownloadStatefulActor extends StatefulActor {
     String handleMessage(String message) {
-        message.replaceFirst("Requested ", "Downloaded ")
+        message.replaceFirst('Requested ', 'Downloaded ')
     }
 }
 
 final class IndexStatefulActor extends StatefulActor {
     String handleMessage(String message) {
-        message.replaceFirst("Downloaded ", "Indexed ")
+        message.replaceFirst('Downloaded ', 'Indexed ')
     }
 }
 
 final class WriteStatefulActor extends StatefulActor {
     String handleMessage(String message) {
-        message.replaceFirst("Indexed ", "Wrote ")
+        message.replaceFirst('Indexed ', 'Wrote ')
     }
 }
 

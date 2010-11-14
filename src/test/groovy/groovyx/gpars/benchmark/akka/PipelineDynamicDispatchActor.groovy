@@ -39,19 +39,19 @@ abstract class StatefulDynamicDispatchActor extends DynamicDispatchActor {
 }
 final class DownloadStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
     String handleMessage(String message) {
-        message.replaceFirst("Requested ", "Downloaded ")
+        message.replaceFirst('Requested ', 'Downloaded ')
     }
 }
 
 final class IndexStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
     String handleMessage(String message) {
-        message.replaceFirst("Downloaded ", "Indexed ")
+        message.replaceFirst('Downloaded ', 'Indexed ')
     }
 }
 
 final class WriteStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
     String handleMessage(String message) {
-        message.replaceFirst("Indexed ", "Wrote ")
+        message.replaceFirst('Indexed ', 'Wrote ')
     }
 }
 

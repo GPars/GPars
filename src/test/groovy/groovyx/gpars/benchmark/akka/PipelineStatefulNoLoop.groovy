@@ -40,19 +40,19 @@ abstract class PipelineHandler {
 
 class DownloadHandler extends PipelineHandler {
     String handleMessage(String message) {
-        message.replaceFirst("Requested ", "Downloaded ")
+        message.replaceFirst('Requested ', 'Downloaded ')
     }
 }
 
 class IndexHandler extends PipelineHandler {
     String handleMessage(String message) {
-        message.replaceFirst("Downloaded ", "Indexed ")
+        message.replaceFirst('Downloaded ', 'Indexed ')
     }
 }
 
 class WriteHandler extends PipelineHandler {
     String handleMessage(String message) {
-        message.replaceFirst("Indexed ", "Wrote ")
+        message.replaceFirst('Indexed ', 'Wrote ')
     }
 }
 

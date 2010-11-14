@@ -46,7 +46,7 @@ final class PipelineBenchmark {
         final def t1 = System.currentTimeMillis()
 
         for (int i = 0; i < 1000000; i++) {
-            downloader << ("Requested " + i)
+            downloader << ('Requested ' + i)
         }
 
         downloader << StopMessage.instance
