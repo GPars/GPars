@@ -33,11 +33,11 @@ public final class DefaultMessageQueue implements MessageQueue {
 
     private LinkedList<Object> outside = new LinkedList<Object>();
     private LinkedList<Object> inside = new LinkedList<Object>();
-    private volatile int counter = 0;
+    private volatile boolean empty = true;
 
     @Override
     public boolean isEmpty() {
-        return inside.size() + counter == 0;
+        return inside.isEmpty() && empty;
     }
 
     @Override
@@ -56,12 +56,12 @@ public final class DefaultMessageQueue implements MessageQueue {
 
     private synchronized void swap(final LinkedList<Object> localQueue) {
         outside = localQueue;
-        counter = 0;
+        empty = true;
     }
 
     @Override
     public synchronized void add(final Object element) {
         outside.add(element);
-        counter += 1;
+        empty = false;
     }
 }
