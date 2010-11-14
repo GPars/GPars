@@ -234,8 +234,10 @@ public abstract class MessageStream extends WithSerialId {
 
         /**
          * Handle cases when the message sent to the actor doesn't get delivered
+         *
+         * @param msg The message that failed to get delivered
          */
-        public void onDeliveryError() {
+        public void onDeliveryError(final Object msg) {
             send(new IllegalStateException("Delivery error. Maybe target actor is not active"));
         }
     }
