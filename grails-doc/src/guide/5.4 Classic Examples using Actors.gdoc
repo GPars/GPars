@@ -65,7 +65,7 @@ final class FilterActor extends DynamicDispatchActor {
      */
     def onMessage(def poisson) {
         if (follower) {
-            def sender = poisson.sender
+            def sender = sender
             follower.sendAndContinue(poisson, {this.stop(); sender?.send('Done')})  //Pass the poisson along and stop after a reply
         } else {  //I am the last in the chain
             stop()
@@ -78,7 +78,8 @@ h2. Sleeping Barber
 
 "Problem description":http://en.wikipedia.org/wiki/Sleeping_barber_problem
 
-{code}import groovyx.gpars.group.DefaultPGroup
+{code}
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.actor.Actor
@@ -95,7 +96,7 @@ final def barber = group.actor {
                     println "Barber: Processing customer ${message.customer.name}"
                     doTheWork(random)
                     message.customer.send new Done()
-                    message.reply new Next()
+                    reply new Next()
                     break
                 case Wait:
                     println "Barber: No customers. Going to have a sleep"
@@ -103,7 +104,7 @@ final def barber = group.actor {
             }
         }
     }
-}.start()
+}
 
 private def doTheWork(Random random) {
     Thread.sleep(random.nextInt(10) * 1000)
@@ -144,7 +145,7 @@ waitingRoom = group.actor {
         }
     }
 
-}.start()
+}
 
 class Customer extends DefaultActor {
     String name
@@ -167,6 +168,7 @@ class Customer extends DefaultActor {
                         break
                     case Done:
                         println "Customer: $name: I have been served."
+                        stop();
                         break
 
                 }
@@ -182,17 +184,24 @@ class Next {}
 class Start {}
 class Done {}
 
-new Customer(name:'Joe', localBarbers:waitingRoom).start()
-new Customer(name:'Dave', localBarbers:waitingRoom).start()
-new Customer(name:'Alice', localBarbers:waitingRoom).start()
+def customers = []
+customers << new Customer(name:'Joe', localBarbers:waitingRoom).start()
+customers << new Customer(name:'Dave', localBarbers:waitingRoom).start()
+customers << new Customer(name:'Alice', localBarbers:waitingRoom).start()
 
-System.in.read()
+sleep 15000
+customers << new Customer(name: 'James', localBarbers: waitingRoom).start()
+sleep 5000
+customers*.join()
+barber.stop()
+waitingRoom.stop()
 {code}
 h2. Dining Philosophers
 
 "Problem description":http://en.wikipedia.org/wiki/Dining_philosophers_problem
 
-{code}import groovyx.gpars.actor.DefaultActor
+{code}
+import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.Actors
 
 Actors.defaultActorPGroup.resize 5
@@ -208,11 +217,15 @@ final class Philosopher extends DefaultActor {
         loop {
             think()
             forks*.send new Take()
+            def messages = []
             react {a ->
+                messages << [a, sender]
                 react {b ->
+                    messages << [b, sender]
                     if ([a, b].any {Rejected.isCase it}) {
                         println "$name: \tOops, can't get my forks! Giving up."
-                        [a, b].find {Accepted.isCase it}?.reply new Finished()
+                        final def accepted = messages.find {Accepted.isCase it[0]}
+                        if (accepted!=null) accepted[1].send new Finished()
                     } else {
                         eat()
                         reply new Finished()
@@ -285,7 +298,9 @@ def philosophers = [
 forks*.start()
 philosophers*.start()
 
-System.in.read()
+sleep 10000
+forks*.stop()
+philosophers*.stop()
 {code}
 h2. Word sort
 
@@ -293,7 +308,8 @@ Given a folder name, the script will sort words in all files in the folder. The 
 
 "Inspired by Scala Concurrency blog post by Michael Galpin":http://fupeg.blogspot.com/2009/06/scala-concurrency.html
 
-{code}//Messages
+{code}
+//Messages
 private final class FileToSort { String fileName }
 private final class SortResult { String fileName; List<String> words }
 
@@ -343,7 +359,7 @@ final class SortMaster extends DefaultActor {
     }
 
     private int sendTasksToWorkers() {
-        List<PooledActor> workers = createWorkers()
+        List<Actor> workers = createWorkers()
         int cnt = 0
         new File(docRoot).eachFile {
             workers[cnt % numActors] << new FileToSort(fileName: it)
@@ -374,10 +390,14 @@ final class SortMaster extends DefaultActor {
 }
 
 //start the actors to sort words
-def master = new SortMaster(docRoot: 'C:/dev/TeamCity/logs/', numActors: 5).start()
+def master = new SortMaster(docRoot: 'c:/tmp/Logs/', numActors: 5).start()
 master.waitUntilDone()
 println 'Done'
-println master.sorted
+
+File file = new File("c:/tmp/Logs/sorted_words.txt")
+file.withPrintWriter { printer ->
+    master.sorted.each { printer.println it }
+}
 {code}
 h2. Load Balancer
 
@@ -386,7 +406,7 @@ Demonstrates work balancing among adaptable set of workers. The load balancer re
 If the load balancer doesn't have any tasks available in the task queue, the worker is stopped.
 If the number of tasks in the task queue exceeds certain limit, a new worker is created to increase size of the worker pool.
 
-{code}import groovyx.gpars.actor.Actor
+{code}
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DefaultActor
 
@@ -406,24 +426,25 @@ final class LoadBalancer extends DefaultActor {
 
     void act() {
         loop {
-            def message = receive()
-            switch (message) {
-                case NeedMoreWork:
-                    if (taskQueue.size() == 0) {
-                        println 'No more tasks in the task queue. Terminating the worker.'
-                        message.reply DemoWorker.EXIT
-                        workers -= 1
-                    } else message.reply taskQueue.remove(0)
-                    break
-                case WorkToDo:
-                    taskQueue << message
-                    if ((workers == 0) || (taskQueue.size() >= QUEUE_SIZE_TRIGGER)) {
-                        println 'Need more workers. Starting one.'
-                        workers += 1
-                        new DemoWorker(this).start()
-                    }
+            react { message ->
+                switch (message) {
+                    case NeedMoreWork:
+                        if (taskQueue.size() == 0) {
+                            println 'No more tasks in the task queue. Terminating the worker.'
+                            reply DemoWorker.EXIT
+                            workers -= 1
+                        } else reply taskQueue.remove(0)
+                        break
+                    case WorkToDo:
+                        taskQueue << message
+                        if ((workers == 0) || (taskQueue.size() >= QUEUE_SIZE_TRIGGER)) {
+                            println 'Need more workers. Starting one.'
+                            workers += 1
+                            new DemoWorker(this).start()
+                        }
+                }
+                println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
             }
-            println "Active workers=${workers}\tTasks in queue=${taskQueue.size()}"
         }
     }
 }
@@ -446,7 +467,7 @@ final class DemoWorker extends DefaultActor {
                     case WorkToDo:
                         processMessage(it)
                         break
-                    case EXIT: stop()
+                    case EXIT: terminate()
                 }
             }
         }
@@ -482,4 +503,7 @@ Thread.sleep 35000  //let the queues get empty
 balancer << new WorkToDo()
 balancer << new WorkToDo()
 Thread.sleep 10000
+
+balancer.stop()
+balancer.join()
 {code}

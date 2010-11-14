@@ -34,6 +34,7 @@ This can be naturally modeled through _continuations_ . As JVM doesn't support c
 which has slight impact on organization of the actors' code. However, the benefits in most cases outweigh the difficulties.
 
 {code}
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DefaultActor
 
 class GameMaster extends DefaultActor {
@@ -46,35 +47,43 @@ class GameMaster extends DefaultActor {
     void act() {
         loop {
             react { int num ->
-                if ( num > secretNum )
-                    reply 'too large'
-                else if ( num < secretNum )
-                    reply 'too small'
+                if (num > secretNum)
+                reply 'too large'
+                else if (num < secretNum)
+                reply 'too small'
                 else {
                     reply 'you win'
-                    stop()
-                    System.exit 0
-}   }   }   }   }
+                    terminate()
+                }
+            }
+        }
+    }
+}
 
 class Player extends DefaultActor {
-    String              name
-    Actor               server
-    int                 myNum
+    String name
+    Actor server
+    int myNum
 
     void act() {
         loop {
             myNum = new Random().nextInt(10)
             server.send myNum
             react {
-                switch( it ) {
+                switch (it) {
                     case 'too large': println "$name: $myNum was too large"; break
                     case 'too small': println "$name: $myNum was too small"; break
-                    case 'you win':   println "$name: I won $myNum"; stop(); break
-}   }   }   }   }
+                    case 'you win': println "$name: I won $myNum"; terminate(); break
+                }
+            }
+        }
+    }
+}
 
 def master = new GameMaster().start()
-new Player( name: 'Player', server: master ).start()
+def player = new Player(name: 'Player', server: master).start()
 
+//this forces main thread to live until both actors stop
 [master, player]*.join()
 {code}
 example by _Jordi Campos i Miralles, Departament de Matemàtica Aplicada i Anàlisi, MAiA Facultat de Matemàtiques, Universitat de Barcelona_
@@ -86,19 +95,41 @@ messages should be immutable or at least follow the *hands-off* policy when the 
 
 h2. Sending messages
 
-Messages can be sent to actors using the _send()_ method. Alternatively, the _<<_ operator or the implicit _call()_ method can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available.
+Messages can be sent to actors using the _send()_ method.
+
+{code}
+def passiveActor = Actors.actor{
+    loop {
+        react { msg -> println "Received: $msg"; }
+    }
+}
+passiveActor.send 'Message 1'
+passiveActor << 'Message 2'    //using the << operator
+passiveActor 'Message 3'       //using the implicit call() method
+{code}
+
+Alternatively, the _<<_ operator or the implicit _call()_ method can be used. A family of _sendAndWait()_ methods is available to block the caller until a reply from the actor is available.
 The _reply_ is returned from the _sendAndWait()_ method as a return value.
 The _sendAndWait()_ methods may also return after a timeout expires or in case of termination of the called actor.
+
 {code}
-actor.send 'Message'
-actor << 'Message'    //using the << operator
-actor 'Message'       //using the implicit call() method
-def reply1 = actor.sendAndWait('Message')
-def reply2 = actor.sendAndWait(10, TimeUnit.SECONDS, 'Message')
-def reply3 = actor.sendAndWait(10.seconds, 'Message')
+def replyingActor = Actors.actor{
+    loop {
+        react { msg ->
+            println "Received: $msg";
+            reply "I've got $msg"
+        }
+    }
+}
+def reply1 = replyingActor.sendAndWait('Message 4')
+def reply2 = replyingActor.sendAndWait('Message 5', 10, TimeUnit.SECONDS)
+use (TimeCategory) {
+    def reply3 = replyingActor.sendAndWait('Message 6', 10.seconds)
+}
 {code}
 
 The _sendAndContinue()_ method allows the caller to continue its processing while the supplied closure is waiting for a reply from the actor.
+
 {code}
 friend.sendAndContinue 'I need money!', {money -> pocket money}
 println 'I can continue while my friend is collecting money for me'
@@ -126,27 +157,28 @@ which has received a message already.
 
 To allow detaching actors from the threads the _react()_ method demands the code to be written in a special *Continuation-style*.
 {code}
-loop {
-    println 'Waiting for a gift'
-    react {gift ->
-        if (myWife.likes gift) reply 'Thank you!'
-        else {
-            reply 'Try again, please'
-            react {anotherGift ->
-                if (myChildren.like gift) reply 'Thank you!'
+Actors.actor {
+    loop {
+        println 'Waiting for a gift'
+        react {gift ->
+            if (myWife.likes gift) reply 'Thank you!'
+            else {
+                reply 'Try again, please'
+                react {anotherGift ->
+                    if (myChildren.like gift) reply 'Thank you!'
+                }
+                println 'Never reached'
             }
-            println 'Never reached'
         }
+        println 'Never reached'
     }
     println 'Never reached'
 }
-println 'Never reached'
-
 {code}
 
 The _react()_ and _loop()_ methods never return normally and any code put after a call to either of the two methods will never be executed.
 The closure supplied to the _react()_ or _loop()_ methods is the code where the computation should *continue* . Thus *continuation style* .
- 
+
 h3. Blocking message retrieval (deprecated)
 
 Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message.
@@ -172,23 +204,7 @@ h2. Sending replies
 The _reply/replyIfExists_ methods are not only defined on the actors themselves, but for _AbstractPooledActor_ (not available in _DefaultActor_ , _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages themselves
 upon their reception, which is particularly handy when handling multiple messages in a single call. In such cases _reply()_ invoked on the actor sends a reply to authors of all the currently processed message (the last one), whereas _reply()_ called on messages sends a reply to the author of the particular message only.
 
-{code}
-//todo needs update (use the sender property instead)
-react {offerA ->
-    react {offerB ->
-        react {offerC ->
-            //sent to each of the senders
-            [offerA, offerB, offerC]*.reply 'Received your kind offer. Now processing it and comparing with others.'
-
-            offerA.reply 'You were the fastest'  //sent to the author of offerA only
-
-            def winnerOffer = [offerA, offerB, offerC].min {it.price}
-            winnerOffer.reply 'I accept your reasonable offer'  //sent to the winner only
-            ([offerA, offerB, offerC] - [winnerOffer])*.reply 'Maybe next time'  //sent to the loosers only
-        }
-    }
-}
-{code}
+"See demo here":http://git.codehaus.org/gitweb.cgi?p=gpars.git;a=blob_plain;f=src/test/groovy/groovyx/gpars/samples/actors/stateful/DemoMultiMessage.groovy;hb=HEAD
 
 h3. The sender property
 
@@ -216,21 +232,21 @@ h3. Forwarding
 When sending a message, a different actor can be specified as the sender so that potential replies to the message will be forwarded to the specified actor and not to the actual originator.
 
 {code}
-def decryptor = actor {
+def decryptor = Actors.actor {
     react {message ->
         reply message.reverse()
 //        sender.send message.reverse()    //An alternative way to send replies
     }
 }
 
-def console = actor {  //This actor will print out decrypted messages, since the replies are forwarded to it
+def console = Actors.actor {  //This actor will print out decrypted messages, since the replies are forwarded to it
     react {
         println 'Decrypted message: ' + it
     }
 }
 
 decryptor.send 'lellarap si yvoorG', console  //Specify an actor to send replies to
-
+console.join()
 {code}
 
 h2. Creating Actors
@@ -240,9 +256,7 @@ Actors share a *pool* of threads, which are dynamically assigned to actors when 
 For example, this is how you create an actor that prints out all messages that it receives.
 
 {code}
-import static groovyx.gpars.actor.Actors.*
-
-def console = actor {
+def console = Actors.actor {
     loop {
         react {
             println it
@@ -256,39 +270,51 @@ Notice the _loop()_ method call, which ensures that the actor doesn't stop after
 Here's an example with a decryptor service, which can decrypt submitted messages and send the decrypted messages back to the originators.
 
 {code}
-import static groovyx.gpars.actor.Actors.*
-
-final def decryptor = actor {
+final def decryptor = Actors.actor {
     loop {
-        react {String message->
-            if ('stopService' == message) stop()
+        react {String message ->
+            if ('stopService' == message) {
+                println 'Stopping decryptor'
+                stop()
+            }
             else reply message.reverse()
         }
     }
 }
 
-actor {
+Actors.actor {
     decryptor.send 'lellarap si yvoorG'
     react {
         println 'Decrypted message: ' + it
         decryptor.send 'stopService'
     }
-}
+}.join()
 {code}
 
 Here's an example of an actor that waits for up to 30 seconds to receive a reply to its message.
 
 {code}
-import static groovyx.gpars.actor.Actors.*
+def friend = Actors.actor {
+    react {
+        //this doesn't reply -> caller won't receive any answer in time
+        println it
+        //reply 'Hello' //uncomment this to answer conversation
+        react {
+            println it
+        }
+    }
+}
 
-def me = actor {
+def me = Actors.actor {
     friend.send('Hi')
-    react(30.seconds) {msg ->
+    //wait for answer 1sec
+    react(1000) {msg ->
         if (msg == Actor.TIMEOUT) {
             friend.send('I see, busy as usual. Never mind.')
             stop()
         } else {
             //continue conversation
+            println "Thank you for $msg"
         }
     }
 }
@@ -303,39 +329,67 @@ Sometimes messages cannot be delivered to the target actor. When special action 
 {code}
 final DefaultActor me
 me = Actors.actor {
-    def message1 = 1
-    def message2 = 2
+    def message = 1
 
-    message1.metaClass.onDeliveryError = {->
+    message.metaClass.onDeliveryError = {->
+        //send message back to the caller
         me << "Could not deliver $delegate"
     }
 
-    message2.metaClass.onDeliveryError = {->
-        me << "Could not deliver $delegate"
+    def actor = Actors.actor {
+        react {
+            //wait 2sec in order next call in demo can be emitted
+            Thread.sleep(2000)
+            //stop actor after first message
+            stop()
+        }
     }
 
-    actor1 << message1
-    actor2 << message1
-    ...
+    actor << message
+    actor << message
+
+    react {
+        //print whatever comes back
+        println it
+    }
+
 }
+
+me.join()
 {code}
 
 Alternatively the _onDeliveryError()_ method can be specified on the sender itself.
+
 {code}
 final DefaultActor me
 me = Actors.actor {
     def message1 = 1
     def message2 = 2
 
-    delegate.metaClass.onDeliveryError = {->
-        me << "Could not deliver some messages"
+    def actor = Actors.actor {
+        react {
+            //wait 2sec in order next call in demo can be emitted
+            Thread.sleep(2000)
+            //stop actor after first message
+            stop()
+        }
     }
 
-    actor1 << message1
-    actor2 << message1
-    ...
+    me.metaClass.onDeliveryError = {msg ->
+        //callback on actor inaccessibility
+        println "Could not deliver message $msg"
+    }
+
+    actor << message1
+    actor << message2
+
+    actor.join()
+
 }
+
+me.join()
 {code}
+
 h2. Joining actors
 
 Actors provide a _join()_ method to allow callers to wait for the actor to terminate. A variant accepting a timeout is also available. The Groovy _spread-dot_ operator comes in handy when joining multiple actors at a time.
@@ -355,7 +409,7 @@ to invoke once the loop finishes - _After Loop Termination Code Handler_ .
 The following actor will loop three times to receive 3 messages and then prints out the maximum of the received messages.
 
 {code}
-final Actor actor = actor {
+final Actor actor = Actors.actor {
     def candidates = []
     def printResult = {-> println "The best offer is ${candidates.max()}"}
 
@@ -375,7 +429,7 @@ actor.join()
 The following actor will receive messages until a value greater then 30 arrives.
 
 {code}
-final Actor actor = actor {
+final Actor actor = Actors.actor {
     def candidates = []
     final Closure printResult = {-> println "Reached best offer - ${candidates.max()}"}
 
