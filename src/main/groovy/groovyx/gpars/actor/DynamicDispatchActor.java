@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor
+package groovyx.gpars.actor;
 
-import groovyx.gpars.actor.impl.DDAClosure
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
+import groovy.lang.Closure;
+import groovyx.gpars.actor.impl.DDAClosure;
 
 /**
  * A pooled actor allowing for an alternative structure of the message handling code.
@@ -25,43 +25,45 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
  * of the onMessage(message) methods defined on the actor.
  * <pre>
  * final class MyActor extends DynamicDispatchActor {*      void onMessage(String message) {*          println 'Received string'
- *}*      void onMessage(Integer message) {*          println 'Received integer'
- *}*      void onMessage(Object message) {*          println 'Received object'
- *}*      void onMessage(NullObject nullMessage) {*          println 'Received null'
- *}*} </pre>
- *
+ * }*      void onMessage(Integer message) {*          println 'Received integer'
+ * }*      void onMessage(Object message) {*          println 'Received object'
+ * }*      void onMessage(NullObject nullMessage) {*          println 'Received null'
+ * }*} </pre>
+ * <p/>
  * Method when {...} provides an alternative way to define message handlers
  *
  * @author Vaclav Pech, Alex Tkachman, Dierk Koenig
- * Date: Jun 26, 2009
+ *         Date: Jun 26, 2009
  */
 
+@SuppressWarnings({"ThisEscapedInObjectConstruction"})
 public class DynamicDispatchActor extends AbstractLoopingActor {
     private static final long serialVersionUID = 2709208258556647529L;
 
     /**
      * Creates a new instance without any when handlers registered
      */
-    DynamicDispatchActor() {
-        this(null)
+    public DynamicDispatchActor() {
+        this(null);
     }
 
     /**
      * Creates an instance, processing all when{} calls in the supplied closure
+     *
      * @param closure A closure to run against te actor, typically to register handlers
      */
-    DynamicDispatchActor(final Closure closure) {
-        if (closure) {
-            Closure cloned = (Closure) closure.clone()
-            cloned.resolveStrategy = Closure.DELEGATE_FIRST
-            cloned.delegate = this
-            cloned.call()
+    public DynamicDispatchActor(final Closure closure) {
+        if (closure != null) {
+            final Closure cloned = (Closure) closure.clone();
+            cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
+            cloned.setDelegate(this);
+            cloned.call();
         }
 
-        initialize(new DDAClosure(this))
+        initialize(new DDAClosure(this));
     }
 
-    void when(final Closure closure) {
-        DefaultGroovyMethods.getMetaClass(this).onMessage closure
+    public final void when(final Closure closure) {
+        DDAHelper.when(this, closure);
     }
 }
