@@ -23,7 +23,8 @@ The _actor()_ factory method will take care of starting the actor.
 
 {code}
 class CustomActor extends DefaultActor {
-    @Override protected void act() {
+    @Override
+    protected void act() {
         loop {
             react {
                 println it
@@ -41,8 +42,8 @@ Messages can be sent to the actor using multiple methods
 {code}
 console.send('Message')
 console 'Message'
-console.sendAndContinue 'Message', {reply -> println "I received reply: $reply"}
-console.sendAndWait 'Message'
+console.sendAndWait 'Message'                                                     //Wait for a reply
+console.sendAndContinue 'Message', {reply -> println "I received reply: $reply"}  //Forward the reply to a function
 {code}
 
 h3. Creating an asynchronous service
@@ -83,16 +84,27 @@ Actors allow time DSL defined by org.codehaus.groovy.runtime.TimeCategory class 
 provided the user wraps the call within a _TimeCategory_ use block.
 
 {code}
-import static groovyx.gpars.actor.Actors.*
+def friend = Actors.actor {
+    react {
+        //this doesn't reply -> caller won't receive any answer in time
+        println it
+        //reply 'Hello' //uncomment this to answer conversation
+        react {
+            println it
+        }
+    }
+}
 
-def me = actor {
+def me = Actors.actor {
     friend.send('Hi')
-    react(30.seconds) {msg ->
+    //wait for answer 1sec
+    react(1000) {msg ->
         if (msg == Actor.TIMEOUT) {
             friend.send('I see, busy as usual. Never mind.')
             stop()
         } else {
             //continue conversation
+            println "Thank you for $msg"
         }
     }
 }
@@ -104,17 +116,31 @@ When a timeout expires when waiting for a message, the Actor.TIMEOUT message arr
 is invoked, if present on the actor:
 
 {code}
-import static groovyx.gpars.actor.Actors.*
+def friend = Actors.actor {
+    react {
+        //this doesn't reply -> caller won't receive any answer in time
+        println it
+        //reply 'Hello' //uncomment this to answer conversation
+        react {
+            println it
+        }
+    }
+}
 
-def me = actor {
+def me = Actors.actor {
+    friend.send('Hi')
+
     delegate.metaClass.onTimeout = {->
         friend.send('I see, busy as usual. Never mind.')
         stop()
     }
 
-    friend.send('Hi')
-    react(30.seconds) {
-        //continue conversation
+    //wait for answer 1sec
+    react(1000) {msg ->
+        if (msg != Actor.TIMEOUT) {
+            //continue conversation
+            println "Thank you for $msg"
+        }
     }
 }
 
@@ -162,12 +188,12 @@ h2. Simple calculator
 
 A little bit more realistic example of an event-driven actor that receives two numeric messages, sums them up and sends the result to the console actor.
 {code}
-import static groovyx.gpars.actor.Actors.*
+import groovyx.gpars.group.DefaultPGroup
 
 //not necessary, just showing that a single-threaded pool can still handle multiple actors
-defaultActorPGroup.resize 1
+def group = new DefaultPGroup(1);
 
-final def console = actor {
+final def console = group.actor {
     loop {
         react {
             println 'Result: ' + it
@@ -175,7 +201,7 @@ final def console = actor {
     }
 }
 
-final def calculator = actor {
+final def calculator = group.actor {
     react {a ->
         react {b ->
             console.send(a + b)
@@ -187,17 +213,9 @@ calculator.send 2
 calculator.send 3
 
 calculator.join()
+group.shutdown()
 {code}
 
-You can group reception of multiple messages in a single _react()_ call.
-
-{code}
-final def calculator = actor {
-    react {a, b ->
-        console.send(a + b)
-    }
-}
-{code}
 Notice that event-driven actors require special care regarding the _react()_ method. Since _event_driven actors_ need to split the code into independent chunks assignable to different threads sequentially and *continuations* are not natively supported on JVM, the chunks are created artificially with tasks and exceptions. As a result the _react()_ and _loop()_ methods never return normally and actors' code must be structured accordingly. Again, this is in line with what Scala actors do.
 
 h3. Concurrent Merge Sort Example
@@ -205,7 +223,8 @@ h3. Concurrent Merge Sort Example
 For comparison I'm also including a more involved example performing a concurrent merge sort of a list of integers using actors. You can see that thanks to flexibility of Groovy we came pretty close to the Scala model, although I still miss Scala pattern matching for message handling.
 
 {code}
-import static groovyx.gpars.actor.Actors.*
+import groovyx.gpars.group.DefaultPGroup
+import static groovyx.gpars.actor.Actors.actor
 
 Closure createMessageHandler(def parentActor) {
     return {
@@ -247,12 +266,7 @@ def console = new DefaultPGroup(1).actor {
 def sorter = actor(createMessageHandler(console))
 sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 console.join()
-{code}
 
-Since _actors_ reuse threads from a pool, the script will work with virtually *any size of a thread pool*, no matter how many actors are created along the way.
-
-For brevity I didn't include the two helper methods split() and merge() in the code snippet. You can find them below.
-{code}
 def split(List<Integer> list) {
     int listSize = list.size()
     int middleIndex = listSize / 2
@@ -275,7 +289,10 @@ List<Integer> merge(List<Integer> a, List<Integer> b) {
     else result.addAll(b[j..-1])
     return result
 }
+
 {code}
+
+Since _actors_ reuse threads from a pool, the script will work with virtually *any size of a thread pool*, no matter how many actors are created along the way.
 
 h3. Actor lifecycle methods
 Each Actor can define lifecycle observing methods, which will be called whenever a certain lifecycle event occurs.
@@ -373,7 +390,7 @@ def actor2 = nonDaemonGroup.actor {
 
 class MyActor {
     def MyActor() {
-        this.actorGroup = nonDaemonGroup
+        this.parallelGroup = nonDaemonGroup
     }
 
     void act() {...}
@@ -426,7 +443,7 @@ def nonDaemonGroup = new NonDaemonPGroup()
 
 class MyActor extends DefaultActor {
     def MyActor() {
-        this.actorGroup = nonDaemonGroup
+        this.parallelGroup = nonDaemonGroup
     }
 
     void act() {...}

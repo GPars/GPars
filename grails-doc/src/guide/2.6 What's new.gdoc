@@ -21,10 +21,13 @@ h3. Actors
 
 * Conditional and counting loop
 * Changed the message timeout API
+* Speed-up of the actor messaging core
 * Refactored Reactor and DynamicDispatchActor achieving a 15x speed-up
-* Speed-up of actor messaging
 * Deprecated _AbstractPooledActor_
 * Added _DefaultActor_ as a new implementation of the stateful actor principle
+* Removed support for replies and senders on messages
+* Extended support for senders to actors themselves
+* Removed the _receive()_ from _DefaultActor_
 
 h3. GroovyCSP
 
