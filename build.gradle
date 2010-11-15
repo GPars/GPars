@@ -204,6 +204,14 @@ task zipSamples(type: Zip) {
     }
 }
 
+task zipJavaDemo(type: Zip) {
+    appendix = 'mvn-java-demo'
+    from('java-demo') {
+        include 'src/**'
+        include 'pom.xml'
+    }
+}
+
 task copyThirdPartyLibs(type: Copy) {
     from('lib')
     into('build/dist')
