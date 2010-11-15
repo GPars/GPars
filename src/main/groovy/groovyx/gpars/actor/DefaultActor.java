@@ -18,7 +18,6 @@ package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
 import groovy.time.Duration;
-import groovyx.gpars.actor.impl.ActorContinuationException;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -87,29 +86,23 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param message The current message to process
      */
     final void onMessage(final Object message) {
-        try {
-            if (nextContinuation != null) {
-                final Closure closure = nextContinuation;
-                nextContinuation = null;
-                closure.call(message);
-            } else
-                throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
-        } catch (ActorContinuationException ignore) {
-        }
+        if (nextContinuation != null) {
+            final Closure closure = nextContinuation;
+            nextContinuation = null;
+            closure.call(message);
+        } else
+            throw new IllegalStateException("The actor " + this + " cannot handle the message " + message + ", as it has no registered message handler at the moment.");
         if (nextContinuation == null && !terminatingFlag) {
-            try {
-                if (loopCondition == null || evalLoopCondition()) {
-                    if (loopCode == null)
-                        if (loopClosure == null) terminate();
-                        else loopClosure.call();
-                    else loopCode.run();
-                } else {
-                    if (afterLoopCode != null) {
-                        runAfterLoopCode(afterLoopCode);
-                    }
-                    if (nextContinuation == null) terminate();
+            if (loopCondition == null || evalLoopCondition()) {
+                if (loopCode == null)
+                    if (loopClosure == null) terminate();
+                    else loopClosure.call();
+                else loopCode.run();
+            } else {
+                if (afterLoopCode != null) {
+                    runAfterLoopCode(afterLoopCode);
                 }
-            } catch (ActorContinuationException ignore) {
+                if (nextContinuation == null) terminate();
             }
         }
     }
