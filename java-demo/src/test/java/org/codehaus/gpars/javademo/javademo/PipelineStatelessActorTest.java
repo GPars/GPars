@@ -19,6 +19,7 @@ package org.codehaus.gpars.javademo.javademo;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.DefaultPool;
 import org.junit.Test;
 
@@ -33,7 +34,7 @@ public class PipelineStatelessActorTest {
         downloader.follower = indexer;
         indexer.follower = writer;
 
-        final DefaultPGroup group = new DefaultPGroup(new DefaultPool(false, 4));
+        final PGroup group = new DefaultPGroup(new DefaultPool(false, 4));
 
         writer.setParallelGroup(group);
         indexer.setParallelGroup(group);
@@ -80,18 +81,21 @@ abstract class StatefulDynamicDispatchActor extends DynamicDispatchActor {
 }
 
 final class DownloadStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
+    @Override
     String handleMessage(final String message) {
         return message.replaceFirst("Requested ", "Downloaded ");
     }
 }
 
 final class IndexStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
+    @Override
     String handleMessage(final String message) {
         return message.replaceFirst("Downloaded ", "Indexed ");
     }
 }
 
 final class WriteStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
+    @Override
     String handleMessage(final String message) {
         return message.replaceFirst("Indexed ", "Wrote ");
     }
