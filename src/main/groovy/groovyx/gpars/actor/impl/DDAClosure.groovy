@@ -26,7 +26,7 @@ import org.codehaus.groovy.runtime.NullObject
  */
 public final class DDAClosure extends Closure {
 
-    private final DynamicDispatchActor dda
+    private final def dda
 
     def DDAClosure(final DynamicDispatchActor dda) {
         super(dda);
