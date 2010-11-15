@@ -24,8 +24,7 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
  * @author Vaclav Pech
  */
 final class DDAHelper {
-    static final void when(final target, final Closure closure) {
+    static final void when(final target, final closure) {
         DefaultGroovyMethods.getMetaClass(target).onMessage closure
     }
-
 }
