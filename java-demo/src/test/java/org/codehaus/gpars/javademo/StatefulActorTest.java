@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.codehaus.gpars.javademo.javademo;
+package org.codehaus.gpars.javademo;
 
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.Actor;
