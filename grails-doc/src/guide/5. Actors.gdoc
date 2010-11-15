@@ -135,7 +135,7 @@ friend.sendAndContinue 'I need money!', {money -> pocket money}
 println 'I can continue while my friend is collecting money for me'
 {code}
 
-All _send()_, _sendAndWait()_ or _sendAndContinue()_ methods will throw an exception if invoked on a non-active actor.
+All _send()_ , _sendAndWait()_ or _sendAndContinue()_ methods will throw an exception if invoked on a non-active actor.
 
 h2. Receiving messages
 
@@ -462,7 +462,6 @@ Use either the _fairActor()_ factory method or the actor's makeFair() method.
 
 h2. Custom schedulers
 
-Actors leverage the standard JDK concurrency library by default.  To provide a custom thread scheduler use the appropriate constructor parameter when creating an actor group. The supplied scheduler will orchestrate threads in the group's thread pool.
+Actors leverage the standard JDK concurrency library by default.  To provide a custom thread scheduler use the appropriate constructor parameter when creating a parallel group (PGroup class). The supplied scheduler will orchestrate threads in the group's thread pool.
 
-
-Please also see the numerous Actor Demos.
+Please also see the numerous "Actor Demos":http://git.codehaus.org/gitweb.cgi?p=gpars.git;a=tree;f=src/test/groovy/groovyx/gpars/samples;h=f9a751689a034a1d3de13c4874f4f4e839cb1026;hb=HEAD .
