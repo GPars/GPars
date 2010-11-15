@@ -16,39 +16,31 @@
 
 package groovyx.gpars.samples.userguide.actor
 
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultActor
-
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Jan Novotný
  */
 
-final DefaultActor me
-me = Actors.actor {
-    def message1 = 1
-    def message2 = 2
+import groovyx.gpars.actor.Actors
 
-    def actor = Actors.actor {
-        react {
-            //wait 2sec in order next call in demo can be emitted
-            Thread.sleep(2000)
-            //stop actor after first message
-            stop()
+final def decryptor = Actors.actor {
+    loop {
+        react {String message ->
+            if ('stopService' == message) {
+                println 'Stopping decryptor'
+                stop()
+            }
+            else reply message.reverse()
         }
     }
-
-    me.metaClass.onDeliveryError = {msg ->
-        //callback on actor inaccessibility
-        println "Could not deliver message $msg"
-    }
-
-    actor << message1
-    actor << message2
-
-    actor.join()
-
 }
 
-me.join()
+final def runner = Actors.actor {
+    decryptor.send 'lellarap si yvoorG'
+    react {
+        println 'Decrypted message: ' + it
+        decryptor.send 'stopService'
+    }
+}
+//wait for runner to finish
+runner.join()
+

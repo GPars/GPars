@@ -216,17 +216,6 @@ react {tweet ->
 }
 {code}
 
-//todo remove
-And for _AbstractPooledActor_ (not available in _DefaultActor_ , _DynamicDispatchActor_ nor _ReactiveActor_ classes) also on the processed messages:
-
-{code}
-//todo remove
-react {tweet ->
-    if (isSpam(tweet)) ignoreTweetsFrom tweet.sender
-    tweet.sender.send 'Never write me again!'
-}
-{code}
-
 h3. Forwarding
 
 When sending a message, a different actor can be specified as the sender so that potential replies to the message will be forwarded to the specified actor and not to the actual originator.
@@ -358,7 +347,7 @@ me = Actors.actor {
 me.join()
 {code}
 
-Alternatively the _onDeliveryError()_ method can be specified on the sender itself.
+Alternatively the _onDeliveryError()_ method can be specified on the sender itself. The method can be added both dynamically
 
 {code}
 final DefaultActor me
@@ -388,6 +377,16 @@ me = Actors.actor {
 }
 
 me.join()
+{code}
+
+and statically in actor definition:
+{code}
+class MyActor extends DefaultActor {
+    public void onDeliveryError(msg) {
+        println "Could not deliver message $msg"
+    }
+    ...
+}
 {code}
 
 h2. Joining actors

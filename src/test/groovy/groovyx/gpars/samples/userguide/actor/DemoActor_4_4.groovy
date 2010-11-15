@@ -21,9 +21,7 @@ import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.CountDownLatch
 
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Jan Novotný
  */
 
 //Messages

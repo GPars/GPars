@@ -6,6 +6,7 @@ Since, unlike _DefaultActor_ descendants, a _DynamicDispatchActor_ not _Reactive
 message receptions, they provide much better performance characteristics, generally comparable to other actor frameworks, like e.g. Scala Actors.
 
 {code}
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
 
 final class MyActor extends DynamicDispatchActor {
@@ -30,14 +31,15 @@ final class MyActor extends DynamicDispatchActor {
     }
 }
 
-final def actor = new MyActor().start()
+final def myActor = new MyActor().start()
 
-actor 1
-actor ''
-actor 1.0
-actor(new ArrayList())
-
-actor.join()
+Actors.actor {
+    myActor 1
+    myActor ''
+    myActor 1.0
+    myActor(new ArrayList())
+    myActor.join()
+}.join()
 {code}
 
 In some scenarios, typically when no implicit conversation-history-dependent state needs to be preserved for the actor, the dynamic dispatch code structure may be more intuitive than the traditional one using nested _loop_ and _react_ statements.
@@ -45,19 +47,25 @@ In some scenarios, typically when no implicit conversation-history-dependent sta
 The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamically at actor construction time using the _when_ handlers:
 
 {code}
-final Actor actor = new DynamicDispatchActor({
+final Actor myActor = new DynamicDispatchActor({
     when {String msg -> println 'A String'; reply 'Thanks'}
     when {Double msg -> println 'A Double'; reply 'Thanks'}
-    when {msg -> println 'A something ...'; reply 'What was that?'}
+    when {msg -> println 'A something ...'; reply 'What was that?';stop()}
 })
-actor.start()
+myActor.start()
+Actors.actor {
+    myActor 'Hello'
+    myActor 1.0d
+    myActor 10 as BigDecimal
+    myActor.join()
+}.join()
 {code}
 
 Obviously the two approaches can be combined:
 {code}
-final class MyActor extends DynamicDispatchActor {
+final class MyDDA extends DynamicDispatchActor {
 
-    def MyActor(final closure) { super(closure); }
+    def MyDDA(final closure) { super(closure); }
 
     void onMessage(String message) {
         println 'Received string'
@@ -77,10 +85,17 @@ final class MyActor extends DynamicDispatchActor {
     }
 }
 
-final def actor = new MyActor({
+final def myActor = new MyDDA({
     when {BigDecimal num -> println 'Received BigDecimal'}
-    if (needHandleFloats) when {Float num -> println 'Got a float'}
+    when {Float num -> println 'Got a float'}
 }).start()
+Actors.actor {
+    myActor 'Hello'
+    myActor 1.0f
+    myActor 10 as BigDecimal
+    myActor.send([])
+    myActor.join()
+}.join()
 {code}
 
 {note}
@@ -101,25 +116,23 @@ h3. Reactive Actor
 The _ReactiveActor_ class, constructed typically by calling _Actors.reactor()_ or _DefaultPGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.
 
 {code}
-import groovyx.gpars.group.DefaultPGroup
-
 final def group = new DefaultPGroup()
 
 final def doubler = group.reactor {
     2 * it
-}.start()
+}
 
 group.actor {
     println 'Double of 10 = ' + doubler.sendAndWait(10)
-}.start()
+}
 
 group.actor {
     println 'Double of 20 = ' + doubler.sendAndWait(20)
-}.start()
+}
 
 group.actor {
     println 'Double of 30 = ' + doubler.sendAndWait(30)
-}.start()
+}
 
 for(i in (1..10)) {
     println "Double of $i = ${doubler.sendAndWait(i)}"
@@ -137,7 +150,7 @@ import groovyx.gpars.actor.Actors
 
 final def doubler = Actors.reactor {
     2 * it
-}.start()
+}
 
 Actor actor = Actors.actor {
     (1..10).each {doubler << it}
@@ -151,7 +164,7 @@ Actor actor = Actors.actor {
             }
         }
     }
-}.start()
+}
 
 actor.join()
 doubler.stop()

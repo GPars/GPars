@@ -17,9 +17,7 @@
 package groovyx.gpars.samples.userguide.actor
 
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Jan Novotný
  */
 
 import groovyx.gpars.actor.Actors

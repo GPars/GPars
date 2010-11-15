@@ -16,38 +16,39 @@
 
 package groovyx.gpars.samples.userguide.actor
 
+import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DefaultActor
+
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Jan Novotný
  */
 
-import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
+final DefaultActor me
+me = Actors.actor {
+    def message = 1
 
-def friend = Actors.actor {
-    react {
-        //this doesn't reply -> caller won't receive any answer in time
-        println it
-        //reply 'Hello' //uncomment this to answer conversation
+    message.metaClass.onDeliveryError = {->
+        //send message back to the caller
+        me << "Could not deliver $delegate"
+    }
+
+    def actor = Actors.actor {
         react {
-            println it
-        }
-    }
-}
-
-def me = Actors.actor {
-    friend.send('Hi')
-    //wait for answer 1sec
-    react(1000) {msg ->
-        if (msg == Actor.TIMEOUT) {
-            friend.send('I see, busy as usual. Never mind.')
+            //wait 2sec in order next call in demo can be emitted
+            Thread.sleep(2000)
+            //stop actor after first message
             stop()
-        } else {
-            //continue conversation
-            println "Thank you for $msg"
         }
     }
+
+    actor << message
+    actor << message
+
+    react {
+        //print whatever comes back
+        println it
+    }
+
 }
 
 me.join()

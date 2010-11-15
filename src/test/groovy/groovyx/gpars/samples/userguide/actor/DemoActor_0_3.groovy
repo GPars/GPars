@@ -16,33 +16,24 @@
 
 package groovyx.gpars.samples.userguide.actor
 
-/**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
- */
-
 import groovyx.gpars.actor.Actors
 
-final def decryptor = Actors.actor {
-    loop {
-        react {String message ->
-            if ('stopService' == message) {
-                println 'Stopping decryptor'
-                stop()
-            }
-            else reply message.reverse()
-        }
+/**
+ * @author Jan Novotný
+ */
+
+def decryptor = Actors.actor {
+    react {message ->
+        reply message.reverse()
+//        sender.send message.reverse()    //An alternative way to send replies
     }
 }
 
-final def runner = Actors.actor {
-    decryptor.send 'lellarap si yvoorG'
+def console = Actors.actor {  //This actor will print out decrypted messages, since the replies are forwarded to it
     react {
         println 'Decrypted message: ' + it
-        decryptor.send 'stopService'
     }
 }
-//wait for runner to finish
-runner.join()
 
+decryptor.send 'lellarap si yvoorG', console  //Specify an actor to send replies to
+console.join()

@@ -16,29 +16,36 @@
 
 package groovyx.gpars.samples.userguide.actor
 
+/**
+ * @author Jan Novotný
+ */
+
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 
-/**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
- */
-
-final Actor actor = Actors.actor {
-    def candidates = []
-    final Closure printResult = {-> println "Reached best offer - ${candidates.max()}"}
-
-    loop({-> candidates.max() < 30}, printResult) {
+def friend = Actors.actor {
+    react {
+        //this doesn't reply -> caller won't receive any answer in time
+        println it
+        //reply 'Hello' //uncomment this to answer conversation
         react {
-            candidates << it
+            println it
         }
     }
 }
 
-actor 10
-actor 20
-actor 25
-actor 31
-actor 20
-actor.join()
+def me = Actors.actor {
+    friend.send('Hi')
+    //wait for answer 1sec
+    react(1000) {msg ->
+        if (msg == Actor.TIMEOUT) {
+            friend.send('I see, busy as usual. Never mind.')
+            stop()
+        } else {
+            //continue conversation
+            println "Thank you for $msg"
+        }
+    }
+}
+
+me.join()

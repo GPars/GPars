@@ -16,26 +16,33 @@
 
 package groovyx.gpars.samples.userguide.actor
 
-import groovyx.gpars.actor.Actors
-
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Vaclav Pech
  */
 
-def decryptor = Actors.actor {
-    react {message ->
-        reply message.reverse()
-//        sender.send message.reverse()    //An alternative way to send replies
-    }
+import groovyx.gpars.group.DefaultPGroup
+
+final def group = new DefaultPGroup()
+
+final def doubler = group.reactor {
+    2 * it
 }
 
-def console = Actors.actor {  //This actor will print out decrypted messages, since the replies are forwarded to it
-    react {
-        println 'Decrypted message: ' + it
-    }
+group.actor {
+    println 'Double of 10 = ' + doubler.sendAndWait(10)
 }
 
-decryptor.send 'lellarap si yvoorG', console  //Specify an actor to send replies to
-console.join()
+group.actor {
+    println 'Double of 20 = ' + doubler.sendAndWait(20)
+}
+
+group.actor {
+    println 'Double of 30 = ' + doubler.sendAndWait(30)
+}
+
+for (i in (1..10)) {
+    println "Double of $i = ${doubler.sendAndWait(i)}"
+}
+
+doubler.stop()
+doubler.join()

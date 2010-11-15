@@ -21,9 +21,7 @@ import groovyx.gpars.actor.Actors
 import java.util.concurrent.TimeUnit
 
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Jan Novotný
  */
 
 def passiveActor = Actors.actor {

@@ -16,41 +16,31 @@
 
 package groovyx.gpars.samples.userguide.actor
 
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.actor.DefaultActor
-
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Vaclav Pech
  */
 
-final DefaultActor me
-me = Actors.actor {
-    def message = 1
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.Actors
 
-    message.metaClass.onDeliveryError = {->
-        //send message back to the caller
-        me << "Could not deliver $delegate"
-    }
-
-    def actor = Actors.actor {
-        react {
-            //wait 2sec in order next call in demo can be emitted
-            Thread.sleep(2000)
-            //stop actor after first message
-            stop()
-        }
-    }
-
-    actor << message
-    actor << message
-
-    react {
-        //print whatever comes back
-        println it
-    }
-
+final def doubler = Actors.reactor {
+    2 * it
 }
 
-me.join()
+Actor actor = Actors.actor {
+    (1..10).each {doubler << it}
+    int i = 0
+    loop {
+        i += 1
+        if (i > 10) stop()
+        else {
+            react {message ->
+                println "Double of $i = $message"
+            }
+        }
+    }
+}
+
+actor.join()
+doubler.stop()
+doubler.join()

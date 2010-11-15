@@ -20,16 +20,14 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 
 /**
- * Description
- * @author Jan Novotný, FG Forrest a.s. (c) 2007
- * @version $Id: $
+ * @author Jan Novotný
  */
 
 final Actor actor = Actors.actor {
     def candidates = []
-    def printResult = {-> println "The best offer is ${candidates.max()}"}
+    final Closure printResult = {-> println "Reached best offer - ${candidates.max()}"}
 
-    loop(3, printResult) {
+    loop({-> candidates.max() < 30}, printResult) {
         react {
             candidates << it
         }
@@ -37,6 +35,8 @@ final Actor actor = Actors.actor {
 }
 
 actor 10
-actor 30
+actor 20
+actor 25
+actor 31
 actor 20
 actor.join()
