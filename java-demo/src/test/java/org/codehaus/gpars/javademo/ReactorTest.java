@@ -24,6 +24,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
+ */
 public class ReactorTest {
 
     @Test

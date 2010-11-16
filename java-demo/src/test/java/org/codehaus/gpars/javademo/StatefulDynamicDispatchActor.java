@@ -19,6 +19,10 @@ package org.codehaus.gpars.javademo;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.DynamicDispatchActor;
 
+/**
+ * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
+ */
+
 abstract class StatefulDynamicDispatchActor extends DynamicDispatchActor {
     Actor follower;
 

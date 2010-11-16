@@ -30,6 +30,8 @@ import static org.junit.Assert.assertEquals;
 /**
  * Creates 10000 chained Actors that are passing messages along. Messages are passed to the first actor and the messages are propageted
  * to the others.
+ *
+ * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
  */
 public class ActorBenchmarkTest {
     private static final int ACTORS = 10000;

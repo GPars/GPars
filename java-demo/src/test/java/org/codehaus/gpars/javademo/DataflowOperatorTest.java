@@ -29,6 +29,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
+ */
+
 public class DataflowOperatorTest {
     @Test
     public void testFlow() throws Exception {

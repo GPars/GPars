@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * Test shows how reacting to messages sent to actor can be nested in logical chain
  *
- * @author Lukas Krecan
+ * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
  */
 public class StatefulActorTest {
     @Test

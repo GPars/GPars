@@ -21,6 +21,10 @@ import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.DefaultPool;
 import org.junit.Test;
 
+/**
+ * @author Jiri Mares, Vaclav Pech
+ */
+
 public class PipelineStatelessActorTest {
     @Test
     public void testActor() throws InterruptedException {
