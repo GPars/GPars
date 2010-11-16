@@ -4,9 +4,8 @@ Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.j
 
 h3. Project changes
 
-TODO needs update
 {note:Title=Breaking Changes}
-See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
+See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
 {note}
 
 h3. Parallel collections
