@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.CountDownLatch
 
 public class PooledActorNetworkingBenchmark implements Benchmark {
@@ -34,7 +34,7 @@ public class PooledActorNetworkingBenchmark implements Benchmark {
     }
 }
 
-class PooledWorkerActor extends AbstractPooledActor {
+class PooledWorkerActor extends DefaultActor {
     void act() {
         loop {
             react {
@@ -44,7 +44,7 @@ class PooledWorkerActor extends AbstractPooledActor {
     }
 }
 
-final class PooledNetworkingMaster extends AbstractPooledActor {
+final class PooledNetworkingMaster extends DefaultActor {
 
     int iterations = 1
     int numActors = 1

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.collections
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.ArrayBlockingQueue
 
 /*
@@ -29,7 +29,7 @@ are placeholders for business operations.
 @author Dierk Koenig, Vaclav Pech
 */
 
-/** The constants that define the world context of the barber shop.  */
+/** The constants that define the world context of the barber shop.   */
 class Shop {
     static final shaveTime = 100
     static final seatCount = 3
@@ -40,7 +40,7 @@ class Shop {
 /** The active element that makes sure that all actions happen in proper
  * uninterrupted sequence, e.g. taking a seat before getting a shave.
  */
-class Customer extends AbstractPooledActor {
+class Customer extends DefaultActor {
     int id
 
     void act() {

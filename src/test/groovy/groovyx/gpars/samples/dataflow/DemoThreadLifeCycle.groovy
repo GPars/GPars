@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import java.util.concurrent.TimeUnit
 import static groovyx.gpars.dataflow.DataFlow.start
 
@@ -35,7 +35,7 @@ start {
     }
 }
 
-private void enhance(AbstractPooledActor thread) {
+private void enhance(Actor thread) {
     thread.metaClass {
         afterStop = {List undeliveredMessages ->
             println "thread has stopped"

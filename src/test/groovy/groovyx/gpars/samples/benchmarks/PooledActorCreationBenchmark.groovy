@@ -16,13 +16,14 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DefaultActor
 
 public class PooledActorCreationBenchmark implements Benchmark {
 
     public long perform(final int numberOfIterations) {
-        final AbstractPooledActor initiator = Actors.actor {
+        final Actor initiator = Actors.actor {
             int iteration = 0
             loop {
                 if (iteration == numberOfIterations) {
@@ -45,7 +46,7 @@ public class PooledActorCreationBenchmark implements Benchmark {
     }
 }
 
-class PooledBouncer extends AbstractPooledActor {
+class PooledBouncer extends DefaultActor {
     void act() {
         react {
             reply '2'

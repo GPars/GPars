@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 
@@ -29,7 +29,7 @@ println 'Threads at start: ' + Thread.threads.length
 for (i in 0..10000) {
     final CountDownLatch latch = new CountDownLatch(2)
     final DefaultPGroup group = new DefaultPGroup(Math.max(1, random.nextInt(20)), i % 2 == 0)
-    final AbstractPooledActor actor = group.actor {
+    final Actor actor = group.actor {
         loop {
             react {
                 reply it

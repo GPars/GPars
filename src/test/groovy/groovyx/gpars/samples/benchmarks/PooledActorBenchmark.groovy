@@ -16,7 +16,6 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 
@@ -34,7 +33,7 @@ public class PooledActorBenchmark implements Benchmark {
 
         final long t1 = System.currentTimeMillis()
 
-        final AbstractPooledActor initiator = Actors.actor {
+        final Actor initiator = Actors.actor {
             int iteration = 0
             loop {
                 if (iteration >= numberOfIterations) {

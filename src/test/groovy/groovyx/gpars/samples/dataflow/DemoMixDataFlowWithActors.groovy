@@ -16,7 +16,6 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
@@ -35,7 +34,7 @@ final Actor doubler = Actors.actor {
     }
 }
 
-final AbstractPooledActor thread = start {
+final Actor thread = start {
     react {
         doubler << it  //send a number to the doubler
         println "Result ${a.val}"  //wait for the result to be bound to 'a'

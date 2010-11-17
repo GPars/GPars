@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.actors.stateful
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DefaultActor
 
 /**
  * Shows actor solution to The Dining Philosophers problem
@@ -25,7 +25,7 @@ import groovyx.gpars.actor.Actors
 
 Actors.defaultActorPGroup.resize 5
 
-final class Philosopher extends AbstractPooledActor {
+final class Philosopher extends DefaultActor {
     private Random random = new Random()
 
     String name
@@ -44,10 +44,10 @@ final class Philosopher extends AbstractPooledActor {
                     if ([a, b].any {Rejected.isCase it}) {
                         println "$name: \tOops, can't get my forks! Giving up."
                         final def accepted = messages.find {Accepted.isCase it[0]}
-                        if (accepted!=null) accepted[1].send new Finished()
+                        if (accepted != null) accepted[1].send new Finished()
                     } else {
                         eat()
-                        messages.collect{it[1]}*.send(new Finished())
+                        messages.collect {it[1]}*.send(new Finished())
                     }
                 }
             }
@@ -67,7 +67,7 @@ final class Philosopher extends AbstractPooledActor {
     }
 }
 
-final class Fork extends AbstractPooledActor {
+final class Fork extends DefaultActor {
 
     String name
     boolean available = true

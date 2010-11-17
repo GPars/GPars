@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.CountDownLatch
 
 public class PooledWordSortBenchmark implements Benchmark {
@@ -45,7 +45,7 @@ private final class SortResult {
     List<String> words
 }
 
-class WordSortActor extends AbstractPooledActor {
+class WordSortActor extends DefaultActor {
     private List<String> sortedWords(String fileName) {
         parseFile(fileName).sort {it.toLowerCase()}
     }
@@ -68,7 +68,7 @@ class WordSortActor extends AbstractPooledActor {
     }
 }
 
-final class SortMaster extends AbstractPooledActor {
+final class SortMaster extends DefaultActor {
 
     String docRoot = '/'
     int numActors = 1
