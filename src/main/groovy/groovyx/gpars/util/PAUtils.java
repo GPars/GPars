@@ -110,7 +110,7 @@ public abstract class PAUtils {
         if (cl.getMaximumNumberOfParameters() == 3) return new Closure(cl.getOwner()) {
             private static final long serialVersionUID = 4777456744250574403L;
 
-            @SuppressWarnings({"RawUseOfParameterizedType"})
+            @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
             @Override
             public Class[] getParameterTypes() {
                 return new Class[]{Map.Entry.class, Integer.class};

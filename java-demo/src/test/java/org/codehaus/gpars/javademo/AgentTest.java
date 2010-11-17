@@ -31,10 +31,10 @@ public class AgentTest {
     public void testAgent() throws Exception {
 
         // Agent is thread safe way to store value
-        final Agent counter = new Agent<Integer>(0);
+        final Agent<Integer> counter = new Agent<Integer>(0);
         counter.send(10);
 
-        assertEquals("Stored agent variable not matching", 10, counter.getVal());
+        assertEquals("Stored agent variable not matching", 10, counter.getVal().intValue());
 
         // Send command to modify agent value
         counter.send(new MessagingRunnable<Integer>() {
@@ -45,7 +45,7 @@ public class AgentTest {
             }
         });
 
-        assertEquals("Final stored agent value not matching", 11, counter.getVal());
+        assertEquals("Final stored agent value not matching", 11, counter.getVal().intValue());
         System.out.println("Current value: " + counter.getVal());
     }
 }

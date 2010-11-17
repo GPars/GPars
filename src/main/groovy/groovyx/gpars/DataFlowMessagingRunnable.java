@@ -27,7 +27,7 @@ import java.util.Arrays;
  *
  * @author Vaclav Pech
  */
-@SuppressWarnings({"RawUseOfParameterizedType"})
+@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
 public abstract class DataFlowMessagingRunnable extends Closure {
     private static final long serialVersionUID = 4796783310470426395L;
     private final Class[] defaultParamTypes;

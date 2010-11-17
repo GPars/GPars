@@ -35,7 +35,7 @@ import java.util.Random;
  * @author Vaclav Pech
  *         Date: 29th Sep 2010
  */
-@SuppressWarnings({"RawUseOfParameterizedType"})
+@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
 public final class SelectBase<T> {
 
     private final List<DataFlowReadChannel<? extends T>> channels;

@@ -37,7 +37,7 @@ public class DataFlowTaskTest {
         final DefaultPGroup group = new DefaultPGroup(10);
 
         // variable can be assigned once only, read allowed multiple times
-        final DataFlowVariable a = new DataFlowVariable();
+        final DataFlowVariable<Integer> a = new DataFlowVariable<Integer>();
 
         // group.task will use thread from pool and uses it to execute value bind
         group.task(new Runnable() {
@@ -49,10 +49,10 @@ public class DataFlowTaskTest {
         });
 
         // group.task will use thread from pool and uses it to execute call method
-        final DataFlowVariable result = group.task(new Callable() {
+        final DataFlowVariable<?> result = group.task(new Callable() {
             public Object call() throws Exception {
                 // getVal will wait for the value to be assigned
-                int result = (Integer) a.getVal() + 10;
+                final int result = a.getVal() + 10;
                 logMessages.add("Value calculated");
                 return result;
             }

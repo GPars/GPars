@@ -33,6 +33,7 @@ import static org.junit.Assert.assertTrue;
  * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
  */
 
+@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
 public class DataflowOperatorTest {
     @Test
     public void testFlow() throws Exception {
@@ -102,7 +103,7 @@ public class DataflowOperatorTest {
      * @param stream
      * @throws InterruptedException
      */
-    private void waitForValue(DataFlowStream stream) throws InterruptedException {
+    private void waitForValue(DataFlowStream<?> stream) throws InterruptedException {
         while (!stream.isBound()) {
             Thread.sleep(100);
         }

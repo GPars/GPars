@@ -31,7 +31,7 @@ import java.util.concurrent.Callable;
  * @author Vaclav Pech, Dierk Koenig
  *         Date: Jun 4, 2009
  */
-@SuppressWarnings({"RawUseOfParameterizedType", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "ConstantDeclaredInAbstractClass", "UtilityClass", "unchecked"})
+@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "ConstantDeclaredInAbstractClass", "UtilityClass", "unchecked"})
 public abstract class DataFlow {
 
     /**

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  *
  * @author Vaclav Pech
  */
-@SuppressWarnings({"RawUseOfParameterizedType", "unchecked"})
+@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType", "unchecked"})
 public final class FQMessageQueue implements MessageQueue {
 
     @SuppressWarnings({"FieldMayBeFinal"})

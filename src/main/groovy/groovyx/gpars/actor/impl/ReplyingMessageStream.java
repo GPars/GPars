@@ -105,7 +105,7 @@ public abstract class ReplyingMessageStream extends Actor {
         }
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
     protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
         assert message != null;
         if (message == TIMEOUT_MESSAGE) handleTimeout();

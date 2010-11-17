@@ -24,7 +24,7 @@ import groovy.lang.Closure;
  *
  * @author Vaclav Pech
  */
-@SuppressWarnings({"RawUseOfParameterizedType", "unchecked"})
+@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType", "unchecked"})
 public abstract class MessagingRunnable<T> extends Closure {
     private static final long serialVersionUID = 4796783310470426395L;
     private static final Class[] PARAMETER_TYPES = {Object.class};
@@ -55,7 +55,8 @@ public abstract class MessagingRunnable<T> extends Closure {
 
     @Override
     public final Object call(final Object[] args) {
-        if (args.length != 1) throw new UnsupportedOperationException(MESSAGING_RUNNABLE_NEED_EXACTLY_ONE_ARGUMENT_TO_RUN);
+        if (args.length != 1)
+            throw new UnsupportedOperationException(MESSAGING_RUNNABLE_NEED_EXACTLY_ONE_ARGUMENT_TO_RUN);
         doRun((T) args[0]);
         return null;
     }
@@ -68,6 +69,7 @@ public abstract class MessagingRunnable<T> extends Closure {
 
     /**
      * Defines the action performed by the Runnable
+     *
      * @param argument The parameter passed from the caller to the closure
      */
     protected abstract void doRun(final T argument);

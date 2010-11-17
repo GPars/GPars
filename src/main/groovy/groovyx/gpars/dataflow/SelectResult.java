@@ -59,7 +59,7 @@ public final class SelectResult<T> {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
-        @SuppressWarnings({"RawUseOfParameterizedType"}) final SelectResult other = (SelectResult) obj;
+        @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"}) final SelectResult other = (SelectResult) obj;
 
         //noinspection AccessingNonPublicFieldOfAnotherObject
         if (index != other.index) return false;

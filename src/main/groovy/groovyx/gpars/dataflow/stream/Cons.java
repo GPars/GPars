@@ -29,7 +29,7 @@ import java.util.Iterator;
 @SuppressWarnings({"TailRecursion", "CallToSimpleGetterFromWithinClass", "unchecked"})
 public class Cons<T> implements FList<T> {
 
-    @SuppressWarnings({"RawUseOfParameterizedType"})
+    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
     static final FList EMPTY = new EmptyList();
 
     private final T first;
@@ -114,7 +114,7 @@ public class Cons<T> implements FList<T> {
         return ", " + first + rest.appendingString();
     }
 
-    @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "RawUseOfParameterizedType"})
+    @SuppressWarnings({"rawtypes", "AccessingNonPublicFieldOfAnotherObject", "RawUseOfParameterizedType"})
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) return true;

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 //todo unchecked casts
-@SuppressWarnings({"TailRecursion", "RawUseOfParameterizedType", "unchecked"})
+@SuppressWarnings({"rawtypes", "TailRecursion", "RawUseOfParameterizedType", "unchecked"})
 public class Stream<T> implements FList<T>, DataFlowChannel<T> {
 
     private final DataFlowVariable<T> first = new DataFlowVariable<T>();
