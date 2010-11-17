@@ -27,7 +27,7 @@ import groovy.lang.Closure;
 @SuppressWarnings({"unchecked"})
 public abstract class ReactorMessagingRunnable<T, V> extends Closure {
     private static final long serialVersionUID = 4796783310470426395L;
-    private static final Class[] PARAMETER_TYPES = {Object.class};
+    private static final Class<?>[] PARAMETER_TYPES = {Object.class};
     private static final String REACTOR_MESSAGING_RUNNABLE_NEED_EXACTLY_ONE_ARGUMENT_TO_RUN = "ReactorMessagingRunnable needs exactly one argument to run.";
 
     protected ReactorMessagingRunnable() {
@@ -44,7 +44,7 @@ public abstract class ReactorMessagingRunnable<T, V> extends Closure {
     }
 
     @Override
-    public final Class[] getParameterTypes() {
+    public final Class<?>[] getParameterTypes() {
         return PARAMETER_TYPES.clone();
     }
 
