@@ -50,11 +50,8 @@ h3. Agent
 h3. Other
 
 * Java API - GPars can now be used from Java
-* A stand-alone maven-based Java API "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-DEF-322/artifact/GPars-samples/gpars-samples-0.11-beta-1-SNAPSHOT.zip
- was added to show GPars integration and use from Java
-
+* A stand-alone maven-based Java API "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-DEF-322/artifact/GPars-samples/gpars-samples-0.11-beta-1-SNAPSHOT.zip was added to show GPars integration and use from Java
 
 h3. Renaming hints
 
-* _AbstractPooledActor_ is now deprecated, use _DefaultActor_ instead
-
+* The _AbstractPooledActor_ class is now deprecated, use _DefaultActor_ instead
