@@ -14,8 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow
+package groovyx.gpars.integration
 
+import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import java.util.concurrent.TimeUnit

@@ -14,9 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.remote
+package groovyx.gpars.integration
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import java.util.concurrent.TimeUnit
 
@@ -54,6 +56,8 @@ public class SyncTest extends GroovyTestCase {
     }
 
     void testSendAndContinue() {
+        final def result = new DataFlowVariable()
+
         def a1 = Actors.actor {
             loop {
                 react {msg ->
@@ -75,12 +79,14 @@ public class SyncTest extends GroovyTestCase {
         }
 
         a2.sendAndContinue("test") {
-            assertEquals "so it goes", it
+            result << it
             a1.stop()
             stop()
         }
 
         a1.join()
         a2.join()
+
+        assertEquals "so it goes", result.val
     }
 }

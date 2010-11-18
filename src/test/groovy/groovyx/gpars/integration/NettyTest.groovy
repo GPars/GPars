@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.remote
+package groovyx.gpars.integration
 
+import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
 
 public class NettyTest extends CommunicationTestBase {

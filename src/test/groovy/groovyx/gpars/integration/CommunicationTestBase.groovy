@@ -14,9 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.remote
+package groovyx.gpars.integration
 
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.remote.LocalHost
+import groovyx.gpars.remote.LocalNode
 import java.util.concurrent.CountDownLatch
 
 public abstract class CommunicationTestBase extends GroovyTestCase {
