@@ -216,7 +216,9 @@ calculator.join()
 group.shutdown()
 {code}
 
-Notice that event-driven actors require special care regarding the _react()_ method. Since _event_driven actors_ need to split the code into independent chunks assignable to different threads sequentially and *continuations* are not natively supported on JVM, the chunks are created artificially with tasks and exceptions. As a result the _react()_ and _loop()_ methods never return normally and actors' code must be structured accordingly. Again, this is in line with what Scala actors do.
+Notice that event-driven actors require special care regarding the _react()_ method. Since _event_driven actors_ need to split the code into independent chunks assignable to different threads sequentially
+and *continuations* are not natively supported on JVM, the chunks are created artificially. The _react()_ method creates the next message handler.
+As soon as the current message handler finishes, the next message handler (continuation) gets scheduled.
 
 h3. Concurrent Merge Sort Example
 

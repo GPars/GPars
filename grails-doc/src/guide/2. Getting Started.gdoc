@@ -8,7 +8,7 @@ That's about it. Let's roll the ball forward.
 
 h2. Brief overview
 
-*GPars* aims to bring several useful concurrency abstractions to the Groovy developers. It's becoming obvious that dealing
+*GPars* aims to bring several useful concurrency abstractions to Java and Groovy developers. It's becoming obvious that dealing
 with concurrency on the thread/synchronized/lock level, as provided by the JVM, is way too low level to be safe and comfortable.
 Many high-level concepts, like actors or dataflow concurrency have been around for quite some time, since parallel computers
 had been in use in computer centers long before multi-core chips hit the hardware mainstream. Now, however, it's the time to

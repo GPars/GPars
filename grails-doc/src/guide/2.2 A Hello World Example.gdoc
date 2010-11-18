@@ -44,7 +44,7 @@ would pay when using GPars.
 For details please refer to the Java API section.
 {note}
 
-To quick-test your integration throughthe Java API, run the following Java actor code:
+To quick-test your integration through Java API, run the following Java actor code:
 
 {code}
 import groovyx.gpars.MessagingRunnable;

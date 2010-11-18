@@ -176,28 +176,15 @@ Actors.actor {
 }
 {code}
 
-The _react()_ and _loop()_ methods never return normally and any code put after a call to either of the two methods will never be executed.
-The closure supplied to the _react()_ or _loop()_ methods is the code where the computation should *continue* . Thus *continuation style* .
+The _react()_ method has a special semantics to allow actors to be detached from threads when no messages are available in their mailbox.
+Essentially, _react()_ schedules the supplied code (closure) to be executed upon next message arrival and returns.
+The closure supplied to the _react()_ methods is the code where the computation should *continue* . Thus *continuation style* .
 
-h3. Blocking message retrieval (deprecated)
-
-Unlike the _react()_ method, which gives up the current thread until a message is available for an actor, the _receive()_ method blocks waiting for a message.
-This allows for a *non-continuation style* code and also might have positive performance implications in certain scenarios.
-
-Mixing _react()_ and _receive()_ calls within a single actor is also possible.
-
-{code}
-//todo remove, if receive becomes unsupported
-Actors.oldActor {
-    def msg1 = receive()
-    receive {msg2, msg3 ->
-        [msg1, msg2, msg3]*.reply 'Hi!'
-    }
-    react {msg4 ->
-        msg4.reply 'You're the last today!'
-    }
-}.start()
-{code}
+Since actor has to preserve the guarantee of at most one thread active within the actor's body, the next message cannot be handled
+before the current message processing finishes. Typically, there shouldn't be a need to put code after calls to _react()_ .
+Some actor implementations even enforce this, however, GPars does not for performance reasons.
+The _loop()_ method allows iteration within the actor body. Unlike typical looping constructs, like _for_ or _while_ loops,
+ _loop()_ cooperates with nested _react()_ blocks and will ensure looping across subsequent message retrievals.
 
 h2. Sending replies
 

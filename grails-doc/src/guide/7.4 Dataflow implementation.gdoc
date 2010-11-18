@@ -8,13 +8,13 @@ The good news is that you can combine actors and Dataflow Concurrency in any way
 {code}
 final DataFlowVariable a = new DataFlowVariable()
 
-final AbstractPooledActor doubler = Actors.actor {
+final Actor doubler = Actors.actor {
     react {message->
         a << 2 * message
     }
 }
 
-final AbstractPooledActor fakingDoubler = actor {
+final Actor fakingDoubler = actor {
     react {
         doubler.send it  //send a number to the doubler
         println "Result ${a.val}"  //wait for the result to be bound to 'a'
