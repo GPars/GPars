@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Creates 10000 chained Actors that are passing messages along. Messages are passed to the first actor and the messages are propageted
+ * Creates 10000 chained Actors that are passing messages along. Messages are passed to the first actor and the messages are propagated
  * to the others.
  *
  * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
