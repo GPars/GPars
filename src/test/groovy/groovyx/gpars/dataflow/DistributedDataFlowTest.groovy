@@ -20,7 +20,7 @@ import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import java.util.concurrent.TimeUnit
 
-public abstract class DistributedDataFlowTest extends GroovyTestCase {
+public class DistributedDataFlowTest extends GroovyTestCase {
     void testDF() {
         final DataFlows df = new DataFlows()
 

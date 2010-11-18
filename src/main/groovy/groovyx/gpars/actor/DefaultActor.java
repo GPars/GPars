@@ -347,8 +347,12 @@ public class DefaultActor extends AbstractLoopingActor {
 
     private Closure enhanceClosure(final Closure closure) {
         final Closure cloned = (Closure) closure.clone();
-        cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
-        cloned.setDelegate(this);
+        if (cloned.getOwner() == cloned.getDelegate()) {
+            cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
+            cloned.setDelegate(this);
+        } else {
+            cloned.setDelegate(new ForwardingDelegate(cloned.getDelegate(), this));
+        }
         return cloned;
     }
 

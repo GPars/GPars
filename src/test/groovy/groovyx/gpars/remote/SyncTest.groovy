@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actors
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import java.util.concurrent.TimeUnit
 
-public abstract class SyncTest extends GroovyTestCase {
+public class SyncTest extends GroovyTestCase {
     void testDistSync() {
         def node1 = new LocalNode(new NettyTransportProvider(), {
             addDiscoveryListener {node, op ->
@@ -48,7 +48,7 @@ public abstract class SyncTest extends GroovyTestCase {
             }
         })
 
-        node1.mainActor.join(5,TimeUnit.SECONDS)
+        node1.mainActor.join(5, TimeUnit.SECONDS)
         node1.localHost.disconnect()
         node2.localHost.disconnect()
     }
