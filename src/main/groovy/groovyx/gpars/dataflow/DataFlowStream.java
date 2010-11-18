@@ -22,6 +22,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,7 +55,7 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
     /**
      * Stores unsatisfied requests for values
      */
-    private final LinkedBlockingQueue<DataFlowVariable<T>> requests = new LinkedBlockingQueue<DataFlowVariable<T>>();
+    private final Queue<DataFlowVariable<T>> requests = new LinkedList<DataFlowVariable<T>>();
 
     /**
      * A collection of listeners who need to be informed each time the stream is bound to a value
@@ -131,7 +132,7 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
         return copyDFV(requests, queue);
     }
 
-    private DataFlowVariable<T> copyDFV(final LinkedBlockingQueue<DataFlowVariable<T>> from, final Queue<DataFlowVariable<T>> to) {
+    private DataFlowVariable<T> copyDFV(final Queue<DataFlowVariable<T>> from, final Queue<DataFlowVariable<T>> to) {
         DataFlowVariable<T> ref;
         synchronized (queueLock) {
             ref = from.poll();
