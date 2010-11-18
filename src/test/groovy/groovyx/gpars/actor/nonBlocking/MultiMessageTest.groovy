@@ -24,6 +24,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
+@Deprecated
 public abstract class MultiMessageTest extends GroovyTestCase {
     public void testReceive() {
         CountDownLatch latch = new CountDownLatch(1)
