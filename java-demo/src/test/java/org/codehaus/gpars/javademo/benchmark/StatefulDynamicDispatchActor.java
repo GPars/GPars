@@ -14,11 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.codehaus.gpars.javademo;
+package org.codehaus.gpars.javademo.benchmark;
 
-final class DownloadStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
-    @Override
-    String handleMessage(final String message) {
-        return message.replaceFirst("Requested ", "Downloaded ");
+import groovyx.gpars.actor.Actor;
+import groovyx.gpars.actor.DynamicDispatchActor;
+
+/**
+ * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
+ */
+
+abstract class StatefulDynamicDispatchActor extends DynamicDispatchActor {
+    Actor follower;
+
+    abstract String handleMessage(String message);
+
+    void onMessage(final String message) {
+        if (follower != null) follower.send(handleMessage(message));
+    }
+
+    void onMessage(final StopMessage message) {
+        if (follower != null) follower.send(message);
+        terminate();
     }
 }

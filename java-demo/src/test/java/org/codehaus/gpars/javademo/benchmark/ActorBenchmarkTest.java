@@ -14,11 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.codehaus.gpars.javademo;
+package org.codehaus.gpars.javademo.benchmark;
 
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.DefaultPool;
 import org.junit.Test;
 
@@ -43,11 +44,11 @@ public class ActorBenchmarkTest {
         final int concurrencyLevel = 20;
 
         // All actors in this group share the same thread pool
-        final DefaultPGroup group = new DefaultPGroup(new DefaultPool(true, concurrencyLevel));
+        final PGroup group = new DefaultPGroup(new DefaultPool(true, concurrencyLevel));
 
         final long t1 = System.currentTimeMillis();
         // With each message received counter is decreased by the actors
-        int latchCount = ACTORS * MESSAGES;
+        final int latchCount = ACTORS * MESSAGES;
         final CountDownLatch cdl = new CountDownLatch(latchCount);
         Actor lastActor = null;
 

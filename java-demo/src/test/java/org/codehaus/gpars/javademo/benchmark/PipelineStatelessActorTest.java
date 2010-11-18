@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.codehaus.gpars.javademo;
+package org.codehaus.gpars.javademo.benchmark;
 
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
