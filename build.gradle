@@ -124,7 +124,7 @@ task integrationTest(type: Test, dependsOn: 'test') {
     include '**/integration/**/*.*'
 }
 
-build.dependsOn integrationTest
+//build.dependsOn integrationTest
 
 try {
     uploadArchives {
