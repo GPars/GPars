@@ -42,7 +42,6 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
     public DataFlowVariable() {
     }
 
-
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
      *
@@ -81,7 +80,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
         return RemoteDataFlowVariable.class;
     }
 
-    public static class RemoteDataFlowVariable<T> extends DataFlowVariable<T> implements RemoteSerialized {
+    public static final class RemoteDataFlowVariable<T> extends DataFlowVariable<T> implements RemoteSerialized {
         private static final long serialVersionUID = -420013188758006693L;
         private final RemoteHost remoteHost;
         private boolean disconnected;

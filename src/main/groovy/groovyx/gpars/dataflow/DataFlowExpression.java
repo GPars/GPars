@@ -49,8 +49,8 @@ import java.util.concurrent.locks.LockSupport;
 @SuppressWarnings({"UnqualifiedStaticUsage", "CallToSimpleGetterFromWithinClass", "ConstantDeclaredInAbstractClass"})
 public abstract class DataFlowExpression<T> extends WithSerialId implements GroovyObject, DataFlowReadChannel<T> {
 
-    static final String ATTACHMENT = "attachment";
-    static final String RESULT = "result";
+    private static final String ATTACHMENT = "attachment";
+    private static final String RESULT = "result";
 
     /**
      * Updater for the state field
@@ -194,7 +194,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                 return;
             }
         }
-
         scheduleCallback(attachment, callback);
     }
 
@@ -248,7 +247,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                 break;
             }
         }
-
         return value;
     }
 
@@ -291,7 +289,6 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
                 break;
             }
         }
-
         return value;
     }
 
