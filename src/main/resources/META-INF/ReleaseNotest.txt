@@ -118,7 +118,7 @@ Added the instantVal property to the SafeVariable class to prioritize read reque
 
 0.8.1
 Added SafeVariable
-Migrated DataFlowStream to Java
+Migrated DataFlowQueue to Java
 Fixed problem with nested actor creation closures
 Added short-hand methods for concurrent collection processing to Asynchronizer and Parallelizer
 

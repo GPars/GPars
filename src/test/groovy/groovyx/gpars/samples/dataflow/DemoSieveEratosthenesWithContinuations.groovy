@@ -16,12 +16,12 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 /**
  * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks with asynchronous value retrieval
- * Asynchronous value retrieval releases the current task's thread whenever waiting for a value to read from the dataFlowStream.
+ * Asynchronous value retrieval releases the current task's thread whenever waiting for a value to read from the DataFlowQueue.
  *
  * In principle, the algorithm consists of concurrently run chained filters,
  * each of which detects whether the current number can be divided by a single prime number.
@@ -33,7 +33,7 @@ group = new DefaultPGroup()
 
 final int requestedPrimeNumberCount = 1000
 
-final DataFlowStream initialChannel = new DataFlowStream()
+final DataFlowQueue initialChannel = new DataFlowQueue()
 
 /**
  * Generating candidate numbers
@@ -51,7 +51,7 @@ group.task {
  * @return A new channel ending the whole chain
  */
 def filter(inChannel, int prime) {
-    def outChannel = new DataFlowStream()
+    def outChannel = new DataFlowQueue()
     inChannel.whenBound {
         doFilter(it, prime, inChannel, outChannel)
     }

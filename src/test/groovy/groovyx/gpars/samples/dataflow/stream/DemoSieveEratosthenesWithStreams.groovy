@@ -30,7 +30,7 @@ import groovyx.gpars.scheduler.ResizeablePool
  */
 
 /**
- * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowStream.val
+ * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowQueue.val
  */
 group = new DefaultPGroup(new ResizeablePool(true))
 

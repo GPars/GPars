@@ -67,9 +67,9 @@ class SelectTest extends Specification {
 
     def "selecting from three df streams"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def select = DataFlow.select(a, b, c)
         when:
         b << 10
@@ -79,9 +79,9 @@ class SelectTest extends Specification {
 
     def "selecting a null value"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def select = DataFlow.select(a, b, c)
         when:
         b << null
@@ -91,9 +91,9 @@ class SelectTest extends Specification {
 
     def "selecting a previously bound null value"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         Thread.start {
             sleep 3000
             b << null
@@ -106,9 +106,9 @@ class SelectTest extends Specification {
 
     def "selecting from three df streams with value being bound is a separate thread"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def select = DataFlow.select(a, b, c)
         when:
         Thread.start {
@@ -127,9 +127,9 @@ class SelectTest extends Specification {
 
     def "selecting from three df streams with a value being bound prior to selector creation"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         c << 20
         when:
         def select = DataFlow.select(a, b, c)
@@ -139,9 +139,9 @@ class SelectTest extends Specification {
 
     def "selecting preserves order within a single stream"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def select = DataFlow.select(a, b, c)
         when:
         b << 10
@@ -155,9 +155,9 @@ class SelectTest extends Specification {
 
     def "selecting across streams"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def select = DataFlow.select(a, b, c)
         when:
         b << 10
@@ -184,9 +184,9 @@ class SelectTest extends Specification {
 
     def "select with quards"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         c << 20
         a << 30
         when:
@@ -202,9 +202,9 @@ class SelectTest extends Specification {
 
     def "priority select"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         c << 20
         a << 30
         when:
@@ -220,9 +220,9 @@ class SelectTest extends Specification {
 
     def "priority select with quards"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         c << 20
         a << 30
         when:
@@ -238,9 +238,9 @@ class SelectTest extends Specification {
 
     def "priority select from one value"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         c << 20
         when:
         def select = DataFlow.select(a, b, c)
@@ -250,9 +250,9 @@ class SelectTest extends Specification {
 
     def "active parallel group doesn't get changed"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def group = new DefaultPGroup()
         def selectGroup = new DefaultPGroup()
         DataFlow.activeParallelGroup.set group
@@ -269,9 +269,9 @@ class SelectTest extends Specification {
 
     def "select uses corrent parallel group"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def group = new DefaultPGroup()
         def selectGroup = new DefaultPGroup()
         DataFlow.activeParallelGroup.set group

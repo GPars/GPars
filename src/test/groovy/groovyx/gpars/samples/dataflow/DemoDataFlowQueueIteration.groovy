@@ -17,17 +17,17 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import java.util.concurrent.CyclicBarrier
 
 /**
- * This demo shows the ways to work with DataFlowStream.
+ * This demo shows the ways to work with DataFlowQueue.
  * It demonstrates the iterative methods, which use the current snapshot of the stream,
  * as well as the 'val' property to gradually take elements away from the stream.
  */
 final CyclicBarrier barrier = new CyclicBarrier(2)
 
-final DataFlowStream stream = new DataFlowStream()
+final DataFlowQueue stream = new DataFlowQueue()
 DataFlow.task {
     (0..10).each {stream << it}
     barrier.await()

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
@@ -46,7 +46,7 @@ def alternative4 = {
     'http://dzone.com/'.toURL().text
 }
 
-final def result = new DataFlowStream()
+final def result = new DataFlowQueue()
 
 [alternative1, alternative2, alternative3, alternative4].each {code ->
     task {

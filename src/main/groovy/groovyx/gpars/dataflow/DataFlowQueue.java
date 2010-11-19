@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"LawOfDemeter", "MethodReturnOfConcreteClass", "AnonymousInnerClass", "AnonymousInnerClassWithTooManyMethods"})
-public final class DataFlowStream<T> implements DataFlowChannel<T> {
+public final class DataFlowQueue<T> implements DataFlowChannel<T> {
 
     /**
      * Internal lock
@@ -339,6 +339,6 @@ public final class DataFlowStream<T> implements DataFlowChannel<T> {
 
     @Override
     public String toString() {
-        return "DataFlowStream(queue=" + new ArrayList<DataFlowVariable<T>>(queue).toString() + ')';
+        return "DataFlowQueue(queue=" + new ArrayList<DataFlowVariable<T>>(queue).toString() + ')';
     }
 }

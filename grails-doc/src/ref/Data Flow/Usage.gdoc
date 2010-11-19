@@ -43,12 +43,12 @@ task {
 }
 {code}
 
-h3. Dataflow Streams
+h3. Dataflow Queues
 
 {code}import static groovyx.gpars.dataflow.DataFlow.task
 
 def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']
-final def buffer = new DataFlowStream()
+final def buffer = new DataFlowQueue()
 
 task {
     for (word in words) {

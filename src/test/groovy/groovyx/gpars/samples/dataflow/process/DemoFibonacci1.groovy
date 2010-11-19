@@ -17,22 +17,22 @@
 package groovyx.gpars.samples.dataflow.process
 
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 group = new DefaultPGroup()
 
 def fib(DataFlowChannel out) {
     group.task {
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
-        def d = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
+        def d = new DataFlowQueue()
         [new Prefix(d, a, 0), new Prefix(c, d, 1), new Copy(a, b, out), new StatePairs(b, c)].each { group.task it}
     }
 }
 
-final DataFlowStream ch = new DataFlowStream()
+final DataFlowQueue ch = new DataFlowQueue()
 group.task new Print('Fibonnaci numbers', ch)
 fib(ch)
 

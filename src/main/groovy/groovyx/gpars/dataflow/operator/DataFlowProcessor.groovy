@@ -46,7 +46,7 @@ abstract class DataFlowProcessor {
     /**
      * Creates a processor
      * After creation the processor needs to be started using the start() method.
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
      * @param code The processor's body to run each time all inputs have a value to read
      */
     protected def DataFlowProcessor(final Map channels, final Closure code) {

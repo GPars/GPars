@@ -17,7 +17,7 @@
 package groovyx.gpars.agent
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
@@ -177,7 +177,7 @@ public class AgentTest extends GroovyTestCase {
     public void testExplicitReply() {
         final Agent counter = new Agent<Long>(0L)
 
-        def result = new DataFlowStream()
+        def result = new DataFlowQueue()
         Actors.actor {
             counter << {owner.send 'Explicit reply'; owner.send 10}
             react {a ->

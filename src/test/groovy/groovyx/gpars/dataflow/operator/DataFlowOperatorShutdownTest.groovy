@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.operator
 import static groovyx.gpars.dataflow.DataFlow.prioritySelector
@@ -31,11 +31,11 @@ import static groovyx.gpars.dataflow.DataFlow.splitter
 public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
     public void testSingleOperator() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-        final DataFlowStream d = new DataFlowStream()
-        final DataFlowStream e = new DataFlowStream()
+        final DataFlowQueue a = new DataFlowQueue()
+        final DataFlowQueue b = new DataFlowQueue()
+        final DataFlowQueue c = new DataFlowQueue()
+        final DataFlowQueue d = new DataFlowQueue()
+        final DataFlowQueue e = new DataFlowQueue()
 
         def op = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
             bindOutput 0, x + y + z
@@ -55,9 +55,9 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
     }
 
     public void testSplitter() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream d = new DataFlowStream()
-        final DataFlowStream e = new DataFlowStream()
+        final DataFlowQueue a = new DataFlowQueue()
+        final DataFlowQueue d = new DataFlowQueue()
+        final DataFlowQueue e = new DataFlowQueue()
 
         def op = splitter(a, [d, e])
 
@@ -85,13 +85,13 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
     }
 
     public void testOperatorNetwork() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-        final DataFlowStream d = new DataFlowStream()
-        final DataFlowStream e = new DataFlowStream()
-        final DataFlowStream f = new DataFlowStream()
-        final DataFlowStream out = new DataFlowStream()
+        final DataFlowQueue a = new DataFlowQueue()
+        final DataFlowQueue b = new DataFlowQueue()
+        final DataFlowQueue c = new DataFlowQueue()
+        final DataFlowQueue d = new DataFlowQueue()
+        final DataFlowQueue e = new DataFlowQueue()
+        final DataFlowQueue f = new DataFlowQueue()
+        final DataFlowQueue out = new DataFlowQueue()
 
         def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
 
@@ -109,13 +109,13 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
     }
 
     public void testSelectorNetwork() {
-        final DataFlowStream a = new DataFlowStream()
-        final DataFlowStream b = new DataFlowStream()
-        final DataFlowStream c = new DataFlowStream()
-        final DataFlowStream d = new DataFlowStream()
-        final DataFlowStream e = new DataFlowStream()
-        final DataFlowStream f = new DataFlowStream()
-        final DataFlowStream out = new DataFlowStream()
+        final DataFlowQueue a = new DataFlowQueue()
+        final DataFlowQueue b = new DataFlowQueue()
+        final DataFlowQueue c = new DataFlowQueue()
+        final DataFlowQueue d = new DataFlowQueue()
+        final DataFlowQueue e = new DataFlowQueue()
+        final DataFlowQueue f = new DataFlowQueue()
+        final DataFlowQueue out = new DataFlowQueue()
 
         def op1 = selector(inputs: [a, b, c], outputs: [d, e]) {value, index -> }
 

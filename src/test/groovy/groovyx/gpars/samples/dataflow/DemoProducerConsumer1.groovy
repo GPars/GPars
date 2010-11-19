@@ -16,14 +16,14 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
- * A simple producer consumer sample showing use of the DataFlowStream class. 
+ * A simple producer consumer sample showing use of the DataFlowQueue class.
  */
 def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']
-final def buffer = new DataFlowStream()
+final def buffer = new DataFlowQueue()
 
 task {
     for (word in words) {

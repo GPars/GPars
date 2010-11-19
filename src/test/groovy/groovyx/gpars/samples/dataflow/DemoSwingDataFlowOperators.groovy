@@ -18,7 +18,7 @@ package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
 import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import java.awt.Font
 import javax.swing.JFrame
 import javax.swing.JTextArea
@@ -50,9 +50,9 @@ JTextArea.metaClass {
     }
 }
 
-def urlRequests = new DataFlowStream()
-def downloadRequests = new DataFlowStream()
-def sites = new DataFlowStream()
+def urlRequests = new DataFlowQueue()
+def downloadRequests = new DataFlowQueue()
+def sites = new DataFlowQueue()
 
 /**
  * Downloads received urls passing downloaded content to the output

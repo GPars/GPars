@@ -8,7 +8,7 @@ have higher priority.
 h2. Selecting a value from multiple channels
 
 {code}
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.select
 import static groovyx.gpars.dataflow.DataFlow.task
@@ -22,7 +22,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
  */
 def a = new DataFlowVariable()
 def b = new DataFlowVariable()
-def c = new DataFlowStream()
+def c = new DataFlowQueue()
 
 task {
     sleep 3000
@@ -87,15 +87,15 @@ def teamLead = sel([true, true, false, false]).value        //Only 'leaders' and
 A typical use for guards is to make Selects flexible to adopt to the changes in the user state.
 
 {code}
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.select
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * Demonstrates the ability to enable/disable channels during a value selection on a select by providing boolean guards.
  */
-final DataFlowStream operations = new DataFlowStream()
-final DataFlowStream numbers = new DataFlowStream()
+final DataFlowQueue operations = new DataFlowQueue()
+final DataFlowQueue numbers = new DataFlowQueue()
 
 task {
     final def select = select(operations, numbers)
@@ -139,8 +139,8 @@ When certain channels should have precedence over others when selecting, the pri
  *
  */
 def critical = new DataFlowVariable()
-def ordinary = new DataFlowStream()
-def whoCares = new DataFlowStream()
+def ordinary = new DataFlowQueue()
+def whoCares = new DataFlowQueue()
 
 task {
     ordinary << 'All working fine'

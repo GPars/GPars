@@ -1,7 +1,7 @@
 h3. The Sieve of Eratosthenes implementation using dataflow tasks
 
 {code}
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
@@ -10,7 +10,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
 
 final int requestedPrimeNumberCount = 1000
 
-final DataFlowStream initialChannel = new DataFlowStream()
+final DataFlowQueue initialChannel = new DataFlowQueue()
 
 /**
  * Generating candidate numbers
@@ -28,7 +28,7 @@ task {
  * @return A new channel ending the whole chain
  */
 def filter(inChannel, int prime) {
-    def outChannel = new DataFlowStream()
+    def outChannel = new DataFlowQueue()
 
     task {
         while (true) {
@@ -55,7 +55,7 @@ requestedPrimeNumberCount.times {
 h3. The Sieve of Eratosthenes implementation using a combination of dataflow tasks and operators
 
 {code}
-       import groovyx.gpars.dataflow.DataFlowStream
+       import groovyx.gpars.dataflow.DataFlowQueue
        import static groovyx.gpars.dataflow.DataFlow.operator
        import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -65,7 +65,7 @@ h3. The Sieve of Eratosthenes implementation using a combination of dataflow tas
 
        final int requestedPrimeNumberCount = 100
 
-       final DataFlowStream initialChannel = new DataFlowStream()
+       final DataFlowQueue initialChannel = new DataFlowQueue()
 
        /**
         * Generating candidate numbers
@@ -83,7 +83,7 @@ h3. The Sieve of Eratosthenes implementation using a combination of dataflow tas
         * @return A new channel ending the whole chain
         */
        def filter(inChannel, int prime) {
-           def outChannel = new DataFlowStream()
+           def outChannel = new DataFlowQueue()
 
            operator([inputs: [inChannel], outputs: [outChannel]]) {
                if (it % prime != 0) {

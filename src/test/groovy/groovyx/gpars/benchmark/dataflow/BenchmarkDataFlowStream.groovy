@@ -17,14 +17,14 @@
 package groovyx.gpars.benchmark.dataflow
 
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 
 final def group1 = new DefaultPGroup(4)
 final def group2 = new DefaultPGroup(4)
-final def stream = new DataFlowStream()
+final def stream = new DataFlowQueue()
 
 //perform(group1, group2, 4, 4, 10, new Stream())
 

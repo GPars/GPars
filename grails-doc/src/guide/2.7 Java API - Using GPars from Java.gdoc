@@ -135,7 +135,7 @@ h3. Agents
 
 h3. Dataflow Concurrency
 
-Both _DataFlowVariables_ and _DataFlowStreams_ can be used from Java without any hiccups. Just avoid the handy overloaded operators
+Both _DataFlowVariables_ and _DataFlowQueues_ can be used from Java without any hiccups. Just avoid the handy overloaded operators
 and go straight to the methods, like _bind_ , _whenBound_, _getVal_ and other.
 You may also continue using dataflow _tasks_ passing to them instances of _Runnable_ or _Callable_ just like groovy _Closure_ .
 
@@ -187,7 +187,7 @@ The sample below should illustrate the main differences between Groovy and Java 
 
 import groovyx.gpars.DataFlowMessagingRunnable;
 import groovyx.gpars.dataflow.DataFlow;
-import groovyx.gpars.dataflow.DataFlowStream;
+import groovyx.gpars.dataflow.DataFlowQueue;
 import groovyx.gpars.dataflow.operator.DataFlowProcessor;
 
 import java.util.Arrays;
@@ -195,10 +195,10 @@ import java.util.List;
 
 public class DataflowOperatorDemo {
     public static void main(final String[] args) throws InterruptedException {
-        final DataFlowStream stream1 = new DataFlowStream();
-        final DataFlowStream stream2 = new DataFlowStream();
-        final DataFlowStream stream3 = new DataFlowStream();
-        final DataFlowStream stream4 = new DataFlowStream();
+        final DataFlowQueue stream1 = new DataFlowQueue();
+        final DataFlowQueue stream2 = new DataFlowQueue();
+        final DataFlowQueue stream3 = new DataFlowQueue();
+        final DataFlowQueue stream4 = new DataFlowQueue();
 
         final DataFlowProcessor op1 = DataFlow.selector(Arrays.asList(stream1), Arrays.asList(stream2), new DataFlowMessagingRunnable(1) {
             @Override protected void doRun(final Object[] objects) {

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors.stateful
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.actor.Actors.actor
 
 def getYearEndClosing(String symbol, int year) {
@@ -31,7 +31,7 @@ def symbols = ['AAPL', 'GOOG', 'IBM', 'MSFT']
 
 def start = System.nanoTime()
 
-final def quotes = new DataFlowStream()
+final def quotes = new DataFlowQueue()
 symbols.each {stock -> actor { quotes << getYearEndClosing(stock, 2008) } }
 def top = ["", 0.0]
 1.upto(symbols.size()) {

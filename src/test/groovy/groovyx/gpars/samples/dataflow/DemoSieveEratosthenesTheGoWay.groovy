@@ -18,7 +18,7 @@ package groovyx.gpars.samples.dataflow
 
 import static groovyx.gpars.dataflow.DataFlow.task as go
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 
 /**
  * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks mimicking closely the example
@@ -57,12 +57,12 @@ def filter(inChannel, outChannel, int prime) {
 // The prime sieve: Daisy-chain Filter processes.
 
 def main() {
-    final DataFlowStream ch = new DataFlowStream()
+    final DataFlowQueue ch = new DataFlowQueue()
     go generate(ch)
     for (i in (1..10)) {
         int prime = ch.val
         println prime
-        def ch1 = new DataFlowStream()
+        def ch1 = new DataFlowQueue()
         go filter(ch, ch1, prime)
         ch = ch1
     }

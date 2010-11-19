@@ -46,9 +46,9 @@ class AsyncSelectTest extends Specification {
 
     def "selecting from three df streams"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         final def result = new DataFlows()
         def select = DataFlow.select(a, b, c)
 
@@ -71,9 +71,9 @@ class AsyncSelectTest extends Specification {
 
     def "selecting from three df streams with a value being bound prior to selector creation"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         c << 20
         def result = new DataFlows()
 
@@ -90,9 +90,9 @@ class AsyncSelectTest extends Specification {
 
     def "selecting preserves order within a single stream"() {
         given:
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         def result = new DataFlows()
 
         def select = DataFlow.select(a, b, c)

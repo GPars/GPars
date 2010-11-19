@@ -28,7 +28,7 @@ In the example you see the "fakingDoubler" using both messages and a _DataFlowVa
 
 h3. Using plain java threads
 
-The _DataFlowVariable_ as well as the _DataFlowStream_ classes can obviously be used from any thread of your application, not only from the tasks created by _DataFlow.task()_ . Consider the following example:
+The _DataFlowVariable_ as well as the _DataFlowQueue_ classes can obviously be used from any thread of your application, not only from the tasks created by _DataFlow.task()_ . Consider the following example:
 {code}import groovyx.gpars.dataflow.DataFlowVariable
 
 final DataFlowVariable a = new DataFlowVariable<String>()

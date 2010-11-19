@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroup
 
@@ -32,8 +32,8 @@ def getYearEndClosing(String stock, int year) {
 }
 
 final PGroup group = new NonDaemonPGroup(1)
-final DataFlowStream stocksStream = new DataFlowStream()
-final DataFlowStream pricedStocks = new DataFlowStream()
+final DataFlowQueue stocksStream = new DataFlowQueue()
+final DataFlowQueue pricedStocks = new DataFlowQueue()
 
 ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT'].each {
     stocksStream << it

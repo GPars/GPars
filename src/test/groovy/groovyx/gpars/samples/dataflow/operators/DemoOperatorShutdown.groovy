@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.operators
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
@@ -24,13 +24,13 @@ import groovyx.gpars.group.NonDaemonPGroup
  * or by sending a poisson message. This demo shows the first approach. 
  */
 
-final DataFlowStream a = new DataFlowStream()
-final DataFlowStream b = new DataFlowStream()
-final DataFlowStream c = new DataFlowStream()
-final DataFlowStream d = new DataFlowStream()
-final DataFlowStream e = new DataFlowStream()
-final DataFlowStream f = new DataFlowStream()
-final DataFlowStream out = new DataFlowStream()
+final DataFlowQueue a = new DataFlowQueue()
+final DataFlowQueue b = new DataFlowQueue()
+final DataFlowQueue c = new DataFlowQueue()
+final DataFlowQueue d = new DataFlowQueue()
+final DataFlowQueue e = new DataFlowQueue()
+final DataFlowQueue f = new DataFlowQueue()
+final DataFlowQueue out = new DataFlowQueue()
 
 final def group = new NonDaemonPGroup()
 

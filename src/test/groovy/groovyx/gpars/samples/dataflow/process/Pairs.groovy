@@ -18,7 +18,7 @@ package groovyx.gpars.samples.dataflow.process
 
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import java.util.concurrent.Callable
 
 final class Pairs implements Callable {
@@ -31,9 +31,9 @@ final class Pairs implements Callable {
     }
 
     public def call() {
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream();
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue();
 
         def group = DataFlow.retrieveCurrentDFPGroup()
         [

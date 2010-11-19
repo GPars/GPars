@@ -68,7 +68,7 @@ Please refer to the Dataflow Concurrency section of the User Guide for details o
 
 {code}
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.task
 
 def alternative1 = {
@@ -88,7 +88,7 @@ def alternative4 = {
 }
 
 //Pick either one of the following, both will work:
-final def result = new DataFlowStream()
+final def result = new DataFlowQueue()
 //  final def result = new DataFlowVariable()
 
 [alternative1, alternative2, alternative3, alternative4].each {code ->

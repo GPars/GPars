@@ -17,23 +17,23 @@
 package groovyx.gpars.samples.dataflow.process
 
 import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 group = new DefaultPGroup()
 
 def numbers(DataFlowChannel out) {
     group.task {
-        def a = new DataFlowStream()
-        def b = new DataFlowStream()
-        def c = new DataFlowStream()
+        def a = new DataFlowQueue()
+        def b = new DataFlowQueue()
+        def c = new DataFlowQueue()
         group.task new Prefix(c, a, 0)
         group.task new Copy(a, b, out)
         group.task new Successor(b, c)
     }
 }
 
-final DataFlowStream ch = new DataFlowStream()
+final DataFlowQueue ch = new DataFlowQueue()
 group.task new Print('Numbers', ch)
 numbers(ch)
 

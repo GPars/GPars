@@ -16,15 +16,15 @@
 
 package groovyx.gpars.samples.dataflow.select
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.selector
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
  * Demonstrates the ability to enable/disable channels during a value selection on a select by providing boolean guards.
  */
-final DataFlowStream operations = new DataFlowStream()
-final DataFlowStream numbers = new DataFlowStream()
+final DataFlowQueue operations = new DataFlowQueue()
+final DataFlowQueue numbers = new DataFlowQueue()
 
 def instruction
 def nums = []

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.operators
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.operator
 import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -32,13 +32,13 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * Date 22nd Sep 2010
  */
 
-final DataFlowStream urlsRequests = new DataFlowStream()
-final DataFlowStream urls = new DataFlowStream()
-final DataFlowStream pagesForGroovy = new DataFlowStream()
-final DataFlowStream pagesForScala = new DataFlowStream()
-final DataFlowStream resultsFromGroovy = new DataFlowStream()
-final DataFlowStream resultsFromScala = new DataFlowStream()
-final DataFlowStream reports = new DataFlowStream()
+final DataFlowQueue urlsRequests = new DataFlowQueue()
+final DataFlowQueue urls = new DataFlowQueue()
+final DataFlowQueue pagesForGroovy = new DataFlowQueue()
+final DataFlowQueue pagesForScala = new DataFlowQueue()
+final DataFlowQueue resultsFromGroovy = new DataFlowQueue()
+final DataFlowQueue resultsFromScala = new DataFlowQueue()
+final DataFlowQueue reports = new DataFlowQueue()
 
 def urlResolver = operator(urlsRequests, urls) {
     bindOutput([url: "http://www.${it}.com"])

@@ -21,7 +21,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
 
 /**
- * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataFlowVariable and DataFlowStream,
+ * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataFlowVariable and DataFlowQueue,
  * as well as 'sendAndContinue()' on actors.
  * A task that waits asynchronously on the DFV to be bound. Once the DFV is bound,
  * upon receiving the message the actor runs the supplied closure / code with the DFV value as a parameter.

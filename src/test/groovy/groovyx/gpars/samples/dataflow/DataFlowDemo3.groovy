@@ -16,14 +16,14 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
- * A producer consumer sample, where the producer generates numbers into the DataFlowStream and the consumer
- * takes a snapshot of the DataFlowStream using the collect() method to calculate summary of the numbers in the stream.
+ * A producer consumer sample, where the producer generates numbers into the DataFlowQueue and the consumer
+ * takes a snapshot of the DataFlowQueue using the collect() method to calculate summary of the numbers in the stream.
  */
-void ints(int n, int max, DataFlowStream<Integer> stream) {
+void ints(int n, int max, DataFlowQueue<Integer> stream) {
     if (n != max) {
         println "Generating int: $n"
         stream << n
@@ -31,7 +31,7 @@ void ints(int n, int max, DataFlowStream<Integer> stream) {
     }
 }
 
-final def producer = new DataFlowStream<Integer>()
+final def producer = new DataFlowQueue<Integer>()
 
 task {
     ints(0, 1000, producer)

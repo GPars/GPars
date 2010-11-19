@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.group.DefaultPGroup
@@ -81,7 +81,7 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowContinuationsOnStreams() {
-        final DataFlowStream stream = new DataFlowStream()
+        final DataFlowQueue stream = new DataFlowQueue()
         final DataFlows results = new DataFlows()
         DataFlow.task {
             results.group1 = DataFlow.activeParallelGroup.get()
@@ -95,7 +95,7 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowContinuationsWithCustomGroupOnStreams() {
-        final DataFlowStream stream = new DataFlowStream()
+        final DataFlowQueue stream = new DataFlowQueue()
         final DataFlows results = new DataFlows()
 
         group.task {
@@ -110,7 +110,7 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowWhenBoundOnStreams() {
-        final DataFlowStream stream = new DataFlowStream()
+        final DataFlowQueue stream = new DataFlowQueue()
         final DataFlows results = new DataFlows()
         DataFlow.task {
             results.group1 = DataFlow.activeParallelGroup.get()
@@ -124,7 +124,7 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowWhenBoundWithCustomGroupOnStreams() {
-        final DataFlowStream stream = new DataFlowStream()
+        final DataFlowQueue stream = new DataFlowQueue()
         final DataFlows results = new DataFlows()
 
         group.task {

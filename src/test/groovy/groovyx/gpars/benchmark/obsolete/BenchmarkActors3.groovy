@@ -24,7 +24,7 @@ def execute(int actorCount) {
     final long sliceSize = n / actorCount
     final long startTimeNanos = System.nanoTime()
     final List computors = []
-//    final DataFlowStream stream = new DataFlowStream()
+//    final DataFlowQueue stream = new DataFlowQueue()
     final ArrayBlockingQueue queue = new ArrayBlockingQueue(actorCount)
     final accumulator = new Thread({
         double sum = 0.0d

@@ -40,7 +40,7 @@ h3. Dataflow
 * Methods for atomic update to multiple operator's output channels
 * Fixed issues with reusing the same parallel group in the DataFlowVariable whenBound() handlers
 * Tasks can return values and can be joined
-* DataFlowStream's _whenBound_ renamed to _wheneverBound_ and _whenNextBound_ renamed to _whenBound_ to obey the _DataFlowChannel_ interface contract
+* DataFlowQueue's _whenBound_ renamed to _wheneverBound_ and _whenNextBound_ renamed to _whenBound_ to obey the _DataFlowChannel_ interface contract
 
 h3. Agent
 

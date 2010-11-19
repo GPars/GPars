@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 /**
@@ -32,7 +32,7 @@ group = new DefaultPGroup()
 
 final int requestedPrimeNumberCount = 1000
 
-final DataFlowStream initialChannel = new DataFlowStream()
+final DataFlowQueue initialChannel = new DataFlowQueue()
 
 /**
  * Generating candidate numbers
@@ -50,7 +50,7 @@ group.task {
  * @return A new channel ending the whole chain
  */
 def filter(inChannel, int prime) {
-    def outChannel = new DataFlowStream()
+    def outChannel = new DataFlowQueue()
 
     group.operator([inputs: [inChannel], outputs: [outChannel]]) {
         if (it % prime != 0) {

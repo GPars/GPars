@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.operators
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.operator
 import static groovyx.gpars.dataflow.DataFlow.prioritySelector
 import static groovyx.gpars.dataflow.DataFlow.splitter
@@ -33,20 +33,20 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * Date 23rd Sep 2010
  */
 
-final DataFlowStream urlsRequests = new DataFlowStream()
-final DataFlowStream urls = new DataFlowStream()
-final DataFlowStream urlsForSpeculation = new DataFlowStream()
-final DataFlowStream pages = new DataFlowStream()
-final DataFlowStream downloadedPages = new DataFlowStream()
-final DataFlowStream speculativePages = new DataFlowStream()
-final DataFlowStream pagesForGroovy = new DataFlowStream()
-final DataFlowStream pagesForScala = new DataFlowStream()
-final DataFlowStream resultsFromGroovy = new DataFlowStream()
-final DataFlowStream resultsFromScala = new DataFlowStream()
-final DataFlowStream unconfirmedReports = new DataFlowStream()
-final DataFlowStream approvals = new DataFlowStream()
-final DataFlowStream reports = new DataFlowStream()
-final DataFlowStream contentForCache = new DataFlowStream()
+final DataFlowQueue urlsRequests = new DataFlowQueue()
+final DataFlowQueue urls = new DataFlowQueue()
+final DataFlowQueue urlsForSpeculation = new DataFlowQueue()
+final DataFlowQueue pages = new DataFlowQueue()
+final DataFlowQueue downloadedPages = new DataFlowQueue()
+final DataFlowQueue speculativePages = new DataFlowQueue()
+final DataFlowQueue pagesForGroovy = new DataFlowQueue()
+final DataFlowQueue pagesForScala = new DataFlowQueue()
+final DataFlowQueue resultsFromGroovy = new DataFlowQueue()
+final DataFlowQueue resultsFromScala = new DataFlowQueue()
+final DataFlowQueue unconfirmedReports = new DataFlowQueue()
+final DataFlowQueue approvals = new DataFlowQueue()
+final DataFlowQueue reports = new DataFlowQueue()
+final DataFlowQueue contentForCache = new DataFlowQueue()
 
 def long counter = 0L
 def urlResolver = operator(inputs: [urlsRequests], outputs: [urls, urlsForSpeculation]) {

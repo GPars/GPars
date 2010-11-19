@@ -16,16 +16,16 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
- * A producer-consumer demo using the DataFlowStream class. Producer downloads web content from a list of urls,
+ * A producer-consumer demo using the DataFlowQueue class. Producer downloads web content from a list of urls,
  * the consumer then counts number of sites referring Groovy. 
  */
 
-def buffer = new DataFlowStream()
+def buffer = new DataFlowQueue()
 
 final def urls = [
         'http://www.dzone.com',

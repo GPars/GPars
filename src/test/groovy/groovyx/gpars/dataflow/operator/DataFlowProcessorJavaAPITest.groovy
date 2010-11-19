@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.DataFlowMessagingRunnable
 import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
@@ -43,7 +43,7 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     public void testOperator() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowStream c = new DataFlowStream()
+        final DataFlowQueue c = new DataFlowQueue()
 
         def op = group.operator(inputs: [a, b], outputs: [c], new TestRunnable1())
 
@@ -58,7 +58,7 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     public void testSelector() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowStream c = new DataFlowStream()
+        final DataFlowQueue c = new DataFlowQueue()
 
         def op = group.selector(inputs: [a, b], outputs: [c], new TestRunnable2())
 
@@ -73,7 +73,7 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     public void testSelectorWithIndex() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowStream c = new DataFlowStream()
+        final DataFlowQueue c = new DataFlowQueue()
 
         def op = group.selector(inputs: [a, b], outputs: [c], new TestRunnable2WithIndex())
 
@@ -88,7 +88,7 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     public void testPrioritySelector() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowStream c = new DataFlowStream()
+        final DataFlowQueue c = new DataFlowQueue()
 
         def op = group.prioritySelector(inputs: [a, b], outputs: [c], new TestRunnable2())
 
@@ -103,7 +103,7 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     public void testPrioritySelectorWithIndex() {
         final DataFlowVariable a = new DataFlowVariable()
         final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowStream c = new DataFlowStream()
+        final DataFlowQueue c = new DataFlowQueue()
 
         def op = group.prioritySelector(inputs: [a, b], outputs: [c], new TestRunnable2WithIndex())
 

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 
 /**
@@ -132,7 +132,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testLoopingWithAct() {
-        final def result = new DataFlowStream()
+        final def result = new DataFlowQueue()
         final def actor
         actor = [act: {
             actor.loop {
@@ -154,7 +154,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testLoopingWithClosure() {
-        final def result = new DataFlowStream()
+        final def result = new DataFlowQueue()
         final def actor = new DefaultActor({
             loop {
                 react {

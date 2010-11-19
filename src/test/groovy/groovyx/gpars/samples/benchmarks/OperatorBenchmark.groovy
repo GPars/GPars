@@ -16,12 +16,12 @@
 
 package groovyx.gpars.samples.benchmarks
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import static groovyx.gpars.dataflow.DataFlow.operator
 
-final DataFlowStream a = new DataFlowStream()
-final DataFlowStream b = new DataFlowStream()
-final DataFlowStream c = new DataFlowStream()
+final DataFlowQueue a = new DataFlowQueue()
+final DataFlowQueue b = new DataFlowQueue()
+final DataFlowQueue c = new DataFlowQueue()
 
 def operator = operator([inputs: [a, b], outputs: [c]]) {x, y ->
     bindOutput(x + y)

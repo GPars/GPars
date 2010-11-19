@@ -41,7 +41,7 @@ public final class DataFlowPrioritySelector extends DataFlowSelector {
      * Creates a priority selector
      * After creation the selector needs to be started using the start() method.
      * @param group A parallel group to use threads from in the internal actor
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowStream or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
      * @param code The selector's body to run each time all inputs have a value to read
      */
     protected def DataFlowPrioritySelector(final PGroup group, final Map channels, final Closure code) {

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.select
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.select
 import static groovyx.gpars.dataflow.DataFlow.task
@@ -30,7 +30,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
  */
 def a = new DataFlowVariable()
 def b = new DataFlowVariable()
-def c = new DataFlowStream()
+def c = new DataFlowQueue()
 
 task {
     sleep 3000

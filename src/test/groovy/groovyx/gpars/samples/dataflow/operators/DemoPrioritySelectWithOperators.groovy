@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.operators
 
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import static groovyx.gpars.dataflow.DataFlow.operator
 import static groovyx.gpars.dataflow.DataFlow.prioritySelector
@@ -34,8 +34,8 @@ import static groovyx.gpars.dataflow.DataFlow.task
  */
 
 def critical = new DataFlowVariable()
-def ordinary = new DataFlowStream()
-def whoCares = new DataFlowStream()
+def ordinary = new DataFlowQueue()
+def whoCares = new DataFlowQueue()
 
 task {
     ordinary << 'All working fine'
@@ -57,9 +57,9 @@ task {
     whoCares << 'The sound has disappeared'
 }
 
-def selected = new DataFlowStream()
+def selected = new DataFlowQueue()
 def selector = prioritySelector(inputs: [critical, ordinary, whoCares], outputs: [selected])
-def results = new DataFlowStream()
+def results = new DataFlowQueue()
 def op = operator(selected, results, {bindOutput it})
 
 println 'Starting to monitor our IT department'

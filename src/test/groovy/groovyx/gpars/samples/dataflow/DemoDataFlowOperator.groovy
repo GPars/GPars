@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowStream
+import groovyx.gpars.dataflow.DataFlowQueue
 
 /**
  * Uses dataflow operators to download websites, cache their contents and check, whether they talk about particular technologies.
@@ -29,17 +29,17 @@ import groovyx.gpars.dataflow.DataFlowStream
 /**
  * Feed for URLs to retrieve from the cache
  */
-def urlRequests = new DataFlowStream()
+def urlRequests = new DataFlowQueue()
 
 /**
  * Feed for URLs to download since they are not cached
  */
-def downloadRequests = new DataFlowStream()
+def downloadRequests = new DataFlowQueue()
 
 /**
  * Feed for site contents
  */
-def sites = new DataFlowStream()
+def sites = new DataFlowQueue()
 
 /**
  * DOWNLOADER
@@ -100,7 +100,7 @@ def cache = DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests,
 /**
  * Feed for the results
  */
-def results = new DataFlowStream()
+def results = new DataFlowQueue()
 
 /**
  * FINDER
