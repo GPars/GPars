@@ -18,14 +18,13 @@ package org.codehaus.gpars.javademo;
 
 import groovyx.gpars.DataFlowMessagingRunnable;
 import groovyx.gpars.dataflow.DataFlow;
-import groovyx.gpars.dataflow.DataFlowStream;
+import groovyx.gpars.dataflow.DataFlowQueue;
 import groovyx.gpars.dataflow.operator.DataFlowProcessor;
 import org.junit.Test;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -38,14 +37,14 @@ public class DataflowOperatorTest {
     @Test
     public void testFlow() throws Exception {
         // Simply said, stream is a queue of values, either input or output queue
-        final DataFlowStream stream1 = new DataFlowStream();
-        final DataFlowStream stream2 = new DataFlowStream();
-        final DataFlowStream stream3 = new DataFlowStream();
-        final DataFlowStream stream4 = new DataFlowStream();
+        final DataFlowQueue stream1 = new DataFlowQueue();
+        final DataFlowQueue stream2 = new DataFlowQueue();
+        final DataFlowQueue stream3 = new DataFlowQueue();
+        final DataFlowQueue stream4 = new DataFlowQueue();
 
         // processor1 waits for value in stream 1 and writes 2*value to stream2
-        List<DataFlowStream> calculationInputList = asList(stream1);
-        List<DataFlowStream> calculationOutputList = asList(stream2);
+        List<DataFlowQueue> calculationInputList = asList(stream1);
+        List<DataFlowQueue> calculationOutputList = asList(stream2);
         final DataFlowProcessor processor1 = DataFlow.operator(calculationInputList, calculationOutputList, new DataFlowMessagingRunnable(1) {
             @Override
             protected void doRun(final Object[] objects) {
@@ -103,7 +102,7 @@ public class DataflowOperatorTest {
      * @param stream
      * @throws InterruptedException
      */
-    private void waitForValue(DataFlowStream<?> stream) throws InterruptedException {
+    private void waitForValue(DataFlowQueue<?> stream) throws InterruptedException {
         while (!stream.isBound()) {
             Thread.sleep(100);
         }
