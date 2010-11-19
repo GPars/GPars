@@ -24,11 +24,12 @@ import java.util.concurrent.TimeUnit
 
 public class SyncTest extends GroovyTestCase {
     void testDistSync() {
+        final def result = new DataFlowVariable()
         def node1 = new LocalNode(new NettyTransportProvider(), {
             addDiscoveryListener {node, op ->
                 if (op == "connected") {
                     def something = node.mainActor.sendAndWait("give me something")
-                    assertEquals "here is something", something
+                    result << something
                     node.mainActor.stop()
                     node.mainActor.join()
                     stop()
@@ -53,6 +54,7 @@ public class SyncTest extends GroovyTestCase {
         node1.mainActor.join(5, TimeUnit.SECONDS)
         node1.localHost.disconnect()
         node2.localHost.disconnect()
+        assertEquals "here is something", result.val
     }
 
     void testSendAndContinue() {
