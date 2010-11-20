@@ -25,6 +25,7 @@ import org.codehaus.groovy.runtime.NullObject
  * @author Vaclav Pech
  */
 public final class DDAClosure extends Closure {
+    private static final long serialVersionUID = 7644465423857532479L;
 
     private final def dda
 
