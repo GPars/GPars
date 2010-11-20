@@ -55,3 +55,4 @@ h3. Other
 h3. Renaming hints
 
 * The _AbstractPooledActor_ class is now deprecated, use _DefaultActor_ instead
+* The _DataFlowStream_ class has been renamed to _DataFlowQueue_
