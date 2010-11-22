@@ -11,7 +11,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.gpars:gpars:0.11-beta-1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.gpars:gpars:0.11-beta-1" level="project" />
     <orderEntry type="library" name="Maven: org.coconut.forkjoin:jsr166y:070108" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:1.6.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.ant:ant:1.7.1" level="project" />

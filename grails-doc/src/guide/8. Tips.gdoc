@@ -27,5 +27,5 @@ Or you may create your own implementation of the _groovyx.gpars.scheduler.Pool_ 
 h3. Java API
 
 Most of GPars functionality can be used from Java just as well as from Groovy. Checkout the _2.6 Java API - Using GPars from Java_ section of the User Guide
-and experiment with the maven-based stand-alone Java "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-DEF-322/artifact/GPars-samples/gpars-samples-0.11-beta-1-SNAPSHOT.zip .
+and experiment with the maven-based stand-alone Java "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-REL-5/artifact/GPars-Java-API-integration-demo-project/gpars-mvn-java-demo-0.11-beta-1.zip .
 Take GPars with you wherever you go!

@@ -241,4 +241,4 @@ may benefit from a rewrite into Java.
 h3. Prerequisites
 
 All the GPars integration rules apply to Java projects just like they do to Groovy projects. You only need to include the groovy distribution jar file in your project and all is clear to march ahead.
-You may also want to check out the sample Java Maven project to get tips on how to integrate GPars into a maven-based pure Java application - "Sample Java Maven Project":http://bamboo.ci.codehaus.org/browse/GPARS-DEF-322/artifact/GPars-samples/gpars-samples-0.11-beta-1-SNAPSHOT.zip
+You may also want to check out the sample Java Maven project to get tips on how to integrate GPars into a maven-based pure Java application - "Sample Java Maven Project":http://bamboo.ci.codehaus.org/browse/GPARS-REL-5/artifact/GPars-Java-API-integration-demo-project/gpars-mvn-java-demo-0.11-beta-1.zip
