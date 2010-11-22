@@ -40,6 +40,7 @@ import java.util.concurrent.CountDownLatch;
  * @author Vaclav Pech
  *         Date: 30th Sep 2010
  */
+@SuppressWarnings({"MethodNamesDifferingOnlyByCase"})
 public class Select<T> {
 
     private final SelectBase<T> selectBase;

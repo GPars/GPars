@@ -65,7 +65,8 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     /**
      * Construct handle for object with given id to it
      *
-     * @param value
+     * @param value The value to associate with the id
+     * @param id    The id, if null a new id will be generated
      */
     private SerialHandle(final WithSerialId value, final UUID id) {
         super(bundle, value);
@@ -106,56 +107,54 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
     /**
      * Subscribes host as interested in the object
      *
-     * @param context
+     * @param context The subscription context to use
      */
-    public void subscribe(final SerialContext context) {
-        synchronized (this) {
-            if (subscribers == null) {
-                subscribers = context;
-            } else {
-                if (subscribers instanceof SerialContext) {
-                    if (subscribers != context) {
-                        final Collection<SerialContext> list = new ArrayList<SerialContext>(2);
-                        list.add((SerialContext) subscribers);
-                        list.add(context);
-                        subscribers = list;
-                    }
-                } else {
-                    @SuppressWarnings({"unchecked"})
-                    final Collection<SerialContext> list = (Collection<SerialContext>) subscribers;
-                    for (final SerialContext remoteHost : list) {
-                        if (remoteHost == context) {
-                            return;
-                        }
-                    }
+    @SuppressWarnings({"SynchronizedMethod"})
+    public synchronized void subscribe(final SerialContext context) {
+        if (subscribers == null) {
+            subscribers = context;
+        } else {
+            if (subscribers instanceof SerialContext) {
+                if (subscribers != context) {
+                    final Collection<SerialContext> list = new ArrayList<SerialContext>(2);
+                    list.add((SerialContext) subscribers);
                     list.add(context);
+                    subscribers = list;
                 }
+            } else {
+                @SuppressWarnings({"unchecked"})
+                final Collection<SerialContext> list = (Collection<SerialContext>) subscribers;
+                for (final SerialContext remoteHost : list) {
+                    if (remoteHost == context) {
+                        return;
+                    }
+                }
+                list.add(context);
             }
-
-            anchor = get();
         }
+
+        anchor = get();
     }
 
-    public void unsubscribe(final SerialContext context) {
-        synchronized (this) {
-            if (subscribers != null) {
-                if (subscribers instanceof SerialContext) {
-                    if (subscribers == context) {
-                        subscribers = null;
-                    }
-                } else {
-                    @SuppressWarnings({"unchecked"})
-                    final List<SerialContext> list = (List<SerialContext>) subscribers;
-                    list.remove(context);
-                    if (list.size() == 1) {
-                        subscribers = list.get(0);
-                    }
+    @SuppressWarnings({"SynchronizedMethod"})
+    public synchronized void unsubscribe(final SerialContext context) {
+        if (subscribers != null) {
+            if (subscribers instanceof SerialContext) {
+                if (subscribers == context) {
+                    subscribers = null;
+                }
+            } else {
+                @SuppressWarnings({"unchecked"})
+                final List<SerialContext> list = (List<SerialContext>) subscribers;
+                list.remove(context);
+                if (list.size() == 1) {
+                    subscribers = list.get(0);
                 }
             }
+        }
 
-            if (subscribers == null) {
-                anchor = null;
-            }
+        if (subscribers == null) {
+            anchor = null;
         }
     }
 
