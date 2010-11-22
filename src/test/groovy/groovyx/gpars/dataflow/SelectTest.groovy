@@ -182,7 +182,7 @@ class SelectTest extends Specification {
         res4 in possibleResults - [res1, res2, res3]
     }
 
-    def "select with quards"() {
+    def "select with guards"() {
         given:
         def a = new DataFlowQueue()
         def b = new DataFlowQueue()
@@ -218,7 +218,7 @@ class SelectTest extends Specification {
         select.prioritySelect() == [2, 20] as SelectResult
     }
 
-    def "priority select with quards"() {
+    def "priority select with guards"() {
         given:
         def a = new DataFlowQueue()
         def b = new DataFlowQueue()
@@ -267,7 +267,7 @@ class SelectTest extends Specification {
         DataFlow.activeParallelGroup.remove()
     }
 
-    def "select uses corrent parallel group"() {
+    def "select uses current parallel group"() {
         given:
         def a = new DataFlowQueue()
         def b = new DataFlowQueue()
