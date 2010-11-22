@@ -44,8 +44,8 @@ public class DataflowOperatorTest {
         final DataFlowQueue stream4 = new DataFlowQueue();
 
         // processor1 waits for value in stream 1 and writes 2*value to stream2
-        List<DataFlowQueue> calculationInputList = asList(stream1);
-        List<DataFlowQueue> calculationOutputList = asList(stream2);
+        final List<DataFlowQueue> calculationInputList = asList(stream1);
+        final List<DataFlowQueue> calculationOutputList = asList(stream2);
         final DataFlowProcessor processor1 = DataFlow.operator(calculationInputList, calculationOutputList, new DataFlowMessagingRunnable(1) {
             @Override
             protected void doRun(final Object[] objects) {
@@ -103,7 +103,7 @@ public class DataflowOperatorTest {
      * @param stream
      * @throws InterruptedException
      */
-    private void waitForValue(DataFlowQueue<?> stream) throws InterruptedException {
+    private void waitForValue(final DataFlowQueue<?> stream) throws InterruptedException {
         while (!stream.isBound()) {
             Thread.sleep(100);
         }
