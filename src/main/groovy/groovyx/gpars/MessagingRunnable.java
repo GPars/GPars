@@ -73,7 +73,4 @@ public abstract class MessagingRunnable<T> extends Closure {
      * @param argument The parameter passed from the caller to the closure
      */
     protected abstract void doRun(final T argument);
-
-    //todo test, document, generify
-    //todo df - parametrize with number of params
 }

@@ -171,7 +171,7 @@ class StreamTest extends GroovyTestCase {
         assert stream.reduce(5) {value, element -> value + element} == 5
     }
 
-    void testReduceNonEmtyStream() {
+    void testReduceNonEmptyStream() {
         task {
             stream << 1 << 2 << 3 << Stream.eos()
         }

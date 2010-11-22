@@ -83,7 +83,7 @@ public class DataflowOperatorTest {
         waitForValue(stream4);
         assertTrue("Stream4 should be bound as values has been passed to its input streams", stream4.isBound());
 
-        //fatch values
+        //fetch values
         assertEquals(102, stream4.getVal());
         assertEquals(104, stream4.getVal());
         assertEquals(106, stream4.getVal());

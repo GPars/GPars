@@ -254,7 +254,7 @@ abstract class AgentBase<T> extends AgentCore {
     private Closure checkClosure(final Closure code) {
         final int maximumNumberOfParameters = code.getMaximumNumberOfParameters();
         if (maximumNumberOfParameters < 2 || maximumNumberOfParameters > 3)
-            throw new IllegalArgumentException("Agent listeners and validators can only take two argments plus optionally the current agent instance as the first argument.");
+            throw new IllegalArgumentException("Agent listeners and validators can only take two arguments plus optionally the current agent instance as the first argument.");
         if (maximumNumberOfParameters == 3) return code.curry(new Object[]{this});
         else return code;
     }

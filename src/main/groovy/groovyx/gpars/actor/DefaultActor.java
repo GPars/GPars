@@ -63,7 +63,7 @@ public class DefaultActor extends AbstractLoopingActor {
     /**
      * Creates an actor, which will execute the supplied code
      *
-     * @param code A Runnable or Closure to be considerred the actor's body
+     * @param code A Runnable or Closure to be considered the actor's body
      */
     public DefaultActor(final Runnable code) {
         if (code != null) {
