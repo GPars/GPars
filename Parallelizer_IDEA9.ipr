@@ -5122,11 +5122,13 @@
       <words>
         <w>abcde</w>
         <w>anàlisi</w>
+        <w>appname</w>
         <w>arial</w>
         <w>assignability</w>
         <w>attrs</w>
         <w>barish</w>
         <w>barriered</w>
+        <w>basename</w>
         <w>budweisser</w>
         <w>canoo</w>
         <w>cest</w>
@@ -5154,6 +5156,7 @@
         <w>javax</w>
         <w>jboss</w>
         <w>jcsp</w>
+        <w>jiri</w>
         <w>jiří</w>
         <w>junit</w>
         <w>kerridge</w>
@@ -5173,6 +5176,7 @@
         <w>rawtypes</w>
         <w>regex</w>
         <w>restarter</w>
+        <w>sourcepath</w>
         <w>spockframework</w>
         <w>spooler</w>
         <w>spoolers</w>
