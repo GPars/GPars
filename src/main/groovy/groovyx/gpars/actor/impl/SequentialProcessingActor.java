@@ -956,7 +956,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
          *
          * @return True, if the next continuation can start.
          */
-        @SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
         public boolean isReady() {
             return isReady.get();
         }

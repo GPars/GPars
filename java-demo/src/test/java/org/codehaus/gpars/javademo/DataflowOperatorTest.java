@@ -100,12 +100,12 @@ public class DataflowOperatorTest {
     /**
      * Waits for value to appear in stream.
      *
-     * @param stream
-     * @throws InterruptedException
+     * @param stream The stream to try to read from
+     * @throws InterruptedException If the thread gets interrupted while sleeping
      */
-    private void waitForValue(final DataFlowQueue<?> stream) throws InterruptedException {
+    private static void waitForValue(final DataFlowQueue<?> stream) throws InterruptedException {
         while (!stream.isBound()) {
-            Thread.sleep(100);
+            Thread.sleep(100L);
         }
     }
 }

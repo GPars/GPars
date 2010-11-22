@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  *         Date: Jun 5, 2009
  */
-@SuppressWarnings({"LawOfDemeter", "MethodReturnOfConcreteClass", "AnonymousInnerClass", "AnonymousInnerClassWithTooManyMethods"})
+@SuppressWarnings({"ClassWithTooManyMethods"})
 public final class DataFlowQueue<T> implements DataFlowChannel<T> {
 
     /**
@@ -102,7 +102,6 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      * Adds a DataFlowVariable representing the passed in value to the buffer.
      *
      * @param value The value to bind to the head of the stream
-     * @return This operator instance
      */
     @Override
     public void bind(final T value) {
@@ -180,10 +179,9 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      * Retrieves the value at the head of the buffer. Returns null, if no value is available.
      *
      * @return The value bound to the DFV at the head of the stream or null
-     * @throws InterruptedException If the current thread is interrupted
      */
     @Override
-    public DataFlowExpression<T> poll() throws InterruptedException {
+    public DataFlowExpression<T> poll() {
         synchronized (queueLock) {
             final DataFlowVariable<T> df = queue.peek();
             if (df != null && df.isBound()) {
