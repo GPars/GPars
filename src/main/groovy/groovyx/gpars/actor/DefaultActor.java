@@ -114,7 +114,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code The closure to invoke repeatedly
      */
     public final void loop(final Runnable code) {
-        loop((Callable<Boolean>) null, null, code);
+        doLoop((Callable<Boolean>) null, null, code);
     }
 
     /**
@@ -137,7 +137,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code          The closure to invoke repeatedly
      */
     protected final void loop(final int numberOfLoops, final Closure afterLoopCode, final Runnable code) {
-        loop(new Callable<Boolean>() {
+        doLoop(new Callable<Boolean>() {
             private int counter = 0;
 
             @Override
@@ -170,7 +170,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code          The closure to invoke repeatedly
      */
     protected final void loop(final Closure condition, final Closure afterLoopCode, final Runnable code) {
-        loop(new Callable<Boolean>() {
+        doLoop(new Callable<Boolean>() {
             @Override
             public Boolean call() {
                 return (Boolean) condition.call();
@@ -188,7 +188,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code          The closure to invoke repeatedly
      */
     @SuppressWarnings({"OverlyComplexBooleanExpression"})
-    private void loop(final Callable<Boolean> condition, final Closure afterLoopCode, final Runnable code) {
+    private void doLoop(final Callable<Boolean> condition, final Closure afterLoopCode, final Runnable code) {
         checkForNull(code);
 
         if (afterLoopCode != null) {
