@@ -26,7 +26,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
 final DataFlowQueue operations = new DataFlowQueue()
 final DataFlowQueue numbers = new DataFlowQueue()
 
-task {
+def t = task {
     final def select = select(operations, numbers)
     3.times {
         def instruction = select([true, false]).value
@@ -51,3 +51,5 @@ task {
     numbers << 50
     numbers << 60
 }
+
+t.join()

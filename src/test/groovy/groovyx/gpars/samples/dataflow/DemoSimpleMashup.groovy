@@ -53,5 +53,4 @@ task {
                     it.val.toUpperCase().contains 'GROOVY'
                 }).size()
     }
-    System.exit 0
-}
+}.join()

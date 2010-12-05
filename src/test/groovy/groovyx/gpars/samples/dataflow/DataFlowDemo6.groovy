@@ -39,4 +39,4 @@ task {
 
 task {
     y << 5
-}
+}.join()

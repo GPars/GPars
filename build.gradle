@@ -277,6 +277,8 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoSieveEratosthenesTheGoWay',              //Never stops
             'DemoSieveEratosthenesTheGoWayWithOperators', //Never stops
             'DemoThreading',                              //Never stops
+            'DemoProducerConsumer1',                      //Never stops
+            'DemoPhysicalCalculations',                   //Needs user input
             'DemoFibonacci1',                             //Needs classes from its source folder
             'DemoFibonacci2',                             //Needs classes from its source folder
             'DemoNumbers',                                //Needs classes from its source folder

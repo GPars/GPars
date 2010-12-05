@@ -43,4 +43,4 @@ final Actor thread = start {
 
 thread << 10
 thread.join()
-System.exit 0
+

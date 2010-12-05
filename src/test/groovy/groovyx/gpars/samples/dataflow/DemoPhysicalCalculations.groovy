@@ -36,7 +36,7 @@ final def deceleration = new DataFlowVariable()
 final def distance = new DataFlowVariable()
 final def author = new DataFlowVariable()
 
-task {
+def t = task {
     println """
 Calculating distance required to stop a moving ball.
 ====================================================
@@ -52,7 +52,6 @@ This example has been calculated asynchronously in multiple threads using GPars 
 Author: ${author.val}
 """
 
-    System.exit 0
 }
 
 task {
@@ -88,3 +87,5 @@ task {
 task {
     distance << deceleration.val * ((velocity.val / deceleration.val) ** 2) * 0.5
 }
+
+t.join()

@@ -27,7 +27,7 @@ import groovyx.gpars.scheduler.ResizeablePool
  * @author Vaclav Pech
  */
 
-final def group = new DefaultPGroup(new ResizeablePool(false))
+final def group = new DefaultPGroup(new ResizeablePool(true))
 
 final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
@@ -39,7 +39,7 @@ group.with {
 
     task {
         println "Result: ${b.val}"
-        System.exit 0
+        group.shutdown()
     }
 
     Thread.sleep 2000
@@ -47,6 +47,6 @@ group.with {
     task {
         a << 10
     }
+    b.join()
 }
 
-group.shutdown()

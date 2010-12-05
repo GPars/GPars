@@ -69,4 +69,3 @@ requestedPrimeNumberCount.times {
     println "Found: $prime"
     currentOutput = filter(currentOutput, prime)
 }
-

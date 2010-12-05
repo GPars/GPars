@@ -33,8 +33,7 @@ task {
                     it.val.toUpperCase().contains 'GROOVY'
                 }).size()
     }
-    System.exit 0
-}
+}.join()
 
 def downloadPage(def url) {
     def page = new DataFlowVariable()

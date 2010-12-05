@@ -41,6 +41,7 @@ h3. Dataflow
 * Fixed issues with reusing the same parallel group in the DataFlowVariable whenBound() handlers
 * Tasks can return values and can be joined
 * DataFlowQueue's _whenBound_ renamed to _wheneverBound_ and _whenNextBound_ renamed to _whenBound_ to obey the _DataFlowChannel_ interface contract
+* DataFlow default parallel group has been made daemon
 
 h3. Agent
 

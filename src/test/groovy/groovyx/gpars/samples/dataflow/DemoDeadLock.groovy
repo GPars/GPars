@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.dataflow
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.TimeUnit
-import static groovyx.gpars.dataflow.DataFlow.start
 import static groovyx.gpars.dataflow.DataFlow.task
 
 /**
@@ -30,11 +30,11 @@ import static groovyx.gpars.dataflow.DataFlow.task
 final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
 
-final def actor = start {
+final def actor = Actors.actor {
 
     delegate.metaClass.onTimeout = {
         println 'Deadlock detected'
-        System.exit 0
+        stop()
     }
 
     react(5, TimeUnit.SECONDS) {x ->
@@ -54,3 +54,4 @@ task {
     actor.send a.val
 }
 
+actor.join()

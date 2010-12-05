@@ -47,8 +47,7 @@ task {
                     it.val.toUpperCase().contains 'GROOVY'
                 }).size()
     }
-    System.exit 0
-}
+}.join()
 {code}
 
 h3. Grouping tasks
@@ -73,7 +72,7 @@ group.with {
 {code}
 
 {note:Title=Custom thread pools for dataflow}
-The default thread pool for dataflow tasks contains non-daemon threads, which means your application will not exit before all tasks complete.
+The default thread pool for dataflow tasks contains daemon threads, which means your application will exit as soon as the main thread finishes and won't wait for all tasks to complete.
 When grouping tasks, make sure that your custom thread pools either use daemon threads, too, which can be achieved by
 using DefaultPGroup or by providing your own thread factory to a thread pool constructor,
 or in case your thread pools use non-daemon threads, such as when using the NonDaemonPGroup group class, make sure you shutdown the group or the thread pool explicitly by calling its shutdown() method,
@@ -104,8 +103,7 @@ task {
                     it.val.toUpperCase().contains 'GROOVY'
                 }).size()
     }
-    System.exit 0
-}
+}.join()
 
 def downloadPage(def url) {
     def page = new DataFlowVariable()
@@ -138,7 +136,7 @@ final def decelerationForce = new DataFlowVariable()
 final def deceleration = new DataFlowVariable()
 final def distance = new DataFlowVariable()
 
-task {
+def t = task {
     println """
 Calculating distance required to stop a moving ball.
 ====================================================
@@ -190,6 +188,9 @@ task {
 task {
     distance << deceleration.val * ((velocity.val/deceleration.val) ** 2) * 0.5
 }
+
+t.join()
+
 {code}Note: I did my best to make all the physical calculations right. Feel free to change the values and see how long distance you need to stop the rolling ball.
 
 h2. Deterministic deadlocks

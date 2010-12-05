@@ -50,4 +50,3 @@ println 'Reading from the stream'
 println ''
 println "The stream is now empty. Length =  ${stream.length()}"
 
-System.exit 0

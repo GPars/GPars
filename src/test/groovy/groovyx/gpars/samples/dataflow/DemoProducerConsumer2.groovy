@@ -48,5 +48,4 @@ task {
         if (content.contains('groovy')) count++
     }
     println "Number of Groovy sites today: $count"
-    System.exit 0
-}
+}.join()

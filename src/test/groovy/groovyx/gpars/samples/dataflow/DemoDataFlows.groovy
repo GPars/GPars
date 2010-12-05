@@ -44,4 +44,3 @@ task { df[1] = 10 }
 task { df[2] = 5 }
 
 assert 15 == df[0]
-System.exit 0

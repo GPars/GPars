@@ -32,7 +32,7 @@ import groovyx.gpars.scheduler.DefaultPool
  * @author Vaclav Pech
  */
 
-final PGroup group = new DefaultPGroup(new DefaultPool(false, 1))
+final PGroup group = new DefaultPGroup(new DefaultPool(true, 1))
 
 final def a = new DataFlowVariable()
 final def b = new DataFlowVariable()
@@ -45,7 +45,7 @@ group.with {
     task {
         b >> {
             println "Result: ${it}"
-            System.exit 0
+            group.shutdown()
         }
     }
 
@@ -54,5 +54,5 @@ group.with {
     task {
         a << 10
     }
-
+    b.join()
 }

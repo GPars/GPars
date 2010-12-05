@@ -36,4 +36,3 @@ new DataFlows().with {
     assert 15 == result
 }
 
-System.exit 0

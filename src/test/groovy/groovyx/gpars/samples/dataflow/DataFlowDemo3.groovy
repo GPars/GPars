@@ -40,5 +40,4 @@ task {
 task {
     Thread.sleep(1000)
     println "Sum: ${producer.collect {it * it}.inject(0) {sum, x -> sum + x}}"
-    System.exit 0
-}
+}.join()

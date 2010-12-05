@@ -33,7 +33,7 @@ start {
     else {
         react(10, TimeUnit.MILLISECONDS) {}  //will timeout
     }
-}
+}.join()
 
 private void enhance(Actor thread) {
     thread.metaClass {
@@ -55,5 +55,3 @@ private void enhance(Actor thread) {
     }
 }
 
-Thread.sleep 5000
-System.exit 0 

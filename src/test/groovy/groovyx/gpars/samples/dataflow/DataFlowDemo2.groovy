@@ -41,4 +41,4 @@ def y = new DataFlowVariable<List<Integer>>()
 
 task { x << ints(0, 500) }
 task { y << sum(0, x.val) }
-task { println("List of sums: " + y.val); System.exit(0) }
+task { println("List of sums: " + y.val); System.exit(0) }.join()

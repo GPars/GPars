@@ -85,3 +85,5 @@ task {
 ['dzone', 'infoq', 'jetbrains', 'oracle'].each {
     urlsRequests << it
 }
+
+sleep 10000

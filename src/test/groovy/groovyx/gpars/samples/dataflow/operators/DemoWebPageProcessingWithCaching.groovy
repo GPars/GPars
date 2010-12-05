@@ -179,3 +179,5 @@ println 'Cache ' + cache.keySet()
 ['dzone', 'infoq', 'invalidUrl_', 'jetbrains', 'oracle'].each {
     urlsRequests << it
 }
+
+sleep 10000

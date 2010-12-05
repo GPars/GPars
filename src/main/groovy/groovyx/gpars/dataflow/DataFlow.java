@@ -19,7 +19,9 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
+import groovyx.gpars.scheduler.ResizeablePool;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ public abstract class DataFlow {
     /**
      * The parallel group used by all Dataflow Concurrency actors by default.
      */
-    public static final DataFlowPGroup DATA_FLOW_GROUP = new DataFlowPGroup(1);
+    public static final PGroup DATA_FLOW_GROUP = new DefaultPGroup(new ResizeablePool(true, 1));
 
     /**
      * Maps threads/tasks to parallel groups they belong to

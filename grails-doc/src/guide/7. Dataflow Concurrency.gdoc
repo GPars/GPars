@@ -12,7 +12,6 @@ final def z = new DataFlowVariable()
 
 task {
     z << x.val + y.val
-    println "Result: ${z.val}"
 }
 
 task {
@@ -22,6 +21,8 @@ task {
 task {
     y << 5
 }
+
+println "Result: ${z.val}"
 {code}
 
 Or the same algorithm rewritten using the _DataFlows_ class.
@@ -34,7 +35,6 @@ final def df = new DataFlows()
 
 task {
     df.z = df.x + df.y
-    println "Result: ${df.z}"
 }
 
 task {
@@ -44,6 +44,9 @@ task {
 task {
     df.y = 5
 }
+
+println "Result: ${df.z}"
+
 {code}
 
 We start three logical tasks, which can run in parallel and perform their particular activities. The tasks need to exchange data and they do so using *Dataflow Variables*.

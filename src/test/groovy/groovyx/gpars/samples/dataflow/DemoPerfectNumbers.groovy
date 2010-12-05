@@ -70,6 +70,5 @@ withPool {
 //    perfectNumbers = (33550300..33550400).findAll {isPerfectWithDF it}
 //    println("Perfect numbers: $perfectNumbers")
 }
-System.exit 0
 
 

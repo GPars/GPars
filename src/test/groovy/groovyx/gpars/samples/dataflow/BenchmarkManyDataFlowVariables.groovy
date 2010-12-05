@@ -19,7 +19,7 @@ package groovyx.gpars.samples.dataflow
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.Executors
 
-final many = 1..(limit)
+final many = 1..(100)
 
 List dfs = many.collect { new DataFlowVariable() }
 def result = new DataFlowVariable()

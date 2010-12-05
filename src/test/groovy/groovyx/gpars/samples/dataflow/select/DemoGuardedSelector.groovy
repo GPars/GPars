@@ -29,7 +29,7 @@ final DataFlowQueue numbers = new DataFlowQueue()
 def instruction
 def nums = []
 
-selector(inputs: [operations, numbers], outputs: [], guards: [true, false]) {value, index ->   //initial guards is set here
+def sel = selector(inputs: [operations, numbers], outputs: [], guards: [true, false]) {value, index ->   //initial guards is set here
     if (index == 0) {
         instruction = value
         setGuard(0, false)  //setGuard() used here
@@ -58,3 +58,7 @@ task {
     numbers << 50
     numbers << 60
 }
+
+sleep 3000
+sel.stop()
+sel.join()
