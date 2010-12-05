@@ -20,23 +20,22 @@ import groovyx.gpars.actor.DynamicDispatchActor
 import org.codehaus.groovy.runtime.NullObject
 
 /**
- * Represents the DDA closure to invoke appropriate message handlers based on message runtime type
+ * Creates a DDA closure to invoke appropriate actor's message handlers based on message runtime type
  *
  * @author Vaclav Pech
  */
-public final class DDAClosure extends Closure {
-    private static final long serialVersionUID = 7644465423857532479L;
+public abstract class DDAClosure {
 
-    private final def dda
+    private def DDAClosure() { }
 
-    def DDAClosure(final DynamicDispatchActor dda) {
-        super(dda);
-        this.dda = dda
-    }
-
-    @SuppressWarnings("GroovyConditionalCanBeElvis")
-    @Override
-    Object call(Object msg) {
-        return dda.onMessage(msg != null ? msg : NullObject.nullObject)  //Groovy truth won't let us use Elvis for numbers, strings and collections correctly)
+    /**
+     * Creates the closure for a given DDA
+     * @param dda The DynamicDispatchActor to dispatch messages on
+     * @return The closure to use for dynamic dispatch to the given actor
+     */
+    public static Closure createDDAClosure(final DynamicDispatchActor dda) {
+        {msg ->
+            return dda.onMessage(msg != null ? msg : NullObject.nullObject)  //Groovy truth won't let us use Elvis for numbers, strings and collections correctly)
+        }
     }
 }

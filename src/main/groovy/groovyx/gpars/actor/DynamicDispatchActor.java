@@ -60,7 +60,7 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
             cloned.call();
         }
 
-        initialize(new DDAClosure(this));
+        initialize(DDAClosure.createDDAClosure(this));
     }
 
     public final void when(final Closure closure) {
