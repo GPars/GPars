@@ -51,7 +51,7 @@ h3. Agent
 h3. Other
 
 * Java API - GPars can now be used from Java
-* A stand-alone maven-based Java API "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-REL-5/artifact/GPars-Java-API-integration-demo-project/gpars-mvn-java-demo-0.11-beta-1.zip was added to show GPars integration and use from Java
+* A stand-alone maven-based Java API "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-REL-5/artifact/GPars-Java-API-integration-demo-project/gpars-mvn-java-demo-0.11-beta-2.zip was added to show GPars integration and use from Java
 * Made Groovy 1.8 compatible
 
 h3. Renaming hints
