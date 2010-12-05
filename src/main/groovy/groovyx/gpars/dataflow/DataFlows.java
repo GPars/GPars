@@ -79,7 +79,7 @@ public final class DataFlows extends GroovyObjectSupport {
      *                                  non-positive.
      * @see java.util.concurrent.ConcurrentHashMap
      */
-    DataFlows(final int initialCapacity, final float loadFactor, final int concurrencyLevel) {
+    public DataFlows(final int initialCapacity, final float loadFactor, final int concurrencyLevel) {
         variables = new ConcurrentHashMap<Object, DataFlowVariable<Object>>(initialCapacity, loadFactor, concurrencyLevel);
     }
 
@@ -88,7 +88,7 @@ public final class DataFlows extends GroovyObjectSupport {
      *
      * @see java.util.concurrent.ConcurrentHashMap
      */
-    DataFlows() {
+    public DataFlows() {
         variables = new ConcurrentHashMap<Object, DataFlowVariable<Object>>(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
     }
 
