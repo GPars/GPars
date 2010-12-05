@@ -114,7 +114,7 @@ public class DefaultActor extends AbstractLoopingActor {
      * @param code The closure to invoke repeatedly
      */
     public final void loop(final Runnable code) {
-        doLoop((Callable<Boolean>) null, null, code);
+        doLoop(null, null, code);
     }
 
     /**
