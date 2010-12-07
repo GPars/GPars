@@ -23,7 +23,6 @@ import java.util.List;
  *
  * @author Vaclav Pech
  *         Date: Nov 17, 2008
- * @see GParsExecutorsPoolUtil
  */
 public final class AsyncException extends RuntimeException {
     private static final long serialVersionUID = 1573135643731810717L;
