@@ -26,6 +26,7 @@ import org.junit.Test;
  *
  * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
  */
+@SuppressWarnings({"MagicNumber"})
 public class StatefulActorTest {
     @Test
     public void testStatefulActor() throws Exception {
@@ -39,7 +40,7 @@ public class StatefulActorTest {
         actor.send("Bye again");
         actor.send(10);
 
-        Thread.sleep(2000);
+        Thread.sleep(2000L);
 
     }
 

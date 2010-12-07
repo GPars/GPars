@@ -21,6 +21,7 @@ import groovyx.gpars.actor.DynamicDispatchActor;
 import org.junit.Test;
 
 
+@SuppressWarnings({"MagicNumber"})
 public class StatelessActorTest {
     @Test
     public void testActor() throws InterruptedException {

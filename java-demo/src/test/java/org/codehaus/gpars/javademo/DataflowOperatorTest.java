@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
  */
 
-@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
+@SuppressWarnings({"rawtypes", "RawUseOfParameterizedType", "MagicNumber"})
 public class DataflowOperatorTest {
     @Test
     public void testFlow() throws Exception {

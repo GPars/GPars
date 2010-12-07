@@ -25,6 +25,7 @@ import org.junit.Test;
  * @author Jiri Mares, Vaclav Pech
  */
 
+@SuppressWarnings({"MagicNumber"})
 public class PipelineStatelessActorTest {
     @Test
     public void testActor() throws InterruptedException {
@@ -49,7 +50,7 @@ public class PipelineStatelessActorTest {
         final long t1 = System.currentTimeMillis();
 
         long i = 0;
-        while (i < 1000000) {
+        while (i < 1000000L) {
             downloader.send("Requested " + i);
             i++;
         }

@@ -28,13 +28,13 @@ import static org.junit.Assert.assertEquals;
 public class AgentTest {
 
     @Test
-    public void testAgent() throws Exception {
+    public void testAgent() throws InterruptedException {
 
         // Agent is thread safe way to store value
         final Agent<Integer> counter = new Agent<Integer>(0);
         counter.send(10);
 
-        assertEquals("Stored agent variable not matching", 10, counter.getVal().intValue());
+        assertEquals("Stored agent variable not matching", 10L, (long) counter.getVal().intValue());
 
         // Send command to modify agent value
         counter.send(new MessagingRunnable<Integer>() {
@@ -45,7 +45,7 @@ public class AgentTest {
             }
         });
 
-        assertEquals("Final stored agent value not matching", 11, counter.getVal().intValue());
+        assertEquals("Final stored agent value not matching", 11L, counter.getVal().intValue());
         System.out.println("Current value: " + counter.getVal());
     }
 }

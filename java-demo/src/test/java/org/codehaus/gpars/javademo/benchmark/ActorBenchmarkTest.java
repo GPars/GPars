@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Vaclav Pech, Lukas Krecan, Pavel Jetensky, Michal Franc
  */
+@SuppressWarnings({"MagicNumber"})
 public class ActorBenchmarkTest {
     private static final int ACTORS = 10000;
     private static final int MESSAGES = 500;

@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings({"MagicNumber"})
 public class DataFlowTaskTest {
 
     @Test
@@ -63,7 +64,7 @@ public class DataFlowTaskTest {
             @Override
             protected void doRun(final Integer resultValue) {
                 logMessages.add("Result calculated");
-                assertEquals("Result value invalid", 20, resultValue.intValue());
+                assertEquals("Result value invalid", 20L, resultValue.intValue());
                 assertEquals("Wrong order of calls", Arrays.asList("Value bound", "Value calculated", "Result calculated"), logMessages);
             }
         });
