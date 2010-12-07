@@ -22,6 +22,7 @@ import org.codehaus.groovy.runtime.NullObject;
 
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
@@ -35,7 +36,7 @@ abstract class AgentBase<T> extends AgentCore {
      * Allows reads not to wait in the message queue.
      * Writes and reads are mutually separated by using write or read locks respectively.
      */
-    protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    protected ReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * Holds the internal mutable state

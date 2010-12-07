@@ -95,9 +95,9 @@ public class NettyTransportProvider extends LocalHost {
     public static class Server {
         private InetSocketAddress address;
 
-        ChannelFactory factory;
+        final ChannelFactory factory;
 
-        ServerBootstrap bootstrap;
+        final ServerBootstrap bootstrap;
 
         Channel channel;
         private ServerPipelineFactory pipelineFactory;
@@ -151,7 +151,7 @@ public class NettyTransportProvider extends LocalHost {
     public static class Client {
         private final NettyTransportProvider provider;
 
-        ChannelFuture channelFuture;
+        final ChannelFuture channelFuture;
 
         final ChannelFactory factory;
 
@@ -218,7 +218,7 @@ public class NettyTransportProvider extends LocalHost {
     }
 
     private static class MyThreadFactory implements ThreadFactory {
-        static MyThreadFactory instance = new MyThreadFactory();
+        static final MyThreadFactory instance = new MyThreadFactory();
 
         @Override
         public Thread newThread(final Runnable r) {

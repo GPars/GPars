@@ -22,7 +22,7 @@ import static groovyx.gpars.actor.Actors.actor
  * @author Vaclav Pech
  * Date: Aug 25th 2010
  */
-class ConditionalLoopTest extends GroovyTestCase {
+@SuppressWarnings("GroovyEmptyCatchBlock") class ConditionalLoopTest extends GroovyTestCase {
     public void testNoLoop() {
         volatile int result = 0
         def actor = actor {
@@ -188,7 +188,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor 3
         actor 4
         actor 5
-        try {actor 6} catch (all) {}
+        try {actor 6} catch (ignore) {}
         actor.join()
         assert result == 5
     }
@@ -207,7 +207,7 @@ class ConditionalLoopTest extends GroovyTestCase {
         actor 3
         actor 4
         actor 5
-        try {actor 6} catch (all) {}
+        try {actor 6} catch (ignore) {}
         actor.join()
         assert result == 5
     }
@@ -283,7 +283,7 @@ class ConditionalLoopTest extends GroovyTestCase {
             actor 6
             actor 7
             actor 8
-        } catch (all) {}
+        } catch (ignore) {}
         actor.join()
         assert result == 18
     }

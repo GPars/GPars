@@ -29,6 +29,7 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.UUID;
 
+@SuppressWarnings({"MagicNumber"})
 public class BroadcastDiscovery {
     @SuppressWarnings({"StaticNonFinalField"})
     private static InetAddress group;
@@ -123,8 +124,7 @@ public class BroadcastDiscovery {
                 }
             };
             receiveThread.start();
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             t.printStackTrace();
         }
     }

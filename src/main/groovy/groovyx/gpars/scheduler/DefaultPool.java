@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *         Date: Feb 27, 2009
  */
 public class DefaultPool implements Pool {
-    private ThreadPoolExecutor pool;
+    private final ThreadPoolExecutor pool;
     private static final long SHUTDOWN_TIMEOUT = 30L;
 
     /**

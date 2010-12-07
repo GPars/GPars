@@ -22,9 +22,9 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.scheduler.DefaultPool
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -69,7 +69,7 @@ public class AgentTest extends GroovyTestCase {
 
     public void testCustomThreadPool() {
         def jugMembers = new Agent<List>(['Me'])  //add Me
-        final ExecutorService pool = Executors.newFixedThreadPool(1)
+        final ThreadPoolExecutor pool = Executors.newFixedThreadPool(1)
         final def group = new DefaultPGroup(new DefaultPool(pool))
         jugMembers.attachToThreadPool group.threadPool
 

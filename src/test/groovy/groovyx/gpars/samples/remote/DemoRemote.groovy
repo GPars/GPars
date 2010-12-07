@@ -114,6 +114,7 @@ def mainNode = new LocalNode(transport, {
                         }
                         catch (IllegalArgumentException e) {
                             // something went wrong so let us just print
+                            e.printStackTrace()
                         }
                     }
                     return

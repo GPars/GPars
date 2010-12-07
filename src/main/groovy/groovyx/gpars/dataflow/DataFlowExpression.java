@@ -299,7 +299,7 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
      * @throws InterruptedException If the current thread is interrupted
      */
     @Override
-    public final DataFlowExpression<T> poll() throws InterruptedException {
+    public final DataFlowExpression<T> poll() {
         if (isBound()) return this;
         else return null;
     }

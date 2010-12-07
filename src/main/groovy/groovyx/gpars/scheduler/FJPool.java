@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  *         Date: Feb 27, 2009
  */
 public class FJPool implements Pool {
-    protected ForkJoinPool pool;
+    protected final ForkJoinPool pool;
     private final int configuredPoolSize;
     private static final long DEFAULT_SHUTDOWN_TIMEOUT = 30L;
 

@@ -109,7 +109,7 @@ public abstract class ReplyingMessageStream extends Actor {
     protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
         assert message != null;
         if (message == TIMEOUT_MESSAGE) handleTimeout();
-        else getSenders().add(message.getSender());
+        else senders.add(message.getSender());
         obj2Sender.put(message.getPayLoad(), message.getSender());
         GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
     }

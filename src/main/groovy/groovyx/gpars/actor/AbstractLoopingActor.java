@@ -146,6 +146,7 @@ public abstract class AbstractLoopingActor extends Actor {
     private void cancelCurrentTimeoutTask() {
         assert currentTimerTask != null;
         currentTimerTask.cancel();
+        currentTimerTask = null;
     }
 
     /**

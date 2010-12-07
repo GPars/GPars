@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException
  * @author Vaclav Pech
  * Date: Aug 18, 2010
  */
-class AsyncInvocationWithTimeoutTest extends GroovyTestCase {
+@SuppressWarnings("GroovyEmptyCatchBlock") class AsyncInvocationWithTimeoutTest extends GroovyTestCase {
 
     public void testFastCalculation() {
         GParsExecutorsPool.withPool(5) {
@@ -67,7 +67,7 @@ class AsyncInvocationWithTimeoutTest extends GroovyTestCase {
         }
 
         final DataFlowVariable result = new DataFlowVariable();
-        {-> try {Thread.sleep 2000; result << 20} catch (all) {}}.callTimeoutAsync(timeout);
+        {-> try {Thread.sleep 2000; result << 20} catch (ignore) {}}.callTimeoutAsync(timeout);
         sleep 3000
         assert !result.bound
     }

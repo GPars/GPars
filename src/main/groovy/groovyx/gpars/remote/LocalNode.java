@@ -40,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Alex Tkachman
  */
+@SuppressWarnings({"MagicNumber"})
 public class LocalNode {
     private final List<RemoteNodeDiscoveryListener> listeners = Collections.synchronizedList(new LinkedList<RemoteNodeDiscoveryListener>());
 

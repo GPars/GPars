@@ -35,8 +35,7 @@ public abstract class RemoteConnection {
 
     public void onMessage(final SerialMsg msg) {
         if (host == null) {
-            final SerialMsg idMsg = (HostIdMsg) msg;
-            host = (RemoteHost) localHost.getSerialHost(idMsg.hostId, this);
+            host = (RemoteHost) localHost.getSerialHost(msg.hostId, this);
         } else {
             throw new IllegalStateException("Unexpected message: " + msg);
         }

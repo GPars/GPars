@@ -76,7 +76,7 @@ public abstract class AsyncMessagingCore implements Runnable {
     /**
      * Incoming messages
      */
-    private final DefaultMessageQueue queue = new DefaultMessageQueue();
+    private final MessageQueue queue = new DefaultMessageQueue();
 
     /**
      * Indicates, whether there's an active thread handling a message inside the agent's body

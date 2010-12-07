@@ -134,7 +134,7 @@ public abstract class Actor extends MessageStream {
      * @throws InterruptedException if interrupted while waiting
      */
     @SuppressWarnings({"AssignmentToMethodParameter"})
-    public final <T> MessageStream sendAndContinue(final T message, Closure closure) throws InterruptedException {
+    public final <T> MessageStream sendAndContinue(final T message, Closure closure) {
         closure = (Closure) closure.clone();
         closure.setDelegate(this);
         closure.setResolveStrategy(Closure.DELEGATE_FIRST);
@@ -198,7 +198,7 @@ public abstract class Actor extends MessageStream {
      * @param listener listener to notify
      * @throws InterruptedException if interrupted while waiting
      */
-    public final void join(final MessageStream listener) throws InterruptedException {
+    public final void join(final MessageStream listener) {
         joinLatch.getValAsync(listener);
     }
 

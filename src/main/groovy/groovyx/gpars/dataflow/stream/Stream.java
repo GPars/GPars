@@ -188,7 +188,7 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
             return "Stream[?]";
         if (isEmpty())
             return "Stream[]";
-        return "Stream[" + getFirst() + (getRest()).appendingString() + ']';
+        return "Stream[" + getFirst() + getRest().appendingString() + ']';
     }
 
     @Override
@@ -197,7 +197,7 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
             return ", ?";
         if (isEmpty())
             return "";
-        return ", " + getFirst() + (getRest()).appendingString();
+        return ", " + getFirst() + getRest().appendingString();
     }
 
     @Override
