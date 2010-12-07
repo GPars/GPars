@@ -5169,7 +5169,7 @@
         </inspection_tool>
       </profile>
     </profiles>
-    <option name="PROJECT_PROFILE" value="ServerInspections" />
+    <option name="PROJECT_PROFILE" value="GPars default" />
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
     <list size="5">
