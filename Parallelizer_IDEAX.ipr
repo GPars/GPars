@@ -563,6 +563,7 @@
           <option name="IGNORE_DEPRECATED" value="false" />
           <option name="IGNORE_JAVADOC_PERIOD" value="true" />
           <option name="IGNORE_DUPLICATED_THROWS" value="false" />
+          <option name="IGNORE_POINT_TO_ITSELF" value="false" />
           <option name="myAdditionalJavadocTags" value="" />
         </inspection_tool>
         <inspection_tool class="JavaLangImport" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -931,9 +932,6 @@
         </inspection_tool>
         <inspection_tool class="AssignmentToStaticFieldFromInstanceMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AssignmentUsedAsCondition" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="AutoBoxing" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignoreAddedToCollection" value="false" />
-        </inspection_tool>
         <inspection_tool class="AutowiredDependenciesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AwaitNotInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AwaitWithoutCorrespondingSignal" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -975,6 +973,9 @@
         </inspection_tool>
         <inspection_tool class="CharUsedInArithmeticContext" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="CharacterComparison" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="CheckEmptyScriptTag" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="CheckImageSize" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="CheckValidXmlInScriptTagBody" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="CheckedExceptionClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ClassComplexity" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="80" />
@@ -1277,6 +1278,32 @@
         <inspection_tool class="HibernateResource" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="insideTryAllowed" value="false" />
         </inspection_tool>
+        <inspection_tool class="HtmlDeprecatedTag" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="HtmlExtraClosingTag" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="HtmlFormInputWithoutLabel" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="HtmlPresentationalElement" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="HtmlUnknownAttribute" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myValues">
+            <value>
+              <list size="0" />
+            </value>
+          </option>
+          <option name="myCustomValuesEnabled" value="true" />
+        </inspection_tool>
+        <inspection_tool class="HtmlUnknownTag" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myValues">
+            <value>
+              <list size="4">
+                <item index="0" class="java.lang.String" itemvalue="nobr" />
+                <item index="1" class="java.lang.String" itemvalue="noembed" />
+                <item index="2" class="java.lang.String" itemvalue="comment" />
+                <item index="3" class="java.lang.String" itemvalue="noscript" />
+              </list>
+            </value>
+          </option>
+          <option name="myCustomValuesEnabled" value="true" />
+        </inspection_tool>
+        <inspection_tool class="HtmlUnknownTarget" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoredTypesString" value="java.io.ByteArrayOutputStream,java.io.ByteArrayInputStream,java.io.StringBufferInputStream,java.io.CharArrayWriter,java.io.CharArrayReader,java.io.StringWriter,java.io.StringReader" />
           <option name="insideTryAllowed" value="false" />
@@ -1309,7 +1336,9 @@
           <option name="annotationNamesString" value="" />
         </inspection_tool>
         <inspection_tool class="InstanceofCatchParameter" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="InstanceofChain" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="InstanceofChain" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreInstanceofOnLibraryClasses" value="false" />
+        </inspection_tool>
         <inspection_tool class="InstanceofIncompatibleInterface" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="InstanceofThis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="InstantiationOfUtilityClass" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1563,19 +1592,6 @@
         <inspection_tool class="QuestionableName" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="nameString" value="aa,abc,bad,bar,bar2,baz,baz1,baz2,baz3,bb,blah,bogus,bool,cc,dd,defau1t,dummy,dummy2,ee,fa1se,ff,foo,foo1,foo2,foo3,foobar,four,fred,fred1,fred2,gg,hh,hello,hello1,hello2,hello3,ii,nu11,one,silly,silly2,string,two,that,then,three,whi1e,var" />
         </inspection_tool>
-        <inspection_tool class="QuirksModeInspectionTool" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="IE50" value="false" />
-          <option name="IE55" value="false" />
-          <option name="IE6" value="true" />
-          <option name="IE7" value="true" />
-          <option name="IE_MAC" value="false" />
-          <option name="MOZILLA" value="true" />
-          <option name="OPERA7" value="false" />
-          <option name="OPERA8" value="false" />
-          <option name="OPERA85" value="true" />
-          <option name="OPERA9" value="true" />
-          <option name="SAFARI" value="true" />
-        </inspection_tool>
         <inspection_tool class="RandomDoubleForRandomInteger" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="RawUseOfParameterizedType" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreObjectConstruction" value="true" />
@@ -1598,6 +1614,9 @@
         <inspection_tool class="ReplaceAssignmentWithOperatorAssignment" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreLazyOperators" value="true" />
           <option name="ignoreObscureOperators" value="false" />
+        </inspection_tool>
+        <inspection_tool class="RequiredAttributes" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myAdditionalRequiredHtmlAttributes" value="" />
         </inspection_tool>
         <inspection_tool class="RequiredBeanTypeInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ReservedWordUsedAsNameJS" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -2401,7 +2420,9 @@
           <option name="annotationNamesString" value="" />
         </inspection_tool>
         <inspection_tool class="InstanceofCatchParameter" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="InstanceofChain" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="InstanceofChain" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreInstanceofOnLibraryClasses" value="false" />
+        </inspection_tool>
         <inspection_tool class="InstanceofIncompatibleInterface" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="InstanceofThis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="InstantiationOfUtilityClass" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -3445,7 +3466,9 @@
           <option name="annotationNamesString" value="" />
         </inspection_tool>
         <inspection_tool class="InstanceofCatchParameter" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="InstanceofChain" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="InstanceofChain" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreInstanceofOnLibraryClasses" value="false" />
+        </inspection_tool>
         <inspection_tool class="InstanceofIncompatibleInterface" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="InstanceofThis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="InstantiationOfUtilityClass" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -4299,6 +4322,7 @@
           <option name="IGNORE_DEPRECATED" value="false" />
           <option name="IGNORE_JAVADOC_PERIOD" value="true" />
           <option name="IGNORE_DUPLICATED_THROWS" value="false" />
+          <option name="IGNORE_POINT_TO_ITSELF" value="false" />
           <option name="myAdditionalJavadocTags" value="" />
         </inspection_tool>
         <inspection_tool class="JavadocReference" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -4839,6 +4863,7 @@
           <option name="IGNORE_DEPRECATED" value="false" />
           <option name="IGNORE_JAVADOC_PERIOD" value="true" />
           <option name="IGNORE_DUPLICATED_THROWS" value="false" />
+          <option name="IGNORE_POINT_TO_ITSELF" value="false" />
           <option name="myAdditionalJavadocTags" value="" />
         </inspection_tool>
         <inspection_tool class="JavadocReference" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -5645,15 +5670,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.gpars:gpars:0.11-beta-1">
+    <library name="Maven: org.codehaus.gpars:gpars:0.11-beta-2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-1/gpars-0.11-beta-1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-2/gpars-0.11-beta-2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-1/gpars-0.11-beta-1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-2/gpars-0.11-beta-2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-1/gpars-0.11-beta-1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-2/gpars-0.11-beta-2-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.codehaus.groovy:groovy-all:1.6.9">
