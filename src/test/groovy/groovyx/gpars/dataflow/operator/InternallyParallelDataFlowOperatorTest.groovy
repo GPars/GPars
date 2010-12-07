@@ -21,6 +21,7 @@ import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
+import java.util.concurrent.CyclicBarrier
 
 /**
  * @author Vaclav Pech
@@ -85,9 +86,11 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testParallelism() {
-        performParallelismTest(5, 3)
-        performParallelismTest(5, 5)
-        performParallelismTest(3, 5)
+        100.times {
+            performParallelismTest(5, 4)
+            performParallelismTest(5, 5)
+            performParallelismTest(3, 5)
+        }
     }
 
     private def performParallelismTest(int poolSize, forks) {
@@ -98,23 +101,26 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         final DataFlowQueue e = new DataFlowQueue()
         final DefaultPGroup group = new DefaultPGroup(poolSize)
 
+        final int parties = Math.min(poolSize - 1, forks)
+        final CyclicBarrier barrier = new CyclicBarrier(parties)
+
         def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: forks) {x, y, z ->
-            sleep 1000
+            barrier.await()
             bindOutput 0, x + y + z
-            bindOutput 1, Thread.currentThread().hashCode()
+            bindOutput 1, Thread.currentThread().name.hashCode()
         }
 
         DataFlow.task { a << 5 }
         DataFlow.task { b << 10 }
-        DataFlow.task { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].each {c << it} }
+        DataFlow.task { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].each {c << it} }
 
-        def results = (1..10).collect {d.val}
-        assertEquals 10, results.size()
-        assert results.containsAll([16, 17, 18, 19, 20, 21, 22, 23, 24, 25])
+        def results = (1..16).collect {d.val}
+        assertEquals 16, results.size()
+        assert results.containsAll([16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])
 
-        def threads = (1..10).collect {e.val}
-        assertEquals 10, threads.size()
-        assert threads.unique().size() in (([poolSize, forks].min() - 1)..[poolSize, forks].max())
+        def threads = (1..16).collect {e.val}
+        assertEquals 16, threads.size()
+        assert threads.unique().size() in (parties..[poolSize, forks].max())
 
         op.stop()
         op.join()
