@@ -89,7 +89,7 @@ final class DemoWorker extends DefaultActor {
 
     private void processMessage(message) {
         synchronized (random) {
-            Thread.sleep random.nextInt(5000)
+            Thread.sleep random.nextInt(3000)
         }
     }
 }
@@ -115,7 +115,7 @@ Thread.start {
 Thread.sleep 35000  //let the queues get empty
 balancer << new WorkToDo()
 balancer << new WorkToDo()
-Thread.sleep 10000
+Thread.sleep 25000
 
 balancer.stop()
 balancer.join()

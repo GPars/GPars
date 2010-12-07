@@ -83,7 +83,7 @@ final class DemoWorker extends DefaultActor {
     }
 
     private void processMessage(message) {
-        Thread.sleep random.nextInt(5000)
+        Thread.sleep random.nextInt(3000)
     }
 }
 final class WorkToDo {}
@@ -108,4 +108,4 @@ Thread.start {
 Thread.sleep 35000
 balancer << new WorkToDo()
 balancer << new WorkToDo()
-Thread.sleep 10000
+Thread.sleep 25000
