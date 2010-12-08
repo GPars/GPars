@@ -18,19 +18,16 @@ package groovyx.gpars.dataflow.stream;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.dataflow.DataFlowChannel;
-import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowReadChannel;
 import groovyx.gpars.dataflow.DataFlowVariable;
-import groovyx.gpars.dataflow.DataFlowWriteChannel;
 
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 //todo unchecked casts
-@SuppressWarnings({"rawtypes", "TailRecursion", "RawUseOfParameterizedType", "unchecked"})
-public class Stream<T> implements FList<T>, DataFlowChannel<T> {
+//todo lazy filter, map and reduce
+@SuppressWarnings({"rawtypes", "TailRecursion", "RawUseOfParameterizedType", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
+public class Stream<T> implements FList<T> {
 
     private final DataFlowVariable<T> first = new DataFlowVariable<T>();
     private final AtomicReference<Stream<T>> rest = new AtomicReference<Stream<T>>();
@@ -61,13 +58,13 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         return this;
     }
 
-    private void generateNext(final T value, final DataFlowWriteChannel<T> stream, final Closure generator, final Closure condition) {
+    private void generateNext(final T value, final Stream<T> stream, final Closure generator, final Closure condition) {
         final boolean addValue = (Boolean) condition.call(new Object[]{value});
         if (!addValue) {
             stream.leftShift(Stream.<T>eos());
             return;
         }
-        final DataFlowWriteChannel<T> next = stream.leftShift(value);
+        final Stream<T> next = stream.leftShift(value);
         final T nextValue = (T) eval(generator.call(new Object[]{value}));
         generateNext(nextValue, next, generator, condition);
     }
@@ -77,33 +74,30 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         return this;
     }
 
-    @Override
-    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
-        try {
-            return leftShift(ref.getVal());
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            //todo perhaps use getValAsync here to avoid declaring the exception
-            return null;
-        }
+    public Stream<T> leftShift(final DataFlowReadChannel<T> ref) {
+        ref.getValAsync(new MessageStream() {
+            @Override
+            public MessageStream send(final Object message) {
+                first.leftShift((T) message);
+                return null;
+            }
+        });
+        return (Stream<T>) getRest();
     }
 
-    @Override
-    public DataFlowWriteChannel<T> leftShift(final T value) {
+    public Stream<T> leftShift(final T value) {
         first.leftShift(value);
-        return (DataFlowWriteChannel<T>) getRest();
+        return (Stream<T>) getRest();
     }
 
-    @Override
-    public void bind(final T value) {
-        first.leftShift(value);
-        getRest();
+    DataFlowVariable<T> getFirstDFV() {
+        return first;
     }
 
     @Override
     public T getFirst() {
         try {
-            return getVal();
+            return first.getVal();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -128,8 +122,7 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         return newStream;
     }
 
-    //todo shouldn't we be lazy here?
-    private void filter(final Stream<T> rest, final Closure filterClosure, final DataFlowWriteChannel<T> result) {
+    private void filter(final Stream<T> rest, final Closure filterClosure, final Stream<T> result) {
         if (rest.isEmpty()) {
             result.leftShift(Stream.<T>eos());
             return;
@@ -148,13 +141,13 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         return newStream;
     }
 
-    private void map(final Stream<T> rest, final Closure mapClosure, final DataFlowWriteChannel result) {
+    private void map(final FList<T> rest, final Closure mapClosure, final Stream result) {
         if (rest.isEmpty()) {
             result.leftShift(Stream.eos());
             return;
         }
         final Object mapped = mapClosure.call(new Object[]{rest.getFirst()});
-        final DataFlowWriteChannel newResult = result.leftShift(eval(mapped));
+        final Stream newResult = result.leftShift(eval(mapped));
         map((Stream<T>) rest.getRest(), mapClosure, newResult);
     }
 
@@ -205,7 +198,7 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
-        final Stream stream = (Stream) obj;
+        final FList stream = (FList) obj;
         if (isEmpty())
             return stream.isEmpty();
         if (!getFirst().equals(stream.getFirst()))
@@ -218,63 +211,6 @@ public class Stream<T> implements FList<T>, DataFlowChannel<T> {
         int result = first.hashCode();
         result = 31 * result + rest.hashCode();
         return result;
-    }
-
-    @Override
-    public T getVal() throws InterruptedException {
-        return first.getVal();
-    }
-
-    @Override
-    public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        return first.getVal(timeout, units);
-    }
-
-    @Override
-    public void getValAsync(final MessageStream callback) {
-        first.getValAsync(callback);
-    }
-
-    @Override
-    public void getValAsync(final Object attachment, final MessageStream callback) {
-        first.getValAsync(attachment, callback);
-    }
-
-    @Override
-    public void rightShift(final Closure closure) {
-        first.rightShift(closure);
-    }
-
-    @Override
-    public void whenBound(final Closure closure) {
-        first.whenBound(closure);
-    }
-
-    @Override
-    public void whenBound(final MessageStream stream) {
-        first.whenBound(stream);
-    }
-
-    //todo provide implementation
-    @Override
-    public void wheneverBound(final Closure closure) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void wheneverBound(final MessageStream stream) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean isBound() {
-        return first.isBound();
-    }
-
-    @Override
-    public DataFlowExpression<T> poll() throws InterruptedException {
-        if (first.isBound()) return first;
-        else return null;
     }
 }
 
