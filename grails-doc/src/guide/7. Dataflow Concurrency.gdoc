@@ -120,22 +120,86 @@ task {
 
 Both _DataFlowVariables_ and _DataFlowQueues_ implement the _DataFlowChannel_ interface with common methods allowing users
 to read values from them. The ability to treat both types identically through the _DataFlowChannel_ interface comes in handy
-once you start using them to wire _tasks_, _operators_ or _selectors_ together.
+once you start using them to wire _tasks_ , _operators_ or _selectors_ together.
 
 {note}
 The _DataFlowChannel_ interface combines two interfaces, each serving its purpose:
-* _DataFlowReadChannel_ holding all the methods necessary for reading values from a channel
-* _DataFlowWriteChannel_ holding all the methods necessary for writing values into a channel
+* DataFlowReadChannel holding all the methods necessary for reading values from a channel
+* DataFlowWriteChannel holding all the methods necessary for writing values into a channel
 You may prefer using these dedicated interfaces instead of the general _DataFlowChannel_ interface, to better express the intended usage.
 {note}
 
-The _DataFlowChannel_ class, unlike the other communication elements, does not implement the _DataFlowChannel_ interface, since the semantics of its use is different.
+The _DataFlowStream_ class, unlike the other communication elements, does not implement the _DataFlowChannel_ interface, since the semantics of its use is different.
 (We'll talk more on _DataFlowStream_ purpose later.)
 Use _DataFlowStreamReadAdapter_ and _DataFlowStreamWriteAdapter_ classes to wrap instances of the _DataFlowChannel_ class
 in _DataFlowReadChannel_ or _DataFlowWriteChannel_ implementations.
 
 h2. DataFlowStream
 
+The _DataFlowStream_ class represents a deterministic dataflow channel. Unlike a _DataFlowQueue_ , _DataFlowStream_ allows multiple readers each to read all the messages.
+Essentially, you may think of _DataFlowStream_ as a 1 to many communication channel, since when a reader consumes a messages,
+other readers will still be able to read the message. Also, all messages arrive to all readers in the same order.
+_DataFlowStream_ is implemented as a functional queue, which impacts the API in that users have to traverse the values in the stream themselves.
+On the other hand in offers handy methods for value filtering or transformation together with interesting performance characteristics.
+
+{code}
+import groovyx.gpars.dataflow.stream.DataFlowStream
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.ResizeablePool
+
+/**
+ * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks
+ *
+ * In principle, the algorithm consists of a concurrently run chained filters,
+ * each of which detects whether the current number can be divided by a single prime number.
+ * (generate nums 1, 2, 3, 4, 5, ...) -> (filter by mod 2) -> (filter by mod 3) -> (filter by mod 5) -> (filter by mod 7) -> (filter by mod 11) -> (caution! Primes falling out here)
+ * The chain is built (grows) on the fly, whenever a new prime is found
+ */
+
+/**
+ * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowQueue.val
+ */
+group = new DefaultPGroup(new ResizeablePool(true))
+
+final int requestedPrimeNumberCount = 100
+
+/**
+ * Generating candidate numbers
+ */
+final DataFlowStream candidates = new DataFlowStream()
+group.task {
+    candidates.generate(2, {it + 1}, {it < 1000})
+}
+
+/**
+ * Chain a new filter for a particular prime number to the end of the Sieve
+ * @param inChannel The current end channel to consume
+ * @param prime The prime number to divide future prime candidates with
+ * @return A new channel ending the whole chain
+ */
+def filter(DataFlowStream inChannel, int prime) {
+    inChannel.filter { number ->
+        group.task {
+            number % prime != 0
+        }
+    }
+}
+
+/**
+ * Consume Sieve output and add additional filters for all found primes
+ */
+def currentOutput = candidates
+requestedPrimeNumberCount.times {
+    int prime = currentOutput.first
+    println "Found: $prime"
+    currentOutput = filter(currentOutput, prime)
+}
+{code}
+
+For convenience and for the ability to use _DataFlowStream_ with other dataflow constructs, like e.g. operators,
+you can wrap it with _DataFlowReadAdapter_ for read access or _DataFlowWriteAdapter_ for write access.
+The _DataFlowStream_ class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
+to the stream, their access to the stream must be serialized externally or the adapters should be used.
 
 h3. DataFlowStream Adapters
 
@@ -146,8 +210,9 @@ will provide write methods around the wrapped _DataFlowStream_ .
 
 {note}
 It is important to mention that the _DataFlowStreamWriteAdapter_ is thread safe allowing multiple threads to add values to the wrapped _DataFlowStream_ through the adapter.
-On the other hand, _DataFlowStreamReadAdapter is designed to be used by a single thread.
-To minimize the overhead and stay in-line with the DataFlowStream semantics, the _DataFlowStreamReadAdapter_ class is not thread-safe
+On the other hand, _DataFlowStreamReadAdapter_ is designed to be used by a single thread.
+
+To minimize the overhead and stay in-line with the _DataFlowStream_ semantics, the _DataFlowStreamReadAdapter_ class is not thread-safe
 and should only be used from within a single thread.
 If multiple threads need to read from a DataFlowStream, they should each create their own wrapping _DataFlowStreamReadAdapter_ .
 {note}

@@ -30,15 +30,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Represents a deterministic dataflow channel. Unlike a DataFlowQueue, DataFlowStream allows multiple readers to each read all the messages.
+ * Represents a deterministic dataflow channel. Unlike a DataFlowQueue, DataFlowStream allows multiple readers each to read all the messages.
  * Essentially, you may think of DataFlowStream as a 1 to many communication channel, since when a reader consumes a messages,
  * other readers will still be able to read the message. Also, all messages arrive to all readers in the same order.
  * DataFlowStream is implemented as a functional queue, which impacts the API in that users have to traverse the values in the stream themselves.
+ * On the other hand in offers handy methods for value filtering or transformation together with interesting performance characteristics.
  * For convenience and for the ability to use DataFlowStream with other dataflow constructs, like e.g. operators,
- * you can wrap it with DataFlowReadAdapter for read access or DataFlowWriteAdapter for write access.
+ * you can wrap DataFlowStreams with DataFlowReadAdapter for read access or DataFlowWriteAdapter for write access.
  * <p/>
- * The DataFlowStream class is designed for single-threaded producers. If multiple threads are supposed to write values
- * to the stream, their access to the stream must be serialized externally.
+ * The DataFlowStream class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
+ * to the stream, their access to the stream must be serialized externally or the adapters should be used.
  *
  * @param <T> Type for values to pass through the stream
  * @author Johannes Link, Vaclav Pech
