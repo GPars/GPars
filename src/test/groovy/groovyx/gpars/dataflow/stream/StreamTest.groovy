@@ -21,11 +21,11 @@ import static groovyx.gpars.dataflow.DataFlow.task
 
 class StreamTest extends GroovyTestCase {
 
-    def stream = new Stream()
+    def stream = new DataFlowStream()
 
     void testEmptyStream() {
         task {
-            stream << Stream.eos()
+            stream << DataFlowStream.eos()
         }
         assert stream.isEmpty()
     }
@@ -40,7 +40,7 @@ class StreamTest extends GroovyTestCase {
 
     void testStreamWithSeveralObjects() {
         task {
-            stream << "first" << "second" << "third" << Stream.eos();
+            stream << "first" << "second" << "third" << DataFlowStream.eos();
         }
         assert stream.first == "first"
         assert stream.rest.first == "second"
@@ -71,7 +71,7 @@ class StreamTest extends GroovyTestCase {
 
     void testIteratingAStream() {
         task {
-            stream << "a" << "b" << "c" << Stream.eos()
+            stream << "a" << "b" << "c" << DataFlowStream.eos()
         }
         def result = ""
         for (a in stream)
@@ -83,7 +83,7 @@ class StreamTest extends GroovyTestCase {
 
     void testGenerator() {
         stream.generate(1, {it + 1}, {it < 3})
-        assert stream == new Stream({it << 1 << 2 << it.eos()})
+        assert stream == new DataFlowStream({it << 1 << 2 << it.eos()})
     }
 
     void testGeneratorAsync() {
@@ -91,55 +91,55 @@ class StreamTest extends GroovyTestCase {
             task {value + 1}
         }
         stream.generate(1, generator, {it < 3})
-        assert stream == new Stream({it << 1 << 2 << it.eos()})
+        assert stream == new DataFlowStream({it << 1 << 2 << it.eos()})
     }
 
     void testApplyAsync() {
         task {
             stream.apply {it << 1 << 2 << it.eos()}
         }
-        assert stream == new Stream({it << 1 << 2 << it.eos()})
+        assert stream == new DataFlowStream({it << 1 << 2 << it.eos()})
     }
 
     void testMapWithIdentity() {
         task {
-            stream << "a" << "b" << Stream.eos()
+            stream << "a" << "b" << DataFlowStream.eos()
         }
         def mappedStream = stream.map {it}
-        assert mappedStream == new Stream({it << "a" << "b" << it.eos()})
+        assert mappedStream == new DataFlowStream({it << "a" << "b" << it.eos()})
     }
 
     void testMapWithTransformation() {
         task {
-            stream << "a" << "b" << Stream.eos()
+            stream << "a" << "b" << DataFlowStream.eos()
         }
         def mappedStream = stream.map {it * 2}
-        assert mappedStream == new Stream({it << "aa" << "bb" << it.eos()})
+        assert mappedStream == new DataFlowStream({it << "aa" << "bb" << it.eos()})
     }
 
     void testMapAsynchronously() {
         task {
-            stream << "a" << "b" << Stream.eos()
+            stream << "a" << "b" << DataFlowStream.eos()
         }
         def mappedStream = stream.map { value ->
             task {
                 value * 2
             }
         }
-        assert mappedStream == new Stream({it << "aa" << "bb" << it.eos()})
+        assert mappedStream == new DataFlowStream({it << "aa" << "bb" << it.eos()})
     }
 
     void testFilterNothing() {
         task {
-            stream << 1 << 2 << 3 << 4 << Stream.eos()
+            stream << 1 << 2 << 3 << 4 << DataFlowStream.eos()
         }
         def filteredStream = stream.filter { true }
-        assert filteredStream == new Stream({it << 1 << 2 << 3 << 4 << it.eos()})
+        assert filteredStream == new DataFlowStream({it << 1 << 2 << 3 << 4 << it.eos()})
     }
 
     void testFilterEverything() {
         task {
-            stream << 1 << 2 << 3 << 4 << Stream.eos()
+            stream << 1 << 2 << 3 << 4 << DataFlowStream.eos()
         }
         def filteredStream = stream.filter { false }
         assert filteredStream.isEmpty()
@@ -147,25 +147,25 @@ class StreamTest extends GroovyTestCase {
 
     void testFilterSomething() {
         task {
-            stream << 1 << 2 << 3 << 4 << Stream.eos()
+            stream << 1 << 2 << 3 << 4 << DataFlowStream.eos()
         }
         def filteredStream = stream.filter { it % 2 == 0 }
-        assert filteredStream == new Stream({it << 2 << 4 << it.eos()})
+        assert filteredStream == new DataFlowStream({it << 2 << 4 << it.eos()})
     }
 
     void testFilterAsynchronously() {
         task {
-            stream << 1 << 2 << 3 << 4 << Stream.eos()
+            stream << 1 << 2 << 3 << 4 << DataFlowStream.eos()
         }
         def filteredStream = stream.filter { value ->
             task {value % 2 == 0}
         }
-        assert filteredStream == new Stream({it << 2 << 4 << it.eos()})
+        assert filteredStream == new DataFlowStream({it << 2 << 4 << it.eos()})
     }
 
     void testReduceEmptyStream() {
         task {
-            stream << Stream.eos()
+            stream << DataFlowStream.eos()
         }
         assert stream.reduce() {value, element -> value + element} == null
         assert stream.reduce(5) {value, element -> value + element} == 5
@@ -173,7 +173,7 @@ class StreamTest extends GroovyTestCase {
 
     void testReduceNonEmptyStream() {
         task {
-            stream << 1 << 2 << 3 << Stream.eos()
+            stream << 1 << 2 << 3 << DataFlowStream.eos()
         }
         assert stream.reduce() {value, element -> value + element} == 6
         assert stream.reduce(5) {value, element -> value + element} == 11

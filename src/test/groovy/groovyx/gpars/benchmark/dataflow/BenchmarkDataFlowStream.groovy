@@ -26,7 +26,7 @@ final def group1 = new DefaultPGroup(4)
 final def group2 = new DefaultPGroup(4)
 final def stream = new DataFlowQueue()
 
-//perform(group1, group2, 4, 4, 10, new Stream())
+//perform(group1, group2, 4, 4, 10, new DataFlowStream())
 
 perform(group1, group2, 4, 4, 4000000, stream)
 perform(group1, group2, 4, 4, 4000000, stream)

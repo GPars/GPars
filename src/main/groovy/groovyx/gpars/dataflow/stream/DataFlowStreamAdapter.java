@@ -30,16 +30,16 @@ import java.util.concurrent.TimeUnit;
 //todo unchecked casts
 //todo a thread-safe variant - multiple writers and readers
 @SuppressWarnings({"rawtypes", "TailRecursion", "RawUseOfParameterizedType", "unchecked"})
-public class DFStream<T> implements DataFlowChannel<T> {
+public class DataFlowStreamAdapter<T> implements DataFlowChannel<T> {
 
-    private Stream<T> head;
-    private Stream<T> tail;
+    private DataFlowStream<T> head;
+    private DataFlowStream<T> tail;
 
-    public DFStream() {
-        this(new Stream<T>());
+    public DataFlowStreamAdapter() {
+        this(new DataFlowStream<T>());
     }
 
-    public DFStream(final Stream<T> stream) {
+    public DataFlowStreamAdapter(final DataFlowStream<T> stream) {
         this.head = stream;
         this.tail = stream;
     }
@@ -74,7 +74,7 @@ public class DFStream<T> implements DataFlowChannel<T> {
     @Override
     public T getVal() throws InterruptedException {
         final T first = tail.getFirst();
-        tail = (Stream<T>) tail.getRest();
+        tail = (DataFlowStream<T>) tail.getRest();
         return first;
     }
 
@@ -83,7 +83,7 @@ public class DFStream<T> implements DataFlowChannel<T> {
         tail.getFirstDFV().getVal(timeout, units);
         if (tail.getFirstDFV().isBound()) {
             final T result = tail.getFirst();
-            tail = (Stream<T>) tail.getRest();
+            tail = (DataFlowStream<T>) tail.getRest();
             return result;
         } else {
             return null;
@@ -135,7 +135,7 @@ public class DFStream<T> implements DataFlowChannel<T> {
     public DataFlowExpression<T> poll() throws InterruptedException {
         final DataFlowVariable<T> firstDFV = tail.getFirstDFV();
         if (firstDFV.isBound()) {
-            tail = (Stream<T>) tail.getRest();
+            tail = (DataFlowStream<T>) tail.getRest();
             return firstDFV;
         } else return null;
     }

@@ -18,6 +18,11 @@ package groovyx.gpars.dataflow.stream;
 
 import groovy.lang.Closure;
 
+/**
+ * Represents a list implemented as a Functional Queue.
+ *
+ * @param <T> The type of values to store in the list
+ */
 public interface FList<T> extends Iterable<T> {
 
     T getFirst();

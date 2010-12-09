@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.stream
 
-import groovyx.gpars.dataflow.stream.Stream
+import groovyx.gpars.dataflow.stream.DataFlowStream
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 
@@ -39,7 +39,7 @@ final int requestedPrimeNumberCount = 100
 /**
  * Generating candidate numbers
  */
-final Stream candidates = new Stream()
+final DataFlowStream candidates = new DataFlowStream()
 group.task {
     candidates.generate(2, {it + 1}, {it < 1000})
 }
@@ -50,7 +50,7 @@ group.task {
  * @param prime The prime number to divide future prime candidates with
  * @return A new channel ending the whole chain
  */
-def filter(Stream inChannel, int prime) {
+def filter(DataFlowStream inChannel, int prime) {
     inChannel.filter { number ->
         group.task {
             number % prime != 0
@@ -63,7 +63,7 @@ def filter(Stream inChannel, int prime) {
  */
 def currentOutput = candidates
 requestedPrimeNumberCount.times {
-    int prime = currentOutput.val
+    int prime = currentOutput.first
     println "Found: $prime"
     currentOutput = filter(currentOutput, prime)
 }

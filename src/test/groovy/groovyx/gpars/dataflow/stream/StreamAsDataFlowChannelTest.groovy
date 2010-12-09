@@ -24,12 +24,12 @@ import static groovyx.gpars.dataflow.DataFlow.task
 class StreamAsDataFlowChannelTest extends GroovyTestCase {
 
     public void testInterfaceImplemented() {
-        def stream = new DFStream(new Stream())
+        def stream = new DataFlowStreamAdapter(new DataFlowStream())
         assert stream instanceof DataFlowChannel
     }
 
     public void testGetVal() {
-        def stream = new DFStream(new Stream())
+        def stream = new DataFlowStreamAdapter(new DataFlowStream())
         task {
             stream << 1
         }
@@ -37,7 +37,7 @@ class StreamAsDataFlowChannelTest extends GroovyTestCase {
     }
 
     public void testRightShift() {
-        def stream = new DFStream(new Stream())
+        def stream = new DataFlowStreamAdapter(new DataFlowStream())
         def result = new DataFlowVariable()
         stream >> {result << it}
         task {
@@ -47,7 +47,7 @@ class StreamAsDataFlowChannelTest extends GroovyTestCase {
     }
 
     public void testWhenBound() {
-        def stream = new DFStream()
+        def stream = new DataFlowStreamAdapter()
         def result = new DataFlowVariable()
         stream.whenBound() {result << it}
         new DefaultPGroup().task {
