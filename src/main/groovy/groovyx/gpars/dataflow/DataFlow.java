@@ -155,7 +155,7 @@ public abstract class DataFlow {
      * @param code   The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final DataFlowChannel input, final DataFlowChannel output, final Closure code) {
+    public static DataFlowProcessor operator(final DataFlowReadChannel input, final DataFlowWriteChannel output, final Closure code) {
         return DataFlow.DATA_FLOW_GROUP.operator(input, output, code);
     }
 
@@ -168,7 +168,7 @@ public abstract class DataFlow {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final DataFlowChannel input, final DataFlowChannel output, final int maxForks, final Closure code) {
+    public static DataFlowProcessor operator(final DataFlowReadChannel input, final DataFlowWriteChannel output, final int maxForks, final Closure code) {
         return DataFlow.DATA_FLOW_GROUP.operator(input, output, maxForks, code);
     }
 
@@ -272,7 +272,7 @@ public abstract class DataFlow {
      * @param outputChannels A list of channels to output to
      * @return A new active splitter instance
      */
-    public static DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowWriteChannel> outputChannels) {
+    public static DataFlowProcessor splitter(final DataFlowReadChannel inputChannel, final List<DataFlowWriteChannel> outputChannels) {
         return DataFlow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels);
     }
 
@@ -285,7 +285,7 @@ public abstract class DataFlow {
      * @param maxForks       Number of threads running the splitter's body, defaults to 1
      * @return A new active splitter instance
      */
-    public static DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels, final int maxForks) {
+    public static DataFlowProcessor splitter(final DataFlowReadChannel inputChannel, final List<DataFlowWriteChannel> outputChannels, final int maxForks) {
         return DataFlow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels, maxForks);
     }
 
@@ -296,7 +296,18 @@ public abstract class DataFlow {
      * @param channels Dataflow variables or streams to wait for values on
      * @return A new select instance
      */
-    public static Select<?> select(final DataFlowChannel<?>... channels) {
+    public static Select<?> select(final DataFlowReadChannel<?>... channels) {
+        return DataFlow.DATA_FLOW_GROUP.select(channels);
+    }
+
+    /**
+     * Creates a select using the default dataflow parallel group. The returns Select instance will allow the user to
+     * obtain values from the supplied dataflow variables or streams as they become available.
+     *
+     * @param channels Dataflow variables or streams to wait for values on
+     * @return A new select instance
+     */
+    public static Select<?> select(final List<DataFlowReadChannel> channels) {
         return DataFlow.DATA_FLOW_GROUP.select(channels);
     }
 }

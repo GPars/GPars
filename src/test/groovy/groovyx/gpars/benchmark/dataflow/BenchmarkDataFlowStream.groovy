@@ -18,6 +18,11 @@ package groovyx.gpars.benchmark.dataflow
 
 import groovyx.gpars.dataflow.DataFlowChannel
 import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataFlowReadChannel
+import groovyx.gpars.dataflow.DataFlowWriteChannel
+import groovyx.gpars.dataflow.stream.DataFlowStream
+import groovyx.gpars.dataflow.stream.DataFlowStreamReadAdapter
+import groovyx.gpars.dataflow.stream.DataFlowStreamWriteAdapter
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
@@ -26,7 +31,12 @@ final def group1 = new DefaultPGroup(4)
 final def group2 = new DefaultPGroup(4)
 final def stream = new DataFlowQueue()
 
-//perform(group1, group2, 4, 4, 10, new DataFlowStream())
+final DataFlowStream dfStream = new DataFlowStream()
+final DataFlowStreamWriteAdapter adapterForWrite = new DataFlowStreamWriteAdapter(dfStream)
+final DataFlowStreamReadAdapter adapterForRead = new DataFlowStreamReadAdapter(dfStream)
+perform(group1, group2, 2, 1, 4000000, adapterForRead, adapterForWrite)
+
+perform(group1, group2, 2, 1, 4000000, stream)
 
 perform(group1, group2, 4, 4, 4000000, stream)
 perform(group1, group2, 4, 4, 4000000, stream)
@@ -37,17 +47,22 @@ perform(group1, group2, 2, 6, 4000000, stream)
 perform(group1, group2, 1, 6, 4000000, stream)
 
 def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, DataFlowChannel stream) {
-    assert !stream.bound
+    perform(producerGroup, consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, stream, stream)
+
+}
+
+def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, DataFlowReadChannel streamToRead, DataFlowWriteChannel streamToWrite) {
+    assert !streamToRead.bound
     final long numberOfMessagesPerProducer = numberOfMessages / numberOfProducers
 
     final def finishedSignal = new CountDownLatch(numberOfProducers)
     final def startSignal = new CountDownLatch(1)
     numberOfConsumers.times {
         consumerGroup.task {
-            def value = stream.val
+            def value = streamToRead.val
             while (value != null) {
                 if (value == -1) finishedSignal.countDown()
-                value = stream.val
+                value = streamToRead.val
             }
         }
     }
@@ -56,9 +71,9 @@ def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numbe
         producerGroup.task {
             startSignal.await()
             for (int i = 0; i < numberOfMessagesPerProducer; i++) {
-                stream.bind num
+                streamToWrite.bind num
             }
-            stream.bind(-1)
+            streamToWrite.bind(-1)
         }
     }
 
@@ -68,7 +83,7 @@ def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numbe
     def l2 = System.currentTimeMillis()
 
     numberOfConsumers.times {
-        stream.bind null
+        streamToWrite.bind null
     }
 
     println "Number of messages: ${numberOfMessages}"

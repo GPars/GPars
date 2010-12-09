@@ -18,72 +18,58 @@ package groovyx.gpars.dataflow.stream;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.dataflow.DataFlowChannel;
 import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowReadChannel;
 import groovyx.gpars.dataflow.DataFlowVariable;
-import groovyx.gpars.dataflow.DataFlowWriteChannel;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
-//todo unchecked casts
-//todo a thread-safe variant - multiple writers and readers
-@SuppressWarnings({"rawtypes", "TailRecursion", "RawUseOfParameterizedType", "unchecked"})
-public class DataFlowStreamAdapter<T> implements DataFlowChannel<T> {
+/**
+ * Adapts a DataFlowStream to accommodate for the DataFlowReadChannel interface.
+ * To minimize the overhead and stay in-line with the DataFlowStream semantics, the DataFlowStreamReadAdapter class is not thread-safe
+ * and should only be used from within a single thread.
+ * If multiple threads need to read from a DataFlowStream, they should each create their own wrapping DataFlowStreamReadAdapter.
+ *
+ * @param <T> The type of messages to pass through the stream
+ */
+public class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T> {
 
     private DataFlowStream<T> head;
-    private DataFlowStream<T> tail;
+    private DataFlowStream<T> asyncHead;
 
-    public DataFlowStreamAdapter() {
-        this(new DataFlowStream<T>());
-    }
-
-    public DataFlowStreamAdapter(final DataFlowStream<T> stream) {
+    /**
+     * Creates a new adapter
+     *
+     * @param stream The stream to wrap
+     */
+    public DataFlowStreamReadAdapter(final DataFlowStream<T> stream) {
         this.head = stream;
-        this.tail = stream;
+        this.asyncHead = head;
     }
 
-    @Override
-    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
-        head = head.leftShift(ref);
-        return this;
-    }
-
-    @Override
-    public DataFlowWriteChannel<T> leftShift(final T value) {
-        head = head.leftShift(value);
-        return this;
-    }
-
-    @Override
-    public void bind(final T value) {
-        head = head.leftShift(value);
-    }
-
-    //todo consider adding to the interface
     public Iterator<T> iterator() {
-        return new FListIterator<T>(tail);
+        return new FListIterator<T>(head);
     }
 
     @Override
     public String toString() {
-        return tail.toString();
+        return head.toString();
     }
 
     @Override
     public T getVal() throws InterruptedException {
-        final T first = tail.getFirst();
-        tail = (DataFlowStream<T>) tail.getRest();
+        final T first = head.getFirst();
+        moveHead();
         return first;
     }
 
     @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        tail.getFirstDFV().getVal(timeout, units);
-        if (tail.getFirstDFV().isBound()) {
-            final T result = tail.getFirst();
-            tail = (DataFlowStream<T>) tail.getRest();
+        head.getFirstDFV().getVal(timeout, units);
+        if (head.getFirstDFV().isBound()) {
+            final T result = head.getFirst();
+            moveHead();
             return result;
         } else {
             return null;
@@ -92,52 +78,64 @@ public class DataFlowStreamAdapter<T> implements DataFlowChannel<T> {
 
     @Override
     public void getValAsync(final MessageStream callback) {
-        tail.getFirstDFV().getValAsync(callback);
+        asyncHead.getFirstDFV().getValAsync(callback);
+        moveAsyncHead();
     }
 
     @Override
     public void getValAsync(final Object attachment, final MessageStream callback) {
-        tail.getFirstDFV().getValAsync(attachment, callback);
+        asyncHead.getFirstDFV().getValAsync(attachment, callback);
+        moveAsyncHead();
     }
 
     @Override
     public void rightShift(final Closure closure) {
-        tail.getFirstDFV().rightShift(closure);
+        whenBound(closure);
     }
 
     @Override
     public void whenBound(final Closure closure) {
-        tail.getFirstDFV().whenBound(closure);
+        asyncHead.getFirstDFV().whenBound(closure);
+        moveAsyncHead();
     }
 
     @Override
     public void whenBound(final MessageStream stream) {
-        this.tail.getFirstDFV().whenBound(stream);
+        asyncHead.getFirstDFV().whenBound(stream);
+        moveAsyncHead();
     }
 
-    //todo provide implementation
     @Override
     public void wheneverBound(final Closure closure) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        head.wheneverBound(closure);
     }
 
     @Override
     public void wheneverBound(final MessageStream stream) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        head.wheneverBound(stream);
     }
 
     @Override
     public boolean isBound() {
-        return tail.getFirstDFV().isBound();
+        return head.getFirstDFV().isBound();
     }
 
     @Override
     public DataFlowExpression<T> poll() throws InterruptedException {
-        final DataFlowVariable<T> firstDFV = tail.getFirstDFV();
+        final DataFlowVariable<T> firstDFV = head.getFirstDFV();
         if (firstDFV.isBound()) {
-            tail = (DataFlowStream<T>) tail.getRest();
+            moveHead();
             return firstDFV;
         } else return null;
+    }
+
+    private void moveHead() {
+        if (head == asyncHead) moveAsyncHead();
+        head = (DataFlowStream<T>) head.getRest();
+    }
+
+    private void moveAsyncHead() {
+        asyncHead = (DataFlowStream<T>) asyncHead.getRest();
     }
 }
 

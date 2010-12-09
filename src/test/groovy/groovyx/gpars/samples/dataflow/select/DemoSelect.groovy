@@ -47,5 +47,5 @@ task {
     c << 30
 }
 
-def select = select(a, b, c)
+def select = select([a, b, c])
 println "The fastest result is ${select()}"

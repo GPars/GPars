@@ -54,7 +54,7 @@ task {
     whoCares << 'The sound has disappeared'
 }
 
-def select = select(critical, ordinary, whoCares)
+def select = select([critical, ordinary, whoCares])
 println 'Starting to monitor our IT department'
 sleep 3000
 10.times {println "Received: ${select.prioritySelect().value}"}

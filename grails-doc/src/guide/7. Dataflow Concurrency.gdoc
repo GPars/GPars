@@ -98,7 +98,8 @@ And these are the three essential rules your programs have to follow:
 
 h2. Dataflow Streams and Queues
 
-Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams and queues to have a full picture of Dataflow Concurrency. Except for dataflow variables there's also a concept of _DataFlowQueues_ that you can leverage.
+Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams and queues to have a full picture of Dataflow Concurrency.
+Except for dataflow variables there are also the concepts of _DataFlowQueues_ and _DataFlowStream_ that you can leverage in your code.
 You may think of them as thread-safe buffers or queues. Check out a typical producer-consumer demo:
 
 {code}import static groovyx.gpars.dataflow.DataFlow.task
@@ -121,6 +122,116 @@ Both _DataFlowVariables_ and _DataFlowQueues_ implement the _DataFlowChannel_ in
 to read values from them. The ability to treat both types identically through the _DataFlowChannel_ interface comes in handy
 once you start using them to wire _tasks_, _operators_ or _selectors_ together.
 
+{note}
+The _DataFlowChannel_ interface combines two interfaces, each serving its purpose:
+* _DataFlowReadChannel_ holding all the methods necessary for reading values from a channel
+* _DataFlowWriteChannel_ holding all the methods necessary for writing values into a channel
+You may prefer using these dedicated interfaces instead of the general _DataFlowChannel_ interface, to better express the intended usage.
+{note}
+
+The _DataFlowChannel_ class, unlike the other communication elements, does not implement the _DataFlowChannel_ interface, since the semantics of its use is different.
+(We'll talk more on _DataFlowStream_ purpose later.)
+Use _DataFlowStreamReadAdapter_ and _DataFlowStreamWriteAdapter_ classes to wrap instances of the _DataFlowChannel_ class
+in _DataFlowReadChannel_ or _DataFlowWriteChannel_ implementations.
+
+h2. DataFlowStream
+
+
+h3. DataFlowStream Adapters
+
+Since the _DataFlowStream_ API as well as the semantics of its use are very different from the one defined by _DataFlow(Read/Write)Channel_ , adapters have to be used in order to allow _DataFlowStreams_
+to be used with other dataflow elements.
+The _DataFlowStreamReadAdapter_ class will wrap a _DataFlowStream_ with necessary methods to read values, while the _DataFlowStreamWriteAdapter_ class
+will provide write methods around the wrapped _DataFlowStream_ .
+
+{note}
+It is important to mention that the _DataFlowStreamWriteAdapter_ is thread safe allowing multiple threads to add values to the wrapped _DataFlowStream_ through the adapter.
+On the other hand, _DataFlowStreamReadAdapter is designed to be used by a single thread.
+To minimize the overhead and stay in-line with the DataFlowStream semantics, the _DataFlowStreamReadAdapter_ class is not thread-safe
+and should only be used from within a single thread.
+If multiple threads need to read from a DataFlowStream, they should each create their own wrapping _DataFlowStreamReadAdapter_ .
+{note}
+
+Thanks to the adapters _DataFlowStream_ can be used for communication between operators or selectors, which expect _DataFlow(Read/Write)Channels_ .
+
+{code}
+import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.stream.DataFlowStream
+import groovyx.gpars.dataflow.stream.DataFlowStreamReadAdapter
+import groovyx.gpars.dataflow.stream.DataFlowStreamWriteAdapter
+import static groovyx.gpars.dataflow.DataFlow.selector
+import static groovyx.gpars.dataflow.DataFlow.operator
+
+/**
+ * Demonstrates the use of DataFlowStreamAdapters to allow dataflow operators to use DataFlowStreams
+ */
+
+final DataFlowStream a = new DataFlowStream()
+final DataFlowStream b = new DataFlowStream()
+def aw = new DataFlowStreamWriteAdapter(a)
+def bw = new DataFlowStreamWriteAdapter(b)
+def ar = new DataFlowStreamReadAdapter(a)
+def br = new DataFlowStreamReadAdapter(b)
+
+def result = new DataFlowQueue()
+
+def op1 = operator(ar, bw) {
+    bindOutput it
+}
+def op2 = selector([br], [result]) {
+    result << it
+}
+
+aw << 1
+aw << 2
+aw << 3
+assert([1, 2, 3] == [result.val, result.val, result.val])
+op1.stop()
+op2.stop()
+op1.join()
+op2.join()
+
+{code}
+
+Also the ability to select a value from multiple _DataFlowChannels_ can only be used through an adapter around a _DataFlowStream_ :
+
+{code}
+import groovyx.gpars.dataflow.Select
+import groovyx.gpars.dataflow.stream.DataFlowStream
+import groovyx.gpars.dataflow.stream.DataFlowStreamReadAdapter
+import groovyx.gpars.dataflow.stream.DataFlowStreamWriteAdapter
+import static groovyx.gpars.dataflow.DataFlow.select
+import static groovyx.gpars.dataflow.DataFlow.task
+
+/**
+ * Demonstrates the use of DataFlowStreamAdapters to allow dataflow select to select on DataFlowStreams
+ */
+
+final DataFlowStream a = new DataFlowStream()
+final DataFlowStream b = new DataFlowStream()
+def aw = new DataFlowStreamWriteAdapter(a)
+def bw = new DataFlowStreamWriteAdapter(b)
+def ar = new DataFlowStreamReadAdapter(a)
+def br = new DataFlowStreamReadAdapter(b)
+
+final Select<?> select = select(ar, br)
+task {
+    aw << 1
+    aw << 2
+    aw << 3
+}
+assert 1 == select().value
+assert 2 == select().value
+assert 3 == select().value
+task {
+    bw << 4
+    aw << 5
+    bw << 6
+}
+def result = (1..3).collect{select()}.sort{it.value}
+assert result*.value == [4, 5, 6]
+assert result*.index == [1, 0, 1]
+{code}
 h2. Bind handlers
 
 {code}

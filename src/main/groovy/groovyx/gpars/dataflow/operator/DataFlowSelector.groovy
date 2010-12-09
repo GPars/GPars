@@ -134,7 +134,6 @@ private class DataFlowSelectorActor extends DataFlowProcessorActor {
         owningProcessor.doSelect()
     }
 
-    @Override
     final void onMessage(SelectResult message) {
         final def index = message.index
         final def value = message.value

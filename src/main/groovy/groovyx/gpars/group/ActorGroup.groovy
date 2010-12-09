@@ -24,7 +24,7 @@ import groovyx.gpars.actor.ReactiveActor
 import groovyx.gpars.actor.impl.RunnableBackedPooledActor
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowChannel
+import groovyx.gpars.dataflow.DataFlowReadChannel
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlowWriteChannel
 import groovyx.gpars.dataflow.Select
@@ -287,7 +287,7 @@ public abstract class PGroup {
      * @param output a dataflow channel to use for output
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    public DataFlowProcessor operator(final DataFlowChannel input, final DataFlowChannel output, final Closure code) {
+    public DataFlowProcessor operator(final DataFlowReadChannel input, final DataFlowWriteChannel output, final Closure code) {
         return new DataFlowOperator(this, [inputs: [input], outputs: [output]], code).start()
     }
 
@@ -298,7 +298,7 @@ public abstract class PGroup {
      * @param maxForks Number of parallel threads running operator's body, defaults to 1
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    public DataFlowProcessor operator(final DataFlowChannel input, final DataFlowChannel output, final int maxForks, final Closure code) {
+    public DataFlowProcessor operator(final DataFlowReadChannel input, final DataFlowWriteChannel output, final int maxForks, final Closure code) {
         return new DataFlowOperator(this, [inputs: [input], outputs: [output], maxForkd: maxForks], code).start()
     }
 
@@ -386,7 +386,7 @@ public abstract class PGroup {
      * @param inputChannel The channel to  read values from
      * @param outputChannels A list of channels to output to
      */
-    public DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowWriteChannel> outputChannels) {
+    public DataFlowProcessor splitter(final DataFlowReadChannel inputChannel, final List<DataFlowWriteChannel> outputChannels) {
         if (inputChannel == null || !outputChannels) throw new IllegalArgumentException("A splitter needs an input channel and at keast one output channel to be created.")
         return new DataFlowOperator(this, [inputs: [inputChannel], outputs: outputChannels], {bindAllOutputs it}).start()
     }
@@ -398,7 +398,7 @@ public abstract class PGroup {
      * @param outputChannels A list of channels to output to
      * @param maxForks Number of threads running the splitter's body, defaults to 1
      */
-    public DataFlowProcessor splitter(final DataFlowChannel inputChannel, final List<DataFlowChannel> outputChannels, int maxForks) {
+    public DataFlowProcessor splitter(final DataFlowReadChannel inputChannel, final List<DataFlowWriteChannel> outputChannels, int maxForks) {
         if (inputChannel == null || !outputChannels) throw new IllegalArgumentException("A splitter needs an input channel and at keast one output channel to be created.")
         return new DataFlowOperator(this, [inputs: [inputChannel], outputs: outputChannels, maxForks: maxForks], {bindAllOutputsAtomically it}).start()
     }
@@ -408,7 +408,16 @@ public abstract class PGroup {
      * obtain values from the supplied dataflow variables or streams as they become available.
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public Select select(final DataFlowChannel... channels) {
+    public Select select(final DataFlowReadChannel... channels) {
+        return new Select(this, channels)
+    }
+
+    /**
+     * Creates a select using the current parallel group. The returns Select instance will allow the user to
+     * obtain values from the supplied dataflow variables or streams as they become available.
+     * @param channels Dataflow variables or streams to wait for values on
+     */
+    public Select select(final List<DataFlowReadChannel> channels) {
         return new Select(this, channels)
     }
 

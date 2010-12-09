@@ -11,11 +11,11 @@
     <orderEntry type="module-library">
       <library name="Groovy">
         <CLASSES>
-          <root url="file://$GROOVY_HOME$/lib" />
+          <root url="file://C:/dev/groovy-1.7.2/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-        <jarDirectory url="file://$GROOVY_HOME$/lib" recursive="false" />
+        <jarDirectory url="file://C:/dev/groovy-1.7.2/lib" recursive="false" />
       </library>
     </orderEntry>
   </component>

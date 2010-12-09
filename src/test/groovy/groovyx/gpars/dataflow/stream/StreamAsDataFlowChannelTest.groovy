@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.stream
 
-import groovyx.gpars.dataflow.DataFlowChannel
+import groovyx.gpars.dataflow.DataFlowReadChannel
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.dataflow.DataFlow.task
@@ -24,34 +24,37 @@ import static groovyx.gpars.dataflow.DataFlow.task
 class StreamAsDataFlowChannelTest extends GroovyTestCase {
 
     public void testInterfaceImplemented() {
-        def stream = new DataFlowStreamAdapter(new DataFlowStream())
-        assert stream instanceof DataFlowChannel
+        def stream = new DataFlowStreamReadAdapter(new DataFlowStream())
+        assert stream instanceof DataFlowReadChannel
     }
 
     public void testGetVal() {
-        def stream = new DataFlowStreamAdapter(new DataFlowStream())
+        final DataFlowStream original = new DataFlowStream()
+        def stream = new DataFlowStreamReadAdapter(original)
         task {
-            stream << 1
+            original << 1
         }
         assert stream.val == 1
     }
 
     public void testRightShift() {
-        def stream = new DataFlowStreamAdapter(new DataFlowStream())
+        final DataFlowStream original = new DataFlowStream()
+        def stream = new DataFlowStreamReadAdapter(original)
         def result = new DataFlowVariable()
         stream >> {result << it}
         task {
-            stream << 1
+            original << 1
         }
         assert result.val == 1
     }
 
     public void testWhenBound() {
-        def stream = new DataFlowStreamAdapter()
+        def original = new DataFlowStream()
+        def stream = new DataFlowStreamReadAdapter(original)
         def result = new DataFlowVariable()
         stream.whenBound() {result << it}
         new DefaultPGroup().task {
-            stream << 1
+            original << 1
         }
         assert result.val == 1
     }
