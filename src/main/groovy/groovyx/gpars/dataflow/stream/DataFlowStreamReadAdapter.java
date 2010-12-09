@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
  * If multiple threads need to read from a DataFlowStream, they should each create their own wrapping DataFlowStreamReadAdapter.
  *
  * @param <T> The type of messages to pass through the stream
+ * @author Vaclav Pech
  */
 public class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T> {
 

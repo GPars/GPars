@@ -24,6 +24,7 @@ import groovyx.gpars.dataflow.DataFlowWriteChannel;
  * It also synchronizes all changes to the underlying stream allowing multiple threads accessing the stream concurrently.
  *
  * @param <T> The type of messages to pass through the stream
+ * @author Vaclav Pech
  */
 @SuppressWarnings({"SynchronizedMethod"})
 public class DataFlowStreamWriteAdapter<T> implements DataFlowWriteChannel<T> {
