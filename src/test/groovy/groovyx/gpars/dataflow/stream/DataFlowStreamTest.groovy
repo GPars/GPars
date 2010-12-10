@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
 import static groovyx.gpars.dataflow.DataFlow.task
 
-class StreamTest extends GroovyTestCase {
+class DataFlowStreamTest extends GroovyTestCase {
 
     def stream = new DataFlowStream()
 
