@@ -80,7 +80,16 @@ remain enhanced till they get garbage collected.
 
 h3. Exception handling
 
-If an exception is thrown while processing any of the passed-in closures, the exception gets re-thrown from the xxxParallel methods.
+If an exception is thrown while processing any of the passed-in closures, the first exception gets re-thrown from the xxxParallel methods and the algorithm stops as soon as possible.
+
+{note}
+The exception handling mechanism of GParsPool builds on the one built into the Fork/Join framework. Since Fork/Join algorithms are by nature hierarchical,
+once any part of the algorithm fails, there's usually little benefit from continuing the computation, since some branches of the algorithm will never return a result.
+
+Bear in mind that the GParsPool implementation doesn't give any guarantees about its behavior after a first unhandled exception occurs,
+beyond stopping the algorithm and re-throwing the first detected exception to the caller.
+This behavior, after all, is consistent with what the traditional sequential iteration methods do.
+{note}
 
 h3. Transparently parallel collections
 
