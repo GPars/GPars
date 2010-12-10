@@ -120,7 +120,7 @@ public class DataFlowStream<T> implements FList<T> {
     }
 
     /**
-     * Calsl the supplied closure with the stream as a parameter
+     * Calls the supplied closure with the stream as a parameter
      *
      * @param closure The closure to call
      * @return This instance of DataFlowStream
