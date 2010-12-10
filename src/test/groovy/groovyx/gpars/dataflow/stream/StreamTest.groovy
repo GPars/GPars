@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow.stream
 
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataFlows
 import static groovyx.gpars.dataflow.DataFlow.task
 
 class StreamTest extends GroovyTestCase {
@@ -46,6 +47,22 @@ class StreamTest extends GroovyTestCase {
         assert stream.rest.first == "second"
         assert stream.rest.rest.first == "third"
         assert stream.rest.rest.rest.isEmpty()
+    }
+
+    void testStreamReadFromManyConsumers() {
+        def results = new DataFlows()
+        def numConsumers = 10
+        task {
+            stream << "a" << "b" << DataFlowStream.eos();
+        }
+        (1..numConsumers).each { index ->
+            task {
+                results[index] = (stream.first + stream.rest.first)
+            }
+        }
+        (1..numConsumers).each { index ->
+            assert results[index] == "ab"
+        }
     }
 
     void testWritingIncompatiblyTwiceThrowsException() {
@@ -195,6 +212,32 @@ class StreamTest extends GroovyTestCase {
             }
         }
         assert sum == 499500
+    }
+
+    void testLargeStream() {
+        int n = 10000 // stack overflow with tail recursion
+        //int n = 1000 // works with tail recursion
+        def expectedSum = (n * (n - 1)) / 2
+
+        stream.generate(1, {it + 1}, {it < n})
+
+        int sumFromIteration = 0
+        for (a in stream)
+            sumFromIteration += a
+        assert sumFromIteration == expectedSum
+
+        def sumFromReduce = stream.reduce() {value, element ->
+            task {
+                value + element
+            }
+        }
+        assert sumFromReduce == expectedSum
+
+        def streamPlusOne = stream.map {value -> value + 1}
+        assert streamPlusOne.first == 2
+
+        def streamOnlyOdd = stream.filter {value -> (value % 2) == 1}
+        assert streamOnlyOdd.rest.first == 3
     }
 
 }

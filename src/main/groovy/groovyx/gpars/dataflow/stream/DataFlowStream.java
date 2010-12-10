@@ -106,14 +106,17 @@ public class DataFlowStream<T> implements FList<T> {
     }
 
     private void generateNext(final T value, final DataFlowStream<T> stream, final Closure generator, final Closure condition) {
-        final boolean addValue = (Boolean) condition.call(new Object[]{value});
-        if (!addValue) {
-            stream.leftShift(DataFlowStream.<T>eos());
-            return;
+        T recurValue = value;
+        DataFlowStream<T> recurStream = stream;
+        while (true) {
+            final boolean addValue = (Boolean) condition.call(new Object[]{recurValue});
+            if (!addValue) {
+                recurStream.leftShift(DataFlowStream.<T>eos());
+                return;
+            }
+            recurStream = recurStream.leftShift(recurValue);
+            recurValue = (T) eval(generator.call(new Object[]{recurValue}));
         }
-        final DataFlowStream<T> next = stream.leftShift(value);
-        final T nextValue = (T) eval(generator.call(new Object[]{value}));
-        generateNext(nextValue, next, generator, condition);
     }
 
     /**
@@ -211,15 +214,17 @@ public class DataFlowStream<T> implements FList<T> {
     }
 
     private void filter(final DataFlowStream<T> rest, final Closure filterClosure, final DataFlowStream<T> result) {
-        if (rest.isEmpty()) {
-            result.leftShift(DataFlowStream.<T>eos());
-            return;
+        DataFlowStream<T> recurRest = rest;
+        DataFlowStream<T> recurResult = result;
+        while (true) {
+            if (recurRest.isEmpty()) {
+                recurResult.leftShift(DataFlowStream.<T>eos());
+                return;
+            }
+            final boolean include = (Boolean) eval(filterClosure.call(new Object[]{recurRest.getFirst()}));
+            if (include) recurResult = recurResult.leftShift(recurRest.getFirst());
+            recurRest = (DataFlowStream<T>) recurRest.getRest();
         }
-        final boolean include = (Boolean) eval(filterClosure.call(new Object[]{rest.getFirst()}));
-        if (include)
-            filter((DataFlowStream<T>) rest.getRest(), filterClosure, result.leftShift(rest.getFirst()));
-        else
-            filter((DataFlowStream<T>) rest.getRest(), filterClosure, result);
     }
 
     /**
@@ -236,13 +241,17 @@ public class DataFlowStream<T> implements FList<T> {
     }
 
     private void map(final FList<T> rest, final Closure mapClosure, final DataFlowStream result) {
-        if (rest.isEmpty()) {
-            result.leftShift(DataFlowStream.eos());
-            return;
+        FList<T> recurRest = rest;
+        DataFlowStream recurResult = result;
+        while (true) {
+            if (recurRest.isEmpty()) {
+                recurResult.leftShift(DataFlowStream.eos());
+                return;
+            }
+            final Object mapped = mapClosure.call(new Object[]{recurRest.getFirst()});
+            recurResult = recurResult.leftShift(eval(mapped));
+            recurRest = recurRest.getRest();
         }
-        final Object mapped = mapClosure.call(new Object[]{rest.getFirst()});
-        final DataFlowStream newResult = result.leftShift(eval(mapped));
-        map((DataFlowStream<T>) rest.getRest(), mapClosure, newResult);
     }
 
     /**
@@ -271,10 +280,15 @@ public class DataFlowStream<T> implements FList<T> {
     }
 
     private T reduce(final T current, final FList<T> rest, final Closure reduceClosure) {
-        if (rest.isEmpty())
-            return current;
-        final Object aggregate = reduceClosure.call(new Object[]{current, rest.getFirst()});
-        return reduce((T) eval(aggregate), rest.getRest(), reduceClosure);
+        T recurCurrent = current;
+        FList<T> recurRest = rest;
+        while (true) {
+            if (recurRest.isEmpty())
+                return recurCurrent;
+            final Object aggregate = reduceClosure.call(new Object[]{recurCurrent, recurRest.getFirst()});
+            recurCurrent = (T) eval(aggregate);
+            recurRest = recurRest.getRest();
+        }
     }
 
     /**
