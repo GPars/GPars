@@ -18,6 +18,7 @@
 package groovyx.gpars
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CyclicBarrier
 
 /**
  * Author: Vaclav Pech
@@ -29,116 +30,133 @@ class MakeTransparentMethodTest extends GroovyTestCase {
     public void testTransparentEach() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().each {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentEachWithIndex() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().eachWithIndex {e, i ->
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentCollect() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().collect {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return it
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentGrep() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().grep {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return true
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentFind() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().find {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return false
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentFindAny() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().findAny {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return false
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentFindAll() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().findAll {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return true
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentAll() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
         GParsPool.withPool(5) {
             items.makeTransparent().every {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return true
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentAny() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().any {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return false
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentAnyOnString() {
@@ -146,7 +164,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final ConcurrentHashMap map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
             items.makeTransparent().any {
-                Thread.sleep 100
+                sleep 500
                 map[Thread.currentThread()] = ''
                 return false
             }
@@ -157,14 +175,16 @@ class MakeTransparentMethodTest extends GroovyTestCase {
     public void testTransparentGroupBy() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().groupBy {
-                Thread.sleep 100
+                barrier.await()
                 map[Thread.currentThread()] = ''
                 return it
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentMin() {

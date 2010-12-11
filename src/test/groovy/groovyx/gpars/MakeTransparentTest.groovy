@@ -18,6 +18,7 @@
 package groovyx.gpars
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CyclicBarrier
 
 /**
  * Author: Vaclav Pech
@@ -102,25 +103,29 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testIdempotenceOfNestingMakeTransparent() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().makeTransparent().each {
-                Thread.sleep 500
+                barrier.await()
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testMakeTransparentPropagationToResults() {
         def items = [1, 2, 3, 4, 5]
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
-                Thread.sleep 500
+                barrier.await()
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testNoMakeTransparentPropagationToResultsWithGroupBy() {
@@ -138,41 +143,47 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testMakeTransparentPropagationToResultsWithString() {
         def items = 'abcde'
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().collect {it * 2}.findAll {it.size() > 1}.each {
-                Thread.sleep 500
+                barrier.await()
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testMakeTransparentPropagationToResultsWithIterator() {
         def items = [1, 2, 3, 4, 5].iterator()
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(5)
+
         GParsPool.withPool(5) {
             items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
-                Thread.sleep 500
+                barrier.await()
                 map[Thread.currentThread()] = ''
             }
         }
-        assert map.keys().size() > 1
+        assert map.keys().size() == 5
     }
 
     public void testTransparentParallelInMethodCall() {
         def items = [1, 2, 3, 4, 5]
-        assertEquals 1, foo(items).keys().size()
+        assertEquals 1, foo(items, 1).keys().size()
 
         GParsPool.withPool(5) {
-            assertEquals 1, foo(items).keys().size()
-            assert foo(items.makeTransparent()).keys().size() > 3
+            assertEquals 1, foo(items, 1).keys().size()
+            assert foo(items.makeTransparent(), 5).keys().size() == 5
         }
     }
 
-    private def foo(Collection c) {
+    private def foo(Collection c, int count) {
         final ConcurrentHashMap map = new ConcurrentHashMap()
+        final CyclicBarrier barrier = new CyclicBarrier(count)
+
         c.collect {it * 2}.findAll {it > 1}.each {
-            Thread.sleep 50
+            barrier.await()
             map[Thread.currentThread()] = ''
         }
         return map
