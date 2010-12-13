@@ -41,21 +41,21 @@ public class DataFlowStreamWriteAdapter<T> implements DataFlowWriteChannel<T> {
     }
 
     @Override
-    public synchronized DataFlowWriteChannel<T> leftShift(final T value) {
+    public final synchronized DataFlowWriteChannel<T> leftShift(final T value) {
         head.leftShift(value);
         head = (DataFlowStream<T>) head.getRest();
         return this;
     }
 
     @Override
-    public synchronized DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
+    public final synchronized DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
         head.leftShift(ref);
         head = (DataFlowStream<T>) head.getRest();
         return this;
     }
 
     @Override
-    public synchronized void bind(final T value) {
+    public final synchronized void bind(final T value) {
         head.leftShift(value);
         head = (DataFlowStream<T>) head.getRest();
     }
@@ -63,6 +63,10 @@ public class DataFlowStreamWriteAdapter<T> implements DataFlowWriteChannel<T> {
     @Override
     public synchronized String toString() {
         return head.toString();
+    }
+
+    protected final synchronized DataFlowStream<T> getHead() {
+        return head;
     }
 }
 

@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
-public class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T> {
+public final class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T> {
 
     private DataFlowStream<T> head;
     private DataFlowStream<T> asyncHead;

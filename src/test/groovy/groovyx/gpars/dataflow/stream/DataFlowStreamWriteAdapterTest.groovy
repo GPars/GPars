@@ -18,13 +18,11 @@ package groovyx.gpars.dataflow.stream
 
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowReadChannel
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 
 public class DataFlowStreamWriteAdapterTest extends GroovyTestCase {
 
     public void testMultipleThreadedWrite() {
-        final CountDownLatch latch = new CountDownLatch(1)
         final def original = new DataFlowStream()
         final def writeStream = new DataFlowStreamWriteAdapter(original)
         final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)

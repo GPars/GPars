@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Johannes Link, Vaclav Pech
  */
 @SuppressWarnings({"rawtypes", "TailRecursion", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
-public class DataFlowStream<T> implements FList<T> {
+public final class DataFlowStream<T> implements FList<T> {
 
     private final DataFlowVariable<T> first = new DataFlowVariable<T>();
     private final AtomicReference<DataFlowStream<T>> rest = new AtomicReference<DataFlowStream<T>>();
