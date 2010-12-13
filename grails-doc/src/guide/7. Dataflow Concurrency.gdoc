@@ -96,11 +96,11 @@ And these are the three essential rules your programs have to follow:
 * It is not possible to change the value of a dataflow variable once it is bound.
 * Dataflow variables makes it easy to create concurrent stream agents.
 
-h2. Dataflow Streams and Queues
+h2. Dataflow Queues and Broadcasts
 
 Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams and queues to have a full picture of Dataflow Concurrency.
-Except for dataflow variables there are also the concepts of _DataFlowQueues_ and _DataFlowStream_ that you can leverage in your code.
-You may think of them as thread-safe buffers or queues. Check out a typical producer-consumer demo:
+Except for dataflow variables there are also the concepts of _DataFlowQueues_ and _DataFlowBroadcast_ that you can leverage in your code.
+You may think of them as thread-safe buffers or queues for message transfer among concurrent tasks or threads. Check out a typical producer-consumer demo:
 
 {code}import static groovyx.gpars.dataflow.DataFlow.task
 
@@ -118,8 +118,8 @@ task {
 }
 {code}
 
-Both _DataFlowVariables_ and _DataFlowQueues_ implement the _DataFlowChannel_ interface with common methods allowing users
-to read values from them. The ability to treat both types identically through the _DataFlowChannel_ interface comes in handy
+Both _DataFlowBroadcasts_ and _DataFlowQueues_ , just like _DataFlowVariables_ , implement the _DataFlowChannel_ interface with common methods allowing users
+to write to them and read values from them. The ability to treat both types identically through the _DataFlowChannel_ interface comes in handy
 once you start using them to wire _tasks_ , _operators_ or _selectors_ together.
 
 {note}
@@ -129,18 +129,46 @@ The _DataFlowChannel_ interface combines two interfaces, each serving its purpos
 You may prefer using these dedicated interfaces instead of the general _DataFlowChannel_ interface, to better express the intended usage.
 {note}
 
-The _DataFlowStream_ class, unlike the other communication elements, does not implement the _DataFlowChannel_ interface, since the semantics of its use is different.
-(We'll talk more on _DataFlowStream_ purpose later.)
-Use _DataFlowStreamReadAdapter_ and _DataFlowStreamWriteAdapter_ classes to wrap instances of the _DataFlowChannel_ class
-in _DataFlowReadChannel_ or _DataFlowWriteChannel_ implementations.
+h3. Point-to-point communication
+
+The _DataFlowQueue_ class can be viewed as a point-to-point (1 to 1, many to 1) communication channel. It allows one or more producers send messages to one reader.
+If multiple readers read from the same _DataFlowQueue_ , they will each consume different messages. Or to put it a different way, each message is consumed by exactly one reader.
+You can easily imagine a simple load-balancing scheme built around a shared _DataFlowQueue_ with readers being added dynamically when the consumer part of your algorithm needs to scale up.
+This is also a useful default choice when connecting tasks or operators.
+
+h3. Publish-subscribe communication
+
+The _DataFlowBroadcast_ class offers a publish-subscribe (1 to many, many to many) communication model. One or more producers write messages,
+while all registered readers will receive all the messages. Each message is thus consumed by all readers with a valid subscription at the moment when the message is being written to the channel.
+The readers subscribe by calling the _createReadChannel()_ method.
+
+{code}
+DataFlowWriteChannel broadcastStream = new DataFlowBroadcast()
+DataFlowReadChannel stream1 = broadcastStream.createReadChannel()
+DataFlowReadChannel stream2 = broadcastStream.createReadChannel()
+broadcastStream << 'Message1'
+broadcastStream << 'Message2'
+broadcastStream << 'Message3'
+assert stream1.val == stream2.val
+assert stream1.val == stream2.val
+assert stream1.val == stream2.val
+{code}
+
+Under the hood _DataFlowBroadcast_ uses the _DataFlowStream_ class to implement the message delivery.
 
 h2. DataFlowStream
 
-The _DataFlowStream_ class represents a deterministic dataflow channel. Unlike a _DataFlowQueue_ , _DataFlowStream_ allows multiple readers each to read all the messages.
+The _DataFlowStream_ class represents a deterministic dataflow channel. It is build around the concept of a functional queue and so provides a lock-free thread-safe implementation for message passing.
 Essentially, you may think of _DataFlowStream_ as a 1 to many communication channel, since when a reader consumes a messages,
 other readers will still be able to read the message. Also, all messages arrive to all readers in the same order.
-_DataFlowStream_ is implemented as a functional queue, which impacts the API in that users have to traverse the values in the stream themselves.
-On the other hand in offers handy methods for value filtering or transformation together with interesting performance characteristics.
+Since _DataFlowStream_ is implemented as a functional queue, its API requires that users traverse the values in the stream themselves.
+On the other hand _DataFlowStream_ offers handy methods for value filtering or transformation together with interesting performance characteristics.
+
+{note}
+The _DataFlowStream_ class, unlike the other communication elements, does not implement the _DataFlowChannel_ interface, since the semantics of its use is different.
+Use _DataFlowStreamReadAdapter_ and _DataFlowStreamWriteAdapter_ classes to wrap instances of the _DataFlowChannel_ class
+in _DataFlowReadChannel_ or _DataFlowWriteChannel_ implementations.
+{note}
 
 {code}
 import groovyx.gpars.dataflow.stream.DataFlowStream
@@ -297,6 +325,12 @@ def result = (1..3).collect{select()}.sort{it.value}
 assert result*.value == [4, 5, 6]
 assert result*.index == [1, 0, 1]
 {code}
+
+{note}
+If you don't need any of the functional queue _DataFlowStream-special_ functionality, like generation, filtering or mapping,
+you may consider using the _DataFlowBroadcast_ class instead, which offers the _publish-subscribe_ communication model through the _DataFlowChannel_ interface.
+{note}
+
 h2. Bind handlers
 
 {code}
@@ -306,17 +340,17 @@ a.whenBound {println "Just to confirm that the variable has been really set to $
 ...
 {code}
 
-A bound handlers can be registered on all dataflow channels (variables, queues or streams) either using the >> operator or the _whenBound()_ method. They will be run once a value is bound to the variable.
+A bound handlers can be registered on all dataflow channels (variables, queues or broadcasts) either using the >> operator or the _whenBound()_ method. They will be run once a value is bound to the variable.
 
-Dataflow queues also support a _wheneverBound_ method to register a closure or a message handler to run each time a value is bound to them.
+Dataflow queues and broadcasts also support a _wheneverBound_ method to register a closure or a message handler to run each time a value is bound to them.
 
 {code}
-def stream = new DataFlowQueue()
-stream.wheneverBound {println "A value $it arrived to the stream"}
+def queue = new DataFlowQueue()
+queue.wheneverBound {println "A value $it arrived to the queue"}
 {code}
 
 {note}
-Dataflow variables and streams are one of several possible ways to implement _Parallel Speculations_ . For details, please check out _Parallel Speculations_ in the _Parallel Collections_ section
+Dataflow variables and broadcasts are one of several possible ways to implement _Parallel Speculations_ . For details, please check out _Parallel Speculations_ in the _Parallel Collections_ section
 of the User Guide.
 {note}
 

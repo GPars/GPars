@@ -139,7 +139,7 @@ inputChannel << 3
 inputChannel << 4
 inputChannel << 5
 {code}
- May result in output streams having the values mixed-up something like:
+ May result in output channels having the values mixed-up something like:
 {code}
 a -> 1, 3, 2, 4, 5
 b -> 2, 1, 3, 5, 4
@@ -175,7 +175,7 @@ operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
 
 {note}
  Using the _bindAllOutputs_ or the _bindAllOutputValues_ methods will not guarantee atomicity of writes across al the output channels when using internal parallelism.
- If preserving the order of messages in multiple output streams is not an issue, _bindAllOutputs_ as well as _bindAllOutputValues_ will provide better performance over the atomic variants.
+ If preserving the order of messages in multiple output channels is not an issue, _bindAllOutputs_ as well as _bindAllOutputValues_ will provide better performance over the atomic variants.
 {note}
 
 h4. Stopping operators
