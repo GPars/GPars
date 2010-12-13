@@ -58,3 +58,4 @@ h3. Renaming hints
 
 * The _AbstractPooledActor_ class is now deprecated, use _DefaultActor_ instead
 * The _DataFlowStream_ class has been renamed to _DataFlowQueue_
+* The _memoize_ method family has been renamed to _gmemoize_ in order to avoid name collisions with memoize in Groovy 1.8
