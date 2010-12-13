@@ -36,7 +36,7 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
     public void testNullParams() {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {2}
-            Closure mem = cl.memoize()
+            Closure mem = cl.gmemoize()
             assertEquals 2, mem(5)
             assertEquals 2, mem(2)
             assertEquals 2, mem(null)
@@ -47,7 +47,7 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
         volatile int counter = 0
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {counter++; if (it == 5) return null else return 2}
-            Closure mem = cl.memoize()
+            Closure mem = cl.gmemoize()
             assert counter == 0
             assertEquals null, mem(5)
             assert counter == 1
@@ -62,7 +62,7 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
     public void testNoParams() {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {-> 2}
-            Closure mem = cl.memoize()
+            Closure mem = cl.gmemoize()
             assertEquals 2, mem()
             assertEquals 2, mem()
         }
@@ -75,7 +75,7 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
                 flag = true
                 it * 2
             }
-            Closure mem = cl.memoize()
+            Closure mem = cl.gmemoize()
             assertEquals 10, mem(5)
             assert flag
             flag = false
@@ -104,7 +104,7 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
                 callFlag << true
                 c
             }
-            Closure mem = cl.memoize()
+            Closure mem = cl.gmemoize()
             checkParams(mem, callFlag, [1, 2, 3], 3)
             checkParams(mem, callFlag, [1, 2, 4], 4)
             checkParams(mem, callFlag, [1, [2], 4], 4)

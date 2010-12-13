@@ -19,16 +19,16 @@ package groovyx.gpars.samples.memoize
 import groovyx.gpars.GParsPool
 
 /**
- * Demonstrates closure result caching through the memoize mechanism
+ * Demonstrates closure result caching through the gmemoize mechanism
  * Without caching the raw algorithm would end-up taking very long to finish given the inherent
  * exponential time complexity of it.
- * Thanks to caching introduced through memoize(), each Fibonacci number has to be calculated only once
+ * Thanks to caching introduced through gmemoize(), each Fibonacci number has to be calculated only once
  * and so we turned the exponential complexity algorithm into a sequential one. With a single extra method call.
  */
 
 GParsPool.withPool {
     Closure fib
-    fib = {n -> n > 1 ? fib(n - 2) + fib(n - 1) : n}.memoizeAtMost(2)  //try to remove the memoize() method call to get the original slow exponential complexity behavior
+    fib = {n -> n > 1 ? fib(n - 2) + fib(n - 1) : n}.memoizeAtMost(2)  //try to remove the gmemoize() method call to get the original slow exponential complexity behavior
     println "Fib for 0: ${fib(0)}"
     println "Fib for 1: ${fib(1)}"
     println "Fib for 2: ${fib(2)}"

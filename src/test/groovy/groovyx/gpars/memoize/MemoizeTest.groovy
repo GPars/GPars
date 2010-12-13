@@ -23,6 +23,6 @@ package groovyx.gpars.memoize
 
 public class MemoizeTest extends AbstractMemoizeTest {
     Closure buildMemoizeClosure(Closure cl) {
-        cl.memoize()
+        cl.gmemoize()
     }
 }

@@ -24,7 +24,7 @@ package groovyx.gpars.memoize
 public class MemoizeAtLeastTest extends AbstractMemoizeTest {
 
     Closure buildMemoizeClosure(Closure cl) {
-        cl.memoizeAtLeast(100)
+        cl.gmemoizeAtLeast(100)
     }
 
     public void testZeroCache() {
@@ -34,7 +34,7 @@ public class MemoizeAtLeastTest extends AbstractMemoizeTest {
                 flag = true
                 it * 2
             }
-            Closure mem = cl.memoizeAtLeast(0)
+            Closure mem = cl.gmemoizeAtLeast(0)
             [1, 2, 3, 4, 5, 6].each {mem(it)}
             assert flag
         }

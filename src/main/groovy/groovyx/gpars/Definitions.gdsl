@@ -100,10 +100,10 @@ contributor(ThreadPoolBody) {
             method name: "callTimeoutAsync", type: "java.util.concurrent.Future", params: [timeout: 'groovy.time.Duration']
             method name: "callTimeoutAsync", type: "java.util.concurrent.Future", params: [timeout: 'Long', args: 'Object[]']
             method name: "callTimeoutAsync", type: "java.util.concurrent.Future", params: [timeout: 'groovy.time.Duration', args: 'Object[]']
-            method name: "memoize", type: "groovy.lang.Closure"
-            method name: "memoizeAtLeast", type: "groovy.lang.Closure", params: [protectedCacheSize: 'int']
-            method name: "memoizeAtMost", type: "groovy.lang.Closure", params: [maxCacheSize: 'int']
-            method name: "memoizeBetween", type: "groovy.lang.Closure", params: [protectedCacheSize: 'int', maxCacheSize: 'int']
+            method name: "gmemoize", type: "groovy.lang.Closure"
+            method name: "gmemoizeAtLeast", type: "groovy.lang.Closure", params: [protectedCacheSize: 'int']
+            method name: "gmemoizeAtMost", type: "groovy.lang.Closure", params: [maxCacheSize: 'int']
+            method name: "gmemoizeBetween", type: "groovy.lang.Closure", params: [protectedCacheSize: 'int', maxCacheSize: 'int']
         }
     }
 }

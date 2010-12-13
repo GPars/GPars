@@ -19,7 +19,7 @@ package groovyx.gpars.samples.memoize
 import groovyx.gpars.GParsPool
 
 /**
- * Demonstrates closure result caching through the memoize mechanism
+ * Demonstrates closure result caching through the gmemoize mechanism
  */
 GParsPool.withPool {
     def urls = ['http://www.dzone.com', 'http://www.theserverside.com', 'http://www.infoq.com']
@@ -27,7 +27,7 @@ GParsPool.withPool {
         println "Downloading $url"
         url.toURL().text.toUpperCase()
     }
-    Closure cachingDownload = download.memoize()
+    Closure cachingDownload = download.gmemoize()
 
     println 'Groovy sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GROOVY')}
     println 'Grails sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GRAILS')}

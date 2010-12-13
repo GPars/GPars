@@ -24,20 +24,20 @@ package groovyx.gpars.memoize
 public class MemoizeBetweenTest extends AbstractMemoizeTest {
 
     Closure buildMemoizeClosure(Closure cl) {
-        cl.memoizeBetween(50, 100)
+        cl.gmemoizeBetween(50, 100)
     }
 
     public void testParameters() {
         groovyx.gpars.GParsPool.withPool {
             Closure cl = {}
             shouldFail(IllegalArgumentException) {
-                cl.memoizeBetween(1, 0)
+                cl.gmemoizeBetween(1, 0)
             }
             shouldFail(IllegalArgumentException) {
-                cl.memoizeBetween(-2, -1)
+                cl.gmemoizeBetween(-2, -1)
             }
             shouldFail(IllegalArgumentException) {
-                cl.memoizeBetween(-1, -1)
+                cl.gmemoizeBetween(-1, -1)
             }
         }
     }
@@ -49,7 +49,7 @@ public class MemoizeBetweenTest extends AbstractMemoizeTest {
                 flag = true
                 it * 2
             }
-            Closure mem = cl.memoizeBetween(0, 0)
+            Closure mem = cl.gmemoizeBetween(0, 0)
             [1, 2, 3, 4, 5, 6].each {mem(it)}
             assert flag
             flag = false
@@ -66,7 +66,7 @@ public class MemoizeBetweenTest extends AbstractMemoizeTest {
                 flag = true
                 it * 2
             }
-            Closure mem = cl.memoizeBetween(3, 3)
+            Closure mem = cl.gmemoizeBetween(3, 3)
             [1, 2, 3, 4, 5, 6].each {mem(it)}
             assert flag
             flag = false

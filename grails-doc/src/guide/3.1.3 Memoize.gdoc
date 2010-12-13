@@ -7,6 +7,11 @@ The memoize functionality of GPars has been contributed to Groovy in version 1.8
 Memoize in GPars is almost identical, except that it searches the memoize caches concurrently using the surrounding thread pool and so may give
 performance benefits in some scenarios.
 
+{note}
+The GPars memoize functionality has been renamed to avoid future conflicts with the memoize functionality in Groovy.
+GPars now calls the methods with a preceding letter _g_ , such as gmemoize().
+{note}
+
 h2. Examples of use
 {code}
 GParsPool.withPool {
@@ -15,7 +20,7 @@ GParsPool.withPool {
         println "Downloading $url"
         url.toURL().text.toUpperCase()
     }
-    Closure cachingDownload = download.memoize()
+    Closure cachingDownload = download.gmemoize()
 
     println 'Groovy sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GROOVY')}
     println 'Grails sites today: ' + urls.findAllParallel {url -> cachingDownload(url).contains('GRAILS')}
@@ -50,7 +55,7 @@ Now with a little twist and added memoize cache the algorithm magically turns in
 
 {code}
 Closure fib
-fib = {n -> n > 1 ? fib(n - 1) + fib(n - 2) : n}.memoize()
+fib = {n -> n > 1 ? fib(n - 1) + fib(n - 2) : n}.gmemoize()
 {code}
 
 The extra memory we added cut off all but one recursive branches of the calculation. And all subsequent calls to the same _fib_

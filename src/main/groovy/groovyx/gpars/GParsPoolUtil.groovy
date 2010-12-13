@@ -138,7 +138,7 @@ public class GParsPoolUtil {
      * The cache gets garbage-collected together with the memoized closure.
      * @return A new function forwarding to the original one while caching the results
      */
-    public static Closure memoize(final Closure cl) {
+    public static Closure gmemoize(final Closure cl) {
         return buildMemoizeFunction([:] as ConcurrentHashMap, cl)
     }
 
@@ -157,8 +157,8 @@ public class GParsPoolUtil {
      * @param maxCacheSize The maximum size the cache can grow to
      * @return A new function forwarding to the original one while caching the results
      */
-    public static Closure memoizeAtMost(final Closure cl, int maxCacheSize) {
-        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeAtMost.")
+    public static Closure gmemoizeAtMost(final Closure cl, int maxCacheSize) {
+        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for gmemoizeAtMost.")
 
         return buildMemoizeFunction(new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
     }
@@ -195,8 +195,8 @@ public class GParsPoolUtil {
      *
      * The cache gets garbage-collected together with the memoized closure.
      */
-    public static Closure memoizeAtLeast(final Closure cl, int protectedCacheSize) {
-        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeAtLeast.")
+    public static Closure gmemoizeAtLeast(final Closure cl, int protectedCacheSize) {
+        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeAtLeast.")
 
         return buildSoftReferenceMemoizeFunction(protectedCacheSize, [:] as ConcurrentHashMap, cl)
     }
@@ -222,10 +222,10 @@ public class GParsPoolUtil {
      *
      * The cache gets garbage-collected together with the memoized closure.
      */
-    public static Closure memoizeBetween(final Closure cl, int protectedCacheSize, int maxCacheSize) {
-        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for memoizeBetween.")
-        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for memoizeBetween.")
-        if (protectedCacheSize > maxCacheSize) throw new IllegalArgumentException("The maxCacheSize parameter to memoizeBetween is required to be greater or equal to the protectedCacheSize parameter.")
+    public static Closure gmemoizeBetween(final Closure cl, int protectedCacheSize, int maxCacheSize) {
+        if (protectedCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the protectedCacheSize parameter for gmemoizeBetween.")
+        if (maxCacheSize < 0) throw new IllegalArgumentException("A non-negative number is required as the maxCacheSize parameter for gmemoizeBetween.")
+        if (protectedCacheSize > maxCacheSize) throw new IllegalArgumentException("The maxCacheSize parameter to gmemoizeBetween is required to be greater or equal to the protectedCacheSize parameter.")
 
         return buildSoftReferenceMemoizeFunction(protectedCacheSize, new LRUProtectionStorage(maxCacheSize).asSynchronized(), cl)
     }
