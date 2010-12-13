@@ -143,7 +143,7 @@ try {
             }
             pom.project {
                 name "GPars"
-                description "The Groovy and Java concurrency library"
+                description "The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more"
                 url "http://gpars.codehaus.org"
                 inceptionYear "2009"
                 licenses {
@@ -153,7 +153,6 @@ try {
                         distribution 'repo'
                     }
                 }
-
             }
             // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
             pom.whenConfigured {pom ->
