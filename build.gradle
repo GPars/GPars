@@ -87,7 +87,9 @@ dependencies {
 
     docs group: 'commons-logging', name: 'commons-logging', version: '1.1.1'
 
-    deployerJars 'org.apache.maven.wagon:wagon-webdav-jackrabbit:1.0-beta-7'
+//    deployerJars 'org.apache.maven.wagon:wagon-webdav-jackrabbit:1.0-beta-7'
+    deployerJars "org.apache.maven.wagon:wagon-http-lightweight:1.0-beta-6"
+
     cover 'net.sourceforge.cobertura:cobertura:1.9.4.1'
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
 }
@@ -128,29 +130,44 @@ task integrationTest(type: Test, dependsOn: 'test') {
 
 try {
     uploadArchives {
-        repositories.mavenDeployer {
+        project.deployer = repositories.mavenDeployer {
             uniqueVersion = false
             configuration = configurations.deployerJars
-            repository(url: "dav:https://dav.codehaus.org/repository/gpars/") {
+
+            repository(url: "https://dav.codehaus.org/repository/gpars/") {
                 authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
             }
-            snapshotRepository(url: "dav:https://dav.codehaus.org/snapshots.repository/gpars/") {
+            snapshotRepository(url: "https://dav.codehaus.org/snapshots.repository/gpars/") {
                 authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+            }
+            pom.project {
+                name "GPars"
+                description "The Groovy and Java concurrency library"
+                url "http://gpars.codehaus.org"
+                inceptionYear "2009"
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
             }
             // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
             pom.whenConfigured {pom ->
                 // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
                 pom.dependencies.each {dependency ->
-                    def optionalDependencies = ['netty', 'jcsp']
-                    if (dependency.artifactId in optionalDependencies) {
+                    if (dependency.artifactId in ['netty', 'jcsp']) {
                         dependency.optional = true
                     }
                 }
+                // Remove test dependencies from all poms
+                pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == "test" })
             }
         }
     }
-}
-catch (Exception e) {
+} catch (Exception e) {
     //  It may be that gpars_repoUserName and/or gpars_repoPassword are not defined in which case an exception
     //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
     //  care that the uploadArchives specification hasn't completed.
