@@ -176,12 +176,15 @@ public class DataFlowVariableTest extends GroovyTestCase {
 
         def t1 = System.currentTimeMillis()
 
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
         Thread.start {
-            sleep 3000
+            barrier.await()
             variable << 10
         }
         variable.join(10, TimeUnit.MILLISECONDS)
         assert !variable.isBound()
+        barrier.await()
 
         variable.join(10, TimeUnit.MINUTES)
         assert 10 == variable.val
