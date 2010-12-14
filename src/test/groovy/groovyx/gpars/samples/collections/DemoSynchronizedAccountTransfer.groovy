@@ -24,15 +24,15 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Dierk König
  */
 class Account {
-    final int balance = 0
+    int balance = 0
 
     synchronized void credit(int add) {
         this.@balance += add
     }
 
-    /** Syncs on this and target */
+    /** Syncs on this and target  */
     void transferTo(Account target, int amount) {
-        def locks = [this,target].sort{ System.identityHashCode it }
+        def locks = [this, target].sort { System.identityHashCode it }
         synchronized (locks[0]) {
             synchronized (locks[1]) {
                 credit(-amount)
