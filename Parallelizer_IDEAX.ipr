@@ -5694,15 +5694,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/coconut/forkjoin/jsr166y/070108/jsr166y-070108-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.gpars:gpars:0.11-beta-4">
+    <library name="Maven: org.codehaus.gpars:gpars:0.11">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-4/gpars-0.11-beta-4.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11/gpars-0.11.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-4/gpars-0.11-beta-4-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11/gpars-0.11-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11-beta-4/gpars-0.11-beta-4-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11/gpars-0.11-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.codehaus.groovy:groovy-all:1.6.9">
