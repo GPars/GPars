@@ -20,47 +20,49 @@ import groovyx.gpars.scheduler.DefaultPool;
 import groovyx.gpars.scheduler.Pool;
 
 /**
- * Provides logical grouping for actors, agents and dataflow tasks and operators. Each group has an underlying thread pool, which will perform actions
- * on behalf of the users belonging to the group. Actors created through the DefaultPGroup.actor() method
- * will automatically belong to the group through which they were created, just like agents created through the agent() or fairAgent() methods
- * or dataflow tasks and operators created through the task() or operator() methods.
- * Uses a pool of non-daemon threads.
- * The DefaultPGroup class implements the Pool interface through @Delegate.
+ * Provides logical grouping for actors, agents and dataflow tasks and operators. Each group has an
+ * underlying thread pool, which will perform actions on behalf of the users belonging to the group. {@code
+ * Actors} created through the {@code DefaultPGroup.actor} method will automatically belong to the group
+ * through which they were created, just like agents created through the {@code agent} or {@code fairAgent}
+ * methods or dataflow tasks and operators created through the {@code task} or {@code operator} methods.
+ * Uses a pool of non-daemon threads.  The {@code DefaultPGroup} class implements the {@code Pool} interface
+ * through {@code @Delegate}.
+ *
  * <pre>
- * <p/>
  * def group = new DefaultPGroup()
  * group.resize 1
- * <p/>
- * def actor = group.actor {*     react {message ->
- *         println message
- * }*}.start()
- * <p/>
+ * def actor = group.actor {
+ *   react {message ->
+ *     println message
+ *   }
+ * }.start()
  * actor.send 'Hi!'
- * ...
+ * . . .
  * group.shutdown()
  * </pre>
- * <p/>
- * Otherwise, if constructing Actors directly through their constructors, the AbstractPooledActor.parallelGroup property,
- * which defaults to the Actors.defaultActorPGroup, can be set before the actor is started.
- * <p/>
+ *
+ * <p>
+ * Otherwise, if constructing {@code Actors} directly through their constructors, the {@code
+ * AbstractPooledActor.parallelGroup} property, which defaults to the {@code Actors.defaultActorPGroup}, can
+ * be set before the actor is started.
+ * </p>
+ *
  * <pre>
  * def group = new DefaultPGroup()
- * <p/>
  * def actor = new MyActor()
  * actor.parallelGroup = group
  * actor.start()
- * ...
+ * . . .
  * group.shutdown()
- * <p/>
  * </pre>
  *
  * @author Vaclav Pech
- *         Date: May 4, 2009
  */
 public final class DefaultPGroup extends PGroup {
 
     /**
-     * Creates a group for actors, agents, tasks and operators. The actors will share the supplied thread pool.
+     * Creates a group for actors, agents, tasks and operators. The actors will share the supplied thread
+     * pool.
      *
      * @param threadPool The thread pool to use for the group
      */
