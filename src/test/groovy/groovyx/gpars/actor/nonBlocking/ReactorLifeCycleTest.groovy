@@ -158,6 +158,7 @@ public class ReactorLifeCycleTest extends GroovyTestCase {
         final Actor actor = group.reactor {
             barrier.await()
             Thread.sleep 30000
+            if (Thread.currentThread().isInterrupted()) return 0
             counter.set 10
             10
         }
