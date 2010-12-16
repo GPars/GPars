@@ -32,7 +32,7 @@ import groovyx.gpars.scheduler.Pool;
  * def group = new DefaultPGroup()
  * group.resize 1
  * def actor = group.actor {
- *   react {message ->
+ *   react { message ->
  *     println message
  *   }
  * }.start()
