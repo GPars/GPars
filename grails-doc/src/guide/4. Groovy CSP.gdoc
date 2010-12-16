@@ -19,5 +19,3 @@ By default, without actively adding an explicit dependency on JCSP in your build
 the standard commercial-software-friendly Apache 2 License terms apply to your project. GPars directly only depends on software licensed under licenses
 compatible with the Apache 2 License.
 {note}
-
-todo
