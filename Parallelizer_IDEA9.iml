@@ -59,7 +59,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/spock-core-0.4-groovy-1.7-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/spock-core-0.5-groovy-1.7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
