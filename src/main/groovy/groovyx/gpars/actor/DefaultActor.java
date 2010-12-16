@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The DefaultActor class is teh base for all stateful actors, who need to maintain implicit state between subsequent message arrivals.
+ * The DefaultActor class is the base for all stateful actors, who need to maintain implicit state between subsequent message arrivals.
  * Allowing the actor creator to structure code in a continuation-like style with message retrieval react commands mixed within normal code
  * makes implementation of some algorithms particularly easy.
  * <p/>
