@@ -243,7 +243,7 @@ task zipJavaDemo(type: Zip) {
 task copyThirdPartyLibs(type: Copy) {
     from('lib')
     into('build/dist')
-    exclude('junit-4.7.jar', 'netty-3.1.5.GA-sources.jar')
+    exclude('junit-4.7.jar', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
 }
 
 task copyLibs(type: Copy) {
