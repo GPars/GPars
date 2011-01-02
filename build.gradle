@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,8 +63,8 @@ jar {
 repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
-    //mavenRepo urls: ["http://snapshots.repository.codehaus.org"]
-    mavenRepo urls: ["http://repository.codehaus.org"]
+    mavenRepo urls: ['http://repository.codehaus.org']
+    //mavenRepo urls: ['http://snapshots.repository.codehaus.org']
 }
 
 configurations {
@@ -79,18 +79,14 @@ dependencies {
     testCompile group: 'org.spockframework', name: 'spock-core', version: hasProperty('spockVersion') ? spockVersion : '0.5-groovy-1.6'
     compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
-//    compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
-    //compile files('lib/jcsp.jar', 'lib/jcsp-demos-util.jar')
+    //compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
     compile group: 'org.codehaus.jcsp', name: 'jcsp', version: '1.1-rc5'
     docs group: 'org.grails', name: 'grails-docs', version: '1.3.5'
     docs group: 'radeox', name: 'radeox', version: '1.0-b2'
-
     docs group: 'commons-logging', name: 'commons-logging', version: '1.1.1'
-
-//    deployerJars 'org.apache.maven.wagon:wagon-webdav-jackrabbit:1.0-beta-7'
-//    deployerJars "org.apache.maven.wagon:wagon-http:1.0-beta-6"
+    //deployerJars 'org.apache.maven.wagon:wagon-webdav-jackrabbit:1.0-beta-7'
+    //deployerJars "org.apache.maven.wagon:wagon-http:1.0-beta-6"
     deployerJars "org.apache.maven.wagon:wagon-http-lightweight:1.0-beta-6"
-
     cover 'net.sourceforge.cobertura:cobertura:1.9.4.1'
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
 }
@@ -114,7 +110,7 @@ task release(dependsOn: ['build']) << {
 }
 
 task withCoverage { // only here such that it can be put on the command line for enabling coverage
-    description = "prepare the test task to use code coverage if needed"
+    description = 'Prepare the test task to use code coverage if needed.'
 }
 
 test {
@@ -134,18 +130,17 @@ try {
         project.deployer = repositories.mavenDeployer {
             uniqueVersion = false
             configuration = configurations.deployerJars
-
-            repository(url: "https://dav.codehaus.org/repository/gpars/") {
+            repository(url: 'https://dav.codehaus.org/repository/gpars/') {
                 authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
             }
-            snapshotRepository(url: "https://dav.codehaus.org/snapshots.repository/gpars/") {
+            snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
                 authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
             }
             pom.project {
-                name "GPars"
-                description "The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more"
-                url "http://gpars.codehaus.org"
-                inceptionYear "2009"
+                name 'GPars'
+                description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
+                url 'http://gpars.codehaus.org'
+                inceptionYear '2009'
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
@@ -163,7 +158,7 @@ try {
                     }
                 }
                 // Remove test dependencies from all poms
-                pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == "test" })
+                pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == 'test' })
             }
         }
     }
@@ -171,7 +166,7 @@ try {
     //  It may be that gpars_repoUserName and/or gpars_repoPassword are not defined in which case an exception
     //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
     //  care that the uploadArchives specification hasn't completed.
-    println 'Upload archives thrown an exception'
+    println 'Upload archives thrown an exception.'
     e.printStackTrace()
 }
 
@@ -271,8 +266,8 @@ zipDist << {
 }
 
 task wrapper(type: Wrapper) {
-    jarPath = 'wrapper'
-    gradleVersion = '0.9-rc-3'
+    jarFile = 'wrapper/gradle-wrapper.jar'
+    gradleVersion = '0.9'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
@@ -314,14 +309,9 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
 }
 
 class DemoTask extends DefaultTask {
-    @org.gradle.api.tasks.InputFiles
-    FileCollection classpath
-
-    @org.gradle.api.tasks.InputFiles
-    FileCollection demoFiles
-
+    @org.gradle.api.tasks.InputFiles FileCollection classpath
+    @org.gradle.api.tasks.InputFiles FileCollection demoFiles
     List excludedDemos
-
     @org.gradle.api.tasks.TaskAction
     def runDemos() {
         def shell = createShell()
@@ -342,12 +332,10 @@ class DemoTask extends DefaultTask {
         println "=== demos: $ok ok, ${failed.size()} failed"
         failed.each { println "${it.file}\n    ${it.exception}" }
     }
-
     private GroovyShell createShell() {
         URLClassLoader classloader = new URLClassLoader(
                 classpath.files.collect {File classpathElement -> classpathElement.toURL()} as URL[],
                 Thread.currentThread().contextClassLoader
-
         )
         System.metaClass.static.exit = {int returnCode -> println ">>> System.exit($returnCode) suppressed." }
         System.in.metaClass.read = {-> println ">>> System.in.read() suppressed"; 'Automated build' }
