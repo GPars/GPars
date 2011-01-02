@@ -60,7 +60,8 @@ public class SerialHandle extends ManagedReference<WithSerialId> {
      */
     private volatile Object subscribers;
 
-    private volatile WithSerialId anchor;
+    @SuppressWarnings("unused")
+    private volatile WithSerialId anchor; //  TODO:  Eclipse requires this to be tagged as unused.
 
     /**
      * Construct handle for object with given id to it

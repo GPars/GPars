@@ -76,7 +76,7 @@ final class AttackActor extends DefaultActor {
     }
 }
 
-final class RunnableAttackActor extends RunnableBackedPooledActor implements Runnable {
+final class RunnableAttackActor extends RunnableBackedPooledActor {
 
     final def attackSignal
     final def retreatSignal

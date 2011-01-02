@@ -82,9 +82,9 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     /**
      * Counter of messages in the queues
      */
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings({"UnusedDeclaration","unused"})
     //modified through countUpdater
-    private volatile int count;
+    private volatile int count; //  TODO:  Eclipse requires this to be tagged as unused.
 
     private static final AtomicReferenceFieldUpdater<SequentialProcessingActor, Node> inputQueueUpdater = AtomicReferenceFieldUpdater.newUpdater(SequentialProcessingActor.class, Node.class, "inputQueue");
 
@@ -602,6 +602,7 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
      *
      * @author Vaclav Pech
      */
+    @SuppressWarnings("unused") //  TODO:  Eclipse requires this to be tagged as unused.
     private final class MultiMessageReaction extends Closure implements GeneratedClosure {
         private static final long serialVersionUID = -4047888721838663324L;
         private final Closure code;

@@ -81,7 +81,7 @@ public abstract class AsyncMessagingCore implements Runnable {
     /**
      * Indicates, whether there's an active thread handling a message inside the agent's body
      */
-    @SuppressWarnings({"FieldMayBeFinal"})
+    @SuppressWarnings({"FieldMayBeFinal","unused"}) //  TODO:  Eclipse requires this to be tagged as unused.
     private volatile int active = AsyncMessagingCore.PASSIVE;
     private static final AtomicIntegerFieldUpdater<AsyncMessagingCore> activeUpdater = AtomicIntegerFieldUpdater.newUpdater(AsyncMessagingCore.class, "active");
     private static final int PASSIVE = 0;

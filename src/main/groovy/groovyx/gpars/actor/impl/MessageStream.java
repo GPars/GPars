@@ -237,6 +237,7 @@ public abstract class MessageStream extends WithSerialId {
          *
          * @param msg The message that failed to get delivered
          */
+        @SuppressWarnings("unused") //  TODO:  Eclipse requires this to be tagged as unused.
         public void onDeliveryError(final Object msg) {
             send(new IllegalStateException("Delivery error. Maybe target actor is not active"));
         }

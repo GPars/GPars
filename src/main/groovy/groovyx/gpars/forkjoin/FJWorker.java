@@ -51,6 +51,6 @@ final class FJWorker<T> extends AbstractForkJoinWorker<T> {
 
     @Override
     protected T computeTask() {
-        return (T) code.call((Object[]) args);
+        return (T) code.call(args);
     }
 }
