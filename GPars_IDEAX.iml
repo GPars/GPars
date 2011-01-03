@@ -24,30 +24,16 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="netty">
+      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/netty-3.1.5.GA.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/netty-3.1.5.GA-sources.jar!/" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="Groovy">
-        <CLASSES>
-          <root url="file://$GROOVY_HOME$/lib" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$GROOVY_HOME$/src/main" />
-        </SOURCES>
-        <jarDirectory url="file://$GROOVY_HOME$/lib" recursive="false" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="jcsp">
+      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jcsp-1.1-rc5.jar!/" />
         </CLASSES>
