@@ -6,3 +6,4 @@ gradle-app.setting
 cobertura.ser
 buildSrc/.gradle
 buildSrc/build
+*.iws
