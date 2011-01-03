@@ -267,7 +267,7 @@ zipDist << {
 
 task wrapper(type: Wrapper) {
     jarFile = 'wrapper/gradle-wrapper.jar'
-    gradleVersion = '0.9'
+    gradleVersion = '0.9.1'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
