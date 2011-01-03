@@ -4,10 +4,10 @@
     <defaultAnt bundledAnt="true" />
   </component>
   <component name="ArtifactManager">
-    <artifact name="Parallelizer_IDEA9:jar">
+    <artifact name="GPars_IDEAX:jar">
       <output-path>$PROJECT_DIR$</output-path>
       <root id="root">
-        <element id="archive" name="GParallelizer-0.6.1.jar" />
+        <element id="archive" name="GPars-0.12-SNAPSHOT.jar" />
       </root>
     </artifact>
   </component>
@@ -219,7 +219,7 @@
     <autodetection-disabled>
       <facet-type id="Gant_Groovy">
         <modules>
-          <module name="Parallelizer_IDEA9">
+          <module name="GPars_IDEAX">
             <files>
               <file url="file://$PROJECT_DIR$/build.gradle" />
             </files>
@@ -227,9 +227,6 @@
         </modules>
       </facet-type>
     </autodetection-disabled>
-  </component>
-  <component name="GradleSettings">
-    <option name="SDK_HOME" value="C:/dev/gradle-0.9-20100309203241+0100" />
   </component>
   <component name="GradleUISettings">
     <setting name="root" />
@@ -5329,7 +5326,7 @@
     </group>
   </component>
   <component name="ProjectDetails">
-    <option name="projectName" value="Parallelizer" />
+    <option name="projectName" value="GPars" />
   </component>
   <component name="ProjectDictionaryState">
     <dictionary name="Vaclav">
@@ -5590,12 +5587,9 @@
     </dictionary>
     <dictionary name="dierkkonig" />
   </component>
-  <component name="ProjectKey">
-    <option name="state" value="https://gparallelizer.googlecode.com/svn/trunk/Parallelizer_IDEA9.ipr" />
-  </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Parallelizer_IDEA9.iml" filepath="$PROJECT_DIR$/Parallelizer_IDEA9.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GPars_IDEAX.iml" filepath="$PROJECT_DIR$/GPars_IDEAX.iml" />
       <module fileurl="file://$PROJECT_DIR$/buildSrc/buildSrc.iml" filepath="$PROJECT_DIR$/buildSrc/buildSrc.iml" />
       <module fileurl="file://$PROJECT_DIR$/java-demo/gpars-java-demo.iml" filepath="$PROJECT_DIR$/java-demo/gpars-java-demo.iml" />
     </modules>
@@ -5606,40 +5600,35 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="$project_jdk_name$" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
-  <component name="SvnBranchConfigurationManager">
-    <option name="myConfigurationMap">
-      <map>
-        <entry key="$PROJECT_DIR$">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="https://gparallelizer.googlecode.com/svn/branches">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                  <entry key="https://gparallelizer.googlecode.com/svn/tags">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                </map>
-              </option>
-              <option name="branchUrls">
-                <list>
-                  <option value="https://gparallelizer.googlecode.com/svn/branches" />
-                  <option value="https://gparallelizer.googlecode.com/svn/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="https://gparallelizer.googlecode.com/svn/trunk" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="myVersion" value="124" />
-    <option name="mySupportsUserInfoFilter" value="true" />
+  <component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="All tests" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="groovyx.gpars.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="GPars_IDEAX" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="groovyx.gpars" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
@@ -5651,37 +5640,15 @@
     </Base>
   </component>
   <component name="libraryTable">
-    <library name="Maven: junit:junit:4.8.1">
+    <library name="Maven: junit:junit:4.8.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.1/junit-4.8.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.2/junit-4.8.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.1/junit-4.8.1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.2/junit-4.8.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.1/junit-4.8.1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.apache.ant:ant-launcher:1.7.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant-launcher/1.7.1/ant-launcher-1.7.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant-launcher/1.7.1/ant-launcher-1.7.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant-launcher/1.7.1/ant-launcher-1.7.1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.apache.ant:ant:1.7.1">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant/1.7.1/ant-1.7.1.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant/1.7.1/ant-1.7.1-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant/1.7.1/ant-1.7.1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.2/junit-4.8.2-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.coconut.forkjoin:jsr166y:070108">
@@ -5706,15 +5673,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11/gpars-0.11-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.groovy:groovy-all:1.6.9">
+    <library name="Maven: org.codehaus.groovy:groovy-all:1.7.6">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.6.9/groovy-all-1.6.9.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.6/groovy-all-1.7.6.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.6.9/groovy-all-1.6.9-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.6/groovy-all-1.7.6-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.6.9/groovy-all-1.6.9-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.6/groovy-all-1.7.6-sources.jar!/" />
       </SOURCES>
     </library>
   </component>

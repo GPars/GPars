@@ -7,7 +7,7 @@
     <artifact name="Parallelizer_IDEA9:jar">
       <output-path>$PROJECT_DIR$</output-path>
       <root id="root">
-        <element id="archive" name="GParallelizer-0.6.1.jar" />
+        <element id="archive" name="GPars-0.12-SNAPSHOT.jar" />
       </root>
     </artifact>
   </component>
@@ -5359,9 +5359,6 @@
     </dictionary>
     <dictionary name="dierkkonig" />
   </component>
-  <component name="ProjectKey">
-    <option name="state" value="https://gparallelizer.googlecode.com/svn/trunk/Parallelizer_IDEA9.ipr" />
-  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Parallelizer_IDEA9.iml" filepath="$PROJECT_DIR$/Parallelizer_IDEA9.iml" />
@@ -5371,41 +5368,6 @@
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="$project_jdk_name$" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
-  </component>
-  <component name="SvnBranchConfigurationManager">
-    <option name="myConfigurationMap">
-      <map>
-        <entry key="$PROJECT_DIR$">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="https://gparallelizer.googlecode.com/svn/branches">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                  <entry key="https://gparallelizer.googlecode.com/svn/tags">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                </map>
-              </option>
-              <option name="branchUrls">
-                <list>
-                  <option value="https://gparallelizer.googlecode.com/svn/branches" />
-                  <option value="https://gparallelizer.googlecode.com/svn/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="https://gparallelizer.googlecode.com/svn/trunk" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="myVersion" value="124" />
-    <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
