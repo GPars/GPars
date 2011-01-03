@@ -55,7 +55,8 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="buildSrc" />
+    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:1.7.6" level="project" />
+    <orderEntry type="library" name="Maven: junit:junit:4.8.2" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
