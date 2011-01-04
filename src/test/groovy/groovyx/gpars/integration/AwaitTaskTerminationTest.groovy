@@ -19,11 +19,13 @@ package groovyx.gpars.integration
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.agent.Agent.agent
+import java.util.concurrent.atomic.AtomicInteger
 
 class AwaitTaskTerminationTest extends GroovyTestCase {
 
     def activeTasks = agent(0L)
 	def pooledGroup
+    def counter = new AtomicInteger(0)
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -32,15 +34,14 @@ class AwaitTaskTerminationTest extends GroovyTestCase {
 
 	public void testShutdown()
 	{
-		println '*** Started at ' + new Date()
 		for (def i in 1..1000)
 			process i
 
         def doneFlag = new DataFlowVariable()
         activeTasks.addListener {oldValue, newValue -> if (newValue==0) doneFlag.bind(true)}
         if (activeTasks.val > 0) doneFlag.join()
+        assert counter.get()==1000
 		pooledGroup.shutdown()
-		println '*** Ended at ' + new Date()
 
 	}
 
@@ -48,8 +49,8 @@ class AwaitTaskTerminationTest extends GroovyTestCase {
 	{
         activeTasks << {updateValue it+1}
 		pooledGroup.task {
-			Thread.sleep(4000) // to simulate some work
-			println 'Task ' + i + ' finished at ' + new Date()
+			Thread.sleep(100) // to simulate some work
+			counter.incrementAndGet()
             activeTasks << {updateValue it-1}
 		}
 	}

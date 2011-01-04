@@ -45,7 +45,7 @@ println '*** Ended at ' + new Date()
 public void process(int i) {
     activeTasks << {updateValue it + 1}
     pooledGroup.task {
-        Thread.sleep(4000) // to simulate some work
+        Thread.sleep(100) // to simulate some work
         println 'Task ' + i + ' finished at ' + new Date()
         activeTasks << {updateValue it - 1}
     }
