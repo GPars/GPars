@@ -19,7 +19,7 @@ package groovyx.gpars.integration
 import groovyx.gpars.remote.LocalHost
 import groovyx.gpars.remote.netty.NettyTransportProvider
 
-public class NettyTest extends CommunicationTestBase {
+public abstract class NettyTest extends CommunicationTestBase {
     static int port = 5239
 
     LocalHost getTransportProvider() {
