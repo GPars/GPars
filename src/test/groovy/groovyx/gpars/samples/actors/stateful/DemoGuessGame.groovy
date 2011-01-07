@@ -32,8 +32,7 @@ class GameMaster extends DefaultActor {
     }
 
     void act() {
-        loop
-        {
+        loop {
             react {int num ->
                 if (num > secretNum)
                     reply 'too large'
@@ -54,8 +53,7 @@ class Player extends DefaultActor {
     int myNum
 
     void act() {
-        loop
-        {
+        loop {
             myNum = new Random().nextInt(20)
 
             server << myNum
