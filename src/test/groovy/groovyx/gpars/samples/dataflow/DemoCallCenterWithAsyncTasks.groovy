@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow.operators
+package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
@@ -23,16 +23,17 @@ import groovyx.gpars.group.PGroup
 /**
  * Motivation http://www.mprescient.com/journal/2011/1/9/concurrency-in-go-a-call-center-tutorial.html and https://gist.github.com/773979
  *
- * Using dataflow operators, which read messages from the queue asynchronously by nature. Can adopt to the number of threads available.
+ * Using dataflow tasks and asynchronous queue reads. Can adopt to the number of threads available.
  */
 
-final class CallCenter {
+final class AsyncCallCenter {
     private final int agents
     private final DataFlowQueue queue
+    private final DataFlowQueue clockIn = new DataFlowQueue()
     private final DataFlowQueue clockOut = new DataFlowQueue()
     private final PGroup group = new DefaultPGroup()
 
-    CallCenter(final int agents, final DataFlowQueue queue) {
+    AsyncCallCenter(final int agents, final DataFlowQueue queue) {
         this.agents = agents
         this.queue = queue
     }
@@ -40,21 +41,32 @@ final class CallCenter {
     def open() {
         println "Call center opening"
         agents.times {agentIndex ->
-            group.operator(queue, clockOut) {
-                if (it == -1) {
-                    println "Agent $agentIndex going home"
-                    bindOutput true
-                    stop()
-                } else {
-                    println "Agent $agentIndex answering a call num $it"
-                    sleep 100
-                    println "Agent $agentIndex answered a call num $it"
-                }
+            group.task {
+                println "Agent $agentIndex logging in"
+                clockIn << true
+                queue.whenBound(createHandler(queue, clockOut, agentIndex))
             }
-            println "Agent $agentIndex logging in"
         }
 
+        agents.times {clockIn.val}
+
         println "Call center open"
+    }
+
+    private static def createHandler(final queue, final clockOut, final int agentIndex) {
+        {message ->
+            switch (message) {
+                case -1:
+                    println "Agent $agentIndex going home"
+                    clockOut << true
+                    break
+                default:
+                    println "Agent $agentIndex answering a call num $message"
+                    sleep 100
+                    println "Agent $agentIndex answered a call num $message"
+                    queue.whenBound(createHandler(queue, clockOut, agentIndex))
+            }
+        }
     }
 
     def close() {
@@ -64,11 +76,12 @@ final class CallCenter {
         group.shutdown()
         println "Call center closed"
     }
+
 }
 
 int numberOfCalls = 100
 final DataFlowQueue incomingCalls = new DataFlowQueue()
-final CallCenter center = new CallCenter(10, incomingCalls)
+final AsyncCallCenter center = new AsyncCallCenter(10, incomingCalls)
 
 final long startTime = System.nanoTime()
 

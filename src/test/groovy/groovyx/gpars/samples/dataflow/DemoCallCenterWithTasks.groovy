@@ -14,23 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow.operators
+package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
+import groovyx.gpars.scheduler.ResizeablePool
 
 /**
  * Motivation http://www.mprescient.com/journal/2011/1/9/concurrency-in-go-a-call-center-tutorial.html and https://gist.github.com/773979
  *
- * Using dataflow operators, which read messages from the queue asynchronously by nature. Can adopt to the number of threads available.
+ * Using dataflow tasks and synchronous queue reads. Cannot adopt to the number of threads available and so needs a resizeable thread pool.
  */
 
 final class CallCenter {
     private final int agents
     private final DataFlowQueue queue
+    private final DataFlowQueue clockIn = new DataFlowQueue()
     private final DataFlowQueue clockOut = new DataFlowQueue()
-    private final PGroup group = new DefaultPGroup()
+    private final PGroup group = new DefaultPGroup(new ResizeablePool(true))
 
     CallCenter(final int agents, final DataFlowQueue queue) {
         this.agents = agents
@@ -40,19 +42,29 @@ final class CallCenter {
     def open() {
         println "Call center opening"
         agents.times {agentIndex ->
-            group.operator(queue, clockOut) {
-                if (it == -1) {
-                    println "Agent $agentIndex going home"
-                    bindOutput true
-                    stop()
-                } else {
-                    println "Agent $agentIndex answering a call num $it"
-                    sleep 100
-                    println "Agent $agentIndex answered a call num $it"
+            group.task {
+                println "Agent $agentIndex logging in"
+                clockIn << true
+
+                boolean done = false
+                while (!done) {
+                    final Object message = queue.val
+                    switch (message) {
+                        case -1:
+                            println "Agent $agentIndex going home"
+                            clockOut << true
+                            done = true
+                            break
+                        default:
+                            println "Agent $agentIndex answering a call num $message"
+                            sleep 100
+                            println "Agent $agentIndex answered a call num $message"
+                    }
                 }
             }
-            println "Agent $agentIndex logging in"
         }
+
+        agents.times {clockIn.val}
 
         println "Call center open"
     }
@@ -64,6 +76,7 @@ final class CallCenter {
         group.shutdown()
         println "Call center closed"
     }
+
 }
 
 int numberOfCalls = 100
