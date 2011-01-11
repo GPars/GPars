@@ -21,6 +21,7 @@ import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Vaclav Pech
@@ -467,5 +468,23 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         op1.stop()
         op1.join()
         group.shutdown()
+    }
+
+    public void testOperatorDoesNotConsumeMessagesAfterStop() {
+        final DataFlowQueue a = new DataFlowQueue()
+        final DataFlowQueue b = new DataFlowQueue()
+
+        def op = group.operator(inputs: [a], outputs: [b]) {
+            bindOutput 0, it
+            stop()
+        }
+
+        a << 1
+        a << 2
+        a << 3
+        a << 4
+
+        assertEquals 1, b.val
+        assertNull b.getVal(1, TimeUnit.SECONDS)
     }
 }

@@ -139,7 +139,7 @@ private class DataFlowSelectorActor extends DataFlowProcessorActor {
         final def value = message.value
         if (checkPoisson(value)) return
         startTask(index, value)
-        owningProcessor.doSelect()
+        if (!hasBeenStopped()) owningProcessor.doSelect()
     }
 
     def startTask(index, result) {

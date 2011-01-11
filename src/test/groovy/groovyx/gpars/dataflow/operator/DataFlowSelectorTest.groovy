@@ -21,6 +21,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Vaclav Pech
@@ -387,5 +388,23 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val] == [3, 1, 2, 4]
         op.stop()
         op.join()
+    }
+
+    public void testSelectorDoesNotConsumeMessagesAfterStop() {
+        final DataFlowQueue a = new DataFlowQueue()
+        final DataFlowQueue b = new DataFlowQueue()
+
+        def op = group.selector(inputs: [a], outputs: [b]) {
+            bindOutput 0, it
+            stop()
+        }
+
+        a << 1
+        a << 2
+        a << 3
+        a << 4
+
+        assertEquals 1, b.val
+        assertNull b.getVal(1, TimeUnit.SECONDS)
     }
 }
