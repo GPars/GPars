@@ -57,32 +57,24 @@ final class CallCenter {
 
     def close() {
         println "Call center closing"
-        agents.times {
-            queue << -1
-        }
-        agents.times {
-            clockOut.val
-        }
+        agents.times { queue << -1 }
+        agents.times { clockOut.val }
         group.shutdown()
         println "Call center closed"
     }
-
 }
 
 int numberOfCalls = 100
-
 final DataFlowQueue incomingCalls = new DataFlowQueue()
 final CallCenter center = new CallCenter(10, incomingCalls)
 
 final long startTime = System.nanoTime()
 
 center.open()
-
 numberOfCalls.times {
     sleep 10
     incomingCalls << it
 }
-
 center.close()
 
 final long stopTime = System.nanoTime()
