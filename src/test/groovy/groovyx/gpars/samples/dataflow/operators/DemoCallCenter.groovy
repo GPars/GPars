@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow
+package groovyx.gpars.samples.dataflow.operators
 
 import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.group.DefaultPGroup
