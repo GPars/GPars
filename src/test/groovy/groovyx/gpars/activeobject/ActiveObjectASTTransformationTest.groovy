@@ -17,7 +17,20 @@
 package groovyx.gpars.activeobject
 
 class ActiveObjectASTTransformationTest extends GroovyTestCase {
-    public void test() {
-        assert true
+        //todo test group, messages, uniqueness
+
+    public void testActorIsActive() {
+        final actor = new MyWrapper().internalActiveObjectActor
+        assert actor.active
+    }
+
+    public void testActorUniqueness() {
+        final actor1 = new MyWrapper().internalActiveObjectActor
+        final actor2 = new MyWrapper().internalActiveObjectActor
+        assert actor1.active
+        assert actor2.active
+        assert actor1.is(actor2)
     }
 }
+@ActiveObject
+class MyWrapper {}

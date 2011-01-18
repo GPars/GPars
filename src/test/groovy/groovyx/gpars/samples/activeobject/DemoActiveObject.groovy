@@ -23,4 +23,7 @@ class Foo {
 
 }
 
-new Foo()
+final actor = new Foo().internalActiveObjectActor
+actor << 10
+actor << 20
+println actor
