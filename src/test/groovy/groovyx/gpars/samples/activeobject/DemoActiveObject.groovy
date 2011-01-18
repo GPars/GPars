@@ -40,6 +40,7 @@ new Foo().bar(20)
 
 sleep 1000
 
+@ActiveObject
 class A {
     @ActiveMethod
     def foo() {
@@ -50,5 +51,6 @@ class A {
 
 @ActiveObject
 class B extends A {
+    def internalActiveObjectActor2 = 20
 
 }

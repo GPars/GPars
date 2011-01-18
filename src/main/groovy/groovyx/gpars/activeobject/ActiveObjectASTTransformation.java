@@ -117,22 +117,23 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
             final FieldNode actorField = node.getField(actorFieldName);
             if (actorField != null) {
-                this.addError("Class annotated with Log annotation cannot have log field declared", actorField);
+                if (actorField.getType().getName().contains("groovyx.gpars.activeobject.InternalActor")) {
+                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                    actorNode = actorField;
+                } else
+                    this.addError("Active Object cannot have a field named " + actorFieldName + " declared", actorField);
             } else {
                 actorNode = addActorFieldToClass(node, actorFieldName);
             }
 
             final Iterable<MethodNode> copyOfMethods = new ArrayList<MethodNode>(node.getMethods());
-            boolean activeMethodFound = false;
             for (final MethodNode method : copyOfMethods) {
                 if (method.isStatic()) continue;
                 final List<AnnotationNode> annotations = method.getAnnotations(new ClassNode(ActiveMethod.class));
                 if (annotations.isEmpty()) continue;
 
                 addActiveMethod(actorNode, node, method);
-                activeMethodFound = true;
             }
-            if (!activeMethodFound) this.addError("No active method found in the ActiveObject", node);
             super.visitClass(node);
         }
 
@@ -181,7 +182,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         private static FieldNode addActorFieldToClass(final ClassNode classNode, final String logFieldName) {
             return classNode.addField(logFieldName,
-                    Opcodes.ACC_FINAL | Opcodes.ACC_TRANSIENT | Opcodes.ACC_STATIC | Opcodes.ACC_PRIVATE,
+                    Opcodes.ACC_FINAL | Opcodes.ACC_TRANSIENT | Opcodes.ACC_PROTECTED,
                     new ClassNode(InternalActor.class),
                     new MethodCallExpression(
                             new ClassExpression(new ClassNode(InternalActor.class)),

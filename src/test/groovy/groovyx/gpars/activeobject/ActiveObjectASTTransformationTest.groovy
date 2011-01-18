@@ -17,22 +17,23 @@
 package groovyx.gpars.activeobject
 
 import groovyx.gpars.dataflow.DataFlowVariable
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 class ActiveObjectASTTransformationTest extends GroovyTestCase {
-    //todo return values
-    //todo exception reporting
-    //todo allow for a static actor field
+    //todo exception reporting - test
+    //todo pass no arguments to the create() method
+    //todo avoid actor field duplicates in hierarchies
+    //todo ensure correct instance is being used with inheritance hierarchies - gaps, no gaps
 
-    //todo make the field non-static
+    // todo test static methods, inheritance of active methods, correctness
+    //todo inheritance with different actor field names allows for multiple actors per instance
+
     //todo pass in the group
     //todo finish all methods before exit
 
-    //todo allow for inheritance to play nicely - check super classes, consider superclasses and subclasses when reporting errors (No active method defined)
-
-    //todo test group, messages, uniqueness
-    // todo test static methods, inheritance of active methods, correctness
 
     //todo return a DFV
+    //todo update GDSL
 
 
 
@@ -40,12 +41,13 @@ class ActiveObjectASTTransformationTest extends GroovyTestCase {
         final actor = new MyWrapper().internalActiveObjectActor
         assert actor.active
     }
+
     public void testActorUniqueness() {
         final actor1 = new MyWrapper().internalActiveObjectActor
         final actor2 = new MyWrapper().internalActiveObjectActor
         assert actor1.active
         assert actor2.active
-        assert actor1.is(actor2)
+        assert !actor1.is(actor2)
     }
 
     public void testActorMessages() {
@@ -79,6 +81,69 @@ class ActiveObjectASTTransformationTest extends GroovyTestCase {
         assert 60 == wrapper.foo(40, 20)
         final actor = wrapper.alternativeActorName
         assert 7 == actor.sendAndWait([wrapper, 'foo', 4, 3])
+    }
+
+    public void testActiveObjectInheritance() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+@ActiveObject
+class A {
+    @ActiveMethod
+    def foo() {
+    }
+}
+
+@ActiveObject
+class B extends A {
+}
+
+[new A(), new B()]
+""")
+        assert a.internalActiveObjectActor.active
+        assert b.internalActiveObjectActor.active
+    }
+
+    public void testActiveObjectInheritanceWithReverseOrder() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+
+@ActiveObject
+class B extends A {
+}
+
+@ActiveObject
+class A {
+    @ActiveMethod
+    def foo() {
+    }
+}
+
+[new A(), new B()]
+""")
+        assert a.internalActiveObjectActor.active
+        assert b.internalActiveObjectActor.active
+    }
+
+    public void testActiveObjectHoldingCollidingFieldShouldFail() {
+        final GroovyShell shell = new GroovyShell()
+        shouldFail(MultipleCompilationErrorsException) {
+            shell.evaluate("""
+import groovyx.gpars.activeobject.*
+    @ActiveObject
+    class A {
+        @ActiveMethod
+        def foo() {
+        }
+    }
+
+    @ActiveObject
+    class B extends A {
+        def internalActiveObjectActor = 20
+    }
+    """)
+        }
     }
 }
 @ActiveObject
