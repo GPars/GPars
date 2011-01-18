@@ -16,24 +16,30 @@
 
 package groovyx.gpars.activeobject
 
+import groovyx.gpars.dataflow.DataFlowVariable
+
 class ActiveObjectASTTransformationTest extends GroovyTestCase {
     //todo return values
-    //todo test actor field name
-        //todo test group, messages, uniqueness
-        // todo test static methods, inheritance of active methods, correctness
-    //todo report if no methods are active
+    //todo exception reporting
+    //todo allow for a static actor field
+
+    //todo make the field non-static
+    //todo pass in the group
+    //todo finish all methods before exit
+
+    //todo allow for inheritance to play nicely - check super classes, consider superclasses and subclasses when reporting errors (No active method defined)
+
+    //todo test group, messages, uniqueness
+    // todo test static methods, inheritance of active methods, correctness
+
     //todo return a DFV
 
-            //todo make the field non-static
-            //todo pass in the group
-    //todo finish all methods before exit
 
 
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
         assert actor.active
     }
-
     public void testActorUniqueness() {
         final actor1 = new MyWrapper().internalActiveObjectActor
         final actor2 = new MyWrapper().internalActiveObjectActor
@@ -41,6 +47,64 @@ class ActiveObjectASTTransformationTest extends GroovyTestCase {
         assert actor2.active
         assert actor1.is(actor2)
     }
+
+    public void testActorMessages() {
+        final MyWrapper wrapper = new MyWrapper()
+        final actor = wrapper.internalActiveObjectActor
+        actor.send([wrapper, 'bar', 231])
+        assert wrapper.result.val == 231
+    }
+
+    public void testActorBlockingMessages() {
+        final MyWrapper wrapper = new MyWrapper()
+        final actor = wrapper.internalActiveObjectActor
+        assert 431 == actor.sendAndWait([wrapper, 'bar', 431])
+    }
+
+    public void testVoidMethod() {
+        final MyWrapper wrapper = new MyWrapper()
+        assertNull wrapper.baz(92)
+        assert 92 == wrapper.result.val
+    }
+
+    public void testNonVoidMethod() {
+        final MyWrapper wrapper = new MyWrapper()
+        assert 12 == wrapper.bar(12)
+        assert 12 == wrapper.result.val
+    }
+
+    public void testAlternativeActorName() {
+        final MyAlternativeWrapper wrapper = new MyAlternativeWrapper()
+        assert 30 == wrapper.foo(10, 20)
+        assert 60 == wrapper.foo(40, 20)
+        final actor = wrapper.alternativeActorName
+        assert 7 == actor.sendAndWait([wrapper, 'foo', 4, 3])
+    }
 }
 @ActiveObject
-class MyWrapper {}
+class MyWrapper {
+    def result = new DataFlowVariable()
+
+    def foo() {
+        println 'Foo'
+    }
+
+    @ActiveMethod
+    def bar(int value) {
+        result.bind(value)
+        value
+    }
+
+    @ActiveMethod
+    void baz(int value) {
+        result.bind(value)
+    }
+}
+
+@ActiveObject("alternativeActorName")
+class MyAlternativeWrapper {
+    @ActiveMethod
+    def foo(int a, int b) {
+        a + b
+    }
+}

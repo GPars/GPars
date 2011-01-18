@@ -34,11 +34,17 @@ public final class InternalActor extends DynamicDispatchActor {
     }
 
     public void onMessage(final Object msg) {
-        Object target = msg[0]
-        String methodName = msg[1]
-        Object[] args = msg[2..-1]
-        target."${METHOD_NAME_PREFIX + methodName}"(*args)
-
+        def result
+        try {
+            Object target = msg[0]
+            String methodName = msg[1]
+            Object[] args = msg[2..-1]
+            result = target."${METHOD_NAME_PREFIX + methodName}"(*args)
+        } catch (all) {
+            result = all
+        } finally {
+            replyIfExists(result)
+        }
     }
 
     public static InternalActor create(final Object param) {

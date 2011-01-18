@@ -39,3 +39,16 @@ new Foo().bar(10)
 new Foo().bar(20)
 
 sleep 1000
+
+class A {
+    @ActiveMethod
+    def foo() {
+
+    }
+
+}
+
+@ActiveObject
+class B extends A {
+
+}

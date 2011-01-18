@@ -27,4 +27,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @GroovyASTTransformationClass({"groovyx.gpars.activeobject.ActiveObjectASTTransformation"})
 public @interface ActiveObject {
+    String INTERNAL_ACTIVE_OBJECT_ACTOR = "internalActiveObjectActor";
+
+    String value() default INTERNAL_ACTIVE_OBJECT_ACTOR;
 }

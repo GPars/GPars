@@ -78,7 +78,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
         if (member != null && member.getText() != null) {
             return member.getText();
         } else {
-            return "internalActiveObjectActor";
+            return ActiveObject.INTERNAL_ACTIVE_OBJECT_ACTOR;
         }
     }
 
@@ -114,6 +114,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         @Override
         public void visitClass(final ClassNode node) {
+
             final FieldNode actorField = node.getField(actorFieldName);
             if (actorField != null) {
                 this.addError("Class annotated with Log annotation cannot have log field declared", actorField);
@@ -122,13 +123,16 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             }
 
             final Iterable<MethodNode> copyOfMethods = new ArrayList<MethodNode>(node.getMethods());
+            boolean activeMethodFound = false;
             for (final MethodNode method : copyOfMethods) {
                 if (method.isStatic()) continue;
                 final List<AnnotationNode> annotations = method.getAnnotations(new ClassNode(ActiveMethod.class));
                 if (annotations.isEmpty()) continue;
 
                 addActiveMethod(actorNode, node, method);
+                activeMethodFound = true;
             }
+            if (!activeMethodFound) this.addError("No active method found in the ActiveObject", node);
             super.visitClass(node);
         }
 
@@ -156,9 +160,10 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
                     original.getCode());
             newMethod.setGenericsTypes(original.getGenericsTypes());
 
+            final String submitMethodName = original.getReturnType().isDerivedFrom(new ClassNode(Void.class)) ? "submit" : "submitAndWait";
             original.setCode(new ExpressionStatement(
                     new MethodCallExpression(
-                            new VariableExpression(actorNode), "submit", args)
+                            new VariableExpression(actorNode), submitMethodName, args)
             ));
         }
 
