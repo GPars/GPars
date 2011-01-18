@@ -38,6 +38,7 @@ import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.TernaryExpression;
 import org.codehaus.groovy.ast.expr.TupleExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
+import org.codehaus.groovy.ast.stmt.ExpressionStatement;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
@@ -51,8 +52,8 @@ import java.util.List;
 
 /**
  * @author Vaclav Pech
- *
- * Inspired by org.codehaus.groovy.transform.LogASTTransformation
+ *         <p/>
+ *         Inspired by org.codehaus.groovy.transform.LogASTTransformation
  */
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
 public class ActiveObjectASTTransformation implements ASTTransformation {
@@ -95,7 +96,6 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
     @SuppressWarnings({"StringToUpperCaseOrToLowerCaseWithoutLocale", "CallToStringEquals"})
     private static class MyClassCodeExpressionTransformer extends ClassCodeExpressionTransformer {
-        private static final String METHIOD_NAME_PREFIX = "activeObject_";
         private FieldNode actorNode;
         private final SourceUnit source;
         private final String actorFieldName;
@@ -130,9 +130,9 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
             final Iterable<MethodNode> copyOfMethods = new ArrayList<MethodNode>(node.getMethods());
             for (final MethodNode method : copyOfMethods) {
-                if(method.isStatic()) continue;
+                if (method.isStatic()) continue;
                 final List<AnnotationNode> annotations = method.getAnnotations(new ClassNode(ActiveMethod.class));
-                if(annotations.isEmpty()) continue;
+                if (annotations.isEmpty()) continue;
                 System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + method);
 
                 addActiveMethod(actorNode, node, method);
@@ -144,21 +144,30 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             if ((original.getModifiers() & Opcodes.ACC_SYNTHETIC) != 0) return;
 
             final ArgumentListExpression args = new ArgumentListExpression();
-                final Parameter[] params = original.getParameters();
-                final Parameter[] newParams = new Parameter[params.length];
-                for (int i = 0; i < newParams.length; i++) {
-                    final Parameter newParam = new Parameter(nonGeneric(params[i].getType()), params[i].getName());
-                    newParam.setInitialExpression(params[i].getInitialExpression());
-                    newParams[i] = newParam;
-                    args.addExpression(new VariableExpression(newParam));
-                }
-                final MethodNode newMethod = owner.addMethod(METHIOD_NAME_PREFIX + original.getName(),
-                        Opcodes.ACC_FINAL & Opcodes.ACC_PRIVATE,
-                        nonGeneric(original.getReturnType()),
-                        newParams,
-                        original.getExceptions(),
-                        original.getCode());
-                newMethod.setGenericsTypes(original.getGenericsTypes());
+            final Parameter[] params = original.getParameters();
+            final Parameter[] newParams = new Parameter[params.length];
+
+            args.addExpression(new VariableExpression("this"));
+            args.addExpression(new ConstantExpression(original.getName()));
+
+            for (int i = 0; i < newParams.length; i++) {
+                final Parameter newParam = new Parameter(nonGeneric(params[i].getType()), params[i].getName());
+                newParam.setInitialExpression(params[i].getInitialExpression());
+                newParams[i] = newParam;
+                args.addExpression(new VariableExpression(newParam));
+            }
+            final MethodNode newMethod = owner.addMethod(InternalActor.METHOD_NAME_PREFIX + original.getName(),
+                    Opcodes.ACC_FINAL & Opcodes.ACC_PRIVATE,
+                    nonGeneric(original.getReturnType()),
+                    newParams,
+                    original.getExceptions(),
+                    original.getCode());
+            newMethod.setGenericsTypes(original.getGenericsTypes());
+
+            original.setCode(new ExpressionStatement(
+                    new MethodCallExpression(
+                            new VariableExpression(actorNode), "submit", args)
+            ));
         }
 
         private static ClassNode nonGeneric(final ClassNode type) {

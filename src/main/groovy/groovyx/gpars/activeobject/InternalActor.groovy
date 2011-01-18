@@ -21,11 +21,24 @@ import groovyx.gpars.actor.DynamicDispatchActor;
 /**
  * @author Vaclav Pech
  */
-public class InternalActor extends DynamicDispatchActor {
+public final class InternalActor extends DynamicDispatchActor {
     private static final long serialVersionUID = 6700367864074699984L;
+    public static final String METHOD_NAME_PREFIX = "activeObject_";
+
+    void submit(Object... args) {
+        send(args);
+    }
+
+    Object submitAndWait(Object... args) {
+        sendAndWait(args);
+    }
 
     public void onMessage(final Object msg) {
-        System.out.println("Received a message " + msg);
+        Object target = msg[0]
+        String methodName = msg[1]
+        Object[] args = msg[2..-1]
+        target."${METHOD_NAME_PREFIX + methodName}"(*args)
+
     }
 
     public static InternalActor create(final Object param) {

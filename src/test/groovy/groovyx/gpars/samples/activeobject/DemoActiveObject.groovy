@@ -26,15 +26,14 @@ class Foo {
     }
 
     @ActiveMethod
-    def bar() {
-        println 'Bar'
+    def bar(int value) {
+        println 'Bar ' + value
     }
 }
 
 final actor = new Foo().internalActiveObjectActor
-actor << 10
-actor << 20
 println actor
 new Foo().foo()
 println new Foo().getMetaClass().getMethods()
-new Foo().activeObject_bar()
+new Foo().activeObject_bar(10)
+new Foo().bar(10)
