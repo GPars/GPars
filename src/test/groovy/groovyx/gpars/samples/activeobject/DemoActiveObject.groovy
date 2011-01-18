@@ -34,6 +34,8 @@ class Foo {
 final actor = new Foo().internalActiveObjectActor
 println actor
 new Foo().foo()
-println new Foo().getMetaClass().getMethods()
 new Foo().activeObject_bar(10)
 new Foo().bar(10)
+new Foo().bar(20)
+
+sleep 1000
