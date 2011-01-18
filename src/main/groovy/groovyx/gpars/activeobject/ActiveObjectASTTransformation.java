@@ -22,10 +22,13 @@ import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
 import org.codehaus.groovy.ast.AnnotationNode;
 import org.codehaus.groovy.ast.ClassCodeExpressionTransformer;
+import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.DynamicVariable;
 import org.codehaus.groovy.ast.FieldNode;
 import org.codehaus.groovy.ast.GroovyClassVisitor;
+import org.codehaus.groovy.ast.MethodNode;
+import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
 import org.codehaus.groovy.ast.expr.BooleanExpression;
 import org.codehaus.groovy.ast.expr.ClassExpression;
@@ -42,7 +45,9 @@ import org.codehaus.groovy.syntax.SyntaxException;
 import org.codehaus.groovy.transform.ASTTransformation;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Vaclav Pech
@@ -90,6 +95,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
     @SuppressWarnings({"StringToUpperCaseOrToLowerCaseWithoutLocale", "CallToStringEquals"})
     private static class MyClassCodeExpressionTransformer extends ClassCodeExpressionTransformer {
+        private static final String METHIOD_NAME_PREFIX = "activeObject_";
         private FieldNode actorNode;
         private final SourceUnit source;
         private final String actorFieldName;
@@ -106,7 +112,6 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         @Override
         public Expression transform(final Expression exp) {
-            System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             if (exp == null) return null;
             if (exp instanceof MethodCallExpression) {
                 return transformMethodCallExpression(exp);
@@ -116,14 +121,56 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         @Override
         public void visitClass(final ClassNode node) {
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaaa");
-            final FieldNode logField = node.getField(actorFieldName);
-            if (logField != null) {
-                this.addError("Class annotated with Log annotation cannot have log field declared", logField);
+            final FieldNode actorField = node.getField(actorFieldName);
+            if (actorField != null) {
+                this.addError("Class annotated with Log annotation cannot have log field declared", actorField);
             } else {
                 actorNode = addActorFieldToClass(node, actorFieldName);
             }
+
+            final Iterable<MethodNode> copyOfMethods = new ArrayList<MethodNode>(node.getMethods());
+            for (final MethodNode method : copyOfMethods) {
+                if(method.isStatic()) continue;
+                final List<AnnotationNode> annotations = method.getAnnotations(new ClassNode(ActiveMethod.class));
+                if(annotations.isEmpty()) continue;
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + method);
+
+                addActiveMethod(actorNode, node, method);
+            }
             super.visitClass(node);
+        }
+
+        private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original) {
+            if ((original.getModifiers() & Opcodes.ACC_SYNTHETIC) != 0) return;
+
+            final ArgumentListExpression args = new ArgumentListExpression();
+                final Parameter[] params = original.getParameters();
+                final Parameter[] newParams = new Parameter[params.length];
+                for (int i = 0; i < newParams.length; i++) {
+                    final Parameter newParam = new Parameter(nonGeneric(params[i].getType()), params[i].getName());
+                    newParam.setInitialExpression(params[i].getInitialExpression());
+                    newParams[i] = newParam;
+                    args.addExpression(new VariableExpression(newParam));
+                }
+                final MethodNode newMethod = owner.addMethod(METHIOD_NAME_PREFIX + original.getName(),
+                        Opcodes.ACC_FINAL & Opcodes.ACC_PRIVATE,
+                        nonGeneric(original.getReturnType()),
+                        newParams,
+                        original.getExceptions(),
+                        original.getCode());
+                newMethod.setGenericsTypes(original.getGenericsTypes());
+        }
+
+        private static ClassNode nonGeneric(final ClassNode type) {
+            if (type.isUsingGenerics()) {
+                final ClassNode nonGen = ClassHelper.makeWithoutCaching(type.getName());
+                nonGen.setRedirect(type);
+                nonGen.setGenericsTypes(null);
+                nonGen.setUsingGenerics(false);
+                return nonGen;
+            } else {
+                return type;
+            }
         }
 
         private Expression transformMethodCallExpression(final Expression exp) {

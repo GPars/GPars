@@ -892,7 +892,6 @@
         <inspection_tool class="AccessToStaticFieldLockedOnInstance" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AmbiguousMethodCall" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AndroidDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="AnnotationClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AnnotationNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[A-Z][A-Za-z\d]*" />
           <option name="m_minLength" value="8" />
@@ -1043,7 +1042,6 @@
         </inspection_tool>
         <inspection_tool class="ContextComponentScanInconsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ContinueOrBreakFromFinallyBlockJS" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="ContinueStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ContinueStatementWithLabel" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="CovariantCompareTo" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="CovariantEquals" enabled="true" level="WARNING" enabled_by_default="true" />

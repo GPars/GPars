@@ -14,27 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.activeobject
+package groovyx.gpars.activeobject;
 
-import groovyx.gpars.activeobject.ActiveObject
-import groovyx.gpars.activeobject.ActiveMethod
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@ActiveObject
-class Foo {
-    def foo() {
-        println 'Foo'
-    }
-
-    @ActiveMethod
-    def bar() {
-        println 'Bar'
-    }
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.METHOD})
+public @interface ActiveMethod {
 }
-
-final actor = new Foo().internalActiveObjectActor
-actor << 10
-actor << 20
-println actor
-new Foo().foo()
-println new Foo().getMetaClass().getMethods()
-new Foo().activeObject_bar()

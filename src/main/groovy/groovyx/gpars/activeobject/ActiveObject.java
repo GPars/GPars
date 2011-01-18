@@ -14,16 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.activeobject
+package groovyx.gpars.activeobject;
 
-import java.lang.annotation.ElementType
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-import java.lang.annotation.Target
-import org.codehaus.groovy.transform.GroovyASTTransformationClass
+import org.codehaus.groovy.transform.GroovyASTTransformationClass;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
-@Target([ElementType.TYPE])
-@GroovyASTTransformationClass(["groovyx.gpars.activeobject.ActiveObjectASTTransformation"])
+@Target({ElementType.TYPE})
+@GroovyASTTransformationClass({"groovyx.gpars.activeobject.ActiveObjectASTTransformation"})
 public @interface ActiveObject {
 }

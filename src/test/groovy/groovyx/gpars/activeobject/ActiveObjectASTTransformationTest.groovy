@@ -18,6 +18,9 @@ package groovyx.gpars.activeobject
 
 class ActiveObjectASTTransformationTest extends GroovyTestCase {
         //todo test group, messages, uniqueness
+        // todo test static methods, inheritance of active methods
+    //todo report if no methods are active
+
 
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
