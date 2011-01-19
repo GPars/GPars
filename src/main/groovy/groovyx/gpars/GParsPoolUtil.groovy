@@ -128,16 +128,29 @@ public class GParsPoolUtil {
 
     private static void evaluateArguments(pool, args, current, soFarArgs, result, original, pooledThreadFlag) {
         if (current == args.size()) {
-            if (pooledThreadFlag) result << original(* soFarArgs)
+            if (pooledThreadFlag) {
+                try {
+                    result << original(* soFarArgs)
+                } catch (all) {
+                    result << all
+                }
+            }
             else {
-                pool.submit({-> result << original(* soFarArgs)} as RecursiveTask)
+                pool.submit({->
+                    try {
+                        result << original(* soFarArgs)
+                    } catch (all) {
+                        result << all
+                    }
+                } as RecursiveTask)
             }
         }
         else {
             def currentArgument = args[current]
             if (currentArgument instanceof DataFlowVariable) {
                 currentArgument.whenBound {value ->
-                    evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
+                    if (value instanceof Throwable) result << value
+                    else evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
                 }
             } else {
                 evaluateArguments(pool, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
@@ -145,6 +158,7 @@ public class GParsPoolUtil {
         }
     }
 
+    //todo exception handling, test, user guide
     /**
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
      */
