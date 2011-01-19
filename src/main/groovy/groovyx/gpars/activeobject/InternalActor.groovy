@@ -16,9 +16,14 @@
 
 package groovyx.gpars.activeobject;
 
-import groovyx.gpars.actor.DynamicDispatchActor;
 
-/**
+import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.group.PGroup
+
+ /**
+ * Backs active objects and invokes all object's active methods.
+ *
  * @author Vaclav Pech
  */
 public final class InternalActor extends DynamicDispatchActor {
@@ -35,6 +40,10 @@ public final class InternalActor extends DynamicDispatchActor {
         else return sendAndWait(args);
     }
 
+    /**
+     * Handles incoming messages
+     * @param msg The message representing the requested method call
+     */
     public void onMessage(final Object msg) {
         def result
         try {
@@ -55,8 +64,15 @@ public final class InternalActor extends DynamicDispatchActor {
         }
     }
 
-    public static InternalActor create(final Object param) {
+    public static InternalActor create(final Object groupId) {
+        PGroup group = null
+        if (groupId.equals("")) group = Actors.defaultActorPGroup
+        else {
+            group = ActiveObjectRegistry.instance.findGroupById(groupId)
+        }
+        if (group==null) throw new IllegalArgumentException("Cannot find a PGroup " + groupId + " in the ActiveObjectRegistry. Please make sure you register the group prior to instantiating ActiveObjects.")
         final InternalActor internalActor = new InternalActor();
+        internalActor.parallelGroup = group;
         internalActor.start();
         return internalActor;
     }

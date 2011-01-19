@@ -180,13 +180,16 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
         }
 
         private static FieldNode addActorFieldToClass(final ClassNode classNode, final String logFieldName) {
+            final ArgumentListExpression args = new ArgumentListExpression();
+            args.addExpression(new ConstantExpression(""));
+
             return classNode.addField(logFieldName,
                     Opcodes.ACC_FINAL | Opcodes.ACC_TRANSIENT | Opcodes.ACC_PROTECTED,
                     new ClassNode(InternalActor.class),
                     new MethodCallExpression(
                             new ClassExpression(new ClassNode(InternalActor.class)),
                             "create",
-                            new ClassExpression(classNode)));
+                            args));
         }
     }
 }
