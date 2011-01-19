@@ -94,6 +94,7 @@ contributor(ThreadPoolBody) {
         final def clazzName = clazz?.qualName?.toUpperCase()
         if (clazzName?.contains("GPARSPOOL") || clazzName?.contains("GPARSEXECUTORSPOOL")) {
             method name: "async", type: "groovy.lang.Closure"
+            method name: "asyncFun", type: "groovy.lang.Closure"
             method name: "callAsync", type: "java.util.concurrent.Future"
             method name: "callAsync", type: "java.util.concurrent.Future", params: [args: 'Object[]']
             method name: "callTimeoutAsync", type: "java.util.concurrent.Future", params: [timeout: 'Long']

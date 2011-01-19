@@ -23,6 +23,11 @@ import static groovyx.gpars.GParsPool.withPool
  * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
  * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
  *
+ * The asyncFun() function allows the user to create an asynchronous variant of a function.
+ * Such asynchronous functions accept uncompleted calculations as parameters (represented by DataFlowVariables),
+ * perform their own calculation asynchronously using the wrapping thread pool
+ * and without blocking the caller they return a DataFlowVariable representing a handle to the result of the ongoing asynchronous calculation.
+ *
  * @author Vaclav Pech
  */
 

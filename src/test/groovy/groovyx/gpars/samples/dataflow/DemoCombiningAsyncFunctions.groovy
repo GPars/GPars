@@ -18,11 +18,8 @@ package groovyx.gpars.samples.dataflow
 
 import static groovyx.gpars.GParsPool.withPool
 
- /**
+/**
  * Demonstrates the way to use asyncFun() to build composable asynchronous functions.
- * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
- * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
- *
  * The asyncFun() function allows the user to create an asynchronous variant of a function.
  * Such asynchronous functions accept uncompleted calculations as parameters (represented by DataFlowVariables),
  * perform their own calculation asynchronously using the wrapping thread pool
@@ -32,17 +29,22 @@ import static groovyx.gpars.GParsPool.withPool
  */
 
 withPool {
-//    def result = ((asyncFun {a, b -> a + b}).call(1, new DataFlowVariable() << 2))
-    def result = (0..100).inject(0, {a, b -> a + b}.asyncFun())
-    println "Doing something else while the calculation is running"
+    Closure sPlus = {Integer a, Integer b ->
+        a + b
+    }
 
-    sleep 1000
-    println "Are we done yet? ${result.bound}"
-    if (!result.bound) println "Let's do something else then, since the calculation is still running"
+    Closure sMultiply = {Integer a, Integer b ->
+        sleep 2000
+        a * b
+    }
 
-    sleep 1000
-    println "Now really, are we done yet? ${result.bound}"
+    println "Synchronous result: " + sMultiply(sPlus(10, 30), 100)
 
-    println "OK, I've run out of patience. I'll sit down here and wait for you to finish my calculation!"
-    println result.val
+    Closure aPlus = sPlus.asyncFun()
+    Closure aMultiply = sMultiply.asyncFun()
+
+    def result = aMultiply(aPlus(10, 30), 100)
+
+    println "Time to do something else while the calculation is running"
+    println "Asynchronous result: " + result.val
 }
