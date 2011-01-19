@@ -42,7 +42,7 @@ def fib(n) {
 }
 
 println "Starting the calculation"
-final def result = fib(30)
+final def result = fib(28)
 println "Now the calculation is running while we can do something else."
 
 sleep 1000
@@ -52,4 +52,5 @@ if (!result.bound) println "Let's do something else then, since the calculation 
 sleep 1000
 println "Now really, are we done yet? ${result.bound}"
 
+println "OK, I've run out of patience. I'll sit down here and wait for you to finish my calculation!"
 println result.val

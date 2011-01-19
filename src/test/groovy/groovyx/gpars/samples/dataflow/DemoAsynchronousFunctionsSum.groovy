@@ -16,12 +16,10 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.GParsPool
 import groovyx.gpars.dataflow.DataFlowVariable
-import jsr166y.forkjoin.RecursiveTask
 import static groovyx.gpars.GParsPool.withPool
 
-/**
+ /**
  * Demonstrates the way to use DataFlowVariables and tasks to create and combine composable asynchronous functions.
  * Inspired by Alex Miller's experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
  *
@@ -38,7 +36,7 @@ def asyncPlus = {a, b ->
     result
 }
 
-def range = 0..100
+def range = 0..100000
 withPool{
     def result = range.collectParallel{new DataFlowVariable() << it}.parallel.reduce(asyncPlus)
     println "Doing something else while the calculation is running"
@@ -52,35 +50,3 @@ withPool{
 def result = range.collect{new DataFlowVariable() << it}.inject(new DataFlowVariable() << 0, asyncPlus)
 println "Doing something else while the calculation is running"
 println result.val
-
-def evaluateArguments(pool, args, current, soFarArgs, result, original) {
-    if (current==args.size()) {
-        pool.submit({->result << original(*soFarArgs)} as RecursiveTask)
-    }
-    else {
-        def currentArgument = args[current]
-        if (currentArgument instanceof DataFlowVariable) {
-            currentArgument.whenBound {value ->
-                evaluateArguments(pool, args, current+1, soFarArgs << value, result, original)
-            }
-        } else {
-            evaluateArguments(pool, args, current+1, soFarArgs << currentArgument, result, original)
-        }
-    }
-
-}
-def asyncFun(final Closure original) {
-    final def pool = GParsPool.retrieveCurrentPool()
-    return {final Object[] args ->
-        final DataFlowVariable result = new DataFlowVariable()
-        evaluateArguments(pool, args.clone(), 0, [], result, original)
-        result
-    }
-}
-
-withPool {
-//    def sum = ((asyncFun {a, b -> a + b}).call(1, new DataFlowVariable() << 2))
-    def sum = (0..100).inject(0, asyncFun{a, b -> a + b})
-    println "Doing something else while the calculation is running"
-    println sum.val
-}
