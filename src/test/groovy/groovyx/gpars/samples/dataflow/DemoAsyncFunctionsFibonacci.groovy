@@ -31,6 +31,8 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Vaclav Pech
  */
 
+//Combining asynchronous summary function with asynchronous fibonacci function
+
 withPool {
     def sum = {a, b -> a + b}.asyncFun()
     def fib

@@ -31,6 +31,8 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Vaclav Pech
  */
 
+//Combining an asynchronous summary with the inject (reduce) function
+
 withPool {
     def result = (0..100).inject(0, {a, b -> a + b}.asyncFun())
     println "Doing something else while the calculation is running"
