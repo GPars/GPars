@@ -21,7 +21,7 @@ import static groovyx.gpars.GParsPool.withPool
 /**
  * Demonstrates the way to use asyncFun() to build composable asynchronous functions.
  * The asyncFun() function allows the user to create an asynchronous variant of a function.
- * Such asynchronous functions accept uncompleted calculations as parameters (represented by DataFlowVariables),
+ * Such asynchronous functions accept asynchronous, potentially uncompleted, calculations as parameters (represented by DataFlowVariables),
  * perform their own calculation asynchronously using the wrapping thread pool
  * and without blocking the caller they return a DataFlowVariable representing a handle to the result of the ongoing asynchronous calculation.
  *
