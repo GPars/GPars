@@ -118,7 +118,6 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             final FieldNode actorField = node.getField(actorFieldName);
             if (actorField != null) {
                 if (actorField.getType().getName().contains("groovyx.gpars.activeobject.InternalActor")) {
-                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                     actorNode = actorField;
                 } else
                     this.addError("Active Object cannot have a field named " + actorFieldName + " declared", actorField);
@@ -128,16 +127,16 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
             final Iterable<MethodNode> copyOfMethods = new ArrayList<MethodNode>(node.getMethods());
             for (final MethodNode method : copyOfMethods) {
-                if (method.isStatic()) continue;
                 final List<AnnotationNode> annotations = method.getAnnotations(new ClassNode(ActiveMethod.class));
                 if (annotations.isEmpty()) continue;
+                if (method.isStatic()) this.addError("Static methods cannot be active", method);
 
                 addActiveMethod(actorNode, node, method);
             }
             super.visitClass(node);
         }
 
-        private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original) {
+        private void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original) {
             if ((original.getModifiers() & Opcodes.ACC_SYNTHETIC) != 0) return;
 
             final ArgumentListExpression args = new ArgumentListExpression();

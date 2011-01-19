@@ -26,24 +26,32 @@ public final class InternalActor extends DynamicDispatchActor {
     public static final String METHOD_NAME_PREFIX = "activeObject_";
 
     void submit(Object... args) {
-        send(args);
+        if (this.currentThread == Thread.currentThread()) handleCurrentMessage(args)
+        else send(args);
     }
 
     Object submitAndWait(Object... args) {
-        sendAndWait(args);
+        if (this.currentThread == Thread.currentThread()) return handleCurrentMessage(args)
+        else return sendAndWait(args);
     }
 
     public void onMessage(final Object msg) {
         def result
         try {
+            result = handleCurrentMessage(msg)
+        } finally {
+            replyIfExists(result)
+        }
+    }
+
+    private Object handleCurrentMessage(final Object msg) {
+        try {
             Object target = msg[0]
             String methodName = msg[1]
             Object[] args = msg[2..-1]
-            result = target."${METHOD_NAME_PREFIX + methodName}"(*args)
+            return target."${METHOD_NAME_PREFIX + methodName}"(*args)
         } catch (all) {
-            result = all
-        } finally {
-            replyIfExists(result)
+            return all
         }
     }
 

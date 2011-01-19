@@ -22,18 +22,13 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 class ActiveObjectASTTransformationTest extends GroovyTestCase {
     //todo exception reporting - test
     //todo pass no arguments to the create() method
-    //todo avoid actor field duplicates in hierarchies
-    //todo ensure correct instance is being used with inheritance hierarchies - gaps, no gaps
-
-    // todo test static methods, inheritance of active methods, correctness
-    //todo inheritance with different actor field names allows for multiple actors per instance
-
     //todo pass in the group
+    //todo inheritance with different actor field names allows for multiple actors per instance
     //todo finish all methods before exit
-
-
     //todo return a DFV
     //todo update GDSL
+    //todo javadoc
+    //todo userguide
 
 
 
@@ -102,6 +97,7 @@ class B extends A {
 """)
         assert a.internalActiveObjectActor.active
         assert b.internalActiveObjectActor.active
+        assert a.internalActiveObjectActor !=b.internalActiveObjectActor
     }
 
     public void testActiveObjectInheritanceWithReverseOrder() {
@@ -124,6 +120,7 @@ class A {
 """)
         assert a.internalActiveObjectActor.active
         assert b.internalActiveObjectActor.active
+        assert a.internalActiveObjectActor !=b.internalActiveObjectActor
     }
 
     public void testActiveObjectHoldingCollidingFieldShouldFail() {
@@ -144,6 +141,272 @@ import groovyx.gpars.activeobject.*
     }
     """)
         }
+    }
+
+    public void testStaticMethodsCannotBeActive() {
+        final GroovyShell shell = new GroovyShell()
+        shouldFail(MultipleCompilationErrorsException) {
+            def a = shell.evaluate("""
+    import groovyx.gpars.activeobject.*
+    import groovyx.gpars.dataflow.DataFlowVariable
+    @ActiveObject
+    class A {
+    static DataFlowVariable result = new DataFlowVariable()
+        @ActiveMethod
+        static def foo(value) {
+        result << Thread.currentThread()
+        }
+    }
+    new A()
+    """)
+        }
+    }
+
+    public void testActiveMethodInNonActiveSuperClassIsIgnored() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+import groovyx.gpars.dataflow.DataFlowVariable
+class A {
+    def result = new DataFlowVariable()
+    @ActiveMethod
+    def foo(value) {
+        result << Thread.currentThread()
+    }
+}
+
+@ActiveObject
+class B extends A {
+}
+
+[new A(), new B()]
+""")
+        shouldFail(MissingPropertyException) {
+            a.internalActiveObjectActor
+        }
+        assert b.internalActiveObjectActor.active
+        a.foo(10)
+        assert a.result.val == Thread.currentThread()
+
+        b.foo(20)
+        assert b.result.val == Thread.currentThread()
+
+    }
+
+    public void testActiveMethodInNonActiveSubClassIsIgnored() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+import groovyx.gpars.dataflow.DataFlowVariable
+@ActiveObject
+class A {
+    def result = new DataFlowVariable()
+}
+
+class B extends A {
+    @ActiveMethod
+    def foo(value) {
+        result << Thread.currentThread()
+    }
+}
+
+[new A(), new B()]
+""")
+        a.internalActiveObjectActor
+        assert a.internalActiveObjectActor.active
+        assert b.internalActiveObjectActor.active
+        shouldFail(MissingMethodException) {
+            a.foo(10)
+        }
+
+        b.foo(20)
+        assert b.result.val == Thread.currentThread()
+    }
+
+    public void testOverridenNonActiveMethod() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+import groovyx.gpars.dataflow.DataFlowVariable
+class A {
+    def result = new DataFlowVariable()
+
+    def foo(value) {
+        result << Thread.currentThread()
+    }
+}
+
+@ActiveObject
+class B extends A {
+    @ActiveMethod
+    def foo(value) {
+        super.foo(value)
+    }
+}
+
+[new A(), new B()]
+""")
+        shouldFail(MissingPropertyException) {
+            a.internalActiveObjectActor
+        }
+        assert b.internalActiveObjectActor.active
+        a.foo(10)
+        assert a.result.val == Thread.currentThread()
+
+        b.foo(20)
+        assert b.result.val != Thread.currentThread()
+    }
+
+    public void testComplexInheritance() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b, c1, c2) = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+import groovyx.gpars.dataflow.DataFlowVariable
+@ActiveObject
+class A {
+    def result = new DataFlowVariable()
+    @ActiveMethod
+    def fooA(value) {
+        result << Thread.currentThread()
+    }
+}
+
+class B extends A {
+}
+
+@ActiveObject
+class C extends B {
+    @ActiveMethod
+    def fooC(value1, value2) {
+        result << Thread.currentThread()
+    }
+}
+[new A(), new B(), new C(), new C()]
+""")
+        assert a.internalActiveObjectActor.active
+        assert b.internalActiveObjectActor.active
+
+        a.fooA(10)
+        assert a.result.val != Thread.currentThread()
+
+        b.fooA(20)
+        assert b.result.val != Thread.currentThread()
+
+        c1.fooA(30)
+        assert c1.result.val != Thread.currentThread()
+
+        c2.fooA(40)
+        assert c2.result.val != Thread.currentThread()
+    }
+
+    public void testComplexInheritanceInDifferentOrder() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b, c1, c2) = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+import groovyx.gpars.dataflow.DataFlowVariable
+@ActiveObject
+class C extends B {
+    @ActiveMethod
+    def fooC(value1, value2) {
+        result << Thread.currentThread()
+    }
+}
+
+class B extends A {
+}
+
+@ActiveObject
+class A {
+    def result = new DataFlowVariable()
+    @ActiveMethod
+    def fooA(value) {
+        result << Thread.currentThread()
+    }
+}
+
+[new A(), new B(), new C(), new C()]
+""")
+        assert a.internalActiveObjectActor.active
+        assert b.internalActiveObjectActor.active
+
+        a.fooA(10)
+        assert a.result.val != Thread.currentThread()
+
+        b.fooA(20)
+        assert b.result.val != Thread.currentThread()
+
+        c1.fooA(30)
+        assert c1.result.val != Thread.currentThread()
+
+        c2.fooA(40)
+        assert c2.result.val != Thread.currentThread()
+    }
+
+    public void testActiveMethodCallingNonActiveMethod() {
+        final GroovyShell shell = new GroovyShell()
+        def a = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+import groovyx.gpars.dataflow.DataFlowQueue
+@ActiveObject
+class A {
+    def result = new DataFlowQueue()
+    def nonActiveFoo(value) {
+        result << Thread.currentThread()
+    }
+
+    @ActiveMethod
+    def activeFoo(value) {
+        result << Thread.currentThread()
+        nonActiveFoo(value)
+    }
+}
+new A()
+""")
+        assert a.internalActiveObjectActor.active
+
+        a.nonActiveFoo(10)
+        assert a.result.val == Thread.currentThread()
+
+        a.activeFoo(10)
+        final t1 = a.result.val
+        final t2 = a.result.val
+        assert t1 != Thread.currentThread()
+        assert t2 != Thread.currentThread()
+        assert t1 == t2
+    }
+
+    public void testActiveMethodCallingActiveMethod() {
+        final GroovyShell shell = new GroovyShell()
+        def a = shell.evaluate("""
+import groovyx.gpars.activeobject.*
+import groovyx.gpars.dataflow.DataFlowQueue
+@ActiveObject
+class A {
+    def result = new DataFlowQueue()
+    @ActiveMethod
+    def activeFoo1(value) {
+        result << Thread.currentThread()
+    }
+
+    @ActiveMethod
+    def activeFoo2(value) {
+        result << Thread.currentThread()
+        activeFoo1(value)
+    }
+}
+new A()
+""")
+        assert a.internalActiveObjectActor.active
+
+        a.activeFoo1(10)
+        assert a.result.val != Thread.currentThread()
+
+        a.activeFoo2(10)
+        final t1 = a.result.val
+        final t2 = a.result.val
+        assert t1 != Thread.currentThread()
+        assert t2 != Thread.currentThread()
+        assert t1 == t2
     }
 }
 @ActiveObject
