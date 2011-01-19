@@ -39,3 +39,7 @@ withPool{
     println "Doing something else while the calculation is running"
     println result.val
 }
+
+def result = range.collect{new DataFlowVariable() << it}.inject(new DataFlowVariable() << 0, asyncPlus)
+println "Doing something else while the calculation is running"
+println result.val
