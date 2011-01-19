@@ -21,7 +21,8 @@ import groovyx.gpars.group.DefaultPGroup
 
 /**
  * Demonstrates the way to use DataFlowVariables and tasks to create and combine composable asynchronous functions.
- * Inspired by Alex Miller's experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
+ * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
+ * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
  *
  * @author Vaclav Pech
  */

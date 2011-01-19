@@ -17,6 +17,7 @@
 package groovyx.gpars
 
 import groovy.time.Duration
+import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.memoize.LRUProtectionStorage
 import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
@@ -125,6 +126,36 @@ public class GParsPoolUtil {
         return {Object... args -> callAsync(cl, * args)}
     }
 
+    private static void evaluateArguments(pool, args, current, soFarArgs, result, original, pooledThreadFlag) {
+        if (current == args.size()) {
+            if (pooledThreadFlag) result << original(* soFarArgs)
+            else {
+                pool.submit({-> result << original(* soFarArgs)} as RecursiveTask)
+            }
+        }
+        else {
+            def currentArgument = args[current]
+            if (currentArgument instanceof DataFlowVariable) {
+                currentArgument.whenBound {value ->
+                    evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
+                }
+            } else {
+                evaluateArguments(pool, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
+            }
+        }
+    }
+
+    /**
+     * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
+     */
+    public static Closure asyncFun(final Closure original) {
+        final def pool = GParsPool.retrieveCurrentPool()
+        return {final Object[] args ->
+            final DataFlowVariable result = new DataFlowVariable()
+            evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            result
+        }
+    }
     /**
      * Creates a caching variant of the supplied closure.
      * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache

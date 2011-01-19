@@ -27,9 +27,15 @@ import static groovyx.gpars.GParsPool.withPool
  */
 
 withPool {
-//    def result = ((asyncFun {a, b -> a + b}).call(1, new DataFlowVariable() << 2))
-    def result = (0..100).inject(0, {a, b -> a + b}.asyncFun())
-    println "Doing something else while the calculation is running"
+    def sum = {a, b -> a + b}.asyncFun()
+    def fib
+    fib = {n ->
+        n <= 2 ? 1 : sum(fib(n - 2), fib(n - 1))
+    }.asyncFun()
+
+    println "Starting the calculation"
+    final def result = fib(14)
+    println "Now the calculation is running while we can do something else."
 
     sleep 1000
     println "Are we done yet? ${result.bound}"
