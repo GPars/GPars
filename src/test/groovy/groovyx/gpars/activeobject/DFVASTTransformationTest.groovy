@@ -112,6 +112,9 @@ class B extends A {
         assert a.result.val != Thread.currentThread()
         assert result.val instanceof RuntimeException
         assert result.val.message == 'test'
+        shouldFail(RuntimeException) {
+            result.get()
+        }
         assert result.bound
     }
 }
