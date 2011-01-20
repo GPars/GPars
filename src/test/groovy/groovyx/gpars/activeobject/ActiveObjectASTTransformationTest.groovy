@@ -20,7 +20,6 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 class ActiveObjectASTTransformationTest extends GroovyTestCase {
-    //todo pass in the group
     //todo exception reporting - test
     //todo return a DFV
     //todo demos

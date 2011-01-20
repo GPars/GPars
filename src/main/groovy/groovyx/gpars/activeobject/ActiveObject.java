@@ -30,4 +30,5 @@ public @interface ActiveObject {
     String INTERNAL_ACTIVE_OBJECT_ACTOR = "internalActiveObjectActor";
 
     String value() default INTERNAL_ACTIVE_OBJECT_ACTOR;
+    String group() default "";
 }

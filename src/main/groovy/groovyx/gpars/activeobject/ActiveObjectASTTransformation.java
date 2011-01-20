@@ -63,13 +63,14 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
         final AnnotationNode activeObjectAnnotation = (AnnotationNode) nodes[0];
 
         final String actorFieldName = lookupActorFieldName(activeObjectAnnotation);
+        final String actorGroupName = lookupActorGroupName(activeObjectAnnotation);
 
         if (!(targetClass instanceof ClassNode))
             throw new GroovyBugError("Class annotation " + activeObjectAnnotation.getClassNode().getName() + " annotated no Class, this must not happen.");
 
         final ClassNode classNode = (ClassNode) targetClass;
 
-        final GroovyClassVisitor transformer = new MyClassCodeExpressionTransformer(source, actorFieldName);
+        final GroovyClassVisitor transformer = new MyClassCodeExpressionTransformer(source, actorFieldName, actorGroupName);
         transformer.visitClass(classNode);
     }
 
@@ -79,6 +80,15 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             return member.getText();
         } else {
             return ActiveObject.INTERNAL_ACTIVE_OBJECT_ACTOR;
+        }
+    }
+
+    private static String lookupActorGroupName(final AnnotationNode logAnnotation) {
+        final Expression member = logAnnotation.getMember("group");
+        if (member != null && member.getText() != null) {
+            return member.getText();
+        } else {
+            return "";
         }
     }
 
@@ -95,10 +105,12 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
         private FieldNode actorNode;
         private final SourceUnit source;
         private final String actorFieldName;
+        private final String actorGroupName;
 
-        private MyClassCodeExpressionTransformer(final SourceUnit source, final String actorFieldName) {
+        private MyClassCodeExpressionTransformer(final SourceUnit source, final String actorFieldName, final String actorGroupName) {
             this.source = source;
             this.actorFieldName = actorFieldName;
+            this.actorGroupName = actorGroupName;
         }
 
         @Override
@@ -122,7 +134,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
                 } else
                     this.addError("Active Object cannot have a field named " + actorFieldName + " declared", actorField);
             } else {
-                actorNode = addActorFieldToClass(node, actorFieldName);
+                actorNode = addActorFieldToClass(node, actorFieldName, actorGroupName);
             }
 
             final Iterable<MethodNode> copyOfMethods = new ArrayList<MethodNode>(node.getMethods());
@@ -179,9 +191,9 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             }
         }
 
-        private static FieldNode addActorFieldToClass(final ClassNode classNode, final String logFieldName) {
+        private static FieldNode addActorFieldToClass(final ClassNode classNode, final String logFieldName, final String actorGroupName) {
             final ArgumentListExpression args = new ArgumentListExpression();
-            args.addExpression(new ConstantExpression(""));
+            args.addExpression(new ConstantExpression(actorGroupName));
 
             return classNode.addField(logFieldName,
                     Opcodes.ACC_FINAL | Opcodes.ACC_TRANSIENT | Opcodes.ACC_PROTECTED,
