@@ -32,16 +32,17 @@ import static groovyx.gpars.GParsPool.withPool
  */
 
 //Combining asynchronous summary function with asynchronous fibonacci function
+//notice also the use of gmemoize() to speed-up the calculation by remembering all calculated values - a nice example of function composability
 
 withPool {
     def sum = {a, b -> a + b}.asyncFun()
     def fib
     fib = {n ->
         n <= 2 ? 1 : sum(fib(n - 2), fib(n - 1))
-    }.asyncFun()
+    }.gmemoize().asyncFun()
 
     println "Starting the calculation"
-    final def result = fib(14)
+    final def result = fib(40)
     println "Now the calculation is running while we can do something else."
 
     sleep 1000
