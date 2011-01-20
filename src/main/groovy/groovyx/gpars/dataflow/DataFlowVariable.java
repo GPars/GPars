@@ -20,6 +20,8 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.RemoteSerialized;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
  * Each instance of DataFlowVariable can be read repeatedly any time using the 'val' property and assigned once
@@ -28,9 +30,9 @@ import groovyx.gpars.serial.RemoteSerialized;
  * For actors and Dataflow Operators the asynchronous non-blocking variants of the getValAsync() methods can be used.
  * They register the request to read a value and will send a message to the actor or operator once the value is available.
  *
+ * @param <T> Type of values to bind with the DataFlowVariable
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Jun 4, 2009
- * @param <T> Type of values to bind with the DataFlowVariable
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
 public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFlowChannel<T> {
@@ -72,6 +74,36 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
             }
         });
         return this;
+    }
+
+    /**
+     * Retrieves the value of the variable, blocking until a value is available
+     * @return The value stored in the variable
+     * @throws Throwable If the stored value is an exception instance it gets re-thrown
+     */
+    @SuppressWarnings({"ProhibitedExceptionDeclared"})
+    public T get() throws Throwable {
+        final T result = getVal();
+        if (result instanceof Throwable) {
+            throw (Throwable) result;
+        }
+        return result;
+    }
+
+    /**
+     * Retrieves the value of the variable, blocking up to given timeout, if the value has not been assigned yet.
+     * @param timeout The timeout value
+     * @param units   Units for the timeout
+     * @return The value stored in the variable
+     * @throws Throwable If the stored value is an exception instance it gets re-thrown
+     */
+    @SuppressWarnings({"ProhibitedExceptionDeclared"})
+    public T get(final long timeout, final TimeUnit units) throws Throwable {
+        final T result = getVal(timeout, units);
+        if (result instanceof Throwable) {
+            throw (Throwable) result;
+        }
+        return result;
     }
 
     @Override

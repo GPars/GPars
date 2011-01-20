@@ -40,6 +40,50 @@ public class DataFlowVariableTest extends GroovyTestCase {
         assertEquals 10, variable.val
     }
 
+    public void testGet() {
+        final DataFlowVariable variable = new DataFlowVariable()
+        variable << 10
+        assertEquals 10, variable.get()
+        assertEquals 10, variable.get()
+        assertEquals 10, variable.get(10, TimeUnit.SECONDS)
+    }
+
+    public void testTimeoutGet() {
+        final DataFlowVariable variable = new DataFlowVariable()
+        assertNull variable.get(1, TimeUnit.SECONDS)
+        variable << 10
+        assertEquals 10, variable.get(10, TimeUnit.SECONDS)
+        assertEquals 10, variable.get()
+    }
+
+    public void testGetException() {
+        final DataFlowVariable variable = new DataFlowVariable()
+        variable << new Exception('test')
+        shouldFail(Exception) {
+            variable.get()
+        }
+        shouldFail(Exception) {
+            variable.get()
+        }
+        shouldFail(Exception) {
+            variable.get(10, TimeUnit.SECONDS)
+        }
+    }
+
+    public void testGetRuntimeException() {
+        final DataFlowVariable variable = new DataFlowVariable()
+        variable << new RuntimeException('test')
+        shouldFail(RuntimeException) {
+            variable.get()
+        }
+        shouldFail(RuntimeException) {
+            variable.get()
+        }
+        shouldFail(RuntimeException) {
+            variable.get(10, TimeUnit.SECONDS)
+        }
+    }
+
     public void testVariableFromThread() {
         final DataFlowVariable variable = new DataFlowVariable()
         DataFlow.start {
