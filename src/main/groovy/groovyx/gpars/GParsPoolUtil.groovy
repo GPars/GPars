@@ -126,6 +126,7 @@ public class GParsPoolUtil {
         return {Object... args -> callAsync(cl, * args)}
     }
 
+
     private static void evaluateArguments(pool, args, current, soFarArgs, result, original, pooledThreadFlag) {
         if (current == args.size()) {
             if (pooledThreadFlag) {
@@ -136,13 +137,7 @@ public class GParsPoolUtil {
                 }
             }
             else {
-                pool.submit({->
-                    try {
-                        result << original(* soFarArgs)
-                    } catch (all) {
-                        result << all
-                    }
-                } as RecursiveTask)
+                pool.submit(new AsyncFunTask(result, original, soFarArgs))
             }
         }
         else {
