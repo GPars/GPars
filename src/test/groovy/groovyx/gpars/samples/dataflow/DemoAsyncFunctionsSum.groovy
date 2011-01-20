@@ -17,8 +17,9 @@
 package groovyx.gpars.samples.dataflow
 
 import static groovyx.gpars.GParsPool.withPool
+import java.util.concurrent.TimeUnit
 
- /**
+/**
  * Demonstrates the way to use asyncFun() to build composable asynchronous functions.
  * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
  * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
@@ -34,7 +35,7 @@ import static groovyx.gpars.GParsPool.withPool
 //Combining an asynchronous summary with the inject (reduce) function
 
 withPool {
-    def result = (0..100).inject(0, {a, b -> a + b}.asyncFun())
+    def result = (0..100000).inject(0, {a, b -> a + b}.asyncFun())
     println "Doing something else while the calculation is running"
 
     sleep 1000
@@ -45,5 +46,5 @@ withPool {
     println "Now really, are we done yet? ${result.bound}"
 
     println "OK, I've run out of patience. I'll sit down here and wait for you to finish my calculation!"
-    println result.val
+    println result.get(2, TimeUnit.MINUTES)
 }

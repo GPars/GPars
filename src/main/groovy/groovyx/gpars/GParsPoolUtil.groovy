@@ -64,7 +64,7 @@ public class GParsPoolUtil {
     private static final Timer timer = new Timer('GParsTimeoutTimer', true)
 
     private static ForkJoinPool retrievePool() {
-        final ForkJoinPool pool = groovyx.gpars.GParsPool.retrieveCurrentPool()
+        final ForkJoinPool pool = GParsPool.retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("No ForkJoinPool available for the current thread")
         return pool
     }
@@ -73,7 +73,7 @@ public class GParsPoolUtil {
      * schedules the supplied closure for processing in the underlying thread pool.
      */
     private static Future callParallel(Closure task) {
-        final ForkJoinPool pool = groovyx.gpars.GParsPool.retrieveCurrentPool()
+        final ForkJoinPool pool = GParsPool.retrieveCurrentPool()
         if (!pool) throw new IllegalStateException("No ExecutorService available for the current thread.")
         return pool.submit([compute: task] as RecursiveTask)
     }
@@ -158,18 +158,18 @@ public class GParsPoolUtil {
         }
     }
 
-    //todo exception handling, test, user guide
     /**
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
      */
     public static Closure asyncFun(final Closure original) {
-        final def pool = GParsPool.retrieveCurrentPool()
+        final def pool = retrievePool()
         return {final Object[] args ->
             final DataFlowVariable result = new DataFlowVariable()
             evaluateArguments(pool, args.clone(), 0, [], result, original, false)
             result
         }
     }
+
     /**
      * Creates a caching variant of the supplied closure.
      * Whenever the closure is called, the mapping between the parameters and the return value is preserved in cache

@@ -46,5 +46,5 @@ withPool {
     def result = aMultiply(aPlus(10, 30), 100)
 
     println "Time to do something else while the calculation is running"
-    println "Asynchronous result: " + result.val
+    println "Asynchronous result: " + result.get()
 }

@@ -53,5 +53,5 @@ withPool {
     println "Now really, are we done yet? ${result.bound}"
 
     println "OK, I've run out of patience. I'll sit down here and wait for you to finish my calculation!"
-    println result.val
+    println result.get()
 }

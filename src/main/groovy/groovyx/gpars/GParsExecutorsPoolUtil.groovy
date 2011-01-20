@@ -17,6 +17,7 @@
 package groovyx.gpars
 
 import groovy.time.Duration
+import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -101,6 +102,50 @@ public class GParsExecutorsPoolUtil {
      */
     public static Closure async(Closure cl) {
         return {Object... args -> callAsync(cl, * args)}
+    }
+
+    private static void evaluateArguments(pool, args, current, soFarArgs, result, original, pooledThreadFlag) {
+        if (current == args.size()) {
+            if (pooledThreadFlag) {
+                try {
+                    result << original(* soFarArgs)
+                } catch (all) {
+                    result << all
+                }
+            }
+            else {
+                pool.submit({->
+                    try {
+                        result << original(* soFarArgs)
+                    } catch (all) {
+                        result << all
+                    }
+                })
+            }
+        }
+        else {
+            def currentArgument = args[current]
+            if (currentArgument instanceof DataFlowVariable) {
+                currentArgument.whenBound {value ->
+                    if (value instanceof Throwable) result << value
+                    else evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
+                }
+            } else {
+                evaluateArguments(pool, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
+            }
+        }
+    }
+
+    /**
+     * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
+     */
+    public static Closure asyncFun(final Closure original) {
+        final def pool = GParsExecutorsPool.retrieveCurrentPool()
+        return {final Object[] args ->
+            final DataFlowVariable result = new DataFlowVariable()
+            evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            result
+        }
     }
 
     /**

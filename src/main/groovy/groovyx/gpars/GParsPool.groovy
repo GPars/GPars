@@ -51,14 +51,14 @@ public class GParsPool {
     /**
      * Retrieves the pool assigned to the current thread.
      */
-    protected static retrieveCurrentPool() {
+    protected static def retrieveCurrentPool() {
         currentPoolStack.current
     }
 
     /**
      * Creates a new pool with the default size()
      */
-    private static createPool() {
+    private static def createPool() {
         return createPool(PoolUtils.retrieveDefaultPoolSize())
     }
 

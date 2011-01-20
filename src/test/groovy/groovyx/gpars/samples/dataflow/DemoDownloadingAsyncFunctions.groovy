@@ -44,7 +44,7 @@ withPool {
     //asynchronous processing converting the synchronous functions into asynchronous ones in-place
     def result = scanFor.asyncFun()('groovy', lower.asyncFun()(download.asyncFun()('http://www.infoq.com')))
     println 'Allowed to do something else now'
-    println result.val
+    println result.get()
 }
 
 //now we'll instead make the functions asynchronous right-away
@@ -62,5 +62,5 @@ withPool {
     //asynchronous processing
     def result = scanFor('groovy', lower(download('http://www.infoq.com')))
     println 'Allowed to do something else now'
-    println result.val
+    println result.get()
 }
