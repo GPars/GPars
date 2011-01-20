@@ -17,6 +17,7 @@
 package groovyx.gpars.activeobject;
 
 import groovyjarjarasm.asm.Opcodes;
+import groovyx.gpars.dataflow.DataFlowVariable;
 import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
@@ -172,7 +173,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
                     original.getCode());
             newMethod.setGenericsTypes(original.getGenericsTypes());
 
-            final String submitMethodName = original.getReturnType().isDerivedFrom(new ClassNode(Void.class)) ? "submit" : "submitAndWait";
+            final String submitMethodName = original.getReturnType().isDerivedFrom(new ClassNode(DataFlowVariable.class)) ? "submit" : "submitAndWait";
             original.setCode(new ExpressionStatement(
                     new MethodCallExpression(
                             new VariableExpression(actorNode), submitMethodName, args)

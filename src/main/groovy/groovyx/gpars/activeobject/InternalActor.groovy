@@ -20,8 +20,9 @@ package groovyx.gpars.activeobject;
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.PGroup
+import groovyx.gpars.dataflow.DataFlowVariable
 
- /**
+/**
  * Backs active objects and invokes all object's active methods.
  *
  * @author Vaclav Pech
@@ -30,11 +31,21 @@ public final class InternalActor extends DynamicDispatchActor {
     private static final long serialVersionUID = 6700367864074699984L;
     public static final String METHOD_NAME_PREFIX = "activeObject_";
 
-    void submit(Object... args) {
-        if (this.currentThread == Thread.currentThread()) handleCurrentMessage(args)
-        else send(args);
+    /**
+     * A DataFlowVariable is expected back
+     * @param args The method parameters
+     */
+    DataFlowVariable submit(Object... args) {
+        def result = new DataFlowVariable()
+        if (this.currentThread == Thread.currentThread()) result << handleCurrentMessage(args)
+        else sendAndContinue(args) {result << it}
+        return result
     }
 
+    /**
+     * A response is expected back
+     * @param args The method parameters
+     */
     Object submitAndWait(Object... args) {
         if (this.currentThread == Thread.currentThread()) return handleCurrentMessage(args)
         else return sendAndWait(args);
@@ -57,7 +68,7 @@ public final class InternalActor extends DynamicDispatchActor {
         try {
             Object target = msg[0]
             String methodName = msg[1]
-            Object[] args = msg[2..-1]
+            Object[] args = msg.size()>2 ? msg[2..-1] : new Object[0]
             return target."${METHOD_NAME_PREFIX + methodName}"(*args)
         } catch (all) {
             return all
