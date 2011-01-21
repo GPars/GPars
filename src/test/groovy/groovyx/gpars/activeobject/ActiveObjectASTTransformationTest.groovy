@@ -20,13 +20,6 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 class ActiveObjectASTTransformationTest extends GroovyTestCase {
-    //todo demos
-    //todo javadoc
-    //todo user guide
-    //todo inheritance with different actor field names allows for multiple actors per instance
-
-
-
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
         assert actor.active
@@ -335,6 +328,32 @@ class A {
 
         c2.fooA(40)
         assert c2.result.val != Thread.currentThread()
+    }
+
+    public void testPolymorphism() {
+        final GroovyShell shell = new GroovyShell()
+        def decryptor = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
+@ActiveObject
+class Decryptor {
+    @ActiveMethod
+    String decrypt(String encryptedText) {
+
+        return encryptedText.reverse()
+    }
+
+    @ActiveMethod
+    Integer decrypt(Integer encryptedNumber) {
+        return -1*encryptedNumber
+    }
+}
+
+new Decryptor()
+""")
+        assert 'dcba' == decryptor.decrypt('abcd')
+        assert -10 == decryptor.decrypt(10)
     }
 
     public void testActiveMethodCallingNonActiveMethod() {

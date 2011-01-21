@@ -1,2 +1,90 @@
-h2. Active Objects
-//todo
+Active objects provide a OO facade on top of actors, allowing you to avoid dealing directly with the actor machinery,
+matching messages or sending replies.
+
+h2. Actors with a friendly facade
+{code}
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
+@ActiveObject
+class Decryptor {
+    @ActiveMethod
+    String decrypt(String encryptedText) {
+        return encryptedText.reverse()
+    }
+
+    @ActiveMethod
+    Integer decrypt(Integer encryptedNumber) {
+        return -1*encryptedNumber + 142
+    }
+}
+
+final Decryptor decryptor = new Decryptor()
+print decryptor.decrypt(' noitcA ni yvoorG')
+print decryptor.decrypt(140)
+println decryptor.decrypt('noittide dn')
+{code}
+
+You mark active objects with the _@ActiveObject_ annotation. This will ensure an actor instance is created for each instance of your class.
+Now you can mark methods with the _@ActiveMethod_ annotation indicating that you want the method to be invoked asynchronously
+by the target object's internal actor.
+
+Under the covers, GPars will translate your method call to a message being sent to the actor. The actor will eventually handle that message by invoking the desired method
+and sending back the reply.
+
+h3. But waiting means we're not really asynchronous, are we?
+
+No, we're not. All we've achieved so far is being thread-safe inside the Active object from concurrent access. Something the _synchronized_
+keyword could give you cheaper and with less hassle.
+
+The real fun begins once you allow your methods return promises for results, aka _DataFlowVariables_ .
+
+{code}
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.dataflow.DataFlowVariable
+
+@ActiveObject
+class Decryptor {
+    @ActiveMethod
+    DataFlowVariable<String> decrypt(String encryptedText) {
+        new DataFlowVariable() << encryptedText.reverse()
+    }
+
+    @ActiveMethod
+    DataFlowVariable<Integer> decrypt(Integer encryptedNumber) {
+        new DataFlowVariable() << -1*encryptedNumber + 142
+    }
+}
+
+final Decryptor decryptor = new Decryptor()
+def firstPart = decryptor.decrypt(' noitcA ni yvoorG')
+def secondPart = decryptor.decrypt(140)
+def thirdPart = decryptor.decrypt('noittide dn')
+
+print firstPart.get()
+print secondPart.get()
+println thirdPart.get()
+{code}
+
+Now calling the method will return as soon as the actor is sent a message. The caller is now allowed to do whatever he likes, while the actor is taking care of the calculation.
+Calling the _get()_ method on the returned promise will block until a value is available. The state of the calculation can be polled using the _bound_ property on the promise.
+The call to _get()_ will eventually return a value or throw an exception, depending on the outcome of the actual calculation.
+
+{note}
+The _get()_ method has also a variant with a timeout parameter, if you want to avoid the risk of waiting indefinitely.
+{note}
+
+h4. Annotation rules
+
+There are a few rules to follow when annotating your objects:
+# The _@ActiveMethod_ annotations are only accepted in classes annotated as _@ActiveObject_
+# Only instance (non-static) methods can be annotated as _@ActiveMethod_
+# You can override active methods with non-active ones and vice versa
+# Subclasses of active objects can declare additional active methods, provided they are themselves annotated as _@ActiveObject_
+# Combining concurrent use of active and non-active methods may result in race conditions. Ideally design your active objects as completely encapsulated classes with all public methods active
+
+
+//todo groups
+//todo alternative actor field names
+//todo inheritance with different actor field names allows for multiple actors per instance
