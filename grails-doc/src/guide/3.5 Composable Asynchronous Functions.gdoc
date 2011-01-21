@@ -21,44 +21,55 @@ For our scenario described here where we process a collection, using those _para
 However, we're now looking for a *generic way to create and combine asynchronous functions* , which would help us
 not only for collection processing but mostly in other more generic cases, like the one right below.
 {note}
-Here's an example of combining three functions, which are supposed to download, transform and search content of a given URL.
+Here's an example of combining four functions, which are supposed to check whether a particular web page matches the contents of a local file.
+We need to download the page, load the file, calculate hashes of both and finally compare the resulting numbers.
 {code}
-    Closure download = {String url ->
-        url.toURL().text
-    }
+Closure download = {String url ->
+    url.toURL().text
+}
 
-    Closure scanFor = {String word, String text ->
-        text.findAll(word).size()
-    }
+Closure loadFile = {String fileName ->
+    ...  //load the file here
+}
 
-    Closure lower = {s -> s.toLowerCase()}
+Closure hash = {s -> s.hashCode()}.asyncFun()
 
-    println scanFor('groovy', lower(download('http://www.infoq.com')))  //synchronous processing
+Closure compare = {int first, int second ->
+    first == second
+}
+
+def result = compare(hash(download('http://www.gpars.org')), hash(loadFile('/coolStuff/gpars/website/index.html')))
+println "The result of comparison: " + result
 {code}
-Each of the functions is responsible for one particular job. One downloads the content, second turns all characters to lower case
-and finally the third one will search for the _groovy_ word. Combining the functions is as simple as nesting their calls.
+Each of the functions is responsible for one particular job. One downloads the content, second loads the file, third calculates the hashes
+and finally the fourth one will do the comparison. Combining the functions is as simple as nesting their calls.
 
 h3. Making it all asynchronous
 
-Now we need to allow the functions run in parallel. At a first glance you may see that some of the functions may well run concurrently. For example, why should ...
+The downside of our code is that we don't leverage the independence of the _download()_ and the _loadFile()_ functions.
+They can run in parallel, can't they?
+Some other functions, however, depend on results of others. They cannot start before the other function finishes. We need to block them till their parameters are available.
+The _hash()_ functions needs a string to work on. The _compare()_ function needs two numbers to compare.
 
-Some functions, however, depend on results of others. They cannot start before the other function finishes. We need to block them till their parameters are available.
 Luckily, the dependency is already expressed implicitly in the code. There's no need for us, the brave programmers, to duplicate the dependency information.
-If one functions takes parameters and the parameters need first to be calculated by another function, we implicitly have a dependency here. The ... depends on... in our example.
-The _inject_ function in out earlier example depends on the results of the _addition_ functions invoked gradually on all the elements of the collection.
+If one functions takes parameters and the parameters need first to be calculated by another function, we implicitly have a dependency here. The _hash()_ function
+depends on the _loadFile()_ as well as on the _download()_ functions in our example.
+The _inject_ function in our earlier example depends on the results of the _addition_ functions invoked gradually on all the elements of the collection.
 
 {note}
-However difficult it may seem, our task is pretty simple. We only need to teach our functions to return _promises_ of their future results. And we need to teach the other functions
-to accept those _promises_ as parameters and wait for their values to become available.
-And if we convince the functions to release the threads they hold while waiting for the values, we get directly to where magic happens.
+However difficult it may seem at first, our task is in fact very simple. We only need to teach our functions to return _promises_ of their future results. And we need to teach the other functions
+to accept those _promises_ as parameters so that they wait for the real values before they start their work.
+And if we convince the functions to release the threads they hold while waiting for the values, we get directly to where the magic can happens.
 {note}
 
 In the good tradition of _GPars_ we've made it very straightforward for you to make any functions believe in other functions' promises. Call the _asyncFun()_ function on a closure
 and you're asynchronous.
 {code}
+withPool {
     def maxPromise = numbers.inject(0, {a, b -> a>b?a:b}.asyncFun())
-    println "Look Ma, I can talk to the user while the math is being done!"
+    println "Look Ma, I can talk to the user while the math is being done for me!"
     println maxPromise.get()
+}
 {code}
 
 The _inject_ function doesn't really care what objects are being returned from the _addition_ function, maybe it is just a little surprised that
@@ -73,9 +84,11 @@ The _promise_ is a good old _DataFlowVariable_ , so you may query its status, re
 {note}
 
 {code}
+withPool {
     def sumPromise = (0..100000).inject(0, {a, b -> a + b}.asyncFun())
     println "Are we done yet? " + sumPromise.bound
     sumPromise.whenBound {sum -> println sum}
+}
 {code}
 
 h3. Can things go wrong?
@@ -94,7 +107,27 @@ h3. This is all fine, but what functions can be really combined?
 
 There are no limits. Take any sequential functions you need to combine and you should be able to combine their asynchronous variants as well.
 
+E.g., back to our initial example comparing content of a file with a web page, we simply make all the functions asynchronous by calling
+the _asyncFun()_ method on them and we are ready to set off.
+
 {code}
+    Closure download = {String url ->
+        url.toURL().text
+    }.asyncFun()
+
+    Closure loadFile = {String fileName ->
+        ...  //load the file here
+    }.asyncFun()
+
+    Closure hash = {s -> s.hashCode()}.asyncFun()
+
+    Closure compare = {int first, int second ->
+        first == second
+    }.asyncFun()
+
+    def result = compare(hash(download('http://www.gpars.org')), hash(loadFile('/coolStuff/gpars/website/index.html')))
+    println 'Allowed to do something else now'
+    println "The result of comparison: " + result.get()
 {code}
 
 On our side this is a very interesting domain to explore, so any comments, feedback and feedback on combining asynchronous functions or hints about its limits are welcome.
