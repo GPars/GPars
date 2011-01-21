@@ -1,1 +1,100 @@
-//todo
+Functions are to be composed. In fact, composing side-effect-free functions is very easy. Much easier and reliable than composing objects, for example.
+We can treat Groovy closures as functions. They take arguments, do their calculation and return a value. Provided you don't let your
+closures touch anything outside their scope, your closures are well-behaved pure functions. Functions that you can combine for a better good.
+{code}
+def sum = (0..100000).inject(0, {a, b -> a + b})
+{code}
+For example, by combining a function adding two numbers with the inject function, which iterates through the whole collection,
+you can quickly summarize all items. Then, replacing the adding function with a comparison function will immediately give you a combined function calculating maximum.
+{code}
+def max = myNumbers.inject(0, {a, b -> a>b?a:b})
+{code}
+
+You see, functional programming is popular for a reason.
+
+h3. Do we miss something here?
+This all works just fine until you realize you're not utilizing the full power of yor expensive hardware. The functions are plain sequential.
+No parallelism in here. All but one processor core do nothing, they're idle, totally wasted.
+{note}
+Those paying attention would suggest to use the _Parallel Collection_ techniques described earlier and they would certainly be correct.
+For our scenario described here where we process a collection, using those _parallel_ methods would be the best choice.
+However, we're now looking for a *generic way to create and combine asynchronous functions* , which would help us
+not only for collection processing but mostly in other more generic cases, like the one right below.
+{note}
+Here's an example of combining three functions, which are supposed to download, transform and search content of a given URL.
+{code}
+    Closure download = {String url ->
+        url.toURL().text
+    }
+
+    Closure scanFor = {String word, String text ->
+        text.findAll(word).size()
+    }
+
+    Closure lower = {s -> s.toLowerCase()}
+
+    println scanFor('groovy', lower(download('http://www.infoq.com')))  //synchronous processing
+{code}
+Each of the functions is responsible for one particular job. One downloads the content, second turns all characters to lower case
+and finally the third one will search for the _groovy_ word. Combining the functions is as simple as nesting their calls.
+
+h3. Making it all asynchronous
+
+Now we need to allow the functions run in parallel. At a first glance you may see that some of the functions may well run concurrently. For example, why should ...
+
+Some functions, however, depend on results of others. They cannot start before the other function finishes. We need to block them till their parameters are available.
+Luckily, the dependency is already expressed implicitly in the code. There's no need for us, the brave programmers, to duplicate the dependency information.
+If one functions takes parameters and the parameters need first to be calculated by another function, we implicitly have a dependency here. The ... depends on... in our example.
+The _inject_ function in out earlier example depends on the results of the _addition_ functions invoked gradually on all the elements of the collection.
+
+{note}
+However difficult it may seem, our task is pretty simple. We only need to teach our functions to return _promises_ of their future results. And we need to teach the other functions
+to accept those _promises_ as parameters and wait for their values to become available.
+And if we convince the functions to release the threads they hold while waiting for the values, we get directly to where magic happens.
+{note}
+
+In the good tradition of _GPars_ we've made it very straightforward for you to make any functions believe in other functions' promises. Call the _asyncFun()_ function on a closure
+and you're asynchronous.
+{code}
+    def maxPromise = numbers.inject(0, {a, b -> a>b?a:b}.asyncFun())
+    println "Look Ma, I can talk to the user while the math is being done!"
+    println maxPromise.get()
+{code}
+
+The _inject_ function doesn't really care what objects are being returned from the _addition_ function, maybe it is just a little surprised that
+each call to the _addition_ function returns so fast, but doesn't moan much, keeps iterating and finally returns the overall result to you.
+
+Now, this is the time you should stand behind what you say and do what you want others to do. Don't frown at the result and just accepts that you got back just a promise.
+A *promise* to get the result delivered as soon as the calculation is done. The extra heat coming out of your laptop is an indication the calculation
+exploits natural parallelism in your functions and makes its best effort to deliver the result to you quickly.
+
+{note}
+The _promise_ is a good old _DataFlowVariable_ , so you may query its status, register notification hooks or make it an input to a Dataflow algorithm
+{note}
+
+{code}
+    def sumPromise = (0..100000).inject(0, {a, b -> a + b}.asyncFun())
+    println "Are we done yet? " + sumPromise.bound
+    sumPromise.whenBound {sum -> println sum}
+{code}
+
+h3. Can things go wrong?
+
+Sure. But you'll get an exception thrown from the result promise _get()_ method.
+
+{code}
+try {
+    sumPromise.get()
+} catch (MyCalculationException e) {
+    println "Guess, things are not ideal today."
+}
+{code}
+
+h3. This is all fine, but what functions can be really combined?
+
+There are no limits. Take any sequential functions you need to combine and you should be able to combine their asynchronous variants as well.
+
+{code}
+{code}
+
+On our side this is a very interesting domain to explore, so any comments, feedback and feedback on combining asynchronous functions or hints about its limits are welcome.
