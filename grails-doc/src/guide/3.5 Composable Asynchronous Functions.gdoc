@@ -1,11 +1,12 @@
 Functions are to be composed. In fact, composing side-effect-free functions is very easy. Much easier and reliable than composing objects, for example.
+h3. Functions in Groovy
 We can treat Groovy closures as functions. They take arguments, do their calculation and return a value. Provided you don't let your
 closures touch anything outside their scope, your closures are well-behaved pure functions. Functions that you can combine for a better good.
 {code}
 def sum = (0..100000).inject(0, {a, b -> a + b})
 {code}
-For example, by combining a function adding two numbers with the inject function, which iterates through the whole collection,
-you can quickly summarize all items. Then, replacing the adding function with a comparison function will immediately give you a combined function calculating maximum.
+For example, by combining a function adding two numbers with the _inject_ function, which iterates through the whole collection,
+you can quickly summarize all items. Then, replacing the _adding_ function with a _comparison_ function will immediately give you a combined function calculating maximum.
 {code}
 def max = myNumbers.inject(0, {a, b -> a>b?a:b})
 {code}
@@ -13,11 +14,11 @@ def max = myNumbers.inject(0, {a, b -> a>b?a:b})
 You see, functional programming is popular for a reason.
 
 h3. Do we miss something here?
-This all works just fine until you realize you're not utilizing the full power of yor expensive hardware. The functions are plain sequential.
+This all works just fine until you realize you're not utilizing the full power of your expensive hardware. The functions are plain sequential.
 No parallelism in here. All but one processor core do nothing, they're idle, totally wasted.
 {note}
 Those paying attention would suggest to use the _Parallel Collection_ techniques described earlier and they would certainly be correct.
-For our scenario described here where we process a collection, using those _parallel_ methods would be the best choice.
+For our scenario described here, where we process a collection, using those _parallel_ methods would be the best choice.
 However, we're now looking for a *generic way to create and combine asynchronous functions* , which would help us
 not only for collection processing but mostly in other more generic cases, like the one right below.
 {note}
@@ -48,10 +49,12 @@ h3. Making it all asynchronous
 
 The downside of our code is that we don't leverage the independence of the _download()_ and the _loadFile()_ functions.
 They can run in parallel, can't they?
-Some other functions, however, depend on results of others. They cannot start before the other function finishes. We need to block them till their parameters are available.
+
+Some functions, however, may depend on results of others. They cannot start before the other function finishes. We need to block them till their parameters are available.
 The _hash()_ functions needs a string to work on. The _compare()_ function needs two numbers to compare.
 
-Luckily, the dependency is already expressed implicitly in the code. There's no need for us, the brave programmers, to duplicate the dependency information.
+So we can only parallelize some functions, while blocking others. Seems like a challenging task.
+Luckily, the dependency is already expressed implicitly in the code. There's no need for us to duplicate the dependency information.
 If one functions takes parameters and the parameters need first to be calculated by another function, we implicitly have a dependency here. The _hash()_ function
 depends on the _loadFile()_ as well as on the _download()_ functions in our example.
 The _inject_ function in our earlier example depends on the results of the _addition_ functions invoked gradually on all the elements of the collection.
@@ -59,10 +62,10 @@ The _inject_ function in our earlier example depends on the results of the _addi
 {note}
 However difficult it may seem at first, our task is in fact very simple. We only need to teach our functions to return _promises_ of their future results. And we need to teach the other functions
 to accept those _promises_ as parameters so that they wait for the real values before they start their work.
-And if we convince the functions to release the threads they hold while waiting for the values, we get directly to where the magic can happens.
+And if we convince the functions to release the threads they hold while waiting for the values, we get directly to where the magic can happen.
 {note}
 
-In the good tradition of _GPars_ we've made it very straightforward for you to make any functions believe in other functions' promises. Call the _asyncFun()_ function on a closure
+In the good tradition of _GPars_ we've made it very straightforward for you to convince any function to believe in other functions' promises. Call the _asyncFun()_ function on a closure
 and you're asynchronous.
 {code}
 withPool {
