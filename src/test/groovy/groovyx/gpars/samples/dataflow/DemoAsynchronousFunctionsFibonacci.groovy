@@ -43,7 +43,7 @@ def fib(n) {
 }
 
 println "Starting the calculation"
-final def result = fib(28)
+final def result = fib(20)
 println "Now the calculation is running while we can do something else."
 
 sleep 1000
