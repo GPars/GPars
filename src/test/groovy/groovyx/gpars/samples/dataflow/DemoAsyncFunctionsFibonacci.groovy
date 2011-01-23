@@ -39,7 +39,7 @@ withPool {
     def fib
     fib = {n ->
         n <= 2 ? 1 : sum(fib(n - 2), fib(n - 1))
-    }.gmemoize().asyncFun()
+    }.gmemoizeAtMost(3).asyncFun()
 
     println "Starting the calculation"
     final def result = fib(40)
