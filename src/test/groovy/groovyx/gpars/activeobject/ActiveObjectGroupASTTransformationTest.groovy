@@ -41,7 +41,7 @@ class ActiveObjectGroupASTTransformationTest extends GroovyTestCase {
     }
 }
 
-@ActiveObject(group = "group1")
+@ActiveObject("group1")
 class MyGroupWrapper {
     def result = new DataFlowVariable()
 
@@ -51,7 +51,7 @@ class MyGroupWrapper {
     }
 }
 
-@ActiveObject(group = "invalidGroup")
+@ActiveObject("invalidGroup")
 class MyInvalidGroupWrapper {
     def result = new DataFlowVariable()
 

@@ -69,7 +69,9 @@ class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActiveObjectInheritance() {
         final GroovyShell shell = new GroovyShell()
         def (a, b) = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
 @ActiveObject
 class A {
     @ActiveMethod
@@ -91,7 +93,8 @@ class B extends A {
     public void testActiveObjectInheritanceWithReverseOrder() {
         final GroovyShell shell = new GroovyShell()
         def (a, b) = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
 
 @ActiveObject
 class B extends A {
@@ -115,7 +118,9 @@ class A {
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {
             shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
     @ActiveObject
     class A {
         @ActiveMethod
@@ -135,7 +140,9 @@ import groovyx.gpars.activeobject.*
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {
             def a = shell.evaluate("""
-    import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
     import groovyx.gpars.dataflow.DataFlowVariable
     @ActiveObject
     class A {
@@ -153,7 +160,9 @@ import groovyx.gpars.activeobject.*
     public void testActiveMethodInNonActiveSuperClassIsIgnored() {
         final GroovyShell shell = new GroovyShell()
         def (a, b) = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
 import groovyx.gpars.dataflow.DataFlowVariable
 class A {
     def result = new DataFlowVariable()
@@ -184,7 +193,9 @@ class B extends A {
     public void testActiveMethodInNonActiveSubClassIsIgnored() {
         final GroovyShell shell = new GroovyShell()
         def (a, b) = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
 import groovyx.gpars.dataflow.DataFlowVariable
 @ActiveObject
 class A {
@@ -214,7 +225,9 @@ class B extends A {
     public void testOverridenNonActiveMethod() {
         final GroovyShell shell = new GroovyShell()
         def (a, b) = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
 import groovyx.gpars.dataflow.DataFlowVariable
 class A {
     def result = new DataFlowVariable()
@@ -248,7 +261,9 @@ class B extends A {
     public void testComplexInheritance() {
         final GroovyShell shell = new GroovyShell()
         def (a, b, c1, c2) = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
 import groovyx.gpars.dataflow.DataFlowVariable
 @ActiveObject
 class A {
@@ -290,7 +305,8 @@ class C extends B {
     public void testComplexInheritanceInDifferentOrder() {
         final GroovyShell shell = new GroovyShell()
         def (a, b, c1, c2) = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.dataflow.DataFlowVariable
 @ActiveObject
 class C extends B {
@@ -359,7 +375,8 @@ new Decryptor()
     public void testActiveMethodCallingNonActiveMethod() {
         final GroovyShell shell = new GroovyShell()
         def a = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.dataflow.DataFlowQueue
 @ActiveObject
 class A {
@@ -392,7 +409,8 @@ new A()
     public void testActiveMethodCallingActiveMethod() {
         final GroovyShell shell = new GroovyShell()
         def a = shell.evaluate("""
-import groovyx.gpars.activeobject.*
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.dataflow.DataFlowQueue
 @ActiveObject
 class A {
@@ -422,6 +440,55 @@ new A()
         assert t2 != Thread.currentThread()
         assert t1 == t2
     }
+
+    public void testTwoActorFields() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b, c) = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.dataflow.DataFlowVariable
+@ActiveObject(actorName = "fieldB")
+class C extends B {
+    @ActiveMethod
+    def fooC(value1, value2) {
+        result << Thread.currentThread()
+    }
+}
+
+class B extends A {
+}
+
+@ActiveObject(actorName = "fieldA")
+class A {
+    def result = new DataFlowVariable()
+    @ActiveMethod
+    def fooA(value) {
+        result << Thread.currentThread()
+    }
+}
+
+[new A(), new B(), new C()]
+""")
+        assert a.fieldA.active
+        assert b.fieldA.active
+        assert c.fieldA.active
+        shouldFail(MissingPropertyException) {
+            assert a.fieldB.active
+        }
+        shouldFail(MissingPropertyException) {
+            assert b.fieldB.active
+        }
+        assert c.fieldB.active
+
+        a.fooA(10)
+        assert a.result.val != Thread.currentThread()
+
+        b.fooA(20)
+        assert b.result.val != Thread.currentThread()
+
+        c.fooA(30)
+        assert c.result.val != Thread.currentThread()
+    }
 }
 @ActiveObject
 class MyWrapper {
@@ -443,7 +510,7 @@ class MyWrapper {
     }
 }
 
-@ActiveObject("alternativeActorName")
+@ActiveObject(actorName = "alternativeActorName")
 class MyAlternativeWrapper {
     @ActiveMethod
     def foo(int a, int b) {

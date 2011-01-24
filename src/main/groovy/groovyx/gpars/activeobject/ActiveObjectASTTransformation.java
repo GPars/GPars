@@ -76,7 +76,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
     }
 
     private static String lookupActorFieldName(final AnnotationNode logAnnotation) {
-        final Expression member = logAnnotation.getMember("value");
+        final Expression member = logAnnotation.getMember("actorName");
         if (member != null && member.getText() != null) {
             return member.getText();
         } else {
@@ -85,7 +85,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
     }
 
     private static String lookupActorGroupName(final AnnotationNode logAnnotation) {
-        final Expression member = logAnnotation.getMember("group");
+        final Expression member = logAnnotation.getMember("value");
         if (member != null && member.getText() != null) {
             return member.getText();
         } else {
