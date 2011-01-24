@@ -21,7 +21,7 @@ import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.agent.Agent.agent
 import java.util.concurrent.atomic.AtomicInteger
 
-class AwaitTaskTerminationTest extends GroovyTestCase {
+public class AwaitTaskTerminationTest extends GroovyTestCase {
 
     def activeTasks = agent(0L)
 	def pooledGroup
