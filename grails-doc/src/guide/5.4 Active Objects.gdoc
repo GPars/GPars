@@ -84,7 +84,72 @@ There are a few rules to follow when annotating your objects:
 # Subclasses of active objects can declare additional active methods, provided they are themselves annotated as _@ActiveObject_
 # Combining concurrent use of active and non-active methods may result in race conditions. Ideally design your active objects as completely encapsulated classes with all public methods active
 
+h3. Inheritance
 
-//todo groups
-//todo alternative actor field names
+The _@ActiveObject_ annotation can appear on any class in an inheritance hierarchy. The actor field will only be created in the first annotated class in the hierarchy, the subclasses will reuse the field.
+
+{code}
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.dataflow.DataFlowVariable
+
+@ActiveObject
+class A {
+    @ActiveMethod
+    def fooA(value) {
+        ...
+    }
+}
+
+class B extends A {
+}
+
+@ActiveObject
+class C extends B {
+    @ActiveMethod
+    def fooC(value1, value2) {
+        ...
+    }
+}
+{code}
+
+In our example the actor field will be generated into class _A_ . Class _C_ has to be annotated with _@ActiveObject_ since it holds
+the _@ActiveMethod_ annotation on method _fooC()_ , while class _B_ does not need the annotation, since none of its methods is active.
+
+h3. Groups
+
+Just like actors can be grouped around thread pools, active objects can be configured to use threads from particular parallel groups.
+{code}
+@ActiveObject("group1")
+class MyActiveObject {
+    ...
+}
+{code}
+
+The _value_ parameter to the _@ActiveObject_ annotation specifies a name of parallel group to bind the internal actor to.
+Only threads from the specified group will be used to run internal actors of instances of the class.
+The groups, however, need to be created and registered prior to creation of any of the active object instances belonging to that group.
+If not specified explicitly, an active object will use the default actor group - _Actors.defaultActorPGroup_ .
+
+{code}
+final DefaultPGroup group = new DefaultPGroup(10)
+ActiveObjectRegistry.instance.register("group1", group)
+{code}
+
+h3. Alternative names for the internal actor
+
+You will probably only rarely run into name collisions with the default name for the active object's internal actor field.
+May you need to change the default name _internalActiveObjectActor_ , use the _actorName_ parameter to the _@ActiveObject_ annotation.
+
+{code}
+@ActiveObject(actorName = "alternativeActorName")
+class MyActiveObject {
+    ...
+}
+{code}
+
+{note}
+Be careful when redefining the actor field's name for a subclass of an active object. This will result in two actors backing up
+your active objects.
+{note}
 //todo inheritance with different actor field names allows for multiple actors per instance
