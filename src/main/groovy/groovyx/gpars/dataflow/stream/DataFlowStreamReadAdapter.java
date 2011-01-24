@@ -21,6 +21,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataFlowExpression;
 import groovyx.gpars.dataflow.DataFlowReadChannel;
 import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.group.PGroup;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -97,6 +98,12 @@ public final class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T
     @Override
     public void whenBound(final Closure closure) {
         asyncHead.getFirstDFV().whenBound(closure);
+        moveAsyncHead();
+    }
+
+    @Override
+    public void whenBound(final PGroup group, final Closure closure) {
+        asyncHead.getFirstDFV().whenBound(group, closure);
         moveAsyncHead();
     }
 

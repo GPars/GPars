@@ -149,7 +149,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             super.visitClass(node);
         }
 
-        private void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original) {
+        private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original) {
             if ((original.getModifiers() & Opcodes.ACC_SYNTHETIC) != 0) return;
 
             final ArgumentListExpression args = new ArgumentListExpression();

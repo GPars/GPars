@@ -54,6 +54,16 @@ public class FJPool implements Pool {
     }
 
     /**
+     * Creates the pool wrapping the provided ForkJoinPool
+     *
+     * @param pool The ForkJoinPool instance to wrap
+     */
+    public FJPool(final ForkJoinPool pool) {
+        this.pool = pool;
+        this.configuredPoolSize = pool.getPoolSize();
+    }
+
+    /**
      * Creates a fork/join pool of given size. Each thread will have the uncaught exception handler set
      * to print the unhandled exception to standard error output.
      *

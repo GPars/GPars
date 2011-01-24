@@ -22,6 +22,7 @@ import groovy.lang.MetaClass;
 import groovy.lang.MetaProperty;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.SerialContext;
@@ -478,6 +479,19 @@ public abstract class DataFlowExpression<T> extends WithSerialId implements Groo
     @Override
     public final void whenBound(final Closure closure) {
         getValAsync(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
+    }
+
+    /**
+     * Schedule closure to be executed by pooled actor after data becomes available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param group The PGruop to use for taskscheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     */
+    @Override
+    public final void whenBound(final PGroup group, final Closure closure) {
+        getValAsync(new DataCallback(closure, group));
     }
 
     /**

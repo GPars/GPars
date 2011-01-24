@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.group.PGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -242,6 +243,11 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
     @Override
     public void whenBound(final Closure closure) {
         getValAsync(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
+    }
+
+    @Override
+    public void whenBound(final PGroup group, final Closure closure) {
+        getValAsync(new DataCallback(closure, group));
     }
 
     /**

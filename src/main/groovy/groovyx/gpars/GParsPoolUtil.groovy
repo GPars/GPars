@@ -43,6 +43,8 @@ import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
 import static groovyx.gpars.util.PAUtils.buildResultMap
 import static groovyx.gpars.util.PAUtils.createComparator
 import static groovyx.gpars.util.PAUtils.createGroupByClosure
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.FJPool
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsPool</i>. The static methods of <i>GParsPoolUtil</i>
@@ -127,7 +129,7 @@ public class GParsPoolUtil {
     }
 
 
-    private static void evaluateArguments(pool, args, current, soFarArgs, result, original, pooledThreadFlag) {
+    private static void evaluateArguments(group, args, current, soFarArgs, result, original, pooledThreadFlag) {
         if (current == args.size()) {
             if (pooledThreadFlag) {
                 try {
@@ -137,7 +139,13 @@ public class GParsPoolUtil {
                 }
             }
             else {
-                pool.submit(new AsyncFunTask(result, original, soFarArgs))
+                group.threadPool.execute({->
+                    try {
+                        result << original(* soFarArgs)
+                    } catch (all) {
+                        result << all
+                    }
+                })
             }
         }
         else {
@@ -145,10 +153,10 @@ public class GParsPoolUtil {
             if (currentArgument instanceof DataFlowVariable) {
                 currentArgument.whenBound {value ->
                     if (value instanceof Throwable) result << value
-                    else evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
+                    else evaluateArguments(group, args, current + 1, soFarArgs << value, result, original, true)
                 }
             } else {
-                evaluateArguments(pool, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
+                evaluateArguments(group, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
             }
         }
     }
@@ -157,10 +165,10 @@ public class GParsPoolUtil {
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
      */
     public static Closure asyncFun(final Closure original) {
-        final def pool = retrievePool()
+        final def group = new DefaultPGroup(new FJPool(retrievePool()))
         return {final Object[] args ->
             final DataFlowVariable result = new DataFlowVariable()
-            evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            evaluateArguments(group, args.clone(), 0, [], result, original, false)
             result
         }
     }

@@ -30,6 +30,8 @@ import static groovyx.gpars.util.PAGroovyUtils.createCollection
 import static groovyx.gpars.util.PAUtils.buildClosureForMaps
 import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
 import static groovyx.gpars.util.PAUtils.buildResultMap
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.scheduler.DefaultPool
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
@@ -104,7 +106,7 @@ public class GParsExecutorsPoolUtil {
         return {Object... args -> callAsync(cl, * args)}
     }
 
-    private static void evaluateArguments(pool, args, current, soFarArgs, result, original, pooledThreadFlag) {
+    private static void evaluateArguments(group, args, current, soFarArgs, result, original, pooledThreadFlag) {
         if (current == args.size()) {
             if (pooledThreadFlag) {
                 try {
@@ -114,7 +116,7 @@ public class GParsExecutorsPoolUtil {
                 }
             }
             else {
-                pool.submit({->
+                group.threadPool.execute({->
                     try {
                         result << original(* soFarArgs)
                     } catch (all) {
@@ -128,10 +130,10 @@ public class GParsExecutorsPoolUtil {
             if (currentArgument instanceof DataFlowVariable) {
                 currentArgument.whenBound {value ->
                     if (value instanceof Throwable) result << value
-                    else evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
+                    else evaluateArguments(group, args, current + 1, soFarArgs << value, result, original, true)
                 }
             } else {
-                evaluateArguments(pool, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
+                evaluateArguments(group, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
             }
         }
     }
@@ -140,10 +142,10 @@ public class GParsExecutorsPoolUtil {
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
      */
     public static Closure asyncFun(final Closure original) {
-        final def pool = GParsExecutorsPool.retrieveCurrentPool()
+        final def group = new DefaultPGroup(new DefaultPool(GParsExecutorsPool.retrieveCurrentPool()))
         return {final Object[] args ->
             final DataFlowVariable result = new DataFlowVariable()
-            evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            evaluateArguments(group, args.clone(), 0, [], result, original, false)
             result
         }
     }
