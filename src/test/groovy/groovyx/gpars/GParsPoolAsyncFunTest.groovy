@@ -16,7 +16,10 @@
 
 package groovyx.gpars
 
- /**
+import groovyx.gpars.dataflow.DataFlowQueue
+import jsr166y.forkjoin.AsyncAction
+
+/**
  * @author Vaclav Pech
  */
 public class GParsPoolAsyncFunTest extends GroovyTestCase {
@@ -57,6 +60,31 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
             Closure aMultiply = sMultiply.asyncFun()
 
             assert sMultiply(sPlus(10, 30), 100) == aMultiply(aPlus(10, 30), 100).val
+        }
+    }
+
+    public void testThreading() {
+        groovyx.gpars.GParsPool.withPool(1) {pool ->
+            def results = new DataFlowQueue()
+            pool.submit([compute:{results << Thread.currentThread();finish()}] as AsyncAction)
+            def t = results.val
+
+            Closure sPlus = {Integer a, Integer b ->
+                results << Thread.currentThread()
+                a + b
+            }
+
+            Closure sMultiply = {Integer a, Integer b ->
+                results << Thread.currentThread()
+                a * b
+            }
+
+            Closure aPlus = sPlus.asyncFun()
+            Closure aMultiply = sMultiply.asyncFun()
+
+            aMultiply(aPlus(10, 30), 100).val
+            assert results.val == t
+            assert results.val == t
         }
     }
 

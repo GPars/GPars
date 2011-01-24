@@ -128,7 +128,7 @@ public class GParsExecutorsPoolUtil {
         else {
             def currentArgument = args[current]
             if (currentArgument instanceof DataFlowVariable) {
-                currentArgument.whenBound {value ->
+                currentArgument.whenBound(group) {value ->
                     if (value instanceof Throwable) result << value
                     else evaluateArguments(group, args, current + 1, soFarArgs << value, result, original, true)
                 }
