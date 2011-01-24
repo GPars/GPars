@@ -94,7 +94,7 @@ public interface DataFlowReadChannel<T> {
      * It is important to notice that even if data already available the execution of closure
      * will not happen immediately but will be scheduled.
      *
-     * @param group The PGruop to use for taskscheduling for asynchronous message delivery
+     * @param group The PGroup to use for task scheduling for asynchronous message delivery
      * @param closure closure to execute when data available
      */
     void whenBound(final PGroup group, final Closure closure);
