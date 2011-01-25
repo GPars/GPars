@@ -1,5 +1,67 @@
 GPars - Groovy Parallel Systems
 
+0.12
+
+0.11
+
+Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=16391
+
+h3. Project changes
+
+See http://gpars.codehaus.org/Breaking+Changes for the list of breaking changes.
+
+h3. Parallel collections
+
+* Added a speculate() method to concurrently run multiple functions each representing a different path to achieve the required goal, while harvesting the first calculated result
+* Added the _combine_ method into the map/reduce family of functions
+* General speed-up of Parallel Array construction and execution
+
+h3. Fork / Join
+
+h3. Actors
+
+* Speed-up of the actor messaging core
+* Refactored Reactor and DynamicDispatchActor achieving a 15x speed-up
+* Conditional and counting loop
+* Changed the message timeout API
+* Deprecated _AbstractPooledActor_
+* Added _DefaultActor_ as a new implementation of the stateful actor principle
+* Removed support for replies and senders on messages
+* Extended support for senders to actors themselves
+* Removed the _receive()_ from _DefaultActor_
+
+h3. GroovyCSP
+
+h3. Dataflow
+
+* New specialized operators - _selector_ , _prioritySelector_ and _splitter_
+* Added _select_ and _prioritySelect_ methods to select a value from multiple channels
+* Dataflow tasks accept Callable as parameters on top of Closures
+* Introduced dataflow queues
+* Unified the interface for dataflow variables, streams and queues - _DataFlowChannel_
+* Methods for atomic update to multiple operator's output channels
+* Fixed issues with reusing the same parallel group in the DataFlowVariable whenBound() handlers
+* Tasks can return values and can be joined
+* DataFlowQueue's _whenBound_ renamed to _wheneverBound_ and _whenNextBound_ renamed to _whenBound_ to obey the _DataFlowChannel_ interface contract
+* DataFlow default parallel group has been made daemon
+
+h3. Agent
+
+* Added listeners and validators
+* Considerable speed-up
+
+h3. Other
+
+* Java API - GPars can now be used from Java
+* A stand-alone maven-based Java API "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-REL-5/artifact/GPars-Java-API-integration-demo-project/gpars-mvn-java-demo-0.11-beta-2.zip was added to show GPars integration and use from Java
+* Made Groovy 1.8 compatible
+
+h3. Renaming hints
+
+* The _AbstractPooledActor_ class is now deprecated, use _DefaultActor_ instead
+* The _DataFlowStream_ class has been renamed to _DataFlowQueue_
+* The _memoize_ method family has been renamed to _gmemoize_ in order to avoid name collisions with memoize in Groovy 1.8
+
 0.10
 
 Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=15793
