@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
+import groovyx.gpars.scheduler.Pool;
 
 import java.util.concurrent.TimeUnit;
 
@@ -94,7 +95,17 @@ public interface DataFlowReadChannel<T> {
      * It is important to notice that even if data already available the execution of closure
      * will not happen immediately but will be scheduled.
      *
-     * @param group The PGroup to use for task scheduling for asynchronous message delivery
+     * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     */
+    void whenBound(final Pool pool, final Closure closure);
+
+    /**
+     * Schedule closure to be executed by pooled actor after data becomes available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param group   The PGroup to use for task scheduling for asynchronous message delivery
      * @param closure closure to execute when data available
      */
     void whenBound(final PGroup group, final Closure closure);

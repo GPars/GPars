@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,8 @@ package groovyx.gpars
 
 import groovy.time.Duration
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.util.PAGroovyUtils
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -30,8 +32,6 @@ import static groovyx.gpars.util.PAGroovyUtils.createCollection
 import static groovyx.gpars.util.PAUtils.buildClosureForMaps
 import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
 import static groovyx.gpars.util.PAUtils.buildResultMap
-import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.DefaultPool
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
@@ -106,46 +106,14 @@ public class GParsExecutorsPoolUtil {
         return {Object... args -> callAsync(cl, * args)}
     }
 
-    private static void evaluateArguments(group, args, current, soFarArgs, result, original, pooledThreadFlag) {
-        if (current == args.size()) {
-            if (pooledThreadFlag) {
-                try {
-                    result << original(* soFarArgs)
-                } catch (all) {
-                    result << all
-                }
-            }
-            else {
-                group.threadPool.execute({->
-                    try {
-                        result << original(* soFarArgs)
-                    } catch (all) {
-                        result << all
-                    }
-                })
-            }
-        }
-        else {
-            def currentArgument = args[current]
-            if (currentArgument instanceof DataFlowVariable) {
-                currentArgument.whenBound(group) {value ->
-                    if (value instanceof Throwable) result << value
-                    else evaluateArguments(group, args, current + 1, soFarArgs << value, result, original, true)
-                }
-            } else {
-                evaluateArguments(group, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
-            }
-        }
-    }
-
     /**
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
      */
     public static Closure asyncFun(final Closure original) {
-        final def group = new DefaultPGroup(new DefaultPool(GParsExecutorsPool.retrieveCurrentPool()))
+        final def pool = new DefaultPool(GParsExecutorsPool.retrieveCurrentPool())
         return {final Object[] args ->
             final DataFlowVariable result = new DataFlowVariable()
-            evaluateArguments(group, args.clone(), 0, [], result, original, false)
+            PAGroovyUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
             result
         }
     }
