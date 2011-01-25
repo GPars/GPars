@@ -19,7 +19,7 @@ package groovyx.gpars.activeobject
 import groovyx.gpars.dataflow.DataFlowVariable
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-class ActiveObjectASTTransformationTest extends GroovyTestCase {
+public class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
         assert actor.active
@@ -87,7 +87,7 @@ class B extends A {
 """)
         assert a.internalActiveObjectActor.active
         assert b.internalActiveObjectActor.active
-        assert a.internalActiveObjectActor !=b.internalActiveObjectActor
+        assert a.internalActiveObjectActor != b.internalActiveObjectActor
     }
 
     public void testActiveObjectInheritanceWithReverseOrder() {
@@ -111,7 +111,7 @@ class A {
 """)
         assert a.internalActiveObjectActor.active
         assert b.internalActiveObjectActor.active
-        assert a.internalActiveObjectActor !=b.internalActiveObjectActor
+        assert a.internalActiveObjectActor != b.internalActiveObjectActor
     }
 
     public void testActiveObjectHoldingCollidingFieldShouldFail() {
@@ -354,13 +354,13 @@ import groovyx.gpars.activeobject.ActiveMethod
 
 @ActiveObject
 class Decryptor {
-    @ActiveMethod
+    @ActiveMethod(blocking=true)
     String decrypt(String encryptedText) {
 
         return encryptedText.reverse()
     }
 
-    @ActiveMethod
+    @ActiveMethod(blocking=true)
     Integer decrypt(Integer encryptedNumber) {
         return -1*encryptedNumber
     }
@@ -415,12 +415,12 @@ import groovyx.gpars.dataflow.DataFlowQueue
 @ActiveObject
 class A {
     def result = new DataFlowQueue()
-    @ActiveMethod
+    @ActiveMethod(blocking=true)
     def activeFoo1(value) {
         result << Thread.currentThread()
     }
 
-    @ActiveMethod
+    @ActiveMethod(blocking=true)
     def activeFoo2(value) {
         result << Thread.currentThread()
         activeFoo1(value)
@@ -498,7 +498,7 @@ class MyWrapper {
         println 'Foo'
     }
 
-    @ActiveMethod
+    @ActiveMethod(blocking = true)
     def bar(int value) {
         result.bind(value)
         value
@@ -512,7 +512,7 @@ class MyWrapper {
 
 @ActiveObject(actorName = "alternativeActorName")
 class MyAlternativeWrapper {
-    @ActiveMethod
+    @ActiveMethod(blocking = true)
     def foo(int a, int b) {
         a + b
     }

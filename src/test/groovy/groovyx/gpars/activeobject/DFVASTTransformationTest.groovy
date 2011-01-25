@@ -16,7 +16,9 @@
 
 package groovyx.gpars.activeobject
 
-class DFVASTTransformationTest extends GroovyTestCase {
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
+
+public class DFVASTTransformationTest extends GroovyTestCase {
 
     public void testDFVReturningMethod() {
         final GroovyShell shell = new GroovyShell()
@@ -49,7 +51,7 @@ class B extends A {
         assert result.val == 10
     }
 
-    public void testDFVReturningMethodAsynchronicity() {
+    public void testDFVReturningMethodAsynchronously() {
         final GroovyShell shell = new GroovyShell()
         def (a, b) = shell.evaluate("""
 import groovyx.gpars.activeobject.*
@@ -61,10 +63,10 @@ class A {
     def barrier = new CyclicBarrier(2)
 
     @ActiveMethod
-    DataFlowVariable foo() {
+    def foo() {
         result << Thread.currentThread()
         barrier.await()
-        new DataFlowVariable() << 10
+        10
     }
 }
 
@@ -93,7 +95,7 @@ class A {
     def barrier = new CyclicBarrier(2)
 
     @ActiveMethod
-    DataFlowVariable foo() {
+    def foo() {
         result << Thread.currentThread()
         barrier.await()
         throw new RuntimeException('test')
@@ -116,6 +118,27 @@ class B extends A {
             result.get()
         }
         assert result.bound
+    }
+
+    public void testNonBlockingWithExplicitTypeIsNotAllowed() {
+        final GroovyShell shell = new GroovyShell()
+        shouldFail(MultipleCompilationErrorsException) {
+            def a = shell.evaluate("""
+    import groovyx.gpars.activeobject.*
+    import groovyx.gpars.dataflow.DataFlowVariable
+    @ActiveObject
+    class A {
+        def result = new DataFlowVariable()
+
+        @ActiveMethod
+        int foo() {
+            10
+        }
+    }
+
+    new A()
+    """)
+        }
     }
 }
 

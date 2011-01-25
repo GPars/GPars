@@ -16,24 +16,26 @@
 
 package groovyx.gpars.samples.activeobject
 
-import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.activeobject.ActiveObject
 
 @ActiveObject
 class Decryptor {
     @ActiveMethod
-    String decrypt(String encryptedText) {
+    def decrypt(String encryptedText) {
         return encryptedText.reverse()
     }
 
     @ActiveMethod
-    Integer decrypt(Integer encryptedNumber) {
-        return -1*encryptedNumber + 142
+    def decrypt(Integer encryptedNumber) {
+        return -1 * encryptedNumber + 142
     }
 }
 
 final Decryptor decryptor = new Decryptor()
-print decryptor.decrypt(' noitcA ni yvoorG')
-print decryptor.decrypt(140)
-println decryptor.decrypt('noittide dn')
+def part1 = decryptor.decrypt(' noitcA ni yvoorG')
+def part2 = decryptor.decrypt(140)
+def part3 = decryptor.decrypt('noittide dn')
+
+println "${part1.get()}${part2.get()}${part3.get()}"
 

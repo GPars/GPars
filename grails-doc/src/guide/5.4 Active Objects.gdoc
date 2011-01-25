@@ -8,12 +8,12 @@ import groovyx.gpars.activeobject.ActiveMethod
 
 @ActiveObject
 class Decryptor {
-    @ActiveMethod
+    @ActiveMethod(blocking = true)
     String decrypt(String encryptedText) {
         return encryptedText.reverse()
     }
 
-    @ActiveMethod
+    @ActiveMethod(blocking = true)
     Integer decrypt(Integer encryptedNumber) {
         return -1*encryptedNumber + 142
     }
@@ -25,9 +25,16 @@ print decryptor.decrypt(140)
 println decryptor.decrypt('noittide dn')
 {code}
 
-You mark active objects with the _@ActiveObject_ annotation. This will ensure an actor instance is created for each instance of your class.
+You mark active objects with the _@ActiveObject_ annotation. This will ensure a hidden actor instance is created for each instance of your class.
 Now you can mark methods with the _@ActiveMethod_ annotation indicating that you want the method to be invoked asynchronously
 by the target object's internal actor.
+An optional boolean _blocking_ parameter to the _@ActiveMethod_ annotation specifies, whether the caller should block until a result is available
+or whether instead the caller received only a _promise_ for a future result in a form of a _DataFlowVariable_ and so the caller is not blocked waiting.
+
+{note}
+By default, all active methods are set to be *non-blocking* . However, methods, which declare their return type explicitly, must be configured
+as blocking, otherwise the compiler will report an error. Only _def_ , _void_ and _DataFlowVariable_ are allowed return types for non-blocking methods.
+{note}
 
 Under the covers, GPars will translate your method call to a message being sent to the actor. The actor will eventually handle that message by invoking the desired method
 and sending back the reply.
@@ -47,12 +54,12 @@ import groovyx.gpars.dataflow.DataFlowVariable
 @ActiveObject
 class Decryptor {
     @ActiveMethod
-    DataFlowVariable<String> decrypt(String encryptedText) {
+    def decrypt(String encryptedText) {
         new DataFlowVariable() << encryptedText.reverse()
     }
 
     @ActiveMethod
-    DataFlowVariable<Integer> decrypt(Integer encryptedNumber) {
+    def decrypt(Integer encryptedNumber) {
         new DataFlowVariable() << -1*encryptedNumber + 142
     }
 }
@@ -153,3 +160,5 @@ Be careful when redefining the actor field's name for a subclass of an active ob
 your active objects.
 {note}
 //todo inheritance with different actor field names allows for multiple actors per instance
+//todo subclass changing group name
+//todo overriding methods with different blocking semantics - test

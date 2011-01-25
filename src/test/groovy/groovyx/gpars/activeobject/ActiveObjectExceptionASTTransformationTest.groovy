@@ -18,7 +18,7 @@ package groovyx.gpars.activeobject
 
 import groovyx.gpars.dataflow.DataFlowVariable
 
-class ActiveObjectExceptionGroupASTTransformationTest extends GroovyTestCase {
+public class ActiveObjectExceptionASTTransformationTest extends GroovyTestCase {
 
     public void testCorrectMethod() {
         assert 10 == new MyExceptionWrapper().foo(10)
@@ -42,7 +42,7 @@ class ActiveObjectExceptionGroupASTTransformationTest extends GroovyTestCase {
     public void testIncorrectAsynchronousMethod() {
         final MyExceptionWrapper a = new MyExceptionWrapper()
         shouldFail(RuntimeException) {
-            a.exceptionBaz(10)
+            a.exceptionBaz(10).get()
         }
         assert a.result.val != Thread.currentThread()
     }
@@ -56,19 +56,19 @@ class MyExceptionWrapper {
         throw new RuntimeException('test')
     }
 
-    @ActiveMethod
+    @ActiveMethod(blocking = true)
     def foo(value) {
         result << Thread.currentThread()
         value
     }
 
-    @ActiveMethod
+    @ActiveMethod(blocking = true)
     def exceptionFoo(value) {
         result << Thread.currentThread()
         throw new RuntimeException('test')
     }
 
-    @ActiveMethod
+    @ActiveMethod(blocking = true)
     def exceptionBar(value) {
         result << Thread.currentThread()
         bar()

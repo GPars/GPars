@@ -17,7 +17,6 @@
 package groovyx.gpars.activeobject;
 
 import groovyjarjarasm.asm.Opcodes;
-import groovyx.gpars.dataflow.DataFlowVariable;
 import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
@@ -144,12 +143,36 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
                 if (annotations.isEmpty()) continue;
                 if (method.isStatic()) this.addError("Static methods cannot be active", method);
 
-                addActiveMethod(actorNode, node, method);
+                addActiveMethod(actorNode, node, method, checkBlockingMethod(method, annotations));
             }
             super.visitClass(node);
         }
 
-        private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original) {
+        private boolean checkBlockingMethod(final MethodNode method, final Iterable<AnnotationNode> annotations) {
+            boolean blocking = false;
+
+            for (final AnnotationNode annotation : annotations) {
+                final Expression member = annotation.getMember("blocking");
+                if (member != null && member.getText() != null) {
+                    if (member.getText().equals("true")) blocking = true;
+                }
+            }
+
+            final ClassNode returnType = method.getReturnType();
+            final String text = returnType.toString();
+            if (!blocking && blockingMandated(text)) {
+                this.addError("Non-blocking methods must not return a specific type. Use def or void instead.", method);
+                return true;
+            }
+            return blocking;
+        }
+
+        private static boolean blockingMandated(final String text) {
+            assert text != null;
+            return !"java.lang.Object".equals(text) && !"void".equals(text) && !text.contains("groovyx.gpars.dataflow.DataFlowVariable");
+        }
+
+        private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original, final boolean blocking) {
             if ((original.getModifiers() & Opcodes.ACC_SYNTHETIC) != 0) return;
 
             final ArgumentListExpression args = new ArgumentListExpression();
@@ -173,7 +196,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
                     original.getCode());
             newMethod.setGenericsTypes(original.getGenericsTypes());
 
-            final String submitMethodName = original.getReturnType().isDerivedFrom(new ClassNode(DataFlowVariable.class)) ? "submit" : "submitAndWait";
+            final String submitMethodName = blocking ? "submitAndWait" : "submit";
             original.setCode(new ExpressionStatement(
                     new MethodCallExpression(
                             new VariableExpression(actorNode), submitMethodName, args)

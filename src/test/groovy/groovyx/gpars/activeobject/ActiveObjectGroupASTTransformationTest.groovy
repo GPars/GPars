@@ -20,7 +20,7 @@ import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.group.DefaultPGroup
 
-class ActiveObjectGroupASTTransformationTest extends GroovyTestCase {
+public class ActiveObjectGroupASTTransformationTest extends GroovyTestCase {
 
     public void testActorGroupMatchesDefault() {
         final actor = new MyWrapper().internalActiveObjectActor
