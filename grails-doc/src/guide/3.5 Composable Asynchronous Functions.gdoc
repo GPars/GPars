@@ -1,4 +1,5 @@
 Functions are to be composed. In fact, composing side-effect-free functions is very easy. Much easier and reliable than composing objects, for example.
+Given the same input, functions always return the same result, they never change their behavior unexpectedly nor they break when multiple threads call them at the same time.
 h3. Functions in Groovy
 We can treat Groovy closures as functions. They take arguments, do their calculation and return a value. Provided you don't let your
 closures touch anything outside their scope, your closures are well-behaved pure functions. Functions that you can combine for a better good.
@@ -13,7 +14,7 @@ def max = myNumbers.inject(0, {a, b -> a>b?a:b})
 
 You see, functional programming is popular for a reason.
 
-h3. Do we miss something here?
+h3. Are we concurrent yet?
 This all works just fine until you realize you're not utilizing the full power of your expensive hardware. The functions are plain sequential.
 No parallelism in here. All but one processor core do nothing, they're idle, totally wasted.
 {note}
@@ -22,7 +23,7 @@ For our scenario described here, where we process a collection, using those _par
 However, we're now looking for a *generic way to create and combine asynchronous functions* , which would help us
 not only for collection processing but mostly in other more generic cases, like the one right below.
 {note}
-Here's an example of combining four functions, which are supposed to check whether a particular web page matches the contents of a local file.
+To make things more obvious, here's an example of combining four functions, which are supposed to check whether a particular web page matches the contents of a local file.
 We need to download the page, load the file, calculate hashes of both and finally compare the resulting numbers.
 {code}
 Closure download = {String url ->
@@ -42,19 +43,23 @@ Closure compare = {int first, int second ->
 def result = compare(hash(download('http://www.gpars.org')), hash(loadFile('/coolStuff/gpars/website/index.html')))
 println "The result of comparison: " + result
 {code}
+We need to download the page, load up the file, calculate hashes of both and finally compare the resulting numbers.
 Each of the functions is responsible for one particular job. One downloads the content, second loads the file, third calculates the hashes
 and finally the fourth one will do the comparison. Combining the functions is as simple as nesting their calls.
 
 h3. Making it all asynchronous
 
 The downside of our code is that we don't leverage the independence of the _download()_ and the _loadFile()_ functions.
-They can run in parallel, can't they?
+Neither we allow the two hashes to be run concurrently. They could well run in parallel, but our way to combine functions restricts any parallelism.
 
-Some functions, however, may depend on results of others. They cannot start before the other function finishes. We need to block them till their parameters are available.
-The _hash()_ functions needs a string to work on. The _compare()_ function needs two numbers to compare.
+Obviously not all of the functions can run concurrently. Some functions depend on results of others. They cannot start before the other function finishes.
+We need to block them till their parameters are available. The _hash()_ functions needs a string to work on. The _compare()_ function needs two numbers to compare.
 
-So we can only parallelize some functions, while blocking others. Seems like a challenging task.
-Luckily, the dependency is already expressed implicitly in the code. There's no need for us to duplicate the dependency information.
+So we can only parallelize some functions, while blocking parallelism of others. Seems like a challenging task.
+
+h3. Things are bright in the functional world
+
+Luckily, the dependencies between functions are already expressed implicitly in the code. There's no need for us to duplicate the dependency information.
 If one functions takes parameters and the parameters need first to be calculated by another function, we implicitly have a dependency here. The _hash()_ function
 depends on the _loadFile()_ as well as on the _download()_ functions in our example.
 The _inject_ function in our earlier example depends on the results of the _addition_ functions invoked gradually on all the elements of the collection.
@@ -114,7 +119,7 @@ h3. This is all fine, but what functions can be really combined?
 
 There are no limits. Take any sequential functions you need to combine and you should be able to combine their asynchronous variants as well.
 
-E.g., back to our initial example comparing content of a file with a web page, we simply make all the functions asynchronous by calling
+Back to our initial example comparing content of a file with a web page, we simply make all the functions asynchronous by calling
 the _asyncFun()_ method on them and we are ready to set off.
 
 {code}
@@ -137,4 +142,4 @@ the _asyncFun()_ method on them and we are ready to set off.
     println "The result of comparison: " + result.get()
 {code}
 
-On our side this is a very interesting domain to explore, so any comments, feedback and feedback on combining asynchronous functions or hints about its limits are welcome.
+On our side this is a very interesting domain to explore, so any comments, questions or suggestions on combining asynchronous functions or hints about its limits are welcome.
