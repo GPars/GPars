@@ -161,4 +161,3 @@ your active objects.
 {note}
 //todo inheritance with different actor field names allows for multiple actors per instance
 //todo subclass changing group name
-//todo overriding methods with different blocking semantics - test

@@ -188,7 +188,8 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
                 newParams[i] = newParam;
                 args.addExpression(new VariableExpression(newParam));
             }
-            final MethodNode newMethod = owner.addMethod(InternalActor.METHOD_NAME_PREFIX + original.getName(),
+
+            final MethodNode newMethod = owner.addMethod(findSuitablePrivateMethodName(owner, original),
                     Opcodes.ACC_FINAL & Opcodes.ACC_PRIVATE,
                     nonGeneric(original.getReturnType()),
                     newParams,
@@ -201,6 +202,16 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
                     new MethodCallExpression(
                             new VariableExpression(actorNode), submitMethodName, args)
             ));
+        }
+
+        private static String findSuitablePrivateMethodName(final ClassNode owner, final MethodNode original) {
+            String newMethodName = InternalActor.METHOD_NAME_PREFIX + original.getName();
+            int counter = 1;
+            while (owner.hasMethod(newMethodName, original.getParameters())) {
+                newMethodName = InternalActor.METHOD_NAME_PREFIX + original.getName() + counter;
+                counter++;
+            }
+            return newMethodName;
         }
 
         private static ClassNode nonGeneric(final ClassNode type) {

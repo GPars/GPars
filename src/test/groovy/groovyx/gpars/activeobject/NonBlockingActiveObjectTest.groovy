@@ -43,6 +43,63 @@ public class NonBlockingActiveObjectTest extends GroovyTestCase {
         assert 19 == wrapper.nonBlockingTypedFoo(20).val
         assert wrapper.result.val != Thread.currentThread()
     }
+
+    public void testNonBlockingOverridingBlocking() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
+@ActiveObject
+class A {
+    @ActiveMethod(blocking=true)
+    def foo() {
+        return 10
+    }
+}
+
+@ActiveObject
+class B extends A {
+    @ActiveMethod(blocking=false)
+    def foo() {
+        return super.foo()
+    }
+}
+
+[new A(), new B()]
+""")
+        assert 10 == a.foo()
+        assert 10 == b.foo().get()
+    }
+
+    public void testBlockingOverridingNonBlocking() {
+        final GroovyShell shell = new GroovyShell()
+        def (a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+
+@ActiveObject
+class A {
+    @ActiveMethod(blocking=false)
+    def foo() {
+        return 10
+    }
+}
+
+@ActiveObject
+class B extends A {
+    @ActiveMethod(blocking=true)
+    def foo() {
+        return super.foo().get()
+    }
+}
+
+[new A(), new B()]
+""")
+        assert 10 == a.foo().get()
+        assert 10 == b.foo()
+    }
+
 }
 
 @ActiveObject()
