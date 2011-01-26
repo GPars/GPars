@@ -443,51 +443,34 @@ new A()
 
     public void testTwoActorFields() {
         final GroovyShell shell = new GroovyShell()
-        def (a, b, c) = shell.evaluate("""
-import groovyx.gpars.activeobject.ActiveObject
-import groovyx.gpars.activeobject.ActiveMethod
-import groovyx.gpars.dataflow.DataFlowVariable
-@ActiveObject(actorName = "fieldB")
-class C extends B {
-    @ActiveMethod
-    def fooC(value1, value2) {
-        result << Thread.currentThread()
-    }
-}
-
-class B extends A {
-}
-
-@ActiveObject(actorName = "fieldA")
-class A {
-    def result = new DataFlowVariable()
-    @ActiveMethod
-    def fooA(value) {
-        result << Thread.currentThread()
-    }
-}
-
-[new A(), new B(), new C()]
-""")
-        assert a.fieldA.active
-        assert b.fieldA.active
-        assert c.fieldA.active
-        shouldFail(MissingPropertyException) {
-            assert a.fieldB.active
+        shouldFail(MultipleCompilationErrorsException) {
+            def (a, b, c) = shell.evaluate("""
+    import groovyx.gpars.activeobject.ActiveObject
+    import groovyx.gpars.activeobject.ActiveMethod
+    import groovyx.gpars.dataflow.DataFlowVariable
+    @ActiveObject(actorName = "fieldB")
+    class C extends B {
+        @ActiveMethod
+        def fooC(value1, value2) {
+            result << Thread.currentThread()
         }
-        shouldFail(MissingPropertyException) {
-            assert b.fieldB.active
+    }
+
+    class B extends A {
+    }
+
+    @ActiveObject(actorName = "fieldA")
+    class A {
+        def result = new DataFlowVariable()
+        @ActiveMethod
+        def fooA(value) {
+            result << Thread.currentThread()
         }
-        assert c.fieldB.active
+    }
 
-        a.fooA(10)
-        assert a.result.val != Thread.currentThread()
-
-        b.fooA(20)
-        assert b.result.val != Thread.currentThread()
-
-        c.fooA(30)
-        assert c.result.val != Thread.currentThread()
+    [new A(), new B(), new C()]
+    """)
+        }
     }
 }
 @ActiveObject
