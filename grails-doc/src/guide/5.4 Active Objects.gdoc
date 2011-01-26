@@ -1,5 +1,5 @@
-Active objects provide a OO facade on top of actors, allowing you to avoid dealing directly with the actor machinery,
-matching messages or sending replies.
+Active objects provide an OO facade on top of actors, allowing you to avoid dealing directly with the actor machinery,
+having to match messages, wait for results and send replies.
 
 h2. Actors with a friendly facade
 {code}
@@ -8,14 +8,64 @@ import groovyx.gpars.activeobject.ActiveMethod
 
 @ActiveObject
 class Decryptor {
-    @ActiveMethod(blocking = true)
-    String decrypt(String encryptedText) {
+    @ActiveMethod
+    def decrypt(String encryptedText) {
         return encryptedText.reverse()
     }
 
-    @ActiveMethod(blocking = true)
-    Integer decrypt(Integer encryptedNumber) {
+    @ActiveMethod
+    def decrypt(Integer encryptedNumber) {
         return -1*encryptedNumber + 142
+    }
+}
+
+final Decryptor decryptor = new Decryptor()
+def part1 = decryptor.decrypt(' noitcA ni yvoorG')
+def part2 = decryptor.decrypt(140)
+def part3 = decryptor.decrypt('noittide dn')
+
+print part1.get()
+print part2.get()
+println part3.get()
+{code}
+
+You mark active objects with the _@ActiveObject_ annotation. This will ensure a hidden actor instance is created for each instance of your class.
+Now you can mark methods with the _@ActiveMethod_ annotation indicating that you want the method to be invoked asynchronously
+by the target object's internal actor.
+An optional boolean _blocking_ parameter to the _@ActiveMethod_ annotation specifies, whether the caller should block until a result is available
+or whether instead the caller should only receive a _promise_ for a future result in a form of a _DataFlowVariable_ and so the caller is not blocked waiting.
+
+{note}
+By default, all active methods are set to be *non-blocking* . However, methods, which declare their return type explicitly, must be configured
+as blocking, otherwise the compiler will report an error. Only _def_ , _void_ and _DataFlowVariable_ are allowed return types for non-blocking methods.
+{note}
+
+Under the covers, GPars will translate your method call to *a message being sent to the internal actor* . The actor will eventually handle that message by invoking the desired method
+on behalf of the caller and once finished a reply will be sent back to the caller.
+Non-blocking methods return promises for results, aka _DataFlowVariables_ .
+
+h3. But blocking means we're not really asynchronous, are we?
+
+Indeed, if you mark your active methods as _blocking_ , the caller will be blocked waiting for the result, just like when doing normal plain method invocation.
+All we've achieved is being thread-safe inside the Active object from concurrent access. Something the _synchronized_ keyword could give you as well.
+So it is the *non-blocking* methods that should drive your decision towards using active objects. Blocking methods will then provide the usual synchronous semantics yet give the consistency guarantees
+across concurrent method invocations. The blocking methods are then still very useful when used in combination with non-blocking ones.
+
+{code}
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.dataflow.DataFlowVariable
+
+@ActiveObject
+class Decryptor {
+    @ActiveMethod(blocking=true)
+    String decrypt(String encryptedText) {
+        encryptedText.reverse()
+    }
+
+    @ActiveMethod(blocking=true)
+    Integer decrypt(Integer encryptedNumber) {
+        -1*encryptedNumber + 142
     }
 }
 
@@ -25,57 +75,12 @@ print decryptor.decrypt(140)
 println decryptor.decrypt('noittide dn')
 {code}
 
-You mark active objects with the _@ActiveObject_ annotation. This will ensure a hidden actor instance is created for each instance of your class.
-Now you can mark methods with the _@ActiveMethod_ annotation indicating that you want the method to be invoked asynchronously
-by the target object's internal actor.
-An optional boolean _blocking_ parameter to the _@ActiveMethod_ annotation specifies, whether the caller should block until a result is available
-or whether instead the caller received only a _promise_ for a future result in a form of a _DataFlowVariable_ and so the caller is not blocked waiting.
+h3. Non-blocking semantics
 
-{note}
-By default, all active methods are set to be *non-blocking* . However, methods, which declare their return type explicitly, must be configured
-as blocking, otherwise the compiler will report an error. Only _def_ , _void_ and _DataFlowVariable_ are allowed return types for non-blocking methods.
-{note}
-
-Under the covers, GPars will translate your method call to a message being sent to the actor. The actor will eventually handle that message by invoking the desired method
-and sending back the reply.
-
-h3. But waiting means we're not really asynchronous, are we?
-
-No, we're not. All we've achieved so far is being thread-safe inside the Active object from concurrent access. Something the _synchronized_
-keyword could give you cheaper and with less hassle.
-
-The real fun begins once you allow your methods return promises for results, aka _DataFlowVariables_ .
-
-{code}
-import groovyx.gpars.activeobject.ActiveMethod
-import groovyx.gpars.activeobject.ActiveObject
-import groovyx.gpars.dataflow.DataFlowVariable
-
-@ActiveObject
-class Decryptor {
-    @ActiveMethod
-    def decrypt(String encryptedText) {
-        new DataFlowVariable() << encryptedText.reverse()
-    }
-
-    @ActiveMethod
-    def decrypt(Integer encryptedNumber) {
-        new DataFlowVariable() << -1*encryptedNumber + 142
-    }
-}
-
-final Decryptor decryptor = new Decryptor()
-def firstPart = decryptor.decrypt(' noitcA ni yvoorG')
-def secondPart = decryptor.decrypt(140)
-def thirdPart = decryptor.decrypt('noittide dn')
-
-print firstPart.get()
-print secondPart.get()
-println thirdPart.get()
-{code}
-
-Now calling the method will return as soon as the actor is sent a message. The caller is now allowed to do whatever he likes, while the actor is taking care of the calculation.
-Calling the _get()_ method on the returned promise will block until a value is available. The state of the calculation can be polled using the _bound_ property on the promise.
+Now calling the non-blocking active method will return as soon as the actor has been sent a message.
+The caller is now allowed to do whatever he likes, while the actor is taking care of the calculation.
+The state of the calculation can be polled using the _bound_ property on the promise.
+Calling the _get()_ method on the returned promise will block the caller until a value is available.
 The call to _get()_ will eventually return a value or throw an exception, depending on the outcome of the actual calculation.
 
 {note}
@@ -89,11 +94,11 @@ There are a few rules to follow when annotating your objects:
 # Only instance (non-static) methods can be annotated as _@ActiveMethod_
 # You can override active methods with non-active ones and vice versa
 # Subclasses of active objects can declare additional active methods, provided they are themselves annotated as _@ActiveObject_
-# Combining concurrent use of active and non-active methods may result in race conditions. Ideally design your active objects as completely encapsulated classes with all public methods active
+# Combining concurrent use of active and non-active methods may result in race conditions. Ideally design your active objects as completely encapsulated classes with all non-private methods marked as active
 
 h3. Inheritance
 
-The _@ActiveObject_ annotation can appear on any class in an inheritance hierarchy. The actor field will only be created in the first annotated class in the hierarchy, the subclasses will reuse the field.
+The _@ActiveObject_ annotation can appear on any class in an inheritance hierarchy. The actor field will only be created in top-most annotated class in the hierarchy, the subclasses will reuse the field.
 
 {code}
 import groovyx.gpars.activeobject.ActiveObject
@@ -156,8 +161,7 @@ class MyActiveObject {
 {code}
 
 {note}
-Be careful when redefining the actor field's name for a subclass of an active object. This will result in two actors backing up
-your active objects.
+Alternative names for internal actors as well as their desired groups cannot be overriden in subclasses.
+Make sure you only specify these values in the top-most active objects in your inheritance hierarchy. Obviously, the top most active object
+is still allowed to subclass other classes, just none of the predecessors must be an active object.
 {note}
-//todo inheritance with different actor field names allows for multiple actors per instance
-//todo subclass changing group name

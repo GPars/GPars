@@ -20,25 +20,19 @@ import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
 
 @ActiveObject
-class Decryptor {
-    @ActiveMethod
-    def decrypt(String encryptedText) {
-        return encryptedText.reverse()
+class BlockingDecryptor {
+    @ActiveMethod(blocking = true)
+    String decrypt(String encryptedText) {
+        encryptedText.reverse()
     }
 
-    @ActiveMethod
-    def decrypt(Integer encryptedNumber) {
-        return -1 * encryptedNumber + 142
+    @ActiveMethod(blocking = true)
+    Integer decrypt(Integer encryptedNumber) {
+        -1 * encryptedNumber + 142
     }
 }
 
-final Decryptor decryptor = new Decryptor()
-def part1 = decryptor.decrypt(' noitcA ni yvoorG')
-def part2 = decryptor.decrypt(140)
-def part3 = decryptor.decrypt('noittide dn')
-
-print part1.get()
-print part2.get()
-println part3.get()
-
-
+final BlockingDecryptor decryptor = new BlockingDecryptor()
+print decryptor.decrypt(' noitcA ni yvoorG')
+print decryptor.decrypt(140)
+println decryptor.decrypt('noittide dn')

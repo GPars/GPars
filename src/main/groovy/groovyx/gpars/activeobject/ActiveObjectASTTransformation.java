@@ -47,6 +47,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Transforms active objects so that their active methods can be invoked asynchronously through an internal actor.
+ *
  * @author Vaclav Pech
  *         <p/>
  *         Inspired by org.codehaus.groovy.transform.LogASTTransformation
