@@ -51,6 +51,7 @@ import java.util.List;
  *         <p/>
  *         Inspired by org.codehaus.groovy.transform.LogASTTransformation
  */
+@SuppressWarnings({"CallToStringEquals"})
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
 public class ActiveObjectASTTransformation implements ASTTransformation {
     @Override
@@ -70,8 +71,26 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         final ClassNode classNode = (ClassNode) targetClass;
 
+        final boolean rootActiveObject = isRootActiveObject(classNode);
+        if (!rootActiveObject && !actorFieldName.equals(ActiveObject.INTERNAL_ACTIVE_OBJECT_ACTOR)) {
+            addError("Actor field name can only be specified at the top of the active object hierarchy. Apparently a superclass of this class is also an active object.", classNode, source);
+        }
+        if (!rootActiveObject && actorGroupName.length() != 0) {
+            addError("Active object's actor group can only be specified at the top of the active object hierarchy. Apparently a superclass of this class is also an active object.", classNode, source);
+        }
+
         final GroovyClassVisitor transformer = new MyClassCodeExpressionTransformer(source, actorFieldName, actorGroupName);
         transformer.visitClass(classNode);
+    }
+
+    private static boolean isRootActiveObject(final ClassNode classNode) {
+        ClassNode superClass = classNode.getSuperClass();
+        while (superClass != null) {
+            final List<AnnotationNode> annotations = superClass.getAnnotations(new ClassNode(ActiveObject.class));
+            if (!annotations.isEmpty()) return false;
+            superClass = superClass.getSuperClass();
+        }
+        return true;
     }
 
     private static String lookupActorFieldName(final AnnotationNode logAnnotation) {
