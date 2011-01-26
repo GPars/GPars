@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,7 +37,7 @@ public abstract class AgentCore {
     protected AgentCore() {
         this.core = new AsyncMessagingCore(Actors.defaultActorPGroup.getThreadPool()) {
             @Override
-            protected void registerError(final Exception e) {
+            protected void registerError(final Throwable e) {
                 AgentCore.this.registerError(e);
             }
 
@@ -89,7 +89,7 @@ public abstract class AgentCore {
     /**
      * Holds agent errors
      */
-    private List<Exception> errors;
+    private List<Throwable> errors;
 
     /**
      * Adds the message to the agent\s message queue
@@ -133,8 +133,8 @@ public abstract class AgentCore {
      * @param e The exception to store
      */
     @SuppressWarnings({"MethodOnlyUsedFromInnerClass", "SynchronizedMethod"})
-    synchronized void registerError(final Exception e) {
-        if (errors == null) errors = new ArrayList<Exception>();
+    synchronized void registerError(final Throwable e) {
+        if (errors == null) errors = new ArrayList<Throwable>();
         errors.add(e);
     }
 
@@ -145,7 +145,7 @@ public abstract class AgentCore {
      * @return A detached collection of exception that have occurred in the agent's body
      */
     @SuppressWarnings({"SynchronizedMethod", "ReturnOfCollectionOrArrayField"})
-    public synchronized List<Exception> getErrors() {
+    public synchronized List<Throwable> getErrors() {
         if (errors == null) return Collections.emptyList();
         try {
             return errors;

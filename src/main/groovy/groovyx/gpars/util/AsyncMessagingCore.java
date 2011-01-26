@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -81,7 +81,7 @@ public abstract class AsyncMessagingCore implements Runnable {
     /**
      * Indicates, whether there's an active thread handling a message inside the agent's body
      */
-    @SuppressWarnings({"FieldMayBeFinal","unused"}) //  TODO:  Eclipse requires this to be tagged as unused.
+    @SuppressWarnings({"FieldMayBeFinal", "unused"}) //  TODO:  Eclipse requires this to be tagged as unused.
     private volatile int active = AsyncMessagingCore.PASSIVE;
     private static final AtomicIntegerFieldUpdater<AsyncMessagingCore> activeUpdater = AtomicIntegerFieldUpdater.newUpdater(AsyncMessagingCore.class, "active");
     private static final int PASSIVE = 0;
@@ -135,7 +135,7 @@ public abstract class AsyncMessagingCore implements Runnable {
                 message = queue.poll();
             }
         } catch (InvokerInvocationException e) {
-            registerError((Exception) e.getCause());
+            registerError(e.getCause());
         } catch (Exception e) {
             registerError(e);
         } finally {
@@ -169,7 +169,7 @@ public abstract class AsyncMessagingCore implements Runnable {
     protected void threadAssigned() {
     }
 
-    protected abstract void registerError(final Exception e);
+    protected abstract void registerError(final Throwable e);
 
     protected abstract void handleMessage(final Object message);
 }
