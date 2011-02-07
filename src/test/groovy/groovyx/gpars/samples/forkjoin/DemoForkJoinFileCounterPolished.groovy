@@ -16,6 +16,7 @@
 
 package groovyx.gpars.samples.forkjoin
 
+import groovy.io.FileType
 import static groovyx.gpars.GParsPool.runForkJoin
 import static groovyx.gpars.GParsPool.withPool
 
@@ -23,7 +24,6 @@ import static groovyx.gpars.GParsPool.withPool
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.
  *
  * Author: Vaclav Pech
- * Date: Nov 1, 2008
  */
 
 /**
@@ -34,15 +34,11 @@ import static groovyx.gpars.GParsPool.withPool
 
 withPool(1) {pool ->  //feel free to experiment with the number of fork/join threads in the pool
     println """Number of files: ${
-        runForkJoin(new File("./src")) {file ->
+        runForkJoin(new File("./src")) {File file ->
             long count = 0
-            file.eachFile {
-                if (it.isDirectory()) {
-                    println "Forking a child task for $it"
-                    forkOffChild(it)           //fork a child task
-                } else {
-                    count++
-                }
+            file.eachDir {forkOffChild(it)}
+            file.eachFile FileType.FILES, {
+                count++
             }
             return count + (childrenResults.sum(0))
             //use results of children tasks to calculate and store own result
