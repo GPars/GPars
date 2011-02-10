@@ -154,31 +154,10 @@
     <module2copyright />
     <LanguageOptions name="Properties">
       <option name="fileTypeOverride" value="1" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="block" value="true" />
-      <option name="separateBefore" value="false" />
-      <option name="separateAfter" value="false" />
-      <option name="prefixLines" value="true" />
-      <option name="lenBefore" value="80" />
-      <option name="lenAfter" value="80" />
-      <option name="box" value="false" />
-      <option name="filler" value=" " />
     </LanguageOptions>
     <LanguageOptions name="__TEMPLATE__">
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
       <option name="block" value="false" />
-      <option name="separateBefore" value="false" />
-      <option name="separateAfter" value="false" />
       <option name="prefixLines" value="false" />
-      <option name="lenBefore" value="80" />
-      <option name="lenAfter" value="80" />
-      <option name="box" value="false" />
-      <option name="filler" value=" " />
     </LanguageOptions>
   </component>
   <component name="DependenciesAnalyzeManager">
@@ -614,7 +593,9 @@
         <inspection_tool class="MissortedModifiers" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_requireAnnotationsFirst" value="true" />
         </inspection_tool>
-        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreForLoopDeclarations" value="true" />
+        </inspection_tool>
         <inspection_tool class="MultipleTypedDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NewStringBufferWithCharArgument" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NoExplicitFinalizeCalls" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1476,7 +1457,9 @@
         <inspection_tool class="MisspelledSetUp" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MisspelledTearDown" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MisspelledToString" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreForLoopDeclarations" value="true" />
+        </inspection_tool>
         <inspection_tool class="MultipleTopLevelClassesInFile" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MultipleTypedDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NakedNotify" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2010,7 +1993,6 @@
           <option name="ignoreSetterCallsOnOtherObjects" value="false" />
         </inspection_tool>
         <inspection_tool class="CallToStringConcatCanBeReplacedByOperator" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="CallerJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="CastConflictsWithInstanceof" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="CastThatLosesPrecision" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreIntegerCharCasts" value="false" />
@@ -2558,7 +2540,9 @@
         <inspection_tool class="ModuleWithTooManyClasses" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="limit" value="100" />
         </inspection_tool>
-        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreForLoopDeclarations" value="true" />
+        </inspection_tool>
         <inspection_tool class="MultipleTopLevelClassesInFile" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MultipleTypedDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MultiplyOrDivideByPowerOfTwo" enabled="true" level="WARNING" enabled_by_default="true">
@@ -2634,7 +2618,6 @@
           <option name="ignoreRequiredObsoleteCollectionTypes" value="false" />
         </inspection_tool>
         <inspection_tool class="OctalAndDecimalIntegersMixed" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="OctalIntegerJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="OverloadedVarargsMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="OverlyComplexArithmeticExpression" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="6" />
@@ -2991,7 +2974,6 @@
         <inspection_tool class="WhileLoopSpinsOnField" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreNonEmtpyLoops" value="false" />
         </inspection_tool>
-        <inspection_tool class="WithStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="XHTMLIncompatabilitiesJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ZeroLengthArrayInitialization" enabled="true" level="WARNING" enabled_by_default="true" />
       </profile>
@@ -3624,7 +3606,9 @@
         <inspection_tool class="MisspelledSetUp" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MisspelledTearDown" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MisspelledToString" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="MultipleDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
+          <option name="ignoreForLoopDeclarations" value="true" />
+        </inspection_tool>
         <inspection_tool class="MultipleTopLevelClassesInFile" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MultipleTypedDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NakedNotify" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -5167,13 +5151,6 @@
     <option name="PROJECT_PROFILE" value="GPars default" />
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
-    <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="TYPO" />
-      <item index="1" class="java.lang.String" itemvalue="SERVER PROBLEM" />
-      <item index="2" class="java.lang.String" itemvalue="INFO" />
-      <item index="3" class="java.lang.String" itemvalue="WARNING" />
-      <item index="4" class="java.lang.String" itemvalue="ERROR" />
-    </list>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-target 1.6" />
