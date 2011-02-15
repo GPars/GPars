@@ -13,7 +13,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.2" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.gpars:gpars:0.11" level="project" />
     <orderEntry type="library" name="Maven: org.coconut.forkjoin:jsr166y:070108" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:1.7.6" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:1.7.8" level="project" />
   </component>
 </module>
 

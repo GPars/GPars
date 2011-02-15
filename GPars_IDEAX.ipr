@@ -722,7 +722,6 @@
         </inspection_tool>
         <inspection_tool class="StringEquality" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="StringToString" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="Suspicious New Line in Method Call" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SuspiciousMethodCalls" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="REPORT_CONVERTIBLE_METHOD_CALLS" value="true" />
         </inspection_tool>
@@ -3857,7 +3856,6 @@
         <inspection_tool class="StringTokenizer" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="SubstringZero" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="SubtractionInCompareTo" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="Suspicious New Line in Method Call" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SuspiciousIndentAfterControlStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="SwitchStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="SwitchStatementDensity" enabled="true" level="WARNING" enabled_by_default="true">
@@ -4475,7 +4473,6 @@
         </inspection_tool>
         <inspection_tool class="StringEquality" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="StringToString" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="Suspicious New Line in Method Call" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SuspiciousMethodCalls" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="REPORT_CONVERTIBLE_METHOD_CALLS" value="true" />
         </inspection_tool>
@@ -5664,6 +5661,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.6/groovy-all-1.7.6-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.codehaus.groovy:groovy-all:1.7.8">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.8/groovy-all-1.7.8.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.8/groovy-all-1.7.8-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.8/groovy-all-1.7.8-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
