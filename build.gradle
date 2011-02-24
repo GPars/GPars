@@ -25,6 +25,7 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
+apply plugin: 'code-quality'
 
 defaultTasks 'test'
 
@@ -122,6 +123,11 @@ test {
 task integrationTest(type: Test, dependsOn: 'test') {
     include '**/integration/**/*.*'
 }
+
+// codenarc configuration
+codeNarcConfigFileName = "./config/codenarc/codenarc.groovy"
+task checkstyleMain(overwrite: true) << {};
+task checkstyleTest(overwrite: true) << {};
 
 //build.dependsOn integrationTest
 
