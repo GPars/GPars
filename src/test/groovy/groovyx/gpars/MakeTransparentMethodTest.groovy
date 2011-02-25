@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentEach() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -43,7 +43,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentEachWithIndex() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -57,7 +57,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentCollect() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -72,7 +72,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentGrep() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -87,7 +87,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentFind() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -102,7 +102,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentFindAny() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -117,7 +117,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentFindAll() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -132,7 +132,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentAll() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
         GParsPool.withPool(5) {
             items.makeTransparent().every {
@@ -146,7 +146,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentAny() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -161,7 +161,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentAnyOnString() {
         def items = 'abcdefg'
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
             items.makeTransparent().any {
                 sleep 500
@@ -174,7 +174,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentGroupBy() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
@@ -189,7 +189,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentMin() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
             items.makeTransparent().min {a, b ->
                 Thread.sleep 100
@@ -202,7 +202,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentMax() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
             items.makeTransparent().max {a, b ->
                 Thread.sleep 100
@@ -264,7 +264,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentReduce() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
             items.makeTransparent().fold {a, b ->
                 Thread.sleep 100
@@ -277,7 +277,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
 
     public void testTransparentSeededReduce() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
             items.makeTransparent().fold(10) {a, b ->
                 Thread.sleep 100

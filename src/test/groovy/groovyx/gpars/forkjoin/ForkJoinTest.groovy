@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -102,14 +102,14 @@ public final class TestSortWorker extends AbstractForkJoinWorker<List<Integer>> 
     /**
      * Sorts a small list or delegates to two children, if the list contains more than two elements.
      */
-    @Override protected List<Integer> computeTask() {
+    @Override
+    List<Integer> computeTask() {
         switch (numbers.size()) {
             case 0..1:
                 return numbers                                   //store own result
             case 2:
                 if (numbers[0] <= numbers[1]) return numbers     //store own result
                 else return numbers[-1..0]                       //store own result
-                break
             default:
                 def splitList = split(numbers)
                 [new TestSortWorker(splitList[0]), new TestSortWorker(splitList[1])].each {forkOffChild it}  //fork a child task

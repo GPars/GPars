@@ -241,6 +241,7 @@ class A {
 class B extends A {
     @ActiveMethod
     def foo(value) {
+        def a = 'stuff'
         super.foo(value)
     }
 }

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,10 +34,12 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
 
     protected void setUp() {
         group = new DefaultPGroup(1)
+        super.setUp()
     }
 
     protected void tearDown() {
         group.shutdown()
+        super.tearDown()
     }
 
     public void testSelector() {
@@ -284,13 +286,13 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
         group.prioritySelector(inputs: [a, b], outputs: [d]) {x, y ->}.stop()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.prioritySelector(inputs: [a, b, c], outputs: [d]) {x, y, z -> }
+            group.prioritySelector(inputs: [a, b, c], outputs: [d]) {x, y, z -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.prioritySelector(inputs: [], outputs: [d]) { }
+            group.prioritySelector(inputs: [], outputs: [d]) { }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.prioritySelector(inputs: [a], outputs: [d]) {-> }
+            group.prioritySelector(inputs: [a], outputs: [d]) {-> }
         }
 
         def op1 = group.prioritySelector(inputs: [a], outputs: [d]) { }

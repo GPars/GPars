@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,11 +63,11 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         shouldFail {
             [1].makeTransparent()
         }
-        assertTrue items == items.makeTransparent()
+        assert items == items.makeTransparent()
         assertNotNull(items.makeTransparent())
-        assertTrue items.makeTransparent() == items.makeTransparent().makeTransparent()
+        assert items.makeTransparent() == items.makeTransparent().makeTransparent()
         final def p1 = items.makeTransparent()
-        assertTrue p1 == p1.makeTransparent()
+        assert p1 == p1.makeTransparent()
 
         shouldFail {
             [1].makeTransparent()
@@ -91,7 +91,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testMakeTransparentPropagationToResults() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance items
         items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
             Thread.sleep 500
@@ -128,7 +128,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testIdempotenceOfNestingMakeTransparent() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().makeTransparent().each {
             Thread.sleep 500
@@ -139,7 +139,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testNoMakeTransparentPropagationToResultsWithGroupBy() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().groupBy {it % 2}.each {
             Thread.sleep 500
@@ -150,7 +150,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testMakeTransparentPropagationToResultsWithString() {
         def items = 'abcde'
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().collect {it * 2}.findAll {it.size() > 1}.each {
             Thread.sleep 500
@@ -161,7 +161,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testMakeTransparentPropagationToResultsWithIterator() {
         def items = [1, 2, 3, 4, 5].iterator()
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
             Thread.sleep 500
@@ -180,7 +180,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     }
 
     private def foo(Collection c) {
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         c.collect {it * 2}.findAll {it > 1}.each {
             Thread.sleep 50
             map[Thread.currentThread()] = ''
@@ -190,7 +190,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testTransparentMin() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().min {a, b ->
             Thread.sleep 100
@@ -202,7 +202,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testTransparentMax() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().max {a, b ->
             Thread.sleep 100
@@ -256,7 +256,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testTransparentReduce() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().fold {a, b ->
             Thread.sleep 100
@@ -268,7 +268,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testTransparentSeededReduce() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().fold(10) {a, b ->
             Thread.sleep 100

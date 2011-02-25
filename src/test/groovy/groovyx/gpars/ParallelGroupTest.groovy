@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,10 +31,12 @@ class ParallelGroupTest extends GroovyTestCase {
 
     protected void setUp() {
         group = new DefaultPGroup()
+        super.setUp()
     }
 
     protected void tearDown() {
         group.shutdown()
+        super.tearDown()
     }
 
 

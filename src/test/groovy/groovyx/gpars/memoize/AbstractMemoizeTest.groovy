@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,11 +49,11 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
             Closure cl = {counter++; if (it == 5) return null else return 2}
             Closure mem = cl.gmemoize()
             assert counter == 0
-            assertEquals null, mem(5)
+            assertNull mem(5)
             assert counter == 1
             assertEquals 2, mem(2)
             assert counter == 2
-            assertEquals null, mem(5)
+            assertNull mem(5)
             assertEquals 2, mem(2)
             assert counter == 2
         }
