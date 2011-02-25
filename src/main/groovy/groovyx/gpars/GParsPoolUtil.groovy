@@ -1066,7 +1066,7 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T foldParallel(Collection<T> collection, seed, Closure cl) {
-        createPAFromCollection(collection.plus(seed), retrievePool()).reduce(new ClosureReducer(cl), null)
+        createPAFromCollection(collection + seed, retrievePool()).reduce(new ClosureReducer(cl), null)
     }
 
     /**

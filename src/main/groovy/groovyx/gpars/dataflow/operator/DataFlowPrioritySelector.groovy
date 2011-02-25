@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public final class DataFlowPrioritySelector extends DataFlowSelector {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
      * @param code The selector's body to run each time all inputs have a value to read
      */
-    protected def DataFlowPrioritySelector(final PGroup group, final Map channels, final Closure code) {
+    def DataFlowPrioritySelector(final PGroup group, final Map channels, final Closure code) {
         super(group, channels, code)
     }
 
@@ -53,7 +53,7 @@ public final class DataFlowPrioritySelector extends DataFlowSelector {
      * The selector's guards are applied to the selection.
      */
     @Override
-    protected void doSelect() {
+    void doSelect() {
         select.prioritySelect(this.actor, guards)
     }
 }
