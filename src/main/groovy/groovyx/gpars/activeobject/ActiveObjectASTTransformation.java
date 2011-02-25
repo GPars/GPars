@@ -175,7 +175,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             for (final AnnotationNode annotation : annotations) {
                 final Expression member = annotation.getMember("blocking");
                 if (member != null && member.getText() != null) {
-                    if (member.getText().equals("true")) blocking = true;
+                    if ("true".equals(member.getText())) blocking = true;
                 }
             }
 
