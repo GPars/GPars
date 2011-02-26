@@ -5389,7 +5389,6 @@
         <inspection_tool class="JUnitFailWithoutMessage" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitSetUpCallsSuper" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitTearDownCallsSuper" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="JUnitTestMethodWithoutAssert" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitUnnecessarySetUp" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitUnnecessaryTearDown" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JavaDoc" enabled="false" level="WARNING" enabled_by_default="false">
@@ -5459,7 +5458,6 @@
         <inspection_tool class="ManualArrayToCollectionCopy" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MavenDuplicateDependenciesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MavenModelInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="MethodName" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MethodNameSameAsClassName" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MethodSize" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MimeType" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -5471,7 +5469,6 @@
         <inspection_tool class="MissingAspectjAutoproxyInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MissingNewInThrowStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MultipleLoggers" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="NestedBlockDepth" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NestedSynchronization" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NewStringBufferWithCharArgument" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NoExplicitFinalizeCalls" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5519,7 +5516,6 @@
         <inspection_tool class="PointlessBooleanExpressionJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PrimitiveArrayArgumentToVariableArgMethod" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PrintStackTrace" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="Println" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="PropertyName" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="RedundantArrayCreation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="RedundantCast" enabled="false" level="WARNING" enabled_by_default="false" />
