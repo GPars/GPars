@@ -11,6 +11,9 @@
       </root>
     </artifact>
   </component>
+  <component name="ClojureCompilerSettings">
+    <option name="CLOJURE_BEFORE" value="false" />
+  </component>
   <component name="CodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS">
       <value>
@@ -5195,13 +5198,7 @@
         <inspection_tool class="EjbSessionHomeInterfaceInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="EjbStaticAccessInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EjbThisExpressionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="EmptyCatchBlock" enabled="false" level="WARNING" enabled_by_default="false">
-          <option name="m_includeComments" value="true" />
-          <option name="m_ignoreTestCases" value="true" />
-          <option name="m_ignoreIgnoreParameter" value="true" />
-        </inspection_tool>
         <inspection_tool class="EmptyElseBlock" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="EmptyFinallyBlock" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EmptyForStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="EmptyIfStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="EmptyMethod" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5213,7 +5210,6 @@
           <option name="m_reportEmptyBlocks" value="false" />
         </inspection_tool>
         <inspection_tool class="EmptySwitchStatement" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="EmptyTryBlock" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EqualsAndHashCode" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="EqualsBetweenInconvertibleTypes" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EqualsWhichDoesntCheckParameterClass" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5541,7 +5537,6 @@
         <inspection_tool class="RequiredBeanTypeInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="RequiredRegex" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ReservedWordUsedAsNameJS" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="ReturnFromFinallyBlock" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ReturnFromFinallyBlockJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ReturnNullFromCatchBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ReturnsNullInsteadOfEmptyArray" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -5774,6 +5769,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-target 1.6" />
+    <option name="MAXIMUM_HEAP_SIZE" value="256" />
   </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
@@ -6231,6 +6227,9 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
+  </component>
+  <component name="ScalacSettings">
+    <option name="SCALAC_BEFORE" value="false" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
