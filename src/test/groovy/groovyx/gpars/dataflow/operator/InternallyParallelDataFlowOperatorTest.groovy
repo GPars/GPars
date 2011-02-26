@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,10 +34,12 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
 
     protected void setUp() {
         group = new DefaultPGroup(10)
+        super.setUp()
     }
 
     protected void tearDown() {
         group.shutdown()
+        super.tearDown()
     }
 
 
@@ -135,16 +137,15 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
         final DataFlowQueue e = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: 0) {x, y, z -> }
+            group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: 0) {x, y, z -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: -1) {x, y, z -> }
+            group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: -1) {x, y, z -> }
         }
     }
 
     public void testOutputNumber() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         def selector1 = group.operator(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
@@ -160,17 +161,16 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
 
     public void testMissingChannels() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs1: [a], outputs: [d], maxForks: 2) {v -> }
+            group.operator(inputs1: [a], outputs: [d], maxForks: 2) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(outputs: [d], maxForks: 2) {v -> }
+            group.operator(outputs: [d], maxForks: 2) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator([maxForks: 2]) {v -> }
+            group.operator([maxForks: 2]) {v -> }
         }
     }
 

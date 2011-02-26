@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,10 +34,12 @@ public class DataFlowSelectorTest extends GroovyTestCase {
 
     protected void setUp() {
         group = new DefaultPGroup(1)
+        super.setUp()
     }
 
     protected void tearDown() {
         group.shutdown()
+        super.tearDown()
     }
 
     public void testSelector() {
@@ -260,13 +262,13 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         group.selector(inputs: [a, b], outputs: [d]) {x, y ->}.stop()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector(inputs: [a, b, c], outputs: [d]) {x, y, z -> }
+            group.selector(inputs: [a, b, c], outputs: [d]) {x, y, z -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector(inputs: [], outputs: [d]) { }
+            group.selector(inputs: [], outputs: [d]) { }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector(inputs: [a], outputs: [d]) {-> }
+            group.selector(inputs: [a], outputs: [d]) {-> }
         }
 
         def op1 = group.selector(inputs: [a], outputs: [d]) { }
@@ -281,7 +283,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
 
     public void testOutputNumber() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         def selector1 = group.selector(inputs: [a], outputs: []) {v -> stop()}
@@ -296,16 +297,15 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DataFlowQueue a = new DataFlowQueue()
         final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue c = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector(outputs: [d]) {v -> }
+            group.selector(outputs: [d]) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector([:]) {v -> }
+            group.selector([:]) {v -> }
         }
     }
 
@@ -394,7 +394,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
         final DataFlowQueue a = new DataFlowQueue()
         final DataFlowQueue b = new DataFlowQueue()
 
-        def op = group.selector(inputs: [a], outputs: [b]) {
+        group.selector(inputs: [a], outputs: [b]) {
             bindOutput 0, it
             stop()
         }

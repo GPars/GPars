@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@ class ForkJoinBuilderTest extends GroovyTestCase {
             case 2:
                 if (nums[0] <= nums[1]) return nums     //store own result
                 else return nums[-1..0]                       //store own result
-                break
             default:
                 def splitList = split(nums)
                 [splitList[0], splitList[1]].each {forkOffChild it}  //fork a child task

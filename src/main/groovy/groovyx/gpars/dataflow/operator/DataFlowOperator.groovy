@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public final class DataFlowOperator extends DataFlowProcessor {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    protected def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
+    def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
         super(channels, code)
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
@@ -63,7 +63,7 @@ public final class DataFlowOperator extends DataFlowProcessor {
     /**
      * Is invoked in case the actor throws an exception.
      */
-    protected void reportError(Throwable e) {
+    void reportError(Throwable e) {
         System.err.println "The dataflow operator experienced an exception and is about to terminate. $e"
         stop()
     }

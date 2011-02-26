@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
 
     public void testUsingNonTransparentEachInTransparentContext() {
         def items = [1, 2, 3, 4, 5]
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().eachParallel {
             Thread.sleep 100
@@ -39,7 +39,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
 
     public void testUsingNonTransparentCollectInTransparentContextWithString() {
         def items = 'abcdefg1'
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         def result = items.makeTransparent().collectParallel {
             Thread.sleep 100
@@ -52,7 +52,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
 
     public void testUsingNonTransparentFindAllInTransparentContextWithString() {
         def items = 'abcdefg1'
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         def result = items.makeTransparent().findAllParallel {
             Thread.sleep 100
@@ -65,7 +65,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
 
     public void testUsingNonTransparentGroupByInTransparentContextWithString() {
         def items = 'abcdefg1'
-        final ConcurrentHashMap map = new ConcurrentHashMap()
+        final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
         items.makeTransparent().groupByParallel {
             Thread.sleep 100
