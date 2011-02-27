@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-ruleset {    
+ruleset {
     ruleset('rulesets/imports.xml')
 
     ruleset('rulesets/naming.xml') {
@@ -99,7 +99,7 @@ ruleset {
         exclude 'UnnecessaryObjectReferences'   //TODO: this may be a bug in a codenarc rule
         exclude 'UnnecessaryStringInstantiation'   //TODO: Fix the code and enable rule
         exclude 'UnnecessaryOverridingMethod'   //TODO: Fix the code and enable rule
-  }
+    }
 
     ruleset('rulesets/dry.xml') {
         exclude 'DuplicateStringLiteral' // TODO: analyze usage and verify correct code
@@ -127,4 +127,3 @@ ruleset {
     }
 
 }
-- 
