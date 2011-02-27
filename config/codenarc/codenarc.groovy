@@ -92,9 +92,9 @@ ruleset {
     }
 
     ruleset('rulesets/unnecessary.xml') {
-        exclude 'UnnecessaryCollectCall'    //TODO: Fix the code and enable rule
+//        exclude 'UnnecessaryCollectCall'    //TODO: Fix the code and enable rule
         exclude 'UnnecessaryConstructor'    //TODO: Fix the code and enable rule
-        exclude 'UnnecessaryReturnKeyword'
+//        exclude 'UnnecessaryReturnKeyword'   //TODO: Fix the code and enable rule
         exclude 'UnnecessaryGetter'   //TODO: Fix the code and enable rule
         exclude 'UnnecessaryObjectReferences'   //TODO: this may be a bug in a codenarc rule
         exclude 'UnnecessaryStringInstantiation'   //TODO: Fix the code and enable rule
