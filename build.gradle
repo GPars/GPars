@@ -141,10 +141,10 @@ try {
             uniqueVersion = false
             configuration = configurations.deployerJars
             repository(url: 'https://dav.codehaus.org/repository/gpars/') {
-                authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+                authentication(userName: codehausUsername, password: codehausPassword)
             }
             snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
-                authentication(userName: gpars_repoUserName, password: gpars_repoPassword)
+                authentication(userName: codehausUsername, password: codehausPassword)
             }
             pom.project {
                 name 'GPars'
@@ -173,7 +173,7 @@ try {
         }
     }
 } catch (Exception e) {
-    //  It may be that gpars_repoUserName and/or gpars_repoPassword are not defined in which case an exception
+    //  It may be that codehausUsername and/or codehausPassword are not defined in which case an exception
     //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
     //  care that the uploadArchives specification hasn't completed.
     println 'Upload archives thrown an exception.'
