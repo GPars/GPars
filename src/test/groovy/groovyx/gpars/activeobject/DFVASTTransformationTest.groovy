@@ -53,7 +53,7 @@ class B extends A {
 
     public void testDFVReturningMethodAsynchronously() {
         final GroovyShell shell = new GroovyShell()
-        def (a, b) = shell.evaluate("""
+        def (a) = shell.evaluate("""
 import groovyx.gpars.activeobject.*
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CyclicBarrier
@@ -74,7 +74,7 @@ class A {
 class B extends A {
 }
 
-[new A(), new B()]
+[new A()]
 """)
         def result = a.foo()
         assert !result.bound
@@ -85,7 +85,7 @@ class B extends A {
 
     public void testDFVReturningMethodException() {
         final GroovyShell shell = new GroovyShell()
-        def (a, b) = shell.evaluate("""
+        def (a) = shell.evaluate("""
 import groovyx.gpars.activeobject.*
 import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CyclicBarrier
@@ -106,7 +106,7 @@ class A {
 class B extends A {
 }
 
-[new A(), new B()]
+[new A()]
 """)
         def result = a.foo()
         assert !result.bound
@@ -123,7 +123,7 @@ class B extends A {
     public void testNonBlockingWithExplicitTypeIsNotAllowed() {
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {
-            def a = shell.evaluate("""
+            shell.evaluate("""
     import groovyx.gpars.activeobject.*
     import groovyx.gpars.dataflow.DataFlowVariable
     @ActiveObject

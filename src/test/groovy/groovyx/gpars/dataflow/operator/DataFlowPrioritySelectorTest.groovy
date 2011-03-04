@@ -307,7 +307,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
 
     public void testOutputNumber() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         def selector1 = group.prioritySelector(inputs: [a], outputs: []) {v -> stop()}
@@ -322,16 +321,13 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.prioritySelector(outputs: [d]) {v -> }
+            group.prioritySelector(outputs: [d]) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.prioritySelector([:]) {v -> }
+            group.prioritySelector([:]) {v -> }
         }
     }
 
@@ -352,7 +348,6 @@ public class DataFlowPrioritySelectorTest extends GroovyTestCase {
 
     public void testExceptionWithDefaultHandler() {
         final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlowVariable a = new DataFlowVariable()
 
         def op = prioritySelector(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')

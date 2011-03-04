@@ -90,16 +90,15 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
         final DataFlowQueue e = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op = group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: 0) {x, y, z -> }
+            group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: 0) {x, y, z -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op = group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: -1) {x, y, z -> }
+            group.selector(inputs: [a, b, c], outputs: [d, e], maxForks: -1) {x, y, z -> }
         }
     }
 
     public void testOutputNumber() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         def selector1 = group.selector(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
@@ -115,17 +114,16 @@ public class InternallyParallelDataFlowSelectorTest extends GroovyTestCase {
 
     public void testMissingChannels() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector(inputs1: [a], outputs: [d], maxForks: 2) {v -> }
+            group.selector(inputs1: [a], outputs: [d], maxForks: 2) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector(outputs: [d], maxForks: 2) {v -> }
+            group.selector(outputs: [d], maxForks: 2) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.selector([maxForks: 2]) {v -> }
+            group.selector([maxForks: 2]) {v -> }
         }
     }
 

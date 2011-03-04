@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public void foo() {
 public void bar() {
     final def group = new DefaultPGroup(20)
 
-    final Actor actor = group.actor {
+    group.actor {
         println 'Started an actor ' + delegate + ":" + owner
         final def nestedActor = group.actor {
             println 'Started nested actor ' + delegate + ":" + owner

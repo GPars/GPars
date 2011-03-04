@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@ final List urls = [
         'http://groovy.codehaus.org',
         'http://griffon.codehaus.org',
         'http://grails.codehaus.org']
-
-final def threadPoolSize = 2  //feel free to play around with various values
 
 final def frame = new SwingBuilder().frame(title: 'Demo', defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
     vbox() {

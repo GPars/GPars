@@ -48,8 +48,8 @@ public class GParsPoolUtilTest extends GroovyTestCase {
     public void testCollect() {
         groovyx.gpars.GParsPool.withPool(5) {
             final List result = GParsPoolUtil.collectParallel([1, 2, 3, 4, 5], {it * 2})
-            assert ([2, 4, 6, 8, 10].equals(result))
-            assert !([2, 41, 6, 8, 10].equals(result))
+            assert ([2, 4, 6, 8, 10] == result)
+            assert ([2, 41, 6, 8, 10] != result)
         }
     }
 

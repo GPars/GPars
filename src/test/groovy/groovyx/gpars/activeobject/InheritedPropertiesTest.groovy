@@ -22,7 +22,7 @@ public class InheritedPropertiesTest extends GroovyTestCase {
     public void testOverridingActorNameNotAllowed() {
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {
-            def (a, b) = shell.evaluate("""
+            shell.evaluate("""
     import groovyx.gpars.activeobject.ActiveObject
     import groovyx.gpars.activeobject.ActiveMethod
 
@@ -45,7 +45,7 @@ public class InheritedPropertiesTest extends GroovyTestCase {
     public void testOverridingActorGroupNotAllowed() {
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {
-            def (a, b) = shell.evaluate("""
+            shell.evaluate("""
     import groovyx.gpars.activeobject.ActiveObject
     import groovyx.gpars.activeobject.ActiveMethod
 

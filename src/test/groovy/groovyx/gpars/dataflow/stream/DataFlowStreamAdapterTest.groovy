@@ -127,7 +127,6 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testIteration() {
-        final CyclicBarrier barrier = new CyclicBarrier(2)
         final def original = new DataFlowStream()
         final def writeStream = new DataFlowStreamWriteAdapter(original)
 

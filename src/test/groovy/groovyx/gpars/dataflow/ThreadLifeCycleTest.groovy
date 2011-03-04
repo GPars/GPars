@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def thread = start {
+        start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
         }
@@ -48,7 +48,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def thread = start {
+        start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
             throw new RuntimeException('test')
@@ -61,7 +61,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final def thread = start {
+        start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
             react(10.milliseconds) {}  //will timeout

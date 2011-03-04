@@ -112,8 +112,6 @@ class ForkJoinBuilderTest extends GroovyTestCase {
     }
 
     public void testIllegalArguments() {
-        final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
-
         withPool(3) {
             shouldFail(IllegalArgumentException) {
                 groovyx.gpars.GParsPool.runForkJoin()
@@ -146,7 +144,6 @@ class ForkJoinBuilderTest extends GroovyTestCase {
     }
 
     public void testForkOffChildIllegalArguments() {
-        final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
         final DataFlows df = new DataFlows()
 
         withPool(3) {

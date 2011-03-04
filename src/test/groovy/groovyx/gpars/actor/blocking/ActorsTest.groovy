@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -33,7 +32,7 @@ public class ActorsTest extends GroovyTestCase {
         final AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor actor = Actors.oldActor {
+        Actors.oldActor {
             loop {
                 final int value = counter.incrementAndGet()
                 if (value == 3) {

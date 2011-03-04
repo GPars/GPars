@@ -62,6 +62,8 @@ class MakeTransparentTest extends GroovyTestCase {
         GParsPool.withPool {
             Collection c = [1, 2, 3, 4, 5].makeTransparent()
             String s = 'abcde'.makeTransparent()
+            assert !c.isEmpty()
+            assert s.size() > 0
         }
     }
 

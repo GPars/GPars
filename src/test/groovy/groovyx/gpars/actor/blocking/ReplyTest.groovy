@@ -238,7 +238,7 @@ public class ReplyTest extends GroovyTestCase {
             }
         }
 
-        final Actor sender = oldActor {
+        oldActor {
             delegate.metaClass {
                 afterStop = {
                     latch.countDown()
@@ -337,7 +337,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         //send and terminate
-        final Actor actor1 = oldActor {
+        oldActor {
             delegate.metaClass.afterStop = {
                 latches[0].countDown()
             }
@@ -347,7 +347,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         //wait, send and terminate
-        final Actor actor2 = oldActor {
+        oldActor {
             delegate.metaClass.afterStop = {
                 latches[2].countDown()
             }
@@ -375,8 +375,6 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testOriginatorDetection() {
-        final CyclicBarrier barrier = new CyclicBarrier(2)
-        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
         final DataFlowVariable originator1 = new DataFlowVariable()
         final DataFlowVariable originator2 = new DataFlowVariable()
         final DataFlowVariable originator3 = new DataFlowVariable()

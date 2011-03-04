@@ -19,8 +19,8 @@ package groovyx.gpars.activeobject;
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.group.PGroup
 import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.group.PGroup
 
 /**
  * Backs active objects and invokes all object's active methods.
@@ -68,20 +68,20 @@ public final class InternalActor extends DynamicDispatchActor {
         try {
             Object target = msg[0]
             String methodName = msg[1]
-            Object[] args = msg.size()>2 ? msg[2..-1] : new Object[0]
-            return target."${METHOD_NAME_PREFIX + methodName}"(*args)
+            Object[] args = msg.size() > 2 ? msg[2..-1] : new Object[0]
+            return target."${METHOD_NAME_PREFIX + methodName}"(* args)
         } catch (all) {
             return all
         }
     }
 
     public static InternalActor create(final Object groupId) {
-        PGroup group = null
-        if (groupId.equals("")) group = Actors.defaultActorPGroup
+        PGroup group
+        if ('' == groupId) group = Actors.defaultActorPGroup
         else {
             group = ActiveObjectRegistry.instance.findGroupById(groupId)
         }
-        if (group==null) throw new IllegalArgumentException("Cannot find a PGroup " + groupId + " in the ActiveObjectRegistry. Please make sure you register the group prior to instantiating ActiveObjects.")
+        if (group == null) throw new IllegalArgumentException("Cannot find a PGroup " + groupId + " in the ActiveObjectRegistry. Please make sure you register the group prior to instantiating ActiveObjects.")
         final InternalActor internalActor = new InternalActor();
         internalActor.parallelGroup = group;
         internalActor.start();

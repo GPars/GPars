@@ -260,25 +260,25 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowQueue d = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b, c], outputs: [d]) {v -> }
+            group.operator(inputs: [a, b, c], outputs: [d]) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b], outputs: [d]) {v -> }
+            group.operator(inputs: [a, b], outputs: [d]) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b], outputs: [d]) {x, y, z -> }
+            group.operator(inputs: [a, b], outputs: [d]) {x, y, z -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a, b], outputs: [d]) {}
+            group.operator(inputs: [a, b], outputs: [d]) {}
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a], outputs: [d]) {x, y -> }
+            group.operator(inputs: [a], outputs: [d]) {x, y -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [], outputs: [d]) { }
+            group.operator(inputs: [], outputs: [d]) { }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs: [a], outputs: [d]) {-> }
+            group.operator(inputs: [a], outputs: [d]) {-> }
         }
 
         def op1 = group.operator(inputs: [a], outputs: [d]) { }
@@ -293,7 +293,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testOutputNumber() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         group.operator(inputs: [a], outputs: []) {v -> stop()}
@@ -307,18 +306,16 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testMissingChannels() {
         final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(inputs1: [a], outputs: [d]) {v -> }
+            group.operator(inputs1: [a], outputs: [d]) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator(outputs: [d]) {v -> }
+            group.operator(outputs: [d]) {v -> }
         }
         shouldFail(IllegalArgumentException) {
-            def op1 = group.operator([:]) {v -> }
+            group.operator([:]) {v -> }
         }
     }
 
@@ -339,7 +336,6 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testExceptionWithDefaultHandler() {
         final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlowVariable a = new DataFlowVariable()
 
         def op = group.operator(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')
@@ -476,7 +472,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowQueue a = new DataFlowQueue()
         final DataFlowQueue b = new DataFlowQueue()
 
-        def op = group.operator(inputs: [a], outputs: [b]) {
+        group.operator(inputs: [a], outputs: [b]) {
             bindOutput 0, it
             stop()
         }

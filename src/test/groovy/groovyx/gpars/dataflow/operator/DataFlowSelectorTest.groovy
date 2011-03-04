@@ -297,8 +297,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
         shouldFail(IllegalArgumentException) {
@@ -326,7 +324,6 @@ public class DataFlowSelectorTest extends GroovyTestCase {
 
     public void testExceptionWithDefaultHandler() {
         final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlowVariable a = new DataFlowVariable()
 
         def op = group.selector(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')

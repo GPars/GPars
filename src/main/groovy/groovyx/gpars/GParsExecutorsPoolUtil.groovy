@@ -137,7 +137,7 @@ public class GParsExecutorsPoolUtil {
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static def eachParallel(Object collection, Closure cl) {
-        final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
+        final List<Throwable> exceptions = Collections.synchronizedList([])
         final Semaphore semaphore = new Semaphore(0)
         Closure code = async({Object... args ->
             try {
@@ -185,7 +185,7 @@ public class GParsExecutorsPoolUtil {
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static def eachWithIndexParallel(Object collection, Closure cl) {
-        final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>())
+        final List<Throwable> exceptions = Collections.synchronizedList([])
         final Semaphore semaphore = new Semaphore(0)
         Closure code = async({Object element, int index ->
             try {

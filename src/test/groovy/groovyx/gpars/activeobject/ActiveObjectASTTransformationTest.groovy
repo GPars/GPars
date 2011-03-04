@@ -139,7 +139,7 @@ import groovyx.gpars.activeobject.ActiveMethod
     public void testStaticMethodsCannotBeActive() {
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {
-            def a = shell.evaluate("""
+            shell.evaluate("""
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
 
@@ -445,7 +445,7 @@ new A()
     public void testTwoActorFields() {
         final GroovyShell shell = new GroovyShell()
         shouldFail(MultipleCompilationErrorsException) {
-            def (a, b, c) = shell.evaluate("""
+            shell.evaluate("""
     import groovyx.gpars.activeobject.ActiveObject
     import groovyx.gpars.activeobject.ActiveMethod
     import groovyx.gpars.dataflow.DataFlowVariable

@@ -79,6 +79,10 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         Collection c2 = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent()
         String s1 = ParallelEnhancer.enhanceInstance('abcde')
         String s2 = ParallelEnhancer.enhanceInstance('abcde').makeTransparent()
+        assert !c1.isEmpty()
+        assert !c2.isEmpty()
+        assert !s1.isEmpty()
+        assert !s2.isEmpty()
     }
 
     public void testNonTransparentAfterClone() {
