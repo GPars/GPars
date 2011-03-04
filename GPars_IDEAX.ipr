@@ -5119,6 +5119,7 @@
         <inspection_tool class="CheckXmlFileWithXercesValidator" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ClassInitializerMayBeStatic" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ClassName" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="ClassSize" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="CloneCallsSuperClone" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CloneDeclaresCloneNotSupported" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CloneableWithoutClone" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -5174,7 +5175,6 @@
         <inspection_tool class="DuplicateCaseLabelJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicateCaseStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="DuplicateImport" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="DuplicateStringLiteral" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="DuplicateThrows" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicatedBeanNamesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ELDeferredExpressionsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5229,7 +5229,6 @@
         <inspection_tool class="ExplicitCallToPowerMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExplicitCallToRightShiftMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExplicitCallToXorMethod" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="ExplicitGarbageCollection" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExplicitHashMapInstantiation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExplicitLinkedListInstantiation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExplicitStackInstantiation" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -5388,6 +5387,7 @@
         <inspection_tool class="JUnitAssertAlwaysSucceeds" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitFailWithoutMessage" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitSetUpCallsSuper" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="JUnitStyleAssertions" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitTearDownCallsSuper" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitUnnecessarySetUp" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JUnitUnnecessaryTearDown" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -5469,7 +5469,7 @@
         <inspection_tool class="MissingAspectjAutoproxyInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MissingNewInThrowStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MultipleLoggers" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="NestedSynchronization" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="NestedBlockDepth" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NewStringBufferWithCharArgument" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NoExplicitFinalizeCalls" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NonJREEmulationClassesInClientCode" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -5516,7 +5516,6 @@
         <inspection_tool class="PointlessBooleanExpressionJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PrimitiveArrayArgumentToVariableArgMethod" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PrintStackTrace" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="PropertyName" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="RedundantArrayCreation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="RedundantCast" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="RedundantThrows" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5589,7 +5588,6 @@
         <inspection_tool class="SpringSecurityFiltersConfiguredInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SpringWebServiceAnnotationsInconsistencyInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SpringWebServicesConfigurationsInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="StatelessClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringConcatenationInsideStringBufferAppend" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="StringConstructor" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreSubstringArguments" value="false" />
@@ -5624,7 +5622,6 @@
         <inspection_tool class="ThrowFromFinallyBlock" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ThrowFromFinallyBlockJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ThrowNullPointerException" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="ThrowRuntimeException" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ThrowThrowable" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ThrowableInstanceNeverThrown" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ThrowableResultOfMethodCallIgnored" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5714,7 +5711,6 @@
         <inspection_tool class="UnusedMessageFormatParameter" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedObject" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnusedParameters" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="UnusedPrivateMethodParameter" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnusedReturnValue" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedVariable" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UseAssertEqualsInsteadOfAssertTrue" enabled="true" level="WARNING" enabled_by_default="true" />
