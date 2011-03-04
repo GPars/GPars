@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
-import jsr166y.forkjoin.ForkJoinPool
-import jsr166y.forkjoin.RecursiveTask
+import jsr166y.ForkJoinPool
+import jsr166y.RecursiveTask
 
 /**
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation

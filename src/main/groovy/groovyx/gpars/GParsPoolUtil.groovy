@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ import java.lang.ref.ReferenceQueue
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
-import jsr166y.forkjoin.ForkJoinExecutor
-import jsr166y.forkjoin.ForkJoinPool
-import jsr166y.forkjoin.Ops.Mapper
-import jsr166y.forkjoin.Ops.Procedure
-import jsr166y.forkjoin.ParallelArray
-import jsr166y.forkjoin.RecursiveTask
+import jsr166y.ForkJoinExecutor
+import jsr166y.ForkJoinPool
+import extra166y.Ops.Mapper
+import extra166y.Ops.Procedure
+import extra166y.ParallelArray
+import extra166y.RecursiveTask
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
 import static groovyx.gpars.util.PAUtils.buildClosureForMaps
 import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex

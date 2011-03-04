@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 
 package groovyx.gpars.samples.collections
 
-import jsr166y.forkjoin.Ops.Mapper
-import jsr166y.forkjoin.Ops.Predicate
-import jsr166y.forkjoin.Ops.Reducer
+import extra166y.Ops.Mapper
+import extra166y.Ops.Predicate
+import extra166y.Ops.Reducer
 
 groovyx.gpars.GParsPool.withPool {
     assert 15 == [1, 2, 3, 4, 5].parallelArray.reduce({a, b -> a + b} as Reducer, 0)                                        //summarize

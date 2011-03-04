@@ -65,7 +65,7 @@ repositories {
     mavenCentral()
     mavenRepo urls: ['http://repository.jboss.org/maven2/']
     mavenRepo urls: ['http://repository.codehaus.org']
-    //mavenRepo urls: ['http://snapshots.repository.codehaus.org']
+    mavenRepo urls: ['http://snapshots.repository.codehaus.org']
 }
 
 configurations {
@@ -78,7 +78,9 @@ dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: hasProperty('groovyVersion') ? groovyVersion : '1.7.8'
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.8.2'
     testCompile group: 'org.spockframework', name: 'spock-core', version: hasProperty('spockVersion') ? spockVersion : '0.5-groovy-1.7'
-    compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
+  //compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
+  compile 'org.codehaus.jsr166-mirror:jsr166y:0.4.40-SNAPSHOT' 
+  compile 'org.codehaus.jsr166-mirror:extra166y:0.4.40-SNAPSHOT' 
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
     //compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
     compile group: 'org.codehaus.jcsp', name: 'jcsp', version: '1.1-rc5'
