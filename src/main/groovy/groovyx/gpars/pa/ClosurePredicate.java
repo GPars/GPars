@@ -16,8 +16,8 @@
 
 package groovyx.gpars.pa;
 
-import groovy.lang.Closure;
 import extra166y.Ops;
+import groovy.lang.Closure;
 
 /**
  * A PA predicate built around a closure
@@ -32,7 +32,7 @@ public final class ClosurePredicate implements Ops.Predicate<Object> {
     }
 
     @Override
-    public boolean evaluate(final Object o) {
+    public boolean op(final Object o) {
         return (Boolean) code.call(o);
     }
 }

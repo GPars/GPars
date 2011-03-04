@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlowQueue
-import jsr166y.forkjoin.AsyncAction
+import jsr166y.RecursiveAction
 
 /**
  * @author Vaclav Pech
@@ -66,7 +66,7 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
     public void testThreading() {
         groovyx.gpars.GParsPool.withPool(1) {pool ->
             def results = new DataFlowQueue()
-            pool.submit([compute:{results << Thread.currentThread();finish()}] as AsyncAction)
+            pool.submit([compute: {results << Thread.currentThread(); complete()}] as RecursiveAction)
             def t = results.val
 
             Closure sPlus = {Integer a, Integer b ->

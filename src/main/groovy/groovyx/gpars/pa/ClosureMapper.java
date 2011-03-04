@@ -16,15 +16,15 @@
 
 package groovyx.gpars.pa;
 
-import groovy.lang.Closure;
 import extra166y.Ops;
+import groovy.lang.Closure;
 
 /**
  * A PA mapper built around a closure
  *
  * @author Vaclav Pech
  */
-public final class ClosureMapper implements Ops.Mapper<Object, Object> {
+public final class ClosureMapper implements Ops.Op<Object, Object> {
     private final Closure code;
 
     public ClosureMapper(final Closure code) {
@@ -32,7 +32,7 @@ public final class ClosureMapper implements Ops.Mapper<Object, Object> {
     }
 
     @Override
-    public Object map(final Object o) {
+    public Object op(final Object o) {
         return code.call(o);
     }
 }

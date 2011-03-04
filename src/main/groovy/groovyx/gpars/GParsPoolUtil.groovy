@@ -16,6 +16,10 @@
 
 package groovyx.gpars
 
+import extra166y.Ops
+import extra166y.Ops.Procedure
+import extra166y.ParallelArray
+import extra166y.ParallelArrayWithMapping
 import groovy.time.Duration
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.memoize.LRUProtectionStorage
@@ -33,12 +37,8 @@ import java.lang.ref.ReferenceQueue
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
-import jsr166y.ForkJoinExecutor
 import jsr166y.ForkJoinPool
-import extra166y.Ops.Mapper
-import extra166y.Ops.Procedure
-import extra166y.ParallelArray
-import extra166y.RecursiveTask
+import jsr166y.RecursiveTask
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
 import static groovyx.gpars.util.PAUtils.buildClosureForMaps
 import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
@@ -276,7 +276,7 @@ public class GParsPoolUtil {
     }
 
     @SuppressWarnings("GroovyMultipleReturnPointsPerMethod")
-    private static <T> ParallelArray<T> createPA(final Object collection, final ForkJoinExecutor pool) {
+    private static <T> ParallelArray<T> createPA(final Object collection, final ForkJoinPool pool) {
         if (collection instanceof Object[]) {
             return createPAFromArray(collection, pool)
         }
@@ -298,11 +298,11 @@ public class GParsPoolUtil {
         return createPAFromCollection(createCollection(collection), pool)
     }
 
-    private static <T> ParallelArray<T> createPAFromCollection(final def collection, final ForkJoinExecutor pool) {
+    private static <T> ParallelArray<T> createPAFromCollection(final def collection, final ForkJoinPool pool) {
         return ParallelArray.createFromCopy(collection.toArray(new T[collection.size()]), pool)
     }
 
-    private static <T> ParallelArray<T> createPAFromArray(final T[] array, final ForkJoinExecutor pool) {
+    private static <T> ParallelArray<T> createPAFromArray(final T[] array, final ForkJoinPool pool) {
         return ParallelArray.createFromCopy(array, pool)
     }
 
@@ -404,7 +404,7 @@ public class GParsPoolUtil {
             indexedCollection << [element, index]
             index++
         }
-        createPAFromCollection(indexedCollection, retrievePool()).withMapping({cl(it[0], it[1])} as Mapper).all()
+        createPAFromCollection(indexedCollection, retrievePool()).withMapping({cl(it[0], it[1])} as Ops.Op).all()
         return collection
     }
 
@@ -1370,7 +1370,7 @@ final class PAWrapper<T> extends AbstractPAWrapper {
  */
 final class MappedPAWrapper<T> extends AbstractPAWrapper {
 
-    def MappedPAWrapper(final ParallelArray.WithMapping pa) {
+    def MappedPAWrapper(final ParallelArrayWithMapping pa) {
         super(pa)
     }
 

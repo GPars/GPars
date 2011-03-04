@@ -6266,17 +6266,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.11/gpars-0.11-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.groovy:groovy-all:1.7.6">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.6/groovy-all-1.7.6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.6/groovy-all-1.7.6-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.6/groovy-all-1.7.6-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.codehaus.groovy:groovy-all:1.7.8">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.8/groovy-all-1.7.8.jar!/" />
@@ -6286,6 +6275,28 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.8/groovy-all-1.7.8-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.codehaus.jsr166-mirror:extra166y:0.4.40-SNAPSHOT">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/0.4.40-SNAPSHOT/extra166y-0.4.40-SNAPSHOT.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/0.4.40-SNAPSHOT/extra166y-0.4.40-SNAPSHOT-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/0.4.40-SNAPSHOT/extra166y-0.4.40-SNAPSHOT-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.codehaus.jsr166-mirror:jsr166y:0.4.40-SNAPSHOT">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/0.4.40-SNAPSHOT/jsr166y-0.4.40-SNAPSHOT.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/0.4.40-SNAPSHOT/jsr166y-0.4.40-SNAPSHOT-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/0.4.40-SNAPSHOT/jsr166y-0.4.40-SNAPSHOT-sources.jar!/" />
       </SOURCES>
     </library>
   </component>

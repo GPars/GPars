@@ -73,16 +73,16 @@ public class FJPool implements Pool {
     private static ForkJoinPool createPool(final int poolSize) {
         assert poolSize > 0;
 
-        final ForkJoinPool pool = new ForkJoinPool(poolSize);
-        pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        final Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
             @Override
             @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
             public void uncaughtException(final Thread t, final Throwable e) {
                 System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                 e.printStackTrace(System.err);
             }
-        });
-        return pool;
+        };
+
+        return new ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, uncaughtExceptionHandler, true);
     }
 
     /**
@@ -92,8 +92,10 @@ public class FJPool implements Pool {
      */
     @Override
     public final void resize(final int poolSize) {
-        PoolUtils.checkValidPoolSize(poolSize);
-        pool.setPoolSize(poolSize);
+        //todo fj migration
+        throw new UnsupportedOperationException("ForkJoin pools can't be resized");
+//        PoolUtils.checkValidPoolSize(poolSize);
+//        pool.setPoolSize(poolSize);
     }
 
     /**

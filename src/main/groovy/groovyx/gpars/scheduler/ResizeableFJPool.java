@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,14 +56,15 @@ public final class ResizeableFJPool extends FJPool {
     public void execute(final Runnable task) {
         synchronized (lock) {
             final int currentPoolSize = pool.getPoolSize();
-            final int submissionCount = pool.getActiveSubmissionCount();
+            final int submissionCount = pool.getQueuedSubmissionCount();
             final int needForThreads = submissionCount + 1 - currentPoolSize;
             if (needForThreads > 0) {
                 if (currentPoolSize + needForThreads > ResizeableFJPool.MAX_POOL_SIZE) {
                     //noinspection AutoBoxing
                     throw new IllegalStateException(MessageFormat.format("The thread pool executor cannot run the task. The upper limit of the thread pool size has probably been reached. Current pool size: {0} Maximum pool size: {1}", currentPoolSize, ResizeableFJPool.MAX_POOL_SIZE));
                 }
-                pool.addWorkers(needForThreads);
+                //todo fj migration
+//                pool.addActiveCount(needForThreads);
             }
         }
         super.execute(new Runnable() {
@@ -72,11 +73,12 @@ public final class ResizeableFJPool extends FJPool {
                 task.run();
                 synchronized (ResizeableFJPool.this.lock) {
                     final int currentPoolSize = pool.getPoolSize();
-                    final int submissionCount = pool.getActiveSubmissionCount();
+                    final int submissionCount = pool.getQueuedSubmissionCount();
                     final int desiredPoolSize = Math.max(submissionCount, getConfiguredPoolSize());
                     final int change = currentPoolSize - desiredPoolSize;
 
-                    if (change >= 3) pool.removeWorkers(change);
+                    //todo fj migration
+//                    if (change >= 3) pool.removeWorkers(change);
                 }
             }
         });

@@ -16,8 +16,8 @@
 
 package groovyx.gpars.pa;
 
-import groovy.lang.Closure;
 import extra166y.Ops;
+import groovy.lang.Closure;
 
 /**
  * A PA reducer built around a closure
@@ -32,7 +32,7 @@ public final class ClosureReducer implements Ops.Reducer<Object> {
     }
 
     @Override
-    public Object combine(final Object o, final Object o1) {
+    public Object op(final Object o, final Object o1) {
         final Object[] args = {o, o1};
         return code.call(args);
     }
