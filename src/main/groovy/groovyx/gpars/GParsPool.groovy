@@ -222,11 +222,33 @@ public class GParsPool {
         jsr166y.ForkJoinPool pool = retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("No active Fork/Join thread pool available to execute closures asynchronously. Consider wrapping the function call with GParsPool.withPool().")
         List<Future<Object>> result = closures.collect {cl ->
-            pool.submit([compute: { cl.call() }] as RecursiveTask)
+            pool.submit(new MyCancellableRecursiveTask(cl))
         }
         result
     }
 
+    final static class MyCancellableRecursiveTask extends RecursiveTask {
+        private final def code
+        private volatile Thread myThread
+
+        MyCancellableRecursiveTask(final code) {
+            this.code = code
+        }
+
+        @Override protected Object compute() {
+            myThread = Thread.currentThread()
+            code.call()
+        }
+
+        @Override
+        boolean cancel(boolean mayInterruptIfRunning) {
+            final boolean cancelled = super.cancel(mayInterruptIfRunning)
+            println "Cancelling " + cancelled
+            if (mayInterruptIfRunning) myThread?.interrupt()
+            return cancelled
+        }
+
+    }
     /**
      * Starts multiple closures in separate threads, collecting Futures for their return values
      * Reuses the pool defined by the surrounding withPool() call.

@@ -53,9 +53,7 @@ public class SpeculationTest extends GroovyTestCase {
                 50
             }]
 
-    //todo fj migration
-
-    public void _testGParsPoolSpeculation() {
+    public void testGParsPoolSpeculation() {
         GParsPool.withPool(5) {
             assert GParsPool.speculate(alternatives) in [20, 40]
         }
@@ -65,10 +63,7 @@ public class SpeculationTest extends GroovyTestCase {
         assert !neverReachedFlag.get()
     }
 
-    public void testFoo() {}
-    //todo fj migration
-
-    public void _testGParsExecutorsPoolSpeculation() {
+    public void testGParsExecutorsPoolSpeculation() {
         GParsExecutorsPool.withPool(5) {
             assert GParsExecutorsPool.speculate(alternatives) in [20, 40]
         }
