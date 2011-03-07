@@ -19,7 +19,6 @@ package groovyx.gpars.forkjoin;
 import jsr166y.RecursiveTask;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
     /**
      * Stores the child workers
      */
-    private Collection<AbstractForkJoinWorker<T>> children = null;
+    private List<AbstractForkJoinWorker<T>> children = null;
 
     protected AbstractForkJoinWorker() {
     }
@@ -60,7 +59,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
      */
     protected final void forkOffChild(final AbstractForkJoinWorker<T> child) {
         if (children == null) children = new ArrayList<AbstractForkJoinWorker<T>>();
-        children.add(child);
+        children.add(0, child);  //Forks and joins have to be processed in reverse order from one another
         child.fork();
     }
 

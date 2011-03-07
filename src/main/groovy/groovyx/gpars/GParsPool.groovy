@@ -71,7 +71,7 @@ public class GParsPool {
 
     private static createPool(int poolSize, UncaughtExceptionHandler handler) {
         if (!(poolSize in 1..Integer.MAX_VALUE)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
-        final jsr166y.ForkJoinPool pool = new jsr166y.ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, handler, true)
+        final jsr166y.ForkJoinPool pool = new jsr166y.ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, handler, false)
         return pool
     }
 

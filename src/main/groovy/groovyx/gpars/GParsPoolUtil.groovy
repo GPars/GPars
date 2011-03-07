@@ -1336,7 +1336,9 @@ abstract class AbstractPAWrapper<T> {
  */
 private class CombineHolder {
 
-    @Delegate final Map content
+    //todo fj migration
+//    @Delegate
+    final Map content
 
     def CombineHolder(final content) {
         this.content = content;

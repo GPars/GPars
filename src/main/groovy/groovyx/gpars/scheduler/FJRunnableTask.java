@@ -36,7 +36,6 @@ final class FJRunnableTask extends RecursiveAction {
     protected void compute() {
         try {
             runnable.run();
-            complete(null);
         } catch (Exception e) {
             completeExceptionally(e);
         }

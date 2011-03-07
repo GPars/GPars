@@ -82,7 +82,7 @@ public class FJPool implements Pool {
             }
         };
 
-        return new ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, uncaughtExceptionHandler, true);
+        return new ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, uncaughtExceptionHandler, false);
     }
 
     /**
@@ -93,8 +93,8 @@ public class FJPool implements Pool {
     @Override
     public final void resize(final int poolSize) {
         //todo fj migration
+        PoolUtils.checkValidPoolSize(poolSize);
         throw new UnsupportedOperationException("ForkJoin pools can't be resized");
-//        PoolUtils.checkValidPoolSize(poolSize);
 //        pool.setPoolSize(poolSize);
     }
 

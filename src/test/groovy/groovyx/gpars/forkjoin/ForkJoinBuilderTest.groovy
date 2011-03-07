@@ -27,8 +27,7 @@ import static groovyx.gpars.GParsPool.withPool
  * Date: Jan 15, 2010
  */
 
-//todo fj migration
-abstract class ForkJoinBuilderTest extends GroovyTestCase {
+class ForkJoinBuilderTest extends GroovyTestCase {
     /**
      * Splits a list of numbers in half
      */
@@ -74,24 +73,20 @@ abstract class ForkJoinBuilderTest extends GroovyTestCase {
         }
     }
 
-    //todo fj migration
-
-    public void _testMergeSort() {
+    public void testMergeSort() {
         final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
 
         withPool(3) {
             assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), runForkJoin(numbers, mergeSortCode).toArray())
         }
-        withPool(1) {
+        withPool(2) {
             final TestSortWorker worker = new TestSortWorker(numbers)
             assertArrayEquals([1, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8].toArray(), runForkJoin(numbers, mergeSortCode).toArray())
             assert [] == worker.childrenResults
         }
     }
 
-    //todo fj migration
-
-    public void _testMergeSortWithException() {
+    public void testMergeSortWithException() {
         final def numbers = [1, 5, 2, 4, 'abc', 8, 6, 7, 3, 4, 5]
 
         withPool(3) {
@@ -101,9 +96,7 @@ abstract class ForkJoinBuilderTest extends GroovyTestCase {
         }
     }
 
-    //todo fj migration
-
-    public void _testMultipleArguments() {
+    public void testMultipleArguments() {
         final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5]
 
         withPool(3) {
@@ -118,9 +111,7 @@ abstract class ForkJoinBuilderTest extends GroovyTestCase {
         }
     }
 
-    //todo fj migration
-
-    public void _testIllegalArguments() {
+    public void testIllegalArguments() {
         withPool(3) {
             shouldFail(IllegalArgumentException) {
                 groovyx.gpars.GParsPool.runForkJoin()
@@ -152,9 +143,7 @@ abstract class ForkJoinBuilderTest extends GroovyTestCase {
         }
     }
 
-    //todo fj migration
-
-    public void _testForkOffChildIllegalArguments() {
+    public void testForkOffChildIllegalArguments() {
         final DataFlows df = new DataFlows()
 
         withPool(3) {
