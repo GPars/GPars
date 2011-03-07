@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ are placeholders for business operations.
 @author Dierk Koenig, Vaclav Pech
 */
 
-/** The constants that define the world context of the barber shop.   */
+/** The constants that define the world context of the barber shop.    */
 class Shop {
     static final shaveTime = 100
     static final seatCount = 3
@@ -61,11 +61,15 @@ class Customer extends DefaultActor {
 /**
  * The barber serves its customers and is therefore a classic daemon thread.
  */
+volatile boolean shopOpen = true
 def barber = Thread.startDaemon {
     final NO_MESSAGE = null
-    while (true) {
+    while (shopOpen) {
         // here is a gotcha if a customer enters the shop after the empty check but before the println!
-        if (Shop.seats.empty) println "sleeping"
+        if (Shop.seats.empty) {
+            println "sleeping"
+            sleep 100
+        }
         println Shop.seats.take().sendAndWait(NO_MESSAGE)
     }
 }
@@ -79,3 +83,4 @@ for (customer in customers) {
 }
 // make sure the simulation ends after all customers visited the shop
 customers*.join()
+shopOpen = false

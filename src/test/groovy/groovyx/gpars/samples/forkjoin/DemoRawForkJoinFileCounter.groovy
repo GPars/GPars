@@ -41,7 +41,7 @@ public class FJFileCounter extends RecursiveTask<Long> {
                 println "Forking a thread for $it"
                 def childCounter = new FJFileCounter(it)
                 childCounter.fork()
-                fileCounters << childCounter
+                fileCounters.add(0, childCounter)
             } else {
                 count++
             }

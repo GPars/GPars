@@ -18,7 +18,7 @@ package groovyx.gpars.samples.dataflow
 
 import static groovyx.gpars.GParsPool.withPool
 
- /**
+/**
  * Demonstrates the way to use asyncFun() to build composable asynchronous functions.
  * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
  * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
@@ -39,10 +39,10 @@ withPool {
     def fib
     fib = {n ->
         n <= 2 ? 1 : sum(fib(n - 2), fib(n - 1))
-    }.gmemoizeAtMost(3).asyncFun()
+    }.asyncFun()
 
     println "Starting the calculation"
-    final def result = fib(40)
+    final def result = fib(30)
     println "Now the calculation is running while we can do something else."
 
     sleep 1000
