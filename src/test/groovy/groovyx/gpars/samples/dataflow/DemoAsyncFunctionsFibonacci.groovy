@@ -38,7 +38,6 @@ withPool {
     def sum = {a, b -> a + b}.asyncFun()
     def fib
     fib = {n ->
-        Thread.yield()
         n <= 2 ? 1 : sum(fib(n - 2), fib(n - 1))
     }.gmemoizeAtMost(30).asyncFun()
 
