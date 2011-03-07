@@ -111,4 +111,28 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
             }
         }
     }
+
+    public void testError() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            Closure sPlus = {Integer a, Integer b ->
+                if (a == -1) throw new Error('test')
+                a + b
+            }
+
+            Closure sMultiply = {Integer a, Integer b ->
+                if (a == -1) throw new Error('test')
+                a * b
+            }
+
+            Closure aPlus = sPlus.asyncFun()
+            Closure aMultiply = sMultiply.asyncFun()
+
+            assert sMultiply(sPlus(10, 30), 100) == aMultiply(aPlus(10, 30), 100).val
+            assert aMultiply(aPlus(-1, 30), 100).val instanceof Error
+            assert aMultiply(aPlus(5, -6), 100).val instanceof Error
+            shouldFail(Error) {
+                assert aMultiply(aPlus(5, -6), 100).get()
+            }
+        }
+    }
 }

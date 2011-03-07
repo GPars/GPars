@@ -47,16 +47,18 @@ abstract class PAGroovyUtils {
             if (pooledThreadFlag) {
                 try {
                     result << original(* soFarArgs)
-                } catch (all) {
+                } catch (Throwable all) {
                     result << all
+                    if (all instanceof Error) throw all
                 }
             }
             else {
                 pool.execute({->
                     try {
                         result << original(* soFarArgs)
-                    } catch (all) {
+                    } catch (Throwable all) {
                         result << all
+                        if (all instanceof Error) throw all
                     }
                 })
             }

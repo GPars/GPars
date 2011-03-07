@@ -121,7 +121,7 @@ public class FJPool implements Pool {
      */
     @Override
     public void execute(final Runnable task) {
-        pool.submit(new FJRunnableTask(task));
+        pool.submit(task);
     }
 
     /**
