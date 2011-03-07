@@ -1336,7 +1336,6 @@ abstract class AbstractPAWrapper<T> {
  */
 private class CombineHolder {
 
-    @Delegate
     final Map content
 
     def CombineHolder(final content) {
@@ -1344,7 +1343,7 @@ private class CombineHolder {
     }
 
     final CombineHolder merge(CombineHolder other, final Closure accumulation, final Closure initialValue) {
-        for (item in other.entrySet()) {
+        for (item in other.content.entrySet()) {
             for (value in item.value) {
                 addToMap(item.key, value, accumulation, initialValue)
             }
