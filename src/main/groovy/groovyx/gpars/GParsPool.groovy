@@ -237,13 +237,13 @@ public class GParsPool {
 
         @Override protected Object compute() {
             myThread = Thread.currentThread()
+            if (isCancelled()) return null;  //making sure we've not been cancelled in the meantime
             code.call()
         }
 
         @Override
         boolean cancel(boolean mayInterruptIfRunning) {
             final boolean cancelled = super.cancel(mayInterruptIfRunning)
-            println "Cancelling " + cancelled
             if (mayInterruptIfRunning) myThread?.interrupt()
             return cancelled
         }
