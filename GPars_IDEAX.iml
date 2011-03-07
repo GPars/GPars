@@ -43,24 +43,8 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/extra166y-0.4.40-SNAPSHOT.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jsr166y-0.4.40-SNAPSHOT.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="Maven: org.codehaus.jsr166-mirror:jsr166y:0.4.40-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jsr166-mirror:extra166y:0.4.40-SNAPSHOT" level="project" />
   </component>
   <component name="copyright">
     <Base>
