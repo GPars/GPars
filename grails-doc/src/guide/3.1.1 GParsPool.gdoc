@@ -129,7 +129,8 @@ assert ['ALICE', 'JASON'] == selectImportantNames(names.makeTransparent())
 
 h3. Dependency resolution
 
-For the _GParsPool_ class to work, the "jsr166y" and the "extra166y" jar files, which are the artifacts of the "JSR-166 initiative":http://g.oswego.edu/dl/concurrency-interest/ must be on the classpath.
+For the _GParsPool_ class to work, the "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar and the "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar
+jar files, which are the artifacts of the "JSR-166 initiative":http://g.oswego.edu/dl/concurrency-interest/ , must be on the classpath.
 
 {code}
 <dependency>
@@ -144,7 +145,8 @@ For the _GParsPool_ class to work, the "jsr166y" and the "extra166y" jar files, 
 </dependency>
 {code}
 
-GPars defines both of the dependencies in its descriptor, so both dependencies should be taken care of automatically, if you use Maven, Ivy, Gradle or other type of automatic dependency resolution tool.
+GPars defines both of the dependencies in its own descriptor, so both dependencies should be taken care of automatically,
+if you use Maven, Ivy, Gradle or other type of automatic dependency resolution tool.
 
 h2. Avoid side-effects in functions
 
