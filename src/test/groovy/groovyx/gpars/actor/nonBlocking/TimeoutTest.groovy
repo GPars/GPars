@@ -150,7 +150,7 @@ public class TimeoutTest extends GroovyTestCase {
         final def actor = actor {
             loop {
                 barrier.await()
-                react(1000) {
+                react(5000) {
                     codeCounter.incrementAndGet()
                 }
             }
@@ -165,7 +165,7 @@ public class TimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
-        actor.stop()
+        actor.terminate()
         assertEquals(2, codeCounter.get())
         assert timeoutFlag.get()
     }

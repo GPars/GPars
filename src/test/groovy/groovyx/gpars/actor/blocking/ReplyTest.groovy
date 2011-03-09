@@ -83,7 +83,7 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         completedBarrier.await()
-        bouncer.stop()
+        bouncer.terminate()
 
         assertEquals([1, 2], replies1)
         assertEquals([10, 20], replies2)
@@ -147,8 +147,8 @@ public class ReplyTest extends GroovyTestCase {
         }
 
         completedBarrier.await()
-        incrementor.stop()
-        decrementor.stop()
+        incrementor.terminate()
+        decrementor.terminate()
         assertEquals 4, replies1.size()
         assert replies1.containsAll([3, 5, 4, 8])
         assertEquals 4, replies2.size()

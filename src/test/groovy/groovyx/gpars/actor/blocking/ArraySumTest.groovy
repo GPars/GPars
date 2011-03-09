@@ -44,7 +44,7 @@ public class ArraySumTest extends GroovyTestCase {
                 result.set it[0]
                 latch.countDown()
             }
-            stop()
+            terminate()
         }
 
         latch.await(90, TimeUnit.SECONDS)
@@ -89,7 +89,7 @@ class Processor extends AbstractPooledActor {
                     new Processor(replyActor, parallelGroup).start().send(splitList2)
             }
         }
-        stop()
+        terminate()
     }
 
     private split(List<Integer> list) {
@@ -115,7 +115,7 @@ class ReplyActor extends AbstractPooledActor {
 
         2.times { sum += receive()}
         parent.send([sum])
-        stop()
+        terminate()
     }
 }
 class ArrayCalculator extends AbstractPooledActor {
@@ -137,6 +137,6 @@ class ArrayCalculator extends AbstractPooledActor {
             result.set it[0]
             latch.countDown()
         }
-        stop()
+        terminate()
     }
 }
