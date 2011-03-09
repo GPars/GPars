@@ -92,7 +92,7 @@ public class FJPool implements Pool {
      */
     @Override
     public final void resize(final int poolSize) {
-        throw new UnsupportedOperationException("ForkJoin pools can't be resized");
+        throw new UnsupportedOperationException("ForkJoin pools can't change size");
     }
 
     /**
