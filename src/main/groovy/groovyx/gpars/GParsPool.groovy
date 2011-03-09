@@ -235,7 +235,8 @@ public class GParsPool {
             this.code = code
         }
 
-        @Override protected Object compute() {
+        @Override
+        Object compute() {
             myThread = Thread.currentThread()
             if (isCancelled()) return null;  //making sure we've not been cancelled in the meantime
             code.call()

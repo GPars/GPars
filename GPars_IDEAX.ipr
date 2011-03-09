@@ -5683,7 +5683,6 @@
         <inspection_tool class="UnnecessaryOverridingMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnnecessaryReturn" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnnecessaryReturnJS" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="UnnecessaryReturnKeyword" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnnecessaryStringInstantiation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnnecessaryTemporaryOnConversionFromString" enabled="false" level="WARNING" enabled_by_default="false" />
