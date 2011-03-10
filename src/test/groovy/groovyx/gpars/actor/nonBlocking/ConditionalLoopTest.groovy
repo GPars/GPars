@@ -121,7 +121,6 @@ import static groovyx.gpars.actor.Actors.actor
             loop({-> counter < 5}) {
                 counter++
                 result++
-                println 'Foo ' + counter
                 stop()
             }
 //            result = 100
@@ -135,7 +134,6 @@ import static groovyx.gpars.actor.Actors.actor
         def actor = actor {
             loop(5) {
                 result++
-                println 'Foo ' + result
                 stop()
             }
 //            result = 100
