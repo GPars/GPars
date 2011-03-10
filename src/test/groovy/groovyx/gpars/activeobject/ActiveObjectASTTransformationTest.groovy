@@ -19,7 +19,7 @@ package groovyx.gpars.activeobject
 import groovyx.gpars.dataflow.DataFlowVariable
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-public abstract class ActiveObjectASTTransformationTest extends GroovyTestCase {
+public class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
         assert actor.active
@@ -373,7 +373,7 @@ new Decryptor()
         assert -10 == decryptor.decrypt(10)
     }
 
-    public void testActiveMethodCallingNonActiveMethod() {
+    public void _testActiveMethodCallingNonActiveMethod() {
         final GroovyShell shell = new GroovyShell()
         def a = shell.evaluate("""
 import groovyx.gpars.activeobject.ActiveObject
