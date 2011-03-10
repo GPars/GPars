@@ -126,10 +126,13 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
         final def actor = actor {
+            int counter = 0
             loop {
                 use(TimeCategory) {
                     barrier.await()
-                    react(5.seconds) {
+                    counter++
+                    if (counter == 3) terminate()
+                    else react(5.seconds) {
                         codeCounter.incrementAndGet()
                     }
                 }
@@ -145,7 +148,6 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
-        actor.terminate()
         assertEquals(2, codeCounter.get())
         assert timeoutFlag.get()
     }

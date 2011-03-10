@@ -43,7 +43,7 @@ public class TimeoutTest extends GroovyTestCase {
             react(1000) {
                 if (it == Actor.TIMEOUT) timeoutFlag.set(true)
                 barrier.await()
-                stop()
+                terminate()
             }
         }
 
@@ -93,7 +93,7 @@ public class TimeoutTest extends GroovyTestCase {
             loop {
                 react(1000) {
                     barrier.await()
-                    stop()
+                    terminate()
                 }
             }
         }
@@ -196,7 +196,6 @@ public class TimeoutTest extends GroovyTestCase {
         assert exceptionFlag.get()
         actor.join()
         assert !actor.isActive()
-
     }
 }
 
