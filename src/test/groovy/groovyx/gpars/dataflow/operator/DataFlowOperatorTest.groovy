@@ -259,36 +259,36 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         final DataFlowQueue c = new DataFlowQueue()
         final DataFlowQueue d = new DataFlowQueue()
 
-        shouldFail(IllegalArgumentException) {
-            group.operator(inputs: [a, b, c], outputs: [d]) {v -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            group.operator(inputs: [a, b], outputs: [d]) {v -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            group.operator(inputs: [a, b], outputs: [d]) {x, y, z -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            group.operator(inputs: [a, b], outputs: [d]) {}
-        }
-        shouldFail(IllegalArgumentException) {
-            group.operator(inputs: [a], outputs: [d]) {x, y -> }
-        }
-        shouldFail(IllegalArgumentException) {
-            group.operator(inputs: [], outputs: [d]) { }
-        }
-        shouldFail(IllegalArgumentException) {
-            group.operator(inputs: [a], outputs: [d]) {-> }
+        group.with {
+            shouldFail(IllegalArgumentException) {
+                operator(inputs: [a, b, c], outputs: [d]) {v -> }
+            }
+            shouldFail(IllegalArgumentException) {
+                operator(inputs: [a, b], outputs: [d]) {v -> }
+            }
+            shouldFail(IllegalArgumentException) {
+                operator(inputs: [a, b], outputs: [d]) {x, y, z -> }
+            }
+            shouldFail(IllegalArgumentException) {
+                operator(inputs: [a, b], outputs: [d]) {}
+            }
+            shouldFail(IllegalArgumentException) {
+                operator(inputs: [a], outputs: [d]) {x, y -> }
+            }
+            shouldFail(IllegalArgumentException) {
+                operator(inputs: [], outputs: [d]) { }
+            }
+            shouldFail(IllegalArgumentException) {
+                operator(inputs: [a], outputs: [d]) {-> }
+            }
+            def op1 = operator(inputs: [a], outputs: [d]) { }
+            op1.stop()
+            op1 = operator(inputs: [a], outputs: [d]) {x -> }
+            op1.stop()
+            op1 = operator(inputs: [a, b], outputs: [d]) {x, y -> }
+            op1.stop()
         }
 
-        def op1 = group.operator(inputs: [a], outputs: [d]) { }
-        op1.stop()
-
-        op1 = group.operator(inputs: [a], outputs: [d]) {x -> }
-        op1.stop()
-
-        op1 = group.operator(inputs: [a, b], outputs: [d]) {x, y -> }
-        op1.stop()
     }
 
     public void testOutputNumber() {

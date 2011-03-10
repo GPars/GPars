@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package groovyx.gpars.pa;
 
+import extra166y.Ops;
 import groovy.lang.Closure;
-import jsr166y.forkjoin.Ops;
 
 /**
  * A PA mapper built around a closure
  *
  * @author Vaclav Pech
  */
-public final class ClosureMapper implements Ops.Mapper<Object, Object> {
+public final class ClosureMapper implements Ops.Op<Object, Object> {
     private final Closure code;
 
     public ClosureMapper(final Closure code) {
@@ -32,7 +32,7 @@ public final class ClosureMapper implements Ops.Mapper<Object, Object> {
     }
 
     @Override
-    public Object map(final Object o) {
+    public Object op(final Object o) {
         return code.call(o);
     }
 }

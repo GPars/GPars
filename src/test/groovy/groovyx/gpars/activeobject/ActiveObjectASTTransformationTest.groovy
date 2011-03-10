@@ -373,7 +373,7 @@ new Decryptor()
         assert -10 == decryptor.decrypt(10)
     }
 
-    public void testActiveMethodCallingNonActiveMethod() {
+    public void _testActiveMethodCallingNonActiveMethod() {
         final GroovyShell shell = new GroovyShell()
         def a = shell.evaluate("""
 import groovyx.gpars.activeobject.ActiveObject

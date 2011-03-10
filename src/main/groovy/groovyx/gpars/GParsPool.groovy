@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
-import jsr166y.forkjoin.ForkJoinPool
-import jsr166y.forkjoin.RecursiveTask
+import jsr166y.ForkJoinPool
+import jsr166y.RecursiveTask
 
 /**
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
@@ -71,8 +71,7 @@ public class GParsPool {
 
     private static createPool(int poolSize, UncaughtExceptionHandler handler) {
         if (!(poolSize in 1..Integer.MAX_VALUE)) throw new IllegalArgumentException("Invalid value $poolSize for the pool size has been specified. Please supply a positive int number.")
-        final jsr166y.forkjoin.ForkJoinPool pool = new jsr166y.forkjoin.ForkJoinPool(poolSize)
-        pool.uncaughtExceptionHandler = handler
+        final jsr166y.ForkJoinPool pool = new jsr166y.ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, handler, false)
         return pool
     }
 
@@ -136,7 +135,7 @@ public class GParsPool {
      * @param cl The block of code to invoke with the DSL enabled
      */
     public static withPool(int numberOfThreads, UncaughtExceptionHandler handler, Closure cl) {
-        final jsr166y.forkjoin.ForkJoinPool pool = createPool(numberOfThreads, handler)
+        final jsr166y.ForkJoinPool pool = createPool(numberOfThreads, handler)
         try {
             return withExistingPool(pool, cl)
         } finally {
@@ -161,7 +160,7 @@ public class GParsPool {
      *}*  </pre>
      * @param pool The thread pool to use, the pool will not be shutdown after this method returns
      */
-    public static withExistingPool(jsr166y.forkjoin.ForkJoinPool pool, Closure cl) {
+    public static withExistingPool(jsr166y.ForkJoinPool pool, Closure cl) {
 
         currentPoolStack << pool
         def result = null
@@ -179,7 +178,7 @@ public class GParsPool {
      * Just like withExistingPool() registers a thread pool, but doesn't install the GParsPoolUtil category.
      * Used by ParallelEnhancer's Parallel mixins. 
      */
-    static ensurePool(final jsr166y.forkjoin.ForkJoinPool pool, final Closure cl) {
+    static ensurePool(final jsr166y.ForkJoinPool pool, final Closure cl) {
         currentPoolStack << pool
         try {
             return cl(pool)
@@ -220,14 +219,37 @@ public class GParsPool {
      * @return Futures for the result values or exceptions of all closures
      */
     public static List<Future<Object>> executeAsync(Closure... closures) {
-        jsr166y.forkjoin.ForkJoinPool pool = retrieveCurrentPool()
+        jsr166y.ForkJoinPool pool = retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("No active Fork/Join thread pool available to execute closures asynchronously. Consider wrapping the function call with GParsPool.withPool().")
         List<Future<Object>> result = closures.collect {cl ->
-            pool.submit([compute: { cl.call() }] as RecursiveTask)
+            pool.submit(new MyCancellableRecursiveTask(cl))
         }
         result
     }
 
+    final static class MyCancellableRecursiveTask extends RecursiveTask {
+        private final def code
+        private volatile Thread myThread
+
+        MyCancellableRecursiveTask(final code) {
+            this.code = code
+        }
+
+        @Override
+        Object compute() {
+            myThread = Thread.currentThread()
+            if (isCancelled()) return null;  //making sure we've not been cancelled in the meantime
+            code.call()
+        }
+
+        @Override
+        boolean cancel(boolean mayInterruptIfRunning) {
+            final boolean cancelled = super.cancel(mayInterruptIfRunning)
+            if (mayInterruptIfRunning) myThread?.interrupt()
+            return cancelled
+        }
+
+    }
     /**
      * Starts multiple closures in separate threads, collecting Futures for their return values
      * Reuses the pool defined by the surrounding withPool() call.

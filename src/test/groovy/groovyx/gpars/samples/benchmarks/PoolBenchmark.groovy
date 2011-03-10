@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package groovyx.gpars.samples.benchmarks
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.FJPool
 import groovyx.gpars.scheduler.Pool
-import groovyx.gpars.scheduler.ResizeableFJPool
 import groovyx.gpars.scheduler.ResizeablePool
 import groovyx.gpars.scheduler.Scheduler
 import java.util.concurrent.CyclicBarrier
@@ -47,9 +46,9 @@ meassurePool(numOfWarmupIterations, items, new FJPool(3))
 time = meassurePool(numOfIterations, items, new FJPool(3))
 println "FJ Pool $time"
 
-meassurePool(numOfWarmupIterations, items, new ResizeableFJPool(3))
-time = meassurePool(numOfIterations, items, new ResizeableFJPool(3))
-println "Resizeable FJ Pool $time"
+meassurePool(numOfWarmupIterations, items, new FJPool(30))
+time = meassurePool(numOfIterations, items, new FJPool(30))
+println "Big FJ Pool $time"
 
 meassurePool(numOfWarmupIterations, items, new Scheduler(3))
 time = meassurePool(numOfIterations, items, new Scheduler(3))

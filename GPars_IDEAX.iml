@@ -17,15 +17,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jsr166y-070108.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/netty-3.1.5.GA.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -52,6 +43,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: org.codehaus.jsr166-mirror:jsr166y:0.4.40-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jsr166-mirror:extra166y:0.4.40-SNAPSHOT" level="project" />
   </component>
   <component name="copyright">
     <Base>

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlowQueue
-import jsr166y.forkjoin.AsyncAction
+import jsr166y.RecursiveAction
 
 /**
  * @author Vaclav Pech
@@ -66,7 +66,7 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
     public void testThreading() {
         groovyx.gpars.GParsPool.withPool(1) {pool ->
             def results = new DataFlowQueue()
-            pool.submit([compute:{results << Thread.currentThread();finish()}] as AsyncAction)
+            pool.submit([compute: {results << Thread.currentThread(); complete()}] as RecursiveAction)
             def t = results.val
 
             Closure sPlus = {Integer a, Integer b ->
@@ -107,6 +107,30 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
             assert aMultiply(aPlus(-1, 30), 100).val instanceof RuntimeException
             assert aMultiply(aPlus(5, -6), 100).val instanceof RuntimeException
             shouldFail(RuntimeException) {
+                assert aMultiply(aPlus(5, -6), 100).get()
+            }
+        }
+    }
+
+    public void testError() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            Closure sPlus = {Integer a, Integer b ->
+                if (a == -1) throw new Error('test')
+                a + b
+            }
+
+            Closure sMultiply = {Integer a, Integer b ->
+                if (a == -1) throw new Error('test')
+                a * b
+            }
+
+            Closure aPlus = sPlus.asyncFun()
+            Closure aMultiply = sMultiply.asyncFun()
+
+            assert sMultiply(sPlus(10, 30), 100) == aMultiply(aPlus(10, 30), 100).val
+            assert aMultiply(aPlus(-1, 30), 100).val instanceof Error
+            assert aMultiply(aPlus(5, -6), 100).val instanceof Error
+            shouldFail(Error) {
                 assert aMultiply(aPlus(5, -6), 100).get()
             }
         }

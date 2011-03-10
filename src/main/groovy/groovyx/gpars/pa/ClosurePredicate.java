@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package groovyx.gpars.pa;
 
+import extra166y.Ops;
 import groovy.lang.Closure;
-import jsr166y.forkjoin.Ops;
 
 /**
  * A PA predicate built around a closure
@@ -32,7 +32,7 @@ public final class ClosurePredicate implements Ops.Predicate<Object> {
     }
 
     @Override
-    public boolean evaluate(final Object o) {
+    public boolean op(final Object o) {
         return (Boolean) code.call(o);
     }
 }

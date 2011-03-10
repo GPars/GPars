@@ -14,29 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.actor.nonBlocking
+package groovyx.gpars.samples.forkjoin
 
-import groovyx.gpars.actor.Actors
-import java.util.concurrent.CountDownLatch
+import jsr166y.ForkJoinPool
+import jsr166y.ForkJoinTask
+import jsr166y.RecursiveTask
 
-public class RepeatLoopTest extends GroovyTestCase {
+class Fibonacci extends RecursiveTask<Integer> {
+    final int n;
 
-    public void testLoopWithoutReact() {
-        volatile int count = 0
-        final CountDownLatch latch = new CountDownLatch(1)
+    Fibonacci(int n) { this.n = n; }
 
-        Actors.actor {
-            loop {
-                if (count == 10) {
-                    latch.countDown()
-                    terminate()
-                    return
-                }
-                count += 1
-            }
-        }
-
-        latch.await()
-        assertEquals 10, count
+    Integer compute() {
+        if (n <= 1)
+            return n;
+        Fibonacci f1 = new Fibonacci(n - 1);
+        Fibonacci f2 = new Fibonacci(n - 2);
+        f1.fork();
+        f2.fork()
+        return f2.join() + f1.join();  //The order matters here
     }
 }
+
+final ForkJoinPool pool = new ForkJoinPool(3)
+final ForkJoinTask<java.lang.Integer> result = pool.submit(new Fibonacci(10))
+println result.get()

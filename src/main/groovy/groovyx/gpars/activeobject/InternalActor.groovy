@@ -70,7 +70,7 @@ public final class InternalActor extends DynamicDispatchActor {
             String methodName = msg[1]
             Object[] args = msg.size() > 2 ? msg[2..-1] : new Object[0]
             return target."${METHOD_NAME_PREFIX + methodName}"(* args)
-        } catch (all) {
+        } catch (Throwable all) {
             return all
         }
     }

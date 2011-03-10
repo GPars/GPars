@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package groovyx.gpars.forkjoin;
 
-import jsr166y.forkjoin.RecursiveTask;
+import jsr166y.RecursiveTask;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +36,7 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
     /**
      * Stores the child workers
      */
-    private Collection<AbstractForkJoinWorker<T>> children = null;
+    private List<AbstractForkJoinWorker<T>> children = null;
 
     protected AbstractForkJoinWorker() {
     }
@@ -69,12 +69,14 @@ public abstract class AbstractForkJoinWorker<T> extends RecursiveTask<T> {
      *
      * @return A list of results returned from the child tasks
      */
+    @SuppressWarnings({"unchecked"})
     public final List<T> getChildrenResults() {
         if (children == null) return Collections.emptyList();
-        final List<T> results = new ArrayList<T>(children.size());
-        for (final AbstractForkJoinWorker<T> worker : children) {
-            results.add(worker.join());
+        final T[] results = (T[]) new Object[children.size()];
+        for (int i = children.size() - 1; i >= 0; i--) {  //Forks and joins have to be processed in reverse order from one another
+            final AbstractForkJoinWorker<T> worker = children.get(i);
+            results[i] = worker.join();
         }
-        return results;
+        return Arrays.asList(results);
     }
 }

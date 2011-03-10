@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package groovyx.gpars.scheduler;
 
 import groovyx.gpars.util.PoolUtils;
-import jsr166y.forkjoin.ForkJoinPool;
+import jsr166y.ForkJoinPool;
 
 import java.util.concurrent.TimeUnit;
 
@@ -73,16 +73,16 @@ public class FJPool implements Pool {
     private static ForkJoinPool createPool(final int poolSize) {
         assert poolSize > 0;
 
-        final ForkJoinPool pool = new ForkJoinPool(poolSize);
-        pool.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        final Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
             @Override
             @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
             public void uncaughtException(final Thread t, final Throwable e) {
                 System.err.println(Pool.UNCAUGHT_EXCEPTION_OCCURRED_IN_ACTOR_POOL + t.getName());
                 e.printStackTrace(System.err);
             }
-        });
-        return pool;
+        };
+
+        return new ForkJoinPool(poolSize, ForkJoinPool.defaultForkJoinWorkerThreadFactory, uncaughtExceptionHandler, false);
     }
 
     /**
@@ -92,8 +92,7 @@ public class FJPool implements Pool {
      */
     @Override
     public final void resize(final int poolSize) {
-        PoolUtils.checkValidPoolSize(poolSize);
-        pool.setPoolSize(poolSize);
+        throw new UnsupportedOperationException("ForkJoin pools can't change size");
     }
 
     /**
@@ -121,7 +120,7 @@ public class FJPool implements Pool {
      */
     @Override
     public void execute(final Runnable task) {
-        pool.submit(new FJRunnableTask(task));
+        pool.submit(task);
     }
 
     /**

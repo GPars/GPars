@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.forkjoin
 
 import groovyx.gpars.GParsPool
-import jsr166y.forkjoin.RecursiveTask
+import jsr166y.RecursiveTask
 
 /**
  * Shows use of the ForkJoin mechanics to count files recursively in a directory.
@@ -41,7 +41,7 @@ public class FJFileCounter extends RecursiveTask<Long> {
                 println "Forking a thread for $it"
                 def childCounter = new FJFileCounter(it)
                 childCounter.fork()
-                fileCounters << childCounter
+                fileCounters.add(0, childCounter)
             } else {
                 count++
             }

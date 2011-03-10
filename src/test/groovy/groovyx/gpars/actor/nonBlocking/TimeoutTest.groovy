@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class TimeoutTest extends GroovyTestCase {
             react(1000) {
                 if (it == Actor.TIMEOUT) timeoutFlag.set(true)
                 barrier.await()
-                stop()
+                terminate()
             }
         }
 
@@ -59,7 +59,7 @@ public class TimeoutTest extends GroovyTestCase {
             react(1000) {
                 if (it == 'TIMEOUT') timeoutFlag.set(true)
                 barrier.await()
-                stop()
+                terminate()
             }
         }
 
@@ -76,7 +76,7 @@ public class TimeoutTest extends GroovyTestCase {
                 react(1000) {
                     if (it == Actor.TIMEOUT) timeoutFlag.set(true)
                     barrier.await()
-                    stop()
+                    terminate()
                 }
             }
         }
@@ -93,7 +93,7 @@ public class TimeoutTest extends GroovyTestCase {
             loop {
                 react(1000) {
                     barrier.await()
-                    stop()
+                    terminate()
                 }
             }
         }
@@ -121,7 +121,7 @@ public class TimeoutTest extends GroovyTestCase {
                     react(1000) {
                         nestedCodeFlag.set(true)
                         nestedMessage = it
-                        stop()
+                        terminate()
                     }
                 }
             }
@@ -148,9 +148,12 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
         final def actor = actor {
+            int count = 0
             loop {
                 barrier.await()
-                react(1000) {
+                count++
+                if (count == 3) terminate()
+                else react(1000) {
                     codeCounter.incrementAndGet()
                 }
             }
@@ -165,7 +168,6 @@ public class TimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
-        actor.stop()
         assertEquals(2, codeCounter.get())
         assert timeoutFlag.get()
     }
@@ -183,7 +185,7 @@ public class TimeoutTest extends GroovyTestCase {
         })
 
         actor.metaClass {
-            onException = {exceptionFlag.set(true); barrier.await()}
+            onException = {exceptionFlag.set(true); barrier.await(); terminate()}
         }
 
         actor.start()
@@ -192,10 +194,8 @@ public class TimeoutTest extends GroovyTestCase {
 
         assertEquals(0, codeCounter.get())
         assert exceptionFlag.get()
-        actor.stop()
         actor.join()
         assert !actor.isActive()
-
     }
 }
 

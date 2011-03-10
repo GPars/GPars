@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package groovyx.gpars.forkjoin;
 
-import jsr166y.forkjoin.ForkJoinExecutor;
-import jsr166y.forkjoin.ForkJoinTask;
+import jsr166y.ForkJoinPool;
+import jsr166y.ForkJoinTask;
 
 import java.util.concurrent.ExecutionException;
 
@@ -30,14 +30,14 @@ public abstract class ForkJoinUtils {
     }
 
     @SuppressWarnings({"StaticMethodOnlyUsedInOneClass"})
-    public static <T> T runForkJoin(final ForkJoinExecutor pool, final ForkJoinTask<T> rootWorker) throws ExecutionException, InterruptedException {
+    public static <T> T runForkJoin(final ForkJoinPool pool, final ForkJoinTask<T> rootWorker) throws ExecutionException, InterruptedException {
         if (pool == null)
             throw new IllegalStateException("Cannot initialize ForkJoin. The pool has not been set. Perhaps, we're not inside a GParsPool.withPool() block.");
         return pool.submit(rootWorker).get();
     }
 
     @SuppressWarnings({"StaticMethodOnlyUsedInOneClass", "OverloadedVarargsMethod"})
-    public static <T> T runForkJoin(final ForkJoinExecutor pool, final Object... args) throws ExecutionException, InterruptedException {
+    public static <T> T runForkJoin(final ForkJoinPool pool, final Object... args) throws ExecutionException, InterruptedException {
         return runForkJoin(pool, new FJWorker<T>(args));
     }
 }

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,6 +98,8 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
                             codeFlag.set(true)
                             react(1.second) {
                                 nestedCodeFlag.set(true)
+                                barrier.await()
+                                terminate()
                             }
                         }
                     }
@@ -116,7 +118,6 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         assert codeFlag.get()
         assert nestedCodeFlag.get()
         assert timeoutFlag.get()
-        actor.stop()
     }
 
     public void testTimeoutInLoop() {
@@ -125,10 +126,13 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
         final def actor = actor {
+            int counter = 0
             loop {
                 use(TimeCategory) {
                     barrier.await()
-                    react(1.second) {
+                    counter++
+                    if (counter == 3) terminate()
+                    else react(5.seconds) {
                         codeCounter.incrementAndGet()
                     }
                 }
@@ -144,7 +148,6 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
-        actor.stop()
         assertEquals(2, codeCounter.get())
         assert timeoutFlag.get()
     }

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,31 +49,31 @@ class MyLoopActor extends DefaultActor {
 
 MyLoopActor actor = new MyLoopActor()
 
-actor.start()
+actor.with {
+    start()
 
-actor.send 1
-actor.send 1
-actor.send 1
-actor.send 1
-actor.send 1
-actor.send 0
-actor.send 2
-actor.send 2
-actor.send 2
-actor.send 2
-actor.send 2
-actor.send 0
-actor.send 3
-actor.send 3
-actor.send 3
-actor.send 3
-actor.send 0
-actor.send 0
+    send 1
+    send 1
+    send 1
+    send 1
+    send 1
+    send 0
+    send 2
+    send 2
+    send 2
+    send 2
+    send 2
+    send 0
+    send 3
+    send 3
+    send 3
+    send 3
+    send 0
+    send 0
 
-
-
-Thread.sleep 2000
-actor.send 4
-Thread.sleep 1000
-actor.stop()
+    Thread.sleep 2000
+    send 4
+    Thread.sleep 1000
+    stop()
+}
 

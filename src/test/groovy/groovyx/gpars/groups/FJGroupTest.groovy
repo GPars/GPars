@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008--2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.FJPool
 import java.util.concurrent.CountDownLatch
-import jsr166y.forkjoin.ForkJoinWorkerThread
+import jsr166y.ForkJoinWorkerThread
 
 public class FJGroupTest extends GroovyTestCase {
     public void testFJGroup() {
