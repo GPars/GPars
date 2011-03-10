@@ -19,7 +19,7 @@ package groovyx.gpars.activeobject
 import groovyx.gpars.dataflow.DataFlowVariable
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-public class ActiveObjectASTTransformationTest extends GroovyTestCase {
+public abstract class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActorIsActive() {
         final actor = new MyWrapper().internalActiveObjectActor
         assert actor.active
