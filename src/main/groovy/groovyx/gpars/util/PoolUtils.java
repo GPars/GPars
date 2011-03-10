@@ -32,7 +32,12 @@ public final class PoolUtils {
     }
 
     public static int retrieveDefaultPoolSize() {
-        return 8;
+        final String poolSizeValue = System.getProperty(PoolUtils.GPARS_POOLSIZE);
+        try {
+            return Integer.parseInt(poolSizeValue);
+        } catch (NumberFormatException ignored) {
+            return Runtime.getRuntime().availableProcessors() + 1;
+        }
     }
 
     public static void checkValidPoolSize(final int poolSize) {

@@ -425,7 +425,7 @@ public abstract class PGroup {
      * Shutdown the thread pool gracefully
      */
     protected void finalize() {
-//        this.threadPool.shutdown()
+        this.threadPool.shutdown()
         super.finalize()
     }
 }
