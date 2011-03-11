@@ -44,11 +44,11 @@ class B extends A {
 """)
         def result = a.foo()
         assert a.result.val != Thread.currentThread()
-        assert result.val == 10
+        assert result.val.val == 10
 
         result = b.foo()
         assert b.result.val != Thread.currentThread()
-        assert result.val == 10
+        assert result.val.val == 10
     }
 
     public void testDFVReturningMethodAsynchronously() {
