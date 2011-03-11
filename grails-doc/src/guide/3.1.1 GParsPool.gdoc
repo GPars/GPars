@@ -127,27 +127,6 @@ assert ['ALICE', 'JASON'] == selectImportantNames(names.makeTransparent())
 
 {code}
 
-h3. Dependency resolution
-
-For the _GParsPool_ class to work, the "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar and the "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar
-jar files, which are the artifacts of the "JSR-166 initiative":http://g.oswego.edu/dl/concurrency-interest/ , must be on the classpath.
-
-{code}
-<dependency>
-    <groupId>org.codehaus.jsr166-mirror</groupId>
-    <artifactId>jsr166y</artifactId>
-    <version>0.4.40-SNAPSHOT</version>
-</dependency>
-<dependency>
-    <groupId>org.codehaus.jsr166-mirror</groupId>
-    <artifactId>extra166y</artifactId>
-    <version>0.4.40-SNAPSHOT</version>
-</dependency>
-{code}
-
-GPars defines both of the dependencies in its own descriptor, so both dependencies should be taken care of automatically,
-if you use Maven, Ivy, Gradle or other type of automatic dependency resolution tool.
-
 h2. Avoid side-effects in functions
 
 We have to warn you. Since the closures that are provided to the parallel methods like _eachParallel()_ or _collectParallel()_ may be run in parallel, you have to make sure that each of the closures

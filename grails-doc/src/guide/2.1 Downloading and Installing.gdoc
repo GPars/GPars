@@ -1,4 +1,25 @@
 There are several ways to add GPars to your project. Either download and add all the jar files manually, specify a dependency in Maven, Ivy or Gradle build files or use Grape.
 If you're building a Grails or a Griffon application, you can leverage the appropriate plugins to fetch the jar files for you.
 
+h3. Dependency resolution
+
+_GPars_ requires two compulsory dependencies - the "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar and the "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar
+jar files, which are the artifacts of the "JSR-166 initiative":http://g.oswego.edu/dl/concurrency-interest/ . These must be on the classpath.
+
+{code}
+<dependency>
+    <groupId>org.codehaus.jsr166-mirror</groupId>
+    <artifactId>jsr166y</artifactId>
+    <version>0.4.40-SNAPSHOT</version>
+</dependency>
+<dependency>
+    <groupId>org.codehaus.jsr166-mirror</groupId>
+    <artifactId>extra166y</artifactId>
+    <version>0.4.40-SNAPSHOT</version>
+</dependency>
+{code}
+
+GPars defines both of the dependencies in its own descriptor, so both dependencies should be taken care of automatically,
+if you use Gradle, Maven, Ivy or other type of automatic dependency resolution tool.
+
 Please visit the "Integration page":http://gpars.codehaus.org/Integration of the project for details.
