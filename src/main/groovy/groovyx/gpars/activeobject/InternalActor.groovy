@@ -37,8 +37,8 @@ public final class InternalActor extends DynamicDispatchActor {
      */
     DataFlowVariable submit(Object... args) {
         def result = new DataFlowVariable()
-        if (this.currentThread == Thread.currentThread()) result << handleCurrentMessage(args)
-        else sendAndContinue(args) {result << it}
+        if (this.currentThread == Thread.currentThread()) result.bind(handleCurrentMessage(args))
+        else sendAndContinue(args) {result.bind(it)}
         return result
     }
 
