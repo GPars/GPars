@@ -70,31 +70,31 @@ class MakeTransparentTest extends GroovyTestCase {
     public void testNonTransparentAfterClone() {
         GParsPool.withPool {
             Collection c = [1, 2, 3, 4, 5].makeTransparent()
-            assert c.isTransparent()
-            assertFalse c.clone().isTransparent()
+            assert c.isConcurrent()
+            assertFalse c.clone().isConcurrent()
         }
     }
 
     public void testIsTransparentCheck() {
         def items = [1, 2, 3, 4, 5]
         shouldFail {
-            items.isTransparent()
+            items.isConcurrent()
         }
         shouldFail(IllegalStateException) {
             GParsPoolUtil.makeTransparent(items)
         }
         GParsPool.withPool {
-            assertFalse items.isTransparent()
-            assertFalse 'abc'.isTransparent()
-            assertTrue items.makeTransparent().isTransparent()
-            assertTrue items.isTransparent()
-            assertTrue 'abcde'.makeTransparent().isTransparent()
+            assertFalse items.isConcurrent()
+            assertFalse 'abc'.isConcurrent()
+            assertTrue items.makeTransparent().isConcurrent()
+            assertTrue items.isConcurrent()
+            assertTrue 'abcde'.makeTransparent().isConcurrent()
         }
 
-        assertTrue items.isTransparent()
-        assertTrue 'abcde'.isTransparent()
+        assertTrue items.isConcurrent()
+        assertTrue 'abcde'.isConcurrent()
         shouldFail {
-            assertTrue 'ab'.isTransparent()
+            assertTrue 'ab'.isConcurrent()
         }
 
         shouldFail(IllegalStateException) {

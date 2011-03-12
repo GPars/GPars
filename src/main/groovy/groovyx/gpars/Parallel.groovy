@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -308,18 +308,32 @@ final class Parallel {
     /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.
      */
-    public def boolean isTransparent() {return false}
+    public def boolean isConcurrent() {return false}
 
     /**
      * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
      * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
-     * After mixing-in, the isTransparent() method will return true.
+     * After mixing-in, the isConcurrent() method will return true.
      * Delegates to GParsPoolUtil.makeTransparent().
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
+    @Deprecated
     static Object makeTransparent(Object collection) {
+        makeConcurrent(collection)
+    }
+
+    /**
+     * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
+     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
+     * like eachParallel(), collectParallel() and such.
+     * After mixing-in, the isConcurrent() method will return true.
+     * Delegates to GParsPoolUtil.makeTransparent().
+     * @param collection The object to make transparent
+     * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
+     */
+    static Object makeConcurrent(Object collection) {
         GParsPoolUtil.makeTransparent(collection)
     }
 

@@ -310,21 +310,34 @@ public class GParsPoolUtil {
      * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
      * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
-     * After mixing-in, the isTransparent() method will return true.
+     * After mixing-in, the isConcurrent() method will return true.
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
+    @Deprecated
     public static Object makeTransparent(Object collection) {
-        if (!(collection.respondsTo('isTransparent'))) throw new IllegalStateException("Cannot make the object transparently parallel. Apparently we're not inside a GParsPool.withPool() block nor the collection hasn't been enhanced with ParallelEnhancer.enhance().")
+        makeConcurrent(collection)
+    }
+
+    /**
+     * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
+     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
+     * like eachParallel(), collectParallel() and such.
+     * After mixing-in, the isConcurrent() method will return true.
+     * @param collection The object to make transparent
+     * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
+     */
+    public static Object makeConcurrent(Object collection) {
+        if (!(collection.respondsTo('isConcurrent'))) throw new IllegalStateException("Cannot make the object transparently parallel. Apparently we're not inside a GParsPool.withPool() block nor the collection hasn't been enhanced with ParallelEnhancer.enhance().")
         //noinspection GroovyGetterCallCanBePropertyAccess
-        if (!collection.isTransparent()) collection.getMetaClass().mixin(TransparentParallel)
+        if (!collection.isConcurrent()) collection.getMetaClass().mixin(TransparentParallel)
         return collection
     }
 
     /**
      * Indicates whether the iterative methods like each() or collect() work have been altered to work concurrently.
      */
-    public static boolean isTransparent(Object collection) { false }
+    public static boolean isConcurrent(Object collection) { false }
 
     /**
      * Creates a Parallel Array out of the supplied collection/object and invokes the withMapping() method using the supplied

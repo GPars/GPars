@@ -49,7 +49,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
                 return false
             }
-            assertFalse result.isTransparent()
+            assertFalse result.isConcurrent()
         }
         assert map.keys().size() > 1
     }
@@ -63,7 +63,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
                 map[Thread.currentThread()] = ''
                 return false
             }
-            assertFalse result.isTransparent()
+            assertFalse result.isConcurrent()
         }
         assert map.keys().size() > 1
     }

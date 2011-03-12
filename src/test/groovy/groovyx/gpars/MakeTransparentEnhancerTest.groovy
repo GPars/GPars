@@ -29,21 +29,21 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     public void testIsTransparent() {
         def items1 = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance items1
-        assertFalse items1.isTransparent()
+        assertFalse items1.isConcurrent()
 
         def items2 = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance items2
-        assertTrue items2.makeTransparent().isTransparent()
+        assertTrue items2.makeTransparent().isConcurrent()
     }
 
     public void testIsTransparentWithString() {
         def items1 = '1abc'
         ParallelEnhancer.enhanceInstance items1
-        assertFalse items1.isTransparent()
+        assertFalse items1.isConcurrent()
 
         def items2 = '2abc'
         ParallelEnhancer.enhanceInstance items2
-        assertTrue items2.makeTransparent().isTransparent()
+        assertTrue items2.makeTransparent().isConcurrent()
     }
 
     public void testMakeTransparentAvailability() {
@@ -88,8 +88,8 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     public void testNonTransparentAfterClone() {
         GParsPool.withPool {
             Collection c = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent()
-            assert c.isTransparent()
-            assertFalse c.clone().isTransparent()
+            assert c.isConcurrent()
+            assertFalse c.clone().isConcurrent()
         }
     }
 
@@ -107,26 +107,26 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     public void testIsTransparentCheck() {
         def items = [1, 2, 3, 4, 5]
         shouldFail {
-            items.isTransparent()
+            items.isConcurrent()
         }
         shouldFail() {
             items.makeTransparent()
         }
         ParallelEnhancer.enhanceInstance(items)
-        assertFalse items.isTransparent()
+        assertFalse items.isConcurrent()
         shouldFail {
-            'abc'.isTransparent()
+            'abc'.isConcurrent()
         }
-        assertTrue items.makeTransparent().isTransparent()
-        assertTrue items.isTransparent()
+        assertTrue items.makeTransparent().isConcurrent()
+        assertTrue items.isConcurrent()
         def s = 'abcde'
         ParallelEnhancer.enhanceInstance(s)
-        assertTrue s.makeTransparent().isTransparent()
+        assertTrue s.makeTransparent().isConcurrent()
 
-        assertTrue items.isTransparent()
-        assertTrue 'abcde'.isTransparent()
+        assertTrue items.isConcurrent()
+        assertTrue 'abcde'.isConcurrent()
         shouldFail {
-            assertTrue 'ab'.isTransparent()
+            assertTrue 'ab'.isConcurrent()
         }
     }
 
