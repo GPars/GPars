@@ -25,7 +25,7 @@ import groovyx.gpars.ParallelEnhancer
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 ParallelEnhancer.enhanceInstance(list)
-list.makeTransparent()
+list.makeConcurrent()
 
 println list.collect {it * 2 }
 
@@ -45,18 +45,18 @@ println "Product: ${list.fold {a, b -> a * b}}"
 
 final String text = 'want to be so big'
 ParallelEnhancer.enhanceInstance text
-text.makeTransparent()
+text.makeConcurrent()
 println((text.collectParallel {it.toUpperCase()}).join())
 
 def animals = ['dog', 'ant', 'cat', 'whale']
 ParallelEnhancer.enhanceInstance animals
-animals.makeTransparent()
+animals.makeConcurrent()
 println(animals.any {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
 println(animals.every {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 
 //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
 // here use parallel implementation under the covers
-println animals.makeTransparent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
+println animals.makeConcurrent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
 
 /**
  * A function implemented using standard sequential collect() and findAll() methods.
@@ -68,4 +68,4 @@ def selectImportantNames(names) {
 def names = ['Joe', 'Alice', 'Dave', 'Jason']
 ParallelEnhancer.enhanceInstance(names)
 //The selectImportantNames() will process the name collections concurrently
-assert ['ALICE', 'JASON'] == selectImportantNames(names.makeTransparent())
+assert ['ALICE', 'JASON'] == selectImportantNames(names.makeConcurrent())

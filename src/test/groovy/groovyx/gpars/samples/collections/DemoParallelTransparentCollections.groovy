@@ -25,7 +25,7 @@ import groovyx.gpars.GParsPool
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 GParsPool.withPool {
-    list.makeTransparent()
+    list.makeConcurrent()
     println list.collectParallel {it * 2 }
 
     list.iterator().eachParallel {
@@ -42,16 +42,16 @@ GParsPool.withPool {
     println((text.collectParallel {it.toUpperCase()}).join())
 
     def animals = ['dog', 'ant', 'cat', 'whale']
-    animals.makeTransparent()
+    animals.makeConcurrent()
     println(animals.any {it ==~ /ant/} ? 'Found an ant' : 'No ants found')
     println(animals.every {it.contains('a')} ? 'All animals contain a' : 'Some animals can live without an a')
 
     //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
     // here use parallel implementation under the covers
-    println animals.makeTransparent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
+    println animals.makeConcurrent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
 
     //The selectImportantNames() will process the name collections concurrently
-    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeTransparent())
+    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeConcurrent())
 }
 
 /**

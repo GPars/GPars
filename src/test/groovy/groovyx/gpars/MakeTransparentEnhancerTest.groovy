@@ -33,7 +33,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
         def items2 = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance items2
-        assertTrue items2.makeTransparent().isConcurrent()
+        assertTrue items2.makeConcurrent().isConcurrent()
     }
 
     public void testIsTransparentWithString() {
@@ -43,42 +43,42 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
         def items2 = '2abc'
         ParallelEnhancer.enhanceInstance items2
-        assertTrue items2.makeTransparent().isConcurrent()
+        assertTrue items2.makeConcurrent().isConcurrent()
     }
 
     public void testMakeTransparentAvailability() {
         shouldFail {
-            [].makeTransparent()
-            [1].makeTransparent()
-            'abcde'.makeTransparent()
+            [].makeConcurrent()
+            [1].makeConcurrent()
+            'abcde'.makeConcurrent()
         }
 
         def items = [1, 2, 3, 4, 5]
 
         shouldFail {
-            items.makeTransparent()
+            items.makeConcurrent()
         }
 
         ParallelEnhancer.enhanceInstance(items)
         shouldFail {
-            [1].makeTransparent()
+            [1].makeConcurrent()
         }
-        assert items == items.makeTransparent()
-        assertNotNull(items.makeTransparent())
-        assert items.makeTransparent() == items.makeTransparent().makeTransparent()
-        final def p1 = items.makeTransparent()
-        assert p1 == p1.makeTransparent()
+        assert items == items.makeConcurrent()
+        assertNotNull(items.makeConcurrent())
+        assert items.makeConcurrent() == items.makeConcurrent().makeConcurrent()
+        final def p1 = items.makeConcurrent()
+        assert p1 == p1.makeConcurrent()
 
         shouldFail {
-            [1].makeTransparent()
+            [1].makeConcurrent()
         }
     }
 
     public void testMakeTransparentTypeCompatibility() {
         Collection c1 = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5])
-        Collection c2 = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent()
+        Collection c2 = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent()
         String s1 = ParallelEnhancer.enhanceInstance('abcde')
-        String s2 = ParallelEnhancer.enhanceInstance('abcde').makeTransparent()
+        String s2 = ParallelEnhancer.enhanceInstance('abcde').makeConcurrent()
         assert !c1.isEmpty()
         assert !c2.isEmpty()
         assert !s1.isEmpty()
@@ -87,7 +87,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testNonTransparentAfterClone() {
         GParsPool.withPool {
-            Collection c = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent()
+            Collection c = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent()
             assert c.isConcurrent()
             assertFalse c.clone().isConcurrent()
         }
@@ -97,7 +97,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance items
-        items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
+        items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -110,18 +110,18 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
             items.isConcurrent()
         }
         shouldFail() {
-            items.makeTransparent()
+            items.makeConcurrent()
         }
         ParallelEnhancer.enhanceInstance(items)
         assertFalse items.isConcurrent()
         shouldFail {
             'abc'.isConcurrent()
         }
-        assertTrue items.makeTransparent().isConcurrent()
+        assertTrue items.makeConcurrent().isConcurrent()
         assertTrue items.isConcurrent()
         def s = 'abcde'
         ParallelEnhancer.enhanceInstance(s)
-        assertTrue s.makeTransparent().isConcurrent()
+        assertTrue s.makeConcurrent().isConcurrent()
 
         assertTrue items.isConcurrent()
         assertTrue 'abcde'.isConcurrent()
@@ -134,7 +134,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().makeTransparent().each {
+        items.makeConcurrent().makeConcurrent().each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -145,7 +145,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().groupBy {it % 2}.each {
+        items.makeConcurrent().groupBy {it % 2}.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -156,7 +156,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = 'abcde'
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().collect {it * 2}.findAll {it.size() > 1}.each {
+        items.makeConcurrent().collect {it * 2}.findAll {it.size() > 1}.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -167,7 +167,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5].iterator()
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
+        items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
             Thread.sleep 500
             map[Thread.currentThread()] = ''
         }
@@ -180,7 +180,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
         ParallelEnhancer.enhanceInstance(items)
         assertEquals 1, foo(items).keys().size()
-        assert foo(items.makeTransparent()).keys().size() > 1
+        assert foo(items.makeConcurrent()).keys().size() > 1
     }
 
     private def foo(Collection c) {
@@ -196,7 +196,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().min {a, b ->
+        items.makeConcurrent().min {a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a - b
@@ -208,7 +208,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().max {a, b ->
+        items.makeConcurrent().max {a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a - b
@@ -219,42 +219,42 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     public void testTransparentSum() {
         def items = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance(items)
-        assertEquals 15, items.makeTransparent().sum()
+        assertEquals 15, items.makeConcurrent().sum()
     }
 
     public void testTransparentCount() {
-        assertEquals 1, ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent().count(3)
-        assertEquals 5, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeTransparent().count(3)
-        assertEquals 0, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeTransparent().count(6)
-        assertEquals 0, ParallelEnhancer.enhanceInstance([]).makeTransparent().count(6)
-        assertEquals 1, ParallelEnhancer.enhanceInstance('abc2').makeTransparent().count('a')
-        assertEquals 3, ParallelEnhancer.enhanceInstance('abcaa2').makeTransparent().count('a')
-        assertEquals 0, ParallelEnhancer.enhanceInstance('ebc2').makeTransparent().count('a')
-        assertEquals 0, ParallelEnhancer.enhanceInstance('     '.trim()).makeTransparent().count('a')
+        assertEquals 1, ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent().count(3)
+        assertEquals 5, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeConcurrent().count(3)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeConcurrent().count(6)
+        assertEquals 0, ParallelEnhancer.enhanceInstance([]).makeConcurrent().count(6)
+        assertEquals 1, ParallelEnhancer.enhanceInstance('abc2').makeConcurrent().count('a')
+        assertEquals 3, ParallelEnhancer.enhanceInstance('abcaa2').makeConcurrent().count('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance('ebc2').makeConcurrent().count('a')
+        assertEquals 0, ParallelEnhancer.enhanceInstance('     '.trim()).makeConcurrent().count('a')
     }
 
     public void testSplit() {
-        def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeTransparent().split {it > 2}
+        def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent().split {it > 2}
         assert [3, 4, 5] as Set == result[0] as Set
         assert [1, 2] as Set == result[1] as Set
         assertEquals 2, result.size()
-        assert [[], []] == ParallelEnhancer.enhanceInstance([]).makeTransparent().split {it > 2}
-        result = ParallelEnhancer.enhanceInstance([3]).makeTransparent().split {it > 2}
+        assert [[], []] == ParallelEnhancer.enhanceInstance([]).makeConcurrent().split {it > 2}
+        result = ParallelEnhancer.enhanceInstance([3]).makeConcurrent().split {it > 2}
         assert [[3], []] == result
-        result = ParallelEnhancer.enhanceInstance([1]).makeTransparent().split {it > 2}
+        result = ParallelEnhancer.enhanceInstance([1]).makeConcurrent().split {it > 2}
         assert [[], [1]] == result
     }
 
     public void testSplitOnString() {
-        def result = ParallelEnhancer.enhanceInstance(new String('abc')).makeTransparent().split {it == 'b'}
+        def result = ParallelEnhancer.enhanceInstance(new String('abc')).makeConcurrent().split {it == 'b'}
         assert ['b'] as Set == result[0] as Set
         assert ['a', 'c'] as Set == result[1] as Set
         assertEquals 2, result.size()
-        result = ParallelEnhancer.enhanceInstance('').makeTransparent().split {it == 'b'}
+        result = ParallelEnhancer.enhanceInstance('').makeConcurrent().split {it == 'b'}
         assert [[], []] == result
-        result = ParallelEnhancer.enhanceInstance('b').makeTransparent().split {it == 'b'}
+        result = ParallelEnhancer.enhanceInstance('b').makeConcurrent().split {it == 'b'}
         assert [['b'], []] == result
-        result = ParallelEnhancer.enhanceInstance('a').makeTransparent().split {it == 'b'}
+        result = ParallelEnhancer.enhanceInstance('a').makeConcurrent().split {it == 'b'}
         assert [[], ['a']] == result
     }
 
@@ -262,7 +262,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().fold {a, b ->
+        items.makeConcurrent().fold {a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a + b
@@ -274,7 +274,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().fold(10) {a, b ->
+        items.makeConcurrent().fold(10) {a, b ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return a + b

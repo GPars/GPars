@@ -28,40 +28,40 @@ class MakeTransparentTest extends GroovyTestCase {
 
     public void testMakeTransparentAvailability() {
         shouldFail {
-            [].makeTransparent()
-            [1].makeTransparent()
-            'abcde'.makeTransparent()
+            [].makeConcurrent()
+            [1].makeConcurrent()
+            'abcde'.makeConcurrent()
         }
 
         def items = [1, 2, 3, 4, 5]
 
         shouldFail {
-            items.makeTransparent()
+            items.makeConcurrent()
         }
 
         GParsPool.withPool {
-            assertNotNull([1].makeTransparent())
-            assertNotNull('abcde'.makeTransparent())
-            assertEquals items, items.makeTransparent()
-            assertNotNull(items.makeTransparent())
-            assert items.makeTransparent() == items.makeTransparent().makeTransparent()
-            final def p1 = items.makeTransparent()
-            assert p1 == p1.makeTransparent()
+            assertNotNull([1].makeConcurrent())
+            assertNotNull('abcde'.makeConcurrent())
+            assertEquals items, items.makeConcurrent()
+            assertNotNull(items.makeConcurrent())
+            assert items.makeConcurrent() == items.makeConcurrent().makeConcurrent()
+            final def p1 = items.makeConcurrent()
+            assert p1 == p1.makeConcurrent()
         }
 
         shouldFail {
-            [1].makeTransparent()
+            [1].makeConcurrent()
         }
 
         shouldFail {
-            items.makeTransparent()
+            items.makeConcurrent()
         }
     }
 
     public void testMakeTransparentTypeCompatibility() {
         GParsPool.withPool {
-            Collection c = [1, 2, 3, 4, 5].makeTransparent()
-            String s = 'abcde'.makeTransparent()
+            Collection c = [1, 2, 3, 4, 5].makeConcurrent()
+            String s = 'abcde'.makeConcurrent()
             assert !c.isEmpty()
             assert s.size() > 0
         }
@@ -69,7 +69,7 @@ class MakeTransparentTest extends GroovyTestCase {
 
     public void testNonTransparentAfterClone() {
         GParsPool.withPool {
-            Collection c = [1, 2, 3, 4, 5].makeTransparent()
+            Collection c = [1, 2, 3, 4, 5].makeConcurrent()
             assert c.isConcurrent()
             assertFalse c.clone().isConcurrent()
         }
@@ -81,14 +81,14 @@ class MakeTransparentTest extends GroovyTestCase {
             items.isConcurrent()
         }
         shouldFail(IllegalStateException) {
-            GParsPoolUtil.makeTransparent(items)
+            GParsPoolUtil.makeConcurrent(items)
         }
         GParsPool.withPool {
             assertFalse items.isConcurrent()
             assertFalse 'abc'.isConcurrent()
-            assertTrue items.makeTransparent().isConcurrent()
+            assertTrue items.makeConcurrent().isConcurrent()
             assertTrue items.isConcurrent()
-            assertTrue 'abcde'.makeTransparent().isConcurrent()
+            assertTrue 'abcde'.makeConcurrent().isConcurrent()
         }
 
         assertTrue items.isConcurrent()
@@ -98,7 +98,7 @@ class MakeTransparentTest extends GroovyTestCase {
         }
 
         shouldFail(IllegalStateException) {
-            GParsPoolUtil.makeTransparent('abcdefgh2')
+            GParsPoolUtil.makeConcurrent('abcdefgh2')
         }
     }
 
@@ -108,7 +108,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().makeTransparent().each {
+            items.makeConcurrent().makeConcurrent().each {
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -122,7 +122,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
+            items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -134,7 +134,7 @@ class MakeTransparentTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeTransparent().groupBy {it % 2}.each {
+            items.makeConcurrent().groupBy {it % 2}.each {
                 Thread.sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -147,7 +147,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final Map map = new ConcurrentHashMap()
 
         GParsPool.withPool(5) {
-            items.makeTransparent().collect {it * 2}.findAll {it.size() > 1}.each {
+            items.makeConcurrent().collect {it * 2}.findAll {it.size() > 1}.each {
                 sleep 500
                 map[Thread.currentThread()] = ''
             }
@@ -161,7 +161,7 @@ class MakeTransparentTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().collect {it * 2}.findAll {it > 1}.each {
+            items.makeConcurrent().collect {it * 2}.findAll {it > 1}.each {
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -175,7 +175,7 @@ class MakeTransparentTest extends GroovyTestCase {
 
         GParsPool.withPool(5) {
             assertEquals 1, foo(items, 1).keys().size()
-            assert foo(items.makeTransparent(), 5).keys().size() == 5
+            assert foo(items.makeConcurrent(), 5).keys().size() == 5
         }
     }
 

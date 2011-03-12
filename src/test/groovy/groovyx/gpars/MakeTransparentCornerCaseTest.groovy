@@ -32,7 +32,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
         final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
         GParsPool.withPool(5) {
-            items.makeTransparent().eachParallel {
+            items.makeConcurrent().eachParallel {
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -44,7 +44,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            def result = items.makeTransparent().collectParallel {
+            def result = items.makeConcurrent().collectParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
@@ -58,7 +58,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            def result = items.makeTransparent().findAllParallel {
+            def result = items.makeConcurrent().findAllParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return false
@@ -72,7 +72,7 @@ class MakeTransparentCornerCaseTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeTransparent().groupByParallel {
+            items.makeConcurrent().groupByParallel {
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return 'a'

@@ -30,7 +30,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().eachParallel {
+        items.makeConcurrent().eachParallel {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
         }
@@ -41,7 +41,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        def result = items.makeTransparent().collectParallel {
+        def result = items.makeConcurrent().collectParallel {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return false
@@ -54,7 +54,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        def result = items.makeTransparent().findAllParallel {
+        def result = items.makeConcurrent().findAllParallel {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return false
@@ -67,7 +67,7 @@ class MakeTransparentCornerCaseEnhancerTest extends GroovyTestCase {
         def items = 'abcdefg1'
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().groupByParallel {
+        items.makeConcurrent().groupByParallel {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return 'a'

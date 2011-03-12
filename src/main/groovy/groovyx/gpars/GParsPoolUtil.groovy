@@ -313,6 +313,7 @@ public class GParsPoolUtil {
      * After mixing-in, the isConcurrent() method will return true.
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
+     * @deprecated Use makeConcurrent() instead
      */
     @Deprecated
     public static Object makeTransparent(Object collection) {

@@ -18,7 +18,7 @@ package groovyx.gpars
 
 /**
  * Enhances objects by being mixed-in either within a GParsPool.withPool() block or after enhancement by
- * the ParallelEnhancer through the makeTransparent() method.
+ * the ParallelEnhancer through the makeConcurrent() method.
  * It overrides the iterative methods, like each, collect and such to delegate to eachParallel, collectParallel
  * and other parallel iterative methods.
  * The collections returned from collect(), findAll() and grep() are again mixed with a TransparentParallel instance,
@@ -32,17 +32,17 @@ final class TransparentParallel {
 
     public def final eachWithIndex(Closure yield) { this.eachWithIndexParallel(yield)}
 
-    public def final collect(Closure yield) { this.collectParallel(yield).makeTransparent()}
+    public def final collect(Closure yield) { this.collectParallel(yield).makeConcurrent()}
 
     public def final find(Closure yield) { this.findParallel(yield)}
 
     public def final findAny(Closure yield) { this.findAnyParallel(yield)}
 
-    public def final findAll(Closure yield) { this.findAllParallel(yield).makeTransparent()}
+    public def final findAll(Closure yield) { this.findAllParallel(yield).makeConcurrent()}
 
-    public def final grep(filter) { this.grepParallel(filter).makeTransparent()}
+    public def final grep(filter) { this.grepParallel(filter).makeConcurrent()}
 
-    public def final split(Closure yield) { this.splitParallel(yield).makeTransparent()}
+    public def final split(Closure yield) { this.splitParallel(yield).makeConcurrent()}
 
     public def final count(filter) { this.countParallel(filter) }
 

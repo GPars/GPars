@@ -315,11 +315,11 @@ final class Parallel {
      * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
      * After mixing-in, the isConcurrent() method will return true.
-     * Delegates to GParsPoolUtil.makeTransparent().
+     * Delegates to GParsPoolUtil.makeConcurrent().
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
+     * @deprecated Use makeConcurrent() instead
      */
-    @Deprecated
     static Object makeTransparent(Object collection) {
         makeConcurrent(collection)
     }
@@ -329,12 +329,12 @@ final class Parallel {
      * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
      * After mixing-in, the isConcurrent() method will return true.
-     * Delegates to GParsPoolUtil.makeTransparent().
+     * Delegates to GParsPoolUtil.makeConcurrent().
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
     static Object makeConcurrent(Object collection) {
-        GParsPoolUtil.makeTransparent(collection)
+        GParsPoolUtil.makeConcurrent(collection)
     }
 
     /**

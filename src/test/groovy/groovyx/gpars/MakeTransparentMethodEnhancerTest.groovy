@@ -30,7 +30,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().each {
+        items.makeConcurrent().each {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
         }
@@ -41,7 +41,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().eachWithIndex {e, i ->
+        items.makeConcurrent().eachWithIndex {e, i ->
             Thread.sleep 100
             map[Thread.currentThread()] = ''
         }
@@ -52,7 +52,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().collect {
+        items.makeConcurrent().collect {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return it
@@ -64,7 +64,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().grep {
+        items.makeConcurrent().grep {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return true
@@ -76,7 +76,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().find {
+        items.makeConcurrent().find {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return false
@@ -88,7 +88,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().findAny {
+        items.makeConcurrent().findAny {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return false
@@ -100,7 +100,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().findAll {
+        items.makeConcurrent().findAll {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return true
@@ -112,7 +112,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().every {
+        items.makeConcurrent().every {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return true
@@ -124,7 +124,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().any {
+        items.makeConcurrent().any {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return false
@@ -136,7 +136,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = 'abcdefg'
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().any {
+        items.makeConcurrent().any {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return false
@@ -148,7 +148,7 @@ class MakeTransparentMethodEnhancerTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         ParallelEnhancer.enhanceInstance(items)
-        items.makeTransparent().groupBy {
+        items.makeConcurrent().groupBy {
             Thread.sleep 100
             map[Thread.currentThread()] = ''
             return it

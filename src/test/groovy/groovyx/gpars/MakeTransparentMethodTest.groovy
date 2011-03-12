@@ -33,7 +33,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().each {
+            items.makeConcurrent().each {
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -47,7 +47,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().eachWithIndex {e, i ->
+            items.makeConcurrent().eachWithIndex {e, i ->
                 barrier.await()
                 map[Thread.currentThread()] = ''
             }
@@ -61,7 +61,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().collect {
+            items.makeConcurrent().collect {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return it
@@ -76,7 +76,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().grep {
+            items.makeConcurrent().grep {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return true
@@ -91,7 +91,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().find {
+            items.makeConcurrent().find {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return false
@@ -106,7 +106,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().findAny {
+            items.makeConcurrent().findAny {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return false
@@ -121,7 +121,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().findAll {
+            items.makeConcurrent().findAll {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return true
@@ -135,7 +135,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final Map map = new ConcurrentHashMap()
         final CyclicBarrier barrier = new CyclicBarrier(5)
         GParsPool.withPool(5) {
-            items.makeTransparent().every {
+            items.makeConcurrent().every {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return true
@@ -150,7 +150,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().any {
+            items.makeConcurrent().any {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return false
@@ -163,7 +163,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = 'abcdefg'
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeTransparent().any {
+            items.makeConcurrent().any {
                 sleep 500
                 map[Thread.currentThread()] = ''
                 return false
@@ -178,7 +178,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(5)
 
         GParsPool.withPool(5) {
-            items.makeTransparent().groupBy {
+            items.makeConcurrent().groupBy {
                 barrier.await()
                 map[Thread.currentThread()] = ''
                 return it
@@ -191,7 +191,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeTransparent().min {a, b ->
+            items.makeConcurrent().min {a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a - b
@@ -204,7 +204,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeTransparent().max {a, b ->
+            items.makeConcurrent().max {a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a - b
@@ -216,48 +216,48 @@ class MakeTransparentMethodTest extends GroovyTestCase {
     public void testTransparentSum() {
         def items = [1, 2, 3, 4, 5]
         GParsPool.withPool(5) {
-            assertEquals 15, items.makeTransparent().sum()
+            assertEquals 15, items.makeConcurrent().sum()
         }
     }
 
     public void testCount() {
         GParsPool.withPool(5) {
-            assertEquals 1, [1, 2, 3, 4, 5].makeTransparent().count(3)
-            assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].makeTransparent().count(3)
-            assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].makeTransparent().count(6)
-            assertEquals 0, [].makeTransparent().count(6)
-            assertEquals 1, 'abc1'.makeTransparent().count('a')
-            assertEquals 3, 'abcaa1'.makeTransparent().count('a')
-            assertEquals 0, 'ebc1'.makeTransparent().count('a')
-            assertEquals 0, '  '.trim().makeTransparent().count('a')
+            assertEquals 1, [1, 2, 3, 4, 5].makeConcurrent().count(3)
+            assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].makeConcurrent().count(3)
+            assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].makeConcurrent().count(6)
+            assertEquals 0, [].makeConcurrent().count(6)
+            assertEquals 1, 'abc1'.makeConcurrent().count('a')
+            assertEquals 3, 'abcaa1'.makeConcurrent().count('a')
+            assertEquals 0, 'ebc1'.makeConcurrent().count('a')
+            assertEquals 0, '  '.trim().makeConcurrent().count('a')
         }
     }
 
     public void testSplit() {
         GParsPool.withPool(5) {
-            def result = [1, 2, 3, 4, 5].makeTransparent().split {it > 2}
+            def result = [1, 2, 3, 4, 5].makeConcurrent().split {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
             assertEquals 2, result.size()
-            assert [[], []] == [].makeTransparent().split {it > 2}
-            result = [3].makeTransparent().split {it > 2}
+            assert [[], []] == [].makeConcurrent().split {it > 2}
+            result = [3].makeConcurrent().split {it > 2}
             assert [[3], []] == result
-            result = [1].makeTransparent().split {it > 2}
+            result = [1].makeConcurrent().split {it > 2}
             assert [[], [1]] == result
         }
     }
 
     public void testSplitOnString() {
         GParsPool.withPool(5) {
-            def result = new String('abc').makeTransparent().split {it == 'b'}
+            def result = new String('abc').makeConcurrent().split {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
             assertEquals 2, result.size()
-            result = ''.makeTransparent().split {it == 'b'}
+            result = ''.makeConcurrent().split {it == 'b'}
             assert [[], []] == result
-            result = 'b'.makeTransparent().split {it == 'b'}
+            result = 'b'.makeConcurrent().split {it == 'b'}
             assert [['b'], []] == result
-            result = 'a'.makeTransparent().split {it == 'b'}
+            result = 'a'.makeConcurrent().split {it == 'b'}
             assert [[], ['a']] == result
         }
     }
@@ -266,7 +266,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeTransparent().fold {a, b ->
+            items.makeConcurrent().fold {a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a + b
@@ -279,7 +279,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
         def items = [1, 2, 3, 4, 5]
         final Map map = new ConcurrentHashMap()
         GParsPool.withPool(5) {
-            items.makeTransparent().fold(10) {a, b ->
+            items.makeConcurrent().fold(10) {a, b ->
                 Thread.sleep 100
                 map[Thread.currentThread()] = ''
                 return a + b
