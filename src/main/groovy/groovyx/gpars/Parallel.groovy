@@ -337,6 +337,20 @@ final class Parallel {
         GParsPoolUtil.makeConcurrent(collection)
     }
 
+    static Object makeSequential(Object collection) {
+        GParsPoolUtil.makeSequential(collection)
+        return collection
+    }
+
+    static void asConcurrent(Object collection, Closure code) {
+        GParsPoolUtil.asConcurrent(collection, code)
+    }
+
+    /**
+     * Empty as the default implementation doesn't need to do anything
+     */
+    static void setConcurrencyActive(Object collection, boolean flag) { }
+
     /**
      * Enhances to resulting collection so that parallel methods can be chained.
      */
