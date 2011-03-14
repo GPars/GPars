@@ -329,7 +329,7 @@ public class GParsPoolUtil {
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
     public static Object makeConcurrent(Object collection) {
-        if (!(collection.respondsTo('isConcurrent'))) throw new IllegalStateException("Cannot make the object transparently parallel. Apparently we're not inside a GParsPool.withPool() block nor the collection hasn't been enhanced with ParallelEnhancer.enhance().")
+        if (!(collection.respondsTo('isConcurrent'))) throw new IllegalStateException("Cannot make the object transparently parallel. Apparently we're not inside a GParsPool.withPool() block nor the collection has been enhanced with ParallelEnhancer.enhance().")
         //noinspection GroovyGetterCallCanBePropertyAccess
         if (!collection.isConcurrent()) collection.getMetaClass().mixin(TransparentParallel)
         return collection
