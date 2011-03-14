@@ -100,7 +100,7 @@ in a sequential way, let say using the _collect()_ method. By changing the seman
 GParsPool.withPool {
 
     //The selectImportantNames() will process the name collections concurrently
-    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeTransparent())
+    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeConcurrent())
 }
 
 /**
@@ -123,7 +123,7 @@ def selectImportantNames(names) {
 def names = ['Joe', 'Alice', 'Dave', 'Jason']
 ParallelEnhancer.enhanceInstance(names)
 //The selectImportantNames() will process the name collections concurrently
-assert ['ALICE', 'JASON'] == selectImportantNames(names.makeTransparent())
+assert ['ALICE', 'JASON'] == selectImportantNames(names.makeConcurrent())
 
 {code}
 
