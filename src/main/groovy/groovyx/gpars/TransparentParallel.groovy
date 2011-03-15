@@ -38,7 +38,7 @@ final class TransparentParallel {
 
     public def final find(Closure yield) { if (concurrencyActive) this.findParallel(yield); else (mixedIn[Object] as Object).find(yield)}
 
-    public def final findAny(Closure yield) { if (concurrencyActive) this.findAnyParallel(yield); else (mixedIn[Object] as Object).findAny(yield)}
+    public def final findAny(Closure yield) { if (concurrencyActive) this.findAnyParallel(yield); else (mixedIn[Object] as Object).find(yield)}
 
     public def final findAll(Closure yield) { if (concurrencyActive) this.findAllParallel(yield).makeConcurrent(); else (mixedIn[Object] as Object).findAll(yield)}
 
@@ -71,6 +71,7 @@ final class TransparentParallel {
     /**
      * Indicates, whether the iterative methods like each() or collect() have been made parallel.
      * Always true once a collection is enhanced through the makeConcurrent() method.
+     * The concurrencyActive flag then indicates, whether the enhanced collection has concurrent or the original sequential semantics
      */
     public def boolean isConcurrent() {return true}
 

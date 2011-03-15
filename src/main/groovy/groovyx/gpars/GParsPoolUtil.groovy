@@ -321,26 +321,46 @@ public class GParsPoolUtil {
     }
 
     /**
-     * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
-     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
+     * Overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
-     * After mixing-in, the isConcurrent() method will return true.
+     * The first time it is invoked on a collection the method creates a TransparentParallel class instance and mixes it
+     * in the object it is invoked on. After mixing-in, the isConcurrent() method will return true.
+     * Delegates to GParsPoolUtil.makeConcurrent().
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
      */
     public static Object makeConcurrent(Object collection) {
         if (!(collection.respondsTo('isConcurrent'))) throw new IllegalStateException("Cannot make the object transparently concurrent. Apparently we're not inside a GParsPool.withPool() block nor the collection has been enhanced with ParallelEnhancer.enhance().")
         //noinspection GroovyGetterCallCanBePropertyAccess
-        if (!collection.isConcurrent()) collection.getMetaClass().mixin(TransparentParallel)
-        else if (!collection.isConcurrencyActive()) collection.setConcurrencyActive(true)
+        if (collection.isConcurrent()) {
+            collection.concurrencyActive = true
+        }
+        else collection.getMetaClass().mixin(TransparentParallel)
         return collection
     }
 
+    /**
+     * Gives the iterative methods like each() or find() the original sequential semantics.
+     * @param collection The collection to apply the change to
+     * @return The collection itself
+     */
     public static Object makeSequential(Object collection) {
-        collection.setConcurrencyActive(false)
+        if (!(collection.respondsTo('isConcurrent'))) throw new IllegalStateException("Cannot make the object sequential. Apparently we're not inside a GParsPool.withPool() block nor the collection has been enhanced with ParallelEnhancer.enhance().")
+        if (collection.isConcurrent()) {
+            collection.concurrencyActive = false
+        }
+
         return collection
     }
 
+    /**
+     * Makes the collection concurrent for the passed-in block of code.
+     * The iterative methods like each or collect are given concurrent semantics inside the passed-in closure.
+     * Once the closure finishes, the original sequential semantics of the methods is restored.
+     * Must be invoked inside a withPool block.
+     * @param collection The collection to enhance
+     * @param code The closure to run with the collection enhanced.
+     */
     public static void asConcurrent(Object collection, Closure code) {
         makeConcurrent(collection)
         try {
@@ -350,12 +370,6 @@ public class GParsPoolUtil {
         }
     }
 
-    /**
-     * Empty as the default implementation doesn't need to do anything
-     */
-    static void setConcurrencyActive(Object collection, boolean flag) { }
-
-    //todo document
     /**
      * Indicates whether the iterative methods like each() or collect() work have been altered to work concurrently.
      */

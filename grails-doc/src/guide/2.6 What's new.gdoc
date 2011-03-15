@@ -14,10 +14,13 @@ h3. Asynchronous functions
 
 h3. Parallel collections
 
+* Renamed makeTransparent() to makeConcurrent()
+* Collections can now repeatedly be made transparently concurrent or sequential using makeConcurrent() and makeSequential() methods
 
 h3. Fork / Join
 
-* Nothing new, perhaps we've reached a maturity point here
+* A few new demos illustrating Fork/Join applicability to recursive functions
+* Leveraging the efficient implementation of the jsr-166y (aka Java 7) Fork/Join library
 
 h3. Actors
 
@@ -37,6 +40,4 @@ h3. Other
 
 h3. Renaming hints
 
-* The _AbstractPooledActor_ class is now deprecated, use _DefaultActor_ instead
-* The _DataFlowStream_ class has been renamed to _DataFlowQueue_
-* The _memoize_ method family has been renamed to _gmemoize_ in order to avoid name collisions with memoize in Groovy 1.8
+* The _makeTransparent()_ method that forces concurrent semantics to iteration methods (each, collect, find, etc.) has been renamed to _makeConcurrent()_

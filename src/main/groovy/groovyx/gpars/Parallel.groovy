@@ -325,10 +325,10 @@ final class Parallel {
     }
 
     /**
-     * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
-     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
+     * Overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
-     * After mixing-in, the isConcurrent() method will return true.
+     * The first time it is invoked on a collection the method creates a TransparentParallel class instance and mixes it
+     * in the object it is invoked on. After mixing-in, the isConcurrent() method will return true.
      * Delegates to GParsPoolUtil.makeConcurrent().
      * @param collection The object to make transparent
      * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
@@ -337,19 +337,26 @@ final class Parallel {
         GParsPoolUtil.makeConcurrent(collection)
     }
 
+    /**
+     * Gives the iterative methods like each() or find() the original sequential semantics.
+     * @param collection The collection to apply the change to
+     * @return The collection itself
+     */
     static Object makeSequential(Object collection) {
         GParsPoolUtil.makeSequential(collection)
         return collection
     }
 
+    /**
+     * Makes the collection concurrent for the passed-in block of code.
+     * The iterative methods like each or collect are given concurrent semantics inside the passed-in closure.
+     * Once the closure finishes, the original sequential semantics of the methods is restored.
+     * @param collection The collection to enhance
+     * @param code The closure to run with the collection enhanced.
+     */
     static void asConcurrent(Object collection, Closure code) {
         GParsPoolUtil.asConcurrent(collection, code)
     }
-
-    /**
-     * Empty as the default implementation doesn't need to do anything
-     */
-    static void setConcurrencyActive(Object collection, boolean flag) { }
 
     /**
      * Enhances to resulting collection so that parallel methods can be chained.

@@ -111,7 +111,75 @@ def selectImportantNames(names) {
 }
 {code}
 
-Transparent parallelizm is also available in combination with _ParallelEnhancer_ .
+The _makeSequential()_ method will reset the collection back to the original sequential semantics.
+
+{code}
+import static groovyx.gpars.GParsPool.withPool
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+
+withPool {
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+
+    list.makeConcurrent()
+
+    println 'Concurrent: '
+    list.each { print it + ',' }
+    println()
+
+    list.makeSequential()
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+}
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+{code}
+
+The _asConcurrent()_ convenience method will allow you to specify code blocks, in which the collection maintains concurrent semantics.
+
+{code}
+import static groovyx.gpars.GParsPool.withPool
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+
+withPool {
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+
+    list.asConcurrent {
+        println 'Concurrent: '
+        list.each { print it + ',' }
+        println()
+    }
+
+    println 'Sequential: '
+    list.each { print it + ',' }
+    println()
+}
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+{code}
+
+Transparent parallelizm, including the _makeConcurrent()_ , _makeSequential()_ and _asConcurrent()_ methods, is also available in combination with _ParallelEnhancer_ .
 {code}
 /**
  * A function implemented using standard sequential collect() and findAll() methods.
@@ -127,6 +195,33 @@ assert ['ALICE', 'JASON'] == selectImportantNames(names.makeConcurrent())
 
 {code}
 
+{code}
+import groovyx.gpars.ParallelEnhancer
+
+def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+
+ParallelEnhancer.enhanceInstance(list)
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+
+list.asConcurrent {
+    println 'Concurrent: '
+    list.each { print it + ',' }
+    println()
+
+}
+list.makeSequential()
+
+println 'Sequential: '
+list.each { print it + ',' }
+println()
+{code}
 h2. Avoid side-effects in functions
 
 We have to warn you. Since the closures that are provided to the parallel methods like _eachParallel()_ or _collectParallel()_ may be run in parallel, you have to make sure that each of the closures
