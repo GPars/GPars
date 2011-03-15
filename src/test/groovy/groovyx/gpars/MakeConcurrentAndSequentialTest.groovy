@@ -54,7 +54,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeSequential()
             def result = [].asSynchronized()
             items1.each {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() == 1
         }
@@ -93,7 +93,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeConcurrent()
             def result = [].asSynchronized()
             items1.each {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() > 1
         }
@@ -105,7 +105,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeConcurrent().makeSequential()
             def result = [].asSynchronized()
             items1.each {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() == 1
         }
@@ -117,7 +117,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.asConcurrent {
                 def result = [].asSynchronized()
                 items1.each {
-                    result << Thread.currentThread()
+                    sleep 100; result << Thread.currentThread()
                 }
                 assert result.unique().size() > 1
             }
@@ -132,7 +132,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             }
             def result = [].asSynchronized()
             items1.each {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() == 1
         }
@@ -144,7 +144,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeConcurrent()
             def result = [].asSynchronized()
             items1.each {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() > 1
         }
@@ -156,7 +156,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeConcurrent().makeSequential()
             def result = [].asSynchronized()
             items1.each {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() == 1
         }
@@ -168,7 +168,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.asConcurrent {
                 def result = [].asSynchronized()
                 items1.each {
-                    result << Thread.currentThread()
+                    sleep 100; result << Thread.currentThread()
                 }
                 assert result.unique().size() > 1
             }
@@ -183,7 +183,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             }
             def result = [].asSynchronized()
             items1.each {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() == 1
         }
@@ -195,7 +195,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeConcurrent()
             def result = [].asSynchronized()
             items1.collect {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() > 1
         }
@@ -207,7 +207,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeConcurrent().makeSequential()
             def result = [].asSynchronized()
             items1.collect {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() == 1
         }
@@ -219,7 +219,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.asConcurrent {
                 def result = [].asSynchronized()
                 items1.collect {
-                    result << Thread.currentThread()
+                    sleep 100; result << Thread.currentThread()
                 }
                 assert result.unique().size() > 1
             }
@@ -234,7 +234,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             }
             def result = [].asSynchronized()
             items1.collect {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() == 1
         }
@@ -246,7 +246,7 @@ class MakeConcurrentAndSequentialTest extends GroovyTestCase {
             items1.makeConcurrent()
             def result = [].asSynchronized()
             items1.findAll {
-                result << Thread.currentThread()
+                sleep 100; result << Thread.currentThread()
             }
             assert result.unique().size() > 1
         }
