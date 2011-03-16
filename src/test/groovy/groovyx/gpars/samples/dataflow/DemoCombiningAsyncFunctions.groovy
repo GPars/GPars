@@ -47,4 +47,8 @@ withPool {
 
     println "Time to do something else while the calculation is running"
     println "Asynchronous result: " + result.get()
+
+    //Now let's use a callback to print the result once available
+    aMultiply(aPlus(10, 30), 100) >> {println "Result in a callback $it"}
+    println "The calculation has started"
 }

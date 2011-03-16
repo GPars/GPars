@@ -24,6 +24,8 @@ import groovyx.gpars.group.DefaultPGroup
  * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
  * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
  *
+ * The asyncFun() mechanism is then a generalization of the principle shown here.
+ *
  * @author Vaclav Pech
  */
 
@@ -36,7 +38,7 @@ def fib(n) {
         group.task {
             def a = fib(n - 2)
             def b = fib(n - 1)
-            a.whenBound{b.whenBound {result << a + b}}
+            a.whenBound {b.whenBound {result << a + b}}
         }
     }
     return result
