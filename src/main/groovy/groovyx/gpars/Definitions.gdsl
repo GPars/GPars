@@ -50,6 +50,7 @@ contributor(parallelCollection) {
     method name: "fold", type: "Object", params: [seed: 'Object', closure: 'groovy.lang.Closure']
     method name: "makeTransparent", type: "groovyx.gpars.TransparentParallel"
     method name: "makeConcurrent", type: "groovyx.gpars.TransparentParallel"
+    method name: "makeSequential", type: "java.lang.Object"
 }
 
 /**
