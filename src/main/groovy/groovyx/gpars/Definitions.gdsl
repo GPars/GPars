@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ contributor(parallelCollection) {
     method name: "fold", type: "Object", params: [closure: 'groovy.lang.Closure']
     method name: "fold", type: "Object", params: [seed: 'Object', closure: 'groovy.lang.Closure']
     method name: "makeTransparent", type: "groovyx.gpars.TransparentParallel"
+    method name: "makeConcurrent", type: "groovyx.gpars.TransparentParallel"
 }
 
 /**
