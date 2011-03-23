@@ -148,7 +148,7 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
         final def actor = actor {
-            int count = 0
+            Integer count = 0
             loop {
                 barrier.await()
                 count++

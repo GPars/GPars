@@ -48,7 +48,7 @@ GParsPool.withPool {
 
     //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
     // here use parallel implementation under the covers
-    println animals.makeConcurrent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
+    println(animals.makeConcurrent().collect {it.toUpperCase()}.groupBy {it.contains 'A'})
 
     //The selectImportantNames() will process the name collections concurrently
     assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeConcurrent())

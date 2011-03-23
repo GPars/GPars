@@ -126,7 +126,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
 
         final def actor = actor {
-            int counter = 0
+            Integer counter = 0
             loop {
                 use(TimeCategory) {
                     barrier.await()

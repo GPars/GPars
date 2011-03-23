@@ -62,7 +62,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testSingleLoop() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             loop({-> counter < 1}) {
                 counter++
@@ -89,7 +89,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testRepeatedLoop() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             loop({-> counter < 5}) {
                 counter++
@@ -116,7 +116,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testRepeatedLoopWithStop() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             loop({-> counter < 5}) {
                 counter++
@@ -145,7 +145,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testRepeatedLoopWithTerminate() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             loop({-> counter < 5}) {
                 counter++
@@ -174,7 +174,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testRepeatedLoopWithReact() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             loop({-> counter < 5}) {
                 counter++
@@ -227,7 +227,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testSingleLoopWithAfterLoopCode() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             loop({-> counter < 1}, {-> result += 3}) {
                 counter++
@@ -242,7 +242,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testRepeatedLoopWithAfterLoopCode() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             loop({-> counter < 5}, {-> result += 3}) {
                 counter++
@@ -257,7 +257,7 @@ import static groovyx.gpars.actor.Actors.actor
     public void testComplexAfterLoopCode() {
         volatile int result = 0
         def actor = actor {
-            int counter = 0
+            Integer counter = 0
 
             def afterLoopCode = {->
                 react {

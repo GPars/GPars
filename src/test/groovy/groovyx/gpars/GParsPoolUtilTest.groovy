@@ -146,7 +146,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
 
     public void testEmptyFindAny() {
         groovyx.gpars.GParsPool.withPool(5) {
-            final int result = GParsPoolUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 6})
+            final Integer result = GParsPoolUtil.findAnyParallel([1, 2, 3, 4, 5], {it > 6})
             assertNull result
         }
     }

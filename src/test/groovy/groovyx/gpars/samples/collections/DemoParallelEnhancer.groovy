@@ -53,5 +53,5 @@ println(animals.everyParallel {it.contains('a')} ? 'All animals contain a' : 'So
 
 //Using transparent parallelism here with method chaining. The iterative methods collect() and groupBy()
 // here use parallel implementation under the covers
-println animals.makeConcurrent().collect {it.toUpperCase()}.groupBy {it.contains 'A'}
+println(animals.makeConcurrent().collect {it.toUpperCase()}.groupBy {it.contains 'A'})
 
