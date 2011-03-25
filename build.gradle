@@ -126,9 +126,9 @@ task integrationTest(type: Test, dependsOn: 'test') {
     include '**/integration/**/*.*'
 }
 
-//apply {
-//    from 'docs.gradle'
-//}
+apply {
+    from 'docs.gradle'
+}
 
 // codenarc configuration
 codeNarcConfigFileName = "./config/codenarc/codenarc.groovy"

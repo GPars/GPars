@@ -1,0 +1,105 @@
+/* GPars - Groovy Parallel Systems */
+/* */
+/* Copyright © 2008-11  The original author or authors */
+/* */
+/* Licensed under the Apache License, Version 2.0 (the "License"); */
+/* you may not use this file except in compliance with the License. */
+/* You may obtain a copy of the License at */
+/* */
+/*       http://www.apache.org/licenses/LICENSE-2.0 */
+/* */
+/* Unless required by applicable law or agreed to in writing, software */
+/* distributed under the License is distributed on an "AS IS" BASIS, */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/* See the License for the specific language governing permissions and */
+/* limitations under the License. */
+
+/* page layout and page numbering */
+@page {
+    size: a4;
+}
+
+@page :left {
+
+@bottom-left {
+        content: counter(page);
+        vertical-align: middle;
+        margin: 0.8em 0;
+        font-size: 12pt;
+    }
+    }
+
+@page :right {
+
+@bottom-right {
+        content: counter(page);
+        vertical-align: middle;
+        margin: 0.8em 0;
+        font-size: 12pt;
+    }
+    }
+
+/* style overrides */
+
+h1 {
+    font-size: 20px;
+    string-set: header content();
+    page-break-before: always
+}
+
+h1>a {
+    font-size: 20px;
+    string-set: header content();
+    page-break-before: always
+}
+
+h2 {
+    font-size: 16px;
+}
+
+h3 {
+    font-size: 14px;
+}
+
+h1, h2, h3, h1>a, h2>a, h3>a {
+    color: #000000;
+}
+
+#toc div.tocItem {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#toc div.tocItem a::after {
+    content: leader('.') target-counter(attr(href), page);
+    font-style: normal;
+}
+
+div.title {
+    font-size: 20px;
+}
+
+.body {
+    font-size: 14px;
+}
+
+pre .code {
+    padding-left: 5px;
+    font-size: 12px;
+    line-height: 100%;
+    white-space: normal;
+    page-break-inside: avoid;
+}
+
+.code, .bq {
+    border: 1px solid black;
+    margin-bottom: 2em;
+    page-break-inside: avoid;
+}
+
+.warning, .note, table {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    page-break-inside: avoid;
+}
