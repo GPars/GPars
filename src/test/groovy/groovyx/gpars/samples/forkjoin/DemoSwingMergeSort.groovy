@@ -28,8 +28,7 @@ import static groovyx.gpars.GParsPool.withPool
 /**
  * Shows use of the ForkJoin mechanics to implement merge sort.
  *
- * Author: Vaclav Pech
- * Date: Nov 1, 2008
+ * Author: Pavel Jetensky, Lukas Krecan, Vaclav Pech
  */
 
 /**
