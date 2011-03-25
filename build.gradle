@@ -126,6 +126,10 @@ task integrationTest(type: Test, dependsOn: 'test') {
     include '**/integration/**/*.*'
 }
 
+//apply {
+//    from 'docs.gradle'
+//}
+
 // codenarc configuration
 codeNarcConfigFileName = "./config/codenarc/codenarc.groovy"
 task checkstyleMain(overwrite: true) << {};
@@ -313,6 +317,7 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoNumbers',                                //Needs classes from its source folder
             'DemoActor_4_4',                              //Specifies absolute paths
             'RunReset',                                   //Starts UI
+            'DemoSwingMergeSort',                         //Starts UI
     ]
 
     classpath = sourceSets.main.runtimeClasspath
