@@ -16,6 +16,9 @@
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
+/**
+ * @author Andres Almiray, Jan Novotny, Marcel Matula, Michal Bernhard
+ */
 buildscript {
     repositories {
         mavenCentral()
