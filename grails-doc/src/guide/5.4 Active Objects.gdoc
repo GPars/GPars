@@ -90,10 +90,10 @@ The _get()_ method has also a variant with a timeout parameter, if you want to a
 h4. Annotation rules
 
 There are a few rules to follow when annotating your objects:
-# The _@ActiveMethod_ annotations are only accepted in classes annotated as _@ActiveObject_
-# Only instance (non-static) methods can be annotated as _@ActiveMethod_
+# The _ActiveMethod_ annotations are only accepted in classes annotated as _ActiveObject_
+# Only instance (non-static) methods can be annotated as _ActiveMethod_
 # You can override active methods with non-active ones and vice versa
-# Subclasses of active objects can declare additional active methods, provided they are themselves annotated as _@ActiveObject_
+# Subclasses of active objects can declare additional active methods, provided they are themselves annotated as _ActiveObject_
 # Combining concurrent use of active and non-active methods may result in race conditions. Ideally design your active objects as completely encapsulated classes with all non-private methods marked as active
 
 h3. Inheritance
