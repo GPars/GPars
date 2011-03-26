@@ -25,7 +25,7 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
-apply plugin: 'code-quality'
+//apply plugin: 'code-quality'
 
 defaultTasks 'test'
 
