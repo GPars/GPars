@@ -156,6 +156,10 @@
       <option name="myLocal" value="true" />
     </copyright>
     <module2copyright />
+    <LanguageOptions name="HTML">
+      <option name="fileTypeOverride" value="1" />
+      <option name="prefixLines" value="false" />
+    </LanguageOptions>
     <LanguageOptions name="Properties">
       <option name="fileTypeOverride" value="1" />
     </LanguageOptions>
@@ -919,7 +923,6 @@
         <inspection_tool class="BeforeOrAfterIsPublicVoidNoArg" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="BigDecimalEquals" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="BreakStatementWithLabel" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="BusyWait" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="BvConfigDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="BvConstraintMappingsInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="CStyleArrayDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1038,9 +1041,6 @@
         <inspection_tool class="DisjointPackage" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="DivideByZero" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="DollarSignInName" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="DoubleCheckedLocking" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignoreOnVolatileVariables" value="false" />
-        </inspection_tool>
         <inspection_tool class="DoubleNegation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="DriverManagerGetConnection" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="DuplicateBooleanBranch" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1852,7 +1852,6 @@
         <inspection_tool class="ValidExternallyBoundObject" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="VariableNotUsedInsideIf" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="VoidMethodAnnotatedWithGET" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="VolatileArrayField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="WSReferenceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="WaitCalledOnCondition" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="WaitNotInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
