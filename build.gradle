@@ -318,6 +318,7 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoActor_4_4',                              //Specifies absolute paths
             'RunReset',                                   //Starts UI
             'DemoSwingMergeSort',                         //Starts UI
+            'DemoVisualForkJoinMergeSort',                //Starts UI
     ]
 
     classpath = sourceSets.main.runtimeClasspath
