@@ -8,6 +8,11 @@ When talking about hierarchical problems, think about quick sort, merge sort, fi
  * Once the sub-problem is small enough, it is solved directly.
  * The solutions of all sub-problems are combined to solve their parent problem, which in turn helps solve its own parent problem.
 
+{note}
+Check out the fancy "interactive Fork/Join visualization demo":http://blog.krecan.net/2011/03/27/visualizing-forkjoin/ ,
+which will show you how threads cooperate to solve a common divide-and-conquer algorithm.
+{note}
+
 The mighty *JSR-166y* library solves Fork / Join orchestration pretty nicely for us, but leaves a couple of rough edges, which can hurt you, if you don't pay attention enough. You still deal
 with threads, pools or synchronization barriers.
 
