@@ -89,7 +89,7 @@ dependencies {
     docs group: 'radeox', name: 'radeox', version: '1.0-b2'
     docs group: 'com.lowagie', name: 'itext', version: '2.0.8'
     docs group: 'org.slf4j', name: 'slf4j-api', version: '1.6.1'
-    docs group: 'org.xhtmlrenderer', name: 'core-renderer', version: 'R8pre2'
+    docs group: 'org.xhtmlrenderer', name: 'core-renderer', version: 'R8'
     docs group: 'commons-logging', name: 'commons-logging', version: '1.1.1'
     //deployerJars 'org.apache.maven.wagon:wagon-webdav-jackrabbit:1.0-beta-7'
     //deployerJars "org.apache.maven.wagon:wagon-http:1.0-beta-6"
