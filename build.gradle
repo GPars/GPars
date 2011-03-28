@@ -223,12 +223,7 @@ groovydoc {
     overview = new File('overview.html')
 }
 
-task documentation(dependsOn: ['javadoc', 'groovydoc', 'docs'], description: 'Create the API documentation.')
-
-task docs << {
-    ant.taskdef(name: 'docs', classname: 'grails.doc.ant.DocPublisherTask', classpath: configurations.docs.asPath)
-    ant.docs(src: "grails-doc/src", dest: "build/docs/guide", properties: "grails-doc/src/doc.properties", styleDir: new File('grails-doc/resources/style'), cssDir: new File('grails-doc/resources/css'), imagesDir: new File('grails-doc/resources/img'))
-}
+task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
 
 task zipDoc(type: Zip, dependsOn: 'documentation') {
     appendix = 'docs'
@@ -259,7 +254,7 @@ task zipJavaDemo(type: Zip) {
 task copyThirdPartyLibs(type: Copy) {
     from('lib')
     into('build/dist')
-    exclude('junit-4.7.jar', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
+    exclude('junit*', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
 }
 
 task copyLibs(type: Copy) {

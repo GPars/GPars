@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
 /**
  * @author Andres Almiray, Jan Novotny, Marcel Matula, Michal Bernhard
  */
@@ -33,62 +31,8 @@ buildscript {
     }
 }
 
-task copyDocs(type: Copy) {
-    destinationDir = "${buildDir}/javadoc-src" as File
-
-    from('src/main/groovy/groovyx/gpars') {
-        include '**/*'
-        include '**/*.html'
-    }
-}
-
-task buildDocs(type: Groovydoc) {
-    dependsOn { copyDocs }
-
-    classpath = configurations.docs
-    source = files("$buildDir/javadoc-src")
-    destinationDir = "$buildDir/manual/api" as File
-    docTitle = "Griffon $version"
-    header = "Griffon $version"
-    windowTitle = "Griffon $version"
-    groovyClassPath = configurations.docs
-    includePrivate = true
-    use = true
-
-    link('http://java.sun.com/j2se/1.5.0/docs/api', 'java.,org.xml.,javax.,org.xml.')
-    link('http://www.dpml.net/api/ant/1.7.0', 'org.apache.ant.,org.apache.tools.ant.')
-    link('http://junit.sourceforge.net/junit3.8.1/javadoc/', 'org.junit.,junit.framework.')
-    link('http://groovy.codehaus.org/api/', 'groovy.,org.codehaus.groovy.')
-}
-
-task jarApi(type: Jar) {
-    dependsOn { buildDocs }
-
-    classifier = 'javadoc'
-    destinationDir = "$buildDir/assemble/jars" as File
-    from "$buildDir/manual/api"
-}
-
-task jarSource(type: Jar) {
-    dependsOn { copyDocs }
-
-    classifier = 'sources'
-    destinationDir = "$buildDir/assemble/jars" as File
-    from "$buildDir/javadoc-src"
-    exclude "**/*.html"
-}
-
-task jarDocs(dependsOn: [jarApi, jarSource]) {}
-
-task prepareGuide(type: Copy) {
-    from('grails-doc/src')
-    into("$buildDir/manual-src")
-}
-
 task buildGuide(type: Copy) {
-    dependsOn { prepareGuide }
-
-    def manualSrc = "$buildDir/manual-src" as File
+    def manualSrc = 'grails-doc/src' as File
     destinationDir = "$buildDir/manual" as File
     from(manualSrc) {
         include '*.properties'
@@ -96,7 +40,7 @@ task buildGuide(type: Copy) {
 
     doLast {
         ant.taskdef(name: 'docs', classname: 'grails.doc.ant.DocPublisherTask', classpath: configurations.docs.asPath);
-        ant.docs(src: "$buildDir/manual-src",
+        ant.docs(src: 'grails-doc/src',
                 dest: "$buildDir/manual",
                 properties: "grails-doc/src/doc.properties",
                 styleDir: new File('grails-doc/resources/style'),
@@ -134,11 +78,12 @@ task pdfGuide(type: Copy) {
 
     doLast {
         delete "$destinationDir/guide/single.pdf"
+        delete "$destinationDir/doc.properties"
     }
 }
 
 task zipGuide(type: Zip) {
-    dependsOn { [pdfGuide, jarDocs] }
+    dependsOn { [pdfGuide] }
     appendix = 'guide'
     from "$buildDir/manual"
 }
