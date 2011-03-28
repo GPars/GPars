@@ -5962,11 +5962,13 @@
         <w>classpathentry</w>
         <w>cloneable</w>
         <w>cobertura</w>
+        <w>codenarc</w>
         <w>composability</w>
         <w>composable</w>
         <w>conv</w>
         <w>csize</w>
         <w>cumulate</w>
+        <w>deployer</w>
         <w>dest</w>
         <w>dgpars</w>
         <w>dists</w>
@@ -5990,12 +5992,14 @@
         <w>jcsp</w>
         <w>jiri</w>
         <w>jiří</w>
+        <w>jonasboner</w>
         <w>jspa</w>
         <w>junit</w>
         <w>jvm's</w>
         <w>kerridge</w>
         <w>kropáček</w>
         <w>laforge</w>
+        <w>larrytheliquid</w>
         <w>matemàtica</w>
         <w>matemàtiques</w>
         <w>memoize</w>
@@ -6027,11 +6031,15 @@
         <w>staropramen</w>
         <w>teamcity</w>
         <w>topleft</w>
+        <w>ulimit</w>
         <w>unsecure</w>
         <w>unsynchronized</w>
         <w>uproc</w>
+        <w>username</w>
         <w>varargs</w>
         <w>webdav</w>
+        <w>wikipedia</w>
+        <w>youre</w>
         <w>ztellman</w>
       </words>
     </dictionary>
