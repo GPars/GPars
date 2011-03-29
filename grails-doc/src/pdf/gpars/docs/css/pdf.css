@@ -4,6 +4,7 @@
 }
 
 @page :left {
+}
 
 @bottom-left {
         content: counter(page);
@@ -11,9 +12,9 @@
         margin: 0.8em 0;
         font-size: 12pt;
     }
-    }
 
 @page :right {
+}
 
 @bottom-right {
         content: counter(page);
@@ -21,19 +22,18 @@
         margin: 0.8em 0;
         font-size: 12pt;
     }
-    }
 
 /* style overrides */
 
 h1 {
     font-size: 20px;
-    string-set: header content();
+    string-set: header content("");
     page-break-before: always
 }
 
 h1>a {
     font-size: 20px;
-    string-set: header content();
+    string-set: header content("");
     page-break-before: always
 }
 

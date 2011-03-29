@@ -63,7 +63,7 @@ task pdfGuide(type: Copy) {
             grails.doc.PdfBuilder.build(
                     basedir: buildDir.absolutePath,
                     home: project.file('grails-doc').absolutePath,
-                    tool: 'gpars'
+                    tool: 'pdf/gpars'
             )
         } catch (x) {
             // it's very likely that the stream is closed before
