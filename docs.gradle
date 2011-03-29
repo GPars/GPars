@@ -73,13 +73,13 @@ task pdfGuide(type: Copy) {
     }
 
     destinationDir = "$buildDir/manual" as File
-    from "$destinationDir/guide/"
+    from "$buildDir/manual/guide/"
     include '*.pdf'
     rename 'single.pdf', "gpars-guide-${version}.pdf"
 
     doLast {
-        delete "$destinationDir/guide/single.pdf"
-        delete "$destinationDir/doc.properties"
+        delete "$buildDir/manual/doc.properties"
+        delete "$buildDir/manual/guide/single.pdf"
     }
 }
 
