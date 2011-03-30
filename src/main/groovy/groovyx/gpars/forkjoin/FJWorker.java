@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,6 +47,16 @@ final class FJWorker<T> extends AbstractForkJoinWorker<T> {
         System.arraycopy(childArgs, 0, params, 0, childArgs.length);
         params[params.length - 1] = code;
         forkOffChild(new FJWorker<T>(params));
+    }
+
+    @SuppressWarnings({"MethodOverloadsMethodOfSuperclass", "OverloadedVarargsMethod"})
+    T runChildDirectly(final Object... childArgs) {
+        if (childArgs.length != args.length)
+            throw new IllegalArgumentException("The runChildDirectly() method requires " + args.length + " arguments, but received " + childArgs.length + " parameters.");
+        final Object[] params = new Object[childArgs.length + 1];
+        System.arraycopy(childArgs, 0, params, 0, childArgs.length);
+        params[params.length - 1] = code;
+        return new FJWorker<T>(params).compute();
     }
 
     @Override

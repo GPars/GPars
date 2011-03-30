@@ -45,7 +45,7 @@ withPool() {
 
 The _runForkJoin()_ factory method will use the supplied recursive code together with the provided values and build a hierarchical Fork/Join
 calculation. The number of values passed to the _runForkJoin()_ method must match the number of expected parameters of the closure as well as
-the number of arguments passed into the _forkOffChild()_ method.
+the number of arguments passed into the _forkOffChild()_ or _runChildDirectly()_ methods.
 
 {code}
 def quicksort(numbers) {
@@ -225,6 +225,26 @@ final def numbers = [1, 5, 2, 4, 3, 8, 6, 7, 3, 4, 5, 2, 2, 9, 8, 7, 6, 7, 8, 1,
 withPool(1) {  //feel free to experiment with the number of fork/join threads in the pool
     println "Sorted numbers: ${runForkJoin(new SortWorker(numbers))}"
 }
+{code}
+
+h3. Running child tasks directly
+
+The _forkOffChild()_ method has a sibling - the _runChildDirectly()_ method, which will run the child task directly and immediately
+within the current thread instead of scheduling the child task for asynchronous processing on the thread pool. Typically you'll
+call _forkOffChild() on all sub-tasks but the last, which you invoke directly without the scheduling overhead.
+{code}
+        Closure fib = {number ->
+            if (number <= 2) {
+                return 1
+            }
+            forkOffChild(number - 1)                            //  This task will run asynchronously, probably in a different thread
+            final def result = runChildDirectly(number - 2)     //  This task is run directly within the current thread
+            return (Integer) getChildrenResults().sum() + result
+        }
+
+        withPool {
+            assert 55 == runForkJoin(10, fib)
+        }
 {code}
 
 h3. Availability

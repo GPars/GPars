@@ -21,6 +21,7 @@ h3. Fork / Join
 
 * A few new demos illustrating Fork/Join applicability to recursive functions
 * Leveraging the efficient implementation of the jsr-166y (aka Java 7) Fork/Join library
+* The runChildDirectly() method allowing to mix asynchronous and synchronous child task execution
 
 h3. Actors
 

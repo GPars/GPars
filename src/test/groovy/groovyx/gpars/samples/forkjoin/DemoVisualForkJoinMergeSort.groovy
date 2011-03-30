@@ -239,8 +239,8 @@ def runDemo() {
                     def label2 = createLabel(row + 1, column + splitList[0].size(), splitList[1])
                     setLabelColor(label, COLOR_WAIT)
                     forkOffChild splitList[0], row + 1, column, label1
-                    forkOffChild splitList[1], row + 1, column + splitList[0].size(), label2
-                    return finishTask(label, merge(label, * childrenResults));       //use results of children tasks to calculate and store own result
+                    final def result = runChildDirectly(splitList[1], row + 1, column + splitList[0].size(), label2)
+                    return finishTask(label, merge(label, result, * childrenResults));       //use results of children tasks to calculate and store own result
 
             }
         }
