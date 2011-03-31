@@ -225,14 +225,19 @@ groovydoc {
 
 task documentation(dependsOn: ['javadoc', 'groovydoc'], description: 'Create the API documentation.')
 
-task zipDoc(type: Zip, dependsOn: 'documentation') {
-    appendix = 'docs'
-    from(docsDir)
+task zipDoc(type: Jar, dependsOn: 'documentation') {
+    classifier = 'javadoc'
+    from docsDir
 }
 
-task zipSrc(type: Zip) {
-    appendix = 'src'
+task zipSrc(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
     from sourceSets.main.allSource
+}
+
+artifacts {
+    archives(zipSrc)
+    archives(zipDoc)
 }
 
 //task zipSamples(dependsOn: 'demo', type: Zip) {
