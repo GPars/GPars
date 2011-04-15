@@ -87,6 +87,23 @@ public class GParsExecutorsPoolAsyncFunTest extends GroovyTestCase {
         }
     }
 
+    public void testCombiningWithBlocking() {
+        groovyx.gpars.GParsExecutorsPool.withPool(5) {
+            Closure sPlus = {Integer a, Integer b ->
+                a + b
+            }
+
+            Closure sMultiply = {Integer a, Integer b ->
+                a * b
+            }
+
+            Closure aPlus = sPlus.asyncFun()
+            Closure aMultiply = sMultiply.asyncFun(true)
+
+            assert sMultiply(sPlus(10, 30), 100) == aMultiply(aPlus(10, 30), 100)
+        }
+    }
+
     public void testException() {
         groovyx.gpars.GParsExecutorsPool.withPool(5) {
             Closure sPlus = {Integer a, Integer b ->

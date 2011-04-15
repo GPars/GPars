@@ -109,12 +109,12 @@ public class GParsExecutorsPoolUtil {
     /**
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataFlowVariable for the potential return value
      */
-    public static Closure asyncFun(final Closure original) {
+    public static Closure asyncFun(final Closure original, final boolean blocking = false) {
         final def pool = new DefaultPool(GParsExecutorsPool.retrieveCurrentPool())
         return {final Object[] args ->
             final DataFlowVariable result = new DataFlowVariable()
             PAGroovyUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
-            result
+            blocking ? result.get() : result
         }
     }
 
