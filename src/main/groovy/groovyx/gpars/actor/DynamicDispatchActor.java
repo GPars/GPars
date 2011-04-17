@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import groovyx.gpars.actor.impl.DDAClosure;
  * }*      void onMessage(Object message) {*          println 'Received object'
  * }*      void onMessage(NullObject nullMessage) {*          println 'Received null'
  * }*} </pre>
- * <p/>
+ *
  * Method when {...} provides an alternative way to define message handlers
  *
  * @author Vaclav Pech, Alex Tkachman, Dierk Koenig
@@ -53,14 +53,24 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
      * @param closure A closure to run against te actor, typically to register handlers
      */
     public DynamicDispatchActor(final Closure closure) {
+        initialize(DDAClosure.createDDAClosure(this));
+        become(closure);
+    }
+
+    /**
+     * Executes the supplied closure in the context of the actor to set all when() handlers
+     *
+     * @param closure A sequence of when() handlers to set on the actor
+     * @return This actor to allow for method chaining
+     */
+    public final DynamicDispatchActor become(final Closure closure) {
         if (closure != null) {
             final Closure cloned = (Closure) closure.clone();
             cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
             cloned.setDelegate(this);
             cloned.call();
         }
-
-        initialize(DDAClosure.createDDAClosure(this));
+        return this;
     }
 
     public final void when(final Closure closure) {

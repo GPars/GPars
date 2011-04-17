@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.dataflow.DataFlows
 import groovyx.gpars.group.DefaultPGroup
@@ -168,7 +169,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         volatile boolean stringFlag = false
         volatile boolean integerFlag = false
 
-        def dda = new DynamicDispatchActor()
+        def dda = new DynamicDispatchActor({when {msg ->}})
         dda.when {String message ->
             stringFlag = true
             reply false
@@ -273,6 +274,62 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert results.d3 == 6
         assert results.d4 == 8
     }
+
+    public void testWhenInConctructor() {
+
+        final def actor = new MyActor({
+            when {BigDecimal num -> results << 'BigDecimal'}
+            when {Double num -> results << 'Double'}
+        }).start()
+
+        actor 1
+        actor ''
+        actor 1.0
+        actor([1, 2, 3, 4, 5])
+
+        actor.join()
+        assert 'Integer' == actor.results.val
+        assert 'string' == actor.results.val
+        assert 'BigDecimal' == actor.results.val
+        assert 'list' == actor.results.val
+    }
+
+    public void testWhenInBecome() {
+
+        final def actor = new MyActor().become {
+            when {BigDecimal num -> results << 'BigDecimal'}
+            when {Double num -> results << 'Double'}
+        }.start()
+
+        actor 1
+        actor ''
+        actor 1.0
+        actor([1, 2, 3, 4, 5])
+
+        actor.join()
+        assert 'Integer' == actor.results.val
+        assert 'string' == actor.results.val
+        assert 'BigDecimal' == actor.results.val
+        assert 'list' == actor.results.val
+    }
+}
+
+final class MyActor extends DynamicDispatchActor {
+
+    def results = new DataFlowQueue()
+
+    def MyActor() { }
+
+    def MyActor(final closure) {
+        super()
+        become(closure)
+    }
+
+    void onMessage(String message) { results << 'string' }
+
+    void onMessage(Integer message) { results << 'Integer' }
+
+    void onMessage(List message) { results << 'list'; stop() }
 }
 
 final class TestDynamicDispatchActor extends DynamicDispatchActor {
