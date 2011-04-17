@@ -44,17 +44,7 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
      * Creates a new instance without any when handlers registered
      */
     public DynamicDispatchActor() {
-        this(null);
-    }
-
-    /**
-     * Creates an instance, processing all when{} calls in the supplied closure
-     *
-     * @param closure A closure to run against te actor, typically to register handlers
-     */
-    public DynamicDispatchActor(final Closure closure) {
         initialize(DDAClosure.createDDAClosure(this));
-        become(closure);
     }
 
     /**

@@ -62,12 +62,11 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         volatile boolean doubleFlag = false
         volatile boolean objectFlag = false
 
-        final Actor actor = new DynamicDispatchActor({
+        final Actor actor = new DynamicDispatchActor().become {
             when {String msg -> stringFlag = true; reply false}
             when {Double msg -> doubleFlag = true; reply false}
             when {msg -> objectFlag = true; reply false}
-        })
-        actor.start()
+        }.start()
 
         actor.sendAndWait 1.0 as Double
         assertFalse stringFlag
@@ -92,9 +91,9 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     public void testSendingListViaWhen() {
         volatile boolean flag = false
 
-        final Actor actor = new DynamicDispatchActor({
+        final Actor actor = new DynamicDispatchActor().become {
             when {List msg -> flag = true; reply false}
-        })
+        }
         actor.start()
 
         actor.sendAndWait(new ArrayList())
@@ -105,11 +104,10 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         volatile boolean numberFlag = false
         volatile boolean doubleFlag = false
 
-        final Actor actor = new DynamicDispatchActor({
+        final Actor actor = new DynamicDispatchActor().become {
             when {Number msg -> numberFlag = true; reply false}
             when {Double msg -> doubleFlag = true; reply false}
-        })
-        actor.start()
+        }.start()
 
         actor.sendAndWait(1.0)
         assert numberFlag
@@ -169,7 +167,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         volatile boolean stringFlag = false
         volatile boolean integerFlag = false
 
-        def dda = new DynamicDispatchActor({when {msg ->}})
+        def dda = new DynamicDispatchActor().become {when {msg ->}}
         dda.when {String message ->
             stringFlag = true
             reply false

@@ -127,7 +127,7 @@ public abstract class PGroup {
      * @param code The closure specifying individual message handlers.
      */
     public final Actor messageHandler(final Closure code) {
-        final def actor = new DynamicDispatchActor(code)
+        final def actor = new DynamicDispatchActor().become(code)
         actor.parallelGroup = this
         actor.start()
         actor
@@ -138,7 +138,7 @@ public abstract class PGroup {
      * @param code The closure specifying individual message handlers.
      */
     public final Actor fairMessageHandler(final Closure code) {
-        final def actor = new DynamicDispatchActor(code)
+        final def actor = new DynamicDispatchActor().become(code)
         actor.parallelGroup = this
         actor.makeFair()
         actor.start()

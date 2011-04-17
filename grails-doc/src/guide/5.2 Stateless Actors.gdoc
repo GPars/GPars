@@ -44,14 +44,14 @@ Actors.actor {
 
 In some scenarios, typically when no implicit conversation-history-dependent state needs to be preserved for the actor, the dynamic dispatch code structure may be more intuitive than the traditional one using nested _loop_ and _react_ statements.
 
-The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamically at actor construction time using the _when_ handlers:
+The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamically at actor construction time using the _when_ handlers, optionally wrapped inside a _become_ method:
 
 {code}
-final Actor myActor = new DynamicDispatchActor({
+final Actor myActor = new DynamicDispatchActor().become {
     when {String msg -> println 'A String'; reply 'Thanks'}
     when {Double msg -> println 'A Double'; reply 'Thanks'}
     when {msg -> println 'A something ...'; reply 'What was that?';stop()}
-})
+}
 myActor.start()
 Actors.actor {
     myActor 'Hello'
@@ -64,8 +64,6 @@ Actors.actor {
 Obviously the two approaches can be combined:
 {code}
 final class MyDDA extends DynamicDispatchActor {
-
-    def MyDDA(final closure) { super(closure); }
 
     void onMessage(String message) {
         println 'Received string'
@@ -85,10 +83,10 @@ final class MyDDA extends DynamicDispatchActor {
     }
 }
 
-final def myActor = new MyDDA({
+final def myActor = new MyDDA().become {
     when {BigDecimal num -> println 'Received BigDecimal'}
     when {Float num -> println 'Got a float'}
-}).start()
+}.start()
 Actors.actor {
     myActor 'Hello'
     myActor 1.0f
