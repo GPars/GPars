@@ -44,7 +44,8 @@ Actors.actor {
 
 In some scenarios, typically when no implicit conversation-history-dependent state needs to be preserved for the actor, the dynamic dispatch code structure may be more intuitive than the traditional one using nested _loop_ and _react_ statements.
 
-The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamically at actor construction time using the _when_ handlers, optionally wrapped inside a _become_ method:
+The _DynamicDispatchActor_ class also provides a handy facility to add message handlers dynamically at actor construction time or any time later
+using the _when_ handlers, optionally wrapped inside a _become_ method:
 
 {code}
 final Actor myActor = new DynamicDispatchActor().become {
@@ -95,6 +96,8 @@ Actors.actor {
     myActor.join()
 }.join()
 {code}
+
+The dynamic message handlers registered via _when_ take precedence over the static _onMessage_ handlers.
 
 {note}
 _DynamicDispatchActor_ can be set to behave in a fair on non-fair (default) manner. Depending on the strategy chosen, the actor

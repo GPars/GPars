@@ -25,7 +25,8 @@ h3. Fork / Join
 
 h3. Actors
 
-* Active Objects wrapping actors under an OO facade
+* Active Objects wrapping actors with an OO facade
+* Enhanced DynamicDispatchActor's API for dynamic message handler registration
 
 h3. Dataflow
 
