@@ -310,6 +310,71 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert 'BigDecimal' == actor.results.val
         assert 'list' == actor.results.val
     }
+
+    public void testWhenOverOnMessage() {
+
+        final def actor = new MyActor().start()
+
+        actor 1
+        actor ''
+
+        assert 'Integer' == actor.results.val
+        assert 'string' == actor.results.val
+
+        actor.when {Integer num -> results << 'Integer2'}
+        actor 1
+        assert 'Integer2' == actor.results.val
+        actor.when {Integer num -> results << 'Integer3'}
+        actor 1
+        assert 'Integer3' == actor.results.val
+        actor.stop()
+        actor.join()
+
+    }
+
+    public void testWhenOverMoreGenericOnMessage() {
+
+        final def actor = new MyGenericActor().start()
+
+        actor 1
+        actor ''
+
+        assert 'Object' == actor.results.val
+        assert 'string' == actor.results.val
+
+        actor.when {Integer num -> results << 'Integer2'}
+        actor 1
+        assert 'Integer2' == actor.results.val
+        actor.when {Integer num -> results << 'Integer3'}
+        actor 1
+        assert 'Integer3' == actor.results.val
+        actor.stop()
+        actor.join()
+
+    }
+
+    public void testWhenOverWhen() {
+
+        final def actor = new MyActor().become {
+            when {BigDecimal num -> results << 'BigDecimal'}
+            when {Double num -> results << 'Double'}
+        }.start()
+
+        actor 1
+        actor ''
+        actor 1.0
+
+        assert 'Integer' == actor.results.val
+        assert 'string' == actor.results.val
+        assert 'BigDecimal' == actor.results.val
+
+        actor.when {BigDecimal num -> results << 'BigDecimal2'}
+        actor 1.0
+        assert 'BigDecimal2' == actor.results.val
+        actor.stop()
+        actor.join()
+
+    }
 }
 
 final class MyActor extends DynamicDispatchActor {
@@ -328,6 +393,17 @@ final class MyActor extends DynamicDispatchActor {
     void onMessage(Integer message) { results << 'Integer' }
 
     void onMessage(List message) { results << 'list'; stop() }
+}
+
+final class MyGenericActor extends DynamicDispatchActor {
+
+    def results = new DataFlowQueue()
+
+    def MyActor() { }
+
+    void onMessage(String message) { results << 'string' }
+
+    void onMessage(Object message) { results << 'Object' }
 }
 
 final class TestDynamicDispatchActor extends DynamicDispatchActor {
