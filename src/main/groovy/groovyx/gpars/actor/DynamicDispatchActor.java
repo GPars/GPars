@@ -64,6 +64,11 @@ public class DynamicDispatchActor extends AbstractLoopingActor {
     }
 
     public final void when(final Closure closure) {
-        DDAHelper.when(this, closure);
+        if (closure != null) {
+            final Closure cloned = (Closure) closure.clone();
+            cloned.setResolveStrategy(Closure.DELEGATE_FIRST);
+            cloned.setDelegate(this);
+            DDAHelper.when(this, cloned);
+        }
     }
 }
