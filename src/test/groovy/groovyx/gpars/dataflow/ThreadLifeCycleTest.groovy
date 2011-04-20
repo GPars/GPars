@@ -26,7 +26,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
 
     public void testPGroup() {
         final Actor actor = start {
-            react {}
+            receive {}
         }
         assertEquals DataFlow.DATA_FLOW_GROUP, actor.parallelGroup
         actor << 'Message'
@@ -64,7 +64,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         start {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
-            react(10.milliseconds) {}  //will timeout
+            receive(10.milliseconds) {}  //will timeout
         }
         latch.await()
         assertEquals 3, counter.get()

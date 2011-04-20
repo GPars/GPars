@@ -40,7 +40,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -70,7 +70,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -94,7 +94,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << null
             }
         }
@@ -115,7 +115,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }

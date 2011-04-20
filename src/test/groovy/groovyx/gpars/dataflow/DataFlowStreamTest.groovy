@@ -33,7 +33,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -64,7 +64,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -89,7 +89,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << null
             }
         }
@@ -111,7 +111,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -131,7 +131,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final Actor thread = DataFlow.start {
             (0..10).each {stream << it}
             barrier.await()
-            react {
+            receive {
                 stream << 11
                 barrier.await()
             }

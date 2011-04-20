@@ -61,7 +61,7 @@ public class ReceiveTest extends GroovyTestCase {
                                 df.result3 = msg2
                                 receive {msg3 ->
                                     df.result4 = msg3
-                                    stop()
+                                    terminate()
                                 }
                                 df.result5 = 'message5'
                             }
@@ -82,7 +82,7 @@ public class ReceiveTest extends GroovyTestCase {
         assertEquals 'message2', df.result2
         assertEquals 'message3', df.result3
         assertEquals 'message4', df.result4
-        assertFalse df.contains('result5')
+        assert !df.contains('result5')
     }
 
     public void testReceiveInLoops() {
@@ -90,7 +90,7 @@ public class ReceiveTest extends GroovyTestCase {
         final def barrier = new CyclicBarrier(2)
 
         def actor = Actors.oldActor {
-            loop {
+            while (true) {
                 if (df.contains('result1')) {
                     terminate()
                 }

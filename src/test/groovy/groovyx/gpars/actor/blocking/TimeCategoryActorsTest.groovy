@@ -52,8 +52,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         assert timeoutFlag
     }
 
-    //todo enable
-    public void _testTimeCategoryNotAvailable() {
+    public void testTimeCategoryNotAvailable() {
         volatile def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -66,7 +65,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
                     try {
                         receive(1.minute) {}
                     } catch (MissingPropertyException ignore) {exceptions++ }
-                    stop()
+                    terminate()
                 } finally {
                     latch.countDown()
                 }

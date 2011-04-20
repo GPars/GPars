@@ -32,8 +32,7 @@ import static groovyx.gpars.actor.Actors.oldActor
  */
 public class ReplyTest extends GroovyTestCase {
 
-    //todo enable - NPE
-    public void _testMultipleClients() {
+    public void testMultipleClients() {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CyclicBarrier completedBarrier = new CyclicBarrier(3)
         def replies1 = []
@@ -319,8 +318,7 @@ public class ReplyTest extends GroovyTestCase {
 
     }
 
-    //todo enable
-    public void _testOriginatorDetection() {
+    public void testOriginatorDetection() {
         final DataFlowVariable originator1 = new DataFlowVariable()
         final DataFlowVariable originator2 = new DataFlowVariable()
         final DataFlowVariable originator3 = new DataFlowVariable()
@@ -330,12 +328,12 @@ public class ReplyTest extends GroovyTestCase {
             receive {msg1 ->
                 originator1 << sender
                 receive {msg2 ->
-                    originator2 << msg2.sender
+                    originator2 << sender
                     receive {msg3 ->
-                        originator3 << msg3.sender
+                        originator3 << sender
                     }
                     def msg4 = receive()
-                    originator4 << msg4.sender
+                    originator4 << sender
                 }
             }
         }
