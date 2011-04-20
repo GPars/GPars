@@ -70,8 +70,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
 
     private volatile Thread waitingThread;
 
-    private static final ActorMessage startMessage = new ActorMessage("startMessage", null);
-
     protected static final int S_ACTIVE_MASK = 1;
     protected static final int S_FINISHING_MASK = 2;
     protected static final int S_FINISHED_MASK = 4;
@@ -277,10 +275,7 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
                 final int cnt = countUpdater.getAndIncrement(this);
 
-                if (cnt == 0) {
-                    if (stopFlag != S_STOPPED && stopFlag != S_TERMINATED)
-                        schedule();
-                } else {
+                if (cnt != 0) {
                     final Thread w = waitingThread;
                     if (w != null) {
                         waitingThread = null;
@@ -296,13 +291,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     @Override
     protected final boolean hasBeenStopped() {
         return stopFlag != S_RUNNING;
-    }
-
-    /**
-     * Schedules the current actor for processing on the actor group's thread pool.
-     */
-    private void schedule() {
-        parallelGroup.getThreadPool().execute(this);
     }
 
     @Override
@@ -337,8 +325,8 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
         if (!stopFlagUpdater.compareAndSet(this, S_NOT_STARTED, S_RUNNING)) {
             throw new IllegalStateException(ACTOR_HAS_ALREADY_BEEN_STARTED);
         }
-
-        send(startMessage);
+        parallelGroup.getThreadPool().execute(this);
+        send(START_MESSAGE);
         return this;
     }
 
@@ -509,15 +497,13 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                 }
                 final ActorMessage toProcess = getMessage();
 
-                if (toProcess == startMessage) {
+                if (toProcess == START_MESSAGE) {
                     handleStart();
 
                     // if we came here it means no loop was started
                     stopFlag = S_STOPPING;
                     throw STOP;
                 }
-
-                this.act();
 
             } catch (GroovyRuntimeException gre) {
                 throw ScriptBytecodeAdapter.unwrap(gre);
@@ -527,20 +513,17 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
         } catch (ActorStopException termination) {
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
-
             shouldTerminate = true;
         } catch (InterruptedException e) {
             shouldTerminate = true;
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
-
             stopFlag = S_TERMINATING;
             handleInterrupt(e);
         } catch (Throwable e) {
             shouldTerminate = true;
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
-
             stopFlag = S_TERMINATING;
             handleException(e);
         } finally {
@@ -554,9 +537,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                 currentThread = null;
                 ongoingThreadTermination.set(false);
                 final int cnt = countUpdater.decrementAndGet(this);
-                if (cnt > 0 && isActive()) {
-                    schedule();
-                }
             }
         }
     }

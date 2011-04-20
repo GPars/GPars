@@ -20,8 +20,6 @@ import groovy.lang.Closure;
 import groovy.time.Duration;
 import groovyx.gpars.actor.impl.SequentialProcessingActor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -144,11 +142,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * @param message The original message
      */
     private void enhanceReplies(final ActorMessage message) {
-        setSender(null);
         setSender(message == null ? null : message.getSender());
-        if (message != null) {
-            obj2Sender.put(message.getPayLoad(), message.getSender());
-        }
     }
 
     /**
@@ -160,7 +154,6 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     @Override
     protected final Object receiveImpl() throws InterruptedException {
         checkStoppedFlags();
-
         final ActorMessage message = takeMessage();
         return enhanceAndUnwrap(message);
     }
@@ -176,7 +169,6 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     @Override
     protected final Object receiveImpl(final long timeout, final TimeUnit units) throws InterruptedException {
         checkStoppedFlags();
-
         final ActorMessage message = takeMessage(timeout, units);
         return enhanceAndUnwrap(message);
     }
@@ -206,10 +198,9 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         handler.setResolveStrategy(Closure.DELEGATE_FIRST);
         handler.setDelegate(this);
 
-        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
         final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
-        final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
-        if (toReceive > 1) throw new IllegalArgumentException(AN_ACTOR_CAN_ONLY_RECEIVE_ONE_MESSAGE_AT_A_TIME);
+        if (maxNumberOfParameters > 1)
+            throw new IllegalArgumentException(AN_ACTOR_CAN_ONLY_RECEIVE_ONE_MESSAGE_AT_A_TIME);
 
         checkStopTerminate();
         final ActorMessage message = takeMessage();
@@ -242,8 +233,8 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         handler.setDelegate(this);
 
         final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
-        final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
-        if (toReceive > 1) throw new IllegalArgumentException(AN_ACTOR_CAN_ONLY_RECEIVE_ONE_MESSAGE_AT_A_TIME);
+        if (maxNumberOfParameters > 1)
+            throw new IllegalArgumentException(AN_ACTOR_CAN_ONLY_RECEIVE_ONE_MESSAGE_AT_A_TIME);
 
         final long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
 

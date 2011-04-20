@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         if (action != null) {
             if (action instanceof Closure) {
                 //noinspection RawUseOfParameterizedType
-                GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) action);
+                GroovyCategorySupport.use(Arrays.<Class>asList(), (Closure) action);
             } else {
                 action.run();
             }
@@ -87,8 +87,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         public Object invokeMethod(final String name, final Object args) {
             try {
                 return InvokerHelper.invokeMethod(first, name, args);
-            }
-            catch (MissingMethodException ignore) {
+            } catch (MissingMethodException ignore) {
                 return InvokerHelper.invokeMethod(second, name, args);
             }
         }
@@ -97,8 +96,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         public Object getProperty(final String property) {
             try {
                 return InvokerHelper.getProperty(first, property);
-            }
-            catch (MissingPropertyException ignore) {
+            } catch (MissingPropertyException ignore) {
                 return InvokerHelper.getProperty(second, property);
             }
         }
@@ -107,8 +105,7 @@ public class RunnableBackedPooledActor extends AbstractPooledActor {
         public void setProperty(final String property, final Object newValue) {
             try {
                 InvokerHelper.setProperty(first, property, newValue);
-            }
-            catch (MissingPropertyException ignore) {
+            } catch (MissingPropertyException ignore) {
                 InvokerHelper.setProperty(second, property, newValue);
             }
         }

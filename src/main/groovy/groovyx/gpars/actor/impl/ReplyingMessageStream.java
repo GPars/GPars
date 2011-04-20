@@ -16,15 +16,10 @@
 
 package groovyx.gpars.actor.impl;
 
-import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.ActorMessage;
-import org.codehaus.groovy.runtime.GroovyCategorySupport;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.WeakHashMap;
 
 /**
  * @author Alex Tkachman, Vaclav Pech
@@ -32,12 +27,11 @@ import java.util.WeakHashMap;
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 public abstract class ReplyingMessageStream extends Actor {
     private static final long serialVersionUID = -4660316352077009411L;
+    public static final String CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED = "Cannot send replies. No sender has been registerred.";
     /**
      * A list of senders for the currently processed messages
      */
     private MessageStream sender = null;
-
-    protected final WeakHashMap<Object, MessageStream> obj2Sender = new WeakHashMap<Object, MessageStream>();
 
     @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
     protected final MessageStream getSender() {
@@ -57,19 +51,15 @@ public abstract class ReplyingMessageStream extends Actor {
      *          If some of the replies failed to be sent.
      */
     protected final void reply(final Object message) {
-        assert sender != null;
-        if (sender == null) {
-            throw new ActorReplyException("Cannot send replies. No sender has been registerred.");
-        } else {
-            final List<Exception> exceptions = new ArrayList<Exception>();
-            try {
-                sender.send(message);
-            } catch (IllegalStateException e) {
-                exceptions.add(e);
-            }
-            if (!exceptions.isEmpty()) {
-                throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
-            }
+        if (sender == null) throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED);
+        final List<Exception> exceptions = new ArrayList<Exception>();
+        try {
+            sender.send(message);
+        } catch (IllegalStateException e) {
+            exceptions.add(e);
+        }
+        if (!exceptions.isEmpty()) {
+            throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
         }
     }
 
@@ -80,19 +70,10 @@ public abstract class ReplyingMessageStream extends Actor {
      * @param message reply message
      */
     protected final void replyIfExists(final Object message) {
-        assert sender != null;
+        if (sender == null) throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED);
         try {
             sender.send(message);
         } catch (IllegalStateException ignore) {
         }
-    }
-
-    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
-    protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
-        assert message != null;
-        if (message == TIMEOUT_MESSAGE) handleTimeout();
-        else sender = message.getSender();
-        obj2Sender.put(message.getPayLoad(), message.getSender());
-        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
     }
 }
