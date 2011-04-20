@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,25 +35,17 @@ public abstract class ReplyingMessageStream extends Actor {
     /**
      * A list of senders for the currently processed messages
      */
-    private final List<MessageStream> senders = new ArrayList<MessageStream>();
+    private MessageStream sender = null;
 
     protected final WeakHashMap<Object, MessageStream> obj2Sender = new WeakHashMap<Object, MessageStream>();
 
     @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
-    protected final List<MessageStream> getSenders() {
-        return senders;
+    protected final MessageStream getSender() {
+        return sender;
     }
 
-    /**
-     * Retrieves the sender actor of the currently processed message.
-     *
-     * @return The sender of the currently processed message or null, if the message was not sent by an actor
-     * @throws groovyx.gpars.actor.impl.ActorReplyException
-     *          If some of the replies failed to be sent.
-     */
-    protected final MessageStream getSender() {
-        assert senders != null;
-        return senders.isEmpty() ? null : senders.get(0);
+    protected final void setSender(final MessageStream sender) {
+        this.sender = sender;
     }
 
     /**
@@ -65,21 +57,15 @@ public abstract class ReplyingMessageStream extends Actor {
      *          If some of the replies failed to be sent.
      */
     protected final void reply(final Object message) {
-        assert senders != null;
-        if (senders.isEmpty()) {
-            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
+        assert sender != null;
+        if (sender == null) {
+            throw new ActorReplyException("Cannot send replies. No sender has been registerred.");
         } else {
             final List<Exception> exceptions = new ArrayList<Exception>();
-            for (final MessageStream sender : senders) {
-                if (sender != null) {
-                    try {
-                        sender.send(message);
-                    } catch (IllegalStateException e) {
-                        exceptions.add(e);
-                    }
-                } else {
-                    exceptions.add(new IllegalArgumentException(String.format("Cannot send a reply message %s to a null recipient.", message)));
-                }
+            try {
+                sender.send(message);
+            } catch (IllegalStateException e) {
+                exceptions.add(e);
             }
             if (!exceptions.isEmpty()) {
                 throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
@@ -94,14 +80,10 @@ public abstract class ReplyingMessageStream extends Actor {
      * @param message reply message
      */
     protected final void replyIfExists(final Object message) {
-        assert senders != null;
-        for (final MessageStream sender : senders) {
-            try {
-                if (sender != null) {
-                    sender.send(message);
-                }
-            } catch (IllegalStateException ignore) {
-            }
+        assert sender != null;
+        try {
+            sender.send(message);
+        } catch (IllegalStateException ignore) {
         }
     }
 
@@ -109,7 +91,7 @@ public abstract class ReplyingMessageStream extends Actor {
     protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
         assert message != null;
         if (message == TIMEOUT_MESSAGE) handleTimeout();
-        else senders.add(message.getSender());
+        else sender = message.getSender();
         obj2Sender.put(message.getPayLoad(), message.getSender());
         GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
     }

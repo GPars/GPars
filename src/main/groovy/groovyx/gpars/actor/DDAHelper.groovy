@@ -16,8 +16,6 @@
 
 package groovyx.gpars.actor
 
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
-
 /**
  * Hooks the supplied when handlers to DDAs
  *
@@ -25,6 +23,6 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
  */
 final class DDAHelper {
     static final void when(final target, final closure) {
-        DefaultGroovyMethods.getMetaClass(target).onMessage closure
+        target.metaClass.onMessage closure
     }
 }

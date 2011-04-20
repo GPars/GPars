@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +18,9 @@ package groovyx.gpars.actor;
 
 import groovy.lang.Closure;
 import groovy.time.Duration;
-import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.actor.impl.SequentialProcessingActor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -45,10 +42,10 @@ import java.util.concurrent.TimeUnit;
  * allows to repeatedly invoke a closure and yet perform each of the iterations sequentially in different
  * thread from the thread pool.  To support continuations correctly the {@code react} and {@code loop}
  * methods never return.
- *
+ * <p/>
  * <pre>
  * import static groovyx.gpars.actor.Actors.actor
- * 
+ *
  * def actor = actor {
  *     loop {
  *         react { message ->
@@ -58,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  *     }
  *     // This line will never be reached.
  * }.start()
- * 
+ *
  * actor.send 'Hi!'
  * </pre>
  * <p>
@@ -101,7 +98,7 @@ import java.util.concurrent.TimeUnit;
  *     println 'Received message: ' + it
  * }
  * </pre>
- *<p>
+ * <p>
  * If no message arrives within the given timeout, the {@code onTimeout} lifecycle handler is invoked, if
  * exists, and the {@code Actor.TIMEOUT} message is returned.  Each {@code Actor} has at any point in time
  * at most one active instance of {@code ActorAction} associated, which abstracts the current chunk of
@@ -135,14 +132,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     private static final String THE_ACTOR_HAS_NOT_BEEN_STARTED = "The actor hasn't been started.";
     private static final String THE_ACTOR_HAS_BEEN_STOPPED = "The actor has been stopped.";
     private static final long serialVersionUID = -6232655362494852540L;
-
-    /**
-     * This method represents the body of the actor. It is called upon actor's start and can exit either
-     * normally by return or due to actor being stopped through the stop() method, which cancels the current
-     * actor action.  Provides an extension point for subclasses to provide their custom {@code Actor}'s
-     * message handling code.
-     */
-    protected abstract void act();
+    public static final String AN_ACTOR_CAN_ONLY_RECEIVE_ONE_MESSAGE_AT_A_TIME = "An actor can only receive one message at a time";
 
     /**
      * Adds {@code reply} and {@code replyIfExists} methods to the current {@code Actor} and the message.
@@ -151,17 +141,13 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
      * processed messages, {@code reply}/{@code replyIfExists} invoked on a message will send a reply to the
      * sender of that particular message only.
      *
-     * @param messages List of {@code ActorMessage} wrapping the sender actor, who we need to be able to
-     *                 respond to, plus the original message
+     * @param message The original message
      */
-    private void enhanceReplies(final Iterable<ActorMessage> messages) {
-        final List<MessageStream> senders = getSenders();
-        senders.clear();
-        for (final ActorMessage message : messages) {
-            senders.add(message == null ? null : message.getSender());
-            if (message != null) {
-                obj2Sender.put(message.getPayLoad(), message.getSender());
-            }
+    private void enhanceReplies(final ActorMessage message) {
+        setSender(null);
+        setSender(message == null ? null : message.getSender());
+        if (message != null) {
+            obj2Sender.put(message.getPayLoad(), message.getSender());
         }
     }
 
@@ -196,7 +182,7 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
     }
 
     private Object enhanceAndUnwrap(final ActorMessage message) {
-        enhanceReplies(Arrays.<ActorMessage>asList(message));
+        enhanceReplies(message);
         if (message == null) {
             return null;
         }
@@ -223,30 +209,21 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
         final List<ActorMessage> messages = new ArrayList<ActorMessage>();
         final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
         final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
+        if (toReceive > 1) throw new IllegalArgumentException(AN_ACTOR_CAN_ONLY_RECEIVE_ONE_MESSAGE_AT_A_TIME);
 
-        collectRequiredMessages(messages, toReceive);
-        enhanceReplies(messages);
+        checkStopTerminate();
+        final ActorMessage message = takeMessage();
+        enhanceReplies(message);
 
         try {
             if (maxNumberOfParameters == 0) {
                 handler.call();
             } else {
-                final Object[] args = new Object[messages.size()];
-                for (int i = 0; i < args.length; i++) {
-                    args[i] = messages.get(i).getPayLoad();
-                }
-                handler.call(args);
+                handler.call(message == null ? message : message.getPayLoad());
             }
 
         } finally {
-            getSenders().clear();
-        }
-    }
-
-    private void collectRequiredMessages(final Collection<ActorMessage> messages, final int toReceive) throws InterruptedException {
-        for (int i = 0; i != toReceive; ++i) {
-            checkStopTerminate();
-            messages.add(takeMessage());
+            setSender(null);
         }
     }
 
@@ -266,46 +243,27 @@ public abstract class AbstractPooledActor extends SequentialProcessingActor {
 
         final int maxNumberOfParameters = handler.getMaximumNumberOfParameters();
         final int toReceive = maxNumberOfParameters == 0 ? 1 : maxNumberOfParameters;
+        if (toReceive > 1) throw new IllegalArgumentException(AN_ACTOR_CAN_ONLY_RECEIVE_ONE_MESSAGE_AT_A_TIME);
 
         final long stopTime = timeUnit.toMillis(timeout) + System.currentTimeMillis();
 
-        boolean nullAppeared = false;  //Ignore further potential messages once a null is retrieved (due to a timeout)
-        final List<ActorMessage> messages = new ArrayList<ActorMessage>();
-        for (int i = 0; i != toReceive; ++i) {
-            if (nullAppeared) {
-                messages.add(null);
-            } else {
-                if (stopFlag != S_RUNNING) {
-                    throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
-                }
-                final ActorMessage message =
-                        takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0L), TimeUnit.MILLISECONDS);
-                nullAppeared = message == null;
-                messages.add(message);
-            }
+        if (stopFlag != S_RUNNING) {
+            throw new IllegalStateException(THE_ACTOR_HAS_NOT_BEEN_STARTED);
         }
+        final ActorMessage message =
+                takeMessage(Math.max(stopTime - System.currentTimeMillis(), 0L), TimeUnit.MILLISECONDS);
 
         try {
-            enhanceReplies(messages);
+            enhanceReplies(message);
 
             if (maxNumberOfParameters == 0) {
                 handler.call();
             } else {
-                final Object[] args = retrievePayloadOfMessages(messages);
-                handler.call(args);
+                handler.call(message == null ? message : message.getPayLoad());
             }
         } finally {
-            getSenders().clear();
+            setSender(null);
         }
-    }
-
-    private static Object[] retrievePayloadOfMessages(final List<ActorMessage> messages) {
-        final Object[] args = new Object[messages.size()];
-        for (int i = 0; i < args.length; i++) {
-            final ActorMessage am = messages.get(i);
-            args[i] = am == null ? am : am.getPayLoad();
-        }
-        return args;
     }
 
     /**
