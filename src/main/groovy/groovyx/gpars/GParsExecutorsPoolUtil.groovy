@@ -19,7 +19,7 @@ package groovyx.gpars
 import groovy.time.Duration
 import groovyx.gpars.dataflow.DataFlowVariable
 import groovyx.gpars.scheduler.DefaultPool
-import groovyx.gpars.util.PAGroovyUtils
+import groovyx.gpars.util.PAUtils
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -113,7 +113,7 @@ public class GParsExecutorsPoolUtil {
         final def pool = new DefaultPool(GParsExecutorsPool.retrieveCurrentPool())
         return {final Object[] args ->
             final DataFlowVariable result = new DataFlowVariable()
-            PAGroovyUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            PAUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
     }

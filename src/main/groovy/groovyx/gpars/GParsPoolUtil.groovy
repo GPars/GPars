@@ -31,7 +31,6 @@ import groovyx.gpars.pa.ClosurePredicate
 import groovyx.gpars.pa.ClosureReducer
 import groovyx.gpars.pa.SumClosure
 import groovyx.gpars.scheduler.FJPool
-import groovyx.gpars.util.PAGroovyUtils
 import groovyx.gpars.util.PAUtils
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.SoftReference
@@ -135,7 +134,7 @@ public class GParsPoolUtil {
         final def pool = new FJPool(retrievePool())
         return {final Object[] args ->
             final DataFlowVariable result = new DataFlowVariable()
-            PAGroovyUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            PAUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
     }

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +51,8 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
      */
     @Override
     public DataFlowWriteChannel<T> leftShift(final T value) {
-        bind(value);
+        if (value instanceof DataFlowReadChannel) bindDFV((DataFlowReadChannel<T>) value);
+        else bind(value);
         return this;
     }
 
@@ -63,6 +64,10 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
      */
     @Override
     public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
+        return bindDFV(ref);
+    }
+
+    private DataFlowWriteChannel<T> bindDFV(final DataFlowReadChannel<T> ref) {
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -458384302762038543L;
 
@@ -78,6 +83,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
 
     /**
      * Retrieves the value of the variable, blocking until a value is available
+     *
      * @return The value stored in the variable
      * @throws Throwable If the stored value is an exception instance it gets re-thrown
      */
@@ -92,6 +98,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
 
     /**
      * Retrieves the value of the variable, blocking up to given timeout, if the value has not been assigned yet.
+     *
      * @param timeout The timeout value
      * @param units   Units for the timeout
      * @return The value stored in the variable

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 package groovyx.gpars.util;
 
 import groovy.lang.Closure;
+import groovyx.gpars.ReactorMessagingRunnable;
+import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.scheduler.Pool;
+import org.codehaus.groovy.runtime.InvokerInvocationException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -192,5 +196,85 @@ public abstract class PAUtils {
                 return null;
             }
         };
+    }
+
+    /**
+     * Performs a single step in the evaluation of parameters passed into an asynchronous function
+     *
+     * @param pool             The thread pool to use
+     * @param args             The list of original arguments
+     * @param current          The index of the current argument to evaluate
+     * @param soFarArgs        A list of arguments evaluated so far
+     * @param result           The DFV expecting the function result to be bound to once calculated
+     * @param original         The original non-asynchronous function to invoke once all arguments are available
+     * @param pooledThreadFlag Indicates, whether we now run in a pooled thread so we don't have to schedule the original function invocation, once all arguments have been bound
+     */
+    @SuppressWarnings({"unchecked"})
+    public static void evaluateArguments(final Pool pool, final Object[] args, final int current, final List<Object> soFarArgs,
+                                         final DataFlowVariable<Object> result, final Closure original, final boolean pooledThreadFlag) {
+        if (current == args.length) {
+            if (pooledThreadFlag) {
+                try {
+                    final Object call = original.call(soFarArgs.toArray(new Object[soFarArgs.size()]));
+                    result.leftShift(call);
+                } catch (InvokerInvocationException e) {
+                    result.bind(e.getCause());
+                } catch (Exception all) {
+                    result.bind(all);
+                } catch (Error error) {
+                    result.bind(error);
+                    throw error;
+                }
+            } else {
+                pool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            result.leftShift(original.call(soFarArgs.toArray(new Object[soFarArgs.size()])));
+                        } catch (InvokerInvocationException e) {
+                            result.bind(e.getCause());
+                        } catch (Exception all) {
+                            result.bind(all);
+                        } catch (Error error) {
+                            result.bind(error);
+                            throw error;
+                        }
+                    }
+                });
+            }
+        } else {
+            final Object currentArgument = args[current];
+            if (currentArgument instanceof DataFlowVariable) {
+                final DataFlowVariable<Object> variable = (DataFlowVariable<Object>) currentArgument;
+                if (variable.isBound()) {
+                    Object currentValue = null;
+                    try {
+                        currentValue = variable.getVal();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException("Interrupted while processing arguments", e);
+                    }
+                    if (currentValue instanceof Throwable) result.leftShift(currentValue);
+                    else {
+                        soFarArgs.add(currentValue);
+                        evaluateArguments(pool, args, current + 1, soFarArgs, result, original, pooledThreadFlag);
+                    }
+                } else {
+                    variable.whenBound(pool, new ReactorMessagingRunnable() {
+                        @Override
+                        protected Object doRun(final Object argument) {
+                            if (argument instanceof Throwable) result.leftShift(argument);
+                            else {
+                                soFarArgs.add(argument);
+                                evaluateArguments(pool, args, current + 1, soFarArgs, result, original, true);
+                            }
+                            return null;
+                        }
+                    });
+                }
+            } else {
+                soFarArgs.add(currentArgument);
+                evaluateArguments(pool, args, current + 1, soFarArgs, result, original, pooledThreadFlag);
+            }
+        }
     }
 }
