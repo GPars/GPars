@@ -21,6 +21,7 @@ import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.RemoteSerialized;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
@@ -109,6 +110,10 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
         final T result = getVal(timeout, units);
         if (result instanceof Throwable) {
             throw (Throwable) result;
+        }
+        if (result == null) {
+            if (!this.isBound()) throw new TimeoutException("Timeout expired in DataFlowVariable.get().");
+            return getVal();
         }
         return result;
     }
