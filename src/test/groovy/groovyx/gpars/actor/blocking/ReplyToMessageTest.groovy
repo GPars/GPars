@@ -44,9 +44,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies2 = []
 
         final def bouncer = group.oldActor {
-            loop {
+            while (true) {
                 receive {
-                    it.reply it
+                    reply it
                     barrier.await()
                 }
             }
@@ -100,11 +100,11 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies2 = []
 
         final def incrementor = group.oldActor {
-            loop { receive { it.reply it + 1 }}
+            while (true) { receive { reply it + 1 }}
         }
 
         final def decrementor = group.oldActor {
-            loop { receive { it.reply it - 1 }}
+            while (true) { receive { reply it - 1 }}
         }
 
         group.oldActor {
@@ -170,9 +170,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
                 }
             }
 
-            loop {
+            while (true) {
                 receive {
-                    it.reply it
+                    reply it
                 }
             }
         }
@@ -190,7 +190,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         final Actor receiver = group.oldActor {
             receive {
-                it.replyIfExists it
+                replyIfExists it
             }
         }
 
@@ -213,7 +213,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         final Actor actor = group.oldActor {
             receive {
-                it.replyIfExists it
+                replyIfExists it
                 flag.set(true)
                 barrier.await()
             }
@@ -233,7 +233,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final Actor replier = group.oldActor {
             receive {
                 latch.await()
-                it.replyIfExists it
+                replyIfExists it
                 flag.set(true)
                 barrier.await()
             }
@@ -254,49 +254,4 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         assert flag.get()
     }
-
-    public void testNestedReplies() {
-        final CyclicBarrier barrier = new CyclicBarrier(3)
-        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
-        def replies1 = []
-        def replies2 = []
-
-        final def maxFinder = group.oldActor {
-            barrier.await()
-            receive {message1 ->
-                receive {message2 ->
-                    def max = Math.max(message1, message2)
-                    message1.reply max
-                    message2.reply max
-                }
-            }
-        }
-
-
-        group.oldActor {
-            barrier.await()
-            maxFinder.send 2
-            receive {
-                replies1 << it
-                completedBarrier.await()
-            }
-        }
-
-        group.oldActor {
-            barrier.await()
-            maxFinder.send 3
-            receive {
-                replies2 << it
-                completedBarrier.await()
-            }
-        }
-
-        completedBarrier.await()
-        assertEquals 1, replies1.size()
-        assertEquals 1, replies2.size()
-
-        assert replies1.contains(3)
-        assert replies2.contains(3)
-    }
-
 }

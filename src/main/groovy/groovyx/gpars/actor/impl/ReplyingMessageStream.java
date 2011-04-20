@@ -70,7 +70,7 @@ public abstract class ReplyingMessageStream extends Actor {
      * @param message reply message
      */
     protected final void replyIfExists(final Object message) {
-        if (sender == null) throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED);
+        if (sender == null) return;
         try {
             sender.send(message);
         } catch (IllegalStateException ignore) {
