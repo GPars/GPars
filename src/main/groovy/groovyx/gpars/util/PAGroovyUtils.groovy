@@ -66,9 +66,15 @@ abstract class PAGroovyUtils {
         else {
             def currentArgument = args[current]
             if (currentArgument instanceof DataFlowVariable) {
-                currentArgument.whenBound(pool) {value ->
-                    if (value instanceof Throwable) result << value
-                    else evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
+                if (currentArgument.isBound()) {
+                    def currentValue = currentArgument.val
+                    if (currentValue instanceof Throwable) result << currentValue
+                    else evaluateArguments(pool, args, current + 1, soFarArgs << currentValue, result, original, pooledThreadFlag)
+                } else {
+                    currentArgument.whenBound(pool) {value ->
+                        if (value instanceof Throwable) result << value
+                        else evaluateArguments(pool, args, current + 1, soFarArgs << value, result, original, true)
+                    }
                 }
             } else {
                 evaluateArguments(pool, args, current + 1, soFarArgs << currentArgument, result, original, pooledThreadFlag)
