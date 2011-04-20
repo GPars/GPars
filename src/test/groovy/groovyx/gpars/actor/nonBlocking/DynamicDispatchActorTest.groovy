@@ -231,9 +231,13 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
         def results = new DataFlowVariable()
 
-        Actors.oldActor {
+        Actors.actor {
             dda << 1
-            results << (1..2).collect {receive(1000, TimeUnit.MILLISECONDS)}
+            react(1000, TimeUnit.MILLISECONDS) {a ->
+                react(1000, TimeUnit.MILLISECONDS) { b ->
+                    results << [a, b]
+                }
+            }
             dda.stop()
         }
         assert results.val == [10, 20]
@@ -273,7 +277,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
         assert results.d4 == 8
     }
 
-    public void testWhenInConctructor() {
+    public void testWhenInConstructor() {
 
         final def actor = new MyActor({
             when {BigDecimal num -> results << 'BigDecimal'}
@@ -312,6 +316,11 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testWhenOverOnMessage() {
+
+//        def dda = Actors.messageHandler {
+        //            when {message -> }
+        //        }
+        //        dda << 1
 
         final def actor = new MyActor().start()
 
