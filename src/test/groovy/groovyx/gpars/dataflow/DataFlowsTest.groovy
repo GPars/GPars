@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
@@ -49,13 +50,13 @@ public class DataFlowsTest extends GroovyTestCase {
     public void testVariableFromThread() {
         final DataFlows data = new DataFlows()
 
-        DataFlow.start {
+        Actors.oldActor {
             data.variable = 10
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
         volatile List<Integer> result = []
-        DataFlow.start {
+        Actors.oldActor {
             result << data.variable
             result << data.variable
             latch.countDown()
@@ -71,11 +72,11 @@ public class DataFlowsTest extends GroovyTestCase {
         volatile int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        DataFlow.start {
+        Actors.oldActor {
             result = data.variable
             latch.countDown()
         }
-        DataFlow.start {
+        Actors.oldActor {
             Thread.sleep 3000
             data.variable = 10
         }
@@ -91,12 +92,12 @@ public class DataFlowsTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         volatile int result = 0
-        DataFlow.start {
+        Actors.oldActor {
             barrier.await()
             result = data.variable
             latch.countDown()
         }
-        DataFlow.start {
+        Actors.oldActor {
             data.variable = 10
             barrier.await()
         }
@@ -110,14 +111,14 @@ public class DataFlowsTest extends GroovyTestCase {
     public void testIndexes() {
         final DataFlows data = new DataFlows()
 
-        DataFlow.start {
+        Actors.oldActor {
             //noinspection GroovyAssignmentCanBeOperatorAssignment
             data[2] = data[0] - data[1]
         }
-        DataFlow.start {
+        Actors.oldActor {
             data[1] = 5
         }
-        DataFlow.start {
+        Actors.oldActor {
             data[0] = 7
         }
         assertEquals 2, data[2]
@@ -143,12 +144,12 @@ public class DataFlowsTest extends GroovyTestCase {
         final DataFlows data = new DataFlows()
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        DataFlow.start {
+        Actors.oldActor {
             barrier.await()
             data.y = 'value'
         }
 
-        DataFlow.start {
+        Actors.oldActor {
             Thread.sleep 1000
             data.remove('y')
             barrier.await()

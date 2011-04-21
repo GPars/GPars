@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import static groovyx.gpars.dataflow.DataFlow.start
+import static groovyx.gpars.actor.Actors.oldActor
 
 public class DataFlowTest extends GroovyTestCase {
 
@@ -30,16 +30,16 @@ public class DataFlowTest extends GroovyTestCase {
         volatile def result = 0
         final def latch = new CountDownLatch(1)
 
-        start {
+        oldActor {
             z << x.val + y.val
             result = z.val
             latch.countDown()
         }
 
-        start {
+        oldActor {
             x << 40
         }
-        start {
+        oldActor {
             y << 2
         }
 
@@ -67,9 +67,9 @@ public class DataFlowTest extends GroovyTestCase {
         volatile def result = 0
         final def latch = new CountDownLatch(1)
 
-        start { x << ints(0, 10) }
-        start { y << sum(0, x.val) }
-        start {
+        oldActor { x << ints(0, 10) }
+        oldActor { y << sum(0, x.val) }
+        oldActor {
             result = y.val
             latch.countDown()
         }
@@ -91,12 +91,12 @@ public class DataFlowTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        start {
+        oldActor {
             z << x.val + y.val
         }
 
-        start {x << 40}
-        start {y << 2}
+        oldActor {x << 40}
+        oldActor {y << 2}
 
         latch.await(90, TimeUnit.SECONDS)
         assertEquals 42, result
@@ -113,15 +113,15 @@ public class DataFlowTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        start {
+        oldActor {
             def v = df.x + df.y
             df.z = v
         }
 
-        start {
+        oldActor {
             df.x = 40
         }
-        start {
+        oldActor {
             df.y = 2
         }
 

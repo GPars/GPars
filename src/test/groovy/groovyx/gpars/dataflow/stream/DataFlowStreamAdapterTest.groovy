@@ -35,12 +35,12 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
         final def writeStream = new DataFlowStreamWriteAdapter(original)
 
         final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.actor {
             writeStream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
             latch.countDown()
-            receive {
+            react {
                 variable << 20
             }
         }
@@ -65,12 +65,12 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
         writeStream << 2
         assert stream.poll()?.val == 2
         assert stream.poll()?.val == null
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.actor {
             writeStream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
             latch.countDown()
-            receive {
+            react {
                 variable << 20
             }
         }
@@ -89,7 +89,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
         final def writeStream = new DataFlowStreamWriteAdapter(original)
 
         final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.oldActor {
             writeStream << null
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
@@ -111,7 +111,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
         final def writeStream = new DataFlowStreamWriteAdapter(original)
 
         final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.oldActor {
             final DataFlowVariable variable = new DataFlowVariable()
             writeStream << variable
             latch.countDown()
@@ -148,7 +148,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
         final def writeStream = new DataFlowStreamWriteAdapter(original)
 
         final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
-        DataFlow.start {
+        Thread.start() {
             (0..10).each {writeStream << null}
             barrier.await()
         }

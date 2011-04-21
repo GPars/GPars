@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
@@ -89,13 +90,13 @@ public class DataFlowVariableTest extends GroovyTestCase {
 
     public void testVariableFromThread() {
         final DataFlowVariable variable = new DataFlowVariable()
-        DataFlow.start {
+        Actors.oldActor {
             variable << 10
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
         volatile List<Integer> result = []
-        DataFlow.start {
+        Actors.oldActor {
             result << variable.val
             result << variable.val
             latch.countDown()
@@ -110,11 +111,11 @@ public class DataFlowVariableTest extends GroovyTestCase {
         volatile int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        DataFlow.start {
+        Actors.oldActor {
             result = variable.val
             latch.countDown()
         }
-        DataFlow.start {
+        Actors.oldActor {
             Thread.sleep 3000
             variable << 10
         }
@@ -130,12 +131,12 @@ public class DataFlowVariableTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         volatile int result = 0
-        DataFlow.start {
+        Actors.oldActor {
             barrier.await()
             result = variable.val
             latch.countDown()
         }
-        DataFlow.start {
+        Actors.oldActor {
             variable << 10
             barrier.await()
         }
@@ -161,7 +162,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         variable >> {
             result << variable.val
         }
-        DataFlow.start {
+        Actors.oldActor {
             variable << 10
         }
 
@@ -190,7 +191,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         variable >> {
             result << variable.poll()
         }
-        DataFlow.start {
+        Actors.oldActor {
             variable << 10
         }
 
