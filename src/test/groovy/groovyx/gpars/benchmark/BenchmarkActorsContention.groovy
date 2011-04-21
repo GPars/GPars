@@ -95,7 +95,7 @@ final class RunnableAttackActor extends RunnableBackedPooledActor {
     public void run() {
         attackSignal.await()
         defender.send weapon
-        this.react {
+        this.receive {
             retreatSignal.countDown()
         }
     }

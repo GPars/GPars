@@ -45,7 +45,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     //todo reduce the number of message reading methods
     //todo restructure the code
     //todo rename, remove deprecation
-    //todo rename the factory methods
     private static final long serialVersionUID = 6479220959200502418L;
 
     /**
