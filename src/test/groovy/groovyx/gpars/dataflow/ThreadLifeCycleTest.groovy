@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
     public void testPGroup() {
-        final Actor actor = Actors.oldActor {
+        final Actor actor = Actors.blockingActor {
             receive {}
         }
         assertEquals Actors.defaultActorPGroup, actor.parallelGroup
@@ -36,7 +36,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.oldActor {
+        Actors.blockingActor {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
         }
@@ -48,7 +48,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.oldActor {
+        Actors.blockingActor {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
             throw new RuntimeException('test')
@@ -61,7 +61,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.oldActor {
+        Actors.blockingActor {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
             receive(10.milliseconds) {}  //will timeout

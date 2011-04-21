@@ -90,13 +90,13 @@ public class DataFlowVariableTest extends GroovyTestCase {
 
     public void testVariableFromThread() {
         final DataFlowVariable variable = new DataFlowVariable()
-        Actors.oldActor {
+        Actors.blockingActor {
             variable << 10
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
         volatile List<Integer> result = []
-        Actors.oldActor {
+        Actors.blockingActor {
             result << variable.val
             result << variable.val
             latch.countDown()
@@ -111,11 +111,11 @@ public class DataFlowVariableTest extends GroovyTestCase {
         volatile int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.oldActor {
+        Actors.blockingActor {
             result = variable.val
             latch.countDown()
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             Thread.sleep 3000
             variable << 10
         }
@@ -131,12 +131,12 @@ public class DataFlowVariableTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         volatile int result = 0
-        Actors.oldActor {
+        Actors.blockingActor {
             barrier.await()
             result = variable.val
             latch.countDown()
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             variable << 10
             barrier.await()
         }
@@ -162,7 +162,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         variable >> {
             result << variable.val
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             variable << 10
         }
 
@@ -191,7 +191,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         variable >> {
             result << variable.poll()
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             variable << 10
         }
 

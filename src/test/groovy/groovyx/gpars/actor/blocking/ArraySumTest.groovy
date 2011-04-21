@@ -38,7 +38,7 @@ public class ArraySumTest extends GroovyTestCase {
         AtomicInteger result = new AtomicInteger(0)
         CountDownLatch latch = new CountDownLatch(1)
 
-        group.oldActor {
+        group.blockingActor {
             new Processor(delegate, group).start().send([1, 2, 3, 4, 5])
             receive {
                 result.set it[0]

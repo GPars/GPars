@@ -29,7 +29,7 @@ public class ReceiveTest extends GroovyTestCase {
     public void testReceive() {
         final DataFlows df = new DataFlows()
 
-        def actor = Actors.oldActor {
+        def actor = Actors.blockingActor {
             df.result1 = receive()
             receive {
                 df.result2 = it
@@ -50,7 +50,7 @@ public class ReceiveTest extends GroovyTestCase {
     public void testNestedReceive() {
         final DataFlows df = new DataFlows()
 
-        def actor = Actors.oldActor {
+        def actor = Actors.blockingActor {
             while (true) {
                 receive {
                     receive {
@@ -89,7 +89,7 @@ public class ReceiveTest extends GroovyTestCase {
         final DataFlows df = new DataFlows()
         final def barrier = new CyclicBarrier(2)
 
-        def actor = Actors.oldActor {
+        def actor = Actors.blockingActor {
             while (true) {
                 if (df.contains('result1')) {
                     terminate()

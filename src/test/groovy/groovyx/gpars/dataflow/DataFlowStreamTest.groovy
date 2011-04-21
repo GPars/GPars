@@ -28,7 +28,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = Actors.oldActor {
+        final Actor thread = Actors.blockingActor {
             stream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
@@ -59,7 +59,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         stream << 2
         assert stream.poll()?.val == 2
         assert stream.poll()?.val == null
-        final Actor thread = Actors.oldActor {
+        final Actor thread = Actors.blockingActor {
             stream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
@@ -84,7 +84,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = Actors.oldActor {
+        final Actor thread = Actors.blockingActor {
             stream << null
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
@@ -107,7 +107,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = Actors.oldActor {
+        final Actor thread = Actors.blockingActor {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
@@ -128,7 +128,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = Actors.oldActor {
+        final Actor thread = Actors.blockingActor {
             (0..10).each {stream << it}
             barrier.await()
             receive {
@@ -154,7 +154,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        Actors.oldActor {
+        Actors.blockingActor {
             (0..10).each {stream << null}
             barrier.await()
         }

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public class NullMessageTest extends GroovyTestCase {
     public void testNullMessage() {
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final Actor actor = Actors.oldActor {
+        final Actor actor = Actors.blockingActor {
             receive {
                 result = it
                 latch.countDown()
@@ -42,7 +42,7 @@ public class NullMessageTest extends GroovyTestCase {
         final def group = new DefaultPGroup(new DefaultPool(true, 100))
         volatile def result = ''
         final def latch = new CountDownLatch(1)
-        final Actor actor = group.oldActor {
+        final Actor actor = group.blockingActor {
             receive {
                 result = it
                 latch.countDown()
@@ -59,12 +59,12 @@ public class NullMessageTest extends GroovyTestCase {
 
     public void testNullMessageFromActorWithReply() {
         final def result = new DataFlowVariable()
-        final Actor actor = Actors.oldActor {
+        final Actor actor = Actors.blockingActor {
             receive {
                 reply 10
             }
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             actor << null
             receive {
                 result << it

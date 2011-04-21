@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import static groovyx.gpars.actor.Actors.oldActor
+import static groovyx.gpars.actor.Actors.blockingActor
 
 public class DataFlowTest extends GroovyTestCase {
 
@@ -30,16 +30,16 @@ public class DataFlowTest extends GroovyTestCase {
         volatile def result = 0
         final def latch = new CountDownLatch(1)
 
-        oldActor {
+        blockingActor {
             z << x.val + y.val
             result = z.val
             latch.countDown()
         }
 
-        oldActor {
+        blockingActor {
             x << 40
         }
-        oldActor {
+        blockingActor {
             y << 2
         }
 
@@ -67,9 +67,9 @@ public class DataFlowTest extends GroovyTestCase {
         volatile def result = 0
         final def latch = new CountDownLatch(1)
 
-        oldActor { x << ints(0, 10) }
-        oldActor { y << sum(0, x.val) }
-        oldActor {
+        blockingActor { x << ints(0, 10) }
+        blockingActor { y << sum(0, x.val) }
+        blockingActor {
             result = y.val
             latch.countDown()
         }
@@ -91,12 +91,12 @@ public class DataFlowTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        oldActor {
+        blockingActor {
             z << x.val + y.val
         }
 
-        oldActor {x << 40}
-        oldActor {y << 2}
+        blockingActor {x << 40}
+        blockingActor {y << 2}
 
         latch.await(90, TimeUnit.SECONDS)
         assertEquals 42, result
@@ -113,15 +113,15 @@ public class DataFlowTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        oldActor {
+        blockingActor {
             def v = df.x + df.y
             df.z = v
         }
 
-        oldActor {
+        blockingActor {
             df.x = 40
         }
-        oldActor {
+        blockingActor {
             df.y = 2
         }
 

@@ -71,7 +71,7 @@ public abstract class PGroup {
     }
 
     @Deprecated
-    public final AbstractPooledActor oldActor(Runnable handler) {
+    public final AbstractPooledActor blockingActor(Runnable handler) {
         final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
         actor.parallelGroup = this
         actor.start()

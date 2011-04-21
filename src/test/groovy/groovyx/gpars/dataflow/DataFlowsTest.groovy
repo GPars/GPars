@@ -50,13 +50,13 @@ public class DataFlowsTest extends GroovyTestCase {
     public void testVariableFromThread() {
         final DataFlows data = new DataFlows()
 
-        Actors.oldActor {
+        Actors.blockingActor {
             data.variable = 10
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
         volatile List<Integer> result = []
-        Actors.oldActor {
+        Actors.blockingActor {
             result << data.variable
             result << data.variable
             latch.countDown()
@@ -72,11 +72,11 @@ public class DataFlowsTest extends GroovyTestCase {
         volatile int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.oldActor {
+        Actors.blockingActor {
             result = data.variable
             latch.countDown()
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             Thread.sleep 3000
             data.variable = 10
         }
@@ -92,12 +92,12 @@ public class DataFlowsTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         volatile int result = 0
-        Actors.oldActor {
+        Actors.blockingActor {
             barrier.await()
             result = data.variable
             latch.countDown()
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             data.variable = 10
             barrier.await()
         }
@@ -111,14 +111,14 @@ public class DataFlowsTest extends GroovyTestCase {
     public void testIndexes() {
         final DataFlows data = new DataFlows()
 
-        Actors.oldActor {
+        Actors.blockingActor {
             //noinspection GroovyAssignmentCanBeOperatorAssignment
             data[2] = data[0] - data[1]
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             data[1] = 5
         }
-        Actors.oldActor {
+        Actors.blockingActor {
             data[0] = 7
         }
         assertEquals 2, data[2]
@@ -144,12 +144,12 @@ public class DataFlowsTest extends GroovyTestCase {
         final DataFlows data = new DataFlows()
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        Actors.oldActor {
+        Actors.blockingActor {
             barrier.await()
             data.y = 'value'
         }
 
-        Actors.oldActor {
+        Actors.blockingActor {
             Thread.sleep 1000
             data.remove('y')
             barrier.await()
