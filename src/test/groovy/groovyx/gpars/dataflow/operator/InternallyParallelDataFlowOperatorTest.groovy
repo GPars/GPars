@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowQueue
 import groovyx.gpars.dataflow.DataFlowVariable
@@ -55,9 +56,9 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
             bindOutput 1, x * y * z
         }
 
-        DataFlow.start { a << 5 }
-        DataFlow.start { b << 20 }
-        DataFlow.start { c << 40 }
+        Actors.blockingActor { a << 5 }
+        Actors.blockingActor { b << 20 }
+        Actors.blockingActor { c << 40 }
 
         assertEquals 65, d.val
         assertEquals 4000, e.val
@@ -77,9 +78,9 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
             bindOutput 1, x * y * z
         }
 
-        DataFlow.start { a << 5 }
-        DataFlow.start { b << 20 }
-        DataFlow.start { c << 40 }
+        Actors.blockingActor { a << 5 }
+        Actors.blockingActor { b << 20 }
+        Actors.blockingActor { c << 40 }
 
         assertEquals 65, d.val
         assertEquals 4000, e.val

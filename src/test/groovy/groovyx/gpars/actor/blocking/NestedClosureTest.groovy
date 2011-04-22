@@ -26,7 +26,7 @@ public class NestedClosureTest extends GroovyTestCase {
         final def group = new DefaultPGroup(20)
 
         group.actor {
-            final def nestedActor = group.oldActor {
+            final def nestedActor = group.blockingActor {
                 receive {
                     reply 20
                     stop()
@@ -45,7 +45,7 @@ public class NestedClosureTest extends GroovyTestCase {
         final def group = new DefaultPGroup(20)
 
         group.actor {
-            final def nestedActor = group.oldActor {
+            final def nestedActor = group.blockingActor {
                 receive {
                     reply 20
                 }

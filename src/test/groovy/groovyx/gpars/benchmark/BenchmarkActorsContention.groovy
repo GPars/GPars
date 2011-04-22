@@ -18,11 +18,12 @@ package groovyx.gpars.benchmark
 
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.ReactiveActor
-import groovyx.gpars.actor.impl.RunnableBackedPooledActor
+
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import groovyx.gpars.actor.impl.RunnableBackedBlockingActor
 
 final def t1 = System.currentTimeMillis()
 
@@ -76,7 +77,7 @@ final class AttackActor extends DefaultActor {
     }
 }
 
-final class RunnableAttackActor extends RunnableBackedPooledActor {
+final class RunnableAttackActor extends RunnableBackedBlockingActor {
 
     final def attackSignal
     final def retreatSignal
@@ -95,7 +96,7 @@ final class RunnableAttackActor extends RunnableBackedPooledActor {
     public void run() {
         attackSignal.await()
         defender.send weapon
-        this.react {
+        this.receive {
             retreatSignal.countDown()
         }
     }

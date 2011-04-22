@@ -16,19 +16,19 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
-import static groovyx.gpars.dataflow.DataFlow.start
+import groovyx.gpars.actor.BlockingActor
 
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
     public void testPGroup() {
-        final Actor actor = start {
-            react {}
+        final Actor actor = Actors.blockingActor {
+            receive {}
         }
-        assertEquals DataFlow.DATA_FLOW_GROUP, actor.parallelGroup
+        assertEquals Actors.defaultActorPGroup, actor.parallelGroup
         actor << 'Message'
     }
 
@@ -36,7 +36,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        start {
+        Actors.blockingActor {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
         }
@@ -48,7 +48,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        start {
+        Actors.blockingActor {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
             throw new RuntimeException('test')
@@ -61,16 +61,16 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         AtomicInteger counter = new AtomicInteger(0)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        start {
+        Actors.blockingActor {
             enhance(delegate, counter, latch)
             counter.incrementAndGet()
-            react(10.milliseconds) {}  //will timeout
+            receive(10.milliseconds) {}  //will timeout
         }
         latch.await()
         assertEquals 3, counter.get()
     }
 
-    private void enhance(final AbstractPooledActor thread, final AtomicInteger counter, final CountDownLatch latch) {
+    private void enhance(final BlockingActor thread, final AtomicInteger counter, final CountDownLatch latch) {
 
         thread.metaClass {
             afterStart = {->  //won't be called

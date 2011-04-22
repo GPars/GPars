@@ -28,12 +28,12 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.blockingActor {
             stream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -59,12 +59,12 @@ public class DataFlowQueueTest extends GroovyTestCase {
         stream << 2
         assert stream.poll()?.val == 2
         assert stream.poll()?.val == null
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.blockingActor {
             stream << 10
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -84,12 +84,12 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.blockingActor {
             stream << null
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << null
             }
         }
@@ -107,11 +107,11 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.blockingActor {
             final DataFlowVariable variable = new DataFlowVariable()
             stream << variable
             latch.countDown()
-            react {
+            receive {
                 variable << 20
             }
         }
@@ -128,10 +128,10 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        final Actor thread = DataFlow.start {
+        final Actor thread = Actors.blockingActor {
             (0..10).each {stream << it}
             barrier.await()
-            react {
+            receive {
                 stream << 11
                 barrier.await()
             }
@@ -154,7 +154,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final DataFlowQueue stream = new DataFlowQueue()
-        DataFlow.start {
+        Actors.blockingActor {
             (0..10).each {stream << null}
             barrier.await()
         }

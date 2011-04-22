@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -35,7 +35,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
 
 
     public void testOnException() {
-        final LFExceptionTestActor actor = new LFExceptionTestActor({->react { throw new LFErrorTestException('Firing off a lifecycle method exception test')}})
+        final LFExceptionTestActor actor = new LFExceptionTestActor({-> receive { throw new LFErrorTestException('Firing off a lifecycle method exception test')}})
         actor.start()
         actor << 1
 
@@ -46,7 +46,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
     }
 
     public void testOnInterrupt() {
-        final LFExceptionTestActor actor = new LFExceptionTestActor({->react { Thread.currentThread().interrupt();Thread.sleep(10)}})
+        final LFExceptionTestActor actor = new LFExceptionTestActor({-> receive { Thread.currentThread().interrupt(); Thread.sleep(10)}})
         actor.start()
         actor << 1
 
@@ -58,9 +58,9 @@ public class LifecycleErrorTest extends GroovyTestCase {
 
     public void testOnInterruptWithReact() {
         final LFExceptionTestActor actor = new LFExceptionTestActor({->
-            react {
+            receive {
                 Thread.currentThread().interrupt();
-                react {}
+                receive {}
             }
         })
         actor.start()
@@ -74,8 +74,8 @@ public class LifecycleErrorTest extends GroovyTestCase {
 
     public void testOnInterruptWithLoop() {
         final LFExceptionTestActor actor = new LFExceptionTestActor({->
-            loop {
-                react {
+            while (true) {
+                receive {
                     Thread.currentThread().interrupt();
                 }
             }
@@ -91,7 +91,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
 
     public void testOnSilentInterrupt() {
         final LFExceptionTestActor actor = new LFExceptionTestActor({->
-            react {
+            receive {
                 Thread.currentThread().interrupt();
             }
         })
@@ -106,8 +106,8 @@ public class LifecycleErrorTest extends GroovyTestCase {
 
     public void testOnTimeout() {
         final LFExceptionTestActor actor = new LFExceptionTestActor({->
-            react {
-                    react(1, TimeUnit.MILLISECONDS){}
+            receive {
+                receive(1, TimeUnit.MILLISECONDS) {}
             }
         })
         actor.start()
@@ -120,7 +120,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
     }
 }
 
-private final class LFExceptionTestActor extends AbstractPooledActor {
+private final class LFExceptionTestActor extends BlockingActor {
     volatile boolean flag1 = false
     volatile boolean flag2 = false
     volatile boolean flag3 = false

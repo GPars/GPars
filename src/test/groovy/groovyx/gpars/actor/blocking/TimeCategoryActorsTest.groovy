@@ -34,7 +34,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile boolean timeoutFlag = false
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.oldActor {
+        Actors.blockingActor {
 
             delegate.metaClass {
                 onTimeout = {-> timeoutFlag = true; terminate() }
@@ -56,16 +56,16 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        def actor = Actors.oldActor {
+        def actor = Actors.blockingActor {
             try {
                 receive(1.second) {}
             } catch (MissingPropertyException ignore) {exceptions++ }
-            loop {
+            while (true) {
                 try {
                     try {
                         receive(1.minute) {}
                     } catch (MissingPropertyException ignore) {exceptions++ }
-                    stop()
+                    terminate()
                 } finally {
                     latch.countDown()
                 }
@@ -81,7 +81,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
         volatile def result = ''
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.oldActor {
+        Actors.blockingActor {
             use(TimeCategory) {
                 receive(2.seconds) {
                     result = it

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ public class DataFlowExpressionTest extends GroovyTestCase {
             def e = 1 + a * b + c
         }
 
-        DataFlow.start { c << 40 }
-        DataFlow.start { a << 5 }
-        DataFlow.start { b << 20 }
+        DataFlow.task { c << 40 }
+        DataFlow.task { a << 5 }
+        DataFlow.task { b << 20 }
 
         assertEquals 141, d.val
     }
@@ -45,7 +45,7 @@ public class DataFlowExpressionTest extends GroovyTestCase {
 
         def prod = a.x * b.x + a.y * b.y + a.z * b.z
 
-        DataFlow.start {
+        DataFlow.task {
             a << [x: 3, y: 2, z: 1]
             b << [x: 1, y: 2, z: 3]
         }
@@ -61,7 +61,7 @@ public class DataFlowExpressionTest extends GroovyTestCase {
             x + y
         }
 
-        DataFlow.start {
+        DataFlow.task {
             a << 5
             b << 7
         }

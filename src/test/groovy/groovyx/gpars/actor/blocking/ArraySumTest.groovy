@@ -16,13 +16,13 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import groovyx.gpars.actor.BlockingActor
 
 /**
  *
@@ -38,7 +38,7 @@ public class ArraySumTest extends GroovyTestCase {
         AtomicInteger result = new AtomicInteger(0)
         CountDownLatch latch = new CountDownLatch(1)
 
-        group.oldActor {
+        group.blockingActor {
             new Processor(delegate, group).start().send([1, 2, 3, 4, 5])
             receive {
                 result.set it[0]
@@ -62,7 +62,7 @@ public class ArraySumTest extends GroovyTestCase {
     }
 }
 
-class Processor extends AbstractPooledActor {
+class Processor extends BlockingActor {
 
     Actor parent
 
@@ -101,7 +101,7 @@ class Processor extends AbstractPooledActor {
     }
 }
 
-class ReplyActor extends AbstractPooledActor {
+class ReplyActor extends BlockingActor {
 
     Actor parent
 
@@ -118,7 +118,7 @@ class ReplyActor extends AbstractPooledActor {
         terminate()
     }
 }
-class ArrayCalculator extends AbstractPooledActor {
+class ArrayCalculator extends BlockingActor {
 
     List<Integer> listToCalculate;
 

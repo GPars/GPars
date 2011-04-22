@@ -317,11 +317,6 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
     public void testWhenOverOnMessage() {
 
-//        def dda = Actors.messageHandler {
-        //            when {message -> }
-        //        }
-        //        dda << 1
-
         final def actor = new MyActor().start()
 
         actor 1

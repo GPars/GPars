@@ -453,3 +453,35 @@ class MyActor extends DefaultActor {
 
 def myActor = new MyActor()
 {code}
+
+h3. Blocking Actors
+
+Instead of event-driven continuation-styled actors, you may in some scenarios prefer using blocking actors.
+Blocking actors hold a single pooled thread for their whole life-time including the time when waiting for messages.
+They avoid some of the thread management overhead, since they never fight for threads after start,
+and also they let you write straight code without the necessity of continuation style, since they only do blocking message reads via the _receive_ method.
+Obviously the number of blocking actors running concurrently is limited by the number of threads available in the shared pool.
+On the other hand, blocking actors typically provide better performance compared to continuation-style actors,
+especially when the actor's message queue rarely gets empty.
+
+{code}
+def decryptor = blockingActor {
+    while (true) {
+        receive {message ->
+            if (message instanceof String) reply message.reverse()
+            else stop()
+        }
+    }
+}
+
+def console = blockingActor {
+    decryptor.send 'lellarap si yvoorG'
+    println 'Decrypted message: ' + receive()
+    decryptor.send false
+}
+
+[decryptor, console]*.join()
+{code}
+
+Blocking actors increase the number of options to tune performance of your applications. They may in particular be good candidates
+for high-traffic positions in your actor network.

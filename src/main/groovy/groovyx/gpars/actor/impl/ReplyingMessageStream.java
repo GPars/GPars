@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,10 @@
 
 package groovyx.gpars.actor.impl;
 
-import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.actor.ActorMessage;
-import org.codehaus.groovy.runtime.GroovyCategorySupport;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.WeakHashMap;
 
 /**
  * @author Alex Tkachman, Vaclav Pech
@@ -32,28 +27,19 @@ import java.util.WeakHashMap;
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 public abstract class ReplyingMessageStream extends Actor {
     private static final long serialVersionUID = -4660316352077009411L;
+    public static final String CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED = "Cannot send replies. No sender has been registerred.";
     /**
      * A list of senders for the currently processed messages
      */
-    private final List<MessageStream> senders = new ArrayList<MessageStream>();
-
-    protected final WeakHashMap<Object, MessageStream> obj2Sender = new WeakHashMap<Object, MessageStream>();
+    private MessageStream sender = null;
 
     @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
-    protected final List<MessageStream> getSenders() {
-        return senders;
+    protected final MessageStream getSender() {
+        return sender;
     }
 
-    /**
-     * Retrieves the sender actor of the currently processed message.
-     *
-     * @return The sender of the currently processed message or null, if the message was not sent by an actor
-     * @throws groovyx.gpars.actor.impl.ActorReplyException
-     *          If some of the replies failed to be sent.
-     */
-    protected final MessageStream getSender() {
-        assert senders != null;
-        return senders.isEmpty() ? null : senders.get(0);
+    protected final void setSender(final MessageStream sender) {
+        this.sender = sender;
     }
 
     /**
@@ -65,25 +51,15 @@ public abstract class ReplyingMessageStream extends Actor {
      *          If some of the replies failed to be sent.
      */
     protected final void reply(final Object message) {
-        assert senders != null;
-        if (senders.isEmpty()) {
-            throw new ActorReplyException("Cannot send replies. The list of recipients is empty.");
-        } else {
-            final List<Exception> exceptions = new ArrayList<Exception>();
-            for (final MessageStream sender : senders) {
-                if (sender != null) {
-                    try {
-                        sender.send(message);
-                    } catch (IllegalStateException e) {
-                        exceptions.add(e);
-                    }
-                } else {
-                    exceptions.add(new IllegalArgumentException(String.format("Cannot send a reply message %s to a null recipient.", message)));
-                }
-            }
-            if (!exceptions.isEmpty()) {
-                throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
-            }
+        if (sender == null) throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED);
+        final List<Exception> exceptions = new ArrayList<Exception>();
+        try {
+            sender.send(message);
+        } catch (IllegalStateException e) {
+            exceptions.add(e);
+        }
+        if (!exceptions.isEmpty()) {
+            throw new ActorReplyException("Failed sending some replies. See the issues field for details", exceptions);
         }
     }
 
@@ -94,23 +70,10 @@ public abstract class ReplyingMessageStream extends Actor {
      * @param message reply message
      */
     protected final void replyIfExists(final Object message) {
-        assert senders != null;
-        for (final MessageStream sender : senders) {
-            try {
-                if (sender != null) {
-                    sender.send(message);
-                }
-            } catch (IllegalStateException ignore) {
-            }
+        if (sender == null) return;
+        try {
+            sender.send(message);
+        } catch (IllegalStateException ignore) {
         }
-    }
-
-    @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
-    protected final void runEnhancedWithRepliesOnMessages(final ActorMessage message, final Closure code) {
-        assert message != null;
-        if (message == TIMEOUT_MESSAGE) handleTimeout();
-        else senders.add(message.getSender());
-        obj2Sender.put(message.getPayLoad(), message.getSender());
-        GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), code);
     }
 }

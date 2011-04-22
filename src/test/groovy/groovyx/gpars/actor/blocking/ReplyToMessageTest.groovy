@@ -43,10 +43,10 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def bouncer = group.oldActor {
-            loop {
+        final def bouncer = group.blockingActor {
+            while (true) {
                 receive {
-                    it.reply it
+                    reply it
                     barrier.await()
                 }
             }
@@ -54,7 +54,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         Thread.sleep 1000
 
-        group.oldActor {
+        group.blockingActor {
             bouncer.send 1
             barrier.await()
             bouncer.send 2
@@ -70,7 +70,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        group.oldActor {
+        group.blockingActor {
             bouncer.send 10
             barrier.await()
             bouncer.send 20
@@ -99,15 +99,15 @@ public class ReplyToMessageTest extends GroovyTestCase {
         def replies1 = []
         def replies2 = []
 
-        final def incrementor = group.oldActor {
-            loop { receive { it.reply it + 1 }}
+        final def incrementor = group.blockingActor {
+            while (true) { receive { reply it + 1 }}
         }
 
-        final def decrementor = group.oldActor {
-            loop { receive { it.reply it - 1 }}
+        final def decrementor = group.blockingActor {
+            while (true) { receive { reply it - 1 }}
         }
 
-        group.oldActor {
+        group.blockingActor {
             barrier.await()
             incrementor.send 2
             decrementor.send 6
@@ -128,7 +128,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
             }
         }
 
-        group.oldActor {
+        group.blockingActor {
             barrier.await()
             incrementor.send 20
             decrementor.send 60
@@ -162,7 +162,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = group.oldActor {
+        final Actor actor = group.blockingActor {
             delegate.metaClass {
                 onException = {
                     flag.set(true)
@@ -170,9 +170,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
                 }
             }
 
-            loop {
+            while (true) {
                 receive {
-                    it.reply it
+                    reply it
                 }
             }
         }
@@ -188,13 +188,13 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor receiver = group.oldActor {
+        final Actor receiver = group.blockingActor {
             receive {
-                it.replyIfExists it
+                replyIfExists it
             }
         }
 
-        group.oldActor {
+        group.blockingActor {
             receiver.send 'messsage'
             receive {
                 flag.set(true)
@@ -211,9 +211,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final Actor actor = group.oldActor {
+        final Actor actor = group.blockingActor {
             receive {
-                it.replyIfExists it
+                replyIfExists it
                 flag.set(true)
                 barrier.await()
             }
@@ -230,16 +230,16 @@ public class ReplyToMessageTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final Actor replier = group.oldActor {
+        final Actor replier = group.blockingActor {
             receive {
                 latch.await()
-                it.replyIfExists it
+                replyIfExists it
                 flag.set(true)
                 barrier.await()
             }
         }
 
-        group.oldActor {
+        group.blockingActor {
             delegate.metaClass {
                 afterStop = {
                     latch.countDown()
@@ -254,49 +254,4 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
         assert flag.get()
     }
-
-    public void testNestedReplies() {
-        final CyclicBarrier barrier = new CyclicBarrier(3)
-        final CyclicBarrier completedBarrier = new CyclicBarrier(3)
-        def replies1 = []
-        def replies2 = []
-
-        final def maxFinder = group.oldActor {
-            barrier.await()
-            receive {message1 ->
-                receive {message2 ->
-                    def max = Math.max(message1, message2)
-                    message1.reply max
-                    message2.reply max
-                }
-            }
-        }
-
-
-        group.oldActor {
-            barrier.await()
-            maxFinder.send 2
-            receive {
-                replies1 << it
-                completedBarrier.await()
-            }
-        }
-
-        group.oldActor {
-            barrier.await()
-            maxFinder.send 3
-            receive {
-                replies2 << it
-                completedBarrier.await()
-            }
-        }
-
-        completedBarrier.await()
-        assertEquals 1, replies1.size()
-        assertEquals 1, replies2.size()
-
-        assert replies1.contains(3)
-        assert replies2.contains(3)
-    }
-
 }

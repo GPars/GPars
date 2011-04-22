@@ -16,12 +16,11 @@
 
 package groovyx.gpars.group
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
-import groovyx.gpars.actor.impl.RunnableBackedPooledActor
+import groovyx.gpars.actor.impl.RunnableBackedBlockingActor
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.DataFlow
 import groovyx.gpars.dataflow.DataFlowReadChannel
@@ -34,6 +33,7 @@ import groovyx.gpars.dataflow.operator.DataFlowProcessor
 import groovyx.gpars.dataflow.operator.DataFlowSelector
 import groovyx.gpars.scheduler.Pool
 import java.util.concurrent.Callable
+import groovyx.gpars.actor.BlockingActor
 
 /**
  * Provides a common super class of pooled parallel groups.
@@ -58,10 +58,10 @@ public abstract class PGroup {
     }
 
     /**
-     * Creates a new instance of PooledActor, using the passed-in runnable/closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultActor, using the passed-in runnable/closure as the body of the actor's act() method.
      * The created actor will belong to the pooled parallel group.
      * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
+     * @return A newly created instance of the DefaultActor class
      */
     public final DefaultActor actor(Runnable handler) {
         final DefaultActor actor = new DefaultActor(handler)
@@ -70,20 +70,25 @@ public abstract class PGroup {
         return actor
     }
 
-    @Deprecated
-    public final AbstractPooledActor oldActor(Runnable handler) {
-        final AbstractPooledActor actor = new RunnableBackedPooledActor(handler)
+    /**
+     * Creates a new instance of BlockingActor, using the passed-in closure as the body of the actor's act() method.
+     * The created actor will be part of the default actor group.
+     * @param handler The body of the newly created actor's act method.
+     * @return A newly created instance of the BlockingActor class
+     */
+    public final BlockingActor blockingActor(Runnable handler) {
+        final BlockingActor actor = new RunnableBackedBlockingActor(handler)
         actor.parallelGroup = this
         actor.start()
         return actor
     }
 
     /**
-     * Creates a new instance of PooledActor, using the passed-in runnable/closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultActor, using the passed-in runnable/closure as the body of the actor's act() method.
      * The actor will cooperate in thread sharing with other actors sharing the same thread pool in a fair manner.
      * The created actor will belong to the pooled parallel group.
      * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
+     * @return A newly created instance of the DefaultActor class
      */
     public final DefaultActor fairActor(Runnable handler) {
         final DefaultActor actor = new DefaultActor(handler)

@@ -30,7 +30,7 @@ class AsyncSelectTest extends Specification {
         def select = DataFlow.select(a, b, c)
 
         def actor
-        actor = Actors.oldActor {
+        actor = Actors.blockingActor {
             result.res1 = receive()
             a << 30
             select(actor)
@@ -53,7 +53,7 @@ class AsyncSelectTest extends Specification {
         def select = DataFlow.select(a, b, c)
 
         def actor
-        actor = Actors.oldActor {
+        actor = Actors.blockingActor {
             result.res1 = receive()
             a << 30
             select(actor)
@@ -79,7 +79,7 @@ class AsyncSelectTest extends Specification {
 
         def select = DataFlow.select(a, b, c)
         def actor
-        actor = Actors.oldActor {
+        actor = Actors.blockingActor {
             result.res1 = receive()
         }
         when:
@@ -97,7 +97,7 @@ class AsyncSelectTest extends Specification {
 
         def select = DataFlow.select(a, b, c)
         def actor
-        actor = Actors.oldActor {
+        actor = Actors.blockingActor {
             result.with {
                 res1 = receive()
                 res2 = receive()

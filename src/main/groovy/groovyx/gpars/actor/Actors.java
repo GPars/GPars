@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ import groovyx.gpars.scheduler.ResizeablePool;
  * Use static import to be able to call Actors methods without the need to prepend them with the Actors identifier.
  * <pre>
  * import static org.gpars.actor.Actors.*
- * <p/>
+ *
  * Actors.defaultActorPGroup.resize 1
- * <p/>
+ *
  * def actor = actor {*     react {message ->
  *         println message
  * }*     //this line will never be reached
  * }.start()
- * <p/>
+ *
  * actor.send 'Hi!'
  * </pre>
  * <p/>
@@ -53,19 +53,25 @@ public abstract class Actors {
     public static final DefaultPGroup defaultActorPGroup = new DefaultPGroup(new ResizeablePool(true));
 
     /**
-     * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
      * The created actor will be part of the default actor group.
      *
      * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
+     * @return A newly created instance of the DefaultActor class
      */
     public static DefaultActor actor(final Runnable handler) {
         return defaultActorPGroup.actor(handler);
     }
 
-    @Deprecated
-    public static AbstractPooledActor oldActor(final Runnable handler) {
-        return defaultActorPGroup.oldActor(handler);
+    /**
+     * Creates a new instance of BlockingActor, using the passed-in closure as the body of the actor's act() method.
+     * The created actor will be part of the default actor group.
+     *
+     * @param handler The body of the newly created actor's act method.
+     * @return A newly created instance of the BlockingActor class
+     */
+    public static BlockingActor blockingActor(final Runnable handler) {
+        return defaultActorPGroup.blockingActor(handler);
     }
 
     /**
@@ -74,7 +80,7 @@ public abstract class Actors {
      * The actor will cooperate in thread sharing with other actors sharing the same thread pool in a fair manner.
      *
      * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
+     * @return A newly created instance of the DefaultActor class
      */
     public static DefaultActor fairActor(final Runnable handler) {
         return defaultActorPGroup.fairActor(handler);

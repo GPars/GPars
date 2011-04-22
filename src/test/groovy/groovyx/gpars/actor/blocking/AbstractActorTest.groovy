@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
@@ -75,7 +75,7 @@ public class AbstractActorTest extends GroovyTestCase {
                 afterStart: {->
                     flag.set(true)
                     latch.countDown()
-                }] as AbstractPooledActor
+                }] as BlockingActor
 
         actor.start()
         latch.await(90, TimeUnit.SECONDS)
@@ -90,7 +90,7 @@ public class AbstractActorTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
         final AtomicReference result = new AtomicReference()
 
-        Actor actor = Actors.oldActor {
+        Actor actor = Actors.blockingActor {
             receive(1, TimeUnit.SECONDS) {
                 receiveFlag.set(true)
                 result.set it
@@ -142,7 +142,7 @@ public class AbstractActorTest extends GroovyTestCase {
     }
 }
 
-class InterruptionTestActor extends AbstractPooledActor {
+class InterruptionTestActor extends BlockingActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
     final AtomicBoolean afterStopFlag = new AtomicBoolean(false)
@@ -165,7 +165,7 @@ class InterruptionTestActor extends AbstractPooledActor {
     }
 }
 
-class AfterStopTestActor extends AbstractPooledActor {
+class AfterStopTestActor extends BlockingActor {
 
     final AtomicBoolean proceedFlag = new AtomicBoolean(false)
     final AtomicBoolean afterStopFlag = new AtomicBoolean(false)

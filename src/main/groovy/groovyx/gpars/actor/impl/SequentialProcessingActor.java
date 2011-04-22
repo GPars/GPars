@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,53 +16,30 @@
 
 package groovyx.gpars.actor.impl;
 
-import groovy.lang.Closure;
 import groovy.lang.GroovyRuntimeException;
 import groovy.time.BaseDuration;
-import groovy.time.Duration;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.ActorMessage;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.group.PGroup;
-import org.codehaus.groovy.runtime.CurriedClosure;
-import org.codehaus.groovy.runtime.GeneratedClosure;
-import org.codehaus.groovy.runtime.GroovyCategorySupport;
-import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.ScriptBytecodeAdapter;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 
-import static groovyx.gpars.actor.impl.ActorException.CONTINUE;
 import static groovyx.gpars.actor.impl.ActorException.STOP;
 import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
 
 /**
  * @author Alex Tkachman, Vaclav Pech
  */
-@Deprecated
 @SuppressWarnings({"UnqualifiedStaticUsage"})
 public abstract class SequentialProcessingActor extends ReplyingMessageStream implements Runnable {
 
     private static final long serialVersionUID = 6479220959200502418L;
-    /**
-     * Code for the loop, if any
-     */
-    protected Runnable loopCode;
-    protected Closure afterLoopCode;
-    protected Callable<Boolean> loopCondition;
-
-    /**
-     * Code for the next action
-     */
-    private volatile Reaction reaction;
 
     /**
      * Stored incoming messages. The most recently received message is in the head of the list.
@@ -79,21 +56,9 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
 
     private final AtomicBoolean ongoingThreadTermination = new AtomicBoolean(false);
 
-    /**
-     * Counter of messages in the queues
-     */
-    @SuppressWarnings({"UnusedDeclaration","unused"})
-    //modified through countUpdater
-    private volatile int count; //  TODO:  Eclipse requires this to be tagged as unused.
-
     private static final AtomicReferenceFieldUpdater<SequentialProcessingActor, Node> inputQueueUpdater = AtomicReferenceFieldUpdater.newUpdater(SequentialProcessingActor.class, Node.class, "inputQueue");
 
-    private static final AtomicIntegerFieldUpdater<SequentialProcessingActor> countUpdater = AtomicIntegerFieldUpdater.newUpdater(SequentialProcessingActor.class, "count");
-
     private volatile Thread waitingThread;
-
-    private static final ActorMessage startMessage = new ActorMessage("startMessage", null);
-    private static final ActorMessage loopMessage = new ActorMessage("loopMessage", null);
 
     protected static final int S_ACTIVE_MASK = 1;
     protected static final int S_FINISHING_MASK = 2;
@@ -117,7 +82,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     protected static final AtomicIntegerFieldUpdater<SequentialProcessingActor> stopFlagUpdater = AtomicIntegerFieldUpdater.newUpdater(SequentialProcessingActor.class, "stopFlag");
 
     private static final String SHOULD_NOT_REACH_HERE = "Should not reach here";
-    private static final String ERROR_EVALUATING_LOOP_CONDITION = "Error evaluating loop condition";
 
     /**
      * Checks the current status of the Actor.
@@ -125,24 +89,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     @Override
     public final boolean isActive() {
         return (stopFlag & S_ACTIVE_MASK) != 0;
-    }
-
-    /**
-     * Retrieves the next message from the queue
-     *
-     * @return The message
-     */
-    private ActorMessage getMessage() {
-        assert isActorThread();
-
-        transferQueues();
-
-        final ActorMessage toProcess = outputQueue.msg;
-        outputQueue = outputQueue.next;
-
-        throwIfNeeded(toProcess);
-
-        return toProcess;
     }
 
     /**
@@ -244,11 +190,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
         final ActorMessage toProcess = outputQueue.msg;
         outputQueue = outputQueue.next;
 
-        // we are in actor thread, so counter >= 1
-        // as we found message it is >= 2
-        // so we have to decrement
-        countUpdater.decrementAndGet(this);
-
         throwIfNeeded(toProcess);
         return toProcess;
     }
@@ -299,17 +240,11 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
             final Node prev = inputQueue;
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
-                final int cnt = countUpdater.getAndIncrement(this);
 
-                if (cnt == 0) {
-                    if (stopFlag != S_STOPPED && stopFlag != S_TERMINATED)
-                        schedule();
-                } else {
-                    final Thread w = waitingThread;
-                    if (w != null) {
-                        waitingThread = null;
-                        LockSupport.unpark(w);
-                    }
+                final Thread w = waitingThread;
+                if (w != null) {
+                    waitingThread = null;
+                    LockSupport.unpark(w);
                 }
                 break;
             }
@@ -320,34 +255,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     @Override
     protected final boolean hasBeenStopped() {
         return stopFlag != S_RUNNING;
-    }
-
-    /**
-     * Schedules the current actor for processing on the actor group's thread pool.
-     */
-    private void schedule() {
-        parallelGroup.getThreadPool().execute(this);
-    }
-
-    protected void scheduleLoop() {
-        if (stopFlag == S_TERMINATING)
-            throw TERMINATE;
-
-        transferQueues();
-
-        if (outputQueue != null) {
-            if (outputQueue.msg == STOP_MESSAGE) {
-                throw STOP;
-            }
-        }
-
-        countUpdater.getAndIncrement(this);
-
-        final Node node = new Node(loopMessage);
-        node.next = outputQueue;
-        outputQueue = node;
-
-        throw CONTINUE;
     }
 
     @Override
@@ -382,8 +289,8 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
         if (!stopFlagUpdater.compareAndSet(this, S_NOT_STARTED, S_RUNNING)) {
             throw new IllegalStateException(ACTOR_HAS_ALREADY_BEEN_STARTED);
         }
-
-        send(startMessage);
+        parallelGroup.getThreadPool().execute(this);
+        send(START_MESSAGE);
         return this;
     }
 
@@ -442,83 +349,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
         }
 
         return this;
-    }
-
-    /**
-     * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param duration Time to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
-     *                 The TimeCategory DSL to specify timeouts must be enabled explicitly inside the Actor's act() method.
-     * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     *                 the closure to send a reply back to the actor, which sent the original message.
-     */
-    protected final void react(final Duration duration, final Closure code) {
-        react(duration.toMilliseconds(), code);
-    }
-
-    /**
-     * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param code The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     *             the closure to send a reply back to the actor, which sent the original message.
-     */
-    protected final void react(final Closure code) {
-        react(-1L, code);
-    }
-
-    /**
-     * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param timeout  Time in milliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
-     * @param timeUnit a TimeUnit determining how to interpret the timeout parameter
-     * @param code     The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     *                 the closure to send a reply back to the actor, which sent the original message.
-     */
-    protected final void react(final long timeout, final TimeUnit timeUnit, final Closure code) {
-        react(timeUnit.toMillis(timeout), code);
-    }
-
-    /**
-     * Schedules an ActorAction to take the next message off the message queue and to pass it on to the supplied closure.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     * Also adds reply() and replyIfExists() methods to the currentActor and the message.
-     * These methods will call send() on the target actor (the sender of the original message).
-     * The reply()/replyIfExists() methods invoked on the actor will be sent to all currently processed messages,
-     * reply()/replyIfExists() invoked on a message will send a reply to the sender of that particular message only.
-     *
-     * @param timeout Time in milliseconds to wait at most for a message to arrive. The actor terminates if a message doesn't arrive within the given timeout.
-     * @param code    The code to handle the next message. The reply() and replyIfExists() methods are available inside
-     *                the closure to send a reply back to the actor, which sent the original message.
-     */
-    protected final void react(final long timeout, final Closure code) {
-
-        if (!isActorThread()) {
-            throw new IllegalStateException("Cannot call react from thread which is not owned by the actor");
-        }
-
-        getSenders().clear();
-        final int maxNumberOfParameters = code.getMaximumNumberOfParameters();
-
-        code.setResolveStrategy(Closure.DELEGATE_FIRST);
-        code.setDelegate(this);
-
-        if (maxNumberOfParameters > 1) {
-            throw new IllegalArgumentException("Actor cannot process a multi-argument closures passed to react().");
-//            this.react(timeout, new MultiMessageReaction(code, maxNumberOfParameters, timeout, new ArrayList<MessageStream>()));
-        } else {
-            assert reaction == null;
-            assert maxNumberOfParameters <= 1;
-
-            final Reaction reactCode = new Reaction(this, maxNumberOfParameters == 1, code);
-            if (timeout >= 0L) {
-                reactCode.setTimeout(timeout);
-            }
-            reaction = reactCode;
-            throw CONTINUE;
-        }
     }
 
     /**
@@ -594,55 +424,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     }
 
     /**
-     * Enables multiple argument closures to be passed to react().
-     * The MultiMessageReaction class takes just one argument and will wrap the intended closure.
-     * After invoking the MultiMessageReaction will curry the obtained value onto the wrapped multi-argument closure.
-     * The whole process of wrapping a multi-argument closure with MultiMessageReaction class instances is repeated until all arguments
-     * are curried. At that moment the original closure, now worth all arguments curried, gets invoked.
-     *
-     * @author Vaclav Pech
-     */
-    @SuppressWarnings("unused") //  TODO:  Eclipse requires this to be tagged as unused.
-    private final class MultiMessageReaction extends Closure implements GeneratedClosure {
-        private static final long serialVersionUID = -4047888721838663324L;
-        private final Closure code;
-        private final int maxNumberOfParameters;
-        private final long timeout;
-        private final List<MessageStream> localSenders;
-
-        private MultiMessageReaction(final Closure code, final int maxNumberOfParameters, final long timeout, final List<MessageStream> localSenders) {
-            super(code.getThisObject());
-            this.code = code;
-            this.maxNumberOfParameters = maxNumberOfParameters;
-            this.timeout = timeout;
-            this.localSenders = localSenders;
-        }
-
-        @Override
-        public int getMaximumNumberOfParameters() {
-            return 1;
-        }
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public Class<?>[] getParameterTypes() {
-            return new Class[]{Object.class};
-        }
-
-        public Object doCall(final Object args) {
-            localSenders.add((MessageStream) InvokerHelper.invokeMethod(args, "getSender", null));
-            final int newNumberOfParameters = maxNumberOfParameters - 1;
-            if (newNumberOfParameters <= 0) {
-                SequentialProcessingActor.this.getSenders().clear();
-                SequentialProcessingActor.this.getSenders().addAll(localSenders);
-                InvokerHelper.invokeClosure(code.curry(new Object[]{args}), null);
-            } else
-                SequentialProcessingActor.this.react(timeout, new MultiMessageReaction(code.curry(new Object[]{args}), newNumberOfParameters, timeout, localSenders));
-            return null;
-        }
-    }
-
-    /**
      * Represents an element in the message queue. Holds an ActorMessage and a reference to the next element in the queue.
      * The reference is null for the last element in the queue.
      */
@@ -655,10 +436,17 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
         }
     }
 
+    /**
+     * This method represents the body of the actor. It is called upon actor's start and can exit either
+     * normally by return or due to actor being stopped through the stop() method, which cancels the current
+     * actor action.  Provides an extension point for subclasses to provide their custom {@code Actor}'s
+     * message handling code.
+     */
+    protected abstract void act();
+
     @Override
     @SuppressWarnings({"ThrowCaughtLocally", "OverlyLongMethod"})
     public void run() {
-        boolean shouldTerminate = false;
         //noinspection OverlyBroadCatchBlock
         try {
             assert currentThread == null;
@@ -670,10 +458,9 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                 if (stopFlag == S_TERMINATING) {
                     throw TERMINATE;
                 }
+                final ActorMessage toProcess = takeMessage();
 
-                final ActorMessage toProcess = getMessage();
-
-                if (toProcess == startMessage) {
+                if (toProcess == START_MESSAGE) {
                     handleStart();
 
                     // if we came here it means no loop was started
@@ -681,58 +468,21 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                     throw STOP;
                 }
 
-                if (toProcess == loopMessage) {
-                    loopCode.run();
-                    throw new IllegalStateException(SHOULD_NOT_REACH_HERE);
-                }
-
-                if (reaction != null) {
-                    reaction.offer(toProcess);
-                    throw CONTINUE;
-                }
-
-                throw new IllegalStateException("Unexpected message " + toProcess);
             } catch (GroovyRuntimeException gre) {
                 throw ScriptBytecodeAdapter.unwrap(gre);
             }
-
-        } catch (ActorContinuationException continuation) {
-            if (Thread.currentThread().isInterrupted()) {
-                shouldTerminate = true;
-                assert stopFlag != S_STOPPED;
-                assert stopFlag != S_TERMINATED;
-
-                stopFlag = S_TERMINATING;
-                //noinspection ThrowableInstanceNeverThrown
-                handleInterrupt(new InterruptedException("Interruption of the actor thread detected."));
-            }
-
         } catch (ActorTerminationException termination) {
-            shouldTerminate = true;
         } catch (ActorStopException termination) {
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
-
-            shouldTerminate = true;
-        } catch (ActorTimeoutException timeout) {
-            shouldTerminate = true;
-            assert stopFlag != S_STOPPED;
-            assert stopFlag != S_TERMINATED;
-
-            stopFlag = S_TERMINATING;
-            handleTimeout();
         } catch (InterruptedException e) {
-            shouldTerminate = true;
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
-
             stopFlag = S_TERMINATING;
             handleInterrupt(e);
         } catch (Throwable e) {
-            shouldTerminate = true;
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
-
             stopFlag = S_TERMINATING;
             handleException(e);
         } finally {
@@ -740,180 +490,13 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                 while (!ongoingThreadTermination.compareAndSet(false, true)) //noinspection CallToThreadYield
                     Thread.yield();
                 Thread.interrupted();
-                if (shouldTerminate) handleTermination();
+                handleTermination();
             } finally {
                 deregisterCurrentActorWithThread();
                 currentThread = null;
                 ongoingThreadTermination.set(false);
-                final int cnt = countUpdater.decrementAndGet(this);
-                if (cnt > 0 && isActive()) {
-                    schedule();
-                }
             }
         }
-    }
-
-    /**
-     * Ensures that the supplied closure will be invoked repeatedly in a loop.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param code The closure to invoke repeatedly
-     */
-    protected final void loop(final Runnable code) {
-        loop((Callable<Boolean>) null, null, code);
-    }
-
-    /**
-     * Ensures that the supplied closure will be invoked repeatedly in a loop.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param numberOfLoops The loop will only be run the given number of times
-     * @param code          The closure to invoke repeatedly
-     */
-    protected final void loop(final int numberOfLoops, final Runnable code) {
-        loop(new Callable<Boolean>() {
-            private int counter = 0;
-
-            @Override
-            public Boolean call() {
-                counter++;
-                //noinspection UnnecessaryBoxing
-                return Boolean.valueOf(counter <= numberOfLoops);
-            }
-        }, null, code);
-    }
-
-    /**
-     * Ensures that the supplied closure will be invoked repeatedly in a loop.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param numberOfLoops The loop will only be run the given number of times
-     * @param afterLoopCode Code to run after the main actor's loop finishes
-     * @param code          The closure to invoke repeatedly
-     */
-    protected final void loop(final int numberOfLoops, final Closure afterLoopCode, final Runnable code) {
-        loop(new Callable<Boolean>() {
-            private int counter = 0;
-
-            @Override
-            public Boolean call() {
-                counter++;
-                //noinspection UnnecessaryBoxing
-                return Boolean.valueOf(counter <= numberOfLoops);
-            }
-        }, afterLoopCode, code);
-    }
-
-    /**
-     * Ensures that the supplied closure will be invoked repeatedly in a loop.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param condition A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
-     * @param code      The closure to invoke repeatedly
-     */
-    protected final void loop(final Closure condition, final Runnable code) {
-        loop(new Callable<Boolean>() {
-            @Override
-            public Boolean call() {
-                return (Boolean) condition.call();
-            }
-        }, null, code);
-
-    }
-
-    /**
-     * Ensures that the supplied closure will be invoked repeatedly in a loop.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param condition     A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
-     * @param afterLoopCode Code to run after the main actor's loop finishes
-     * @param code          The closure to invoke repeatedly
-     */
-    protected final void loop(final Closure condition, final Closure afterLoopCode, final Runnable code) {
-        loop(new Callable<Boolean>() {
-            @Override
-            public Boolean call() {
-                return (Boolean) condition.call();
-            }
-        }, afterLoopCode, code);
-
-    }
-
-    /**
-     * Ensures that the supplied closure will be invoked repeatedly in a loop.
-     * The method never returns, but instead frees the processing thread back to the thread pool.
-     *
-     * @param condition     A condition to evaluate before each iteration starts. If the condition returns false, the loop exits.
-     * @param afterLoopCode Code to run after the main actor's loop finishes
-     * @param code          The closure to invoke repeatedly
-     */
-    private void loop(final Callable<Boolean> condition, final Closure afterLoopCode, final Runnable code) {
-        if (loopCode != null || loopCondition != null) {
-            throw new IllegalStateException("The loop method must be only called once");
-        }
-
-        if (code instanceof Closure) {
-            ((Closure) code).setResolveStrategy(Closure.DELEGATE_FIRST);
-            ((Closure) code).setDelegate(this);
-        }
-        loopCondition = condition;
-        loopCode = new Runnable() {
-            @Override
-            @SuppressWarnings("rawtypes")
-            public void run() {
-                getSenders().clear();
-                obj2Sender.clear();
-
-                if (code instanceof Closure)
-                //noinspection deprecation
-                {
-                    //noinspection RawUseOfParameterizedType
-                    GroovyCategorySupport.use(Arrays.<Class>asList(ReplyCategory.class), (Closure) code);
-                } else {
-                    code.run();
-                }
-                doLoopCall();
-            }
-        };
-        if (afterLoopCode != null) {
-            this.afterLoopCode = afterLoopCode;
-            this.afterLoopCode.setDelegate(this);
-            this.afterLoopCode.setResolveStrategy(Closure.DELEGATE_FIRST);
-        }
-        doLoopCall();
-    }
-
-    private static boolean verifyLoopCondition(final Callable<Boolean> condition) {
-        try {
-            if (condition == null) return true;
-            return condition.call() == Boolean.TRUE;
-        } catch (Exception e) {
-            throw new RuntimeException(ERROR_EVALUATING_LOOP_CONDITION, e);
-        }
-    }
-
-    private void doLoopCall() {
-        if (verifyLoopCondition(loopCondition)) {
-            checkStopTerminate();
-
-            //noinspection VariableNotUsedInsideIf
-            if (loopCode != null) {
-                scheduleLoop();  //throws a control exception
-            }
-        }
-        if (afterLoopCode != null) {
-            loopCode = null;
-            final Closure localAfterLoopCode = afterLoopCode;
-            afterLoopCode = null;
-            localAfterLoopCode.call();
-        }
-        stopFlag = S_STOPPING;
-        throw STOP;
-    }
-
-    final void runReaction(final ActorMessage message, final Closure code) {
-        runEnhancedWithRepliesOnMessages(message, code);
-        doLoopCall();
     }
 
     protected final void checkStopTerminate() {
@@ -923,71 +506,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
 
             if (stopFlag != S_STOPPING)
                 throw new IllegalStateException(SHOULD_NOT_REACH_HERE);
-        }
-    }
-
-    /**
-     * Buffers messages for the next continuation of an event-driven actor, handles timeouts and no-param continuations.
-     *
-     * @author Vaclav Pech, Alex Tkachman
-     *         Date: May 22, 2009
-     */
-    @SuppressWarnings({"InstanceVariableOfConcreteClass"})
-    private static final class Reaction {
-        private final boolean codeNeedsArgument;
-        private final AtomicBoolean isReady = new AtomicBoolean(false);
-        private final Closure code;
-        private final SequentialProcessingActor actor;
-
-        /**
-         * Creates a new instance.
-         *
-         * @param actor             actor
-         * @param codeNeedsArgument Indicates, whether the provided code expects an argument
-         * @param code              code to execute
-         */
-        Reaction(final SequentialProcessingActor actor, final boolean codeNeedsArgument, final Closure code) {
-            this.actor = actor;
-            this.code = code;
-            this.codeNeedsArgument = codeNeedsArgument;
-        }
-
-        /**
-         * Indicates whether a message or a timeout has arrived.
-         *
-         * @return True, if the next continuation can start.
-         */
-        public boolean isReady() {
-            return isReady.get();
-        }
-
-        public void offer(final ActorMessage actorMessage) {
-            final boolean readyFlag = isReady.getAndSet(true);
-            assert !readyFlag;
-
-            actor.reaction = null;
-
-            if (codeNeedsArgument) {
-                actor.runReaction(actorMessage, new CurriedClosure(code, new Object[]{actorMessage.getPayLoad()}));
-            } else {
-                actor.runReaction(actorMessage, code);
-            }
-        }
-
-        public void setTimeout(final long timeout) {
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!isReady()) {
-                        //noinspection CatchGenericClass
-                        try {
-                            actor.send(TIMEOUT_MESSAGE);
-                        } catch (Exception e) {
-                            actor.handleException(e);
-                        }
-                    }
-                }
-            }, timeout);
         }
     }
 }

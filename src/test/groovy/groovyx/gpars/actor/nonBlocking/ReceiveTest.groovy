@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ public class ReceiveTest extends GroovyTestCase {
     public void testReceive() {
         final DataFlows df = new DataFlows()
 
-        def actor = Actors.oldActor {
+        def actor = Actors.blockingActor {
             df.result1 = receive()
             receive {
                 df.result2 = it
             }
-            react {
+            receive {
                 df.result3 = it
             }
         }
@@ -50,18 +50,18 @@ public class ReceiveTest extends GroovyTestCase {
     public void testNestedReceive() {
         final DataFlows df = new DataFlows()
 
-        def actor = Actors.oldActor {
-            loop {
-                react {
-                    react {
+        def actor = Actors.blockingActor {
+            while (true) {
+                receive {
+                    receive {
                         receive {msg1 ->
                             df.result1 = msg1
                             df.result2 = receive()
                             receive {msg2 ->
                                 df.result3 = msg2
-                                react {msg3 ->
+                                receive {msg3 ->
                                     df.result4 = msg3
-                                    stop()
+                                    terminate()
                                 }
                                 df.result5 = 'message5'
                             }
@@ -82,15 +82,15 @@ public class ReceiveTest extends GroovyTestCase {
         assertEquals 'message2', df.result2
         assertEquals 'message3', df.result3
         assertEquals 'message4', df.result4
-        assertFalse df.contains('result5')
+        assert !df.contains('result5')
     }
 
     public void testReceiveInLoops() {
         final DataFlows df = new DataFlows()
         final def barrier = new CyclicBarrier(2)
 
-        def actor = Actors.oldActor {
-            loop {
+        def actor = Actors.blockingActor {
+            while (true) {
                 if (df.contains('result1')) {
                     terminate()
                 }

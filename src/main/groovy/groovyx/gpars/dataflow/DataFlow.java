@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,20 +57,6 @@ public abstract class DataFlow {
             pGroup = DataFlow.DATA_FLOW_GROUP;
         }
         return pGroup;
-    }
-
-    /**
-     * Creates a new instance of SingleRunActor to run the supplied code.
-     * In general cases prefer task() instead, which is more lightweight.
-     *
-     * @param code The actor's body
-     * @return A started instance
-     */
-    public static Actor start(final Closure code) {
-        final SingleRunActor singleRunActor = new SingleRunActor();
-        singleRunActor.setBody(code);
-        singleRunActor.start();
-        return singleRunActor;
     }
 
     /**
