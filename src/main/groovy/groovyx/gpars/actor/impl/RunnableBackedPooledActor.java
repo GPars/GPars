@@ -27,11 +27,10 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import java.util.Arrays;
 
 /**
- * Utility class to implement AbstractPooledActor backed by any Runnable (including Closure)
+ * Utility class to implement a blocking actor backed by any Runnable (including Closure)
  *
  * @author Alex Tkachman, Vaclav Pech
  */
-@Deprecated
 public class RunnableBackedPooledActor extends AbstractPooledActor {
     private static final long serialVersionUID = 8992135845484038961L;
 

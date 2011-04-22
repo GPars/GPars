@@ -36,15 +36,10 @@ import static groovyx.gpars.actor.impl.ActorException.TERMINATE;
 /**
  * @author Alex Tkachman, Vaclav Pech
  */
-@Deprecated
 @SuppressWarnings({"UnqualifiedStaticUsage"})
 public abstract class SequentialProcessingActor extends ReplyingMessageStream implements Runnable {
 
-    //todo fix the concurrency bug
     //todo demo, user guide, javadoc
-    //todo reduce the number of message reading methods
-    //todo restructure the code
-    //todo rename, remove deprecation
     private static final long serialVersionUID = 6479220959200502418L;
 
     /**
