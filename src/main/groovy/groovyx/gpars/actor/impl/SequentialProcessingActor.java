@@ -62,16 +62,7 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
 
     private final AtomicBoolean ongoingThreadTermination = new AtomicBoolean(false);
 
-    /**
-     * Counter of messages in the queues
-     */
-    @SuppressWarnings({"UnusedDeclaration", "unused"})
-    //modified through countUpdater
-    private volatile int count; //  TODO:  Eclipse requires this to be tagged as unused.
-
     private static final AtomicReferenceFieldUpdater<SequentialProcessingActor, Node> inputQueueUpdater = AtomicReferenceFieldUpdater.newUpdater(SequentialProcessingActor.class, Node.class, "inputQueue");
-
-    private static final AtomicIntegerFieldUpdater<SequentialProcessingActor> countUpdater = AtomicIntegerFieldUpdater.newUpdater(SequentialProcessingActor.class, "count");
 
     private volatile Thread waitingThread;
 
@@ -142,24 +133,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     }
 
     /**
-     * Retrieves the next message from the queue
-     *
-     * @return The message
-     */
-    private ActorMessage getMessage() {
-        assert isActorThread();
-
-        transferQueues();
-
-        final ActorMessage toProcess = outputQueue.msg;
-        outputQueue = outputQueue.next;
-
-        throwIfNeeded(toProcess);
-
-        return toProcess;
-    }
-
-    /**
      * Takes a message from the queues. Blocks until a message is available.
      *
      * @return The message
@@ -223,11 +196,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
         final ActorMessage toProcess = outputQueue.msg;
         outputQueue = outputQueue.next;
 
-        // we are in actor thread, so counter >= 1
-        // as we found message it is >= 2
-        // so we have to decrement
-        countUpdater.decrementAndGet(this);
-
         throwIfNeeded(toProcess);
         return toProcess;
     }
@@ -278,14 +246,11 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
             final Node prev = inputQueue;
             toAdd.next = prev;
             if (inputQueueUpdater.compareAndSet(this, prev, toAdd)) {
-                final int cnt = countUpdater.getAndIncrement(this);
 
-                if (cnt != 0) {
-                    final Thread w = waitingThread;
-                    if (w != null) {
-                        waitingThread = null;
-                        LockSupport.unpark(w);
-                    }
+                final Thread w = waitingThread;
+                if (w != null) {
+                    waitingThread = null;
+                    LockSupport.unpark(w);
                 }
                 break;
             }
@@ -488,7 +453,6 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
     @Override
     @SuppressWarnings({"ThrowCaughtLocally", "OverlyLongMethod"})
     public void run() {
-        boolean shouldTerminate = false;
         //noinspection OverlyBroadCatchBlock
         try {
             assert currentThread == null;
@@ -500,7 +464,7 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                 if (stopFlag == S_TERMINATING) {
                     throw TERMINATE;
                 }
-                final ActorMessage toProcess = getMessage();
+                final ActorMessage toProcess = takeMessage();
 
                 if (toProcess == START_MESSAGE) {
                     handleStart();
@@ -514,19 +478,15 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                 throw ScriptBytecodeAdapter.unwrap(gre);
             }
         } catch (ActorTerminationException termination) {
-            shouldTerminate = true;
         } catch (ActorStopException termination) {
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
-            shouldTerminate = true;
         } catch (InterruptedException e) {
-            shouldTerminate = true;
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
             stopFlag = S_TERMINATING;
             handleInterrupt(e);
         } catch (Throwable e) {
-            shouldTerminate = true;
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;
             stopFlag = S_TERMINATING;
@@ -536,12 +496,11 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
                 while (!ongoingThreadTermination.compareAndSet(false, true)) //noinspection CallToThreadYield
                     Thread.yield();
                 Thread.interrupted();
-                if (shouldTerminate) handleTermination();
+                handleTermination();
             } finally {
                 deregisterCurrentActorWithThread();
                 currentThread = null;
                 ongoingThreadTermination.set(false);
-                final int cnt = countUpdater.decrementAndGet(this);
             }
         }
     }
