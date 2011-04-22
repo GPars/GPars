@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.groups
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
@@ -83,35 +83,35 @@ public class PGroupTest extends GroovyTestCase { /**
 
     public void testGroupsWithActorInheritance() {
 //        volatile boolean daemon = false;
-//        final CountDownLatch latch1 = new CountDownLatch(1)
-//        final CountDownLatch latch2 = new CountDownLatch(1)
-//
-//        final DefaultPGroup daemonGroup = new DefaultPGroup()
-//        final PGroup nonDaemonGroup = new NonDaemonPGroup()
-//
-//        final GroupTestActor actor1 = new GroupTestActor(daemonGroup)
-//        actor1.metaClass.act = {->
-//            daemon = Thread.currentThread().isDaemon()
-//            latch1.countDown()
-//        }
-//        actor1.start()
-//
-//        assertEquals daemonGroup, actor1.parallelGroup
-//        latch1.await()
-//        assert daemon
-//
-//        final GroupTestActor actor2 = new GroupTestActor(nonDaemonGroup)
-//        actor2.metaClass.act = {->
-//            daemon = Thread.currentThread().isDaemon()
-//            latch2.countDown()
-//        }
-//        actor2.start()
-//
-//        assertEquals nonDaemonGroup, actor2.parallelGroup
-//        latch2.await()
-//        assertFalse daemon
-//        daemonGroup.shutdown()
-//        nonDaemonGroup.shutdown()
+        //        final CountDownLatch latch1 = new CountDownLatch(1)
+        //        final CountDownLatch latch2 = new CountDownLatch(1)
+        //
+        //        final DefaultPGroup daemonGroup = new DefaultPGroup()
+        //        final PGroup nonDaemonGroup = new NonDaemonPGroup()
+        //
+        //        final GroupTestActor actor1 = new GroupTestActor(daemonGroup)
+        //        actor1.metaClass.act = {->
+        //            daemon = Thread.currentThread().isDaemon()
+        //            latch1.countDown()
+        //        }
+        //        actor1.start()
+        //
+        //        assertEquals daemonGroup, actor1.parallelGroup
+        //        latch1.await()
+        //        assert daemon
+        //
+        //        final GroupTestActor actor2 = new GroupTestActor(nonDaemonGroup)
+        //        actor2.metaClass.act = {->
+        //            daemon = Thread.currentThread().isDaemon()
+        //            latch2.countDown()
+        //        }
+        //        actor2.start()
+        //
+        //        assertEquals nonDaemonGroup, actor2.parallelGroup
+        //        latch2.await()
+        //        assertFalse daemon
+        //        daemonGroup.shutdown()
+        //        nonDaemonGroup.shutdown()
     }
 
     public void testValidGroupReset() {
@@ -162,7 +162,7 @@ public class PGroupTest extends GroovyTestCase { /**
     }
 }
 
-class GroupTestActor extends AbstractPooledActor {
+class GroupTestActor extends BlockingActor {
 
     def GroupTestActor(PGroup group) {
         parallelGroup = group

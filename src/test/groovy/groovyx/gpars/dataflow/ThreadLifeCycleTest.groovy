@@ -16,11 +16,11 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.AbstractPooledActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
+import groovyx.gpars.actor.BlockingActor
 
 public class ThreadLifeCycleTest extends GroovyTestCase {
 
@@ -70,7 +70,7 @@ public class ThreadLifeCycleTest extends GroovyTestCase {
         assertEquals 3, counter.get()
     }
 
-    private void enhance(final AbstractPooledActor thread, final AtomicInteger counter, final CountDownLatch latch) {
+    private void enhance(final BlockingActor thread, final AtomicInteger counter, final CountDownLatch latch) {
 
         thread.metaClass {
             afterStart = {->  //won't be called

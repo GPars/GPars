@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.BlockingActor
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -45,7 +45,7 @@ public class DefaultActorTest extends GroovyTestCase {
     }
 }
 
-class DefaultTestActor extends AbstractPooledActor {
+class DefaultTestActor extends BlockingActor {
 
     final AtomicBoolean receiveWasCalled = new AtomicBoolean(false)
     final CountDownLatch receiveCallsOutstanding = new CountDownLatch(1)

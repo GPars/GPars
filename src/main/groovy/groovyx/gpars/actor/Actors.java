@@ -53,18 +53,24 @@ public abstract class Actors {
     public static final DefaultPGroup defaultActorPGroup = new DefaultPGroup(new ResizeablePool(true));
 
     /**
-     * Creates a new instance of PooledActor, using the passed-in closure as the body of the actor's act() method.
+     * Creates a new instance of DefaultActor, using the passed-in closure as the body of the actor's act() method.
      * The created actor will be part of the default actor group.
      *
      * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
+     * @return A newly created instance of the DefaultActor class
      */
     public static DefaultActor actor(final Runnable handler) {
         return defaultActorPGroup.actor(handler);
     }
 
-    @Deprecated
-    public static AbstractPooledActor blockingActor(final Runnable handler) {
+    /**
+     * Creates a new instance of BlockingActor, using the passed-in closure as the body of the actor's act() method.
+     * The created actor will be part of the default actor group.
+     *
+     * @param handler The body of the newly created actor's act method.
+     * @return A newly created instance of the BlockingActor class
+     */
+    public static BlockingActor blockingActor(final Runnable handler) {
         return defaultActorPGroup.blockingActor(handler);
     }
 
@@ -74,7 +80,7 @@ public abstract class Actors {
      * The actor will cooperate in thread sharing with other actors sharing the same thread pool in a fair manner.
      *
      * @param handler The body of the newly created actor's act method.
-     * @return A newly created instance of the AbstractPooledActor class
+     * @return A newly created instance of the DefaultActor class
      */
     public static DefaultActor fairActor(final Runnable handler) {
         return defaultActorPGroup.fairActor(handler);

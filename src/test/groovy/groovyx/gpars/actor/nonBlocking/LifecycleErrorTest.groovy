@@ -16,7 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.actor.AbstractPooledActor
+import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -120,7 +120,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
     }
 }
 
-private final class LFExceptionTestActor extends AbstractPooledActor {
+private final class LFExceptionTestActor extends BlockingActor {
     volatile boolean flag1 = false
     volatile boolean flag2 = false
     volatile boolean flag3 = false

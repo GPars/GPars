@@ -20,7 +20,7 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyObjectSupport;
 import groovy.lang.MissingMethodException;
 import groovy.lang.MissingPropertyException;
-import groovyx.gpars.actor.AbstractPooledActor;
+import groovyx.gpars.actor.BlockingActor;
 import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
@@ -31,12 +31,12 @@ import java.util.Arrays;
  *
  * @author Alex Tkachman, Vaclav Pech
  */
-public class RunnableBackedPooledActor extends AbstractPooledActor {
+public class RunnableBackedBlockingActor extends BlockingActor {
     private static final long serialVersionUID = 8992135845484038961L;
 
     private Runnable action;
 
-    public RunnableBackedPooledActor(final Runnable handler) {
+    public RunnableBackedBlockingActor(final Runnable handler) {
         setAction(handler);
     }
 
