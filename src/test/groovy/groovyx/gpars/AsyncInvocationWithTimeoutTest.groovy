@@ -21,6 +21,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.util.concurrent.CyclicBarrier
 
 /**
  * @author Vaclav Pech
@@ -57,16 +58,19 @@ import java.util.concurrent.TimeoutException
     }
 
     private def calculate(timeout) {
+        CyclicBarrier barrier = new CyclicBarrier(2)
         shouldFail(CancellationException) {
-            {-> Thread.sleep 5000; 20}.callTimeoutAsync(timeout).get()
+            {-> barrier.await(5, TimeUnit.MINUTES); 20}.callTimeoutAsync(timeout).get()
         }
 
+        barrier = new CyclicBarrier(2)
         shouldFail(TimeoutException) {
-            {-> Thread.sleep 5000; 20}.callTimeoutAsync(1000).get(50, TimeUnit.MILLISECONDS)
+            {-> barrier.await(5, TimeUnit.MINUTES); 20}.callTimeoutAsync(1000).get(50, TimeUnit.MILLISECONDS)
         }
 
+        barrier = new CyclicBarrier(2)
         final DataFlowVariable result = new DataFlowVariable();
-        {-> try {Thread.sleep 2000; result << 20} catch (ignore) {}}.callTimeoutAsync(timeout);
+        {-> try {barrier.await(5, TimeUnit.MINUTES); result << 20} catch (ignore) {}}.callTimeoutAsync(timeout);
         sleep 3000
         assert !result.bound
     }
