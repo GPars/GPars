@@ -325,6 +325,10 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'RunReset',                                   //Starts UI
             'DemoSwingMergeSort',                         //Starts UI
             'DemoVisualForkJoinMergeSort',                //Starts UI
+            'DemoStm',                                    //Stm
+            'DemoDirectStm',                              //Stm
+            'DemoRetry',                                  //Stm
+            'DemoCustomBlocks',                           //Stm
     ]
 
     classpath = sourceSets.main.runtimeClasspath
