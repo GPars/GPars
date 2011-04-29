@@ -21,8 +21,6 @@ import org.multiverse.api.references.IntRef
 import static org.multiverse.api.StmUtils.newIntRef
 
 //todo transactional properties to avoid creating getters only to call atomic{}
-//todo test exception handling
-//todo make sure the multiverse dependency is optional
 
 public class Account {
     private final IntRef amount = newIntRef(0);
