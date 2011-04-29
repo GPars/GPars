@@ -38,6 +38,8 @@ public abstract class GParsStm {
     private static final String CANNOT_CREATE_AN_ATOMIC_BLOCK_SOME_OF_THE_SPECIFIED_PARAMETERS_ARE_NOT_SUPPORTED = "Cannot create an atomic block. Some of the specified parameters are not supported. ";
 
     //todo transactional properties to avoid creating getters only to call atomic{}
+    //todo retries
+    //todo annotations for objects and methods
 
     //todo reconsider need and accessibility
     public static final TransactionFactoryBuilder transactionFactory = getGlobalStmInstance().createTransactionFactoryBuilder();
