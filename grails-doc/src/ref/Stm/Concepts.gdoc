@@ -5,4 +5,4 @@ h4. Stm
 Software Transactional Memory (STM) gives developers transactional semantics for accessing in-memory data. When multiple threads
 share data in memory, by marking blocks of code as transactional (atomic) the developer delegates to the Stm engine the responsibility
 for making sure that all manipulated data remain consistent.
-GPars leverages the Multiverse Stm engine. Check out more at the "Multiverse site":http://multiverse.codehaus.org/overview.html
+GPars leverages the Multiverse Stm engine. Check out more at the Multiverse site (http://multiverse.codehaus.org/overview.html).

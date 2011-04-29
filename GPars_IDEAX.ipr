@@ -6011,6 +6011,7 @@
         <w>instanceof</w>
         <w>intdiv</w>
         <w>intelli</w>
+        <w>interruptible</w>
         <w>iterable</w>
         <w>javabuilder</w>
         <w>javanature</w>
