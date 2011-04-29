@@ -22,6 +22,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicLongClosure;
 
 /**
+ * A default implementation of org.multiverse.api.closures.AtomicLongClosure properly handling exception propagation
+ *
  * @author Vaclav Pech
  */
 final class GParsAtomicLongBlock implements AtomicLongClosure {

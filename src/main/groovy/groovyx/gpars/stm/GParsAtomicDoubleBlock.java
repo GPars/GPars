@@ -22,6 +22,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicDoubleClosure;
 
 /**
+ * A default implementation of org.multiverse.api.closures.AtomicDoubleClosure properly handling exception propagation
+ *
  * @author Vaclav Pech
  */
 final class GParsAtomicDoubleBlock implements AtomicDoubleClosure {

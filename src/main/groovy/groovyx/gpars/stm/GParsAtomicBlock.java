@@ -22,6 +22,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicClosure;
 
 /**
+ * A default implementation of org.multiverse.api.closures.AtomicClosure properly handling exception propagation
+ *
  * @author Vaclav Pech
  */
 final class GParsAtomicBlock<T> implements AtomicClosure<T> {

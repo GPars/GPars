@@ -22,6 +22,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicBooleanClosure;
 
 /**
+ * A default implementation of org.multiverse.api.closures.AtomicBooleanClosure properly handling exception propagation
+ *
  * @author Vaclav Pech
  */
 final class GParsAtomicBooleanBlock implements AtomicBooleanClosure {

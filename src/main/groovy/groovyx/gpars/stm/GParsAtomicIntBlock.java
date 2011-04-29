@@ -22,6 +22,8 @@ import org.multiverse.api.Transaction;
 import org.multiverse.api.closures.AtomicIntClosure;
 
 /**
+ * A default implementation of org.multiverse.api.closures.AtomicIntClosure properly handling exception propagation
+ *
  * @author Vaclav Pech
  */
 final class GParsAtomicIntBlock implements AtomicIntClosure {

@@ -146,6 +146,23 @@ class AtomicTest extends GroovyTestCase {
         }
     }
 
+    public void testRetry() {
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+
+        def counter = newIntRef(0)
+        final int max = 100
+        Thread.start {
+            while (counter.atomicGet() < max) {
+                counter.atomicIncrementAndGet(1)
+                sleep 10
+            }
+        }
+        assert max + 1 == GParsStm.atomicWithInt(block) {tx ->
+            if (counter.get() == max) return counter.get() + 1
+            tx.retry()
+        }
+    }
+
 }
 
 public class Account {
