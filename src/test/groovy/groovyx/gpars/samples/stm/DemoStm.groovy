@@ -16,32 +16,30 @@
 
 package groovyx.gpars.samples.stm
 
-import org.multiverse.api.Transaction
-import org.multiverse.api.closures.AtomicIntClosure
-import org.multiverse.api.closures.AtomicVoidClosure
+import groovyx.gpars.stm.GParsStm
 import org.multiverse.api.references.IntRef
-import static org.multiverse.api.StmUtils.execute
 import static org.multiverse.api.StmUtils.newIntRef
 
-//todo add multiverse license.txt to the lib folder
-//todo transactional properties to avoit creating getters only to call atomic{}
+//todo transactional properties to avoid creating getters only to call atomic{}
+//todo test exception handling
+//todo make sure the multiverse dependency is optional
 
 public class Account {
     private final IntRef amount = newIntRef(0);
 
     public void transfer(final int a) {
-        execute({Transaction tx ->
+        GParsStm.atomic {
             amount.increment(a);
             println 'Running for ' + a
             sleep 3000
             amount.increment(a);
-        } as AtomicVoidClosure)
+        }
     }
 
     public int getCurrentAmount() {
-        execute({Transaction tx ->
-            return amount.get();
-        } as AtomicIntClosure)
+        GParsStm.atomicInt {
+            amount.get();
+        }
     }
 }
 
@@ -58,3 +56,5 @@ def t2 = Thread.start {
 
 [t1, t2]*.join()
 println account.currentAmount
+
+
