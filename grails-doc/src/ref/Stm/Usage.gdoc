@@ -1,0 +1,36 @@
+h3. Running a piece of code atomically
+
+{code}
+import groovyx.gpars.stm.GParsStm
+import org.multiverse.api.references.IntRef
+import static org.multiverse.api.StmUtils.newIntRef
+
+public class Account {
+    private final IntRef amount = newIntRef(0);
+
+    public void transfer(final int a) {
+        GParsStm.atomic {
+            amount.increment(a);
+        }
+    }
+
+    public int getCurrentAmount() {
+        GParsStm.atomicWithInt {
+            amount.get();
+        }
+    }
+}
+{code}
+
+h3. Customizing the transactional properties
+
+{code}
+import groovyx.gpars.stm.GParsStm
+import org.multiverse.api.AtomicBlock
+import org.multiverse.api.PropagationLevel
+
+final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+assert GParsStm.atomicWithBoolean(block) {
+    true
+}
+{code}
