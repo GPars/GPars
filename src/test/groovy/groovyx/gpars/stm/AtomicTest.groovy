@@ -80,6 +80,34 @@ class AtomicTest extends GroovyTestCase {
         }
     }
 
+    public void testSingleCustomAtomicBooleanBlock() {
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        assert GParsStm.atomicWithBoolean(block) {
+            true
+        }
+    }
+
+    public void testSingleCustomAtomicLongBlock() {
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        assert 10L == GParsStm.atomicWithLong(block) {
+            10L
+        }
+    }
+
+    public void testSingleCustomAtomicIntBlock() {
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        assert 10 == GParsStm.atomicWithInt(block) {
+            10
+        }
+    }
+
+    public void testSingleCustomAtomicDoubleBlock() {
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        assert 10.0d == GParsStm.atomicWithDouble(block) {
+            10.0d
+        }
+    }
+
     public void testCustomAtomicBlock() {
         final Account account = new Account()
         final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)

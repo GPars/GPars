@@ -90,20 +90,40 @@ public abstract class GParsStm {
         return defaultAtomicBlock.execute(new GParsAtomicIntBlock(code));
     }
 
+    public static int atomicWithInt(final AtomicBlock block, final Closure code) {
+        return block.execute(new GParsAtomicIntBlock(code));
+    }
+
     public static long atomicWithLong(final Closure code) {
         return defaultAtomicBlock.execute(new GParsAtomicLongBlock(code));
+    }
+
+    public static long atomicWithLong(final AtomicBlock block, final Closure code) {
+        return block.execute(new GParsAtomicLongBlock(code));
     }
 
     public static boolean atomicWithBoolean(final Closure code) {
         return defaultAtomicBlock.execute(new GParsAtomicBooleanBlock(code));
     }
 
+    public static boolean atomicWithBoolean(final AtomicBlock block, final Closure code) {
+        return block.execute(new GParsAtomicBooleanBlock(code));
+    }
+
     public static double atomicWithDouble(final Closure code) {
         return defaultAtomicBlock.execute(new GParsAtomicDoubleBlock(code));
     }
 
+    public static double atomicWithDouble(final AtomicBlock block, final Closure code) {
+        return block.execute(new GParsAtomicDoubleBlock(code));
+    }
+
     public static void atomicWithVoid(final Closure code) {
         defaultAtomicBlock.execute(new GParsAtomicVoidBlock(code));
+    }
+
+    public static void atomicWithVoid(final AtomicBlock block, final Closure code) {
+        block.execute(new GParsAtomicVoidBlock(code));
     }
 
     static void unwrapStmControlError(final InvokerInvocationException e) {

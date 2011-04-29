@@ -17,26 +17,31 @@
 package groovyx.gpars.samples.stm
 
 import groovyx.gpars.stm.GParsStm
+import org.multiverse.api.AtomicBlock
+import org.multiverse.api.PropagationLevel
 import org.multiverse.api.references.IntRef
 import static org.multiverse.api.StmUtils.newIntRef
 
-public class Account {
+public class CustomAccount {
     private final IntRef amount = newIntRef(0);
 
+    private static AtomicBlock writeBlock = GParsStm.createAtomicBlock(familyName: 'Write', PropagationLevel: PropagationLevel.Requires)
+    private static AtomicBlock readBlock = GParsStm.createAtomicBlock(readonly: true, PropagationLevel: PropagationLevel.RequiresNew, familyName: 'Read')
+
     public void transfer(final int a) {
-        GParsStm.atomic {
+        GParsStm.atomic(writeBlock) {
             amount.increment(a);
         }
     }
 
     public int getCurrentAmount() {
-        GParsStm.atomicWithInt {
+        GParsStm.atomicWithInt(readBlock) {
             amount.get();
         }
     }
 }
 
-final Account account = new Account()
+final CustomAccount account = new CustomAccount()
 account.transfer(10)
 def t1 = Thread.start {
     account.transfer(2)
