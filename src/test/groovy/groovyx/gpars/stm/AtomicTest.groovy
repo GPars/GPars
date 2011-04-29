@@ -16,6 +16,7 @@
 
 package groovyx.gpars.stm
 
+import java.util.concurrent.CountDownLatch
 import org.multiverse.api.AtomicBlock
 import org.multiverse.api.PropagationLevel
 import org.multiverse.api.references.IntRef
@@ -62,16 +63,44 @@ class AtomicTest extends GroovyTestCase {
         assert 480 == account.currentAmount
     }
 
+    public void testSingleCustomAtomicBlock() {
+        final Account account = new Account()
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        GParsStm.atomic(block) {
+            account.transfer(10)
+            def t1 = Thread.start {
+                account.transfer(100)
+            }
+            def t2 = Thread.start {
+                account.transfer(20)
+            }
+
+            [t1, t2]*.join()
+            assert 260 == account.currentAmount
+        }
+    }
+
     public void testCustomAtomicBlock() {
         final Account account = new Account()
-        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 300, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 3000, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+
+        final CountDownLatch latch = new CountDownLatch(1)
+        def t1 = Thread.start {
+            GParsStm.atomic(block) {
+                account.transfer(100)
+                latch.await()
+            }
+        }
         GParsStm.atomic(block) {
             account.transfer(10)
             assert 20 == account.currentAmount
         }
+        latch.countDown()
+        t1.join()
+        assert 220 == account.currentAmount
     }
 
-    public void testCustomAtomicBlockwithTimeout() {
+    public void testCustomAtomicBlockWithTimeout() {
         final Account account = new Account()
         final AtomicBlock block = GParsStm.createAtomicBlock(timeoutNs: 1000L, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
         GParsStm.atomic(block) {
