@@ -20,8 +20,6 @@ import groovyx.gpars.stm.GParsStm
 import org.multiverse.api.references.IntRef
 import static org.multiverse.api.StmUtils.newIntRef
 
-//todo transactional properties to avoid creating getters only to call atomic{}
-
 public class Account {
     private final IntRef amount = newIntRef(0);
 

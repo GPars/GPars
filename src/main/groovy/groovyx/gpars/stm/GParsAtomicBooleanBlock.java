@@ -17,23 +17,29 @@
 package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
+import org.codehaus.groovy.runtime.InvokerInvocationException;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicClosure;
+import org.multiverse.api.closures.AtomicBooleanClosure;
 
 /**
  * @author Vaclav Pech
  */
-final class AtomicBlock<T> implements AtomicClosure<T> {
+final class GParsAtomicBooleanBlock implements AtomicBooleanClosure {
     private final Closure code;
 
-    AtomicBlock(final Closure code) {
+    GParsAtomicBooleanBlock(final Closure code) {
         if (code == null) throw new IllegalArgumentException(GParsStm.THE_CODE_FOR_AN_ATOMIC_BLOCK_MUST_NOT_BE_NULL);
         this.code = code;
     }
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public T execute(final Transaction transaction) {
-        return (T) code.call(transaction);
+    public boolean execute(final Transaction transaction) {
+        try {
+            return (Boolean) code.call(transaction);
+        } catch (InvokerInvocationException e) {
+            GParsStm.unwrapStmControlError(e);
+            throw new IllegalStateException(GParsStm.AN_EXCEPTION_WAS_EXPECTED_TO_BE_THROWN_FROM_UNWRAP_STM_CONTROL_ERROR_FOR + e, e);
+        }
     }
 }

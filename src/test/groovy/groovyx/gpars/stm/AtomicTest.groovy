@@ -16,6 +16,8 @@
 
 package groovyx.gpars.stm
 
+import org.multiverse.api.AtomicBlock
+import org.multiverse.api.PropagationLevel
 import org.multiverse.api.references.IntRef
 import static org.multiverse.api.StmUtils.newIntRef
 
@@ -59,6 +61,34 @@ class AtomicTest extends GroovyTestCase {
         [t1, t2]*.join()
         assert 480 == account.currentAmount
     }
+
+    public void testCustomAtomicBlock() {
+        final Account account = new Account()
+        final AtomicBlock block = GParsStm.createAtomicBlock(maxRetries: 300, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        GParsStm.atomic(block) {
+            account.transfer(10)
+            assert 20 == account.currentAmount
+        }
+    }
+
+    public void testCustomAtomicBlockwithTimeout() {
+        final Account account = new Account()
+        final AtomicBlock block = GParsStm.createAtomicBlock(timeoutNs: 1000L, familyName: 'Custom', PropagationLevel: PropagationLevel.Requires, interruptible: false)
+        GParsStm.atomic(block) {
+            account.transfer(10)
+            assert 20 == account.currentAmount
+        }
+    }
+
+    public void testCustomAtomicBlockWithInvalidParameters() {
+        shouldFail(IllegalArgumentException) {
+            GParsStm.createAtomicBlock(familyNam: 'Custom')
+        }
+        shouldFail(IllegalArgumentException) {
+            GParsStm.createAtomicBlock('': 'Foo')
+        }
+    }
+
 }
 
 public class Account {
