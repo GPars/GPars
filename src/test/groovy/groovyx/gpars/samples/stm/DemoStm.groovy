@@ -37,7 +37,7 @@ public class Account {
     }
 
     public int getCurrentAmount() {
-        GParsStm.atomicInt {
+        GParsStm.atomicWithInt {
             amount.get();
         }
     }

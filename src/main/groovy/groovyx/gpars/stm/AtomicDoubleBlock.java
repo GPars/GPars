@@ -18,22 +18,22 @@ package groovyx.gpars.stm;
 
 import groovy.lang.Closure;
 import org.multiverse.api.Transaction;
-import org.multiverse.api.closures.AtomicClosure;
+import org.multiverse.api.closures.AtomicDoubleClosure;
 
 /**
  * @author Vaclav Pech
  */
-final class AtomicBlock<T> implements AtomicClosure<T> {
+final class AtomicDoubleBlock implements AtomicDoubleClosure {
     private final Closure code;
 
-    AtomicBlock(final Closure code) {
+    AtomicDoubleBlock(final Closure code) {
         if (code == null) throw new IllegalArgumentException(GParsStm.THE_CODE_FOR_AN_ATOMIC_BLOCK_MUST_NOT_BE_NULL);
         this.code = code;
     }
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public T execute(final Transaction transaction) {
-        return (T) code.call(transaction);
+    public double execute(final Transaction transaction) {
+        return (Double) code.call(transaction);
     }
 }

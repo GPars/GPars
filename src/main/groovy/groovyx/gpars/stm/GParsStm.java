@@ -23,27 +23,29 @@ import org.multiverse.api.StmUtils;
  * @author Vaclav Pech
  */
 public abstract class GParsStm {
+    static final String THE_CODE_FOR_AN_ATOMIC_BLOCK_MUST_NOT_BE_NULL = "The code for an atomic block must not be null.";
+
     public static <T> T atomic(final Closure code) {
         return StmUtils.execute(new AtomicBlock<T>(code));
     }
 
-    public static int atomicInt(final Closure code) {
-        return StmUtils.execute(new AtomicBlock<Integer>(code));
+    public static int atomicWithInt(final Closure code) {
+        return StmUtils.execute(new AtomicIntBlock(code));
     }
 
-    public static long atomicLong(final Closure code) {
-        return StmUtils.execute(new AtomicBlock<Long>(code));
+    public static long atomicWithLong(final Closure code) {
+        return StmUtils.execute(new AtomicLongBlock(code));
     }
 
-    public static boolean atomicBoolean(final Closure code) {
-        return StmUtils.execute(new AtomicBlock<Boolean>(code));
+    public static boolean atomicWithBoolean(final Closure code) {
+        return StmUtils.execute(new AtomicBooleanBlock(code));
     }
 
-    public static double atomicDouble(final Closure code) {
-        return StmUtils.execute(new AtomicBlock<Double>(code));
+    public static double atomicWithDouble(final Closure code) {
+        return StmUtils.execute(new AtomicDoubleBlock(code));
     }
 
-    public static void atomicVoid(final Closure code) {
-        StmUtils.execute(new AtomicBlock<Void>(code));
+    public static void atomicWithVoid(final Closure code) {
+        StmUtils.execute(new AtomicVoidBlock(code));
     }
 }
