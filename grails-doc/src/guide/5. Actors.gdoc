@@ -1,9 +1,17 @@
-The actor support in gpars were inspired by the Actors library in Scala but have meanwhile gone beyond that.
+The actor support in GPars was originally inspired by the Actors library in Scala, but has since gone well
+beyond what Scala offers as standard.
 
-Actors allow for a messaging-based concurrency model, built from independent active objects that exchange messages and have no mutable shared state.
-Actors can help developers avoid issues like deadlocks, live-locks or starvation, so typical for shared memory, while leveraging the multi-core nature of today's hardware.
-A nice wrap-up of the key "concepts behind actors":http://ruben.savanne.be/articles/concurrency-in-erlang-scala was written recently by Ruben Vermeersch.
-Actors guarantee that always *at most one thread processes the actor's body* at a time and also under the covers the memory gets synchronized
+Actors allow for a message passing-based concurrency model: programs are collections of independent active
+objects that exchange messages and have no mutable shared state.  Actors can help developers avoid issues
+such as deadlock, live-lock and starvation, which are common problems for shared memory based approaches.
+Actors are a way of leveraging the multi-core nature of today's hardware without all the problems
+traditionally associated with shared-memory multi-threading, which is why programming languages such as
+Erlang and Scala have taken up this model.
+
+A nice article summarizing the key "concepts behind
+actors":http://ruben.savanne.be/articles/concurrency-in-erlang-scala was written recently by Ruben
+Vermeersch.  Actors always guarantee that *at most one thread processes the actor's body* at any one time
+and also, under the covers, that the memory gets synchronized
 each time a thread gets assigned to an actor so the actor's state *can be safely modified* by code in the body *without any other extra (synchronization or locking) effort* .
 Ideally actor's code should *never be invoked* directly from outside so all the code of the actor class can only be executed by the thread
 handling the last received message and so all the actor's code is *implicitly thread-safe* .
