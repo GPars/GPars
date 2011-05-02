@@ -54,6 +54,9 @@ h3. Grouping tasks
 
 Dataflow tasks can be organized into groups to allow for performance fine-tuning. Groups provide a handy _task()_ factory method
 to create tasks attached to the groups.
+Using groups allows you to organize tasks or operators around different thread pools (wrapped inside the group).
+While the DataFlow.task() command schedules the task on a default thread pool (java.util.concurrent.Executor, fixed size=#cpu+1, daemon threads),
+you may prefer being able to define your own thread pool(s) to run your tasks.
 
 {code}
 import groovyx.gpars.group.DefaultPGroup
