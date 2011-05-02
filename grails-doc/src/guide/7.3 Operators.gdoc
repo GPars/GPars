@@ -114,6 +114,9 @@ numbers are allowed with value 1 being the default.
 
 {note}
 Please always make sure the *group* serving the operator holds enough threads to support all requested forks.
+Using groups allows you to organize tasks or operators around different thread pools (wrapped inside the group).
+While the DataFlow.task() command schedules the task on a default thread pool (java.util.concurrent.Executor, fixed size=#cpu+1, daemon threads),
+you may prefer being able to define your own thread pool(s) to run your tasks.
 
 {code}
 def group = new DefaultPGroup(10)
