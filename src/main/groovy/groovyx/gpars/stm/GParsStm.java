@@ -40,8 +40,6 @@ public abstract class GParsStm {
     static final String AN_EXCEPTION_WAS_EXPECTED_TO_BE_THROWN_FROM_UNWRAP_STM_CONTROL_ERROR_FOR = "An exception was expected to be thrown from unwrapStmControlError for ";
     private static final String CANNOT_CREATE_AN_ATOMIC_BLOCK_SOME_OF_THE_SPECIFIED_PARAMETERS_ARE_NOT_SUPPORTED = "Cannot create an atomic block. Some of the specified parameters are not supported. ";
 
-    //todo annotations for objects, methods and properties
-
     /**
      * Gives access to multiverse TransactionFactoryBuilder to allow customized creation of atomic blocks
      */
