@@ -142,4 +142,51 @@ the _asyncFun()_ method on them and we are ready to set off.
     println "The result of comparison: " + result.get()
 {code}
 
+h3. Calling asynchronous functions from within asynchronous functions
+
+Another very valuable characteristics of asynchronous functions is that their result promises can also be composed.
+
+{code}
+import static groovyx.gpars.GParsPool.withPool
+
+  withPool {
+      Closure plus = {Integer a, Integer b ->
+          sleep 3000
+          println 'Adding numbers'
+          a + b
+      }.asyncFun()
+
+      Closure multiply = {Integer a, Integer b ->
+          sleep 2000
+          a * b
+      }.asyncFun()
+
+      Closure measureTime = {->
+          sleep 3000
+          4
+      }.asyncFun()
+
+      Closure distance = {Integer initialDistance, Integer velocity, Integer time ->
+          plus(initialDistance, multiply(velocity, time))
+      }.asyncFun()
+
+      Closure chattyDistance = {Integer initialDistance, Integer velocity, Integer time ->
+          println 'All parameters are now ready - starting'
+          println 'About to call another asynchronous function'
+          def innerResultPromise = plus(initialDistance, multiply(velocity, time))
+          println 'Returning the promise for the inner calculation as my own result'
+          return innerResultPromise
+      }.asyncFun()
+
+      println "Distance = " + distance(100, 20, measureTime()).get() + ' m'
+      println "ChattyDistance = " + chattyDistance(100, 20, measureTime()).get() + ' m'
+  }
+{code}
+
+If an asynchronous function (e.f. the _distance_ function in the example) in its body calls another asynchronous function
+(e.g. _plus_ ) and returns the the promise of the invoked function, the inner function's ( _plus_ ) result promise will compose with the outer function's ( _distance_ )
+result promise. The inner function ( _plus_ ) will now bind its result to the outer function's ( _distance_ ) promise, once the inner function (plus) finishes its calculation.
+This ability of promises to compose allows functions to cease their calculation without blocking a thread not only when waiting for parameters,
+but also whenever they call another asynchronous function anywhere in their body.
+
 On our side this is a very interesting domain to explore, so any comments, questions or suggestions on combining asynchronous functions or hints about its limits are welcome.
