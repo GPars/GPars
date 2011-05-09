@@ -18,6 +18,7 @@ package groovyx.gpars.activeobject
 
 import groovyx.gpars.dataflow.DataFlowVariable
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import groovyx.gpars.dataflow.Promise
 
 public class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActorIsActive() {
@@ -183,7 +184,8 @@ class B extends A {
         }
         assert b.internalActiveObjectActor.active
         a.foo(10)
-        assert a.result.val == Thread.currentThread()
+        assert a.result instanceof Promise
+        assert a.result.get() == Thread.currentThread()
 
         b.foo(20)
         assert b.result.val == Thread.currentThread()

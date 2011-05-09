@@ -16,8 +16,9 @@
 
 package groovyx.gpars.samples.dataflow
 
-import static groovyx.gpars.GParsPool.withPool
+import groovyx.gpars.dataflow.Promise
 import java.util.concurrent.TimeUnit
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * Demonstrates the way to use asyncFun() to build composable asynchronous functions.
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit
 //Combining an asynchronous summary with the inject (reduce) function
 
 withPool {
-    def result = (0..100000).inject(0, {a, b -> a + b}.asyncFun())
+    Promise<Integer> result = (0..100000).inject(0, {a, b -> a + b}.asyncFun())
     println "Doing something else while the calculation is running"
 
     sleep 1000

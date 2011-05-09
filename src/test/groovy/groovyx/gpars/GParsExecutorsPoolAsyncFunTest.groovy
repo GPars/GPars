@@ -17,6 +17,7 @@
 package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.Promise
 
 /**
  * @author Vaclav Pech
@@ -32,6 +33,7 @@ public class GParsExecutorsPoolAsyncFunTest extends GroovyTestCase {
             }.asyncFun()
 
             assert fib(1).val == 1
+            assert fib(10) instanceof Promise
             assert fib(10).val == 55
             assert fib(10).val == 55
         }

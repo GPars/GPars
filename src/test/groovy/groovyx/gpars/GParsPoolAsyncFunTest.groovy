@@ -17,6 +17,7 @@
 package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.Promise
 import jsr166y.RecursiveAction
 
 /**
@@ -33,7 +34,8 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
             }.asyncFun()
 
             assert fib(1).val == 1
-            assert fib(10).val == 55
+            assert fib(10) instanceof Promise
+            assert fib(10).get() == 55
             assert fib(10).val == 55
         }
     }

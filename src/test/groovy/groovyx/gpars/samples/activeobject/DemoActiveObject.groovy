@@ -18,6 +18,7 @@ package groovyx.gpars.samples.activeobject
 
 import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.dataflow.Promise
 
 @ActiveObject
 class Decryptor {
@@ -33,9 +34,9 @@ class Decryptor {
 }
 
 final Decryptor decryptor = new Decryptor()
-def part1 = decryptor.decrypt(' noitcA ni yvoorG')
-def part2 = decryptor.decrypt(140)
-def part3 = decryptor.decrypt('noittide dn')
+Promise<String> part1 = decryptor.decrypt(' noitcA ni yvoorG')
+Promise<Integer> part2 = decryptor.decrypt(140)
+Promise<String> part3 = decryptor.decrypt('noittide dn')
 
 print part1.get()
 print part2.get()

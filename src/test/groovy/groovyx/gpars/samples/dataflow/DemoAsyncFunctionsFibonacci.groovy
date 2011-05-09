@@ -16,6 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
+import groovyx.gpars.dataflow.Promise
 import static groovyx.gpars.GParsPool.withPool
 
 /**
@@ -42,7 +43,7 @@ withPool {
     }.gmemoizeAtMost(30).asyncFun()
 
     println "Starting the calculation"
-    final def result = fib(40)
+    final Promise<Integer> result = fib(40)
     println "Now the calculation is running while we can do something else."
 
     sleep 1000
