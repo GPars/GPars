@@ -81,8 +81,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.8.2'
     testCompile group: 'org.spockframework', name: 'spock-core', version: hasProperty('spockVersion') ? spockVersion : '0.5-groovy-1.7'
     //compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
-    compile 'org.codehaus.jsr166-mirror:jsr166y:0.4.40-SNAPSHOT'
-    compile 'org.codehaus.jsr166-mirror:extra166y:0.4.40-SNAPSHOT'
+    compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
+    compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile 'org.multiverse:multiverse-beta:0.7-RC-1'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
     //compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
