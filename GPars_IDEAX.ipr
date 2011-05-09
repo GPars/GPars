@@ -6418,6 +6418,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/0.4.40-SNAPSHOT/extra166y-0.4.40-SNAPSHOT-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: org.codehaus.jsr166-mirror:extra166y:1.7.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: org.codehaus.jsr166-mirror:jsr166y:0.4.40-SNAPSHOT">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/0.4.40-SNAPSHOT/jsr166y-0.4.40-SNAPSHOT.jar!/" />
@@ -6427,6 +6438,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/0.4.40-SNAPSHOT/jsr166y-0.4.40-SNAPSHOT-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.codehaus.jsr166-mirror:jsr166y:1.7.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
