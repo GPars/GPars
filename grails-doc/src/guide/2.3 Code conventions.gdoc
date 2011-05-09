@@ -39,4 +39,4 @@ In samples we tend to statically import frequently used factory methods:
  * DataFlow.task()
  * DataFlow.operator()
 
-It is more a matter of stile preferences and personal taste, but we think static imports make the code more compact and readable.
+It is more a matter of style preferences and personal taste, but we think static imports make the code more compact and readable.
