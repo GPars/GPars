@@ -5,10 +5,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/org/codehaus/jcsp/jcsp/1.1-rc5/jcsp-1.1-rc5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/spockframework/spock-core/0.5-groovy-1.7/spock-core-0.5-groovy-1.7.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/codehaus/groovy/groovy-all/1.7.9/groovy-all-1.7.9.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/groovy/groovy-all/1.8.0/groovy-all-1.8.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/netty/netty/3.1.5.GA/netty-3.1.5.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/codehaus/jsr166-mirror/jsr166y/0.4.40-SNAPSHOT/jsr166y-0.4.40-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/codehaus/jsr166-mirror/extra166y/0.4.40-SNAPSHOT/extra166y-0.4.40-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/spock-core-0.6-groovy-1.8-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
