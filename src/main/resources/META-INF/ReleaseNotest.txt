@@ -2,6 +2,8 @@ GPars - Groovy Parallel Systems
 
 0.12
 
+todo
+
 0.11
 
 Check out the JIRA release notes at http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=16391
