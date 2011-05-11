@@ -16,7 +16,6 @@
 
 package groovyx.gpars.activeobject;
 
-import groovyjarjarasm.asm.Opcodes;
 import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
@@ -42,6 +41,7 @@ import org.codehaus.groovy.syntax.SyntaxException;
 import org.codehaus.groovy.transform.ASTTransformation;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -190,11 +190,11 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         private static boolean blockingMandated(final String text) {
             assert text != null;
-            return !"java.lang.Object".equals(text) && !"void".equals(text) && !text.contains("groovyx.gpars.dataflow.DataFlowVariable");
+            return !"java.lang.Object".equals(text) && !"void".equals(text) && !text.contains("groovyx.gpars.dataflow.DataflowVariable");
         }
 
         private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original, final boolean blocking) {
-            if ((original.getModifiers() & Opcodes.ACC_SYNTHETIC) != 0) return;
+            if (original.isSynthetic()) return;
 
             final ArgumentListExpression args = new ArgumentListExpression();
             final Parameter[] params = original.getParameters();
@@ -211,7 +211,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             }
 
             final MethodNode newMethod = owner.addMethod(findSuitablePrivateMethodName(owner, original),
-                    Opcodes.ACC_FINAL & Opcodes.ACC_PRIVATE,
+                    Modifier.FINAL & Modifier.PRIVATE,
                     nonGeneric(original.getReturnType()),
                     newParams,
                     original.getExceptions(),
@@ -252,7 +252,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             args.addExpression(new ConstantExpression(actorGroupName));
 
             return classNode.addField(logFieldName,
-                    Opcodes.ACC_FINAL | Opcodes.ACC_TRANSIENT | Opcodes.ACC_PROTECTED,
+                    Modifier.FINAL | Modifier.TRANSIENT | Modifier.PROTECTED,
                     new ClassNode(InternalActor.class),
                     new MethodCallExpression(
                             new ClassExpression(new ClassNode(InternalActor.class)),
