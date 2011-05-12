@@ -340,22 +340,27 @@ public class DataflowSelectorTest extends GroovyTestCase {
         final DataflowQueue c = new DataflowQueue()
         final DataflowQueue d = new DataflowQueue()
 
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+
         def op = group.selector(inputs: [a, b, c], outputs: [d]) {
             if (it == 1) setGuard(0, false)
             if (it == 3) setGuard(2, false)
             if (it == 4) setGuard(0, true)
             if (it == 5) setGuard(2, true)
             bindOutput it
+            barrier.await()
         }
         a << 1
-        sleep 500
+        barrier.await()
         a << 2
         sleep 500
         b << 3
-        sleep 500
+        barrier.await()
         c << 4
-        sleep 500
         b << 5
+        barrier.await()
+        barrier.await()
+        barrier.await()
 
         assert [d.val, d.val, d.val, d.val, d.val] == [1, 3, 5, 4, 2]
         op.stop()
