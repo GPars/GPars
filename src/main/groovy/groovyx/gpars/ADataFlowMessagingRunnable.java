@@ -28,16 +28,16 @@ import java.util.Arrays;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
-public abstract class DataflowMessagingRunnable extends Closure {
+public abstract class ADataFlowMessagingRunnable extends Closure {
     private static final long serialVersionUID = 4796783310470426395L;
     private final Class[] defaultParamTypes;
     private final int numberOfParameters;
 
-    protected DataflowMessagingRunnable(final int numberOfParameters) {
+    protected ADataFlowMessagingRunnable(final int numberOfParameters) {
         this(null, numberOfParameters);
     }
 
-    protected DataflowMessagingRunnable(final Object owner, final int numberOfParameters) {
+    protected ADataFlowMessagingRunnable(final Object owner, final int numberOfParameters) {
         super(owner);
         this.numberOfParameters = numberOfParameters;
         this.defaultParamTypes = new Class[numberOfParameters];
