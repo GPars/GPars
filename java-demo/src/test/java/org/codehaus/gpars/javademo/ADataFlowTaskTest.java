@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings({"MagicNumber"})
-public class DataflowTaskTest {
+public class ADataFlowTaskTest {
 
     @Test
     public void testDataflowVariable() throws InterruptedException {
