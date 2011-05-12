@@ -6385,15 +6385,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.2/junit-4.8.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.gpars:gpars:0.12-beta-1-SNAPSHOT">
+    <library name="Maven: org.codehaus.gpars:gpars:0.12-SNAPSHOT">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-beta-1-SNAPSHOT/gpars-0.12-beta-1-SNAPSHOT.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-SNAPSHOT/gpars-0.12-SNAPSHOT.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-beta-1-SNAPSHOT/gpars-0.12-beta-1-SNAPSHOT-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-SNAPSHOT/gpars-0.12-SNAPSHOT-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-beta-1-SNAPSHOT/gpars-0.12-beta-1-SNAPSHOT-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-SNAPSHOT/gpars-0.12-SNAPSHOT-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.codehaus.groovy:groovy-all:1.7.8">
