@@ -203,7 +203,7 @@ protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
      * return True, if poisson has been received
      */
     boolean checkPoisson(def data) {
-        if (data instanceof DataflowPoisson) {
+        if (data instanceof DataflowPoissonPill) {
             owningProcessor.bindAllOutputsAtomically data
             owningProcessor.stop()
             return true

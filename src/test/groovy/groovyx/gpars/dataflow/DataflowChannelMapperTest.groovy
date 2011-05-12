@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.dataflow.operator.DataflowPoisson
+import groovyx.gpars.dataflow.operator.DataflowPoissonPill
 import static groovyx.gpars.dataflow.Dataflow.operator
 
 /**
@@ -41,7 +41,7 @@ class DataflowChannelMapperTest extends GroovyTestCase {
         assert 4 == filteredQueue.val
         assert 6 == filteredQueue.val
         assert !filteredQueue.isBound()
-        queue.bind(DataflowPoisson.instance)
+        queue.bind(DataflowPoissonPill.instance)
     }
 
     public void testCreationFromBroadCast() {
@@ -57,6 +57,6 @@ class DataflowChannelMapperTest extends GroovyTestCase {
         assert 4 == filteredQueue.val
         assert 6 == filteredQueue.val
         assert !filteredQueue.isBound()
-        queue.bind(DataflowPoisson.instance)
+        queue.bind(DataflowPoissonPill.instance)
     }
 }

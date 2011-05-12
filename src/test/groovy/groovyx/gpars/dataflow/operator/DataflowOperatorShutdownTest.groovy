@@ -48,9 +48,9 @@ public class DataflowOperatorShutdownTest extends GroovyTestCase {
 
         assertEquals 60, d.val
         assertEquals 6000, e.val
-        a << DataflowPoisson.instance
-        assert d.val == DataflowPoisson.instance
-        assert e.val == DataflowPoisson.instance
+        a << DataflowPoissonPill.instance
+        assert d.val == DataflowPoissonPill.instance
+        assert e.val == DataflowPoissonPill.instance
         op.join()
     }
 
@@ -65,9 +65,9 @@ public class DataflowOperatorShutdownTest extends GroovyTestCase {
 
         assertEquals 10, d.val
         assertEquals 10, e.val
-        a << DataflowPoisson.instance
-        assert d.val == DataflowPoisson.instance
-        assert e.val == DataflowPoisson.instance
+        a << DataflowPoissonPill.instance
+        assert d.val == DataflowPoissonPill.instance
+        assert e.val == DataflowPoissonPill.instance
         op.join()
     }
 
@@ -79,8 +79,8 @@ public class DataflowOperatorShutdownTest extends GroovyTestCase {
             bindOutput x
         }
 
-        a << DataflowPoisson.instance
-        assert d.val == DataflowPoisson.instance
+        a << DataflowPoissonPill.instance
+        assert d.val == DataflowPoissonPill.instance
         op.join()
     }
 
@@ -99,10 +99,10 @@ public class DataflowOperatorShutdownTest extends GroovyTestCase {
 
         def op3 = operator(inputs: [e, f], outputs: [b, out]) {x, y -> }
 
-        a << DataflowPoisson.instance
+        a << DataflowPoissonPill.instance
 
-        assert out.val == DataflowPoisson.instance
-        assert out.val == DataflowPoisson.instance
+        assert out.val == DataflowPoissonPill.instance
+        assert out.val == DataflowPoissonPill.instance
         op1.join()
         op2.join()
         op3.join()
@@ -123,9 +123,9 @@ public class DataflowOperatorShutdownTest extends GroovyTestCase {
 
         def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-        a << DataflowPoisson.instance
+        a << DataflowPoissonPill.instance
 
-        assert out.val == DataflowPoisson.instance
+        assert out.val == DataflowPoissonPill.instance
         op1.join()
         op2.join()
         op3.join()
