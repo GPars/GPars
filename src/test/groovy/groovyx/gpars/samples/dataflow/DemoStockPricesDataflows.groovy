@@ -28,7 +28,7 @@ All synchronization logic is hidden in the access to Dataflows.
  */
 
 /** Fetch the stock price for the end of that year from the yahoo REST service.
- * @return price as double or 0 if call failed.          */
+ * @return price as double or 0 if call failed.           */
 def getYearEndClosing(String stock, int year) {
     def url = "http://ichart.finance.yahoo.com/table.csv?s=$stock&amp;a=11&amp;b=01&amp;c=$year&amp;d=11&amp;e=31&amp;f=$year&amp;g=m;ignore=.csv"
     try {
