@@ -39,7 +39,7 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public class DataflowSelector extends DataflowProcessor {
+public class ADataFlowSelector extends DataflowProcessor {
 
     protected final Select select
     protected final List<Boolean> guards

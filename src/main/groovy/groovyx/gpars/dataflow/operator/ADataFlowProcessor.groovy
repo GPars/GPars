@@ -36,7 +36,7 @@ import groovyx.gpars.group.PGroup
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-abstract class DataflowProcessor {
+abstract class ADataFlowProcessor {
 
     /**
      * The internal actor performing on behalf of the processor

@@ -35,7 +35,7 @@ import groovyx.gpars.group.PGroup
  * @author Vaclav Pech
  * Date: Sep 23, 2009
  */
-public final class DataflowPrioritySelector extends DataflowSelector {
+public final class ADataFlowPrioritySelector extends DataflowSelector {
 
     /**
      * Creates a priority selector

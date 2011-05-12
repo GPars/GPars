@@ -35,7 +35,7 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public final class DataflowOperator extends DataflowProcessor {
+public final class ADataFlowOperator extends DataflowProcessor {
 
     /**
      * Creates an operator
