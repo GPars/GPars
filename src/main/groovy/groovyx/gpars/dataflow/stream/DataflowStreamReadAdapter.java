@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
-public final class ADataFlowStreamReadAdapter<T> implements DataflowReadChannel<T> {
+public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     private DataflowStream<T> head;
     private DataflowStream<T> asyncHead;
@@ -46,7 +46,7 @@ public final class ADataFlowStreamReadAdapter<T> implements DataflowReadChannel<
      *
      * @param stream The stream to wrap
      */
-    public ADataFlowStreamReadAdapter(final DataflowStream<T> stream) {
+    public DataflowStreamReadAdapter(final DataflowStream<T> stream) {
         this.head = stream;
         this.asyncHead = head;
     }
