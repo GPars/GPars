@@ -34,7 +34,7 @@ import java.util.concurrent.Callable;
  *         Date: Jun 4, 2009
  */
 @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "ConstantDeclaredInAbstractClass", "UtilityClass", "unchecked"})
-public abstract class Dataflow {
+public abstract class ADataFlow {
 
     /**
      * The parallel group used by all Dataflow Concurrency actors by default.

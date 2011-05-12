@@ -38,12 +38,12 @@ import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
-public final class DataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
+public final class ADataFlowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
 
     /**
      * Creates a new adapter
      */
-    public DataflowBroadcast() {
+    public ADataFlowBroadcast() {
         super(new DataflowStream<T>());
     }
 
