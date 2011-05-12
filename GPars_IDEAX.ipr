@@ -190,7 +190,7 @@
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/dataflow/operator/DataFlowOperator.groovy" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/dataflow/operator/DataflowOperator.groovy" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/RemoteConnection.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/RemoteHost.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/message" charset="UTF-8" />
