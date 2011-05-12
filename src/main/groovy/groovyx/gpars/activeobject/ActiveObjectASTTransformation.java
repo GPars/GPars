@@ -180,7 +180,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             }
 
             final ClassNode returnType = method.getReturnType();
-            final String text = returnType.toString();
+            final String text = returnType.getName();
             if (!blocking && blockingMandated(text)) {
                 this.addError("Non-blocking methods must not return a specific type. Use def or void instead.", method);
                 return true;
@@ -188,9 +188,10 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
             return blocking;
         }
 
+        @SuppressWarnings({"OverlyComplexBooleanExpression"})
         private static boolean blockingMandated(final String text) {
             assert text != null;
-            return !"java.lang.Object".equals(text) && !"void".equals(text) && !text.contains("groovyx.gpars.dataflow.DataflowVariable");
+            return !("java.lang.Object".equals(text) || "void".equals(text) || text.contains("groovyx.gpars.dataflow.DataflowVariable") || text.contains("groovyx.gpars.dataflow.Promise"));
         }
 
         private static void addActiveMethod(final FieldNode actorNode, final ClassNode owner, final MethodNode original, final boolean blocking) {
@@ -212,7 +213,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
             final MethodNode newMethod = owner.addMethod(findSuitablePrivateMethodName(owner, original),
                     Modifier.FINAL & Modifier.PRIVATE,
-                    nonGeneric(original.getReturnType()),
+                    new ClassNode(Object.class),
                     newParams,
                     original.getExceptions(),
                     original.getCode());
