@@ -23,12 +23,12 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  *
  * @author Alex Tkachman
  */
-public class DataflowInvocationExpression extends DataflowComplexExpression<Object> {
+public class ADataFlowInvocationExpression extends DataflowComplexExpression<Object> {
     private static final long serialVersionUID = -678669663648650627L;
     private Object receiver;
     private final String methodName;
 
-    public DataflowInvocationExpression(final Object receiver, final String methodName, final Object[] args) {
+    public ADataFlowInvocationExpression(final Object receiver, final String methodName, final Object[] args) {
         super(args);
         this.receiver = receiver;
         this.methodName = methodName;

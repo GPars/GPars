@@ -49,7 +49,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author Alex Tkachman, Vaclav Pech
  */
 @SuppressWarnings({"UnqualifiedStaticUsage", "CallToSimpleGetterFromWithinClass", "ConstantDeclaredInAbstractClass"})
-public abstract class DataflowExpression<T> extends WithSerialId implements GroovyObject, DataflowReadChannel<T> {
+public abstract class ADataFlowExpression<T> extends WithSerialId implements GroovyObject, DataflowReadChannel<T> {
 
     private static final String ATTACHMENT = "attachment";
     private static final String RESULT = "result";
@@ -133,7 +133,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     /**
      * Creates a new unbound Dataflow Expression
      */
-    protected DataflowExpression() {
+    protected ADataFlowExpression() {
         state = S_NOT_INITIALIZED;
     }
 
