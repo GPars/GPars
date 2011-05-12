@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-public interface ADataFlowReadChannel<T> {
+public interface DataflowReadChannel<T> {
 
     /**
      * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message

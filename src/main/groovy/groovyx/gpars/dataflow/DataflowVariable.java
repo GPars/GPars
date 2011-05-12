@@ -36,13 +36,13 @@ import java.util.concurrent.TimeoutException;
  *         Date: Jun 4, 2009
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
-public class ADataFlowVariable<T> extends DataflowExpression<T> implements DataflowChannel<T>, Promise<T> {
+public class DataflowVariable<T> extends DataflowExpression<T> implements DataflowChannel<T>, Promise<T> {
     private static final long serialVersionUID = 1340439210749936258L;
 
     /**
      * Creates a new unbound Dataflow Variable
      */
-    public ADataFlowVariable() {
+    public DataflowVariable() {
     }
 
     /**

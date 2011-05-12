@@ -16,31 +16,33 @@
 
 package groovyx.gpars.dataflow;
 
+import org.codehaus.groovy.runtime.InvokerHelper;
+
 /**
+ * DFE which evaluate property when receiver became available
+ *
  * @author Alex Tkachman
  */
-public abstract class ADataFlowComplexExpression<T> extends DataflowExpression<T> {
-    private static final long serialVersionUID = 1527021112173826064L;
-    protected final Object[] args;
+public class DataflowGetPropertyExpression<T> extends DataflowExpression<T> {
+    private static final long serialVersionUID = 2984824057556784227L;
+    private final DataflowExpression<T> receiver;
+    private final String name;
 
-    protected ADataFlowComplexExpression(final Object... elements) {
-        this.args = elements.clone();
+    public DataflowGetPropertyExpression(final DataflowExpression<T> expression, final String name) {
+        this.receiver = expression;
+        this.name = name;
+        subscribe();
     }
 
     @Override
     protected void subscribe(final DataflowExpressionsCollector listener) {
-        for (int i = 0; i != args.length; ++i) {
-            args[i] = listener.subscribe(args[i]);
-        }
+        listener.subscribe(receiver);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected T evaluate() {
-        for (int i = 0; i != args.length; ++i) {
-            if (args[i] instanceof DataflowExpression) {
-                args[i] = ((DataflowExpression<?>) args[i]).value;
-            }
-        }
-        return null;
+        //noinspection unchecked
+        return (T) InvokerHelper.getProperty(receiver.value, name);
     }
 }

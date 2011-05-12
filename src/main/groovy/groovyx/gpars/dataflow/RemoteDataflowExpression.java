@@ -24,11 +24,11 @@ import groovyx.gpars.serial.SerialContext;
 /**
  * @author Alex Tkachman
  */
-public class ARemoteDataFlowExpression<T> extends DataflowExpression<T> implements RemoteSerialized {
+public class RemoteDataflowExpression<T> extends DataflowExpression<T> implements RemoteSerialized {
     private static final long serialVersionUID = -3166182949181062129L;
     private final RemoteHost remoteHost;
 
-    public ARemoteDataFlowExpression() {
+    public RemoteDataflowExpression() {
         remoteHost = (RemoteHost) SerialContext.get();
         getValAsync(new MessageStream() {
             private static final long serialVersionUID = -8868544599311892034L;

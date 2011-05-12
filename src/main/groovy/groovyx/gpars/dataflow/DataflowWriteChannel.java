@@ -22,7 +22,7 @@ package groovyx.gpars.dataflow;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-public interface ADataFlowWriteChannel<T> {
+public interface DataflowWriteChannel<T> {
 
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataflowVariable

@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author Vaclav Pech, Dierk Koenig, Alex Tkachman
  *         Date: Sep 3, 2009
  */
-public final class ADataFlows extends GroovyObjectSupport {
+public final class Dataflows extends GroovyObjectSupport {
 
     private static final DataflowVariable<Object> DUMMY = new DataflowVariable<Object>();
 
@@ -79,7 +79,7 @@ public final class ADataFlows extends GroovyObjectSupport {
      *                                  non-positive.
      * @see java.util.concurrent.ConcurrentHashMap
      */
-    public ADataFlows(final int initialCapacity, final float loadFactor, final int concurrencyLevel) {
+    public Dataflows(final int initialCapacity, final float loadFactor, final int concurrencyLevel) {
         variables = new ConcurrentHashMap<Object, DataflowVariable<Object>>(initialCapacity, loadFactor, concurrencyLevel);
     }
 
@@ -88,7 +88,7 @@ public final class ADataFlows extends GroovyObjectSupport {
      *
      * @see java.util.concurrent.ConcurrentHashMap
      */
-    public ADataFlows() {
+    public Dataflows() {
         variables = new ConcurrentHashMap<Object, DataflowVariable<Object>>(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
     }
 

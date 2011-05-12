@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"ClassWithTooManyMethods"})
-public final class ADataFlowQueue<T> implements DataflowChannel<T> {
+public final class DataflowQueue<T> implements DataflowChannel<T> {
 
     /**
      * Internal lock
