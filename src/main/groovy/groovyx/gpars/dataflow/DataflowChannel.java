@@ -22,5 +22,5 @@ package groovyx.gpars.dataflow;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-public interface ADataFlowChannel<T> extends DataflowReadChannel<T>, DataflowWriteChannel<T> {
+public interface DataflowChannel<T> extends DataflowReadChannel<T>, DataflowWriteChannel<T> {
 }
