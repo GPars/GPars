@@ -20,12 +20,12 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import static groovyx.gpars.actor.Actors.blockingActor
 
-public class DataFlowTest extends GroovyTestCase {
+public class DataflowTest extends GroovyTestCase {
 
     public void testSimpleAssignment() {
-        DataFlowVariable<Integer> x = new DataFlowVariable()
-        DataFlowVariable<Integer> y = new DataFlowVariable()
-        DataFlowVariable<Integer> z = new DataFlowVariable()
+        DataflowVariable<Integer> x = new DataflowVariable()
+        DataflowVariable<Integer> y = new DataflowVariable()
+        DataflowVariable<Integer> z = new DataflowVariable()
 
         volatile def result = 0
         final def latch = new CountDownLatch(1)
@@ -61,8 +61,8 @@ public class DataFlowTest extends GroovyTestCase {
     }
 
     public void testListAssignment() {
-        def x = new DataFlowVariable<List<Integer>>()
-        def y = new DataFlowVariable<List<Integer>>()
+        def x = new DataflowVariable<List<Integer>>()
+        def y = new DataflowVariable<List<Integer>>()
 
         volatile def result = 0
         final def latch = new CountDownLatch(1)
@@ -79,9 +79,9 @@ public class DataFlowTest extends GroovyTestCase {
     }
 
     void testRightShift() {
-        DataFlowVariable<Integer> x = new DataFlowVariable()
-        DataFlowVariable<Integer> y = new DataFlowVariable()
-        DataFlowVariable<Integer> z = new DataFlowVariable()
+        DataflowVariable<Integer> x = new DataflowVariable()
+        DataflowVariable<Integer> y = new DataflowVariable()
+        DataflowVariable<Integer> z = new DataflowVariable()
 
         volatile def result = 0
         final def latch = new CountDownLatch(1)
@@ -103,7 +103,7 @@ public class DataFlowTest extends GroovyTestCase {
     }
 
     void testMethodSyntax() {
-        def df = new DataFlows()
+        def df = new Dataflows()
 
         volatile def result = 0
         final def latch = new CountDownLatch(1)

@@ -33,16 +33,16 @@ You mark active objects with the _@ActiveObject_ annotation. This will ensure a 
 Now you can mark methods with the _@ActiveMethod_ annotation indicating that you want the method to be invoked asynchronously
 by the target object's internal actor.
 An optional boolean _blocking_ parameter to the _@ActiveMethod_ annotation specifies, whether the caller should block until a result is available
-or whether instead the caller should only receive a _promise_ for a future result in a form of a _DataFlowVariable_ and so the caller is not blocked waiting.
+or whether instead the caller should only receive a _promise_ for a future result in a form of a _DataflowVariable_ and so the caller is not blocked waiting.
 
 {note}
 By default, all active methods are set to be *non-blocking* . However, methods, which declare their return type explicitly, must be configured
-as blocking, otherwise the compiler will report an error. Only _def_ , _void_ and _DataFlowVariable_ are allowed return types for non-blocking methods.
+as blocking, otherwise the compiler will report an error. Only _def_ , _void_ and _DataflowVariable_ are allowed return types for non-blocking methods.
 {note}
 
 Under the covers, GPars will translate your method call to *a message being sent to the internal actor* . The actor will eventually handle that message by invoking the desired method
 on behalf of the caller and once finished a reply will be sent back to the caller.
-Non-blocking methods return promises for results, aka _DataFlowVariables_ .
+Non-blocking methods return promises for results, aka _DataflowVariables_ .
 
 h3. But blocking means we're not really asynchronous, are we?
 
@@ -54,7 +54,7 @@ across concurrent method invocations. The blocking methods are then still very u
 {code}
 import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 
 @ActiveObject
 class Decryptor {
@@ -103,7 +103,7 @@ The _@ActiveObject_ annotation can appear on any class in an inheritance hierarc
 {code}
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 
 @ActiveObject
 class A {

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.TimeUnit
-import static groovyx.gpars.dataflow.DataFlow.task
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates that deadlocks are deterministic in dataflow concurrency model. The deadlock appears reliably every time
@@ -27,8 +27,8 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * Also shows a way to exchange messages among threads and set and handle timeouts.
  */
 
-final def a = new DataFlowVariable()
-final def b = new DataFlowVariable()
+final def a = new DataflowVariable()
+final def b = new DataflowVariable()
 
 final def actor = Actors.actor {
 

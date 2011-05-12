@@ -1,6 +1,6 @@
 The *Dataflow tasks* give you an easy-to-grasp abstraction of mutually-independent logical tasks or threads, which can run
 concurrently and exchange data solely through Dataflow Variables, Queues, Broadcasts and Streams.
-DataFlow tasks with their easy-to-express mutual dependencies and inherently sequential body could also be used as a practical implementation of UML _Activity Diagrams_ .
+Dataflow tasks with their easy-to-express mutual dependencies and inherently sequential body could also be used as a practical implementation of UML _Activity Diagrams_ .
 
 Check out the examples.
 
@@ -9,8 +9,8 @@ h3. A simple mashup example
 In the example we're downloading the front pages of three popular web sites, each in their own task, while in a separate task we're filtering out sites talking about Groovy today and forming the output. The output task synchronizes automatically with the three download tasks on the three Dataflow variables through which the content of each website is passed to the output task.
 
 {code}import static groovyx.gpars.GParsPool.*
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 
 /**
@@ -18,9 +18,9 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * and checks how many of them refer to Groovy.
  */
 
-def dzone = new DataFlowVariable()
-def jroller = new DataFlowVariable()
-def theserverside = new DataFlowVariable()
+def dzone = new DataflowVariable()
+def jroller = new DataflowVariable()
+def theserverside = new DataflowVariable()
 
 task {
     println 'Started downloading from DZone'
@@ -55,7 +55,7 @@ h3. Grouping tasks
 Dataflow tasks can be organized into groups to allow for performance fine-tuning. Groups provide a handy _task()_ factory method
 to create tasks attached to the groups.
 Using groups allows you to organize tasks or operators around different thread pools (wrapped inside the group).
-While the DataFlow.task() command schedules the task on a default thread pool (java.util.concurrent.Executor, fixed size=#cpu+1, daemon threads),
+While the Dataflow.task() command schedules the task on a default thread pool (java.util.concurrent.Executor, fixed size=#cpu+1, daemon threads),
 you may prefer being able to define your own thread pool(s) to run your tasks.
 
 {code}
@@ -84,13 +84,13 @@ otherwise your applications will not exit.
 
 h3. A mashup variant with methods
 
-To avoid giving you wrong impression about structuring the Dataflow code, here's a rewrite of the mashup example, with a _downloadPage()_ method performing the actual download in a separate task and returning a DataFlowVariable instance, so that the main application thread could eventually get hold of the downloaded content.
+To avoid giving you wrong impression about structuring the Dataflow code, here's a rewrite of the mashup example, with a _downloadPage()_ method performing the actual download in a separate task and returning a DataflowVariable instance, so that the main application thread could eventually get hold of the downloaded content.
 Dataflow variables can obviously be passed around as parameters or return values.
 {code}package groovyx.gpars.samples.dataflow
 
 import static groovyx.gpars.GParsExecutorsPool.*
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 
 /**
@@ -109,7 +109,7 @@ task {
 }.join()
 
 def downloadPage(def url) {
-    def page = new DataFlowVariable()
+    def page = new DataflowVariable()
     task {
         println "Started downloading from $url"
         page << url.toURL().text
@@ -125,19 +125,19 @@ Dataflow programs naturally scale with the number of processors. Up to a certain
 Check out, for example, the following script, which calculates parameters of a simple physical experiment and prints out the results. Each task performs its part of the calculation and may depend on values calculated by some other tasks as well as its result might be needed by some of the other tasks. With Dataflow Concurrency you can split the work between tasks or reorder the tasks themselves as you like and the dataflow mechanics will ensure the calculation will be accomplished correctly.
 
 {code}
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
-final def mass = new DataFlowVariable()
-final def radius = new DataFlowVariable()
-final def volume = new DataFlowVariable()
-final def density = new DataFlowVariable()
-final def acceleration = new DataFlowVariable()
-final def time = new DataFlowVariable()
-final def velocity = new DataFlowVariable()
-final def decelerationForce = new DataFlowVariable()
-final def deceleration = new DataFlowVariable()
-final def distance = new DataFlowVariable()
+final def mass = new DataflowVariable()
+final def radius = new DataflowVariable()
+final def volume = new DataflowVariable()
+final def density = new DataflowVariable()
+final def acceleration = new DataflowVariable()
+final def time = new DataflowVariable()
+final def velocity = new DataflowVariable()
+final def decelerationForce = new DataflowVariable()
+final def deceleration = new DataflowVariable()
+final def distance = new DataflowVariable()
 
 def t = task {
     println """
@@ -151,7 +151,7 @@ Given our ability to push the ball backwards with a force of ${decelerationForce
 of ${deceleration.val} m/s2 and so stop the ball at a distance of ${distance.val} m.
 
 =======================================================================================================================
-This example has been calculated asynchronously in multiple tasks using GPars DataFlow concurrency in Groovy.
+This example has been calculated asynchronously in multiple tasks using GPars Dataflow concurrency in Groovy.
 Author: ${author.val}
 """
 
@@ -211,32 +211,32 @@ task {
 }
 {code}
 
-h2. DataFlows map
+h2. Dataflows map
 
-As a handy shortcut the _DataFlows_ class can help you reduce the amount of code you have to write to leverage Dataflow variables.
+As a handy shortcut the _Dataflows_ class can help you reduce the amount of code you have to write to leverage Dataflow variables.
 
 {code}
-def df = new DataFlows()
+def df = new Dataflows()
 df.x = 'value1'
 assert df.x == 'value1'
 
-DataFlow.task {df.y = 'value2}
+Dataflow.task {df.y = 'value2}
 
 assert df.y == 'value2'
 {code}
-Think of DataFlows as a map with Dataflow Variables as keys storing their bound values as appropriate map values. The semantics of reading a value (e.g. df.x) and binding a value (e.g. df.x = 'value') remain identical to the semantics of plain Dataflow Variables (x.val and x << 'value' respectively).
+Think of Dataflows as a map with Dataflow Variables as keys storing their bound values as appropriate map values. The semantics of reading a value (e.g. df.x) and binding a value (e.g. df.x = 'value') remain identical to the semantics of plain Dataflow Variables (x.val and x << 'value' respectively).
 
-h3. Mixing _DataFlows_ and Groovy _with_ blocks
+h3. Mixing _Dataflows_ and Groovy _with_ blocks
 
-When inside a _with_ block of a DataFlows instance, the dataflow variables stored inside the DataFlows instance can be accessed directly
-without the need to prefix them with the DataFlows instance identifier.
+When inside a _with_ block of a Dataflows instance, the dataflow variables stored inside the Dataflows instance can be accessed directly
+without the need to prefix them with the Dataflows instance identifier.
 
 {code}
-new DataFlows().with {
+new Dataflows().with {
     x = 'value1'
     assert x == 'value1'
 
-    DataFlow.task {y = 'value2}
+    Dataflow.task {y = 'value2}
 
     assert y == 'value2'
 }
@@ -245,14 +245,14 @@ new DataFlows().with {
 h2. Returning a value from a task
 
 Typically dataflow tasks communicate through dataflow variables. On top of that, tasks can also return values, again through a dataflow variable.
- When you invoke the _task()_ factory method, you get back an instance of DataFlowVariable, on which you can listen for the task's return value,
- just like when using any other DataFlowVariable.
+ When you invoke the _task()_ factory method, you get back an instance of DataflowVariable, on which you can listen for the task's return value,
+ just like when using any other DataflowVariable.
 
  {code}
-    final DataFlowVariable t1 = task {
+    final DataflowVariable t1 = task {
         return 10
     }
-    final DataFlowVariable t2 = task {
+    final DataflowVariable t2 = task {
         return 20
     }
     def results = [t1, t2]*.val
@@ -275,10 +275,10 @@ task >> {value -> println "The task finished and returned $value"}
 
  {code}
  task {
-     final DataFlowVariable t1 = task {
+     final DataflowVariable t1 = task {
          println 'First sub-task running.'
      }
-     final DataFlowVariable t2 = task {
+     final DataflowVariable t2 = task {
          println 'Second sub-task running'
      }
      [t1, t2]*.join()

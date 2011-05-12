@@ -17,16 +17,16 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.GParsPool
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * A simple mashup sample, downloads content of three websites and checks how many of them refer to Groovy.
  */
 
-def dzone = new DataFlowVariable()
-def jroller = new DataFlowVariable()
-def theserverside = new DataFlowVariable()
+def dzone = new DataflowVariable()
+def jroller = new DataflowVariable()
+def theserverside = new DataflowVariable()
 
 task {
     println 'Started downloading from DZone'

@@ -18,7 +18,7 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
@@ -58,7 +58,7 @@ public class NullMessageTest extends GroovyTestCase {
     }
 
     public void testNullMessageFromActorWithReply() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         final Actor actor = Actors.blockingActor {
             receive {
                 reply 10

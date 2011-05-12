@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,24 +16,24 @@
 
 package groovyx.gpars.benchmark.dataflow
 
-import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowReadChannel
-import groovyx.gpars.dataflow.DataFlowWriteChannel
-import groovyx.gpars.dataflow.stream.DataFlowStream
-import groovyx.gpars.dataflow.stream.DataFlowStreamReadAdapter
-import groovyx.gpars.dataflow.stream.DataFlowStreamWriteAdapter
+import groovyx.gpars.dataflow.DataflowChannel
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.DataflowWriteChannel
+import groovyx.gpars.dataflow.stream.DataflowStream
+import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter
+import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 
 final def group1 = new DefaultPGroup(4)
 final def group2 = new DefaultPGroup(4)
-final def stream = new DataFlowQueue()
+final def stream = new DataflowQueue()
 
-final DataFlowStream dfStream = new DataFlowStream()
-final DataFlowStreamWriteAdapter adapterForWrite = new DataFlowStreamWriteAdapter(dfStream)
-final DataFlowStreamReadAdapter adapterForRead = new DataFlowStreamReadAdapter(dfStream)
+final DataflowStream dfStream = new DataflowStream()
+final DataflowStreamWriteAdapter adapterForWrite = new DataflowStreamWriteAdapter(dfStream)
+final DataflowStreamReadAdapter adapterForRead = new DataflowStreamReadAdapter(dfStream)
 perform(group1, group2, 2, 1, 4000000, adapterForRead, adapterForWrite)
 
 perform(group1, group2, 2, 1, 4000000, stream)
@@ -46,12 +46,12 @@ perform(group1, group2, 2, 4, 4000000, stream)
 perform(group1, group2, 2, 6, 4000000, stream)
 perform(group1, group2, 1, 6, 4000000, stream)
 
-def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, DataFlowChannel stream) {
+def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, DataflowChannel stream) {
     perform(producerGroup, consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, stream, stream)
 
 }
 
-def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, DataFlowReadChannel streamToRead, DataFlowWriteChannel streamToWrite) {
+def perform(PGroup producerGroup, PGroup consumerGroup, numberOfProducers, numberOfConsumers, numberOfMessages, DataflowReadChannel streamToRead, DataflowWriteChannel streamToWrite) {
     assert !streamToRead.bound
     final long numberOfMessagesPerProducer = numberOfMessages / numberOfProducers
 

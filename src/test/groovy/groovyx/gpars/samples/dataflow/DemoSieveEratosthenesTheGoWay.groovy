@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.dataflow
 
-import static groovyx.gpars.dataflow.DataFlow.task as go
+import static groovyx.gpars.dataflow.Dataflow.task as go
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 
 /**
  * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks mimicking closely the example
@@ -57,12 +57,12 @@ def filter(inChannel, outChannel, int prime) {
 // The prime sieve: Daisy-chain Filter processes.
 
 def main() {
-    final DataFlowQueue ch = new DataFlowQueue()
+    final DataflowQueue ch = new DataflowQueue()
     go generate(ch)
     for (i in (1..10)) {
         int prime = ch.val
         println prime
-        def ch1 = new DataFlowQueue()
+        def ch1 = new DataflowQueue()
         go filter(ch, ch1, prime)
         ch = ch1
     }

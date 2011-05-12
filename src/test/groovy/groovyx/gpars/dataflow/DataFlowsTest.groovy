@@ -21,10 +21,10 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
-public class DataFlowsTest extends GroovyTestCase {
+public class DataflowsTest extends GroovyTestCase {
 
     public void testValueAssignment() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
 
         data.y = 'value'
         final def y = data.y
@@ -38,7 +38,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testDoubleAssignment() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
 
         shouldFail(IllegalStateException) {
             data.x = 1
@@ -48,7 +48,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testVariableFromThread() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
 
         Actors.blockingActor {
             data.variable = 10
@@ -67,7 +67,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testBlockedRead() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
 
         volatile int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
@@ -87,7 +87,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testNonBlockedRead() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -109,7 +109,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testIndexes() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
 
         Actors.blockingActor {
             //noinspection GroovyAssignmentCanBeOperatorAssignment
@@ -125,7 +125,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testValueRemoval() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
 
         data.y = 'value1'
         shouldFail {
@@ -141,7 +141,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testUnblockingAfterValueRemoval() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         Actors.blockingActor {
@@ -165,9 +165,9 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testWhenValueBound() {
-        final DataFlows data = new DataFlows()
-        final def result1 = new DataFlowVariable()
-        final def result2 = new DataFlowVariable()
+        final Dataflows data = new Dataflows()
+        final def result1 = new DataflowVariable()
+        final def result2 = new DataflowVariable()
 
         data.y {result1 << it }
         data.y = 'value'
@@ -185,10 +185,10 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testChainedWhenValueBound() {
-        final DataFlows data = new DataFlows()
-        final def result1 = new DataFlowVariable()
-        final def result2 = new DataFlowVariable()
-        final def result3 = new DataFlowVariable()
+        final Dataflows data = new Dataflows()
+        final def result1 = new DataflowVariable()
+        final def result2 = new DataflowVariable()
+        final def result3 = new DataflowVariable()
 
         data.y {
             result3 << it
@@ -206,7 +206,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testContains() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
         assertFalse data.contains('key')
         data.key1 = 'value1'
         assertFalse data.contains('key2')
@@ -215,7 +215,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testUnboundContains() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
         final CyclicBarrier barrier = new CyclicBarrier(2)
         Thread.start {
             barrier.await()
@@ -233,7 +233,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testIterator() {
-        final DataFlows data = new DataFlows()
+        final Dataflows data = new Dataflows()
 
         data.x = 0
         data.y = 1
@@ -244,7 +244,7 @@ public class DataFlowsTest extends GroovyTestCase {
         }
         assert 'x' in log
         assert 'y' in log
-        assertEquals 2, log.findAll { it in DataFlowVariable }.size()
+        assertEquals 2, log.findAll { it in DataflowVariable }.size()
 
         def log2 = []
         for (entry in data) {
@@ -260,7 +260,7 @@ public class DataFlowsTest extends GroovyTestCase {
     }
 
     public void testInterruption() {
-        final def flows = new DataFlows()
+        final def flows = new Dataflows()
         Thread t = Thread.start {
             try {
                 flows.x = 1

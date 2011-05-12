@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 import groovy.time.Duration
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -69,7 +69,7 @@ import java.util.concurrent.CyclicBarrier
         }
 
         barrier = new CyclicBarrier(2)
-        final DataFlowVariable result = new DataFlowVariable();
+        final DataflowVariable result = new DataflowVariable();
         {-> try {barrier.await(5, TimeUnit.MINUTES); result << 20} catch (ignore) {}}.callTimeoutAsync(timeout);
         sleep 3000
         assert !result.bound

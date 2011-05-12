@@ -18,9 +18,9 @@ package groovyx.gpars.dataflow.stream;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.dataflow.DataFlowExpression;
-import groovyx.gpars.dataflow.DataFlowReadChannel;
-import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.DataflowExpression;
+import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
@@ -28,25 +28,25 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Adapts a DataFlowStream to accommodate for the DataFlowReadChannel interface.
- * To minimize the overhead and stay in-line with the DataFlowStream semantics, the DataFlowStreamReadAdapter class is not thread-safe
+ * Adapts a DataflowStream to accommodate for the DataflowReadChannel interface.
+ * To minimize the overhead and stay in-line with the DataflowStream semantics, the DataflowStreamReadAdapter class is not thread-safe
  * and should only be used from within a single thread.
- * If multiple threads need to read from a DataFlowStream, they should each create their own wrapping DataFlowStreamReadAdapter.
+ * If multiple threads need to read from a DataflowStream, they should each create their own wrapping DataflowStreamReadAdapter.
  *
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
-public final class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T> {
+public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
-    private DataFlowStream<T> head;
-    private DataFlowStream<T> asyncHead;
+    private DataflowStream<T> head;
+    private DataflowStream<T> asyncHead;
 
     /**
      * Creates a new adapter
      *
      * @param stream The stream to wrap
      */
-    public DataFlowStreamReadAdapter(final DataFlowStream<T> stream) {
+    public DataflowStreamReadAdapter(final DataflowStream<T> stream) {
         this.head = stream;
         this.asyncHead = head;
     }
@@ -144,8 +144,8 @@ public final class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T
     }
 
     @Override
-    public DataFlowExpression<T> poll() throws InterruptedException {
-        final DataFlowVariable<T> firstDFV = head.getFirstDFV();
+    public DataflowExpression<T> poll() throws InterruptedException {
+        final DataflowVariable<T> firstDFV = head.getFirstDFV();
         if (firstDFV.isBound()) {
             moveHead();
             return firstDFV;
@@ -154,11 +154,11 @@ public final class DataFlowStreamReadAdapter<T> implements DataFlowReadChannel<T
 
     private void moveHead() {
         if (head == asyncHead) moveAsyncHead();
-        head = (DataFlowStream<T>) head.getRest();
+        head = (DataflowStream<T>) head.getRest();
     }
 
     private void moveAsyncHead() {
-        asyncHead = (DataFlowStream<T>) asyncHead.getRest();
+        asyncHead = (DataflowStream<T>) asyncHead.getRest();
     }
 }
 

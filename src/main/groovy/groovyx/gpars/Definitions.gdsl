@@ -114,7 +114,7 @@ contributor(ThreadPoolBody) {
 }
 
 /**
- * Enhances closures within the DataFlow.operator blocks
+ * Enhances closures within the Dataflow.operator blocks
  */
 
 def operatorBody = context(scope: closureScope())

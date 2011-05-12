@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package groovyx.gpars.agent;
 
 import groovy.lang.Closure;
-import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.DataflowVariable;
 import org.codehaus.groovy.runtime.NullObject;
 
 import java.util.Collection;
@@ -200,7 +200,7 @@ abstract class AgentBase<T> extends AgentCore {
      */
     @SuppressWarnings({"unchecked"})
     final T sendAndWait(final Closure message) throws InterruptedException {
-        final DataFlowVariable<Object> result = new DataFlowVariable<Object>();
+        final DataflowVariable<Object> result = new DataflowVariable<Object>();
         this.send(new Closure(message.getOwner()) {
             private static final long serialVersionUID = -4637623342002266534L;
 

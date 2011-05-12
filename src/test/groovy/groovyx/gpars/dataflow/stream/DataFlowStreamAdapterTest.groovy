@@ -18,26 +18,26 @@ package groovyx.gpars.dataflow.stream
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowReadChannel
-import groovyx.gpars.dataflow.DataFlowVariable
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Dataflows
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
-public class DataFlowStreamAdapterTest extends GroovyTestCase {
+public class DataflowStreamAdapterTest extends GroovyTestCase {
 
     public void testStream() {
         final CountDownLatch latch = new CountDownLatch(1)
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
 
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         final Actor thread = Actors.actor {
             writeStream << 10
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             writeStream << variable
             latch.countDown()
             react {
@@ -53,10 +53,10 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
 
     public void testStreamPoll() {
         final CountDownLatch latch = new CountDownLatch(1)
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
 
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         assert stream.poll() == null
         assert stream.poll() == null
         writeStream << 1
@@ -67,7 +67,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
         assert stream.poll()?.val == null
         final Actor thread = Actors.actor {
             writeStream << 10
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             writeStream << variable
             latch.countDown()
             react {
@@ -85,13 +85,13 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
 
     public void testNullValues() {
         final CountDownLatch latch = new CountDownLatch(1)
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
 
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         final Actor thread = Actors.blockingActor {
             writeStream << null
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             writeStream << variable
             latch.countDown()
             receive {
@@ -107,12 +107,12 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
 
     public void testTake() {
         final CountDownLatch latch = new CountDownLatch(1)
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
 
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         final Actor thread = Actors.blockingActor {
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             writeStream << variable
             latch.countDown()
             receive {
@@ -127,13 +127,13 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testIteration() {
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
 
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
-        DataFlow.task {
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
+        Dataflow.task {
             (0..10).each {writeStream << it}
-            writeStream << DataFlowStream.eos()
+            writeStream << DataflowStream.eos()
         }.join()
         stream.eachWithIndex {index, element -> assertEquals index, element }
 
@@ -144,10 +144,10 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
 
     public void testIterationWithNulls() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
 
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         Thread.start() {
             (0..10).each {writeStream << null}
             barrier.await()
@@ -160,10 +160,10 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testWhenBound() {
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
-        final DataFlows df = new DataFlows()
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
+        final Dataflows df = new Dataflows()
         stream >> {df.x1 = it}
         stream >> {df.x2 = it}
         def actor = Actors.actor {
@@ -181,13 +181,13 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testWheneverBound() {
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
 
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
-        final DataFlowQueue dfs1 = new DataFlowQueue()
-        final DataFlowQueue dfs2 = new DataFlowQueue()
-        final DataFlowQueue dfs3 = new DataFlowQueue()
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
+        final DataflowQueue dfs1 = new DataflowQueue()
+        final DataflowQueue dfs2 = new DataflowQueue()
+        final DataflowQueue dfs3 = new DataflowQueue()
         stream.wheneverBound {dfs1 << it}
         stream.wheneverBound {dfs2 << it}
         def actor = Actors.actor {
@@ -208,7 +208,7 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
         writeStream << 10
         writeStream << 20
         writeStream << 30
-        def df = new DataFlowVariable()
+        def df = new DataflowVariable()
         writeStream << df
         df << 40
         assert [10, 20, 30, 40] as Set == [dfs1.val, dfs1.val, dfs1.val, dfs1.val] as Set
@@ -217,10 +217,10 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testAsyncValueRetrieval() {
-        def result = new DataFlows()
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        def result = new Dataflows()
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         Actors.actor {
             writeStream << 10
         }
@@ -232,9 +232,9 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testGetValWithTimeout() {
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         final CyclicBarrier barrier = new CyclicBarrier(2)
         Actors.actor {
             writeStream << 10
@@ -247,9 +247,9 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testMissedTimeout() {
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
         writeStream << 10
         assert 10 == stream.getVal(10, TimeUnit.MILLISECONDS)
@@ -263,9 +263,9 @@ public class DataFlowStreamAdapterTest extends GroovyTestCase {
     }
 
     public void testMissedTimeoutWithNull() {
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
         assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
         writeStream << null
         assert null == stream.getVal(10, TimeUnit.MINUTES)

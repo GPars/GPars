@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 package groovyx.gpars.integration
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import java.util.concurrent.TimeUnit
 
 public class SyncTest extends GroovyTestCase {
     void testDistSync() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         def node1 = new LocalNode(new NettyTransportProvider(), {
             addDiscoveryListener {node, op ->
                 if (op == "connected") {
@@ -58,7 +58,7 @@ public class SyncTest extends GroovyTestCase {
     }
 
     void testSendAndContinue() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
 
         def a1 = Actors.actor {
             loop {

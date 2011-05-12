@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import spock.lang.Specification
 class SelectTest extends Specification {
     def "selecting from three df variables"() {
         given:
-        def a = new DataFlowVariable()
-        def b = new DataFlowVariable()
-        def c = new DataFlowVariable()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowVariable()
+        def b = new DataflowVariable()
+        def c = new DataflowVariable()
+        def select = Dataflow.select(a, b, c)
         when:
         b << 10
         then:
@@ -34,10 +34,10 @@ class SelectTest extends Specification {
 
     def "selecting from three df variables with value being bound is a separate thread"() {
         given:
-        def a = new DataFlowVariable()
-        def b = new DataFlowVariable()
-        def c = new DataFlowVariable()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowVariable()
+        def b = new DataflowVariable()
+        def c = new DataflowVariable()
+        def select = Dataflow.select(a, b, c)
         when:
         Thread.start {
             sleep 3000
@@ -55,22 +55,22 @@ class SelectTest extends Specification {
 
     def "selecting from three df variables with a value being bound prior to selector creation"() {
         given:
-        def a = new DataFlowVariable()
-        def b = new DataFlowVariable()
-        def c = new DataFlowVariable()
+        def a = new DataflowVariable()
+        def b = new DataflowVariable()
+        def c = new DataflowVariable()
         c << 20
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         then:
         select() == [2, 20] as SelectResult
     }
 
     def "selecting from three df streams"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        def select = Dataflow.select(a, b, c)
         when:
         b << 10
         then:
@@ -79,10 +79,10 @@ class SelectTest extends Specification {
 
     def "selecting a null value"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        def select = Dataflow.select(a, b, c)
         when:
         b << null
         then:
@@ -91,25 +91,25 @@ class SelectTest extends Specification {
 
     def "selecting a previously bound null value"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         Thread.start {
             sleep 3000
             b << null
         }
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         then:
         select() == [1, null] as SelectResult
     }
 
     def "selecting from three df streams with value being bound is a separate thread"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        def select = Dataflow.select(a, b, c)
         when:
         Thread.start {
             sleep 3000
@@ -127,22 +127,22 @@ class SelectTest extends Specification {
 
     def "selecting from three df streams with a value being bound prior to selector creation"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         c << 20
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         then:
         select() == [2, 20] as SelectResult
     }
 
     def "selecting preserves order within a single stream"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        def select = Dataflow.select(a, b, c)
         when:
         b << 10
         b << 20
@@ -155,10 +155,10 @@ class SelectTest extends Specification {
 
     def "selecting across streams"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        def select = Dataflow.select(a, b, c)
         when:
         b << 10
         a << 20
@@ -184,13 +184,13 @@ class SelectTest extends Specification {
 
     def "select with guards"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         c << 20
         a << 30
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         b << 5
         b << 10
         then:
@@ -202,13 +202,13 @@ class SelectTest extends Specification {
 
     def "priority select"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         c << 20
         a << 30
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         b << 5
         b << 10
         then:
@@ -220,13 +220,13 @@ class SelectTest extends Specification {
 
     def "priority select with guards"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         c << 20
         a << 30
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         b << 5
         b << 10
         then:
@@ -238,53 +238,53 @@ class SelectTest extends Specification {
 
     def "priority select from one value"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         c << 20
         when:
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         then:
         select.prioritySelect() == [2, 20] as SelectResult
     }
 
     def "active parallel group doesn't get changed"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         def group = new DefaultPGroup()
         def selectGroup = new DefaultPGroup()
-        DataFlow.activeParallelGroup.set group
+        Dataflow.activeParallelGroup.set group
         when:
         group.shutdown()
         selectGroup.select(a, b, c)
         then:
-        DataFlow.retrieveCurrentDFPGroup() == group
+        Dataflow.retrieveCurrentDFPGroup() == group
 
         cleanup:
         selectGroup.shutdown()
-        DataFlow.activeParallelGroup.remove()
+        Dataflow.activeParallelGroup.remove()
     }
 
     def "select uses current parallel group"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         def group = new DefaultPGroup()
         def selectGroup = new DefaultPGroup()
-        DataFlow.activeParallelGroup.set group
+        Dataflow.activeParallelGroup.set group
         c << 20
         when:
         group.shutdown()
         def select = selectGroup.select(a, b, c)
         then:
         select().value == 20
-        DataFlow.retrieveCurrentDFPGroup() == group
+        Dataflow.retrieveCurrentDFPGroup() == group
 
         cleanup:
         selectGroup.shutdown()
-        DataFlow.activeParallelGroup.remove()
+        Dataflow.activeParallelGroup.remove()
     }
 }

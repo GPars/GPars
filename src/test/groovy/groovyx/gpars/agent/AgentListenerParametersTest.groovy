@@ -16,7 +16,7 @@
 
 package groovyx.gpars.agent
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 
 /**
  * @author Vaclav Pech
@@ -25,7 +25,7 @@ import groovyx.gpars.dataflow.DataFlowVariable
 public class AgentListenerParametersTest extends GroovyTestCase {
 
     public void testListenerWithAgentParameter() {
-        final DataFlowVariable result = new DataFlowVariable()
+        final DataflowVariable result = new DataflowVariable()
         def counter = new Agent(0)
         counter.addListener {agent, o, n -> result << agent}
         counter 20
@@ -33,7 +33,7 @@ public class AgentListenerParametersTest extends GroovyTestCase {
     }
 
     public void testValidatorWithAgentParameter() {
-        final DataFlowVariable result = new DataFlowVariable()
+        final DataflowVariable result = new DataflowVariable()
         def counter = new Agent(0)
         counter.addValidator {agent, o, n -> if (n == 10) throw new RuntimeException('test') else result << agent}
         counter 10

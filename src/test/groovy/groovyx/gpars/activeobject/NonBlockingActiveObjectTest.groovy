@@ -16,7 +16,7 @@
 
 package groovyx.gpars.activeobject
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 
 public class NonBlockingActiveObjectTest extends GroovyTestCase {
 
@@ -104,7 +104,7 @@ class B extends A {
 
 @ActiveObject()
 class MyNonBlockingWrapper {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 
     @ActiveMethod
     public def nonBlockingFoo(value) {

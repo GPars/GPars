@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.operators
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
@@ -24,13 +24,13 @@ import groovyx.gpars.group.NonDaemonPGroup
  * or by sending a poisson message. This demo shows the first approach. 
  */
 
-final DataFlowQueue a = new DataFlowQueue()
-final DataFlowQueue b = new DataFlowQueue()
-final DataFlowQueue c = new DataFlowQueue()
-final DataFlowQueue d = new DataFlowQueue()
-final DataFlowQueue e = new DataFlowQueue()
-final DataFlowQueue f = new DataFlowQueue()
-final DataFlowQueue out = new DataFlowQueue()
+final DataflowQueue a = new DataflowQueue()
+final DataflowQueue b = new DataflowQueue()
+final DataflowQueue c = new DataflowQueue()
+final DataflowQueue d = new DataflowQueue()
+final DataflowQueue e = new DataflowQueue()
+final DataflowQueue f = new DataflowQueue()
+final DataflowQueue out = new DataflowQueue()
 
 final def group = new NonDaemonPGroup()
 

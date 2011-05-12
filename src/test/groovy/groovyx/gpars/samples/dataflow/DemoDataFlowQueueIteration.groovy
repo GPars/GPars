@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
 import java.util.concurrent.CyclicBarrier
 
 /**
- * This demo shows the ways to work with DataFlowQueue.
+ * This demo shows the ways to work with DataflowQueue.
  * It demonstrates the iterative methods, which use the current snapshot of the stream,
  * as well as the 'val' property to gradually take elements away from the stream.
  */
 final CyclicBarrier barrier = new CyclicBarrier(2)
 
-final DataFlowQueue stream = new DataFlowQueue()
-DataFlow.task {
+final DataflowQueue stream = new DataflowQueue()
+Dataflow.task {
     (0..10).each {stream << it}
     barrier.await()
 }

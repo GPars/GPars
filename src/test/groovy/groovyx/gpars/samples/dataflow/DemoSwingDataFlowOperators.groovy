@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
 import java.awt.Font
 import javax.swing.JFrame
 import javax.swing.JTextArea
@@ -50,14 +50,14 @@ JTextArea.metaClass {
     }
 }
 
-def urlRequests = new DataFlowQueue()
-def downloadRequests = new DataFlowQueue()
-def sites = new DataFlowQueue()
+def urlRequests = new DataflowQueue()
+def downloadRequests = new DataflowQueue()
+def sites = new DataflowQueue()
 
 /**
  * Downloads received urls passing downloaded content to the output
  */
-DataFlow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
+Dataflow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
 
     contentDownloaderArea.report "Downloading ${request.site}"
 //    def content = request.site.toURL().text
@@ -76,7 +76,7 @@ pendingDownloads = [:]
  * Caches sites' contents. Accepts requests for url content, outputs the content. Outputs requests for download
  * if the site is not in cache yet.
  */
-DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
+Dataflow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 
     if (request.content) {
         contentCacheArea.report "Caching ${request.site}"
@@ -115,7 +115,7 @@ DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {re
 /**
  * Accepts sites' content searching for the word Groovy in them, printing results to the UI.
  */
-DataFlow.operator(inputs: [sites], outputs: []) {request ->
+Dataflow.operator(inputs: [sites], outputs: []) {request ->
     def result = request.content.toUpperCase().contains('GROOVY')
     wordFinderArea.report "${result ? '' : 'No '}Groovy in ${request.site}."
 }

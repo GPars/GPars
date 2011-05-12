@@ -18,7 +18,7 @@ package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
@@ -319,10 +319,10 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testOriginatorDetection() {
-        final DataFlowVariable originator1 = new DataFlowVariable()
-        final DataFlowVariable originator2 = new DataFlowVariable()
-        final DataFlowVariable originator3 = new DataFlowVariable()
-        final DataFlowVariable originator4 = new DataFlowVariable()
+        final DataflowVariable originator1 = new DataflowVariable()
+        final DataflowVariable originator2 = new DataflowVariable()
+        final DataflowVariable originator3 = new DataflowVariable()
+        final DataflowVariable originator4 = new DataflowVariable()
 
         final def bouncer = blockingActor {
             receive {msg1 ->

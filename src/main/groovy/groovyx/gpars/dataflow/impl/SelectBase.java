@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package groovyx.gpars.dataflow.impl;
 
-import groovyx.gpars.dataflow.DataFlow;
-import groovyx.gpars.dataflow.DataFlowExpression;
-import groovyx.gpars.dataflow.DataFlowReadChannel;
-import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowExpression;
+import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.group.PGroup;
 
 import java.util.ArrayList;
@@ -38,11 +38,11 @@ import java.util.Random;
 @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
 public final class SelectBase<T> {
 
-    private final List<DataFlowReadChannel<? extends T>> channels;
+    private final List<DataflowReadChannel<? extends T>> channels;
     private final int numberOfChannels;
 
     /**
-     * Since DataFlowVariables should be only read once, they need to be disabled after selecting their value
+     * Since DataflowVariables should be only read once, they need to be disabled after selecting their value
      * The array stores a boolean flag for each index, indicating, whether the channel/variable has been disabled
      */
     private final boolean[] disabledDFVs;
@@ -61,20 +61,20 @@ public final class SelectBase<T> {
      * @param pGroup   The group, the thread pool of which should be used for notification message handlers
      * @param channels All the input channels to select on
      */
-    public SelectBase(final PGroup pGroup, final List<DataFlowReadChannel<? extends T>> channels) {
+    public SelectBase(final PGroup pGroup, final List<DataflowReadChannel<? extends T>> channels) {
         this.channels = Collections.unmodifiableList(channels);
         numberOfChannels = channels.size();
         disabledDFVs = new boolean[numberOfChannels];
         Arrays.fill(disabledDFVs, false);
         for (int i = 0; i < numberOfChannels; i++) {
-            final DataFlowReadChannel<? extends T> channel = channels.get(i);
-            final PGroup originalGroup = DataFlow.retrieveCurrentDFPGroup();
+            final DataflowReadChannel<? extends T> channel = channels.get(i);
+            final PGroup originalGroup = Dataflow.retrieveCurrentDFPGroup();
             try {
-                DataFlow.activeParallelGroup.set(pGroup);
+                Dataflow.activeParallelGroup.set(pGroup);
                 //noinspection ThisEscapedInObjectConstruction
                 channel.wheneverBound(new SelectCallback<T>(this, i, channel));
             } finally {
-                DataFlow.activeParallelGroup.set(originalGroup);
+                Dataflow.activeParallelGroup.set(originalGroup);
             }
         }
     }
@@ -87,11 +87,11 @@ public final class SelectBase<T> {
      * @throws InterruptedException If the thread is interrupted during value retrieval from the channel
      */
     @SuppressWarnings({"MethodOnlyUsedFromInnerClass"})
-    void boundNotification(final int index, final DataFlowReadChannel<? extends T> channel) throws InterruptedException {
+    void boundNotification(final int index, final DataflowReadChannel<? extends T> channel) throws InterruptedException {
         synchronized (channels) {
             for (final SelectRequest<T> selectRequest : pendingRequests) {
                 if (selectRequest.matchesMask(index) && !disabledDFVs[index]) {
-                    final DataFlowExpression<? extends T> value = channel.poll();
+                    final DataflowExpression<? extends T> value = channel.poll();
                     if (value != null) {
                         pendingRequests.remove(selectRequest);
                         disableDFV(index, channel);
@@ -119,8 +119,8 @@ public final class SelectBase<T> {
             for (int i = 0; i < numberOfChannels; i++) {
                 final int currentPosition = (startPosition + i) % numberOfChannels;
                 if (selectRequest.matchesMask(currentPosition) && !disabledDFVs[currentPosition]) {
-                    final DataFlowReadChannel<? extends T> channel = channels.get(currentPosition);
-                    final DataFlowExpression<? extends T> value = channel.poll();
+                    final DataflowReadChannel<? extends T> channel = channels.get(currentPosition);
+                    final DataflowExpression<? extends T> value = channel.poll();
                     if (value != null) {
                         disableDFV(currentPosition, channel);
                         selectRequest.valueFound(currentPosition, value.getVal());
@@ -138,7 +138,7 @@ public final class SelectBase<T> {
      * @param currentPosition The position to mark
      * @param channel         The channel being considered
      */
-    private void disableDFV(final int currentPosition, final DataFlowReadChannel<? extends T> channel) {
-        if (channel instanceof DataFlowVariable) disabledDFVs[currentPosition] = true;
+    private void disableDFV(final int currentPosition, final DataflowReadChannel<? extends T> channel) {
+        if (channel instanceof DataflowVariable) disabledDFVs[currentPosition] = true;
     }
 }

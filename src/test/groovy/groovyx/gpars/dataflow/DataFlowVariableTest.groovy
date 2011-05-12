@@ -22,10 +22,10 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-public class DataFlowVariableTest extends GroovyTestCase {
+public class DataflowVariableTest extends GroovyTestCase {
 
     public void testVariable() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         variable << 10
         assertEquals 10, variable.val
         assertEquals 10, variable.val
@@ -35,7 +35,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
         }
 
         shouldFail(IllegalStateException) {
-            final def v = new DataFlowVariable()
+            final def v = new DataflowVariable()
             v << 1
             variable << v
         }
@@ -43,7 +43,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testGet() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         variable << 10
         assertEquals 10, variable.get()
         assertEquals 10, variable.get()
@@ -51,7 +51,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testTimeoutGet() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         shouldFail(TimeoutException) {
             variable.get(1, TimeUnit.SECONDS)
         }
@@ -61,7 +61,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testGetException() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         variable << new Exception('test')
         shouldFail(Exception) {
             variable.get()
@@ -75,7 +75,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testGetRuntimeException() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         variable << new RuntimeException('test')
         shouldFail(RuntimeException) {
             variable.get()
@@ -89,7 +89,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testVariableFromThread() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         Actors.blockingActor {
             variable << 10
         }
@@ -107,7 +107,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testBlockedRead() {
-        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
+        final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
         volatile int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -126,7 +126,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testNonBlockedRead() {
-        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
+        final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -148,16 +148,16 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testToString() {
-        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
-        assertEquals 'DataFlowVariable(value=null)', variable.toString()
+        final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
+        assertEquals 'DataflowVariable(value=null)', variable.toString()
         variable << 10
-        assertEquals 'DataFlowVariable(value=10)', variable.toString()
-        assertEquals 'DataFlowVariable(value=10)', variable.toString()
+        assertEquals 'DataflowVariable(value=10)', variable.toString()
+        assertEquals 'DataflowVariable(value=10)', variable.toString()
     }
 
     public void testVariableBlockedBoundHandler() {
-        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
-        volatile def result = new DataFlowVariable()
+        final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
+        volatile def result = new DataflowVariable()
 
         variable >> {
             result << variable.val
@@ -171,10 +171,10 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testVariableNonBlockedBoundHandler() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         variable << 10
 
-        volatile def result = new DataFlowVariable()
+        volatile def result = new DataflowVariable()
 
         variable >> {
             result << it
@@ -183,8 +183,8 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testVariablePoll() {
-        final DataFlowVariable<Integer> variable = new DataFlowVariable<Integer>()
-        volatile def result = new DataFlowVariable()
+        final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
+        volatile def result = new DataflowVariable()
 
         assert variable.poll() == null
         assert variable.poll() == null
@@ -201,7 +201,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testJoin() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
 
         def t1 = System.currentTimeMillis()
 
@@ -220,7 +220,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testTimedJoin() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
 
         def t1 = System.currentTimeMillis()
 
@@ -244,7 +244,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testEqualValueRebind() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         variable.bind([1, 2, 3])
         variable.bind([1, 2, 3])
         variable.bindSafely([1, 2, 3])
@@ -264,7 +264,7 @@ public class DataFlowVariableTest extends GroovyTestCase {
     }
 
     public void testNullValueRebind() {
-        final DataFlowVariable variable = new DataFlowVariable()
+        final DataflowVariable variable = new DataflowVariable()
         variable.bind(null)
         variable.bind(null)
         variable.bindSafely(null)

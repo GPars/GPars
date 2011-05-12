@@ -8,10 +8,10 @@ have higher priority.
 h2. Selecting a value from multiple channels
 
 {code}
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.select
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.select
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Shows a basic use of Select, which monitors a set of input channels for values and makes these values
@@ -20,9 +20,9 @@ import static groovyx.gpars.dataflow.DataFlow.task
  *
  * You might also consider checking out the prioritySelect method, which prioritizes values by the index of their input channel
  */
-def a = new DataFlowVariable()
-def b = new DataFlowVariable()
-def c = new DataFlowQueue()
+def a = new DataflowVariable()
+def b = new DataflowVariable()
+def c = new DataflowQueue()
 
 task {
     sleep 3000
@@ -87,15 +87,15 @@ def teamLead = sel([true, true, false, false]).value        //Only 'leaders' and
 A typical use for guards is to make Selects flexible to adopt to the changes in the user state.
 
 {code}
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.select
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.select
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates the ability to enable/disable channels during a value selection on a select by providing boolean guards.
  */
-final DataFlowQueue operations = new DataFlowQueue()
-final DataFlowQueue numbers = new DataFlowQueue()
+final DataflowQueue operations = new DataflowQueue()
+final DataflowQueue numbers = new DataflowQueue()
 
 def t = task {
     final def select = select(operations, numbers)
@@ -140,9 +140,9 @@ When certain channels should have precedence over others when selecting, the pri
  * Messages received through a single input channel will have their mutual order preserved.
  *
  */
-def critical = new DataFlowVariable()
-def ordinary = new DataFlowQueue()
-def whoCares = new DataFlowQueue()
+def critical = new DataflowVariable()
+def ordinary = new DataflowQueue()
+def whoCares = new DataflowQueue()
 
 task {
     ordinary << 'All working fine'

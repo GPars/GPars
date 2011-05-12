@@ -115,7 +115,7 @@ numbers are allowed with value 1 being the default.
 {note}
 Please always make sure the *group* serving the operator holds enough threads to support all requested forks.
 Using groups allows you to organize tasks or operators around different thread pools (wrapped inside the group).
-While the DataFlow.task() command schedules the task on a default thread pool (java.util.concurrent.Executor, fixed size=#cpu+1, daemon threads),
+While the Dataflow.task() command schedules the task on a default thread pool (java.util.concurrent.Executor, fixed size=#cpu+1, daemon threads),
 you may prefer being able to define your own thread pool(s) to run your tasks.
 
 {code}
@@ -210,7 +210,7 @@ def op2 = selector(inputs: [d], outputs: [f, out]) { }
 
 def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-a << DataFlowPoisson.instance  //Send the poisson
+a << DataflowPoisson.instance  //Send the poisson
 
 op1.join()
 op2.join()
@@ -265,7 +265,7 @@ selector ([inputs : [a, b, c], outputs : [d, e]) {value, index ->
 
 h3. Priority Selector
 
-When priorities need to be preserved among input channels, a _DataFlowPrioritySelector_ should be used.
+When priorities need to be preserved among input channels, a _DataflowPrioritySelector_ should be used.
 
 {code}
 prioritySelector[inputs : [a, b, c], outputs : [d, e]) {value, index ->
@@ -300,15 +300,15 @@ The _guards_ input property can be used to set the initial mask on all input cha
 are then available in the selector's body.
 
 {code}
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.selector
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.selector
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates the ability to enable/disable channels during a value selection on a select by providing boolean guards.
  */
-final DataFlowQueue operations = new DataFlowQueue()
-final DataFlowQueue numbers = new DataFlowQueue()
+final DataflowQueue operations = new DataflowQueue()
+final DataflowQueue numbers = new DataflowQueue()
 
 def instruction
 def nums = []

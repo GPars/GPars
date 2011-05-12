@@ -16,12 +16,12 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 
 public class NestedClosureTest extends GroovyTestCase {
     public void testNestedClosures() {
-        final def result = new DataFlowVariable<Integer>()
+        final def result = new DataflowVariable<Integer>()
 
         final def group = new DefaultPGroup(20)
 
@@ -40,7 +40,7 @@ public class NestedClosureTest extends GroovyTestCase {
     }
 
     public void testNestedClosuresForActors() {
-        final def result = new DataFlowVariable<Integer>()
+        final def result = new DataflowVariable<Integer>()
 
         final def group = new DefaultPGroup(20)
 

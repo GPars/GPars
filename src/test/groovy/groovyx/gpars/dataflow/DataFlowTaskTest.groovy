@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,26 +18,26 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.Callable
 
-public class DataFlowTaskTest extends GroovyTestCase {
+public class DataflowTaskTest extends GroovyTestCase {
 
     public void testTaskWithRunnable() {
-        def a = new DataFlowVariable()
-        DataFlow.task(new TestRunnable(a))
+        def a = new DataflowVariable()
+        Dataflow.task(new TestRunnable(a))
 
         assert a.val == 10
     }
 
     public void testTaskWithCallable() {
-        def a = new DataFlowVariable()
-        def result = DataFlow.task(new TestCallable(a))
+        def a = new DataflowVariable()
+        def result = Dataflow.task(new TestCallable(a))
 
         assert a.val == 10
         assert result.val == 20
     }
 
     public void testTaskWithClosure() {
-        def a = new DataFlowVariable()
-        def result = DataFlow.task {
+        def a = new DataflowVariable()
+        def result = Dataflow.task {
             a << 10
             return 20
         }

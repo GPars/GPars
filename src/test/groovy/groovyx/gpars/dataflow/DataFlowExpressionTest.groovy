@@ -19,12 +19,12 @@ package groovyx.gpars.dataflow
 /**
  * @author Alex Tkachman
  */
-public class DataFlowExpressionTest extends GroovyTestCase {
+public class DataflowExpressionTest extends GroovyTestCase {
 
     public void testInvoke() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowVariable c = new DataFlowVariable()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowVariable c = new DataflowVariable()
 
         def d = a * b + c + 1
 
@@ -32,20 +32,20 @@ public class DataFlowExpressionTest extends GroovyTestCase {
             def e = 1 + a * b + c
         }
 
-        DataFlow.task { c << 40 }
-        DataFlow.task { a << 5 }
-        DataFlow.task { b << 20 }
+        Dataflow.task { c << 40 }
+        Dataflow.task { a << 5 }
+        Dataflow.task { b << 20 }
 
         assertEquals 141, d.val
     }
 
     public void testProperty() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
 
         def prod = a.x * b.x + a.y * b.y + a.z * b.z
 
-        DataFlow.task {
+        Dataflow.task {
             a << [x: 3, y: 2, z: 1]
             b << [x: 1, y: 2, z: 3]
         }
@@ -54,14 +54,14 @@ public class DataFlowExpressionTest extends GroovyTestCase {
     }
 
     public void testTransform() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
 
-        def prod = DataFlowExpression.transform([a, b]) {x, y ->
+        def prod = DataflowExpression.transform([a, b]) {x, y ->
             x + y
         }
 
-        DataFlow.task {
+        Dataflow.task {
             a << 5
             b << 7
         }
@@ -69,15 +69,15 @@ public class DataFlowExpressionTest extends GroovyTestCase {
         assertEquals(13, (prod + 1).val)
 
         shouldFail(IllegalArgumentException) {
-            DataFlowExpression.transform([a]) {x, y ->}
+            DataflowExpression.transform([a]) {x, y ->}
         }
 
         shouldFail(IllegalArgumentException) {
-            DataFlowExpression.transform([a, b, null]) {x, y ->}
+            DataflowExpression.transform([a, b, null]) {x, y ->}
         }
 
         shouldFail(IllegalArgumentException) {
-            DataFlowExpression.transform([a]) {->}
+            DataflowExpression.transform([a]) {->}
         }
     }
 }

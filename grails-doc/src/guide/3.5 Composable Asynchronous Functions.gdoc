@@ -88,7 +88,7 @@ A *promise* to get the result delivered as soon as the calculation is done. The 
 exploits natural parallelism in your functions and makes its best effort to deliver the result to you quickly.
 
 {note}
-The _promise_ is a good old _DataFlowVariable_ , so you may query its status, register notification hooks or make it an input to a Dataflow algorithm.
+The _promise_ is a good old _DataflowVariable_ , so you may query its status, register notification hooks or make it an input to a Dataflow algorithm.
 {note}
 
 {code}

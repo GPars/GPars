@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
- * A producer consumer sample, where the producer generates numbers into the DataFlowQueue, the intermediate consumer
+ * A producer consumer sample, where the producer generates numbers into the DataflowQueue, the intermediate consumer
  * keeps reading numbers from the producer, calculates the summary of numbers it saw so far and passes the summaries
  * on to the final consumer, which prints them out.
  * Since both consumers read elements using the 'val' property, they will keep reading until stopped explicitly.
  */
-void ints(int n, int max, DataFlowQueue<Integer> stream) {
+void ints(int n, int max, DataflowQueue<Integer> stream) {
     if (n != max) {
         println "Generating int: $n"
         stream << n
@@ -34,19 +34,19 @@ void ints(int n, int max, DataFlowQueue<Integer> stream) {
 }
 
 @SuppressWarnings("GroovyInfiniteRecursion")
-void sum(int s, DataFlowQueue<Integer> inStream, DataFlowQueue<Integer> outStream) {
+void sum(int s, DataflowQueue<Integer> inStream, DataflowQueue<Integer> outStream) {
     println "Calculating $s"
     outStream << s
     sum(inStream.val + s, inStream, outStream)
 }
 
-void printSum(DataFlowQueue stream) {
+void printSum(DataflowQueue stream) {
     println "Result ${stream.val}"
     printSum stream
 }
 
-final def producer = new DataFlowQueue<Integer>()
-final def consumer = new DataFlowQueue<Integer>()
+final def producer = new DataflowQueue<Integer>()
+final def consumer = new DataflowQueue<Integer>()
 
 task {
     ints(0, 1000, producer)

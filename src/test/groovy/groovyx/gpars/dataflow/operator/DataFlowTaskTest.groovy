@@ -16,18 +16,18 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
 
-public class DataFlowTaskTest extends GroovyTestCase {
+public class DataflowTaskTest extends GroovyTestCase {
 
     public void testTaskRun() {
-        final DataFlowVariable a = new DataFlowVariable()
+        final DataflowVariable a = new DataflowVariable()
 
         task {-> a << true }
 
@@ -35,7 +35,7 @@ public class DataFlowTaskTest extends GroovyTestCase {
     }
 
     public void testTaskRunWithImplicitArgumentToClosure() {
-        final DataFlowVariable a = new DataFlowVariable()
+        final DataflowVariable a = new DataflowVariable()
 
         task { a << true }
 
@@ -43,7 +43,7 @@ public class DataFlowTaskTest extends GroovyTestCase {
     }
 
     public void testDelegate() {
-        final DataFlowVariable a = new DataFlowVariable()
+        final DataflowVariable a = new DataflowVariable()
 
         task {a << delegate}
 

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 
@@ -30,13 +30,13 @@ import groovyx.gpars.scheduler.ResizeablePool
  */
 
 /**
- * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowQueue.val
+ * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataflowQueue.val
  */
 group = new DefaultPGroup(new ResizeablePool(true))
 
 final int requestedPrimeNumberCount = 1000
 
-final DataFlowQueue initialChannel = new DataFlowQueue()
+final DataflowQueue initialChannel = new DataflowQueue()
 
 /**
  * Generating candidate numbers
@@ -55,7 +55,7 @@ group.task {
  * @return A new channel ending the whole chain
  */
 def filter(inChannel, int prime) {
-    def outChannel = new DataFlowQueue()
+    def outChannel = new DataflowQueue()
 
     group.task {
         while (true) {

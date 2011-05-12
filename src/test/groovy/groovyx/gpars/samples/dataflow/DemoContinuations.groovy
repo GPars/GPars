@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * In the example using the right shift operator in place of the whenBound method, you can see one task consuming
@@ -29,9 +29,9 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * Date: June 2, 2010
  */
 
-def age = new DataFlowVariable()
-def kids = new DataFlowVariable()
-def taxRate = new DataFlowVariable()
+def age = new DataflowVariable()
+def kids = new DataflowVariable()
+def taxRate = new DataflowVariable()
 
 task {
     println "What is your age?"

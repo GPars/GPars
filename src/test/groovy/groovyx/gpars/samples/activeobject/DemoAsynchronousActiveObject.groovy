@@ -18,18 +18,18 @@ package groovyx.gpars.samples.activeobject
 
 import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 
 @ActiveObject
 class AsyncDecryptor {
     @ActiveMethod
-    DataFlowVariable<String> decrypt(String encryptedText) {
-        new DataFlowVariable() << encryptedText.reverse()
+    DataflowVariable<String> decrypt(String encryptedText) {
+        new DataflowVariable() << encryptedText.reverse()
     }
 
     @ActiveMethod
-    DataFlowVariable<Integer> decrypt(Integer encryptedNumber) {
-        new DataFlowVariable() << -1*encryptedNumber + 142
+    DataflowVariable<Integer> decrypt(Integer encryptedNumber) {
+        new DataflowVariable() << -1 * encryptedNumber + 142
     }
 }
 

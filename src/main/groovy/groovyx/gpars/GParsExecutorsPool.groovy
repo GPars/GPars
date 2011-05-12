@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.util.PoolUtils
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
@@ -262,8 +262,8 @@ class GParsExecutorsPool {
      * @return The fastest result obtained
      */
     public static def speculate(Closure... alternatives) {
-        def result = new DataFlowVariable()
-        def futures = new DataFlowVariable()
+        def result = new DataflowVariable()
+        def futures = new DataflowVariable()
         futures << GParsExecutorsPool.executeAsync(alternatives.collect {
             original ->
             {->

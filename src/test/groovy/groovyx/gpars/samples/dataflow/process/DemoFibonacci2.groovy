@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,23 +16,23 @@
 
 package groovyx.gpars.samples.dataflow.process
 
-import groovyx.gpars.dataflow.DataFlowChannel
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowChannel
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 group = new DefaultPGroup()
 
-def fib(DataFlowChannel out) {
+def fib(DataflowChannel out) {
     group.task {
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        def d = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        def d = new DataflowQueue()
         [new Prefix(d, a, 0), new Prefix(c, d, 1), new Copy(a, b, out), new Pairs(b, c)].each { group.task it}
     }
 }
 
-final DataFlowQueue ch = new DataFlowQueue()
+final DataflowQueue ch = new DataflowQueue()
 group.task new Print('Fibonnaci numbers', ch)
 fib(ch)
 

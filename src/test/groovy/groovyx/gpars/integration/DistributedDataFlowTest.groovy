@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 package groovyx.gpars.integration
 
-import groovyx.gpars.dataflow.DataFlowVariable
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Dataflows
 import groovyx.gpars.remote.LocalNode
 import groovyx.gpars.remote.netty.NettyTransportProvider
 import java.util.concurrent.TimeUnit
 
-public class DistributedDataFlowTest extends GroovyTestCase {
+public class DistributedDataflowTest extends GroovyTestCase {
     void testDF() {
-        final DataFlows df = new DataFlows()
+        final Dataflows df = new Dataflows()
 
-        def results = [one: new DataFlowVariable(), two: new DataFlowVariable()]
+        def results = [one: new DataflowVariable(), two: new DataflowVariable()]
         def nodes = ["one", "two"].collect {node ->
             new LocalNode(new NettyTransportProvider(), {
                 addDiscoveryListener {anotherNode, op ->
@@ -35,30 +35,30 @@ public class DistributedDataFlowTest extends GroovyTestCase {
                     }
                 }
 
-                def dataFlow = new DataFlowVariable();
+                def dataflow = new DataflowVariable();
 
                 loop {
                     react {msg ->
                         switch (msg.command) {
 
                             case "connected": // 1
-                                msg.actor << [command: "getDataFlow", to: delegate]
+                                msg.actor << [command: "getDataflow", to: delegate]
                                 break
 
-                            case "getDataFlow":  // 2
-                                msg.to << [command: "dataFlow", dataFlow: dataFlow, actor: delegate]
+                            case "getDataflow":  // 2
+                                msg.to << [command: "dataflow", dataflow: dataflow, actor: delegate]
                                 break
 
-                            case "dataFlow":  // 1
-                                msg.actor << [command: "setDataFlow", dataFlow: msg.dataFlow, value: node]
-                                msg.dataFlow.whenBound {v ->
+                            case "dataflow":  // 1
+                                msg.actor << [command: "setDataflow", dataflow: msg.dataflow, value: node]
+                                msg.dataflow.whenBound {v ->
                                     df."$node" = v
                                 }
-                                msg.dataFlow << node
+                                msg.dataflow << node
                                 break
 
-                            case "setDataFlow": // 2
-                                results[node] << msg.dataFlow.val
+                            case "setDataflow": // 2
+                                results[node] << msg.dataflow.val
                                 break
                         }
                     }

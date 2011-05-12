@@ -10,7 +10,7 @@ Apache 2 license, which GPars uses, GPL is more restrictive on use in commercial
 rules before enabling use of JCSP in your code.
 {note}
 
-If the GPL license is too restrictive for your use, you might consider checking out the DataFlow Concurrency chapter of this User Guide
+If the GPL license is too restrictive for your use, you might consider checking out the Dataflow Concurrency chapter of this User Guide
 to learn about _tasks_ , _selectors_ and _operators_ , which may help you resolve concurrency issues in ways similar to the CSP approach.
 In fact the dataflow and CSP concepts stand very close to each other.
 

@@ -31,7 +31,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Represents a thread-safe data flow stream. Values or DataFlowVariables are added using the '<<' operator
+ * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '<<' operator
  * and safely read once available using the 'val' property.
  * The iterative methods like each(), collect(), iterator(), any(), all() or the for loops work with snapshots
  * of the stream at the time of calling the particular method.
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"ClassWithTooManyMethods"})
-public final class DataFlowQueue<T> implements DataFlowChannel<T> {
+public final class DataflowQueue<T> implements DataflowChannel<T> {
 
     /**
      * Internal lock
@@ -50,14 +50,14 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
     private final Object queueLock = new Object();
 
     /**
-     * Stores the received DataFlowVariables in the buffer.
+     * Stores the received DataflowVariables in the buffer.
      */
-    private final LinkedBlockingQueue<DataFlowVariable<T>> queue = new LinkedBlockingQueue<DataFlowVariable<T>>();
+    private final LinkedBlockingQueue<DataflowVariable<T>> queue = new LinkedBlockingQueue<DataflowVariable<T>>();
 
     /**
      * Stores unsatisfied requests for values
      */
-    private final Queue<DataFlowVariable<T>> requests = new LinkedList<DataFlowVariable<T>>();
+    private final Queue<DataflowVariable<T>> requests = new LinkedList<DataflowVariable<T>>();
 
     /**
      * A collection of listeners who need to be informed each time the stream is bound to a value
@@ -65,7 +65,7 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
     private final Collection<MessageStream> wheneverBoundListeners = new CopyOnWriteArrayList<MessageStream>();
 
     /**
-     * Adds a DataFlowVariable to the buffer.
+     * Adds a DataflowVariable to the buffer.
      * Implementation detail - in fact another DFV is added to the buffer and an asynchronous 'whenBound' handler
      * is registered with the supplied DFV to update the one stored in the buffer.
      *
@@ -73,8 +73,8 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
-        final DataFlowVariable<T> originalRef = retrieveForBind();
+    public DataflowWriteChannel<T> leftShift(final DataflowReadChannel<T> ref) {
+        final DataflowVariable<T> originalRef = retrieveForBind();
         hookWheneverBoundListeners(originalRef);
 
         ref.getValAsync(new MessageStream() {
@@ -90,18 +90,18 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
     }
 
     /**
-     * Adds a DataFlowVariable representing the passed in value to the buffer.
+     * Adds a DataflowVariable representing the passed in value to the buffer.
      *
      * @param value The value to bind to the head of the stream
      */
     @Override
-    public DataFlowWriteChannel<T> leftShift(final T value) {
+    public DataflowWriteChannel<T> leftShift(final T value) {
         hookWheneverBoundListeners(retrieveForBind()).bind(value);
         return this;
     }
 
     /**
-     * Adds a DataFlowVariable representing the passed in value to the buffer.
+     * Adds a DataflowVariable representing the passed in value to the buffer.
      *
      * @param value The value to bind to the head of the stream
      */
@@ -116,7 +116,7 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      * @param expr The expression to hook all the when bound listeners to
      * @return The supplied expression handler to allow method chaining
      */
-    private DataFlowExpression<T> hookWheneverBoundListeners(final DataFlowExpression<T> expr) {
+    private DataflowExpression<T> hookWheneverBoundListeners(final DataflowExpression<T> expr) {
         for (final MessageStream listener : wheneverBoundListeners) {
             expr.whenBound(listener);
         }
@@ -129,16 +129,16 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      *
      * @return The DFV to bind the value on
      */
-    private DataFlowVariable<T> retrieveForBind() {
+    private DataflowVariable<T> retrieveForBind() {
         return copyDFV(requests, queue);
     }
 
-    private DataFlowVariable<T> copyDFV(final Queue<DataFlowVariable<T>> from, final Queue<DataFlowVariable<T>> to) {
-        DataFlowVariable<T> ref;
+    private DataflowVariable<T> copyDFV(final Queue<DataflowVariable<T>> from, final Queue<DataflowVariable<T>> to) {
+        DataflowVariable<T> ref;
         synchronized (queueLock) {
             ref = from.poll();
             if (ref == null) {
-                ref = new DataFlowVariable<T>();
+                ref = new DataflowVariable<T>();
                 to.offer(ref);
             }
         }
@@ -166,7 +166,7 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      */
     @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        final DataFlowVariable<T> variable = retrieveOrCreateVariable();
+        final DataflowVariable<T> variable = retrieveOrCreateVariable();
         variable.getVal(timeout, units);
         synchronized (queueLock) {
             if (!variable.isBound()) {
@@ -183,9 +183,9 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      * @return The value bound to the DFV at the head of the stream or null
      */
     @Override
-    public DataFlowExpression<T> poll() {
+    public DataflowExpression<T> poll() {
         synchronized (queueLock) {
-            final DataFlowVariable<T> df = queue.peek();
+            final DataflowVariable<T> df = queue.peek();
             if (df != null && df.isBound()) {
                 queue.poll();
                 return df;
@@ -243,7 +243,7 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      */
     @Override
     public void whenBound(final Closure closure) {
-        getValAsync(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
+        getValAsync(new DataCallback(closure, Dataflow.retrieveCurrentDFPGroup()));
     }
 
     /**
@@ -281,7 +281,7 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      */
     @Override
     public void wheneverBound(final Closure closure) {
-        wheneverBoundListeners.add(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
+        wheneverBoundListeners.add(new DataCallback(closure, Dataflow.retrieveCurrentDFPGroup()));
     }
 
     /**
@@ -310,7 +310,7 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
      *
      * @return The DFV to wait for value on
      */
-    private DataFlowVariable<T> retrieveOrCreateVariable() {
+    private DataflowVariable<T> retrieveOrCreateVariable() {
         return copyDFV(queue, requests);
     }
 
@@ -325,12 +325,12 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
 
     /**
      * Returns an iterator over a current snapshot of the buffer's content. The next() method returns actual values
-     * not the DataFlowVariables.
+     * not the DataflowVariables.
      *
      * @return AN iterator over all DFVs in the queue
      */
     public Iterator<T> iterator() {
-        final Iterator<DataFlowVariable<T>> iterator = queue.iterator();
+        final Iterator<DataflowVariable<T>> iterator = queue.iterator();
         return new Iterator<T>() {
 
             @Override
@@ -357,6 +357,6 @@ public final class DataFlowQueue<T> implements DataFlowChannel<T> {
 
     @Override
     public String toString() {
-        return "DataFlowQueue(queue=" + new ArrayList<DataFlowVariable<T>>(queue).toString() + ')';
+        return "DataflowQueue(queue=" + new ArrayList<DataflowVariable<T>>(queue).toString() + ')';
     }
 }

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import groovy.lang.MetaMethod;
 import groovy.time.BaseDuration;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
-import groovyx.gpars.dataflow.DataFlowExpression;
-import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.DataflowExpression;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
@@ -58,7 +58,7 @@ public abstract class Actor extends MessageStream {
     private static final ThreadLocal<Actor> currentActorPerThread = new ThreadLocal<Actor>();
     private static final long serialVersionUID = -3491276479442857422L;
 
-    private final DataFlowExpression<Object> joinLatch;
+    private final DataflowExpression<Object> joinLatch;
 
     /**
      * The parallel group to which the message stream belongs
@@ -85,19 +85,19 @@ public abstract class Actor extends MessageStream {
     protected static final Timer timer = new Timer("GPars Actor Timer", true);
 
     protected Actor() {
-        this(new DataFlowVariable<Object>());
+        this(new DataflowVariable<Object>());
     }
 
     /**
      * Constructor to be used by deserialization
      *
-     * @param joinLatch The instance of DataFlowExpression to use for join operation
+     * @param joinLatch The instance of DataflowExpression to use for join operation
      */
-    protected Actor(final DataFlowExpression<Object> joinLatch) {
+    protected Actor(final DataflowExpression<Object> joinLatch) {
         this(joinLatch, Actors.defaultActorPGroup);
     }
 
-    protected Actor(final DataFlowExpression<Object> joinLatch, final PGroup parallelGroup) {
+    protected Actor(final DataflowExpression<Object> joinLatch, final PGroup parallelGroup) {
         this.joinLatch = joinLatch;
         this.parallelGroup = parallelGroup;
     }
@@ -230,9 +230,9 @@ public abstract class Actor extends MessageStream {
     /**
      * Join-point for this actor
      *
-     * @return The DataFlowExpression instance, which is used to join this actor
+     * @return The DataflowExpression instance, which is used to join this actor
      */
-    public DataFlowExpression<Object> getJoinLatch() {
+    public DataflowExpression<Object> getJoinLatch() {
         return joinLatch;
     }
 
@@ -391,10 +391,10 @@ public abstract class Actor extends MessageStream {
     }
 
     public static class MyRemoteHandle extends DefaultRemoteHandle {
-        private final DataFlowExpression<Object> joinLatch;
+        private final DataflowExpression<Object> joinLatch;
         private static final long serialVersionUID = 3721849638877039035L;
 
-        public MyRemoteHandle(final SerialHandle handle, final SerialContext host, final DataFlowExpression<Object> joinLatch) {
+        public MyRemoteHandle(final SerialHandle handle, final SerialContext host, final DataflowExpression<Object> joinLatch) {
             super(handle.getSerialId(), host.getHostId(), RemoteActor.class);
             this.joinLatch = joinLatch;
         }
@@ -409,7 +409,7 @@ public abstract class Actor extends MessageStream {
         private final RemoteHost remoteHost;
         private static final long serialVersionUID = -1375776678860848278L;
 
-        public RemoteActor(final SerialContext host, final DataFlowExpression<Object> jointLatch) {
+        public RemoteActor(final SerialContext host, final DataflowExpression<Object> jointLatch) {
             super(jointLatch);
             remoteHost = (RemoteHost) host;
         }

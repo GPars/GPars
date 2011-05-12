@@ -11,7 +11,7 @@ h4. Dataflow Variable
 
 A single-assignment multi-read variable offering a thread-safe data-exchange among threads.
 
-h4. DataFlows class
+h4. Dataflows class
 
 A virtual infinite map of Dataflow Variables with on-demand creation policy.
 

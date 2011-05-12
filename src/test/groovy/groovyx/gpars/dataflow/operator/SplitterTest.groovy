@@ -16,8 +16,8 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.TimeUnit
@@ -42,10 +42,10 @@ public class SplitterTest extends GroovyTestCase {
     }
 
     public void testSplit() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op = group.splitter(a, [b, c, d])
 
@@ -63,10 +63,10 @@ public class SplitterTest extends GroovyTestCase {
     }
 
     public void testSplitWithMultipleForks() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op = group.splitter(a, [b, c, d], 5)
 
@@ -84,10 +84,10 @@ public class SplitterTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op = group.splitter(a, [b, c, d])
 
@@ -104,13 +104,13 @@ public class SplitterTest extends GroovyTestCase {
 
     public void testEmptyInputsOrOutputs() {
         shouldFail(IllegalArgumentException) {
-            group.splitter(null, [new DataFlowVariable()])
+            group.splitter(null, [new DataflowVariable()])
         }
         shouldFail(IllegalArgumentException) {
-            group.splitter(new DataFlowVariable(), [])
+            group.splitter(new DataflowVariable(), [])
         }
         shouldFail(IllegalArgumentException) {
-            group.splitter(new DataFlowVariable(), null)
+            group.splitter(new DataflowVariable(), null)
         }
     }
 }

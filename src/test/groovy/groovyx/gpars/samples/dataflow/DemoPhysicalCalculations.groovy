@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,25 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * An example showing multiple threads calculating different parts of a complex physical calculation
  * and one thread consolidating the results of individual calculations into a final report.
  */
 
-final def mass = new DataFlowVariable()
-final def radius = new DataFlowVariable()
-final def volume = new DataFlowVariable()
-final def density = new DataFlowVariable()
-final def acceleration = new DataFlowVariable()
-final def time = new DataFlowVariable()
-final def velocity = new DataFlowVariable()
-final def decelerationForce = new DataFlowVariable()
-final def deceleration = new DataFlowVariable()
-final def distance = new DataFlowVariable()
-final def author = new DataFlowVariable()
+final def mass = new DataflowVariable()
+final def radius = new DataflowVariable()
+final def volume = new DataflowVariable()
+final def density = new DataflowVariable()
+final def acceleration = new DataflowVariable()
+final def time = new DataflowVariable()
+final def velocity = new DataflowVariable()
+final def decelerationForce = new DataflowVariable()
+final def deceleration = new DataflowVariable()
+final def distance = new DataflowVariable()
+final def author = new DataflowVariable()
 
 def t = task {
     println """
@@ -48,7 +48,7 @@ Given our ability to push the ball backwards with a force of ${decelerationForce
 of ${deceleration.val} m/s2 and so stop the ball at a distance of ${distance.val} m.
 
 =======================================================================================================================
-This example has been calculated asynchronously in multiple threads using GPars DataFlow concurrency in Groovy.
+This example has been calculated asynchronously in multiple threads using GPars Dataflow concurrency in Groovy.
 Author: ${author.val}
 """
 

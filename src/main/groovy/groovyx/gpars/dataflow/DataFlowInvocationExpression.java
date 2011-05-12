@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  *
  * @author Alex Tkachman
  */
-public class DataFlowInvocationExpression extends DataFlowComplexExpression<Object> {
+public class DataflowInvocationExpression extends DataflowComplexExpression<Object> {
     private static final long serialVersionUID = -678669663648650627L;
     private Object receiver;
     private final String methodName;
 
-    public DataFlowInvocationExpression(final Object receiver, final String methodName, final Object[] args) {
+    public DataflowInvocationExpression(final Object receiver, final String methodName, final Object[] args) {
         super(args);
         this.receiver = receiver;
         this.methodName = methodName;
@@ -36,18 +36,18 @@ public class DataFlowInvocationExpression extends DataFlowComplexExpression<Obje
     }
 
     @Override
-    @SuppressWarnings ( "unchecked" )
+    @SuppressWarnings("unchecked")
     protected Object evaluate() {
-        if (receiver instanceof DataFlowExpression) {
-            receiver = ((DataFlowExpression<Object>) receiver).value;
+        if (receiver instanceof DataflowExpression) {
+            receiver = ((DataflowExpression<Object>) receiver).value;
         }
         super.evaluate();
         return InvokerHelper.invokeMethod(receiver, methodName, args);
     }
 
     @Override
-    protected void subscribe(final DataFlowExpressionsCollector listener) {
-        if (receiver instanceof DataFlowExpression) {
+    protected void subscribe(final DataflowExpressionsCollector listener) {
+        if (receiver instanceof DataflowExpression) {
             receiver = listener.subscribe(receiver);
         }
         super.subscribe(listener);

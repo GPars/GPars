@@ -25,50 +25,50 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Represents a thread-safe single-assignment, multi-read variable.
- * Each instance of DataFlowVariable can be read repeatedly any time using the 'val' property and assigned once
+ * Each instance of DataflowVariable can be read repeatedly any time using the 'val' property and assigned once
  * in its lifetime using the '<<' operator. Reads preceding assignment will be blocked until the value
  * is assigned.
  * For actors and Dataflow Operators the asynchronous non-blocking variants of the getValAsync() methods can be used.
  * They register the request to read a value and will send a message to the actor or operator once the value is available.
  *
- * @param <T> Type of values to bind with the DataFlowVariable
+ * @param <T> Type of values to bind with the DataflowVariable
  * @author Vaclav Pech, Alex Tkachman
  *         Date: Jun 4, 2009
  */
 @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "UnqualifiedStaticUsage"})
-public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFlowChannel<T>, Promise<T> {
+public class DataflowVariable<T> extends DataflowExpression<T> implements DataflowChannel<T>, Promise<T> {
     private static final long serialVersionUID = 1340439210749936258L;
 
     /**
      * Creates a new unbound Dataflow Variable
      */
-    public DataFlowVariable() {
+    public DataflowVariable() {
     }
 
     /**
-     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataflowVariable
      *
      * @param value The value to assign
      */
     @Override
-    public DataFlowWriteChannel<T> leftShift(final T value) {
-        if (value instanceof DataFlowReadChannel) bindDFV((DataFlowReadChannel<T>) value);
+    public DataflowWriteChannel<T> leftShift(final T value) {
+        if (value instanceof DataflowReadChannel) bindDFV((DataflowReadChannel<T>) value);
         else bind(value);
         return this;
     }
 
     /**
-     * Assigns a value from one DataFlowVariable instance to this variable.
-     * Can only be invoked once on each instance of DataFlowVariable
+     * Assigns a value from one DataflowVariable instance to this variable.
+     * Can only be invoked once on each instance of DataflowVariable
      *
-     * @param ref The DataFlowVariable instance the value of which to bind
+     * @param ref The DataflowVariable instance the value of which to bind
      */
     @Override
-    public DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
+    public DataflowWriteChannel<T> leftShift(final DataflowReadChannel<T> ref) {
         return bindDFV(ref);
     }
 
-    private DataFlowWriteChannel<T> bindDFV(final DataFlowReadChannel<T> ref) {
+    private DataflowWriteChannel<T> bindDFV(final DataflowReadChannel<T> ref) {
         ref.getValAsync(new MessageStream() {
             private static final long serialVersionUID = -458384302762038543L;
 
@@ -112,7 +112,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
             throw (Throwable) result;
         }
         if (result == null) {
-            if (!this.isBound()) throw new TimeoutException("Timeout expired in DataFlowVariable.get().");
+            if (!this.isBound()) throw new TimeoutException("Timeout expired in DataflowVariable.get().");
             return getVal();
         }
         return result;
@@ -120,16 +120,16 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Class<RemoteDataFlowVariable> getRemoteClass() {
-        return RemoteDataFlowVariable.class;
+    public Class<RemoteDataflowVariable> getRemoteClass() {
+        return RemoteDataflowVariable.class;
     }
 
-    public static final class RemoteDataFlowVariable<T> extends DataFlowVariable<T> implements RemoteSerialized {
+    public static final class RemoteDataflowVariable<T> extends DataflowVariable<T> implements RemoteSerialized {
         private static final long serialVersionUID = -420013188758006693L;
         private final RemoteHost remoteHost;
         private boolean disconnected;
 
-        public RemoteDataFlowVariable(final RemoteHost host) {
+        public RemoteDataflowVariable(final RemoteHost host) {
             remoteHost = host;
             getValAsync(new MessageStream() {
                 private static final long serialVersionUID = 7968302123667353660L;
@@ -138,7 +138,7 @@ public class DataFlowVariable<T> extends DataFlowExpression<T> implements DataFl
                 @Override
                 public MessageStream send(final Object message) {
                     if (!disconnected) {
-                        remoteHost.write(new BindDataFlow(RemoteDataFlowVariable.this, message, remoteHost.getHostId()));
+                        remoteHost.write(new BindDataflow(RemoteDataflowVariable.this, message, remoteHost.getHostId()));
                     }
                     return this;
                 }

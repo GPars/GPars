@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public class DataFlowSelector extends DataFlowProcessor {
+public class DataflowSelector extends DataflowProcessor {
 
     protected final Select select
     protected final List<Boolean> guards
@@ -48,10 +48,10 @@ public class DataFlowSelector extends DataFlowProcessor {
      * Creates a selector
      * After creation the selector needs to be started using the start() method.
      * @param group A parallel group to use threads from in the internal actor
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code The selector's body to run each time all inputs have a value to read
      */
-    protected def DataFlowSelector(final PGroup group, final Map channels, final Closure code) {
+    protected def DataflowSelector(final PGroup group, final Map channels, final Closure code) {
         super(channels, code)
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
@@ -61,9 +61,9 @@ public class DataFlowSelector extends DataFlowProcessor {
 
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
-            this.actor = new ForkingDataFlowSelectorActor(this, group, outputs, inputs, code.clone(), channels.maxForks)
+            this.actor = new ForkingDataflowSelectorActor(this, group, outputs, inputs, code.clone(), channels.maxForks)
         } else {
-            this.actor = new DataFlowSelectorActor(this, group, outputs, inputs, code.clone())
+            this.actor = new DataflowSelectorActor(this, group, outputs, inputs, code.clone())
         }
         select = new Select(group, inputs)
         guards = Collections.synchronizedList(new ArrayList<Boolean>((int) inputs.size()))
@@ -120,10 +120,10 @@ public class DataFlowSelector extends DataFlowProcessor {
  * Iteratively waits for enough values from inputs.
  * Once all required inputs are available (received as messages), the selector's body is run.
  */
-private class DataFlowSelectorActor extends DataFlowProcessorActor {
+private class DataflowSelectorActor extends DataflowProcessorActor {
     protected final boolean passIndex = false
 
-    def DataFlowSelectorActor(owningOperator, group, outputs, inputs, code) {
+    def DataflowSelectorActor(owningOperator, group, outputs, inputs, code) {
         super(owningOperator, group, outputs, inputs, code)
         if (code.maximumNumberOfParameters == 2) {
             passIndex = true
@@ -160,11 +160,11 @@ private class DataFlowSelectorActor extends DataFlowProcessorActor {
  * The selector's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
  * The maxForks property guards the maximum number or concurrently run copies.
  */
-private final class ForkingDataFlowSelectorActor extends DataFlowSelectorActor {
+private final class ForkingDataflowSelectorActor extends DataflowSelectorActor {
     private final Semaphore semaphore
     private final def threadPool
 
-    def ForkingDataFlowSelectorActor(owningOperator, group, outputs, inputs, code, maxForks) {
+    def ForkingDataflowSelectorActor(owningOperator, group, outputs, inputs, code, maxForks) {
         super(owningOperator, group, outputs, inputs, code)
         this.semaphore = new Semaphore(maxForks)
         this.threadPool = group.threadPool

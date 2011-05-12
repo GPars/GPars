@@ -22,15 +22,15 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
-public class DataFlowQueueTest extends GroovyTestCase {
+public class DataflowQueueTest extends GroovyTestCase {
 
     public void testStream() {
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         final Actor thread = Actors.blockingActor {
             stream << 10
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             stream << variable
             latch.countDown()
             receive {
@@ -50,7 +50,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
     public void testStreamPoll() {
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         assert stream.poll() == null
         assert stream.poll() == null
         stream << 1
@@ -61,7 +61,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         assert stream.poll()?.val == null
         final Actor thread = Actors.blockingActor {
             stream << 10
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             stream << variable
             latch.countDown()
             receive {
@@ -83,10 +83,10 @@ public class DataFlowQueueTest extends GroovyTestCase {
     public void testNullValues() {
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         final Actor thread = Actors.blockingActor {
             stream << null
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             stream << variable
             latch.countDown()
             receive {
@@ -106,9 +106,9 @@ public class DataFlowQueueTest extends GroovyTestCase {
     public void testTake() {
         final CountDownLatch latch = new CountDownLatch(1)
 
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         final Actor thread = Actors.blockingActor {
-            final DataFlowVariable variable = new DataFlowVariable()
+            final DataflowVariable variable = new DataflowVariable()
             stream << variable
             latch.countDown()
             receive {
@@ -127,7 +127,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
     public void testIteration() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         final Actor thread = Actors.blockingActor {
             (0..10).each {stream << it}
             barrier.await()
@@ -153,7 +153,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
     public void testIterationWithNulls() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         Actors.blockingActor {
             (0..10).each {stream << null}
             barrier.await()
@@ -168,31 +168,31 @@ public class DataFlowQueueTest extends GroovyTestCase {
     }
 
     public void testToString() {
-        final DataFlowQueue<Integer> stream = new DataFlowQueue<Integer>()
-        assertEquals 'DataFlowQueue(queue=[])', stream.toString()
+        final DataflowQueue<Integer> stream = new DataflowQueue<Integer>()
+        assertEquals 'DataflowQueue(queue=[])', stream.toString()
         stream << 10
-        assertEquals 'DataFlowQueue(queue=[DataFlowVariable(value=10)])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=10)])', stream.toString()
         stream << 20
-        assertEquals 'DataFlowQueue(queue=[DataFlowVariable(value=10), DataFlowVariable(value=20)])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=10), DataflowVariable(value=20)])', stream.toString()
         stream.val
-        assertEquals 'DataFlowQueue(queue=[DataFlowVariable(value=20)])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=20)])', stream.toString()
         stream.val
-        assertEquals 'DataFlowQueue(queue=[])', stream.toString()
-        final DataFlowVariable variable = new DataFlowVariable()
+        assertEquals 'DataflowQueue(queue=[])', stream.toString()
+        final DataflowVariable variable = new DataflowVariable()
         stream << variable
-        assertEquals 'DataFlowQueue(queue=[DataFlowVariable(value=null)])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=null)])', stream.toString()
         variable << '30'
         Thread.sleep 1000  //let the value propagate asynchronously into the variable stored in the stream
-        assertEquals 'DataFlowQueue(queue=[DataFlowVariable(value=30)])', stream.toString()
-        assertEquals 'DataFlowQueue(queue=[DataFlowVariable(value=30)])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=30)])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=30)])', stream.toString()
         stream.val
-        assertEquals 'DataFlowQueue(queue=[])', stream.toString()
-        assertEquals 'DataFlowQueue(queue=[])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[])', stream.toString()
+        assertEquals 'DataflowQueue(queue=[])', stream.toString()
     }
 
     public void testWhenBound() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlows df = new DataFlows()
+        final DataflowQueue stream = new DataflowQueue()
+        final Dataflows df = new Dataflows()
         stream >> {df.x1 = it}
         stream >> {df.x2 = it}
         def actor = Actors.actor {
@@ -210,10 +210,10 @@ public class DataFlowQueueTest extends GroovyTestCase {
     }
 
     public void testWheneverBound() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlowQueue dfs1 = new DataFlowQueue()
-        final DataFlowQueue dfs2 = new DataFlowQueue()
-        final DataFlowQueue dfs3 = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
+        final DataflowQueue dfs1 = new DataflowQueue()
+        final DataflowQueue dfs2 = new DataflowQueue()
+        final DataflowQueue dfs3 = new DataflowQueue()
         stream.wheneverBound {dfs1 << it}
         stream.wheneverBound {dfs2 << it}
         def actor = Actors.actor {
@@ -234,7 +234,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
         stream << 10
         stream << 20
         stream << 30
-        def df = new DataFlowVariable()
+        def df = new DataflowVariable()
         stream << df
         df << 40
         assert [10, 20, 30, 40] as Set == [dfs1.val, dfs1.val, dfs1.val, dfs1.val] as Set
@@ -243,8 +243,8 @@ public class DataFlowQueueTest extends GroovyTestCase {
     }
 
     public void testAsyncValueRetrieval() {
-        def result = new DataFlows()
-        final DataFlowQueue stream = new DataFlowQueue()
+        def result = new Dataflows()
+        final DataflowQueue stream = new DataflowQueue()
         Actors.actor {
             stream << 10
         }
@@ -256,7 +256,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
     }
 
     public void testGetValWithTimeout() {
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         final CyclicBarrier barrier = new CyclicBarrier(2)
         Actors.actor {
             stream << 10
@@ -269,7 +269,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
     }
 
     public void testMissedTimeout() {
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
         stream << 10
         assert 10 == stream.getVal(10, TimeUnit.MILLISECONDS)
@@ -283,7 +283,7 @@ public class DataFlowQueueTest extends GroovyTestCase {
     }
 
     public void testMissedTimeoutWithNull() {
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
         assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
         stream << null
         assert null == stream.getVal(10, TimeUnit.MINUTES)

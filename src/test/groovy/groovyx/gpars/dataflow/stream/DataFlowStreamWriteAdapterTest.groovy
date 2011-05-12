@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
 
 package groovyx.gpars.dataflow.stream
 
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowReadChannel
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowReadChannel
 import java.util.concurrent.CyclicBarrier
 
-public class DataFlowStreamWriteAdapterTest extends GroovyTestCase {
+public class DataflowStreamWriteAdapterTest extends GroovyTestCase {
 
     public void testMultipleThreadedWrite() {
-        final def original = new DataFlowStream()
-        final def writeStream = new DataFlowStreamWriteAdapter(original)
-        final DataFlowReadChannel stream = new DataFlowStreamReadAdapter(original)
+        final def original = new DataflowStream()
+        final def writeStream = new DataflowStreamWriteAdapter(original)
+        final DataflowReadChannel stream = new DataflowStreamReadAdapter(original)
 
         final CyclicBarrier barrier = new CyclicBarrier(10)
         10.times {value ->
-            DataFlow.task {
+            Dataflow.task {
                 barrier.await()
                 writeStream << value
             }

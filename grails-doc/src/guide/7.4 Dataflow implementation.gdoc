@@ -1,4 +1,4 @@
-The Dataflow Concurrency in GPars builds on top of its actor support. All of the dataflow tasks share a thread pool and so the number threads created through _DataFlow.task()_ factory method don't need to correspond to the number of physical threads required from the system.
+The Dataflow Concurrency in GPars builds on top of its actor support. All of the dataflow tasks share a thread pool and so the number threads created through _Dataflow.task()_ factory method don't need to correspond to the number of physical threads required from the system.
 The _PGroup.task()_ factory method can be used to attach the created task to a group. Since each group defines its own thread pool, you can easily organize tasks around different thread pools just like you do with actors.
 
 h3. Combining actors and Dataflow Concurrency
@@ -6,7 +6,7 @@ h3. Combining actors and Dataflow Concurrency
 The good news is that you can combine actors and Dataflow Concurrency in any way you feel fit for your particular problem at hands. You can freely you use Dataflow Variables from actors.
 
 {code}
-final DataFlowVariable a = new DataFlowVariable()
+final DataflowVariable a = new DataflowVariable()
 
 final Actor doubler = Actors.actor {
     react {message->
@@ -24,15 +24,15 @@ final Actor fakingDoubler = actor {
 fakingDoubler << 10
 {code}
 
-In the example you see the "fakingDoubler" using both messages and a _DataFlowVariable_ to communicate with the _doubler_ actor.
+In the example you see the "fakingDoubler" using both messages and a _DataflowVariable_ to communicate with the _doubler_ actor.
 
 h3. Using plain java threads
 
-The _DataFlowVariable_ as well as the _DataFlowQueue_ classes can obviously be used from any thread of your application, not only from the tasks created by _DataFlow.task()_ . Consider the following example:
-{code}import groovyx.gpars.dataflow.DataFlowVariable
+The _DataflowVariable_ as well as the _DataflowQueue_ classes can obviously be used from any thread of your application, not only from the tasks created by _Dataflow.task()_ . Consider the following example:
+{code}import groovyx.gpars.dataflow.DataflowVariable
 
-final DataFlowVariable a = new DataFlowVariable<String>()
-final DataFlowVariable b = new DataFlowVariable<String>()
+final DataflowVariable a = new DataflowVariable<String>()
+final DataflowVariable b = new DataflowVariable<String>()
 
 Thread.start {
     println "Received: $a.val"

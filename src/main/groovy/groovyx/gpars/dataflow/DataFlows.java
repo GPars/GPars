@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,18 +27,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Convenience class that makes working with DataFlowVariables more comfortable.
+ * Convenience class that makes working with DataflowVariables more comfortable.
  * <p/>
- * See the implementation of groovyx.gpars.samples.dataflow.DemoDataFlows for a full example.
+ * See the implementation of groovyx.gpars.samples.dataflow.DemoDataflows for a full example.
  * <p/>
- * A DataFlows instance is a bean with properties of type DataFlowVariable.
- * Property access is relayed to the access methods of DataFlowVariable.
+ * A Dataflows instance is a bean with properties of type DataflowVariable.
+ * Property access is relayed to the access methods of DataflowVariable.
  * Each property is initialized lazily the first time it is accessed.
  * Non-String named properties can be also accessed using array-like indexing syntax
- * This allows a rather compact usage of DataFlowVariables like
+ * This allows a rather compact usage of DataflowVariables like
  * <p/>
  * <pre>
- * final df = new DataFlows()
+ * final df = new Dataflows()
  * start { df[0] = df.x + df.y }
  * start { df.x = 10 }
  * start { df.y = 5 }
@@ -48,14 +48,14 @@ import java.util.concurrent.ConcurrentMap;
  * @author Vaclav Pech, Dierk Koenig, Alex Tkachman
  *         Date: Sep 3, 2009
  */
-public final class DataFlows extends GroovyObjectSupport {
+public final class Dataflows extends GroovyObjectSupport {
 
-    private static final DataFlowVariable<Object> DUMMY = new DataFlowVariable<Object>();
+    private static final DataflowVariable<Object> DUMMY = new DataflowVariable<Object>();
 
     private final Object lock = new Object();
 
     @SuppressWarnings({"FieldAccessedSynchronizedAndUnsynchronized"})
-    private ConcurrentMap<Object, DataFlowVariable<Object>> variables = null;
+    private ConcurrentMap<Object, DataflowVariable<Object>> variables = null;
 
     // copy from ConcurrentHashMap for jdk 1.5 backwards compatibility
     static final int DEFAULT_INITIAL_CAPACITY = 16;
@@ -79,8 +79,8 @@ public final class DataFlows extends GroovyObjectSupport {
      *                                  non-positive.
      * @see java.util.concurrent.ConcurrentHashMap
      */
-    public DataFlows(final int initialCapacity, final float loadFactor, final int concurrencyLevel) {
-        variables = new ConcurrentHashMap<Object, DataFlowVariable<Object>>(initialCapacity, loadFactor, concurrencyLevel);
+    public Dataflows(final int initialCapacity, final float loadFactor, final int concurrencyLevel) {
+        variables = new ConcurrentHashMap<Object, DataflowVariable<Object>>(initialCapacity, loadFactor, concurrencyLevel);
     }
 
     /**
@@ -88,15 +88,15 @@ public final class DataFlows extends GroovyObjectSupport {
      *
      * @see java.util.concurrent.ConcurrentHashMap
      */
-    public DataFlows() {
-        variables = new ConcurrentHashMap<Object, DataFlowVariable<Object>>(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
+    public Dataflows() {
+        variables = new ConcurrentHashMap<Object, DataflowVariable<Object>>(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
     }
 
     /**
-     * Binds the value to the DataFlowVariable that is associated with the property "name".
+     * Binds the value to the DataflowVariable that is associated with the property "name".
      *
-     * @param newValue a scalar or a DataFlowVariable that may block on value access
-     * @see DataFlowVariable#bind
+     * @param newValue a scalar or a DataflowVariable that may block on value access
+     * @see DataflowVariable#bind
      */
     @Override
     public void setProperty(final String property, final Object newValue) {
@@ -104,9 +104,9 @@ public final class DataFlows extends GroovyObjectSupport {
     }
 
     /**
-     * @return the value of the DataFlowVariable associated with the property "name".
+     * @return the value of the DataflowVariable associated with the property "name".
      *         May block if the value is not scalar.
-     * @see DataFlowVariable#getVal
+     * @see DataflowVariable#getVal
      */
     @Override
     public Object getProperty(final String property) {
@@ -121,7 +121,7 @@ public final class DataFlows extends GroovyObjectSupport {
      * Invokes the given method.
      * Allows for invoking whenBound() on the dataflow variables.
      * <pre>
-     * def df = new DataFlows()
+     * def df = new Dataflows()
      * df.var {*     println "Variable bound to $it"
      * }* </pre>
      *
@@ -131,22 +131,22 @@ public final class DataFlows extends GroovyObjectSupport {
      */
     @Override
     public Object invokeMethod(final String name, final Object args) {
-        final DataFlowVariable<Object> df = ensureToContainVariable(name);
+        final DataflowVariable<Object> df = ensureToContainVariable(name);
         if (args instanceof Object[] && ((Object[]) args).length == 1 && ((Object[]) args)[0] instanceof Closure) {
             df.whenBound((Closure) ((Object[]) args)[0]);
             return this;
         } else
-            throw new MissingMethodException(name, DataFlows.class, (Object[]) args);
+            throw new MissingMethodException(name, Dataflows.class, (Object[]) args);
     }
 
     /**
      * Retrieves the DFV associated with the given index
      *
      * @param index The index to find a match for
-     * @return the value of the DataFlowVariable associated with the property "index".
+     * @return the value of the DataflowVariable associated with the property "index".
      *         May block if the value is not scalar.
      * @throws InterruptedException If the thread gets interrupted
-     * @see DataFlowVariable#getVal
+     * @see DataflowVariable#getVal
      */
     @SuppressWarnings({"AutoBoxing"})
     Object getAt(final int index) throws InterruptedException {
@@ -154,11 +154,11 @@ public final class DataFlows extends GroovyObjectSupport {
     }
 
     /**
-     * Binds the value to the DataFlowVariable that is associated with the property "index".
+     * Binds the value to the DataflowVariable that is associated with the property "index".
      *
      * @param index The index to associate the value with
-     * @param value a scalar or a DataFlowVariable that may block on value access
-     * @see DataFlowVariable#bind
+     * @param value a scalar or a DataflowVariable that may block on value access
+     * @see DataflowVariable#bind
      */
     void putAt(final Object index, final Object value) {
         ensureToContainVariable(index).bind(value);
@@ -173,10 +173,10 @@ public final class DataFlows extends GroovyObjectSupport {
      * Unfortunately we have to sync on this as there is no better option (God forbid to sync on name)
      *
      * @param name The key to ensure has a DFV bound to it
-     * @return DataFlowVariable corresponding to name
+     * @return DataflowVariable corresponding to name
      */
-    private DataFlowVariable<Object> ensureToContainVariable(final Object name) {
-        DataFlowVariable<Object> df = variables.putIfAbsent(name, DUMMY);
+    private DataflowVariable<Object> ensureToContainVariable(final Object name) {
+        DataflowVariable<Object> df = variables.putIfAbsent(name, DUMMY);
         if (df == null || df == DUMMY) {
             df = putNewUnderLock(name);
         }
@@ -189,12 +189,12 @@ public final class DataFlows extends GroovyObjectSupport {
      * @param name The key to ensure has a DFV bound to it
      * @return a DFV associated with the key
      */
-    private DataFlowVariable<Object> putNewUnderLock(final Object name) {
+    private DataflowVariable<Object> putNewUnderLock(final Object name) {
         synchronized (lock) {
-            DataFlowVariable<Object> df = variables.get(name);
+            DataflowVariable<Object> df = variables.get(name);
             //noinspection AccessToStaticFieldLockedOnInstance
             if (df == null || df == DUMMY) {
-                df = new DataFlowVariable<Object>();
+                df = new DataflowVariable<Object>();
                 variables.put(name, df);
             }
             return df;
@@ -207,9 +207,9 @@ public final class DataFlows extends GroovyObjectSupport {
      * @param name The name of the DFV to remove.
      * @return A DFV is exists, or null
      */
-    public DataFlowVariable<Object> remove(final Object name) {
+    public DataflowVariable<Object> remove(final Object name) {
         synchronized (lock) {
-            final DataFlowVariable<Object> df = variables.remove(name);
+            final DataflowVariable<Object> df = variables.remove(name);
             if (df != null) df.bindSafely(null);
             return df;
         }
@@ -230,9 +230,9 @@ public final class DataFlows extends GroovyObjectSupport {
      * The iteration restrictions of ConcurrentHashMap concerning parallel access and
      * ConcurrentModificationException apply.
      *
-     * @return iterator over the stored key:DataFlowVariable value pairs
+     * @return iterator over the stored key:DataflowVariable value pairs
      */
-    public Iterator<Map.Entry<Object, DataFlowVariable<Object>>> iterator() {
+    public Iterator<Map.Entry<Object, DataflowVariable<Object>>> iterator() {
         return variables.entrySet().iterator();
     }
 }

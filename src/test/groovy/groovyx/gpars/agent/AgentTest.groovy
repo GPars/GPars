@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package groovyx.gpars.agent
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.scheduler.DefaultPool
@@ -166,7 +166,7 @@ public class AgentTest extends GroovyTestCase {
 
         [t1, t2, t3]*.join()
 
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         counter.valAsync {
             result << it
         }
@@ -177,7 +177,7 @@ public class AgentTest extends GroovyTestCase {
     public void testExplicitReply() {
         final Agent counter = new Agent<Long>(0L)
 
-        def result = new DataFlowQueue()
+        def result = new DataflowQueue()
         Actors.actor {
             counter << {owner.send 'Explicit reply'; owner.send 10}
             react {a ->
@@ -219,7 +219,7 @@ public class AgentTest extends GroovyTestCase {
     public void testNullInitialValue() {
         final Agent counter = new Agent<Long>()
 
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         counter << {result << it}
         assertNull result.val
     }
@@ -227,7 +227,7 @@ public class AgentTest extends GroovyTestCase {
     public void testReplies() {
         final Agent counter = new Agent<Long>(0L)
 
-        def result = new DataFlowVariable()
+        def result = new DataflowVariable()
         Actors.actor {
             counter << {owner.send it}
             react {
@@ -236,7 +236,7 @@ public class AgentTest extends GroovyTestCase {
         }
         assertEquals 0, result.val
 
-        result = new DataFlowVariable()
+        result = new DataflowVariable()
         Actors.actor {
             counter << {owner.send null}
             react {
@@ -285,7 +285,7 @@ public class AgentTest extends GroovyTestCase {
         final Agent counter = new Agent<Long>(0L)
         counter << 'test'
 
-        final DataFlowVariable result = new DataFlowVariable<Long>()
+        final DataflowVariable result = new DataflowVariable<Long>()
 
         counter.valAsync {
             result << it

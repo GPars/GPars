@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 // limitations under the License.
 
 /*
-Visual demo of DataFlows that need to processed in a given order -
+Visual demo of Dataflows that need to processed in a given order -
 like for appending - while retrieving the several parts concurrently.
 @author Vaclav Pech
 @author Dierk Koenig
@@ -25,15 +25,15 @@ package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
 import groovyx.gpars.GParsPool
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.Dataflows
 import static javax.swing.BorderFactory.createEmptyBorder
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE
 
 def rand = new Random()
 def values = (1..5).collect { 1 + rand.nextInt(15) }
 
-final DataFlows retrieved = new DataFlows()
+final Dataflows retrieved = new Dataflows()
 def bars = []
 def labels = []
 
@@ -51,7 +51,7 @@ builder.build {
     frame.pack()
 }
 
-DataFlow.task {
+Dataflow.task {
     def result = ''
     values.eachWithIndex {value, index ->
         builder.edt { labels[index].text = 'Waiting' }

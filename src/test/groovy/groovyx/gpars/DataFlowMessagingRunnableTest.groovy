@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package groovyx.gpars
 
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflows
 
-class DataFlowMessagingRunnableTest extends GroovyTestCase {
+class DataflowMessagingRunnableTest extends GroovyTestCase {
     public void testMessagingRunnable() {
-        final def df = new DataFlows()
-        final def runnable = new MyTestDataFlowMessagingRunnable(df)
+        final def df = new Dataflows()
+        final def runnable = new MyTestDataflowMessagingRunnable(df)
         shouldFail(UnsupportedOperationException) {
             runnable.call()
         }
@@ -42,21 +42,21 @@ class DataFlowMessagingRunnableTest extends GroovyTestCase {
     }
 
     public void testMaxNumberOfParameters() {
-        final def runnable = new MyTestDataFlowMessagingRunnable(null)
+        final def runnable = new MyTestDataflowMessagingRunnable(null)
         assert 3 == runnable.maximumNumberOfParameters
     }
 
     public void testParameterTypes() {
-        final def runnable = new MyTestDataFlowMessagingRunnable(null)
+        final def runnable = new MyTestDataflowMessagingRunnable(null)
         assert [Object, Object, Object] as Class[] == runnable.parameterTypes
     }
 }
 
-class MyTestDataFlowMessagingRunnable extends DataFlowMessagingRunnable {
+class MyTestDataflowMessagingRunnable extends DataflowMessagingRunnable {
 
     def df
 
-    def MyTestDataFlowMessagingRunnable(df) {
+    def MyTestDataflowMessagingRunnable(df) {
         super(3)
         this.df = df
     }

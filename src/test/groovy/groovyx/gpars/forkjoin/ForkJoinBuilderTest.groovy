@@ -16,7 +16,7 @@
 
 package groovyx.gpars.forkjoin
 
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflows
 import java.util.concurrent.ExecutionException
 import static groovyx.gpars.GParsPool.runForkJoin
 import static groovyx.gpars.GParsPool.withPool
@@ -144,7 +144,7 @@ class ForkJoinBuilderTest extends GroovyTestCase {
     }
 
     public void testForkOffChildIllegalArguments() {
-        final DataFlows df = new DataFlows()
+        final Dataflows df = new Dataflows()
 
         withPool(3) {
             groovyx.gpars.GParsPool.runForkJoin(1, 2) {a, b ->

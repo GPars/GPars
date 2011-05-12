@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package groovyx.gpars.samples.dataflow.select
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.select
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.select
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates the ability to enable/disable channels during a value selection on a select by providing boolean guards.
  */
-final DataFlowQueue operations = new DataFlowQueue()
-final DataFlowQueue numbers = new DataFlowQueue()
+final DataflowQueue operations = new DataflowQueue()
+final DataflowQueue numbers = new DataflowQueue()
 
 def t = task {
     final def select = select(operations, numbers)

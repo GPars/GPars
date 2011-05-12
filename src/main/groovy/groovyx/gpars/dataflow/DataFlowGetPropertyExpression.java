@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,22 +23,24 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  *
  * @author Alex Tkachman
  */
-public class DataFlowGetPropertyExpression<T> extends DataFlowExpression<T> {
+public class DataflowGetPropertyExpression<T> extends DataflowExpression<T> {
     private static final long serialVersionUID = 2984824057556784227L;
-    private final DataFlowExpression<T> receiver;
+    private final DataflowExpression<T> receiver;
     private final String name;
 
-    public DataFlowGetPropertyExpression(final DataFlowExpression<T> expression, final String name) {
+    public DataflowGetPropertyExpression(final DataflowExpression<T> expression, final String name) {
         this.receiver = expression;
         this.name = name;
         subscribe();
     }
 
-    @Override protected void subscribe(final DataFlowExpressionsCollector listener) {
+    @Override
+    protected void subscribe(final DataflowExpressionsCollector listener) {
         listener.subscribe(receiver);
     }
 
-    @Override @SuppressWarnings("unchecked")
+    @Override
+    @SuppressWarnings("unchecked")
     protected T evaluate() {
         //noinspection unchecked
         return (T) InvokerHelper.getProperty(receiver.value, name);

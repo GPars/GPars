@@ -16,9 +16,9 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.TimeUnit
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
  * Date: Sep 9, 2009
  */
 
-public class DataFlowOperatorTest extends GroovyTestCase {
+public class DataflowOperatorTest extends GroovyTestCase {
 
     private PGroup group
 
@@ -43,20 +43,20 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOperator() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowVariable d = new DataFlowVariable()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowVariable d = new DataflowVariable()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = group.operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
             bindOutput 0, x + y + z
             bindOutput 1, x * y * z
         }
 
-        DataFlow.task { a << 5 }
-        DataFlow.task { b << 20 }
-        DataFlow.task { c << 40 }
+        Dataflow.task { a << 5 }
+        Dataflow.task { b << 20 }
+        Dataflow.task { c << 40 }
 
         assertEquals 65, d.val
         assertEquals 4000, e.val
@@ -65,8 +65,8 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOperatorWithDoubleWaitOnChannel() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
 
         def op = group.operator(inputs: [a, a], outputs: [b]) {x, y ->
             bindOutput 0, x + y
@@ -84,16 +84,16 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testNonCommutativeOperator() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
 
         def op = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
             bindOutput 0, 2 * x + y
         }
 
-        DataFlow.task { a << 5 }
-        DataFlow.task { b << 20 }
+        Dataflow.task { a << 5 }
+        Dataflow.task { b << 20 }
 
         assertEquals 30, c.val
 
@@ -101,9 +101,9 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testGroupingOperatorsAndTasks() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
 
         def op = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
             bindOutput 0, 2 * x + y
@@ -118,9 +118,9 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testSimpleOperators() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
         a << 1
         a << 2
         a << 3
@@ -143,9 +143,9 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testCombinedOperators() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
         a << 1
         a << 2
         a << 3
@@ -154,12 +154,12 @@ public class DataFlowOperatorTest extends GroovyTestCase {
         b << 6
         b << 7
 
-        final DataFlowQueue x = new DataFlowQueue()
+        final DataflowQueue x = new DataflowQueue()
         def op1 = group.operator(inputs: [a], outputs: [x]) {v ->
             bindOutput v * v
         }
 
-        final DataFlowQueue y = new DataFlowQueue()
+        final DataflowQueue y = new DataflowQueue()
         def op2 = group.operator(inputs: [b], outputs: [y]) {v ->
             bindOutput v * v
         }
@@ -175,9 +175,9 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
         volatile boolean flag = false
 
         def op1 = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
@@ -190,8 +190,8 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testInterrupt() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
         volatile boolean flag = false
 
         def op1 = group.operator(inputs: [a], outputs: [b]) {v ->
@@ -209,7 +209,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testEmptyInputs() {
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue b = new DataflowQueue()
         volatile boolean flag = false
 
         shouldFail(IllegalArgumentException) {
@@ -223,9 +223,9 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputs() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
         volatile boolean flag = false
 
         def op1 = group.operator(inputs: [a], outputs: [b, c]) {
@@ -240,7 +240,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testEmptyOutputs() {
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue b = new DataflowQueue()
         volatile boolean flag = false
 
         def op1 = group.operator(inputs: [b], outputs: []) {
@@ -254,10 +254,10 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testInputNumber() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         group.with {
             shouldFail(IllegalArgumentException) {
@@ -292,8 +292,8 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         group.operator(inputs: [a], outputs: []) {v -> stop()}
         group.operator(inputs: [a]) {v -> stop()}
@@ -305,8 +305,8 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         shouldFail(IllegalArgumentException) {
             group.operator(inputs1: [a], outputs: [d]) {v -> }
@@ -320,8 +320,8 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testException() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlowVariable a = new DataFlowVariable()
+        final DataflowQueue stream = new DataflowQueue()
+        final DataflowVariable a = new DataflowVariable()
 
         def op = group.operator(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
@@ -335,7 +335,7 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testExceptionWithDefaultHandler() {
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
 
         def op = group.operator(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')
@@ -347,10 +347,10 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testBindAllOutputs() {
         def group = new DefaultPGroup(10)
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
             bindAllOutputs x
@@ -370,10 +370,10 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testBindAllOutputValues() {
         def group = new DefaultPGroup(10)
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
             bindAllOutputValues x, x, x
@@ -393,10 +393,10 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testBindAllOutputsAtomically() {
         def group = new DefaultPGroup(10)
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
             bindAllOutputsAtomically x
@@ -419,10 +419,10 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testBindAllOutputValuesAtomically() {
         def group = new DefaultPGroup(10)
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
             bindAllOutputValuesAtomically x, x, x
@@ -445,10 +445,10 @@ public class DataFlowOperatorTest extends GroovyTestCase {
 
     public void testBindAllOutputValuesAtomicallyWithDifferentValues() {
         def group = new DefaultPGroup(10)
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op1 = group.operator(inputs: [a], outputs: [b, c, d], maxForks: 5) {x ->
             bindAllOutputValuesAtomically x, 2 * x, 3 * x
@@ -469,8 +469,8 @@ public class DataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOperatorDoesNotConsumeMessagesAfterStop() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
 
         group.operator(inputs: [a], outputs: [b]) {
             bindOutput 0, it

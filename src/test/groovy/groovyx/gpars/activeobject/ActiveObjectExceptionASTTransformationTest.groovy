@@ -16,7 +16,7 @@
 
 package groovyx.gpars.activeobject
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 
 public class ActiveObjectExceptionASTTransformationTest extends GroovyTestCase {
 
@@ -50,7 +50,7 @@ public class ActiveObjectExceptionASTTransformationTest extends GroovyTestCase {
 
 @ActiveObject
 class MyExceptionWrapper {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 
     private def bar() {
         throw new RuntimeException('test')

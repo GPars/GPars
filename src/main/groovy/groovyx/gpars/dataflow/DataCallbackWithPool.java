@@ -21,7 +21,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.scheduler.Pool;
 
 /**
- * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataFlowVariable and DataFlowQueue,
+ * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataflowVariable and DataflowQueue,
  * whenever a thread pool instead of a PGroup is specified..
  * A task that waits asynchronously on the DFV to be bound. Once the DFV is bound,
  * upon receiving the message the actor runs the supplied closure / code with the DFV value as a parameter.
@@ -48,7 +48,7 @@ public final class DataCallbackWithPool extends MessageStream {
     /**
      * Sends a message back to the DataCallback.
      * Will schedule processing the internal closure with the thread pool
-     * Registers its parallel group with DataFlowExpressions for nested 'whenBound' handlers to use the same group.
+     * Registers its parallel group with DataflowExpressions for nested 'whenBound' handlers to use the same group.
      */
     @Override
     public MessageStream send(final Object message) {

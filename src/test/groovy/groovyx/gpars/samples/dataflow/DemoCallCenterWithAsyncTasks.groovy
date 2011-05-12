@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 
@@ -28,12 +28,12 @@ import groovyx.gpars.group.PGroup
 
 final class AsyncCallCenter {
     private final int agents
-    private final DataFlowQueue queue
-    private final DataFlowQueue clockIn = new DataFlowQueue()
-    private final DataFlowQueue clockOut = new DataFlowQueue()
+    private final DataflowQueue queue
+    private final DataflowQueue clockIn = new DataflowQueue()
+    private final DataflowQueue clockOut = new DataflowQueue()
     private final PGroup group = new DefaultPGroup()
 
-    AsyncCallCenter(final int agents, final DataFlowQueue queue) {
+    AsyncCallCenter(final int agents, final DataflowQueue queue) {
         this.agents = agents
         this.queue = queue
     }
@@ -80,7 +80,7 @@ final class AsyncCallCenter {
 }
 
 int numberOfCalls = 100
-final DataFlowQueue incomingCalls = new DataFlowQueue()
+final DataflowQueue incomingCalls = new DataflowQueue()
 final AsyncCallCenter center = new AsyncCallCenter(10, incomingCalls)
 
 final long startTime = System.nanoTime()

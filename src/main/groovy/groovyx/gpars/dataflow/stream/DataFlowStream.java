@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package groovyx.gpars.dataflow.stream;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
-import groovyx.gpars.dataflow.DataFlow;
-import groovyx.gpars.dataflow.DataFlowExpression;
-import groovyx.gpars.dataflow.DataFlowReadChannel;
-import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowExpression;
+import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.DataflowVariable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,25 +30,25 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Represents a deterministic dataflow channel. Unlike a DataFlowQueue, DataFlowStream allows multiple readers each to read all the messages.
- * Essentially, you may think of DataFlowStream as a 1 to many communication channel, since when a reader consumes a messages,
+ * Represents a deterministic dataflow channel. Unlike a DataflowQueue, DataflowStream allows multiple readers each to read all the messages.
+ * Essentially, you may think of DataflowStream as a 1 to many communication channel, since when a reader consumes a messages,
  * other readers will still be able to read the message. Also, all messages arrive to all readers in the same order.
- * DataFlowStream is implemented as a functional queue, which impacts the API in that users have to traverse the values in the stream themselves.
+ * DataflowStream is implemented as a functional queue, which impacts the API in that users have to traverse the values in the stream themselves.
  * On the other hand in offers handy methods for value filtering or transformation together with interesting performance characteristics.
- * For convenience and for the ability to use DataFlowStream with other dataflow constructs, like e.g. operators,
- * you can wrap DataFlowStreams with DataFlowReadAdapter for read access or DataFlowWriteAdapter for write access.
+ * For convenience and for the ability to use DataflowStream with other dataflow constructs, like e.g. operators,
+ * you can wrap DataflowStreams with DataflowReadAdapter for read access or DataflowWriteAdapter for write access.
  * <p/>
- * The DataFlowStream class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
+ * The DataflowStream class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
  * to the stream, their access to the stream must be serialized externally or the adapters should be used.
  *
  * @param <T> Type for values to pass through the stream
  * @author Johannes Link, Vaclav Pech
  */
 @SuppressWarnings({"rawtypes", "TailRecursion", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
-public final class DataFlowStream<T> implements FList<T> {
+public final class DataflowStream<T> implements FList<T> {
 
-    private final DataFlowVariable<T> first = new DataFlowVariable<T>();
-    private final AtomicReference<DataFlowStream<T>> rest = new AtomicReference<DataFlowStream<T>>();
+    private final DataflowVariable<T> first = new DataflowVariable<T>();
+    private final AtomicReference<DataflowStream<T>> rest = new AtomicReference<DataflowStream<T>>();
 
     /**
      * A collection of listeners who need to be informed each time the stream is bound to a value
@@ -59,20 +59,20 @@ public final class DataFlowStream<T> implements FList<T> {
         return null;
     }
 
-    private static <T> T eval(final Object valueOrDataFlowVariable) {
-        if (valueOrDataFlowVariable instanceof DataFlowVariable)
+    private static <T> T eval(final Object valueOrDataflowVariable) {
+        if (valueOrDataflowVariable instanceof DataflowVariable)
             try {
-                return ((DataFlowReadChannel<T>) valueOrDataFlowVariable).getVal();
+                return ((DataflowReadChannel<T>) valueOrDataflowVariable).getVal();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        return (T) valueOrDataFlowVariable;
+        return (T) valueOrDataflowVariable;
     }
 
     /**
      * Creates an empty stream
      */
-    public DataFlowStream() {
+    public DataflowStream() {
         wheneverBoundListeners = new CopyOnWriteArrayList<MessageStream>();
     }
 
@@ -81,13 +81,13 @@ public final class DataFlowStream<T> implements FList<T> {
      *
      * @param toBeApplied The closure to use for initialization
      */
-    public DataFlowStream(final Closure toBeApplied) {
+    public DataflowStream(final Closure toBeApplied) {
         this();
         apply(toBeApplied);
     }
 
     @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter"})
-    private DataFlowStream(final Collection<MessageStream> wheneverBoundListeners) {
+    private DataflowStream(final Collection<MessageStream> wheneverBoundListeners) {
         this.wheneverBoundListeners = wheneverBoundListeners;
         hookWheneverBoundListeners(first);
     }
@@ -100,18 +100,18 @@ public final class DataFlowStream<T> implements FList<T> {
      * @param condition A closure indicating whether the generation should continue based on the last generated value
      * @return This stream
      */
-    public DataFlowStream<T> generate(final T seed, final Closure generator, final Closure condition) {
+    public DataflowStream<T> generate(final T seed, final Closure generator, final Closure condition) {
         generateNext(seed, this, generator, condition);
         return this;
     }
 
-    private void generateNext(final T value, final DataFlowStream<T> stream, final Closure generator, final Closure condition) {
+    private void generateNext(final T value, final DataflowStream<T> stream, final Closure generator, final Closure condition) {
         T recurValue = value;
-        DataFlowStream<T> recurStream = stream;
+        DataflowStream<T> recurStream = stream;
         while (true) {
             final boolean addValue = (Boolean) condition.call(new Object[]{recurValue});
             if (!addValue) {
-                recurStream.leftShift(DataFlowStream.<T>eos());
+                recurStream.leftShift(DataflowStream.<T>eos());
                 return;
             }
             recurStream = recurStream.leftShift(recurValue);
@@ -123,9 +123,9 @@ public final class DataFlowStream<T> implements FList<T> {
      * Calls the supplied closure with the stream as a parameter
      *
      * @param closure The closure to call
-     * @return This instance of DataFlowStream
+     * @return This instance of DataflowStream
      */
-    public final DataFlowStream<T> apply(final Closure closure) {
+    public final DataflowStream<T> apply(final Closure closure) {
         closure.call(new Object[]{this});
         return this;
     }
@@ -133,10 +133,10 @@ public final class DataFlowStream<T> implements FList<T> {
     /**
      * Adds a dataflow variable value to the stream, once the value is available
      *
-     * @param ref The DataFlowVariable to check for value
+     * @param ref The DataflowVariable to check for value
      * @return The rest of the stream
      */
-    public DataFlowStream<T> leftShift(final DataFlowReadChannel<T> ref) {
+    public DataflowStream<T> leftShift(final DataflowReadChannel<T> ref) {
         ref.getValAsync(new MessageStream() {
             @Override
             public MessageStream send(final Object message) {
@@ -144,7 +144,7 @@ public final class DataFlowStream<T> implements FList<T> {
                 return null;
             }
         });
-        return (DataFlowStream<T>) getRest();
+        return (DataflowStream<T>) getRest();
     }
 
     /**
@@ -153,16 +153,16 @@ public final class DataFlowStream<T> implements FList<T> {
      * @param value The value to add
      * @return The rest of the stream
      */
-    public DataFlowStream<T> leftShift(final T value) {
+    public DataflowStream<T> leftShift(final T value) {
         bind(value);
-        return (DataFlowStream<T>) getRest();
+        return (DataflowStream<T>) getRest();
     }
 
     private void bind(final T value) {
         first.bind(value);
     }
 
-    DataFlowVariable<T> getFirstDFV() {
+    DataflowVariable<T> getFirstDFV() {
         return first;
     }
 
@@ -181,14 +181,14 @@ public final class DataFlowStream<T> implements FList<T> {
     }
 
     /**
-     * Retrieves a DataFlowStream representing the rest of this Stream after removing the first element
+     * Retrieves a DataflowStream representing the rest of this Stream after removing the first element
      *
      * @return The remaining stream elements
      */
     @Override
     public FList<T> getRest() {
         if (rest.get() == null)
-            rest.compareAndSet(null, new DataFlowStream<T>(wheneverBoundListeners));
+            rest.compareAndSet(null, new DataflowStream<T>(wheneverBoundListeners));
         return rest.get();
     }
 
@@ -208,22 +208,22 @@ public final class DataFlowStream<T> implements FList<T> {
      */
     @Override
     public FList<T> filter(final Closure filterClosure) {
-        final DataFlowStream<T> newStream = new DataFlowStream<T>();
+        final DataflowStream<T> newStream = new DataflowStream<T>();
         filter(this, filterClosure, newStream);
         return newStream;
     }
 
-    private void filter(final DataFlowStream<T> rest, final Closure filterClosure, final DataFlowStream<T> result) {
-        DataFlowStream<T> recurRest = rest;
-        DataFlowStream<T> recurResult = result;
+    private void filter(final DataflowStream<T> rest, final Closure filterClosure, final DataflowStream<T> result) {
+        DataflowStream<T> recurRest = rest;
+        DataflowStream<T> recurResult = result;
         while (true) {
             if (recurRest.isEmpty()) {
-                recurResult.leftShift(DataFlowStream.<T>eos());
+                recurResult.leftShift(DataflowStream.<T>eos());
                 return;
             }
             final boolean include = (Boolean) eval(filterClosure.call(new Object[]{recurRest.getFirst()}));
             if (include) recurResult = recurResult.leftShift(recurRest.getFirst());
-            recurRest = (DataFlowStream<T>) recurRest.getRest();
+            recurRest = (DataflowStream<T>) recurRest.getRest();
         }
     }
 
@@ -235,17 +235,17 @@ public final class DataFlowStream<T> implements FList<T> {
      */
     @Override
     public FList<Object> map(final Closure mapClosure) {
-        final DataFlowStream<Object> newStream = new DataFlowStream<Object>();
+        final DataflowStream<Object> newStream = new DataflowStream<Object>();
         map(this, mapClosure, newStream);
         return newStream;
     }
 
-    private void map(final FList<T> rest, final Closure mapClosure, final DataFlowStream result) {
+    private void map(final FList<T> rest, final Closure mapClosure, final DataflowStream result) {
         FList<T> recurRest = rest;
-        DataFlowStream recurResult = result;
+        DataflowStream recurResult = result;
         while (true) {
             if (recurRest.isEmpty()) {
-                recurResult.leftShift(DataFlowStream.eos());
+                recurResult.leftShift(DataflowStream.eos());
                 return;
             }
             final Object mapped = mapClosure.call(new Object[]{recurRest.getFirst()});
@@ -304,10 +304,10 @@ public final class DataFlowStream<T> implements FList<T> {
     @Override
     public String toString() {
         if (!first.isBound())
-            return "DataFlowStream[?]";
+            return "DataflowStream[?]";
         if (isEmpty())
-            return "DataFlowStream[]";
-        return "DataFlowStream[" + getFirst() + getRest().appendingString() + ']';
+            return "DataflowStream[]";
+        return "DataflowStream[" + getFirst() + getRest().appendingString() + ']';
     }
 
     @Override
@@ -340,7 +340,7 @@ public final class DataFlowStream<T> implements FList<T> {
     }
 
     public void wheneverBound(final Closure closure) {
-        wheneverBoundListeners.add(new DataCallback(closure, DataFlow.retrieveCurrentDFPGroup()));
+        wheneverBoundListeners.add(new DataCallback(closure, Dataflow.retrieveCurrentDFPGroup()));
         first.whenBound(closure);
     }
 
@@ -355,7 +355,7 @@ public final class DataFlowStream<T> implements FList<T> {
      * @param expr The expression to hook all the when bound listeners to
      * @return The supplied expression handler to allow method chaining
      */
-    private DataFlowExpression<T> hookWheneverBoundListeners(final DataFlowExpression<T> expr) {
+    private DataflowExpression<T> hookWheneverBoundListeners(final DataflowExpression<T> expr) {
         for (final MessageStream listener : wheneverBoundListeners) {
             expr.whenBound(listener);
         }

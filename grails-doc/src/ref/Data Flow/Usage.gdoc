@@ -1,11 +1,11 @@
 h3. Dataflow Variables
 
 {code}
-import static groovyx.gpars.dataflow.DataFlow.task
+import static groovyx.gpars.dataflow.Dataflow.task
 
-final def x = new DataFlowVariable()
-final def y = new DataFlowVariable()
-final def z = new DataFlowVariable()
+final def x = new DataflowVariable()
+final def y = new DataflowVariable()
+final def z = new DataflowVariable()
 
 task {
     z << x.val + y.val
@@ -21,13 +21,13 @@ task {
 }
 {code}
 
-h3. DataFlows
+h3. Dataflows
 
 {code}
 
-import static groovyx.gpars.dataflow.DataFlow.task
+import static groovyx.gpars.dataflow.Dataflow.task
 
-final def df = new DataFlows()
+final def df = new Dataflows()
 
 task {
     df.z = df.x + df.y
@@ -45,10 +45,10 @@ task {
 
 h3. Dataflow Queues
 
-{code}import static groovyx.gpars.dataflow.DataFlow.task
+{code}import static groovyx.gpars.dataflow.Dataflow.task
 
 def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']
-final def buffer = new DataFlowQueue()
+final def buffer = new DataflowQueue()
 
 task {
     for (word in words) {
@@ -64,7 +64,7 @@ task {
 h3. Bind handlers
 
 {code}
-def a = new DataFlowVariable()
+def a = new DataflowVariable()
 a >> {println "The variable has just been bound to $it"}
 a.whenBound {println "Just to confirm that the variable has been really set to $it"}
 ...

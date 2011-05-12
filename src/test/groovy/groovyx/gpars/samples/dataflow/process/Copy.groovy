@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package groovyx.gpars.samples.dataflow.process
 
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowChannel
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowChannel
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Callable
 
 final class Copy implements Callable {
-    private final DataFlowChannel inChannel
-    private final DataFlowChannel outChannel1
-    private final DataFlowChannel outChannel2
+    private final DataflowChannel inChannel
+    private final DataflowChannel outChannel1
+    private final DataflowChannel outChannel2
 
     def Copy(final inChannel, final outChannel1, final outChannel2) {
         this.inChannel = inChannel;
@@ -33,7 +33,7 @@ final class Copy implements Callable {
     }
 
     public def call() {
-        final PGroup group = DataFlow.retrieveCurrentDFPGroup()
+        final PGroup group = Dataflow.retrieveCurrentDFPGroup()
         while (true) {
             def i = inChannel.val
             group.task {

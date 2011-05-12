@@ -68,8 +68,8 @@ Please refer to the Dataflow Concurrency section of the User Guide for details o
 
 {code}
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.task
 
 def alternative1 = {
     'http://www.dzone.com/links/index.html'.toURL().text
@@ -88,8 +88,8 @@ def alternative4 = {
 }
 
 //Pick either one of the following, both will work:
-final def result = new DataFlowQueue()
-//  final def result = new DataFlowVariable()
+final def result = new DataflowQueue()
+//  final def result = new DataflowVariable()
 
 [alternative1, alternative2, alternative3, alternative4].each {code ->
     task {

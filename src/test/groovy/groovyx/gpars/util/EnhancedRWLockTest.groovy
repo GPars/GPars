@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package groovyx.gpars.util
 
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.concurrent.TimeUnit
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 
 /**
  *
@@ -34,11 +34,11 @@ class EnhancedRWLockTest extends GroovyTestCase {
             lock.readLock().unlock()
             assertFalse lock.writeLock().tryLock(10, TimeUnit.MILLISECONDS)
 
-            final def result1 = new DataFlowVariable<Boolean>()
-            Thread.start {result1 << lock.readLock().tryLock(10, TimeUnit.MILLISECONDS);lock.readLock().unlock()}
+            final def result1 = new DataflowVariable<Boolean>()
+            Thread.start {result1 << lock.readLock().tryLock(10, TimeUnit.MILLISECONDS); lock.readLock().unlock()}
             assertTrue result1.val
 
-            final def result2 = new DataFlowVariable<Boolean>()
+            final def result2 = new DataflowVariable<Boolean>()
             Thread.start {result2 << lock.writeLock().tryLock(10, TimeUnit.MILLISECONDS)}
             assertFalse result2.val
         }
@@ -52,11 +52,11 @@ class EnhancedRWLockTest extends GroovyTestCase {
             assertTrue lock.writeLock().tryLock()
             lock.writeLock().unlock()
 
-            final def result1 = new DataFlowVariable<Boolean>()
+            final def result1 = new DataflowVariable<Boolean>()
             Thread.start {result1 << lock.readLock().tryLock(10, TimeUnit.MILLISECONDS)}
             assertFalse result1.val
 
-            final def result2 = new DataFlowVariable<Boolean>()
+            final def result2 = new DataflowVariable<Boolean>()
             Thread.start {result2 << lock.writeLock().tryLock(10, TimeUnit.MILLISECONDS)}
             assertFalse result2.val
         }

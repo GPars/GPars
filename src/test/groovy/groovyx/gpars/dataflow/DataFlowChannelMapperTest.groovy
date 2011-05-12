@@ -16,8 +16,8 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.dataflow.operator.DataFlowPoisson
-import static groovyx.gpars.dataflow.DataFlow.operator
+import groovyx.gpars.dataflow.operator.DataflowPoisson
+import static groovyx.gpars.dataflow.Dataflow.operator
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,11 +26,11 @@ import static groovyx.gpars.dataflow.DataFlow.operator
  * Time: 14:28
  * To change this template use File | Settings | File Templates.
  */
-class DataFlowChannelMapperTest extends GroovyTestCase {
+class DataflowChannelMapperTest extends GroovyTestCase {
 
     public void testCreationFromQueue() {
-        final DataFlowQueue queue = new DataFlowQueue()
-        final DataFlowReadChannel filteredQueue = new DataFlowQueue()
+        final DataflowQueue queue = new DataflowQueue()
+        final DataflowReadChannel filteredQueue = new DataflowQueue()
         operator(queue, filteredQueue) {
             bindOutput it * 2
         }
@@ -41,12 +41,12 @@ class DataFlowChannelMapperTest extends GroovyTestCase {
         assert 4 == filteredQueue.val
         assert 6 == filteredQueue.val
         assert !filteredQueue.isBound()
-        queue.bind(DataFlowPoisson.instance)
+        queue.bind(DataflowPoisson.instance)
     }
 
     public void testCreationFromBroadCast() {
-        final DataFlowBroadcast queue = new DataFlowBroadcast()
-        final DataFlowReadChannel filteredQueue = new DataFlowQueue()
+        final DataflowBroadcast queue = new DataflowBroadcast()
+        final DataflowReadChannel filteredQueue = new DataflowQueue()
         operator(queue.createReadChannel(), filteredQueue) {
             bindOutput it * 2
         }
@@ -57,6 +57,6 @@ class DataFlowChannelMapperTest extends GroovyTestCase {
         assert 4 == filteredQueue.val
         assert 6 == filteredQueue.val
         assert !filteredQueue.isBound()
-        queue.bind(DataFlowPoisson.instance)
+        queue.bind(DataflowPoisson.instance)
     }
 }

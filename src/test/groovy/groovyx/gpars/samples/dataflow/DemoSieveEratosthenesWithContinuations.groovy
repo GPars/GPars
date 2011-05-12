@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 
 /**
  * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks with asynchronous value retrieval
- * Asynchronous value retrieval releases the current task's thread whenever waiting for a value to read from the DataFlowQueue.
+ * Asynchronous value retrieval releases the current task's thread whenever waiting for a value to read from the DataflowQueue.
  *
  * In principle, the algorithm consists of concurrently run chained filters,
  * each of which detects whether the current number can be divided by a single prime number.
@@ -33,7 +33,7 @@ group = new DefaultPGroup()
 
 final int requestedPrimeNumberCount = 1000
 
-final DataFlowQueue initialChannel = new DataFlowQueue()
+final DataflowQueue initialChannel = new DataflowQueue()
 
 /**
  * Generating candidate numbers
@@ -51,7 +51,7 @@ group.task {
  * @return A new channel ending the whole chain
  */
 def filter(inChannel, int prime) {
-    def outChannel = new DataFlowQueue()
+    def outChannel = new DataflowQueue()
     inChannel.whenBound {
         doFilter(it, prime, inChannel, outChannel)
     }

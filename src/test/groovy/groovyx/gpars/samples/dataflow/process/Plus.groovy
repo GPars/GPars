@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package groovyx.gpars.samples.dataflow.process
 
-import groovyx.gpars.dataflow.DataFlowChannel
+import groovyx.gpars.dataflow.DataflowChannel
 import java.util.concurrent.Callable
 
 final class Plus implements Callable {
-    private final DataFlowChannel inChannel1
-    private final DataFlowChannel inChannel2
-    private final DataFlowChannel outChannel
+    private final DataflowChannel inChannel1
+    private final DataflowChannel inChannel2
+    private final DataflowChannel outChannel
 
     def Plus(final inChannel1, final inChannel2, final outChannel) {
         this.inChannel1 = inChannel1;

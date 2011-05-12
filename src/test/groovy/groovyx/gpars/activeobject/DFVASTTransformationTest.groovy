@@ -24,15 +24,15 @@ public class DFVASTTransformationTest extends GroovyTestCase {
         final GroovyShell shell = new GroovyShell()
         def (a, b) = shell.evaluate("""
 import groovyx.gpars.activeobject.*
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 @ActiveObject
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 
     @ActiveMethod
-    DataFlowVariable foo() {
+    DataflowVariable foo() {
         result << Thread.currentThread()
-        new DataFlowVariable() << 10
+        new DataflowVariable() << 10
     }
 }
 
@@ -55,11 +55,11 @@ class B extends A {
         final GroovyShell shell = new GroovyShell()
         def (a) = shell.evaluate("""
 import groovyx.gpars.activeobject.*
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.CyclicBarrier
 @ActiveObject
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
     def barrier = new CyclicBarrier(2)
 
     @ActiveMethod
@@ -87,11 +87,11 @@ class B extends A {
         final GroovyShell shell = new GroovyShell()
         def (a) = shell.evaluate("""
 import groovyx.gpars.activeobject.*
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.CyclicBarrier
 @ActiveObject
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
     def barrier = new CyclicBarrier(2)
 
     @ActiveMethod
@@ -125,10 +125,10 @@ class B extends A {
         shouldFail(MultipleCompilationErrorsException) {
             shell.evaluate("""
     import groovyx.gpars.activeobject.*
-    import groovyx.gpars.dataflow.DataFlowVariable
+    import groovyx.gpars.dataflow.DataflowVariable
     @ActiveObject
     class A {
-        def result = new DataFlowVariable()
+        def result = new DataflowVariable()
 
         @ActiveMethod
         int foo() {

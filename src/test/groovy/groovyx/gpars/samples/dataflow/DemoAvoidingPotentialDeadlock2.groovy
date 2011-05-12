@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import groovyx.gpars.scheduler.DefaultPool
 
 /**
  * Demonstrates deadlock prevention using the whenBound (>>) dataflow construct. Instead of blocking the task
- * together with its underlying thread on a read call to DataFlowVariable.val, the whenBound handler will be invoked only
- * after the value of the DataFlowVariable is set and so the reader doesn't consume a thread while waiting for a value
+ * together with its underlying thread on a read call to DataflowVariable.val, the whenBound handler will be invoked only
+ * after the value of the DataflowVariable is set and so the reader doesn't consume a thread while waiting for a value
  * to arrive.
  * The code would end up deadlocked if we blocked the threads during reads, since the first two tasks
  * wait for each other to bind values to a and b. Only the third thread can unlock the two threads by setting value of a.
@@ -34,8 +34,8 @@ import groovyx.gpars.scheduler.DefaultPool
 
 final PGroup group = new DefaultPGroup(new DefaultPool(true, 1))
 
-final def a = new DataFlowVariable()
-final def b = new DataFlowVariable()
+final def a = new DataflowVariable()
+final def b = new DataflowVariable()
 
 group.with {
     task {

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,29 +22,29 @@ package groovyx.gpars.dataflow;
  * @author Vaclav Pech
  *         Date: 21st Sep 2010
  */
-public interface DataFlowWriteChannel<T> {
+public interface DataflowWriteChannel<T> {
 
     /**
-     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataflowVariable
      *
      * @param value The value to assign
      * @return The current channel instance
      */
-    DataFlowWriteChannel<T> leftShift(final T value);
+    DataflowWriteChannel<T> leftShift(final T value);
 
     /**
-     * Assigns a value to the variable. Can only be invoked once on each instance of DataFlowVariable
+     * Assigns a value to the variable. Can only be invoked once on each instance of DataflowVariable
      *
      * @param value The value to assign
      */
     void bind(final T value);
 
     /**
-     * Assigns a value from one DataFlowVariable instance to this variable.
-     * Can only be invoked once on each instance of DataFlowVariable
+     * Assigns a value from one DataflowVariable instance to this variable.
+     * Can only be invoked once on each instance of DataflowVariable
      *
-     * @param ref The DataFlowVariable instance the value of which to bind
+     * @param ref The DataflowVariable instance the value of which to bind
      * @return The current channel instance
      */
-    DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref);
+    DataflowWriteChannel<T> leftShift(final DataflowReadChannel<T> ref);
 }

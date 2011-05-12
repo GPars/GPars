@@ -17,7 +17,7 @@
 package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflows
 import java.util.concurrent.CyclicBarrier
 
 /**
@@ -27,7 +27,7 @@ import java.util.concurrent.CyclicBarrier
 public class ReceiveTest extends GroovyTestCase {
 
     public void testReceive() {
-        final DataFlows df = new DataFlows()
+        final Dataflows df = new Dataflows()
 
         def actor = Actors.blockingActor {
             df.result1 = receive()
@@ -48,7 +48,7 @@ public class ReceiveTest extends GroovyTestCase {
     }
 
     public void testNestedReceive() {
-        final DataFlows df = new DataFlows()
+        final Dataflows df = new Dataflows()
 
         def actor = Actors.blockingActor {
             while (true) {
@@ -86,7 +86,7 @@ public class ReceiveTest extends GroovyTestCase {
     }
 
     public void testReceiveInLoops() {
-        final DataFlows df = new DataFlows()
+        final Dataflows df = new Dataflows()
         final def barrier = new CyclicBarrier(2)
 
         def actor = Actors.blockingActor {

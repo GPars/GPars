@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
- * A producer-consumer demo using the DataFlowQueue class. Producer downloads web content from a list of urls,
+ * A producer-consumer demo using the DataflowQueue class. Producer downloads web content from a list of urls,
  * the consumer then counts number of sites referring Groovy. 
  */
 
-def buffer = new DataFlowQueue()
+def buffer = new DataflowQueue()
 
 final def urls = [
         'http://www.dzone.com',
@@ -35,7 +35,7 @@ final def urls = [
 
 task {
     for (url in urls) {
-        final def site = new DataFlowVariable()
+        final def site = new DataflowVariable()
         buffer << site
         site << url.toURL().text
     }

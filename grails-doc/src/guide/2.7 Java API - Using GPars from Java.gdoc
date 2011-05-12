@@ -16,7 +16,7 @@ To overcome the lack of closures as a language element in Java and to avoid forc
 through the Java API, a few handy wrapper classes have been provided to help you define callbacks, actor body or dataflow tasks.
 * groovyx.gpars.MessagingRunnable - used for single-argument callbacks or actor body
 * groovyx.gpars.ReactorMessagingRunnable - used for ReactiveActor body
-* groovyx.gpars.DataFlowMessagingRunnable - used for dataflow operators' body
+* groovyx.gpars.DataflowMessagingRunnable - used for dataflow operators' body
 
 These classes can be used in all places GPars API expects a Groovy closure.
 
@@ -135,23 +135,23 @@ h3. Agents
 
 h3. Dataflow Concurrency
 
-Both _DataFlowVariables_ and _DataFlowQueues_ can be used from Java without any hiccups. Just avoid the handy overloaded operators
+Both _DataflowVariables_ and _DataflowQueues_ can be used from Java without any hiccups. Just avoid the handy overloaded operators
 and go straight to the methods, like _bind_ , _whenBound_, _getVal_ and other.
 You may also continue using dataflow _tasks_ passing to them instances of _Runnable_ or _Callable_ just like groovy _Closure_ .
 
 {code}
 
 import groovyx.gpars.MessagingRunnable;
-import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.group.DefaultPGroup;
 
 import java.util.concurrent.Callable;
 
-public class DataFlowTaskDemo {
+public class DataflowTaskDemo {
     public static void main(final String[] args) throws InterruptedException {
         final DefaultPGroup group = new DefaultPGroup(10);
 
-        final DataFlowVariable a = new DataFlowVariable();
+        final DataflowVariable a = new DataflowVariable();
 
         group.task(new Runnable() {
             public void run() {
@@ -159,7 +159,7 @@ public class DataFlowTaskDemo {
             }
         });
 
-        final DataFlowVariable result = group.task(new Callable() {
+        final DataflowVariable result = group.task(new Callable() {
             public Object call() throws Exception {
                 return (Integer)a.getVal() + 10;
             }
@@ -180,27 +180,27 @@ h3. Dataflow operators
 
 The sample below should illustrate the main differences between Groovy and Java API for dataflow operators.
 # Use the convenience factory methods accepting list of channels to create operators or selectors
-# Use _DataFlowMessagingRunnable_ to specify the operator body
+# Use _DataflowMessagingRunnable_ to specify the operator body
 # Call _getOwningProcessor()_ to get hold of the operator from within the body in order to e.g. bind output values
 
 {code}
 
-import groovyx.gpars.DataFlowMessagingRunnable;
-import groovyx.gpars.dataflow.DataFlow;
-import groovyx.gpars.dataflow.DataFlowQueue;
-import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+import groovyx.gpars.DataflowMessagingRunnable;
+import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowQueue;
+import groovyx.gpars.dataflow.operator.DataflowProcessor;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class DataflowOperatorDemo {
     public static void main(final String[] args) throws InterruptedException {
-        final DataFlowQueue stream1 = new DataFlowQueue();
-        final DataFlowQueue stream2 = new DataFlowQueue();
-        final DataFlowQueue stream3 = new DataFlowQueue();
-        final DataFlowQueue stream4 = new DataFlowQueue();
+        final DataflowQueue stream1 = new DataflowQueue();
+        final DataflowQueue stream2 = new DataflowQueue();
+        final DataflowQueue stream3 = new DataflowQueue();
+        final DataflowQueue stream4 = new DataflowQueue();
 
-        final DataFlowProcessor op1 = DataFlow.selector(Arrays.asList(stream1), Arrays.asList(stream2), new DataFlowMessagingRunnable(1) {
+        final DataflowProcessor op1 = Dataflow.selector(Arrays.asList(stream1), Arrays.asList(stream2), new DataflowMessagingRunnable(1) {
             @Override protected void doRun(final Object[] objects) {
                 getOwningProcessor().bindOutput(2*(Integer)objects[0]);
             }
@@ -208,7 +208,7 @@ public class DataflowOperatorDemo {
 
         final List secondOperatorInput = Arrays.asList(stream2, stream3);
 
-        final DataFlowProcessor op2 = DataFlow.operator(secondOperatorInput, Arrays.asList(stream4), new DataFlowMessagingRunnable(2) {
+        final DataflowProcessor op2 = Dataflow.operator(secondOperatorInput, Arrays.asList(stream4), new DataflowMessagingRunnable(2) {
             @Override protected void doRun(final Object[] objects) {
                 getOwningProcessor().bindOutput((Integer) objects[0] + (Integer) objects[1]);
             }

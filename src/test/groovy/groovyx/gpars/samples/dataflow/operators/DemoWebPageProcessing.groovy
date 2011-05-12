@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package groovyx.gpars.samples.dataflow.operators
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.operator
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.operator
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Builds a network of dataflow operators, which will in turn complete provided urls, download them, search for the words
@@ -32,13 +32,13 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * Date 22nd Sep 2010
  */
 
-final DataFlowQueue urlsRequests = new DataFlowQueue()
-final DataFlowQueue urls = new DataFlowQueue()
-final DataFlowQueue pagesForGroovy = new DataFlowQueue()
-final DataFlowQueue pagesForScala = new DataFlowQueue()
-final DataFlowQueue resultsFromGroovy = new DataFlowQueue()
-final DataFlowQueue resultsFromScala = new DataFlowQueue()
-final DataFlowQueue reports = new DataFlowQueue()
+final DataflowQueue urlsRequests = new DataflowQueue()
+final DataflowQueue urls = new DataflowQueue()
+final DataflowQueue pagesForGroovy = new DataflowQueue()
+final DataflowQueue pagesForScala = new DataflowQueue()
+final DataflowQueue resultsFromGroovy = new DataflowQueue()
+final DataflowQueue resultsFromScala = new DataflowQueue()
+final DataflowQueue reports = new DataflowQueue()
 
 def urlResolver = operator(urlsRequests, urls) {
     bindOutput([url: "http://www.${it}.com"])

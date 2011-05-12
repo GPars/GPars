@@ -16,7 +16,7 @@
 
 package groovyx.gpars.activeobject
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import groovyx.gpars.dataflow.Promise
 
@@ -144,10 +144,10 @@ import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
 
-    import groovyx.gpars.dataflow.DataFlowVariable
+    import groovyx.gpars.dataflow.DataflowVariable
     @ActiveObject
     class A {
-    static DataFlowVariable result = new DataFlowVariable()
+    static DataflowVariable result = new DataflowVariable()
         @ActiveMethod
         static def foo(value) {
         result << Thread.currentThread()
@@ -164,9 +164,9 @@ import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
     @ActiveMethod
     def foo(value) {
         result << Thread.currentThread()
@@ -198,10 +198,10 @@ class B extends A {
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 @ActiveObject
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 }
 
 class B extends A {
@@ -230,9 +230,9 @@ class B extends A {
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 
     def foo(value) {
         result << Thread.currentThread()
@@ -267,10 +267,10 @@ class B extends A {
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 @ActiveObject
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
     @ActiveMethod
     def fooA(value) {
         result << Thread.currentThread()
@@ -310,7 +310,7 @@ class C extends B {
         def (a, b, c1, c2) = shell.evaluate("""
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 @ActiveObject
 class C extends B {
     @ActiveMethod
@@ -324,7 +324,7 @@ class B extends A {
 
 @ActiveObject
 class A {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
     @ActiveMethod
     def fooA(value) {
         result << Thread.currentThread()
@@ -380,10 +380,10 @@ new Decryptor()
         def a = shell.evaluate("""
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 @ActiveObject
 class A {
-    def result = new DataFlowQueue()
+    def result = new DataflowQueue()
     def nonActiveFoo(value) {
         result << Thread.currentThread()
     }
@@ -414,10 +414,10 @@ new A()
         def a = shell.evaluate("""
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.activeobject.ActiveMethod
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 @ActiveObject
 class A {
-    def result = new DataFlowQueue()
+    def result = new DataflowQueue()
     @ActiveMethod(blocking=true)
     def activeFoo1(value) {
         result << Thread.currentThread()
@@ -450,7 +450,7 @@ new A()
             shell.evaluate("""
     import groovyx.gpars.activeobject.ActiveObject
     import groovyx.gpars.activeobject.ActiveMethod
-    import groovyx.gpars.dataflow.DataFlowVariable
+    import groovyx.gpars.dataflow.DataflowVariable
     @ActiveObject(actorName = "fieldB")
     class C extends B {
         @ActiveMethod
@@ -464,7 +464,7 @@ new A()
 
     @ActiveObject(actorName = "fieldA")
     class A {
-        def result = new DataFlowVariable()
+        def result = new DataflowVariable()
         @ActiveMethod
         def fooA(value) {
             result << Thread.currentThread()
@@ -478,7 +478,7 @@ new A()
 }
 @ActiveObject
 class MyWrapper {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 
     def foo() {
         println 'Foo'

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import spock.lang.Specification
 class DFSpockTest extends Specification {
 
     def "data flow variable gets assigned"() {
-        def result = new DataFlowVariable()
+        def result = new DataflowVariable()
         when: result << 10
         then:
         result.val == 10
@@ -29,7 +29,7 @@ class DFSpockTest extends Specification {
     }
 
     def "data flow variable cannot be re-assigned"() {
-        def result = new DataFlowVariable()
+        def result = new DataflowVariable()
         given: result << 10
         when: result << 20
         then:

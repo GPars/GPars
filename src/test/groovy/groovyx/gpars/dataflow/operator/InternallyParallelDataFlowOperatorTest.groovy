@@ -17,9 +17,9 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
@@ -29,7 +29,7 @@ import java.util.concurrent.CyclicBarrier
  * Date: Mar 8, 2010
  */
 
-public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
+public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
 
     private PGroup group
 
@@ -45,11 +45,11 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
 
 
     public void testOneForkOperator() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowVariable d = new DataFlowVariable()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowVariable d = new DataflowVariable()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: 1) {x, y, z ->
             bindOutput 0, x + y + z
@@ -67,11 +67,11 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testTwoForkOperator() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowVariable d = new DataFlowVariable()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowVariable d = new DataflowVariable()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: 2) {x, y, z ->
             bindOutput 0, x + y + z
@@ -97,11 +97,11 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     private def performParallelismTest(int poolSize, forks) {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
         final DefaultPGroup group = new DefaultPGroup(poolSize)
 
         final int parties = Math.min(poolSize - 1, forks)
@@ -113,9 +113,9 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
             bindOutput 1, Thread.currentThread().name.hashCode()
         }
 
-        DataFlow.task { a << 5 }
-        DataFlow.task { b << 10 }
-        DataFlow.task { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].each {c << it} }
+        Dataflow.task { a << 5 }
+        Dataflow.task { b << 10 }
+        Dataflow.task { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].each {c << it} }
 
         def results = (1..16).collect {d.val}
         assertEquals 16, results.size()
@@ -131,11 +131,11 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testInvalidMaxForks() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowVariable d = new DataFlowVariable()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowVariable d = new DataflowVariable()
+        final DataflowQueue e = new DataflowQueue()
 
         shouldFail(IllegalArgumentException) {
             group.operator(inputs: [a, b, c], outputs: [d, e], maxForks: 0) {x, y, z -> }
@@ -146,8 +146,8 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def selector1 = group.operator(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
         def selector2 = group.operator(inputs: [a], maxForks: 2) {v -> stop()}
@@ -161,8 +161,8 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         shouldFail(IllegalArgumentException) {
             group.operator(inputs1: [a], outputs: [d], maxForks: 2) {v -> }
@@ -176,8 +176,8 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testException() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlowVariable a = new DataFlowVariable()
+        final DataflowQueue stream = new DataflowQueue()
+        final DataflowVariable a = new DataflowVariable()
 
         def op = group.operator(inputs: [stream], outputs: [], maxFork: 3) {
             throw new RuntimeException('test')
@@ -191,7 +191,7 @@ public class InternallyParallelDataFlowOperatorTest extends GroovyTestCase {
     }
 
     public void testExceptionWithDefaultHandler() {
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
 
         def op = group.operator(inputs: [stream], outputs: [], maxFork: 3) {
             if (it == 'invalidValue') throw new RuntimeException('test')

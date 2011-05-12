@@ -16,8 +16,8 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
  * Date: Sep 9, 2009
  */
 
-public class DataFlowSelectorTest extends GroovyTestCase {
+public class DataflowSelectorTest extends GroovyTestCase {
 
     private PGroup group
 
@@ -43,11 +43,11 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testSelector() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b, c], outputs: [d, e]) {x ->
             bindOutput 0, x
@@ -67,10 +67,10 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testSelectorNotResubscribesOnDFVs() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b, c], outputs: [d]) {x ->
             bindOutput 0, x
@@ -92,11 +92,11 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testDefaultCopySelector() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b, c], outputs: [d, e])
 
@@ -115,11 +115,11 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testSelectorWithIndex() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b, c], outputs: [d, e]) {x, index ->
             bindOutput 0, x
@@ -143,8 +143,8 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testOperatorWithDoubleWaitOnChannel() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         def op = group.selector(inputs: [a, a], outputs: [b]) {x ->
@@ -167,9 +167,9 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testStop() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
         final CyclicBarrier barrier = new CyclicBarrier(2)
         volatile int counter = 0
 
@@ -188,8 +188,8 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testInterrupt() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
         volatile boolean flag = false
 
         def op1 = group.selector(inputs: [a], outputs: [b]) {v ->
@@ -207,7 +207,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testEmptyInputs() {
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue b = new DataflowQueue()
         volatile boolean flag = false
 
         shouldFail(IllegalArgumentException) {
@@ -221,9 +221,9 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testOutputs() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
         volatile boolean flag = false
 
         def op1 = group.selector(inputs: [a], outputs: [b, c]) {
@@ -238,7 +238,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testEmptyOutputs() {
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue b = new DataflowQueue()
         volatile boolean flag = false
 
         def op1 = group.selector(inputs: [b], outputs: []) {
@@ -252,10 +252,10 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testInputNumber() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         group.selector(inputs: [a, b], outputs: [d]) {}.stop()
         group.selector(inputs: [a, b], outputs: [d]) {x ->}.stop()
@@ -282,8 +282,8 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testOutputNumber() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def selector1 = group.selector(inputs: [a], outputs: []) {v -> stop()}
         def selector2 = group.selector(inputs: [a]) {v -> stop()}
@@ -297,7 +297,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testMissingChannels() {
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         shouldFail(IllegalArgumentException) {
             group.selector(outputs: [d]) {v -> }
@@ -308,8 +308,8 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testException() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlowVariable a = new DataFlowVariable()
+        final DataflowQueue stream = new DataflowQueue()
+        final DataflowVariable a = new DataflowVariable()
 
         def op = group.selector(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
@@ -323,7 +323,7 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testExceptionWithDefaultHandler() {
-        final DataFlowQueue stream = new DataFlowQueue()
+        final DataflowQueue stream = new DataflowQueue()
 
         def op = group.selector(inputs: [stream], outputs: []) {
             if (it == 'invalidValue') throw new RuntimeException('test')
@@ -335,10 +335,10 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testGuards() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b, c], outputs: [d]) {
             if (it == 1) setGuard(0, false)
@@ -364,10 +364,10 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testInitialGuards() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b, c], outputs: [d], guards: [false, true, true]) {
             if (it == 3) setGuards([true, false, false])
@@ -388,8 +388,8 @@ public class DataFlowSelectorTest extends GroovyTestCase {
     }
 
     public void testSelectorDoesNotConsumeMessagesAfterStop() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
 
         group.selector(inputs: [a], outputs: [b]) {
             bindOutput 0, it

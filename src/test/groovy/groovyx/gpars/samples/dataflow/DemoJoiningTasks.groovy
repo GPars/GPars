@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates composing tasks
@@ -27,10 +27,10 @@ import static groovyx.gpars.dataflow.DataFlow.task
  */
 
 task {
-    final DataFlowVariable t1 = task {
+    final DataflowVariable t1 = task {
         println 'First sub-task running.'
     }
-    final DataFlowVariable t2 = task {
+    final DataflowVariable t2 = task {
         println 'Second sub-task running'
     }
     [t1, t2]*.join()
@@ -40,10 +40,10 @@ task {
 def volatile a, b, c
 
 task {
-    final DataFlowVariable t1 = task {
+    final DataflowVariable t1 = task {
         a = Math.random()
     }
-    final DataFlowVariable t2 = task {
+    final DataflowVariable t2 = task {
         b = Math.random()
     }
 

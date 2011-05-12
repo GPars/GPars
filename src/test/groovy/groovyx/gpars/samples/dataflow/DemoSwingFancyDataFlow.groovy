@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
 import groovyx.gpars.GParsPool
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.Dataflows
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.JFrame
@@ -32,7 +32,7 @@ import javax.swing.JFrame
  */
 
 def values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-final DataFlows df = new DataFlows()
+final Dataflows df = new Dataflows()
 final SwingBuilder builder = new SwingBuilder()
 
 builder.build {
@@ -47,7 +47,7 @@ builder.build {
     frame.pack()
 }
 
-DataFlow.task {
+Dataflow.task {
     int sum = 0
     values.eachWithIndex {value, index ->
         builder.edt {

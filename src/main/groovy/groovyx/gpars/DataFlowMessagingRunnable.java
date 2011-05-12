@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package groovyx.gpars;
 
 import groovy.lang.Closure;
-import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+import groovyx.gpars.dataflow.operator.DataflowProcessor;
 
 import java.util.Arrays;
 
@@ -28,16 +28,16 @@ import java.util.Arrays;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
-public abstract class DataFlowMessagingRunnable extends Closure {
+public abstract class DataflowMessagingRunnable extends Closure {
     private static final long serialVersionUID = 4796783310470426395L;
     private final Class[] defaultParamTypes;
     private final int numberOfParameters;
 
-    protected DataFlowMessagingRunnable(final int numberOfParameters) {
+    protected DataflowMessagingRunnable(final int numberOfParameters) {
         this(null, numberOfParameters);
     }
 
-    protected DataFlowMessagingRunnable(final Object owner, final int numberOfParameters) {
+    protected DataflowMessagingRunnable(final Object owner, final int numberOfParameters) {
         super(owner);
         this.numberOfParameters = numberOfParameters;
         this.defaultParamTypes = new Class[numberOfParameters];
@@ -45,12 +45,12 @@ public abstract class DataFlowMessagingRunnable extends Closure {
     }
 
     /**
-     * Retrieves the owning processor (operator or selector) giving the DataFlowMessagingRunnable a way to call methods like bindOutput()
+     * Retrieves the owning processor (operator or selector) giving the DataflowMessagingRunnable a way to call methods like bindOutput()
      *
      * @return The owning processor
      */
-    public DataFlowProcessor getOwningProcessor() {
-        return (DataFlowProcessor) getDelegate();
+    public DataflowProcessor getOwningProcessor() {
+        return (DataflowProcessor) getDelegate();
     }
 
     @Override

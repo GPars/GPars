@@ -16,11 +16,11 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import static groovyx.gpars.GParsPool.withPool
 
 /**
- * Demonstrates the way to use DataFlowVariables and tasks to create and combine composable asynchronous functions.
+ * Demonstrates the way to use DataflowVariables and tasks to create and combine composable asynchronous functions.
  * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
  * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
  *
@@ -29,7 +29,7 @@ import static groovyx.gpars.GParsPool.withPool
  */
 
 def asyncPlus = {a, b ->
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
     a >> {
         b >> {
             result << a + b
@@ -40,15 +40,15 @@ def asyncPlus = {a, b ->
 
 def range = 0..100000
 withPool {
-    def result = range.collectParallel {new DataFlowVariable() << it}.parallel.reduce(asyncPlus)
+    def result = range.collectParallel {new DataflowVariable() << it}.parallel.reduce(asyncPlus)
     println "Doing something else while the calculation is running"
     println result.val
 
-    result = range.collectParallel {new DataFlowVariable() << it}.foldParallel(asyncPlus)
+    result = range.collectParallel {new DataflowVariable() << it}.foldParallel(asyncPlus)
     println "Doing something else while the calculation is running"
     println result.val
 }
 
-def result = range.collect {new DataFlowVariable() << it}.inject(new DataFlowVariable() << 0, asyncPlus)
+def result = range.collect {new DataflowVariable() << it}.inject(new DataflowVariable() << 0, asyncPlus)
 println "Doing something else while the calculation is running"
 println result.val

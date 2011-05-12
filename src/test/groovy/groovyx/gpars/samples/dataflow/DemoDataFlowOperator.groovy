@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
 
 /**
  * Uses dataflow operators to download websites, cache their contents and check, whether they talk about particular technologies.
@@ -29,24 +29,24 @@ import groovyx.gpars.dataflow.DataFlowQueue
 /**
  * Feed for URLs to retrieve from the cache
  */
-def urlRequests = new DataFlowQueue()
+def urlRequests = new DataflowQueue()
 
 /**
  * Feed for URLs to download since they are not cached
  */
-def downloadRequests = new DataFlowQueue()
+def downloadRequests = new DataflowQueue()
 
 /**
  * Feed for site contents
  */
-def sites = new DataFlowQueue()
+def sites = new DataflowQueue()
 
 /**
  * DOWNLOADER
  *
  * Downloads received urls passing downloaded content to the output
  */
-def downloader = DataFlow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
+def downloader = Dataflow.operator(inputs: [downloadRequests], outputs: [urlRequests]) {request ->
 
     println "[Downloader] Downloading ${request.site}"
     def content = request.site.toURL().text
@@ -63,7 +63,7 @@ pendingDownloads = [:]
  * Caches sites' contents. Accepts requests for url content, outputs the content. Outputs requests for download
  * if the site is not in cache yet.
  */
-def cache = DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
+def cache = Dataflow.operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 
     if (request.content) {
         println "[Cache] Caching ${request.site}"
@@ -100,14 +100,14 @@ def cache = DataFlow.operator(inputs: [urlRequests], outputs: [downloadRequests,
 /**
  * Feed for the results
  */
-def results = new DataFlowQueue()
+def results = new DataflowQueue()
 
 /**
  * FINDER
  *
  * Accepts sites' content searching for requested word in them. Sends the result to the results stream.
  */
-def finder = DataFlow.operator(inputs: [sites], outputs: [results]) {request ->
+def finder = Dataflow.operator(inputs: [sites], outputs: [results]) {request ->
     println "[Finder] Searching for ${request.word} in ${request.site}."
     def result = request.content.toUpperCase().contains(request.word.toUpperCase())
     results << "${result ? '' : 'No '}${request.word} in ${request.site}."
@@ -128,7 +128,7 @@ Thread.start {
         //There are multiple ways to get hold of the output feeds
         println "============================================================= Result: " + results.val
 //        println "============================================================= Result: " + finder.output.val
-//        println "============================================================= Result: " + finder.outputs[0].val
+        //        println "============================================================= Result: " + finder.outputs[0].val
     }
     finder.stop()
     cache.stop()

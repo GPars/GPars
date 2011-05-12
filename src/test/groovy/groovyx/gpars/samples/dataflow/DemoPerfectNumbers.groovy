@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 // limitations under the License.
 
 /**
- * Demonstrates DataFlow variables used to calculate perfect numbers concurrently.
+ * Demonstrates Dataflow variables used to calculate perfect numbers concurrently.
  *
  * @author Vaclav Pech
  * Date: Nov 6, 2009
@@ -23,8 +23,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.Dataflows
 import static groovyx.gpars.GParsPool.withPool
 
 def isPerfectSequetial(num) {
@@ -36,12 +36,12 @@ def isPerfectSequetial(num) {
 }
 
 def isPerfectWithDF(Integer num) {
-    final def flows = new DataFlows()
+    final def flows = new Dataflows()
     final def processors = Math.min(num, Runtime.runtime.availableProcessors() + 1)
     def int chunk = num / processors + 1
     for (i in (1..processors)) {
         final int index = i
-        DataFlow.task {
+        Dataflow.task {
             final int start = chunk * (index - 1) + 1
             final int end = Math.min(num, chunk * index)
             def sum = 0
@@ -68,7 +68,7 @@ withPool {
     def perfectNumbers = (1..5000).findAll {isPerfectWithDF it}
     println("Perfect numbers: $perfectNumbers")
 //    perfectNumbers = (33550300..33550400).findAll {isPerfectWithDF it}
-//    println("Perfect numbers: $perfectNumbers")
+    //    println("Perfect numbers: $perfectNumbers")
 }
 
 

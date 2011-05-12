@@ -1,8 +1,8 @@
 h3. The Sieve of Eratosthenes implementation using dataflow tasks
 
 {code}
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks
@@ -10,7 +10,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
 
 final int requestedPrimeNumberCount = 1000
 
-final DataFlowQueue initialChannel = new DataFlowQueue()
+final DataflowQueue initialChannel = new DataflowQueue()
 
 /**
  * Generating candidate numbers
@@ -28,7 +28,7 @@ task {
  * @return A new channel ending the whole chain
  */
 def filter(inChannel, int prime) {
-    def outChannel = new DataFlowQueue()
+    def outChannel = new DataflowQueue()
 
     task {
         while (true) {
@@ -55,9 +55,9 @@ requestedPrimeNumberCount.times {
 h3. The Sieve of Eratosthenes implementation using a combination of dataflow tasks and operators
 
 {code}
-       import groovyx.gpars.dataflow.DataFlowQueue
-       import static groovyx.gpars.dataflow.DataFlow.operator
-       import static groovyx.gpars.dataflow.DataFlow.task
+       import groovyx.gpars.dataflow.DataflowQueue
+       import static groovyx.gpars.dataflow.Dataflow.operator
+       import static groovyx.gpars.dataflow.Dataflow.task
 
        /**
         * Demonstrates concurrent implementation of the Sieve of Eratosthenes using dataflow tasks and operators
@@ -65,7 +65,7 @@ h3. The Sieve of Eratosthenes implementation using a combination of dataflow tas
 
        final int requestedPrimeNumberCount = 100
 
-       final DataFlowQueue initialChannel = new DataFlowQueue()
+       final DataflowQueue initialChannel = new DataflowQueue()
 
        /**
         * Generating candidate numbers
@@ -83,7 +83,7 @@ h3. The Sieve of Eratosthenes implementation using a combination of dataflow tas
         * @return A new channel ending the whole chain
         */
        def filter(inChannel, int prime) {
-           def outChannel = new DataFlowQueue()
+           def outChannel = new DataflowQueue()
 
            operator([inputs: [inChannel], outputs: [outChannel]]) {
                if (it % prime != 0) {

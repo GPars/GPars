@@ -16,11 +16,11 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 
 /**
- * Demonstrates the way to use DataFlowVariables and tasks to create and combine composable asynchronous functions.
+ * Demonstrates the way to use DataflowVariables and tasks to create and combine composable asynchronous functions.
  * Inspired by Alex Miller's post (http://tech.puredanger.com/2011/01/19/lamina-channels-and-async-tasks/)
  * and the experiments at https://github.com/ztellman/lamina/wiki/Asynchronous-functions
  *
@@ -32,7 +32,7 @@ import groovyx.gpars.group.DefaultPGroup
 group = new DefaultPGroup(8)
 
 def fib(n) {
-    final DataFlowVariable result = new DataFlowVariable()
+    final DataflowVariable result = new DataflowVariable()
     if (n <= 2) result << 1
     else {
         group.task {

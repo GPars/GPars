@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.actors.stateful
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import static groovyx.gpars.actor.Actors.actor
 
 def getYearEndClosing(String symbol, int year) {
@@ -31,7 +31,7 @@ def symbols = ['AAPL', 'GOOG', 'IBM', 'MSFT']
 
 def start = System.nanoTime()
 
-final def quotes = new DataFlowQueue()
+final def quotes = new DataflowQueue()
 symbols.each {stock -> actor { quotes << getYearEndClosing(stock, 2008) } }
 def top = ["", 0.0]
 1.upto(symbols.size()) {

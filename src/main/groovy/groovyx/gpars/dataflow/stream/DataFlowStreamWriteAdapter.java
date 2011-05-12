@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,48 +16,48 @@
 
 package groovyx.gpars.dataflow.stream;
 
-import groovyx.gpars.dataflow.DataFlowReadChannel;
-import groovyx.gpars.dataflow.DataFlowWriteChannel;
+import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.DataflowWriteChannel;
 
 /**
- * Adapts a DataFlowStream to accommodate for the DataFlowWriteChannel interface.
+ * Adapts a DataflowStream to accommodate for the DataflowWriteChannel interface.
  * It also synchronizes all changes to the underlying stream allowing multiple threads accessing the stream concurrently.
  *
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
 @SuppressWarnings({"SynchronizedMethod"})
-public class DataFlowStreamWriteAdapter<T> implements DataFlowWriteChannel<T> {
+public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
 
-    private DataFlowStream<T> head;
+    private DataflowStream<T> head;
 
     /**
      * Creates a new adapter
      *
      * @param stream The stream to wrap
      */
-    public DataFlowStreamWriteAdapter(final DataFlowStream<T> stream) {
+    public DataflowStreamWriteAdapter(final DataflowStream<T> stream) {
         this.head = stream;
     }
 
     @Override
-    public final synchronized DataFlowWriteChannel<T> leftShift(final T value) {
+    public final synchronized DataflowWriteChannel<T> leftShift(final T value) {
         head.leftShift(value);
-        head = (DataFlowStream<T>) head.getRest();
+        head = (DataflowStream<T>) head.getRest();
         return this;
     }
 
     @Override
-    public final synchronized DataFlowWriteChannel<T> leftShift(final DataFlowReadChannel<T> ref) {
+    public final synchronized DataflowWriteChannel<T> leftShift(final DataflowReadChannel<T> ref) {
         head.leftShift(ref);
-        head = (DataFlowStream<T>) head.getRest();
+        head = (DataflowStream<T>) head.getRest();
         return this;
     }
 
     @Override
     public final synchronized void bind(final T value) {
         head.leftShift(value);
-        head = (DataFlowStream<T>) head.getRest();
+        head = (DataflowStream<T>) head.getRest();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class DataFlowStreamWriteAdapter<T> implements DataFlowWriteChannel<T> {
         return head.toString();
     }
 
-    protected final synchronized DataFlowStream<T> getHead() {
+    protected final synchronized DataflowStream<T> getHead() {
         return head;
     }
 }

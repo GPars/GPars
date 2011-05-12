@@ -17,7 +17,7 @@
 package groovyx.gpars.activeobject
 
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 
 public class ActiveObjectGroupASTTransformationTest extends GroovyTestCase {
@@ -43,7 +43,7 @@ public class ActiveObjectGroupASTTransformationTest extends GroovyTestCase {
 
 @ActiveObject("group1")
 class MyGroupWrapper {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 
     @ActiveMethod
     public void foo(value) {
@@ -53,7 +53,7 @@ class MyGroupWrapper {
 
 @ActiveObject("invalidGroup")
 class MyInvalidGroupWrapper {
-    def result = new DataFlowVariable()
+    def result = new DataflowVariable()
 
     @ActiveMethod
     public void foo(value) {

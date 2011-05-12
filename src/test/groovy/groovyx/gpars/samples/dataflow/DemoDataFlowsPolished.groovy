@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlows
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.Dataflows
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
- * Demonstrates the use of the DataFlows class to exchange values among threads or tasks.
- * Uses the with() method on DataFlows to simplify the DSL.
+ * Demonstrates the use of the Dataflows class to exchange values among threads or tasks.
+ * Uses the with() method on Dataflows to simplify the DSL.
  *
  * @author Vaclav Pech, Dierk Koenig
  */
 
-new DataFlows().with {
+new Dataflows().with {
     task { result = x + y }
 
     task { x = 10 }

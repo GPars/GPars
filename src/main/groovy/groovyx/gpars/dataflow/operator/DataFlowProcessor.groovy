@@ -36,7 +36,7 @@ import groovyx.gpars.group.PGroup
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-abstract class DataFlowProcessor {
+abstract class DataflowProcessor {
 
     /**
      * The internal actor performing on behalf of the processor
@@ -46,10 +46,10 @@ abstract class DataFlowProcessor {
     /**
      * Creates a processor
      * After creation the processor needs to be started using the start() method.
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code The processor's body to run each time all inputs have a value to read
      */
-    protected def DataFlowProcessor(final Map channels, final Closure code) {
+    protected def DataflowProcessor(final Map channels, final Closure code) {
         if (channels?.inputs?.size() == 0) throw new IllegalArgumentException("The processor body must take some inputs. The provided list of input channels is empty.")
         code.delegate = this
     }
@@ -62,7 +62,7 @@ abstract class DataFlowProcessor {
      * Starts a processor using the specified parallel group
      * @param group The parallel group to use with the processor
      */
-    final public DataFlowProcessor start(PGroup group) {
+    final public DataflowProcessor start(PGroup group) {
         actor.parallelGroup = group
         actor.start()
         return this
@@ -71,7 +71,7 @@ abstract class DataFlowProcessor {
     /**
      * Starts a processor using the specified parallel group
      */
-    final public DataFlowProcessor start() {
+    final public DataflowProcessor start() {
         actor.start()
         return this
     }
@@ -157,13 +157,13 @@ abstract class DataFlowProcessor {
     ;
 }
 
-protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
+protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
     protected final List inputs
     protected final List outputs
     protected final Closure code
     protected final def owningProcessor
 
-    def DataFlowProcessorActor(owningProcessor, group, outputs, inputs, code) {
+    def DataflowProcessorActor(owningProcessor, group, outputs, inputs, code) {
         super()
         parallelGroup = group
 
@@ -203,7 +203,7 @@ protected abstract class DataFlowProcessorActor extends DynamicDispatchActor {
      * return True, if poisson has been received
      */
     boolean checkPoisson(def data) {
-        if (data instanceof DataFlowPoisson) {
+        if (data instanceof DataflowPoisson) {
             owningProcessor.bindAllOutputsAtomically data
             owningProcessor.stop()
             return true

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,26 +16,26 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.operator
-import static groovyx.gpars.dataflow.DataFlow.prioritySelector
-import static groovyx.gpars.dataflow.DataFlow.selector
-import static groovyx.gpars.dataflow.DataFlow.splitter
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.operator
+import static groovyx.gpars.dataflow.Dataflow.prioritySelector
+import static groovyx.gpars.dataflow.Dataflow.selector
+import static groovyx.gpars.dataflow.Dataflow.splitter
 
 /**
  * @author Vaclav Pech
  * Date: Oct 6, 2009
  */
 
-public class DataFlowOperatorShutdownTest extends GroovyTestCase {
+public class DataflowOperatorShutdownTest extends GroovyTestCase {
 
     public void testSingleOperator() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
             bindOutput 0, x + y + z
@@ -48,16 +48,16 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         assertEquals 60, d.val
         assertEquals 6000, e.val
-        a << DataFlowPoisson.instance
-        assert d.val == DataFlowPoisson.instance
-        assert e.val == DataFlowPoisson.instance
+        a << DataflowPoisson.instance
+        assert d.val == DataflowPoisson.instance
+        assert e.val == DataflowPoisson.instance
         op.join()
     }
 
     public void testSplitter() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
 
         def op = splitter(a, [d, e])
 
@@ -65,33 +65,33 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         assertEquals 10, d.val
         assertEquals 10, e.val
-        a << DataFlowPoisson.instance
-        assert d.val == DataFlowPoisson.instance
-        assert e.val == DataFlowPoisson.instance
+        a << DataflowPoisson.instance
+        assert d.val == DataflowPoisson.instance
+        assert e.val == DataflowPoisson.instance
         op.join()
     }
 
     public void testOperatorOnDFV() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable d = new DataFlowVariable()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable d = new DataflowVariable()
 
         def op = operator(inputs: [a], outputs: [d]) {x ->
             bindOutput x
         }
 
-        a << DataFlowPoisson.instance
-        assert d.val == DataFlowPoisson.instance
+        a << DataflowPoisson.instance
+        assert d.val == DataflowPoisson.instance
         op.join()
     }
 
     public void testOperatorNetwork() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
-        final DataFlowQueue f = new DataFlowQueue()
-        final DataFlowQueue out = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
+        final DataflowQueue f = new DataflowQueue()
+        final DataflowQueue out = new DataflowQueue()
 
         def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
 
@@ -99,23 +99,23 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         def op3 = operator(inputs: [e, f], outputs: [b, out]) {x, y -> }
 
-        a << DataFlowPoisson.instance
+        a << DataflowPoisson.instance
 
-        assert out.val == DataFlowPoisson.instance
-        assert out.val == DataFlowPoisson.instance
+        assert out.val == DataflowPoisson.instance
+        assert out.val == DataflowPoisson.instance
         op1.join()
         op2.join()
         op3.join()
     }
 
     public void testSelectorNetwork() {
-        final DataFlowQueue a = new DataFlowQueue()
-        final DataFlowQueue b = new DataFlowQueue()
-        final DataFlowQueue c = new DataFlowQueue()
-        final DataFlowQueue d = new DataFlowQueue()
-        final DataFlowQueue e = new DataFlowQueue()
-        final DataFlowQueue f = new DataFlowQueue()
-        final DataFlowQueue out = new DataFlowQueue()
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
+        final DataflowQueue f = new DataflowQueue()
+        final DataflowQueue out = new DataflowQueue()
 
         def op1 = selector(inputs: [a, b, c], outputs: [d, e]) {value, index -> }
 
@@ -123,9 +123,9 @@ public class DataFlowOperatorShutdownTest extends GroovyTestCase {
 
         def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-        a << DataFlowPoisson.instance
+        a << DataflowPoisson.instance
 
-        assert out.val == DataFlowPoisson.instance
+        assert out.val == DataflowPoisson.instance
         op1.join()
         op2.join()
         op3.join()

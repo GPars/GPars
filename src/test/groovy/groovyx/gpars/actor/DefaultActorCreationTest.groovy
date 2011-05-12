@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 
 /**
  * @author Vaclav Pech
  */
 class DefaultActorCreationTest extends GroovyTestCase {
     public void testCreationWithAct() {
-        final def result = new DataFlowVariable()
-        final def thread = new DataFlowVariable()
+        final def result = new DataflowVariable()
+        final def thread = new DataflowVariable()
         final def actor = [act: {
             result << 'Received'
             thread << Thread.currentThread()
@@ -40,8 +40,8 @@ class DefaultActorCreationTest extends GroovyTestCase {
     public void testCreationWithoutAct() {
         final def actor = new DefaultActor()
 
-        final def error = new DataFlowVariable()
-        final def stopped = new DataFlowVariable()
+        final def error = new DataflowVariable()
+        final def stopped = new DataflowVariable()
         actor.metaClass.onException {
             error << it
         }
@@ -60,8 +60,8 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testCreationWithClosure() {
-        final def result = new DataFlowVariable()
-        final def thread = new DataFlowVariable()
+        final def result = new DataflowVariable()
+        final def thread = new DataflowVariable()
         final def actor = new DefaultActor({
             result << 'Received'
             thread << Thread.currentThread()
@@ -74,7 +74,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testMessagingWithAct() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         final def actor
         actor = [act: {
             actor.react {
@@ -89,7 +89,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testMessagingWithClosure() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         final def actor = new DefaultActor({
             react {
                 result << it
@@ -103,7 +103,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testNullMessagingWithAct() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         final def actor
         actor = [act: {
             actor.react {
@@ -118,7 +118,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testNullMessagingWithClosure() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         final def actor = new DefaultActor({
             react {
                 result << it
@@ -132,7 +132,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testLoopingWithAct() {
-        final def result = new DataFlowQueue()
+        final def result = new DataflowQueue()
         final def actor
         actor = [act: {
             actor.loop {
@@ -154,7 +154,7 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testLoopingWithClosure() {
-        final def result = new DataFlowQueue()
+        final def result = new DataflowQueue()
         final def actor = new DefaultActor({
             loop {
                 react {
@@ -209,8 +209,8 @@ class DefaultActorCreationTest extends GroovyTestCase {
 
 
     public void testContinuationStyleWithAct() {
-        final def result = new DataFlowVariable()
-        final def continuationResult = new DataFlowVariable()
+        final def result = new DataflowVariable()
+        final def continuationResult = new DataflowVariable()
         final def actor
         actor = [act: {
             actor.react {
@@ -227,8 +227,8 @@ class DefaultActorCreationTest extends GroovyTestCase {
     }
 
     public void testContinuationStyleWithClosure() {
-        final def result = new DataFlowVariable()
-        final def continuationResult = new DataFlowVariable()
+        final def result = new DataflowVariable()
+        final def continuationResult = new DataflowVariable()
         final def actor = new DefaultActor({
             react {
                 result << it

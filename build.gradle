@@ -295,17 +295,17 @@ task wrapper(type: Wrapper) {
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
     excludedDemos = [
             'DemoPotentialDeadlock',                      // may deadlock (on purpose)
-            'DemoNonDeterministicDeadlockWithDataFlows',  // may deadlock (on purpose)
+            'DemoNonDeterministicDeadlockWithDataflows',  // may deadlock (on purpose)
             'DemoDeadLock',                               // deadlock (on purpose)
             'DemoRemote',                                 // doesn't work in an automated environment
             'DemoSwing',                                  // maybe we don't want these to run on the CI ..
             'DemoSwingMashup',                            // but they can be run locally
             'DemoSwingCollectionProcessing',
             'DemoSwingActors',
-            'DemoSwingDataFlowOperators',
-            'DemoSwingFancyDataFlow',                     // Shows UI
-            'DemoSwingDataFlowProgress',                  // Shows UI
-            'DataFlowDemo4',                              // Never stops
+            'DemoSwingDataflowOperators',
+            'DemoSwingFancyDataflow',                     // Shows UI
+            'DemoSwingDataflowProgress',                  // Shows UI
+            'DataflowDemo4',                              // Never stops
             'DemoWebPageProcessing',                      // Never stops
             'DemoWebPageProcessingWithCaching',           // Never stops
             'DemoMapReduce',                              // Relies on internet connection
@@ -360,7 +360,7 @@ class DemoTask extends DefaultTask {
             println "*** done"
         }
         println "*** cleaning up"
-        shell.evaluate("groovyx.gpars.dataflow.DataFlow.DATA_FLOW_GROUP.shutdown()")
+        shell.evaluate("groovyx.gpars.dataflow.Dataflow.DATA_FLOW_GROUP.shutdown()")
         println "=== demos: $ok ok, ${failed.size()} failed"
         failed.each { println "${it.file}\n    ${it.exception}" }
     }

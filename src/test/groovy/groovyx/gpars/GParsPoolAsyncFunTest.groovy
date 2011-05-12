@@ -16,7 +16,7 @@
 
 package groovyx.gpars
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.Promise
 import jsr166y.RecursiveAction
 
@@ -84,7 +84,7 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
 
     public void testThreading() {
         groovyx.gpars.GParsPool.withPool(1) {pool ->
-            def results = new DataFlowQueue()
+            def results = new DataflowQueue()
             pool.submit([compute: {results << Thread.currentThread(); complete()}] as RecursiveAction)
             def t = results.val
 

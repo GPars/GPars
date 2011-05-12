@@ -22,12 +22,12 @@ import spock.lang.Specification
 class AsyncSelectTest extends Specification {
     def "selecting from three df variables"() {
         given:
-        def a = new DataFlowVariable()
-        def b = new DataFlowVariable()
-        def c = new DataFlowVariable()
+        def a = new DataflowVariable()
+        def b = new DataflowVariable()
+        def c = new DataflowVariable()
 
-        final def result = new DataFlows()
-        def select = DataFlow.select(a, b, c)
+        final def result = new Dataflows()
+        def select = Dataflow.select(a, b, c)
 
         def actor
         actor = Actors.blockingActor {
@@ -46,11 +46,11 @@ class AsyncSelectTest extends Specification {
 
     def "selecting from three df streams"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        final def result = new DataFlows()
-        def select = DataFlow.select(a, b, c)
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        final def result = new Dataflows()
+        def select = Dataflow.select(a, b, c)
 
         def actor
         actor = Actors.blockingActor {
@@ -71,13 +71,13 @@ class AsyncSelectTest extends Specification {
 
     def "selecting from three df streams with a value being bound prior to selector creation"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
         c << 20
-        def result = new DataFlows()
+        def result = new Dataflows()
 
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         def actor
         actor = Actors.blockingActor {
             result.res1 = receive()
@@ -90,12 +90,12 @@ class AsyncSelectTest extends Specification {
 
     def "selecting preserves order within a single stream"() {
         given:
-        def a = new DataFlowQueue()
-        def b = new DataFlowQueue()
-        def c = new DataFlowQueue()
-        def result = new DataFlows()
+        def a = new DataflowQueue()
+        def b = new DataflowQueue()
+        def c = new DataflowQueue()
+        def result = new Dataflows()
 
-        def select = DataFlow.select(a, b, c)
+        def select = Dataflow.select(a, b, c)
         def actor
         actor = Actors.blockingActor {
             result.with {

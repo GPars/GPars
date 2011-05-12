@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+import groovyx.gpars.dataflow.operator.DataflowProcessor;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.ResizeablePool;
@@ -34,7 +34,7 @@ import java.util.concurrent.Callable;
  *         Date: Jun 4, 2009
  */
 @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "ConstantDeclaredInAbstractClass", "UtilityClass", "unchecked"})
-public abstract class DataFlow {
+public abstract class Dataflow {
 
     /**
      * The parallel group used by all Dataflow Concurrency actors by default.
@@ -47,14 +47,14 @@ public abstract class DataFlow {
     public static final ThreadLocal<PGroup> activeParallelGroup = new ThreadLocal<PGroup>();
 
     /**
-     * Retrieves the thread-local value of the active PGroup or the default DataFlowGroup
+     * Retrieves the thread-local value of the active PGroup or the default DataflowGroup
      *
      * @return The PGroup to use for DF within the current thread
      */
     public static PGroup retrieveCurrentDFPGroup() {
         PGroup pGroup = activeParallelGroup.get();
         if (pGroup == null) {
-            pGroup = DataFlow.DATA_FLOW_GROUP;
+            pGroup = Dataflow.DATA_FLOW_GROUP;
         }
         return pGroup;
     }
@@ -62,50 +62,50 @@ public abstract class DataFlow {
     /**
      * Creates a new task assigned to a thread from the default dataflow parallel group.
      * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
-     * but can only exchange data using explicit DataFlowVariables and Streams.
+     * but can only exchange data using explicit DataflowVariables and Streams.
      *
      * @param code The task body to run
-     * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
+     * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public static DataFlowVariable task(final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.task(code);
+    public static DataflowVariable task(final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.task(code);
     }
 
     /**
      * Creates a new task assigned to a thread from the current parallel group.
      * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
-     * but can only exchange data using explicit DataFlowVariables and Streams.
-     * Registers itself with DataFlow for nested 'whenBound' handlers to use the same group.
+     * but can only exchange data using explicit DataflowVariables and Streams.
+     * Registers itself with Dataflow for nested 'whenBound' handlers to use the same group.
      *
      * @param callable The task body to run
-     * @return A DataFlowVariable, which gets assigned the value returned from the supplied code
+     * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public static DataFlowVariable task(final Callable callable) {
-        return DataFlow.DATA_FLOW_GROUP.task(callable);
+    public static DataflowVariable task(final Callable callable) {
+        return Dataflow.DATA_FLOW_GROUP.task(callable);
     }
 
     /**
      * Creates a new task assigned to a thread from the current parallel group.
      * Tasks are a lightweight version of dataflow operators, which do not define their communication channels explicitly,
-     * but can only exchange data using explicit DataFlowVariables and Streams.
-     * Registers itself with DataFlow for nested 'whenBound' handlers to use the same group.
+     * but can only exchange data using explicit DataflowVariables and Streams.
+     * Registers itself with Dataflow for nested 'whenBound' handlers to use the same group.
      *
      * @param runnable The task body to run
-     * @return A DataFlowVariable, which gets bound to null once the supplied code finishes
+     * @return A DataflowVariable, which gets bound to null once the supplied code finishes
      */
-    public static DataFlowVariable task(final Runnable runnable) {
-        return DataFlow.DATA_FLOW_GROUP.task(runnable);
+    public static DataflowVariable task(final Runnable runnable) {
+        return Dataflow.DATA_FLOW_GROUP.task(runnable);
     }
 
     /**
      * Creates an operator using the default dataflow parallel group
      *
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final Map channels, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.operator(channels, code);
+    public static DataflowProcessor operator(final Map channels, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.operator(channels, code);
     }
 
     /**
@@ -116,8 +116,8 @@ public abstract class DataFlow {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, code);
+    public static DataflowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, code);
     }
 
     /**
@@ -129,8 +129,8 @@ public abstract class DataFlow {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, maxForks, code);
+    public static DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, maxForks, code);
     }
 
     /**
@@ -141,8 +141,8 @@ public abstract class DataFlow {
      * @param code   The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final DataFlowReadChannel input, final DataFlowWriteChannel output, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.operator(input, output, code);
+    public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.operator(input, output, code);
     }
 
     /**
@@ -154,19 +154,19 @@ public abstract class DataFlow {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new active operator instance
      */
-    public static DataFlowProcessor operator(final DataFlowReadChannel input, final DataFlowWriteChannel output, final int maxForks, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.operator(input, output, maxForks, code);
+    public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.operator(input, output, maxForks, code);
     }
 
     /**
      * Creates a selector using the default dataflow parallel group
      *
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataFlowProcessor selector(final Map channels, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.selector(channels, code);
+    public static DataflowProcessor selector(final Map channels, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.selector(channels, code);
     }
 
     /**
@@ -177,18 +177,18 @@ public abstract class DataFlow {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataFlowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels, code);
+    public static DataflowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels, code);
     }
 
     /**
      * Creates a selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
      *
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @return A new active selector instance
      */
-    public static DataFlowProcessor selector(final Map channels) {
-        return DataFlow.DATA_FLOW_GROUP.selector(channels);
+    public static DataflowProcessor selector(final Map channels) {
+        return Dataflow.DATA_FLOW_GROUP.selector(channels);
     }
 
     /**
@@ -198,20 +198,20 @@ public abstract class DataFlow {
      * @param outputChannels dataflow channels to use for output
      * @return A new active selector instance
      */
-    public static DataFlowProcessor selector(final List inputChannels, final List outputChannels) {
-        return DataFlow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels);
+    public static DataflowProcessor selector(final List inputChannels, final List outputChannels) {
+        return Dataflow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels);
     }
 
     /**
      * Creates a prioritizing selector using the default dataflow parallel group
      * Input with lower position index have higher priority.
      *
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataFlowProcessor prioritySelector(final Map channels, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.prioritySelector(channels, code);
+    public static DataflowProcessor prioritySelector(final Map channels, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.prioritySelector(channels, code);
     }
 
     /**
@@ -223,19 +223,19 @@ public abstract class DataFlow {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new active selector instance
      */
-    public static DataFlowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
-        return DataFlow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels, code);
+    public static DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
+        return Dataflow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels, code);
     }
 
     /**
      * Creates a prioritizing selector using the default dataflow parallel group. Since no body is provided, the selector will simply copy the incoming values to all output channels.
      * Input with lower position index have higher priority.
      *
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @return A new active selector instance
      */
-    public static DataFlowProcessor prioritySelector(final Map channels) {
-        return DataFlow.DATA_FLOW_GROUP.prioritySelector(channels);
+    public static DataflowProcessor prioritySelector(final Map channels) {
+        return Dataflow.DATA_FLOW_GROUP.prioritySelector(channels);
     }
 
     /**
@@ -246,8 +246,8 @@ public abstract class DataFlow {
      * @param outputChannels dataflow channels to use for output
      * @return A new active selector instance
      */
-    public static DataFlowProcessor prioritySelector(final List inputChannels, final List outputChannels) {
-        return DataFlow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels);
+    public static DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels) {
+        return Dataflow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels);
     }
 
     /**
@@ -258,8 +258,8 @@ public abstract class DataFlow {
      * @param outputChannels A list of channels to output to
      * @return A new active splitter instance
      */
-    public static DataFlowProcessor splitter(final DataFlowReadChannel inputChannel, final List<DataFlowWriteChannel> outputChannels) {
-        return DataFlow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels);
+    public static DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels) {
+        return Dataflow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels);
     }
 
     /**
@@ -271,8 +271,8 @@ public abstract class DataFlow {
      * @param maxForks       Number of threads running the splitter's body, defaults to 1
      * @return A new active splitter instance
      */
-    public static DataFlowProcessor splitter(final DataFlowReadChannel inputChannel, final List<DataFlowWriteChannel> outputChannels, final int maxForks) {
-        return DataFlow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels, maxForks);
+    public static DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels, final int maxForks) {
+        return Dataflow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels, maxForks);
     }
 
     /**
@@ -282,8 +282,8 @@ public abstract class DataFlow {
      * @param channels Dataflow variables or streams to wait for values on
      * @return A new select instance
      */
-    public static Select<?> select(final DataFlowReadChannel<?>... channels) {
-        return DataFlow.DATA_FLOW_GROUP.select(channels);
+    public static Select<?> select(final DataflowReadChannel<?>... channels) {
+        return Dataflow.DATA_FLOW_GROUP.select(channels);
     }
 
     /**
@@ -293,7 +293,7 @@ public abstract class DataFlow {
      * @param channels Dataflow variables or streams to wait for values on
      * @return A new select instance
      */
-    public static Select<?> select(final List<DataFlowReadChannel> channels) {
-        return DataFlow.DATA_FLOW_GROUP.select(channels);
+    public static Select<?> select(final List<DataflowReadChannel> channels) {
+        return Dataflow.DATA_FLOW_GROUP.select(channels);
     }
 }

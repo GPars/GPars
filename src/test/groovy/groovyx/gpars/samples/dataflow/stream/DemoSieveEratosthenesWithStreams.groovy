@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow.stream
 
-import groovyx.gpars.dataflow.stream.DataFlowStream
+import groovyx.gpars.dataflow.stream.DataflowStream
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 
@@ -30,7 +30,7 @@ import groovyx.gpars.scheduler.ResizeablePool
  */
 
 /**
- * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowQueue.val
+ * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataflowQueue.val
  */
 group = new DefaultPGroup(new ResizeablePool(true))
 
@@ -39,7 +39,7 @@ final int requestedPrimeNumberCount = 100
 /**
  * Generating candidate numbers
  */
-final DataFlowStream candidates = new DataFlowStream()
+final DataflowStream candidates = new DataflowStream()
 group.task {
     candidates.generate(2, {it + 1}, {it < 1000})
 }
@@ -50,7 +50,7 @@ group.task {
  * @param prime The prime number to divide future prime candidates with
  * @return A new channel ending the whole chain
  */
-def filter(DataFlowStream inChannel, int prime) {
+def filter(DataflowStream inChannel, int prime) {
     inChannel.filter { number ->
         group.task {
             number % prime != 0

@@ -16,7 +16,7 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -35,24 +35,24 @@ import java.util.concurrent.Semaphore
  * @author Vaclav Pech
  * Date: Sep 9, 2009
  */
-public final class DataFlowOperator extends DataFlowProcessor {
+public final class DataflowOperator extends DataflowProcessor {
 
     /**
      * Creates an operator
      * After creation the operator needs to be started using the start() method.
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code The operator's body to run each time all inputs have a value to read
      */
-    def DataFlowOperator(final PGroup group, final Map channels, final Closure code) {
+    def DataflowOperator(final PGroup group, final Map channels, final Closure code) {
         super(channels, code)
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The operator's body accepts $parameters parameters while it is given ${channels?.inputs?.size()} input streams. The numbers must match.")
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
-            this.actor = new ForkingDataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
+            this.actor = new ForkingDataflowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone(), channels.maxForks)
         } else {
-            this.actor = new DataFlowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
+            this.actor = new DataflowOperatorActor(this, group, channels.outputs?.asImmutable(), channels.inputs.asImmutable(), code.clone())
         }
     }
 
@@ -75,10 +75,10 @@ public final class DataFlowOperator extends DataFlowProcessor {
  * Iteratively waits for enough values from inputs.
  * Once all required inputs are available (received as messages), the operator's body is run.
  */
-private class DataFlowOperatorActor extends DataFlowProcessorActor {
+private class DataflowOperatorActor extends DataflowProcessorActor {
     Map values = [:]
 
-    def DataFlowOperatorActor(owningOperator, group, outputs, inputs, code) {
+    def DataflowOperatorActor(owningOperator, group, outputs, inputs, code) {
         super(owningOperator, group, outputs, inputs, code)
     }
 
@@ -88,7 +88,7 @@ private class DataFlowOperatorActor extends DataFlowProcessorActor {
 
     private final def queryInputs(final boolean initialRun) {
         return inputs.eachWithIndex {input, index ->
-            if (initialRun || !(input instanceof DataFlowVariable)) {
+            if (initialRun || !(input instanceof DataflowVariable)) {
                 input.getValAsync(index, this)
             } else {
                 values[index] = input.val
@@ -100,7 +100,7 @@ private class DataFlowOperatorActor extends DataFlowProcessorActor {
     final void onMessage(def message) {
         if (checkPoisson(message.result)) return
         values[message.attachment] = message.result
-        if (values.size() > inputs.size()) throw new IllegalStateException("The DataFlowOperatorActor is in an inconsistent state. values.size()=" + values.size() + ", inputs.size()=" + inputs.size())
+        if (values.size() > inputs.size()) throw new IllegalStateException("The DataflowOperatorActor is in an inconsistent state. values.size()=" + values.size() + ", inputs.size()=" + inputs.size())
         if (values.size() == inputs.size()) {
             def results = values.sort {it.key}.values() as List
             startTask(results)
@@ -123,11 +123,11 @@ private class DataFlowOperatorActor extends DataFlowProcessorActor {
  * The operator's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
  * The maxForks property guards the maximum number or concurrently run copies.
  */
-private final class ForkingDataFlowOperatorActor extends DataFlowOperatorActor {
+private final class ForkingDataflowOperatorActor extends DataflowOperatorActor {
     private final Semaphore semaphore
     private final def threadPool
 
-    def ForkingDataFlowOperatorActor(owningOperator, group, outputs, inputs, code, maxForks) {
+    def ForkingDataflowOperatorActor(owningOperator, group, outputs, inputs, code, maxForks) {
         super(owningOperator, group, outputs, inputs, code)
         this.semaphore = new Semaphore(maxForks)
         this.threadPool = group.threadPool

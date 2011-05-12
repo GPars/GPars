@@ -17,8 +17,8 @@
 package groovyx.gpars.samples.dataflow
 
 import groovyx.gpars.GParsPool
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * A simple mashup sample, downloads content of three websites and checks how many of them refer to Groovy.
@@ -36,7 +36,7 @@ task {
 }.join()
 
 def downloadPage(def url) {
-    def page = new DataFlowVariable()
+    def page = new DataflowVariable()
     task {
         println "Started downloading from $url"
         page << url.toURL().text

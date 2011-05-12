@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.Executors
 
 final many = 1..(100)
 
-List dfs = many.collect { new DataFlowVariable() }
-def result = new DataFlowVariable()
+List dfs = many.collect { new DataflowVariable() }
+def result = new DataflowVariable()
 
 def scheduler = Executors.newFixedThreadPool(20)
 

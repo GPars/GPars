@@ -16,10 +16,10 @@
 
 package groovyx.gpars
 
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Dataflows
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 
@@ -41,7 +41,7 @@ class ParallelGroupTest extends GroovyTestCase {
 
 
     public void testParallelGroup() {
-        final DataFlows results = new DataFlows()
+        final Dataflows results = new Dataflows()
         def actor = group.actor {
             results.group1 = parallelGroup
             react {}
@@ -54,27 +54,27 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowContinuations() {
-        final DataFlowVariable variable = new DataFlowVariable()
-        final DataFlows results = new DataFlows()
-        DataFlow.task {
-            results.group1 = DataFlow.activeParallelGroup.get()
+        final DataflowVariable variable = new DataflowVariable()
+        final Dataflows results = new Dataflows()
+        Dataflow.task {
+            results.group1 = Dataflow.activeParallelGroup.get()
             variable.whenBound {
-                results.group2 = DataFlow.activeParallelGroup.get()
+                results.group2 = Dataflow.activeParallelGroup.get()
             }
             variable << 'Foo'
         }
         assert results.group1 == results.group2
-        assert results.group1 == DataFlow.DATA_FLOW_GROUP
+        assert results.group1 == Dataflow.DATA_FLOW_GROUP
     }
 
     public void testDataflowContinuationsWithCustomGroup() {
-        final DataFlowVariable variable = new DataFlowVariable()
-        final DataFlows results = new DataFlows()
+        final DataflowVariable variable = new DataflowVariable()
+        final Dataflows results = new Dataflows()
 
         group.task {
-            results.group1 = DataFlow.activeParallelGroup.get()
+            results.group1 = Dataflow.activeParallelGroup.get()
             variable.whenBound {
-                results.group2 = DataFlow.activeParallelGroup.get()
+                results.group2 = Dataflow.activeParallelGroup.get()
             }
             variable << 'Foo'
         }
@@ -83,27 +83,27 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowContinuationsOnStreams() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlows results = new DataFlows()
-        DataFlow.task {
-            results.group1 = DataFlow.activeParallelGroup.get()
+        final DataflowQueue stream = new DataflowQueue()
+        final Dataflows results = new Dataflows()
+        Dataflow.task {
+            results.group1 = Dataflow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlow.activeParallelGroup.get()
+                results.group2 = Dataflow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }
         assert results.group1 == results.group2
-        assert results.group1 == DataFlow.DATA_FLOW_GROUP
+        assert results.group1 == Dataflow.DATA_FLOW_GROUP
     }
 
     public void testDataflowContinuationsWithCustomGroupOnStreams() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlows results = new DataFlows()
+        final DataflowQueue stream = new DataflowQueue()
+        final Dataflows results = new Dataflows()
 
         group.task {
-            results.group1 = DataFlow.activeParallelGroup.get()
+            results.group1 = Dataflow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlow.activeParallelGroup.get()
+                results.group2 = Dataflow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }
@@ -112,27 +112,27 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowWhenBoundOnStreams() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlows results = new DataFlows()
-        DataFlow.task {
-            results.group1 = DataFlow.activeParallelGroup.get()
+        final DataflowQueue stream = new DataflowQueue()
+        final Dataflows results = new Dataflows()
+        Dataflow.task {
+            results.group1 = Dataflow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlow.activeParallelGroup.get()
+                results.group2 = Dataflow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }
         assert results.group1 == results.group2
-        assert results.group1 == DataFlow.DATA_FLOW_GROUP
+        assert results.group1 == Dataflow.DATA_FLOW_GROUP
     }
 
     public void testDataflowWhenBoundWithCustomGroupOnStreams() {
-        final DataFlowQueue stream = new DataFlowQueue()
-        final DataFlows results = new DataFlows()
+        final DataflowQueue stream = new DataflowQueue()
+        final Dataflows results = new Dataflows()
 
         group.task {
-            results.group1 = DataFlow.activeParallelGroup.get()
+            results.group1 = Dataflow.activeParallelGroup.get()
             stream.whenBound {
-                results.group2 = DataFlow.activeParallelGroup.get()
+                results.group2 = Dataflow.activeParallelGroup.get()
             }
             stream << 'Foo'
         }
@@ -141,8 +141,8 @@ class ParallelGroupTest extends GroovyTestCase {
     }
 
     public void testDataflowContinuationsWithSingleThread() {
-        final DataFlowVariable variable = new DataFlowVariable()
-        final DataFlows results = new DataFlows()
+        final DataflowVariable variable = new DataflowVariable()
+        final Dataflows results = new Dataflows()
 
         final DefaultPGroup group = new DefaultPGroup(1)
         group.task {
@@ -165,7 +165,7 @@ class ParallelGroupTest extends GroovyTestCase {
 
     public void testSendAndContinue() {
         final DefaultPGroup group = new DefaultPGroup(1)
-        def results = new DataFlows()
+        def results = new Dataflows()
 
         def actor = group.actor {
             results.t1 = Thread.currentThread()

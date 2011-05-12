@@ -19,7 +19,7 @@ package groovyx.gpars.activeobject;
 
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.PGroup
 
 /**
@@ -32,11 +32,11 @@ public final class InternalActor extends DynamicDispatchActor {
     public static final String METHOD_NAME_PREFIX = "activeObject_";
 
     /**
-     * A DataFlowVariable is expected back
+     * A DataflowVariable is expected back
      * @param args The method parameters
      */
-    DataFlowVariable submit(Object... args) {
-        def result = new DataFlowVariable()
+    DataflowVariable submit(Object... args) {
+        def result = new DataflowVariable()
         if (this.currentThread == Thread.currentThread()) result.bind(handleCurrentMessage(args))
         else sendAndContinue(args) {result.bind(it)}
         return result

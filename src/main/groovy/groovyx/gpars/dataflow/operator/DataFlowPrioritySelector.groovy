@@ -35,16 +35,16 @@ import groovyx.gpars.group.PGroup
  * @author Vaclav Pech
  * Date: Sep 23, 2009
  */
-public final class DataFlowPrioritySelector extends DataFlowSelector {
+public final class DataflowPrioritySelector extends DataflowSelector {
 
     /**
      * Creates a priority selector
      * After creation the selector needs to be started using the start() method.
      * @param group A parallel group to use threads from in the internal actor
-     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataFlowQueue or DataFlowVariable classes) to use for inputs and outputs
+     * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code The selector's body to run each time all inputs have a value to read
      */
-    def DataFlowPrioritySelector(final PGroup group, final Map channels, final Closure code) {
+    def DataflowPrioritySelector(final PGroup group, final Map channels, final Closure code) {
         super(group, channels, code)
     }
 

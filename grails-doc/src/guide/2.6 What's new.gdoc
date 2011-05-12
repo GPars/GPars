@@ -50,3 +50,4 @@ h3. Other
 h3. Renaming hints
 
 * The _makeTransparent()_ method that forces concurrent semantics to iteration methods (each, collect, find, etc.) has been renamed to _makeConcurrent()_
+* Capitalization has changed in the names of dataflow classes DataFlow -> Dataflow e.g. DataFlowVariable is now called DataflowVariable

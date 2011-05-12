@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import static groovyx.gpars.agent.Agent.agent
 
@@ -35,7 +35,7 @@ println '*** Started at ' + new Date()
 for (def i in 1..1000)
     process i
 
-def doneFlag = new DataFlowVariable()
+def doneFlag = new DataflowVariable()
 activeTasks.addListener {oldValue, newValue -> if (newValue == 0) doneFlag.bind(true)}
 if (activeTasks.val > 0) doneFlag.join()
 pooledGroup.shutdown()

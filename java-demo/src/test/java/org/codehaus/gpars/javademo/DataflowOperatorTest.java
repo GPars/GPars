@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.codehaus.gpars.javademo;
 
-import groovyx.gpars.DataFlowMessagingRunnable;
-import groovyx.gpars.dataflow.DataFlow;
-import groovyx.gpars.dataflow.DataFlowQueue;
-import groovyx.gpars.dataflow.operator.DataFlowProcessor;
+import groovyx.gpars.DataflowMessagingRunnable;
+import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowQueue;
+import groovyx.gpars.dataflow.operator.DataflowProcessor;
 import org.junit.Test;
 
 import java.util.List;
@@ -38,15 +38,15 @@ public class DataflowOperatorTest {
     @Test
     public void testFlow() throws Exception {
         // Simply said, stream is a queue of values, either input or output queue
-        final DataFlowQueue stream1 = new DataFlowQueue();
-        final DataFlowQueue stream2 = new DataFlowQueue();
-        final DataFlowQueue stream3 = new DataFlowQueue();
-        final DataFlowQueue stream4 = new DataFlowQueue();
+        final DataflowQueue stream1 = new DataflowQueue();
+        final DataflowQueue stream2 = new DataflowQueue();
+        final DataflowQueue stream3 = new DataflowQueue();
+        final DataflowQueue stream4 = new DataflowQueue();
 
         // processor1 waits for value in stream 1 and writes 2*value to stream2
-        final List<DataFlowQueue> calculationInputList = asList(stream1);
-        final List<DataFlowQueue> calculationOutputList = asList(stream2);
-        final DataFlowProcessor processor1 = DataFlow.operator(calculationInputList, calculationOutputList, new DataFlowMessagingRunnable(1) {
+        final List<DataflowQueue> calculationInputList = asList(stream1);
+        final List<DataflowQueue> calculationOutputList = asList(stream2);
+        final DataflowProcessor processor1 = Dataflow.operator(calculationInputList, calculationOutputList, new DataflowMessagingRunnable(1) {
             @Override
             protected void doRun(final Object[] objects) {
                 // Passing calculated value to output stream
@@ -63,7 +63,7 @@ public class DataflowOperatorTest {
         assertTrue("Stream2 should be bound as value has been calculated by processor1", stream2.isBound());
 
         // processor2 reads value from stream2 and stream 2 and writes sum to stream 4
-        final DataFlowProcessor processor2 = DataFlow.operator(asList(stream2, stream3), asList(stream4), new DataFlowMessagingRunnable(2) {
+        final DataflowProcessor processor2 = Dataflow.operator(asList(stream2, stream3), asList(stream4), new DataflowMessagingRunnable(2) {
             @Override
             protected void doRun(final Object[] objects) {
                 getOwningProcessor().bindOutput((Integer) objects[0] + (Integer) objects[1]);
@@ -103,7 +103,7 @@ public class DataflowOperatorTest {
      * @param stream The stream to try to read from
      * @throws InterruptedException If the thread gets interrupted while sleeping
      */
-    private static void waitForValue(final DataFlowQueue<?> stream) throws InterruptedException {
+    private static void waitForValue(final DataflowQueue<?> stream) throws InterruptedException {
         while (!stream.isBound()) {
             Thread.sleep(100L);
         }

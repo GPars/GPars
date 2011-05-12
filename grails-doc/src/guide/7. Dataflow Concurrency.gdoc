@@ -4,11 +4,11 @@ h2. Introduction
 
 Check out the small example written in Groovy using GPars, which sums results of calculations performed by three concurrently run tasks:
 {code}
-import static groovyx.gpars.dataflow.DataFlow.task
+import static groovyx.gpars.dataflow.Dataflow.task
 
-final def x = new DataFlowVariable()
-final def y = new DataFlowVariable()
-final def z = new DataFlowVariable()
+final def x = new DataflowVariable()
+final def y = new DataflowVariable()
+final def z = new DataflowVariable()
 
 task {
     z << x.val + y.val
@@ -25,13 +25,13 @@ task {
 println "Result: ${z.val}"
 {code}
 
-Or the same algorithm rewritten using the _DataFlows_ class.
+Or the same algorithm rewritten using the _Dataflows_ class.
 
 {code}
 
-import static groovyx.gpars.dataflow.DataFlow.task
+import static groovyx.gpars.dataflow.Dataflow.task
 
-final def df = new DataFlows()
+final def df = new Dataflows()
 
 task {
     df.z = df.x + df.y
@@ -52,7 +52,7 @@ println "Result: ${df.z}"
 We start three logical tasks, which can run in parallel and perform their particular activities. The tasks need to exchange data and they do so using *Dataflow Variables*.
 Think of Dataflow Variables as one-shot channels safely and reliably transferring data from producers to their consumers.
 
-The Dataflow Variables have a pretty straightforward semantics. When a task needs to read a value from _DataFlowVariable_ (through the val property), it will block until the value has been set by another task or thread (using the '<<' operator). Each _DataFlowVariable_ can be set *only once* in its lifetime. Notice that you don't have to bother with ordering and synchronizing the tasks or threads and their access to shared variables. The values are magically transferred among tasks at the right time without your intervention.
+The Dataflow Variables have a pretty straightforward semantics. When a task needs to read a value from _DataflowVariable_ (through the val property), it will block until the value has been set by another task or thread (using the '<<' operator). Each _DataflowVariable_ can be set *only once* in its lifetime. Notice that you don't have to bother with ordering and synchronizing the tasks or threads and their access to shared variables. The values are magically transferred among tasks at the right time without your intervention.
 The data flow seamlessly among tasks / threads without your intervention or care.
 
 *Implementation detail:* The three tasks in the example *do not necessarily need to be mapped to three physical threads*. Tasks represent so-called "green" or "logical" threads and can be mapped under the covers to any number of physical threads. The actual mapping depends on the scheduler, but the outcome of dataflow algorithms doesn't depend on the actual scheduling.
@@ -83,7 +83,7 @@ Operations (in Dataflow programs) consist of "black boxes" with inputs and outpu
 
 h2. Principles
 
-With Dataflow Concurrency you can safely share variables across tasks. These variables (in Groovy instances of the _DataFlowVariable_ class) can only be assigned (using the '<<' operator) a value once in their lifetime. The values of the variables, on the other hand, can be read multiple times (in Groovy through the val property), even before the value has been assigned. In such cases the reading task is suspended until the value is set by another task.
+With Dataflow Concurrency you can safely share variables across tasks. These variables (in Groovy instances of the _DataflowVariable_ class) can only be assigned (using the '<<' operator) a value once in their lifetime. The values of the variables, on the other hand, can be read multiple times (in Groovy through the val property), even before the value has been assigned. In such cases the reading task is suspended until the value is set by another task.
 So you can simply write your code for each task sequentially using Dataflow Variables and the underlying mechanics will make sure you get all the values you need in a thread-safe manner.
 
 In brief, you generally perform three operations with Dataflow variables:
@@ -99,13 +99,13 @@ And these are the three essential rules your programs have to follow:
 h2. Dataflow Queues and Broadcasts
 
 Before you go to check the samples of using *Dataflow Variables*, *Tasks* and *Operators*, you should know a bit about streams and queues to have a full picture of Dataflow Concurrency.
-Except for dataflow variables there are also the concepts of _DataFlowQueues_ and _DataFlowBroadcast_ that you can leverage in your code.
+Except for dataflow variables there are also the concepts of _DataflowQueues_ and _DataflowBroadcast_ that you can leverage in your code.
 You may think of them as thread-safe buffers or queues for message transfer among concurrent tasks or threads. Check out a typical producer-consumer demo:
 
-{code}import static groovyx.gpars.dataflow.DataFlow.task
+{code}import static groovyx.gpars.dataflow.Dataflow.task
 
 def words = ['Groovy', 'fantastic', 'concurrency', 'fun', 'enjoy', 'safe', 'GPars', 'data', 'flow']
-final def buffer = new DataFlowQueue()
+final def buffer = new DataflowQueue()
 
 task {
     for (word in words) {
@@ -118,34 +118,34 @@ task {
 }
 {code}
 
-Both _DataFlowBroadcasts_ and _DataFlowQueues_ , just like _DataFlowVariables_ , implement the _DataFlowChannel_ interface with common methods allowing users
-to write to them and read values from them. The ability to treat both types identically through the _DataFlowChannel_ interface comes in handy
+Both _DataflowBroadcasts_ and _DataflowQueues_ , just like _DataflowVariables_ , implement the _DataflowChannel_ interface with common methods allowing users
+to write to them and read values from them. The ability to treat both types identically through the _DataflowChannel_ interface comes in handy
 once you start using them to wire _tasks_ , _operators_ or _selectors_ together.
 
 {note}
-The _DataFlowChannel_ interface combines two interfaces, each serving its purpose:
-* DataFlowReadChannel holding all the methods necessary for reading values from a channel
-* DataFlowWriteChannel holding all the methods necessary for writing values into a channel
-You may prefer using these dedicated interfaces instead of the general _DataFlowChannel_ interface, to better express the intended usage.
+The _DataflowChannel_ interface combines two interfaces, each serving its purpose:
+* DataflowReadChannel holding all the methods necessary for reading values from a channel
+* DataflowWriteChannel holding all the methods necessary for writing values into a channel
+You may prefer using these dedicated interfaces instead of the general _DataflowChannel_ interface, to better express the intended usage.
 {note}
 
 h3. Point-to-point communication
 
-The _DataFlowQueue_ class can be viewed as a point-to-point (1 to 1, many to 1) communication channel. It allows one or more producers send messages to one reader.
-If multiple readers read from the same _DataFlowQueue_ , they will each consume different messages. Or to put it a different way, each message is consumed by exactly one reader.
-You can easily imagine a simple load-balancing scheme built around a shared _DataFlowQueue_ with readers being added dynamically when the consumer part of your algorithm needs to scale up.
+The _DataflowQueue_ class can be viewed as a point-to-point (1 to 1, many to 1) communication channel. It allows one or more producers send messages to one reader.
+If multiple readers read from the same _DataflowQueue_ , they will each consume different messages. Or to put it a different way, each message is consumed by exactly one reader.
+You can easily imagine a simple load-balancing scheme built around a shared _DataflowQueue_ with readers being added dynamically when the consumer part of your algorithm needs to scale up.
 This is also a useful default choice when connecting tasks or operators.
 
 h3. Publish-subscribe communication
 
-The _DataFlowBroadcast_ class offers a publish-subscribe (1 to many, many to many) communication model. One or more producers write messages,
+The _DataflowBroadcast_ class offers a publish-subscribe (1 to many, many to many) communication model. One or more producers write messages,
 while all registered readers will receive all the messages. Each message is thus consumed by all readers with a valid subscription at the moment when the message is being written to the channel.
 The readers subscribe by calling the _createReadChannel()_ method.
 
 {code}
-DataFlowWriteChannel broadcastStream = new DataFlowBroadcast()
-DataFlowReadChannel stream1 = broadcastStream.createReadChannel()
-DataFlowReadChannel stream2 = broadcastStream.createReadChannel()
+DataflowWriteChannel broadcastStream = new DataflowBroadcast()
+DataflowReadChannel stream1 = broadcastStream.createReadChannel()
+DataflowReadChannel stream2 = broadcastStream.createReadChannel()
 broadcastStream << 'Message1'
 broadcastStream << 'Message2'
 broadcastStream << 'Message3'
@@ -154,24 +154,24 @@ assert stream1.val == stream2.val
 assert stream1.val == stream2.val
 {code}
 
-Under the hood _DataFlowBroadcast_ uses the _DataFlowStream_ class to implement the message delivery.
+Under the hood _DataflowBroadcast_ uses the _DataflowStream_ class to implement the message delivery.
 
-h2. DataFlowStream
+h2. DataflowStream
 
-The _DataFlowStream_ class represents a deterministic dataflow channel. It is build around the concept of a functional queue and so provides a lock-free thread-safe implementation for message passing.
-Essentially, you may think of _DataFlowStream_ as a 1 to many communication channel, since when a reader consumes a messages,
+The _DataflowStream_ class represents a deterministic dataflow channel. It is build around the concept of a functional queue and so provides a lock-free thread-safe implementation for message passing.
+Essentially, you may think of _DataflowStream_ as a 1 to many communication channel, since when a reader consumes a messages,
 other readers will still be able to read the message. Also, all messages arrive to all readers in the same order.
-Since _DataFlowStream_ is implemented as a functional queue, its API requires that users traverse the values in the stream themselves.
-On the other hand _DataFlowStream_ offers handy methods for value filtering or transformation together with interesting performance characteristics.
+Since _DataflowStream_ is implemented as a functional queue, its API requires that users traverse the values in the stream themselves.
+On the other hand _DataflowStream_ offers handy methods for value filtering or transformation together with interesting performance characteristics.
 
 {note}
-The _DataFlowStream_ class, unlike the other communication elements, does not implement the _DataFlowChannel_ interface, since the semantics of its use is different.
-Use _DataFlowStreamReadAdapter_ and _DataFlowStreamWriteAdapter_ classes to wrap instances of the _DataFlowChannel_ class
-in _DataFlowReadChannel_ or _DataFlowWriteChannel_ implementations.
+The _DataflowStream_ class, unlike the other communication elements, does not implement the _DataflowChannel_ interface, since the semantics of its use is different.
+Use _DataflowStreamReadAdapter_ and _DataflowStreamWriteAdapter_ classes to wrap instances of the _DataflowChannel_ class
+in _DataflowReadChannel_ or _DataflowWriteChannel_ implementations.
 {note}
 
 {code}
-import groovyx.gpars.dataflow.stream.DataFlowStream
+import groovyx.gpars.dataflow.stream.DataflowStream
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 
@@ -185,7 +185,7 @@ import groovyx.gpars.scheduler.ResizeablePool
  */
 
 /**
- * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataFlowQueue.val
+ * We need a resizeable thread pool, since tasks consume threads while waiting blocked for values at DataflowQueue.val
  */
 group = new DefaultPGroup(new ResizeablePool(true))
 
@@ -194,7 +194,7 @@ final int requestedPrimeNumberCount = 100
 /**
  * Generating candidate numbers
  */
-final DataFlowStream candidates = new DataFlowStream()
+final DataflowStream candidates = new DataflowStream()
 group.task {
     candidates.generate(2, {it + 1}, {it < 1000})
 }
@@ -205,7 +205,7 @@ group.task {
  * @param prime The prime number to divide future prime candidates with
  * @return A new channel ending the whole chain
  */
-def filter(DataFlowStream inChannel, int prime) {
+def filter(DataflowStream inChannel, int prime) {
     inChannel.filter { number ->
         group.task {
             number % prime != 0
@@ -224,49 +224,49 @@ requestedPrimeNumberCount.times {
 }
 {code}
 
-For convenience and for the ability to use _DataFlowStream_ with other dataflow constructs, like e.g. operators,
-you can wrap it with _DataFlowReadAdapter_ for read access or _DataFlowWriteAdapter_ for write access.
-The _DataFlowStream_ class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
+For convenience and for the ability to use _DataflowStream_ with other dataflow constructs, like e.g. operators,
+you can wrap it with _DataflowReadAdapter_ for read access or _DataflowWriteAdapter_ for write access.
+The _DataflowStream_ class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
 to the stream, their access to the stream must be serialized externally or the adapters should be used.
 
-h3. DataFlowStream Adapters
+h3. DataflowStream Adapters
 
-Since the _DataFlowStream_ API as well as the semantics of its use are very different from the one defined by _DataFlow(Read/Write)Channel_ , adapters have to be used in order to allow _DataFlowStreams_
+Since the _DataflowStream_ API as well as the semantics of its use are very different from the one defined by _Dataflow(Read/Write)Channel_ , adapters have to be used in order to allow _DataflowStreams_
 to be used with other dataflow elements.
-The _DataFlowStreamReadAdapter_ class will wrap a _DataFlowStream_ with necessary methods to read values, while the _DataFlowStreamWriteAdapter_ class
-will provide write methods around the wrapped _DataFlowStream_ .
+The _DataflowStreamReadAdapter_ class will wrap a _DataflowStream_ with necessary methods to read values, while the _DataflowStreamWriteAdapter_ class
+will provide write methods around the wrapped _DataflowStream_ .
 
 {note}
-It is important to mention that the _DataFlowStreamWriteAdapter_ is thread safe allowing multiple threads to add values to the wrapped _DataFlowStream_ through the adapter.
-On the other hand, _DataFlowStreamReadAdapter_ is designed to be used by a single thread.
+It is important to mention that the _DataflowStreamWriteAdapter_ is thread safe allowing multiple threads to add values to the wrapped _DataflowStream_ through the adapter.
+On the other hand, _DataflowStreamReadAdapter_ is designed to be used by a single thread.
 
-To minimize the overhead and stay in-line with the _DataFlowStream_ semantics, the _DataFlowStreamReadAdapter_ class is not thread-safe
+To minimize the overhead and stay in-line with the _DataflowStream_ semantics, the _DataflowStreamReadAdapter_ class is not thread-safe
 and should only be used from within a single thread.
-If multiple threads need to read from a DataFlowStream, they should each create their own wrapping _DataFlowStreamReadAdapter_ .
+If multiple threads need to read from a DataflowStream, they should each create their own wrapping _DataflowStreamReadAdapter_ .
 {note}
 
-Thanks to the adapters _DataFlowStream_ can be used for communication between operators or selectors, which expect _DataFlow(Read/Write)Channels_ .
+Thanks to the adapters _DataflowStream_ can be used for communication between operators or selectors, which expect _Dataflow(Read/Write)Channels_ .
 
 {code}
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.stream.DataFlowStream
-import groovyx.gpars.dataflow.stream.DataFlowStreamReadAdapter
-import groovyx.gpars.dataflow.stream.DataFlowStreamWriteAdapter
-import static groovyx.gpars.dataflow.DataFlow.selector
-import static groovyx.gpars.dataflow.DataFlow.operator
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.stream.DataflowStream
+import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter
+import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter
+import static groovyx.gpars.dataflow.Dataflow.selector
+import static groovyx.gpars.dataflow.Dataflow.operator
 
 /**
- * Demonstrates the use of DataFlowStreamAdapters to allow dataflow operators to use DataFlowStreams
+ * Demonstrates the use of DataflowStreamAdapters to allow dataflow operators to use DataflowStreams
  */
 
-final DataFlowStream a = new DataFlowStream()
-final DataFlowStream b = new DataFlowStream()
-def aw = new DataFlowStreamWriteAdapter(a)
-def bw = new DataFlowStreamWriteAdapter(b)
-def ar = new DataFlowStreamReadAdapter(a)
-def br = new DataFlowStreamReadAdapter(b)
+final DataflowStream a = new DataflowStream()
+final DataflowStream b = new DataflowStream()
+def aw = new DataflowStreamWriteAdapter(a)
+def bw = new DataflowStreamWriteAdapter(b)
+def ar = new DataflowStreamReadAdapter(a)
+def br = new DataflowStreamReadAdapter(b)
 
-def result = new DataFlowQueue()
+def result = new DataflowQueue()
 
 def op1 = operator(ar, bw) {
     bindOutput it
@@ -286,26 +286,26 @@ op2.join()
 
 {code}
 
-Also the ability to select a value from multiple _DataFlowChannels_ can only be used through an adapter around a _DataFlowStream_ :
+Also the ability to select a value from multiple _DataflowChannels_ can only be used through an adapter around a _DataflowStream_ :
 
 {code}
 import groovyx.gpars.dataflow.Select
-import groovyx.gpars.dataflow.stream.DataFlowStream
-import groovyx.gpars.dataflow.stream.DataFlowStreamReadAdapter
-import groovyx.gpars.dataflow.stream.DataFlowStreamWriteAdapter
-import static groovyx.gpars.dataflow.DataFlow.select
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.stream.DataflowStream
+import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter
+import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter
+import static groovyx.gpars.dataflow.Dataflow.select
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
- * Demonstrates the use of DataFlowStreamAdapters to allow dataflow select to select on DataFlowStreams
+ * Demonstrates the use of DataflowStreamAdapters to allow dataflow select to select on DataflowStreams
  */
 
-final DataFlowStream a = new DataFlowStream()
-final DataFlowStream b = new DataFlowStream()
-def aw = new DataFlowStreamWriteAdapter(a)
-def bw = new DataFlowStreamWriteAdapter(b)
-def ar = new DataFlowStreamReadAdapter(a)
-def br = new DataFlowStreamReadAdapter(b)
+final DataflowStream a = new DataflowStream()
+final DataflowStream b = new DataflowStream()
+def aw = new DataflowStreamWriteAdapter(a)
+def bw = new DataflowStreamWriteAdapter(b)
+def ar = new DataflowStreamReadAdapter(a)
+def br = new DataflowStreamReadAdapter(b)
 
 final Select<?> select = select(ar, br)
 task {
@@ -327,14 +327,14 @@ assert result*.index == [1, 0, 1]
 {code}
 
 {note}
-If you don't need any of the functional queue _DataFlowStream-special_ functionality, like generation, filtering or mapping,
-you may consider using the _DataFlowBroadcast_ class instead, which offers the _publish-subscribe_ communication model through the _DataFlowChannel_ interface.
+If you don't need any of the functional queue _DataflowStream-special_ functionality, like generation, filtering or mapping,
+you may consider using the _DataflowBroadcast_ class instead, which offers the _publish-subscribe_ communication model through the _DataflowChannel_ interface.
 {note}
 
 h2. Bind handlers
 
 {code}
-def a = new DataFlowVariable()
+def a = new DataflowVariable()
 a >> {println "The variable has just been bound to $it"}
 a.whenBound {println "Just to confirm that the variable has been really set to $it"}
 ...
@@ -345,7 +345,7 @@ A bound handlers can be registered on all dataflow channels (variables, queues o
 Dataflow queues and broadcasts also support a _wheneverBound_ method to register a closure or a message handler to run each time a value is bound to them.
 
 {code}
-def queue = new DataFlowQueue()
+def queue = new DataflowQueue()
 queue.wheneverBound {println "A value $it arrived to the queue"}
 {code}
 

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.atomic.AtomicBoolean
@@ -403,9 +403,9 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testOriginatorDetection() {
-        final DataFlowVariable originator1 = new DataFlowVariable()
-        final DataFlowVariable originator2 = new DataFlowVariable()
-        final DataFlowVariable originator3 = new DataFlowVariable()
+        final DataflowVariable originator1 = new DataflowVariable()
+        final DataflowVariable originator2 = new DataflowVariable()
+        final DataflowVariable originator3 = new DataflowVariable()
 
         final def bouncer = actor {
             react {msg1 ->

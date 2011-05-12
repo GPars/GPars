@@ -19,9 +19,9 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Dataflows
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.TimeUnit
 import org.codehaus.groovy.runtime.NullObject
@@ -229,7 +229,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
             }
         }
 
-        def results = new DataFlowVariable()
+        def results = new DataflowVariable()
 
         Actors.actor {
             dda << 1
@@ -263,7 +263,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
             }
         }
 
-        final DataFlows results = new DataFlows()
+        final Dataflows results = new Dataflows()
 
         dda.sendAndContinue(1) {results.d1 = it}
         dda.sendAndContinue(2) {results.d2 = it}
@@ -383,7 +383,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
 
 final class MyActor extends DynamicDispatchActor {
 
-    def results = new DataFlowQueue()
+    def results = new DataflowQueue()
 
     def MyActor() { }
 
@@ -401,7 +401,7 @@ final class MyActor extends DynamicDispatchActor {
 
 final class MyGenericActor extends DynamicDispatchActor {
 
-    def results = new DataFlowQueue()
+    def results = new DataflowQueue()
 
     def MyActor() { }
 

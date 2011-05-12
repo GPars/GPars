@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowVariable
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowVariable
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
  * Demonstrates speculations - an ability to run in parallel several calculations of the same value with varying time demands,
@@ -26,7 +26,7 @@ import static groovyx.gpars.dataflow.DataFlow.task
  * In the sample we're willing to check whether there's an article on 'groovy' on DZone and we're using 4 urls, which resolve to the same page being downloaded.
  * Using the speculate approach we increased our chances to get the result even if some of the urls do not work or work considerably slower than others.
  *
- * This demo uses a DataFlowVariable to get the first result. We're silently leveraging the ability of DataFlowVariable
+ * This demo uses a DataflowVariable to get the first result. We're silently leveraging the ability of DataflowVariable
  * to accept re-binding to the same value.
  *
  * @author Vaclav Pech
@@ -48,7 +48,7 @@ def alternative4 = {
     'http://dzone.com/'.toURL().text
 }
 
-final def result = new DataFlowVariable()
+final def result = new DataflowVariable()
 
 [alternative1, alternative2, alternative3, alternative4].each {code ->
     task {

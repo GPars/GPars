@@ -16,7 +16,7 @@
 
 package groovyx.gpars
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.forkjoin.AbstractForkJoinWorker
 import groovyx.gpars.forkjoin.ForkJoinUtils
 import groovyx.gpars.util.PoolUtils
@@ -282,8 +282,8 @@ public class GParsPool {
      * @return The fastest result obtained
      */
     public static def speculate(Closure... alternatives) {
-        def result = new DataFlowVariable()
-        def futures = new DataFlowVariable()
+        def result = new DataflowVariable()
+        def futures = new DataflowVariable()
         futures << GParsPool.executeAsync(alternatives.collect {
             original ->
             {->

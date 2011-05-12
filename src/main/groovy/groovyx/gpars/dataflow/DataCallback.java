@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.group.PGroup;
 
 /**
- * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataFlowVariable and DataFlowQueue,
+ * A helper class enabling the 'whenBound()' or 'getValAsync' functionality of a DataflowVariable and DataflowQueue,
  * as well as 'sendAndContinue()' on actors.
  * A task that waits asynchronously on the DFV to be bound. Once the DFV is bound,
  * upon receiving the message the actor runs the supplied closure / code with the DFV value as a parameter.
@@ -48,18 +48,18 @@ public final class DataCallback extends MessageStream {
     /**
      * Sends a message back to the DataCallback.
      * Will schedule processing the internal closure with the thread pool
-     * Registers its parallel group with DataFlowExpressions for nested 'whenBound' handlers to use the same group.
+     * Registers its parallel group with DataflowExpressions for nested 'whenBound' handlers to use the same group.
      */
     @Override
     public MessageStream send(final Object message) {
         parallelGroup.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                DataFlow.activeParallelGroup.set(parallelGroup);
+                Dataflow.activeParallelGroup.set(parallelGroup);
                 try {
                     code.call(message);
                 } finally {
-                    DataFlow.activeParallelGroup.remove();
+                    Dataflow.activeParallelGroup.remove();
                 }
             }
         });

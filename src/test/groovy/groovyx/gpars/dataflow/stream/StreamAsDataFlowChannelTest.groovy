@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package groovyx.gpars.dataflow.stream
 
-import groovyx.gpars.dataflow.DataFlowReadChannel
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
-import static groovyx.gpars.dataflow.DataFlow.task
+import static groovyx.gpars.dataflow.Dataflow.task
 
-class StreamAsDataFlowChannelTest extends GroovyTestCase {
+class StreamAsDataflowChannelTest extends GroovyTestCase {
 
     public void testInterfaceImplemented() {
-        def stream = new DataFlowStreamReadAdapter(new DataFlowStream())
-        assert stream instanceof DataFlowReadChannel
+        def stream = new DataflowStreamReadAdapter(new DataflowStream())
+        assert stream instanceof DataflowReadChannel
     }
 
     public void testGetVal() {
-        final DataFlowStream original = new DataFlowStream()
-        def stream = new DataFlowStreamReadAdapter(original)
+        final DataflowStream original = new DataflowStream()
+        def stream = new DataflowStreamReadAdapter(original)
         task {
             original << 1
         }
@@ -38,9 +38,9 @@ class StreamAsDataFlowChannelTest extends GroovyTestCase {
     }
 
     public void testRightShift() {
-        final DataFlowStream original = new DataFlowStream()
-        def stream = new DataFlowStreamReadAdapter(original)
-        def result = new DataFlowVariable()
+        final DataflowStream original = new DataflowStream()
+        def stream = new DataflowStreamReadAdapter(original)
+        def result = new DataflowVariable()
         stream >> {result << it}
         task {
             original << 1
@@ -49,9 +49,9 @@ class StreamAsDataFlowChannelTest extends GroovyTestCase {
     }
 
     public void testWhenBound() {
-        def original = new DataFlowStream()
-        def stream = new DataFlowStreamReadAdapter(original)
-        def result = new DataFlowVariable()
+        def original = new DataflowStream()
+        def stream = new DataflowStreamReadAdapter(original)
+        def result = new DataflowVariable()
         stream.whenBound() {result << it}
         new DefaultPGroup().task {
             original << 1

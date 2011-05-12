@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ package groovyx.gpars.dataflow;
 /**
  * @author Alex Tkachman
  */
-public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T> {
+public abstract class DataflowComplexExpression<T> extends DataflowExpression<T> {
     private static final long serialVersionUID = 1527021112173826064L;
     protected final Object[] args;
 
-    protected DataFlowComplexExpression(final Object... elements) {
+    protected DataflowComplexExpression(final Object... elements) {
         this.args = elements.clone();
     }
 
     @Override
-    protected void subscribe(final DataFlowExpressionsCollector listener) {
+    protected void subscribe(final DataflowExpressionsCollector listener) {
         for (int i = 0; i != args.length; ++i) {
             args[i] = listener.subscribe(args[i]);
         }
@@ -37,8 +37,8 @@ public abstract class DataFlowComplexExpression<T> extends DataFlowExpression<T>
     @Override
     protected T evaluate() {
         for (int i = 0; i != args.length; ++i) {
-            if (args[i] instanceof DataFlowExpression) {
-                args[i] = ((DataFlowExpression<?>) args[i]).value;
+            if (args[i] instanceof DataflowExpression) {
+                args[i] = ((DataflowExpression<?>) args[i]).value;
             }
         }
         return null;

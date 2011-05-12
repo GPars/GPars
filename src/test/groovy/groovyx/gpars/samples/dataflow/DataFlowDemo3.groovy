@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowQueue
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
- * A producer consumer sample, where the producer generates numbers into the DataFlowQueue and the consumer
- * takes a snapshot of the DataFlowQueue using the collect() method to calculate summary of the numbers in the stream.
+ * A producer consumer sample, where the producer generates numbers into the DataflowQueue and the consumer
+ * takes a snapshot of the DataflowQueue using the collect() method to calculate summary of the numbers in the stream.
  */
-void ints(int n, int max, DataFlowQueue<Integer> stream) {
+void ints(int n, int max, DataflowQueue<Integer> stream) {
     if (n != max) {
         println "Generating int: $n"
         stream << n
@@ -31,7 +31,7 @@ void ints(int n, int max, DataFlowQueue<Integer> stream) {
     }
 }
 
-final def producer = new DataFlowQueue<Integer>()
+final def producer = new DataflowQueue<Integer>()
 
 task {
     ints(0, 1000, producer)

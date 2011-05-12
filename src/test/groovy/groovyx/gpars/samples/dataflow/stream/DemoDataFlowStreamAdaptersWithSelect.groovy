@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,22 +17,22 @@
 package groovyx.gpars.samples.dataflow.stream
 
 import groovyx.gpars.dataflow.Select
-import groovyx.gpars.dataflow.stream.DataFlowStream
-import groovyx.gpars.dataflow.stream.DataFlowStreamReadAdapter
-import groovyx.gpars.dataflow.stream.DataFlowStreamWriteAdapter
-import static groovyx.gpars.dataflow.DataFlow.select
-import static groovyx.gpars.dataflow.DataFlow.task
+import groovyx.gpars.dataflow.stream.DataflowStream
+import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter
+import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter
+import static groovyx.gpars.dataflow.Dataflow.select
+import static groovyx.gpars.dataflow.Dataflow.task
 
 /**
- * Demonstrates the use of DataFlowStreamAdapters to allow dataflow select to select on DataFlowStreams
+ * Demonstrates the use of DataflowStreamAdapters to allow dataflow select to select on DataflowStreams
  */
 
-final DataFlowStream a = new DataFlowStream()
-final DataFlowStream b = new DataFlowStream()
-def aw = new DataFlowStreamWriteAdapter(a)
-def bw = new DataFlowStreamWriteAdapter(b)
-def ar = new DataFlowStreamReadAdapter(a)
-def br = new DataFlowStreamReadAdapter(b)
+final DataflowStream a = new DataflowStream()
+final DataflowStream b = new DataflowStream()
+def aw = new DataflowStreamWriteAdapter(a)
+def bw = new DataflowStreamWriteAdapter(b)
+def ar = new DataflowStreamReadAdapter(a)
+def br = new DataflowStreamReadAdapter(b)
 
 final Select<?> select = select(ar, br)
 task {

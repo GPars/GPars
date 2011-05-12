@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.benchmark.obsolete
 
-import groovyx.gpars.samples.dataflow.BenchmarkManyDataFlowVariables
+import groovyx.gpars.samples.dataflow.BenchmarkManyDataflowVariables
 
 long measure(int limit, Script worker) {
     print "running ${worker.class.name} with limit $limit ... "
@@ -28,7 +28,7 @@ long measure(int limit, Script worker) {
     (end - begin) / 1000000
 }
 
-def dfv = new BenchmarkManyDataFlowVariables()
+def dfv = new BenchmarkManyDataflowVariables()
 def limits = [1, 10, 100, 1000, 10000, 100000, 200000, 500000, 1000000, 2500000] * 3
 def times = limits.sort().collect { sleep 100; measure(it, dfv) }
 

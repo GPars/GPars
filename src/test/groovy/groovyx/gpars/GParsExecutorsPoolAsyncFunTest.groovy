@@ -16,7 +16,7 @@
 
 package groovyx.gpars
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.Promise
 
 /**
@@ -49,7 +49,7 @@ public class GParsExecutorsPoolAsyncFunTest extends GroovyTestCase {
 
     public void testThreading() {
         groovyx.gpars.GParsExecutorsPool.withPool(1) {pool ->
-            def results = new DataFlowQueue()
+            def results = new DataflowQueue()
             pool.submit({results << Thread.currentThread()})
             def t = results.val
 

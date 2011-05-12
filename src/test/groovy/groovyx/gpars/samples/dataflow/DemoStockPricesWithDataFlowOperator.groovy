@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlowQueue
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroup
 
@@ -32,8 +32,8 @@ def getYearEndClosing(String stock, int year) {
 }
 
 final PGroup group = new NonDaemonPGroup(1)
-final DataFlowQueue stocksStream = new DataFlowQueue()
-final DataFlowQueue pricedStocks = new DataFlowQueue()
+final DataflowQueue stocksStream = new DataflowQueue()
+final DataflowQueue pricedStocks = new DataflowQueue()
 
 ['AAPL', 'GOOG', 'IBM', 'JAVA', 'MSFT'].each {
     stocksStream << it

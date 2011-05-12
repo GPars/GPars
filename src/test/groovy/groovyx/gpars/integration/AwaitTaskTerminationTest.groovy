@@ -16,7 +16,7 @@
 
 package groovyx.gpars.integration
 
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.atomic.AtomicInteger
 import static groovyx.gpars.agent.Agent.agent
@@ -36,7 +36,7 @@ public class AwaitTaskTerminationTest extends GroovyTestCase {
         for (def i in 1..1000)
             process i
 
-        def doneFlag = new DataFlowVariable()
+        def doneFlag = new DataflowVariable()
         activeTasks.addListener {oldValue, newValue -> if (newValue == 0) doneFlag.bind(true)}
         if (activeTasks.val > 0) doneFlag.join()
         assert counter.get() == 1000

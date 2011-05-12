@@ -16,11 +16,11 @@
 
 package groovyx.gpars.actor
 
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflows
 
 class DDAReplyTest extends GroovyTestCase {
     public void testSender() {
-        final DataFlows df = new DataFlows()
+        final Dataflows df = new Dataflows()
 
         def dda = new DynamicDispatchActor().become {
             when {msg ->

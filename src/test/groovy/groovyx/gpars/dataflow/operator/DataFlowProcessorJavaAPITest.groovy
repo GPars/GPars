@@ -16,10 +16,10 @@
 
 package groovyx.gpars.dataflow.operator
 
-import groovyx.gpars.DataFlowMessagingRunnable
-import groovyx.gpars.dataflow.DataFlow
-import groovyx.gpars.dataflow.DataFlowQueue
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.DataflowMessagingRunnable
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 
@@ -28,7 +28,7 @@ import groovyx.gpars.group.PGroup
  * Date: Now 8, 2010
  */
 
-public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
+public class DataflowProcessorJavaAPITest extends GroovyTestCase {
 
     private PGroup group
 
@@ -43,14 +43,14 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     }
 
     public void testOperator() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
 
         def op = group.operator(inputs: [a, b], outputs: [c], new TestRunnable1())
 
-        DataFlow.task { a << 10 }
-        DataFlow.task { b << 20 }
+        Dataflow.task { a << 10 }
+        Dataflow.task { b << 20 }
 
         assertEquals 30, c.val
 
@@ -58,9 +58,9 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     }
 
     public void testSelector() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b], outputs: [c], new TestRunnable2())
 
@@ -73,9 +73,9 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     }
 
     public void testSelectorWithIndex() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
 
         def op = group.selector(inputs: [a, b], outputs: [c], new TestRunnable2WithIndex())
 
@@ -88,9 +88,9 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     }
 
     public void testPrioritySelector() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
 
         def op = group.prioritySelector(inputs: [a, b], outputs: [c], new TestRunnable2())
 
@@ -103,9 +103,9 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     }
 
     public void testPrioritySelectorWithIndex() {
-        final DataFlowVariable a = new DataFlowVariable()
-        final DataFlowVariable b = new DataFlowVariable()
-        final DataFlowQueue c = new DataFlowQueue()
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+        final DataflowQueue c = new DataflowQueue()
 
         def op = group.prioritySelector(inputs: [a, b], outputs: [c], new TestRunnable2WithIndex())
 
@@ -118,7 +118,7 @@ public class DataFlowProcessorJavaAPITest extends GroovyTestCase {
     }
 }
 
-class TestRunnable1 extends DataFlowMessagingRunnable {
+class TestRunnable1 extends DataflowMessagingRunnable {
 
     def TestRunnable1() {
         super(2);
@@ -129,7 +129,7 @@ class TestRunnable1 extends DataFlowMessagingRunnable {
     }
 }
 
-class TestRunnable2 extends DataFlowMessagingRunnable {
+class TestRunnable2 extends DataflowMessagingRunnable {
 
     def TestRunnable2() {
         super(1);
@@ -140,7 +140,7 @@ class TestRunnable2 extends DataFlowMessagingRunnable {
     }
 }
 
-class TestRunnable2WithIndex extends DataFlowMessagingRunnable {
+class TestRunnable2WithIndex extends DataflowMessagingRunnable {
 
     def TestRunnable2WithIndex() {
         super(2);

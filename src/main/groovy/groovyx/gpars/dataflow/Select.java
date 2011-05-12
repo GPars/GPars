@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class Select<T> {
      * @param channels The input channels to select from
      */
     @SuppressWarnings({"OverloadedVarargsMethod"})
-    public Select(final PGroup pGroup, final DataFlowReadChannel<? extends T>... channels) {
+    public Select(final PGroup pGroup, final DataflowReadChannel<? extends T>... channels) {
         selectBase = new SelectBase<T>(pGroup, Arrays.asList(channels));
     }
 
@@ -58,7 +58,7 @@ public class Select<T> {
      * @param pGroup   The group, the thread pool of which should be used for notification message handlers
      * @param channels The list of input channels to select from
      */
-    public Select(final PGroup pGroup, final List<DataFlowReadChannel<? extends T>> channels) {
+    public Select(final PGroup pGroup, final List<DataflowReadChannel<? extends T>> channels) {
         //noinspection unchecked
         selectBase = new SelectBase<T>(pGroup, channels);
     }

@@ -18,7 +18,7 @@ package groovyx.gpars.util;
 
 import groovy.lang.Closure;
 import groovyx.gpars.ReactorMessagingRunnable;
-import groovyx.gpars.dataflow.DataFlowVariable;
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.scheduler.Pool;
 import org.codehaus.groovy.runtime.InvokerInvocationException;
 
@@ -211,7 +211,7 @@ public abstract class PAUtils {
      */
     @SuppressWarnings({"unchecked"})
     public static void evaluateArguments(final Pool pool, final Object[] args, final int current, final List<Object> soFarArgs,
-                                         final DataFlowVariable<Object> result, final Closure original, final boolean pooledThreadFlag) {
+                                         final DataflowVariable<Object> result, final Closure original, final boolean pooledThreadFlag) {
         if (current == args.length) {
             if (pooledThreadFlag) {
                 try {
@@ -244,8 +244,8 @@ public abstract class PAUtils {
             }
         } else {
             final Object currentArgument = args[current];
-            if (currentArgument instanceof DataFlowVariable) {
-                final DataFlowVariable<Object> variable = (DataFlowVariable<Object>) currentArgument;
+            if (currentArgument instanceof DataflowVariable) {
+                final DataflowVariable<Object> variable = (DataflowVariable<Object>) currentArgument;
                 if (variable.isBound()) {
                     Object currentValue = null;
                     try {

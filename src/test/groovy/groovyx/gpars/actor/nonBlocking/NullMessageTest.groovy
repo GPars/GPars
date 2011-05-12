@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package groovyx.gpars.actor.nonBlocking
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.DataFlowVariable
+import groovyx.gpars.dataflow.DataflowVariable
 import java.util.concurrent.CountDownLatch
 import static groovyx.gpars.actor.Actors.actor
 
@@ -55,7 +55,7 @@ public class NullMessageTest extends GroovyTestCase {
     }
 
     public void testNullMessageFromActorWithReply() {
-        final def result = new DataFlowVariable()
+        final def result = new DataflowVariable()
         final Actor actor = actor {
             react {
                 reply 10

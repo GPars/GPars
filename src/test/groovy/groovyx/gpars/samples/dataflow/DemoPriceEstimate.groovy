@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataFlows
+import groovyx.gpars.dataflow.Dataflows
 import groovyx.gpars.group.DefaultPGroup
 
 /**
@@ -27,7 +27,7 @@ import groovyx.gpars.group.DefaultPGroup
 def log(text) {println text}
 
 public Map calculateProjectDuration(int numOfEntities) {
-    def df = new DataFlows()
+    def df = new Dataflows()
     final def group = new DefaultPGroup(4)
 
     try {
