@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Johannes Link, Vaclav Pech
  */
 @SuppressWarnings({"rawtypes", "TailRecursion", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
-public final class DataflowStream<T> implements FList<T> {
+public final class ADataFlowStream<T> implements FList<T> {
 
     private final DataflowVariable<T> first = new DataflowVariable<T>();
     private final AtomicReference<DataflowStream<T>> rest = new AtomicReference<DataflowStream<T>>();
@@ -72,7 +72,7 @@ public final class DataflowStream<T> implements FList<T> {
     /**
      * Creates an empty stream
      */
-    public DataflowStream() {
+    public ADataFlowStream() {
         wheneverBoundListeners = new CopyOnWriteArrayList<MessageStream>();
     }
 
@@ -81,13 +81,13 @@ public final class DataflowStream<T> implements FList<T> {
      *
      * @param toBeApplied The closure to use for initialization
      */
-    public DataflowStream(final Closure toBeApplied) {
+    public ADataFlowStream(final Closure toBeApplied) {
         this();
         apply(toBeApplied);
     }
 
     @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter"})
-    private DataflowStream(final Collection<MessageStream> wheneverBoundListeners) {
+    private ADataFlowStream(final Collection<MessageStream> wheneverBoundListeners) {
         this.wheneverBoundListeners = wheneverBoundListeners;
         hookWheneverBoundListeners(first);
     }

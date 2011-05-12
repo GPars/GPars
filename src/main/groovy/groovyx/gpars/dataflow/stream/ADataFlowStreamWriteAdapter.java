@@ -27,7 +27,7 @@ import groovyx.gpars.dataflow.DataflowWriteChannel;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"SynchronizedMethod"})
-public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
+public class ADataFlowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
 
     private DataflowStream<T> head;
 
@@ -36,7 +36,7 @@ public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
      *
      * @param stream The stream to wrap
      */
-    public DataflowStreamWriteAdapter(final DataflowStream<T> stream) {
+    public ADataFlowStreamWriteAdapter(final DataflowStream<T> stream) {
         this.head = stream;
     }
 
