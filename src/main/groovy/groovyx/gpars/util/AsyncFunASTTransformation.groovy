@@ -33,6 +33,7 @@ import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.ClassExpression
 import org.codehaus.groovy.ast.ClassHelper
+import groovyx.gpars.AsyncFun
 
 /**
  *
@@ -55,9 +56,18 @@ class AsyncFunASTTransformation implements ASTTransformation {
         AnnotationNode node = (AnnotationNode) nodes[0];
 
         if (parent instanceof FieldNode) {
+
+
+            final Expression classExpression
+            if (node.members.value instanceof ClassExpression) {
+                classExpression = node.members.value
+            } else {
+                classExpression = new ClassExpression(ClassHelper.make(GParsPoolUtil))
+            }
+
             Expression initExpression = parent.initialValueExpression
             MethodCallExpression newInitExpression = new MethodCallExpression(
-                    new ClassExpression(ClassHelper.make(GParsPoolUtil)),
+                    classExpression,
                     new ConstantExpression('asyncFun'),
                     new ArgumentListExpression(initExpression))
             parent.initialValueExpression = newInitExpression

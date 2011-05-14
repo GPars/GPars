@@ -66,16 +66,66 @@ class AsyncFunAnnotationTest extends Specification {
         wasCalled
     }
 
-    def "test ast transformation implementation"() {
+
+    def "test annotation with property accessors"() {
+
+        when:
+        boolean wasCalled = false
+        groovyx.gpars.GParsPool.withPool(5) {
+            def tester = new TestSum()
+            assert tester.sum4(1, 2).val == 3
+            assert tester.sum4(10, 15) instanceof Promise
+            wasCalled = true
+        }
+
+        then:
+        wasCalled
+    }
+
+    def "test annotation parameters"() {
+
+        when:
+        boolean wasCalled = false
+        groovyx.gpars.GParsPool.withPool(5) {
+            def tester = new TestSum()
+            assert tester.sum5(1, 2).val == 3
+            assert tester.sum5(10, 15) instanceof Promise
+            wasCalled = true
+        }
+
+        then:
+        wasCalled
+    }
+
+    def "test annotation parameters with older thread pool"() {
+
+        when:
+        boolean wasCalled = false
+        groovyx.gpars.GParsExecutorsPool.withPool(5) {
+            def tester = new MyOtherTester()
+            assert tester.sum6(1, 2).val == 3
+            assert tester.sum6(10, 15) instanceof Promise
+            wasCalled = true
+        }
+
+        then:
+        wasCalled
+    }
+
+    def "test combining with @Field in script"() {
         when:
         boolean x = true
         then:
         new GroovyShell().evaluate("""
+            import groovyx.gpars.GParsExecutorsPoolUtil
+
             class MyClass {
-                @groovyx.gpars.AsyncFun
+                @groovyx.gpars.AsyncFun(GParsExecutorsPoolUtil)
                 def f = { true }
             }
-            true
+            return groovyx.gpars.GParsExecutorsPool.withPool(5) {
+                new MyClass().f()
+            }
 """)
     }
 
@@ -89,12 +139,27 @@ class AsyncFunAnnotationTest extends Specification {
         @AsyncFun
         def sum3 = getNewClosureSum()
 
-        def getClosureSum(){
+        def holder = [a: [b: [c: getNewClosureSum()]]]
+
+        @AsyncFun
+        def sum4 = holder.a.b.c
+
+        @AsyncFun(GParsPoolUtil)
+        def sum5 = getNewClosureSum()
+
+        def getClosureSum() {
             sum
         }
 
         def getNewClosureSum() {
             { a, b -> a + b }
         }
+    }
+
+    class MyOtherTester {
+
+        @AsyncFun(GParsExecutorsPoolUtil)
+        def sum6 = {a, b -> a + b }
+
     }
 }

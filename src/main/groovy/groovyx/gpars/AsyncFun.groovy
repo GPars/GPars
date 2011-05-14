@@ -36,4 +36,5 @@ import groovyx.gpars.util.AsyncFunASTTransformation
 @Target([ElementType.FIELD])
 @GroovyASTTransformationClass(classes = [AsyncFunASTTransformation])
 @interface AsyncFun {
+    Class value() default GParsPoolUtil
 }
