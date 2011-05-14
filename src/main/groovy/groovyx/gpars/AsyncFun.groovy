@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.Target
 import java.lang.annotation.ElementType
 import groovyx.gpars.util.AsyncFunASTTransformation
+import java.lang.annotation.Documented
 
 /**
  * This annotation makes a field or local variable as an asynchronous function, and the field/variable should be
@@ -31,7 +32,7 @@ import groovyx.gpars.util.AsyncFunASTTransformation
  * @author Hamlet D'Arcy
  * Date: May 14, 2011
  */
-
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ElementType.FIELD])
 @GroovyASTTransformationClass(classes = [AsyncFunASTTransformation])
