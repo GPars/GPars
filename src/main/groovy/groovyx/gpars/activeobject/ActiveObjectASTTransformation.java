@@ -16,6 +16,7 @@
 
 package groovyx.gpars.activeobject;
 
+import groovyx.gpars.util.ASTUtils;
 import org.codehaus.groovy.GroovyBugError;
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
@@ -36,8 +37,6 @@ import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.stmt.ExpressionStatement;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
-import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
-import org.codehaus.groovy.syntax.SyntaxException;
 import org.codehaus.groovy.transform.ASTTransformation;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
 
@@ -59,7 +58,7 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
     @Override
     public void visit(final ASTNode[] nodes, final SourceUnit source) {
         if (nodes.length != 2 || !(nodes[0] instanceof AnnotationNode) || !(nodes[1] instanceof AnnotatedNode)) {
-            addError("Internal error: expecting [AnnotationNode, AnnotatedNode] but got: " + Arrays.asList(nodes), nodes[0], source);
+            ASTUtils.addError("Internal error: expecting [AnnotationNode, AnnotatedNode] but got: " + Arrays.asList(nodes), nodes[0], source);
         }
 
         final AnnotatedNode targetClass = (AnnotatedNode) nodes[1];
@@ -75,10 +74,10 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
 
         final boolean rootActiveObject = isRootActiveObject(classNode);
         if (!rootActiveObject && !actorFieldName.equals(ActiveObject.INTERNAL_ACTIVE_OBJECT_ACTOR)) {
-            addError("Actor field name can only be specified at the top of the active object hierarchy. Apparently a superclass of this class is also an active object.", classNode, source);
+            ASTUtils.addError("Actor field name can only be specified at the top of the active object hierarchy. Apparently a superclass of this class is also an active object.", classNode, source);
         }
         if (!rootActiveObject && actorGroupName.length() != 0) {
-            addError("Active object's actor group can only be specified at the top of the active object hierarchy. Apparently a superclass of this class is also an active object.", classNode, source);
+            ASTUtils.addError("Active object's actor group can only be specified at the top of the active object hierarchy. Apparently a superclass of this class is also an active object.", classNode, source);
         }
 
         final GroovyClassVisitor transformer = new MyClassCodeExpressionTransformer(source, actorFieldName, actorGroupName);
@@ -111,14 +110,6 @@ public class ActiveObjectASTTransformation implements ASTTransformation {
         } else {
             return "";
         }
-    }
-
-    public static void addError(final String msg, final ASTNode expr, final SourceUnit source) {
-        final int line = expr.getLineNumber();
-        final int col = expr.getColumnNumber();
-        source.getErrorCollector().addErrorAndContinue(
-                new SyntaxErrorMessage(new SyntaxException(msg + '\n', line, col), source)
-        );
     }
 
     @SuppressWarnings({"StringToUpperCaseOrToLowerCaseWithoutLocale", "CallToStringEquals"})

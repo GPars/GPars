@@ -52,13 +52,12 @@ task buildGuide(type: Copy) {
 
 }
 
-task pdfGuide(type: Copy) {
+task pdfGuide() {
     dependsOn { buildGuide }
-
-    inputs.dir("$buildDir/manual" as File)
-    outputs.files "$buildDir/manual/guide.pdf"
-
-    doFirst {
+	inputs.files(file("$buildDir/manual/guide/single.html"))
+	outputs.files(file("$buildDir/manual/gpars-guide-${version}.pdf"))
+    
+	doFirst {
         try {
             grails.doc.PdfBuilder.build(
                     basedir: buildDir.absolutePath,
@@ -70,16 +69,18 @@ task pdfGuide(type: Copy) {
             // the renderer 'finishes' but it actually does
             // ignore for now
         }
-    }
-
-    destinationDir = "$buildDir/manual" as File
-    from "$buildDir/manual/guide/"
-    include '*.pdf'
-    rename 'single.pdf', "gpars-guide-${version}.pdf"
+    
+		copy{
+			from("$buildDir/manual/guide"){
+				include '*.pdf'
+			    rename 'single.pdf', "gpars-guide-${version}.pdf"
+			}
+			into("$buildDir/manual")
+		}
+	}
 
     doLast {
         delete "$buildDir/manual/doc.properties"
-        delete "$buildDir/manual/guide/single.pdf"
     }
 }
 
