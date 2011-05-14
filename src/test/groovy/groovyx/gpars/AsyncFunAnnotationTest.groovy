@@ -112,23 +112,6 @@ class AsyncFunAnnotationTest extends Specification {
         wasCalled
     }
 
-    def "test combining with @Field in script"() {
-        when:
-        boolean x = true
-        then:
-        new GroovyShell().evaluate("""
-            import groovyx.gpars.GParsExecutorsPoolUtil
-
-            class MyClass {
-                @groovyx.gpars.AsyncFun(GParsExecutorsPoolUtil)
-                def f = { true }
-            }
-            return groovyx.gpars.GParsExecutorsPool.withPool(5) {
-                new MyClass().f()
-            }
-""")
-    }
-
     class TestSum {
         @AsyncFun
         def sum = {a, b -> a + b }

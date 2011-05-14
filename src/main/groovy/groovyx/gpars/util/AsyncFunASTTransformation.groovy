@@ -57,7 +57,6 @@ class AsyncFunASTTransformation implements ASTTransformation {
 
         if (parent instanceof FieldNode) {
 
-
             final Expression classExpression
             if (node.members.value instanceof ClassExpression) {
                 classExpression = node.members.value
