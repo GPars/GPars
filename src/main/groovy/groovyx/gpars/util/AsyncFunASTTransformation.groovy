@@ -52,24 +52,24 @@ class AsyncFunASTTransformation implements ASTTransformation {
             addError("Internal error: expecting [AnnotationNode, AnnotatedNode] but got: " + Arrays.asList(nodes));
         }
 
-        AnnotatedNode parent = (AnnotatedNode) nodes[1];
-        AnnotationNode node = (AnnotationNode) nodes[0];
+        AnnotatedNode fieldNode = (AnnotatedNode) nodes[1];
+        AnnotationNode annotation = (AnnotationNode) nodes[0];
 
-        if (parent instanceof FieldNode) {
+        if (fieldNode instanceof FieldNode) {
 
             final Expression classExpression
-            if (node.members.value instanceof ClassExpression) {
-                classExpression = node.members.value
+            if (annotation.members.value instanceof ClassExpression) {
+                classExpression = annotation.members.value
             } else {
                 classExpression = new ClassExpression(ClassHelper.make(GParsPoolUtil))
             }
 
-            Expression initExpression = parent.initialValueExpression
+            Expression initExpression = fieldNode.initialValueExpression
             MethodCallExpression newInitExpression = new MethodCallExpression(
                     classExpression,
                     new ConstantExpression('asyncFun'),
                     new ArgumentListExpression(initExpression))
-            parent.initialValueExpression = newInitExpression
+            fieldNode.initialValueExpression = newInitExpression
         }
     }
 }
