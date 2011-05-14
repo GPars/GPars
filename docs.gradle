@@ -55,8 +55,6 @@ task buildGuide(type: Copy) {
 task pdfGuide() {
     dependsOn { buildGuide }
 	inputs.files(file("$buildDir/manual/guide/single.html"))
-	println file("$buildDir/manual/gpars-guide-${version}.pdf").absolutePath
-	println file("$buildDir/manual/guide/single.html").absolutePath
 	outputs.files(file("$buildDir/manual/gpars-guide-${version}.pdf"))
     
 	doFirst {
