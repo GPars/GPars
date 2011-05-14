@@ -18,6 +18,7 @@ package groovyx.gpars.activeobject;
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,5 +32,6 @@ public @interface ActiveObject {
     String INTERNAL_ACTIVE_OBJECT_ACTOR = "internalActiveObjectActor";
 
     String value() default "";
+
     String actorName() default INTERNAL_ACTIVE_OBJECT_ACTOR;
 }

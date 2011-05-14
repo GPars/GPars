@@ -189,7 +189,7 @@ result promise. The inner function ( _plus_ ) will now bind its result to the ou
 This ability of promises to compose allows functions to cease their calculation without blocking a thread not only when waiting for parameters,
 but also whenever they call another asynchronous function anywhere in their body.
 
-h3. The @AsyncFun annotation
+h3. Using annotation to create asynchronous functions
 
 Instead of calling the _asyncFun()_ function, the _@AsyncFun_ annotation can be used to annotate Closure-typed fields.
 The fields have to be initialized in-place and the containing class needs to be instantiated withing a _withPool_ block.
