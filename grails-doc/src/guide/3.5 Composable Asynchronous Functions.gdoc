@@ -189,4 +189,43 @@ result promise. The inner function ( _plus_ ) will now bind its result to the ou
 This ability of promises to compose allows functions to cease their calculation without blocking a thread not only when waiting for parameters,
 but also whenever they call another asynchronous function anywhere in their body.
 
+h3. The @AsyncFun annotation
+
+Instead of calling the _asyncFun()_ function, the _@AsyncFun_ annotation can be used to annotate Closure-typed fields.
+The fields have to be initialized in-place and the containing class needs to be instantiated withing a _withPool_ block.
+
+{code}
+import static groovyx.gpars.GParsPool.withPool
+import groovyx.gpars.AsyncFun
+
+class DownloadingSearch {
+    @AsyncFun Closure download = {String url ->
+        url.toURL().text
+    }
+
+    @AsyncFun Closure scanFor = {String word, String text ->
+        text.findAll(word).size()
+    }
+
+    @AsyncFun Closure lower = {s -> s.toLowerCase()}
+
+    void scan() {
+        def result = scanFor('groovy', lower(download('http://www.infoq.com')))  //synchronous processing
+        println 'Allowed to do something else now'
+        println result.get()
+    }
+}
+
+withPool {
+    new DownloadingSearch().scan()
+}
+{code}
+
+h4. Alternative pools
+
+The _@AsyncFun_ annotation by default uses an instance of _GParsPool_ from the wrapping withPool block. You may, however, specify the type of pool explicitly:
+{code}
+@AsyncFun(GParsExecutorsPoolUtil) def sum6 = {a, b -> a + b }
+{code}
+
 On our side this is a very interesting domain to explore, so any comments, questions or suggestions on combining asynchronous functions or hints about its limits are welcome.

@@ -11,6 +11,7 @@ See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes fo
 h3. Asynchronous functions
 
 * The asyncFun() method now creates composable asynchronous functions
+* The @AsyncFun annotation can be used to create
 
 h3. Parallel collections
 
