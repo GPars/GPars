@@ -18,6 +18,7 @@
 //  Author: Russel Winder
 //  Author: Dierk König
 //  Author: Hans Dockter
+//  Author: Rene Groeschke - fixing the pdfGuide task
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
 // gradle imports these by default, but IDEA doesn't know
@@ -31,7 +32,7 @@ defaultTasks 'test'
 
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
-version = '0.12'
+version = '0.12-SNAPSHOT'
 bundleVersion = version
 
 sourceCompatibility = 5
@@ -106,9 +107,9 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '320M')
 
 gradle.taskGraph.whenReady {taskGraph ->
-    if (!taskGraph.hasTask(':release')) {
-        version += '-SNAPSHOT'
-    }
+    if(taskGraph.hasTask(":release") && version.contains("SNAPSHOT")){
+		throw(new StopExecutionException("You should not release a snapshot version! We're Stopping the build!"))
+	}
     if (taskGraph.hasTask(':test') && taskGraph.hasTask(':withCoverage')) {
         new Coverage(this).setup()
     }
@@ -147,49 +148,44 @@ tasks.withType(CodeNarc).all { codeNarcTask ->
 
 //build.dependsOn integrationTest
 
-try {
-    uploadArchives {
-        project.deployer = repositories.mavenDeployer {
-            uniqueVersion = false
-            configuration = configurations.deployerJars
-            repository(url: 'https://dav.codehaus.org/repository/gpars/') {
-                authentication(userName: codehausUsername, password: codehausPassword)
-            }
-            snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
-                authentication(userName: codehausUsername, password: codehausPassword)
-            }
-            pom.project {
-                name 'GPars'
-                description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
-                url 'http://gpars.codehaus.org'
-                inceptionYear '2009'
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
+if(!project.hasProperty('codehausUsername')) codehausUsername = ''
+if(!project.hasProperty('codehausPassword')) codehausPassword = ''
+
+uploadArchives {
+    project.deployer = repositories.mavenDeployer {
+        uniqueVersion = false
+        configuration = configurations.deployerJars
+        repository(url: 'https://dav.codehaus.org/repository/gpars/') {
+            authentication(userName: codehausUsername, password: codehausPassword)
+        }
+        snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
+            authentication(userName: codehausUsername, password: codehausPassword)
+        }
+        pom.project {
+            name 'GPars'
+            description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
+            url 'http://gpars.codehaus.org'
+            inceptionYear '2009'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
                 }
-            }
-            // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
-            pom.whenConfigured {pom ->
-                // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
-                pom.dependencies.each {dependency ->
-                    if (dependency.artifactId in ['netty', 'jcsp', 'multiverse-beta']) {
-                        dependency.optional = true
-                    }
-                }
-                // Remove test dependencies from all poms
-                pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == 'test' })
             }
         }
+        // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
+        pom.whenConfigured {pom ->
+            // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
+            pom.dependencies.each {dependency ->
+                if (dependency.artifactId in ['netty', 'jcsp', 'multiverse-beta']) {
+                    dependency.optional = true
+                }
+            }
+            // Remove test dependencies from all poms
+            pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == 'test' })
+        }
     }
-} catch (Exception e) {
-    //  It may be that codehausUsername and/or codehausPassword are not defined in which case an exception
-    //  will be thrown.  As it is impossible to do an upload if these are not defined then we don't really
-    //  care that the uploadArchives specification hasn't completed.
-    println 'Upload archives thrown an exception.'
-    e.printStackTrace()
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
