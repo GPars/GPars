@@ -82,14 +82,14 @@ class AsyncFunAnnotationTest extends Specification {
         wasCalled
     }
 
-    def "test annotation parameters"() {
+    def "test non-blocking annotation parameters"() {
 
         when:
         boolean wasCalled = false
         groovyx.gpars.GParsPool.withPool(5) {
             def tester = new TestSum()
-            assert tester.sum5(1, 2).val == 3
-            assert tester.sum5(10, 15) instanceof Promise
+            assert tester.sum8(1, 2).val == 3
+            assert tester.sum8(10, 15) instanceof Promise
             wasCalled = true
         }
 
@@ -97,7 +97,52 @@ class AsyncFunAnnotationTest extends Specification {
         wasCalled
     }
 
-    def "test annotation parameters with older thread pool"() {
+    def "test blocking annotation parameters"() {
+
+        when:
+        boolean wasCalled = false
+        groovyx.gpars.GParsPool.withPool(5) {
+            def tester = new TestSum()
+            assert tester.sum10(1, 2) == 3
+            assert tester.sum10(10, 15) instanceof Integer
+            wasCalled = true
+        }
+
+        then:
+        wasCalled
+    }
+
+    def "test non-blocking annotation parameters with thread pool specified "() {
+
+        when:
+        boolean wasCalled = false
+        groovyx.gpars.GParsPool.withPool(5) {
+            def tester = new TestSum()
+            assert tester.sum7(1, 2).val == 3
+            assert tester.sum7(10, 15) instanceof Promise
+            wasCalled = true
+        }
+
+        then:
+        wasCalled
+    }
+
+    def "test blocking annotation parameters with thread pool specified "() {
+
+        when:
+        boolean wasCalled = false
+        groovyx.gpars.GParsPool.withPool(5) {
+            def tester = new TestSum()
+            assert tester.sum9(1, 2) == 3
+            assert tester.sum9(10, 15) instanceof Integer
+            wasCalled = true
+        }
+
+        then:
+        wasCalled
+    }
+
+    def "test annotation parameters with an alternative thread pool specified "() {
 
         when:
         boolean wasCalled = false
@@ -130,11 +175,17 @@ class AsyncFunAnnotationTest extends Specification {
         @AsyncFun(GParsPoolUtil)
         def sum5 = getNewClosureSum()
 
-        @AsyncFun(value = GParsPoolUtil, blocking = true)
+        @AsyncFun(value = GParsPoolUtil, blocking = false)
         def sum7 = getNewClosureSum()
 
-        @AsyncFun(blocking = true)
+        @AsyncFun(blocking = false)
         def sum8 = getNewClosureSum()
+
+        @AsyncFun(value = GParsPoolUtil, blocking = true)
+        def sum9 = getNewClosureSum()
+
+        @AsyncFun(blocking = true)
+        def sum10 = getNewClosureSum()
 
         def getClosureSum() {
             sum
