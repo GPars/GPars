@@ -249,7 +249,7 @@ h2. Selectors
 
 Selector's body should be a closure consuming either one or two arguments.
 {code}
-selector ([inputs : [a, b, c], outputs : [d, e]) {value ->
+selector (inputs : [a, b, c], outputs : [d, e]) {value ->
     ....
 }
 {code}
@@ -258,7 +258,7 @@ The two-argument closure will get a value plus an index of the input channel, th
 This allows the selector to distinguish between values coming through different input channels.
 
 {code}
-selector ([inputs : [a, b, c], outputs : [d, e]) {value, index ->
+selector (inputs : [a, b, c], outputs : [d, e]) {value, index ->
     ....
 }
 {code}
@@ -268,7 +268,7 @@ h3. Priority Selector
 When priorities need to be preserved among input channels, a _DataflowPrioritySelector_ should be used.
 
 {code}
-prioritySelector[inputs : [a, b, c], outputs : [d, e]) {value, index ->
+prioritySelector(inputs : [a, b, c], outputs : [d, e]) {value, index ->
     ...
 }
 {code}
@@ -280,7 +280,7 @@ h3. Join selector
 A selector without a body closure specified will copy all incoming values to all of its output channels.
 
 {code}
-def join = selector ([inputs : [programmers, analysis, managers], outputs : [employees, colleagues])
+def join = selector (inputs : [programmers, analysis, managers], outputs : [employees, colleagues])
 {code}
 
 h3. Internal parallelism
@@ -288,7 +288,7 @@ h3. Internal parallelism
 The _maxForks_ attribute allowing for internal selectors parallelism is also available.
 
 {code}
-selector ([inputs : [a, b, c], outputs : [d, e], maxForks : 5) {value ->
+selector (inputs : [a, b, c], outputs : [d, e], maxForks : 5) {value ->
     ....
 }
 {code}
