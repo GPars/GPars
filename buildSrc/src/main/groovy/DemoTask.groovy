@@ -5,7 +5,7 @@ import org.gradle.api.tasks.TaskAction
 
 class DemoTask extends DefaultTask {
     @InputFiles FileCollection classpath
-    @org.gradle.api.tasks.InputFiles FileCollection demoFiles
+    @InputFiles FileCollection demoFiles
     List excludedDemos
 
     @TaskAction

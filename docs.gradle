@@ -15,73 +15,21 @@
  */
 
 /**
- * @author Andres Almiray, Jan Novotny, Marcel Matula, Michal Bernhard
+ * @author Andres Almiray, Jan Novotny, Marcel Matula, Michal Bernhard, Rene Groeschke
  */
-buildscript {
-    repositories {
-        mavenCentral()
-        mavenRepo name: 'SpringSource', urls: 'http://repository.springsource.com/maven/bundles/release'
-        mavenRepo name: 'JavaNet', urls: 'http://download.java.net/maven/2/'
-    }
 
-    dependencies {
-        classpath("org.grails:grails-docs:1.3.6") { transitive = false }
-        classpath("org.xhtmlrenderer:core-renderer:R8") { transitive = false }
-        classpath("com.lowagie:itext:2.0.8") { transitive = false }
-        classpath("radeox:radeox:1.0-b2") { transitive = false }
-    }
+task buildGuide(type: GrailsDoc) {
+    srcDir = file('grails-doc/src')
+	props = file('grails-doc/src/doc.properties')
+    styleDir = file('grails-doc/resources/style')
+    cssDir = file('grails-doc/resources/css')
+    imagesDir = file('grails-doc/resources/img')
+	outputDir = file("$buildDir/manual")
 }
 
-task buildGuide(type: Copy) {
-    def manualSrc = 'grails-doc/src' as File
-    destinationDir = "$buildDir/manual" as File
-    from(manualSrc) {
-        include '*.properties'
-    }
-
-    doLast {
-        ant.taskdef(name: 'docs', classname: 'grails.doc.ant.DocPublisherTask', classpath: configurations.docs.asPath);
-        ant.docs(src: 'grails-doc/src',
-                dest: "$buildDir/manual",
-                properties: "grails-doc/src/doc.properties",
-                styleDir: new File('grails-doc/resources/style'),
-                cssDir: new File('grails-doc/resources/css'),
-                imagesDir: new File('grails-doc/resources/img')
-        )
-    }
-
-}
-
-task pdfGuide() {
-    dependsOn { buildGuide }
-	inputs.files(file("$buildDir/manual/guide/single.html"))
-	outputs.files(file("$buildDir/manual/gpars-guide-${version}.pdf"))
-    
-	doFirst {
-        try {
-            grails.doc.PdfBuilder.build(
-                    basedir: buildDir.absolutePath,
-                    home: project.file('grails-doc').absolutePath,
-                    tool: 'pdf/gpars'
-            )
-        } catch (x) {
-            // it's very likely that the stream is closed before
-            // the renderer 'finishes' but it actually does
-            // ignore for now
-        }
-    
-		copy{
-			from("$buildDir/manual/guide"){
-				include '*.pdf'
-			    rename 'single.pdf', "gpars-guide-${version}.pdf"
-			}
-			into("$buildDir/manual")
-		}
-	}
-
-    doLast {
-        delete "$buildDir/manual/doc.properties"
-    }
+task pdfGuide(type:PdfGuide, dependsOn:buildGuide) {
+	inputs.files file("$buildDir/manual/guide")
+	pdfName = "gpars-guide-${project.version}.pdf"
 }
 
 task zipGuide(type: Zip) {

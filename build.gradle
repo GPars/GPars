@@ -28,12 +28,8 @@ apply plugin: 'maven'
 apply plugin: 'osgi'
 
 //apply plugin: 'code-quality'
-apply {
-    from 'docs.gradle'
-}
 
 defaultTasks 'test'
-
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '0.12-SNAPSHOT'
@@ -44,6 +40,11 @@ targetCompatibility = 5
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
+
+apply {
+    from 'docs.gradle'
+}
+
 jar {
     manifest {
         name = 'gpars'
