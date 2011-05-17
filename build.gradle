@@ -18,7 +18,7 @@
 //  Author: Russel Winder
 //  Author: Dierk König
 //  Author: Hans Dockter
-//  Author: Rene Groeschke - fixing the pdfGuide task
+//  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
 // gradle imports these by default, but IDEA doesn't know
@@ -26,10 +26,10 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
+
 //apply plugin: 'code-quality'
 
 defaultTasks 'test'
-
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '0.12-SNAPSHOT'
@@ -40,6 +40,11 @@ targetCompatibility = 5
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
+
+apply {
+    from 'docs.gradle'
+}
+
 jar {
     manifest {
         name = 'gpars'
@@ -134,9 +139,6 @@ task integrationTest(type: Test, dependsOn: 'test') {
     include '**/integration/**/*.*'
 }
 
-apply {
-    from 'docs.gradle'
-}
 
 // codenarc configuration
 codeNarcConfigFileName = "./config/codenarc/codenarc.groovy"
@@ -203,10 +205,11 @@ javadoc {
     options.windowTitle(titleForDocumentation)
     options.docTitle(titleForDocumentation)
     options.footer(copyrightString)
-}
-javadoc.doFirst {
-    javadoc.title = titleForDocumentation
-    javadoc.options.docTitle = javadoc.title
+
+	doFirst {
+	    javadoc.title = titleForDocumentation
+	    javadoc.options.docTitle = javadoc.title
+	}
 }
 
 groovydoc {
@@ -319,43 +322,5 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
     demoFiles = sourceSets.test.allGroovy.matching {
         include '**/*Demo*.groovy'
         exclude excludedDemos.collect {name -> "**/${name}.groovy" }
-    }
-}
-
-class DemoTask extends DefaultTask {
-    @org.gradle.api.tasks.InputFiles FileCollection classpath
-    @org.gradle.api.tasks.InputFiles FileCollection demoFiles
-    List excludedDemos
-
-    @org.gradle.api.tasks.TaskAction
-    def runDemos() {
-        def shell = createShell()
-        def failed = []
-        def ok = 0
-        demoFiles.files.each {File file ->
-            println "*** starting demo $file.name"
-            try {
-                shell.evaluate(file)
-                ok += 1
-            } catch (Exception ex) {
-                failed << [file: file, exception: ex]
-            }
-            println "*** done"
-        }
-        println "*** cleaning up"
-        shell.evaluate("groovyx.gpars.dataflow.Dataflow.DATA_FLOW_GROUP.shutdown()")
-        println "=== demos: $ok ok, ${failed.size()} failed"
-        failed.each { println "${it.file}\n    ${it.exception}" }
-    }
-
-    private GroovyShell createShell() {
-        URLClassLoader classloader = new URLClassLoader(
-                classpath.files.collect {File classpathElement -> classpathElement.toURL()} as URL[],
-                Thread.currentThread().contextClassLoader
-        )
-        System.metaClass.static.exit = {int returnCode -> println ">>> System.exit($returnCode) suppressed." }
-        System.in.metaClass.read = {-> println ">>> System.in.read() suppressed"; 'Automated build' }
-        System.in.metaClass.readLines = {-> println ">>> System.in.read() suppressed"; ['Automated build'] }
-        new GroovyShell(classloader)
     }
 }
