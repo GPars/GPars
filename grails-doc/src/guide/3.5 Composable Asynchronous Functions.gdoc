@@ -230,10 +230,11 @@ The _AsyncFun_ annotation by default uses an instance of _GParsPool_ from the wr
 
 h4. Blocking functions through annotations
 
-The _AsyncFun_ also allows the user to specify, whether the resulting function should have blocking or non-blocking (default) semantics.
+The _AsyncFun_ also allows the user to specify, whether the resulting function should have blocking (true) or non-blocking (false - default) semantics.
 
 {code}
-
+@AsyncFun(blocking = true)
+def sum = {a, b -> a + b }
 {code}
 
 On our side this is a very interesting domain to explore, so any comments, questions or suggestions on combining asynchronous functions or hints about its limits are welcome.
