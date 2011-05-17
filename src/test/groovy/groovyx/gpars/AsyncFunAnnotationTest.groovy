@@ -130,6 +130,12 @@ class AsyncFunAnnotationTest extends Specification {
         @AsyncFun(GParsPoolUtil)
         def sum5 = getNewClosureSum()
 
+        @AsyncFun(value = GParsPoolUtil, blocking = true)
+        def sum7 = getNewClosureSum()
+
+        @AsyncFun(blocking = true)
+        def sum8 = getNewClosureSum()
+
         def getClosureSum() {
             sum
         }

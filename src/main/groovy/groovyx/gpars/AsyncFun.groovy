@@ -38,4 +38,10 @@ import java.lang.annotation.Documented
 @GroovyASTTransformationClass(classes = [AsyncFunASTTransformation])
 @interface AsyncFun {
     Class value() default GParsPoolUtil
+
+    /**
+     *
+     * @return
+     */
+    boolean blocking() default false
 }

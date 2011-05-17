@@ -16,24 +16,27 @@
 
 package groovyx.gpars.util
 
-import org.codehaus.groovy.control.CompilePhase
-import org.codehaus.groovy.transform.GroovyASTTransformation
-import org.codehaus.groovy.transform.ASTTransformation
-import org.codehaus.groovy.ast.ASTNode
-import org.codehaus.groovy.control.SourceUnit
-import org.codehaus.groovy.ast.FieldNode
-import org.codehaus.groovy.ast.AnnotationNode
-import org.codehaus.groovy.ast.AnnotatedNode
-import org.codehaus.groovy.GroovyBugError
-import static groovyx.gpars.util.ASTUtils.*
-import org.codehaus.groovy.ast.expr.Expression
-import org.codehaus.groovy.ast.expr.MethodCallExpression
 import groovyx.gpars.GParsPoolUtil
-import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.GroovyBugError
+import org.codehaus.groovy.ast.ASTNode
+import org.codehaus.groovy.ast.AnnotatedNode
+import org.codehaus.groovy.ast.AnnotationNode
+import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.expr.ArgumentListExpression
 import org.codehaus.groovy.ast.expr.ClassExpression
-import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.Expression
+import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.control.CompilePhase
+import org.codehaus.groovy.control.SourceUnit
+import org.codehaus.groovy.transform.ASTTransformation
+import org.codehaus.groovy.transform.GroovyASTTransformation
 import groovyx.gpars.AsyncFun
+import org.codehaus.groovy.ast.expr.StaticMethodCallExpression
+import org.codehaus.groovy.ast.Parameter
+import org.codehaus.groovy.ast.MethodNode
+import static groovyx.gpars.util.ASTUtils.addError
 
 /**
  *
@@ -42,34 +45,55 @@ import groovyx.gpars.AsyncFun
  * @see groovyx.gpars.GParsPoolUtil
  * @author Vladimir Orany
  * @author Hamlet D'Arcy
+ * @author Dinko Srkoč
+ * @author Paul King
  */
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 class AsyncFunASTTransformation implements ASTTransformation {
+    private static final MY_TYPE = ClassHelper.make(AsyncFun)
+
     @Override
     void visit(ASTNode[] nodes, SourceUnit source) {
+        init(nodes)
 
-        if (nodes.length != 2 || !(nodes[0] instanceof AnnotationNode) || !(nodes[1] instanceof AnnotatedNode)) {
-            addError("Internal error: expecting [AnnotationNode, AnnotatedNode] but got: " + Arrays.asList(nodes));
+        AnnotatedNode fieldNode = (AnnotatedNode) nodes[1]
+        AnnotationNode annotation = (AnnotationNode) nodes[0]
+        if (!MY_TYPE == annotation.classNode || !(fieldNode in FieldNode)) return
+
+        Expression classExpression
+        if (annotation.members.value instanceof ClassExpression) {
+            classExpression = annotation.members.value
+        } else {
+            classExpression = new ClassExpression(ClassHelper.make(GParsPoolUtil))
         }
 
-        AnnotatedNode fieldNode = (AnnotatedNode) nodes[1];
-        AnnotationNode annotation = (AnnotationNode) nodes[0];
+        validatePoolClass(classExpression, fieldNode, source)
+        Expression initExpression = fieldNode.initialValueExpression
+        def blocking = new ConstantExpression(memberHasValue(annotation, 'blocking', true))
 
-        if (fieldNode instanceof FieldNode) {
+        Expression newInitExpression = new StaticMethodCallExpression(
+                classExpression.type,
+                'asyncFun',
+                new ArgumentListExpression(initExpression, blocking))
+        fieldNode.initialValueExpression = newInitExpression
+    }
 
-            final Expression classExpression
-            if (annotation.members.value instanceof ClassExpression) {
-                classExpression = annotation.members.value
-            } else {
-                classExpression = new ClassExpression(ClassHelper.make(GParsPoolUtil))
-            }
+    private validatePoolClass(Expression classExpression, AnnotatedNode fieldNode, SourceUnit source) {
+        Parameter[] parameters = [new Parameter(ClassHelper.CLOSURE_TYPE, 'a1'),
+                new Parameter(ClassHelper.boolean_TYPE, 'a2')]
+        MethodNode asyncFunMethod = classExpression.type.getMethod('asyncFun', parameters)
+        if (!asyncFunMethod || !asyncFunMethod.isStatic())
+            addError("Supplied pool class has no static asyncFun(Closure, boolean) method", fieldNode, source)
+    }
 
-            Expression initExpression = fieldNode.initialValueExpression
-            MethodCallExpression newInitExpression = new MethodCallExpression(
-                    classExpression,
-                    new ConstantExpression('asyncFun'),
-                    new ArgumentListExpression(initExpression))
-            fieldNode.initialValueExpression = newInitExpression
+    private init(ASTNode[] nodes) {
+        if (nodes.length != 2 || !(nodes[0] in AnnotationNode) || !(nodes[1] in AnnotatedNode)) {
+            throw new GroovyBugError("Internal error: expecting [AnnotationNode, AnnotatedNode] but got: " + Arrays.asList(nodes))
         }
+    }
+
+    private memberHasValue(AnnotationNode node, String name, Object value) {
+        Expression member = node.getMember(name)
+        member && member in ConstantExpression && member.value == value
     }
 }
