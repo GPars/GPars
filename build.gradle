@@ -59,6 +59,7 @@ jar {
         instruction 'provider', theVendor
         instruction 'Export-Package', "*;version=${version}"
         instruction 'Import-Package', '*;resolution:=optional'
+		instruction '-removeheaders', 'Bnd-LastModified'
     }
 }
 
@@ -237,7 +238,6 @@ artifacts {
     archives(zipDoc)
 }
 
-//task zipSamples(dependsOn: 'demo', type: Zip) {
 task zipSamples(type: Zip) {
     appendix = 'samples'
     from sourceSets.test.allSource.matching {
@@ -253,34 +253,21 @@ task zipJavaDemo(type: Zip) {
     }
 }
 
-task copyThirdPartyLibs(type: Copy) {
-    from('lib')
-    into('build/dist')
-    exclude('junit*', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
-}
-
-task copyLibs(type: Copy) {
-    from('build/libs')
-    into('build/dist')
-}
-
-task copyDists(type: Copy) {
-    from('build/distributions')
-    into('build/dist')
-}
-
-task copyLicense(type: Copy) {
-    from('src/main/resources/META-INF/')
-    into('build/dist')
-    include('LICENSE.txt', 'NOTICE.txt')
-}
-
-task zipDist(dependsOn: ['jar', 'copyThirdPartyLibs', 'copyLibs', 'copyDists', 'copyLicense'], type: Zip) {
-    appendix = 'all'
-    from 'build/dist'
-}
-zipDist << {
-    ant.delete(dir: file('build/dist'), failonerror: true)
+task zipDist(type: Zip) {
+    //get the main jar
+	from jar.outputs.files
+	
+	// get the libs
+	from('lib'){
+		exclude('junit*', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
+	}
+	
+	//get the license and notice files
+	from('src/main/resources/META-INF/'){
+		include('LICENSE.txt', 'NOTICE.txt')
+	}
+    
+	appendix = 'all'
 }
 
 task wrapper(type: Wrapper) {
