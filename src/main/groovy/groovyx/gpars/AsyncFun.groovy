@@ -40,8 +40,7 @@ import java.lang.annotation.Documented
     Class value() default GParsPoolUtil
 
     /**
-     *
-     * @return
+     * Set to true to execute the closure in blocking mode.
      */
     boolean blocking() default false
 }
