@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ final def firstFilter = new FilterActor(2).start()
 (2..requestedPrimeNumberBoundary).each {
     firstFilter it
 }
-firstFilter.sendAndWait 'Poisson'
+firstFilter.sendAndWait 'Poison'
 
 /**
  * Filter out numbers that can be divided by a single prime number

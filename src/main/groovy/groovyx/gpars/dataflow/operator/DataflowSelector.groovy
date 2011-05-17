@@ -137,7 +137,7 @@ private class DataflowSelectorActor extends DataflowProcessorActor {
     final void onMessage(SelectResult message) {
         final def index = message.index
         final def value = message.value
-        if (checkPoisson(value)) return
+        if (checkPoison(value)) return
         startTask(index, value)
         if (!hasBeenStopped()) owningProcessor.doSelect()
     }

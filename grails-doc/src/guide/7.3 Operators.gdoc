@@ -210,7 +210,7 @@ def op2 = selector(inputs: [d], outputs: [f, out]) { }
 
 def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-a << DataflowPoissonPill.instance  //Send the poisson
+a << PoisonPill.instance  //Send the poisson
 
 op1.join()
 op2.join()

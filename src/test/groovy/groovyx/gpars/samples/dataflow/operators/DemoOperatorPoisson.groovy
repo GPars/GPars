@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow.operators
 
 import groovyx.gpars.dataflow.DataflowQueue
-import groovyx.gpars.dataflow.operator.DataflowPoissonPill
+import groovyx.gpars.dataflow.operator.PoisonPill
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
@@ -45,9 +45,9 @@ def op2 = group.selector(inputs: [d], outputs: [f, out]) { }
 
 def op3 = group.prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-a << DataflowPoissonPill.instance  //Send the poisson
+a << PoisonPill.instance  //Send the poisson
 
-assert out.val == DataflowPoissonPill.instance  //The poisson will fall out from the output channels
+assert out.val == PoisonPill.instance  //The poisson will fall out from the output channels
 op1.join()
 op2.join()
 op3.join()

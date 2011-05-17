@@ -202,8 +202,8 @@ protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
      * @param poisson The poisson to re-send
      * return True, if poisson has been received
      */
-    boolean checkPoisson(def data) {
-        if (data instanceof DataflowPoissonPill) {
+    boolean checkPoison(def data) {
+        if (data instanceof PoisonPill) {
             owningProcessor.bindAllOutputsAtomically data
             owningProcessor.stop()
             return true

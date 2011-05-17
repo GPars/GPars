@@ -98,7 +98,7 @@ private class DataflowOperatorActor extends DataflowProcessorActor {
 
     @Override
     final void onMessage(def message) {
-        if (checkPoisson(message.result)) return
+        if (checkPoison(message.result)) return
         values[message.attachment] = message.result
         if (values.size() > inputs.size()) throw new IllegalStateException("The DataflowOperatorActor is in an inconsistent state. values.size()=" + values.size() + ", inputs.size()=" + inputs.size())
         if (values.size() == inputs.size()) {
