@@ -59,6 +59,7 @@ jar {
         instruction 'provider', theVendor
         instruction 'Export-Package', "*;version=${version}"
         instruction 'Import-Package', '*;resolution:=optional'
+		instruction '-removeheaders', 'Bnd-LastModified'
     }
 }
 
