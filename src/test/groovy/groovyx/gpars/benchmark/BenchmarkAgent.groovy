@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,31 +23,33 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 final def concurrencyLevel = 8
-group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
-final def t1 = System.currentTimeMillis()
-final def cdl = new CountDownLatch(20000 * 500)
-def last = null
+4.times {
+    group = new DefaultPGroup(new FJPool(concurrencyLevel))
+    final def t1 = System.currentTimeMillis()
+    final def cdl = new CountDownLatch(20000 * 500)
+    def last = null
 
-for (int i = 0; i < 20000; i++) {
-    final def channel = new Agent(new AgentState(last, cdl))
-    channel.attachToThreadPool group.threadPool
+    for (int i = 0; i < 20000; i++) {
+        final def channel = new Agent(new AgentState(last, cdl))
+        channel.attachToThreadPool group.threadPool
 //    channel.makeFair()
-    last = channel
+        last = channel
+    }
+
+    Closure message
+    message = {it.relay(message)}
+
+    for (int i = 0; i < 500; i++) {
+        last.send(message)
+    }
+
+    cdl.await(1000, TimeUnit.SECONDS)
+
+    group.shutdown()
+    final def t2 = System.currentTimeMillis()
+    println(t2 - t1)
 }
-
-Closure message
-message = {it.relay(message)}
-
-for (int i = 0; i < 500; i++) {
-    last.send(message)
-}
-
-cdl.await(1000, TimeUnit.SECONDS)
-
-group.shutdown()
-final def t2 = System.currentTimeMillis()
-println(t2 - t1)
 
 final class AgentState {
 

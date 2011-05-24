@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,31 +24,33 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 final def concurrencyLevel = 8
-group = new DefaultPGroup(new FJPool(concurrencyLevel))
+4.times {
+    group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
-final def t1 = System.currentTimeMillis()
-final def cdl = new CountDownLatch(10000 * 500)
-final def channels = new Actor[10000]
+    final def t1 = System.currentTimeMillis()
+    final def cdl = new CountDownLatch(10000 * 500)
+    final def channels = new Actor[10000]
 
-for (int i = 0; i < 10000; i++) {
-    final def channel = new HandlerWithArray(channels, i, cdl)
-    channel.parallelGroup = group
-    channels[i] = channel
-    channel.silentStart()
-}
-
-for (int i = 0; i < 500; i++) {
-    channels[i].send("Hi")
-    for (int j = 0; j < i; j++) {
-        cdl.countDown()
+    for (int i = 0; i < 10000; i++) {
+        final def channel = new HandlerWithArray(channels, i, cdl)
+        channel.parallelGroup = group
+        channels[i] = channel
+        channel.silentStart()
     }
+
+    for (int i = 0; i < 500; i++) {
+        channels[i].send("Hi")
+        for (int j = 0; j < i; j++) {
+            cdl.countDown()
+        }
+    }
+
+    cdl.await(1000, TimeUnit.SECONDS)
+
+    group.shutdown()
+    final def t2 = System.currentTimeMillis()
+    println(t2 - t1)
 }
-
-cdl.await(1000, TimeUnit.SECONDS)
-
-group.shutdown()
-final def t2 = System.currentTimeMillis()
-println(t2 - t1)
 
 final class HandlerWithArray extends DynamicDispatchActor {
 

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,35 +42,37 @@ public class ActorBenchmarkTest {
     @Test
     public void testBenchmark() throws Exception {
 
-        final int concurrencyLevel = 20;
+        for (int index = 0; index <= 3; index++) {
+            final int concurrencyLevel = 20;
 
-        // All actors in this group share the same thread pool
-        final PGroup group = new DefaultPGroup(new DefaultPool(true, concurrencyLevel));
+            // All actors in this group share the same thread pool
+            final PGroup group = new DefaultPGroup(new DefaultPool(true, concurrencyLevel));
 
-        final long t1 = System.currentTimeMillis();
-        // With each message received counter is decreased by the actors
-        final int latchCount = ACTORS * MESSAGES;
-        final CountDownLatch cdl = new CountDownLatch(latchCount);
-        Actor lastActor = null;
+            final long t1 = System.currentTimeMillis();
+            // With each message received counter is decreased by the actors
+            final int latchCount = ACTORS * MESSAGES;
+            final CountDownLatch cdl = new CountDownLatch(latchCount);
+            Actor lastActor = null;
 
-        // Create and chain actors (backwards - the lastActor will be first)
-        for (int i = 0; i < ACTORS; i++) {
-            final Actor actor = new MessagePassingActor(lastActor, cdl);
-            actor.setParallelGroup(group);
-            lastActor = actor;
-            actor.start();
+            // Create and chain actors (backwards - the lastActor will be first)
+            for (int i = 0; i < ACTORS; i++) {
+                final Actor actor = new MessagePassingActor(lastActor, cdl);
+                actor.setParallelGroup(group);
+                lastActor = actor;
+                actor.start();
+            }
+
+            for (int i = 0; i < MESSAGES; i++) {
+                lastActor.send("Hi");
+            }
+
+            cdl.await(1000, TimeUnit.SECONDS);
+
+            group.shutdown();
+            final long t2 = System.currentTimeMillis();
+            System.out.println("Time to process " + latchCount + " messages: " + (t2 - t1) + " ms");
+            assertEquals("Latch has not been decreased to 0", 0, cdl.getCount());
         }
-
-        for (int i = 0; i < MESSAGES; i++) {
-            lastActor.send("Hi");
-        }
-
-        cdl.await(1000, TimeUnit.SECONDS);
-
-        group.shutdown();
-        final long t2 = System.currentTimeMillis();
-        System.out.println("Time to process " + latchCount + " messages: " + (t2 - t1) + " ms");
-        assertEquals("Latch has not been decreased to 0", 0, cdl.getCount());
 
     }
 
