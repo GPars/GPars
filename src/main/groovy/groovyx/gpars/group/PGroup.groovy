@@ -17,6 +17,7 @@
 package groovyx.gpars.group
 
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
@@ -33,7 +34,6 @@ import groovyx.gpars.dataflow.operator.DataflowProcessor
 import groovyx.gpars.dataflow.operator.DataflowSelector
 import groovyx.gpars.scheduler.Pool
 import java.util.concurrent.Callable
-import groovyx.gpars.actor.BlockingActor
 
 /**
  * Provides a common super class of pooled parallel groups.
