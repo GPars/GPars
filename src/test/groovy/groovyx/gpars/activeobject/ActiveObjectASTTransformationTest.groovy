@@ -17,8 +17,8 @@
 package groovyx.gpars.activeobject
 
 import groovyx.gpars.dataflow.DataflowVariable
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import groovyx.gpars.dataflow.Promise
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 public class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActorIsActive() {
@@ -37,14 +37,8 @@ public class ActiveObjectASTTransformationTest extends GroovyTestCase {
     public void testActorMessages() {
         final MyWrapper wrapper = new MyWrapper()
         final actor = wrapper.internalActiveObjectActor
-        actor.send([wrapper, 'bar', 231])
+        actor.send([[wrapper, 'bar', 231].toArray(), new DataflowVariable()].toArray())
         assert wrapper.result.val == 231
-    }
-
-    public void testActorBlockingMessages() {
-        final MyWrapper wrapper = new MyWrapper()
-        final actor = wrapper.internalActiveObjectActor
-        assert 431 == actor.sendAndWait([wrapper, 'bar', 431])
     }
 
     public void testVoidMethod() {
@@ -64,7 +58,9 @@ public class ActiveObjectASTTransformationTest extends GroovyTestCase {
         assert 30 == wrapper.foo(10, 20)
         assert 60 == wrapper.foo(40, 20)
         final actor = wrapper.alternativeActorName
-        assert 7 == actor.sendAndWait([wrapper, 'foo', 4, 3])
+        final DataflowVariable result = new DataflowVariable()
+        actor.send([[wrapper, 'foo', 4, 3].toArray(), result].toArray())
+        assert 7 == result.get()
     }
 
     public void testActiveObjectInheritance() {
