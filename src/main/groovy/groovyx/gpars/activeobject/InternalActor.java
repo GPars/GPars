@@ -40,6 +40,7 @@ public final class InternalActor extends DynamicDispatchActor {
 
     /**
      * A DataflowVariable is expected back
+     *
      * @param args The method parameters
      * @return A Promise for the real result
      */
@@ -57,6 +58,7 @@ public final class InternalActor extends DynamicDispatchActor {
 
     /**
      * A response is expected back
+     *
      * @param args The method parameters
      * @return The result of the internal method as returned when run in the internal actor's context
      * @throws InterruptedException If the current thread gets interrupted while waiting for the internal actor to respond
@@ -68,6 +70,7 @@ public final class InternalActor extends DynamicDispatchActor {
 
     /**
      * Handles incoming messages
+     *
      * @param msg The message representing the requested method call
      */
     public void onMessage(final Object msg) {
@@ -78,7 +81,8 @@ public final class InternalActor extends DynamicDispatchActor {
     private static Object handleCurrentMessage(final Object msg) {
         try {
             final Object[] params;
-            if (msg instanceof Collection) params = ((Collection<Object>)msg).toArray(new Object[((Collection<Object>)msg).size()]);
+            if (msg instanceof Collection)
+                params = ((Collection<Object>) msg).toArray(new Object[((Collection<Object>) msg).size()]);
             else params = (Object[]) msg;
             final Object target = params[0];
             final String methodName = (String) params[1];
@@ -95,10 +99,11 @@ public final class InternalActor extends DynamicDispatchActor {
         else {
             group = ActiveObjectRegistry.getInstance().findGroupById((String) groupId);
         }
-        if (group == null) throw new IllegalArgumentException("Cannot find a PGroup " + groupId + " in the ActiveObjectRegistry. Please make sure you register the group prior to instantiating ActiveObjects.");
+        if (group == null)
+            throw new IllegalArgumentException("Cannot find a PGroup " + groupId + " in the ActiveObjectRegistry. Please make sure you register the group prior to instantiating ActiveObjects.");
         final InternalActor internalActor = new InternalActor();
         internalActor.setParallelGroup(group);
-        internalActor.start();
+        internalActor.silentStart();
         return internalActor;
     }
 }
