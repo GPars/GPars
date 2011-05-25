@@ -17,7 +17,6 @@
 package groovyx.gpars.activeobject;
 
 
-import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.dataflow.DataflowVariable;
@@ -47,12 +46,7 @@ public final class InternalActor extends DynamicDispatchActor {
     DataflowVariable<Object> submit(final Object... args) {
         final DataflowVariable<Object> result = new DataflowVariable<Object>();
         if (this.currentThread == Thread.currentThread()) result.bind(handleCurrentMessage(args));
-        else sendAndContinue(args, new MessagingRunnable<Object>() {
-            @Override
-            protected void doRun(final Object argument) {
-                result.bind(argument);
-            }
-        });
+        else send(new Object[]{args, result});
         return result;
     }
 
@@ -65,7 +59,11 @@ public final class InternalActor extends DynamicDispatchActor {
      */
     Object submitAndWait(final Object... args) throws InterruptedException {
         if (this.currentThread == Thread.currentThread()) return handleCurrentMessage(args);
-        else return sendAndWait(args);
+        else {
+            final DataflowVariable<Object> result = new DataflowVariable<Object>();
+            send(new Object[]{args, result});
+            return result.getVal();
+        }
     }
 
     /**
@@ -73,8 +71,10 @@ public final class InternalActor extends DynamicDispatchActor {
      *
      * @param msg The message representing the requested method call
      */
-    public void onMessage(final Object msg) {
-        replyIfExists(handleCurrentMessage(msg));
+    @SuppressWarnings({"unchecked", "MethodMayBeStatic"})
+    public void onMessage(final Object[] msg) {
+        final DataflowVariable<Object> promise = (DataflowVariable<Object>) msg[1];
+        promise.bind(handleCurrentMessage(msg[0]));
     }
 
     @SuppressWarnings({"unchecked"})
