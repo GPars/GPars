@@ -51,7 +51,7 @@ public abstract class AbstractLoopingActor extends Actor {
      *
      * @param code Code to run on each message
      */
-    final void initialize(final Closure code) {
+    protected final void initialize(final Closure code) {
 
         //noinspection OverlyComplexAnonymousInnerClass
         this.core = new AsyncMessagingCore(parallelGroup.getThreadPool()) {

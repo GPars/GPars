@@ -17,8 +17,9 @@
 package groovyx.gpars.activeobject;
 
 
+import groovyx.gpars.MessagingRunnable;
+import groovyx.gpars.actor.AbstractLoopingActor;
 import groovyx.gpars.actor.Actors;
-import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.group.PGroup;
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -32,13 +33,25 @@ import java.util.Collection;
  * @author Vaclav Pech
  */
 @SuppressWarnings({"CallToStringEquals"})
-public final class InternalActor extends DynamicDispatchActor {
+public final class InternalActor extends AbstractLoopingActor {
     private static final long serialVersionUID = 6700367864074699984L;
     public static final String METHOD_NAME_PREFIX = "activeObject_";
     private static final Object[] No_ARGS = new Object[0];
 
     /**
-     * A DataflowVariable is expected back
+     * Just like DynamicDispatchActor, except that the actual method dispatch is static through the closure passed to the initialize() method.
+     */
+    public InternalActor() {
+        initialize(new MessagingRunnable() {
+            @Override
+            protected void doRun(final Object argument) {
+                InternalActor.this.onMessage((Object[]) argument);
+            }
+        });
+    }
+
+    /**
+     * A DataflowVariable is passed to the actor, which will bind it once the result is known.
      *
      * @param args The method parameters
      * @return A Promise for the real result
@@ -51,18 +64,21 @@ public final class InternalActor extends DynamicDispatchActor {
     }
 
     /**
-     * A response is expected back
+     * A DataflowVariable is passed to the actor, which will bind it once the result is known.
+     * The method blocks waiting for the Promise to hold a value. The value is then returned back to the caller.
      *
      * @param args The method parameters
      * @return The result of the internal method as returned when run in the internal actor's context
      * @throws InterruptedException If the current thread gets interrupted while waiting for the internal actor to respond
+     * @throws Throwable            If the target method invoked asynchronously throws an exception.
      */
-    Object submitAndWait(final Object... args) throws InterruptedException {
+    @SuppressWarnings({"ProhibitedExceptionDeclared"})
+    Object submitAndWait(final Object... args) throws Throwable {
         if (this.currentThread == Thread.currentThread()) return handleCurrentMessage(args);
         else {
             final DataflowVariable<Object> result = new DataflowVariable<Object>();
             send(new Object[]{args, result});
-            return result.getVal();
+            return result.get();
         }
     }
 
