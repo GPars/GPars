@@ -64,7 +64,7 @@ jar {
         instruction 'provider', theVendor
         instruction 'Export-Package', "*;version=${version}"
         instruction 'Import-Package', '*;resolution:=optional'
-		instruction '-removeheaders', 'Bnd-LastModified'
+        instruction '-removeheaders', 'Bnd-LastModified'
     }
 }
 
@@ -88,8 +88,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: hasProperty('junitVersion') ? junitVersion : '4.8.2'
     testCompile group: 'org.spockframework', name: 'spock-core', version: hasProperty('spockVersion') ? spockVersion : '0.5-groovy-1.7'
     //compile group: 'org.coconut.forkjoin', name: 'jsr166y', version: hasProperty('jsr166yVersion') ? jsr166yVersion : '070108'
-    compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
-    compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
+    compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0.1-SNAPSHOT'
+    compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0.1-SNAPSHOT'
     compile 'org.multiverse:multiverse-beta:0.7-RC-1'
     compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA'
     //compile group: 'org.jboss.netty', name: 'netty', version: hasProperty('nettyVersion') ? nettyVersion : '3.1.5.GA' {maven.optional = true}
@@ -113,9 +113,9 @@ compileGroovy.options.compilerArgs = ['-Xlint']
 [compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '320M')
 
 gradle.taskGraph.whenReady {taskGraph ->
-    if(taskGraph.hasTask(":release") && version.contains("SNAPSHOT")){
-		throw(new StopExecutionException("You should not release a snapshot version! We're Stopping the build!"))
-	}
+    if (taskGraph.hasTask(":release") && version.contains("SNAPSHOT")) {
+        throw (new StopExecutionException("You should not release a snapshot version! We're Stopping the build!"))
+    }
     if (taskGraph.hasTask(':test') && taskGraph.hasTask(':withCoverage')) {
         new Coverage(this).setup()
     }
@@ -139,7 +139,6 @@ task integrationTest(type: Test, dependsOn: 'test') {
     include '**/integration/**/*.*'
 }
 
-
 // codenarc configuration
 codeNarcConfigFileName = "./config/codenarc/codenarc.groovy"
 task checkstyleMain(overwrite: true) << {};
@@ -151,8 +150,8 @@ tasks.withType(CodeNarc).all { codeNarcTask ->
 
 //build.dependsOn integrationTest
 
-if(!project.hasProperty('codehausUsername')) codehausUsername = ''
-if(!project.hasProperty('codehausPassword')) codehausPassword = ''
+if (!project.hasProperty('codehausUsername')) codehausUsername = ''
+if (!project.hasProperty('codehausPassword')) codehausPassword = ''
 
 uploadArchives {
     project.deployer = repositories.mavenDeployer {
@@ -206,10 +205,10 @@ javadoc {
     options.docTitle(titleForDocumentation)
     options.footer(copyrightString)
 
-	doFirst {
-	    javadoc.title = titleForDocumentation
-	    javadoc.options.docTitle = javadoc.title
-	}
+    doFirst {
+        javadoc.title = titleForDocumentation
+        javadoc.options.docTitle = javadoc.title
+    }
 }
 
 groovydoc {
@@ -258,19 +257,19 @@ task zipJavaDemo(type: Zip) {
 
 task zipDist(type: Zip) {
     //get the main jar
-	from jar.outputs.files
-	
-	// get the libs
-	from('lib'){
-		exclude('junit*', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
-	}
-	
-	//get the license and notice files
-	from('src/main/resources/META-INF/'){
-		include('LICENSE.txt', 'NOTICE.txt')
-	}
-    
-	appendix = 'all'
+    from jar.outputs.files
+
+    // get the libs
+    from('lib') {
+        exclude('junit*', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
+    }
+
+    //get the license and notice files
+    from('src/main/resources/META-INF/') {
+        include('LICENSE.txt', 'NOTICE.txt')
+    }
+
+    appendix = 'all'
 }
 
 task wrapper(type: Wrapper) {
