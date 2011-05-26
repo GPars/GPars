@@ -189,6 +189,38 @@ result promise. The inner function ( _plus_ ) will now bind its result to the ou
 This ability of promises to compose allows functions to cease their calculation without blocking a thread not only when waiting for parameters,
 but also whenever they call another asynchronous function anywhere in their body.
 
+h3. Methods as asynchronous functions
+
+Methods can be referred to as closures using the _.&_ operator. These closures can then be transformed using _asyncFun_ into composable asynchronous functions just like ordinary closures.
+
+{code}
+class DownloadHelper {
+    String download(String url) {
+        url.toURL().text
+    }
+
+    int scanFor(String word, String text) {
+        text.findAll(word).size()
+    }
+
+    String lower(s) {
+        s.toLowerCase()
+    }
+}
+//now we'll make the methods asynchronous
+withPool {
+    final DownloadHelper d = new DownloadHelper()
+    Closure download = d.&download.asyncFun()
+    Closure scanFor = d.&scanFor.asyncFun()
+    Closure lower = d.&lower.asyncFun()
+
+    //asynchronous processing
+    def result = scanFor('groovy', lower(download('http://www.infoq.com')))
+    println 'Allowed to do something else now'
+    println result.get()
+}
+{code}
+
 h3. Using annotation to create asynchronous functions
 
 Instead of calling the _asyncFun()_ function, the _@AsyncFun_ annotation can be used to annotate Closure-typed fields.
