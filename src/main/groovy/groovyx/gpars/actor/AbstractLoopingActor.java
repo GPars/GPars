@@ -265,7 +265,7 @@ public abstract class AbstractLoopingActor extends Actor {
      */
     protected final void reply(final Object message) {
         if (currentSender == null) {
-            throw new ActorReplyException("Cannot send replies. No sender has been registered.");
+            throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERED);
         } else {
             currentSender.send(message);
         }

@@ -28,7 +28,7 @@ h3. Actors
 
 * Active Objects wrapping actors with an OO facade
 * Enhanced DynamicDispatchActor's API for dynamic message handler registration
-* Added BlockingActor to allow for non-conntiuation style actors
+* Added BlockingActor to allow for non-continuation style actors
 * Removed the deprecated actor classes
 
 h3. Dataflow

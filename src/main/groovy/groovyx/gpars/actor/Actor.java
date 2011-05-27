@@ -57,6 +57,7 @@ public abstract class Actor extends MessageStream {
      */
     private static final ThreadLocal<Actor> currentActorPerThread = new ThreadLocal<Actor>();
     private static final long serialVersionUID = -3491276479442857422L;
+    public static final String CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERED = "Cannot send replies. No sender has been registered.";
 
     private final DataflowExpression<Object> joinLatch;
 

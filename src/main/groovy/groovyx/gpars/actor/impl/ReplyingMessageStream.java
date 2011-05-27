@@ -27,7 +27,6 @@ import java.util.List;
 @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 public abstract class ReplyingMessageStream extends Actor {
     private static final long serialVersionUID = -4660316352077009411L;
-    public static final String CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED = "Cannot send replies. No sender has been registerred.";
     /**
      * A list of senders for the currently processed messages
      */
@@ -51,7 +50,7 @@ public abstract class ReplyingMessageStream extends Actor {
      *          If some of the replies failed to be sent.
      */
     protected final void reply(final Object message) {
-        if (sender == null) throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERRED);
+        if (sender == null) throw new ActorReplyException(CANNOT_SEND_REPLIES_NO_SENDER_HAS_BEEN_REGISTERED);
         final List<Exception> exceptions = new ArrayList<Exception>();
         try {
             sender.send(message);

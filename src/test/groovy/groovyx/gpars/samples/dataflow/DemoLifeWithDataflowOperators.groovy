@@ -51,7 +51,7 @@ class LifeGameWithDataflowOperators {
     void run() {
         welcome()
         printInitialGrid()
-        setupBeasties()
+        setupIndividuals()
         evolve(0)
 
     }
@@ -108,11 +108,11 @@ class LifeGameWithDataflowOperators {
         }
     }
 
-    void setupBeasties() {
+    void setupIndividuals() {
         println()
         println "You now need to specify the cells in which the automata live."
         println "Please enter in the format (x, y). Enter -1, -1 to end this phase."
-        getBeastiePlaces()
+        getCellPlaces()
         println "Game will now begin..."
     }
 
@@ -133,23 +133,23 @@ class LifeGameWithDataflowOperators {
         }
     }
 
-    void getBeastiePlaces() {
+    void getCellPlaces() {
         String gridPoint = new Scanner(System.in).nextLine()
         def comma = ","
         def gridBits = gridPoint.tokenize(comma)
         if (gridBits.isEmpty()) {
             errorXY(gridPoint + " does not evaluate")
-            getBeastiePlaces()
+            getCellPlaces()
             return
         }
         if (gridBits[1] == null) {
             errorXY(gridPoint + " badly formed")
-            getBeastiePlaces()
+            getCellPlaces()
             return
         }
         if (!gridBits[0].isInteger() || !gridBits[1].isInteger()) {
             errorXY(gridPoint + " not numerical")
-            getBeastiePlaces()
+            getCellPlaces()
             return
         }
         def gridW = gridBits[0].toInteger()
@@ -158,13 +158,13 @@ class LifeGameWithDataflowOperators {
             return
         if (!(gridW in 1..gridWidth) || !(gridH in 1..gridHeight)) {
             errorXY(gridPoint + " out of range")
-            getBeastiePlaces()
+            getCellPlaces()
             return
         }
         initialGrid[gridH - 1][gridW - 1] = 1;
         printInitialGrid()
         println "Next place x,y... or -1,-1 to finish"
-        getBeastiePlaces()
+        getCellPlaces()
         return
     }
 
