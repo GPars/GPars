@@ -125,7 +125,7 @@ class LifeGameWithDataflowOperators {
         }
 
         while (true) {
-            heartbeats << 'go!'  //This message is sent to all operators and to trigger the calculation of the next generation
+            heartbeats << 'go!'  //This message is sent to all operators to trigger the calculation of the next generation
             println "Generation $generation"
             printGrid()
             ++generation
