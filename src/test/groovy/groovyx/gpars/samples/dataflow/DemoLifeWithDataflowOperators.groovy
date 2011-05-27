@@ -43,6 +43,7 @@ class LifeGameWithDataflowOperators {
     final List<List<DataflowBroadcast>> channelGrid = []  //the sequence of life values (0 or 1) for each cell
     final List<List<DataflowReadChannel>> printingGrid = []  //the sequence of life values (0 or 1) for each cell to read by the print method
     final List<List<DataflowOperator>> operatorGrid = []  //the grid of operators calculating values for their respective cells
+    final DataflowBroadcast heartbeats = new DataflowBroadcast()  //gives pace to the calculation
     def gridWidth
     def gridHeight
     final def group = new NonDaemonPGroup()  //the thread pool to use by all the operators
@@ -82,6 +83,7 @@ class LifeGameWithDataflowOperators {
                         if (columnIndex < gridHeight - 1) inputChannels.add(channelGrid[currentRowIndex][columnIndex + 1].createReadChannel())
                     }
                 }
+                inputChannels.add(heartbeats.createReadChannel())
 
                 final Closure code = new LifeClosure(this, inputChannels.size)
                 operatorRow[columnIndex] = group.operator(inputs: inputChannels, outputs: [channelGrid[rowIndex][columnIndex]], code)
@@ -123,9 +125,11 @@ class LifeGameWithDataflowOperators {
         }
 
         while (true) {
+            heartbeats << 'go!'  //This message is sent to all operators and to trigger the calculation of the next generation
             println "Generation $generation"
             printGrid()
             ++generation
+            sleep 500
         }
     }
 
@@ -261,7 +265,7 @@ class LifeClosure extends Closure {
     @Override
     Object call(Object[] args) {
         def result = args[0]
-        def mates = args[1..-1].findAll {it > 0}.size()
+        def mates = args[1..-2].findAll {it > 0}.size()
         if (mates > 3) result = 0
         else if (mates == 3) result = 1
         else if (result == 1 && mates == 2)
