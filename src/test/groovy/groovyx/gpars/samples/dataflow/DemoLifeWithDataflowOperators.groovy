@@ -22,8 +22,17 @@ import groovyx.gpars.dataflow.operator.DataflowOperator
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
- * A concurrent implementation of the Game of Life
+ * A concurrent implementation of the Game of Life using dataflow operators
  * Inspired by https://github.com/mcmenaminadrian/Groovy-Life/blob/master/Life.groovy
+ *
+ * Each cell of the world is represented by a DataflowBroadcast instance, which emits the current value to all subscribed listeners.
+ * The printGrid() method is one of these listeners, so it can show the current state of the world to the user.
+ * To transform an old world into a new one, a dataflow operator exists for each cell, monitoring the cell as well as the surroundings of the cell
+ * and calculating the new value for the cell, whenever all the monitored cells emit new values. The calculated value is written
+ * back into the cell and so it can be observed by all interested operators in the next iteration of the system.
+ *
+ * The system iterates spontaneously without any external clock or synchronization. The inherent quality of operators to wait for all input values
+ * before proceeding guarantees that the system evolves in phases/generations.
  *
  * @author Vaclav Pech
  */
@@ -32,7 +41,7 @@ class LifeGameWithDataflowOperators {
 /* Controls the game */
     final def initialGrid = []  //initial values entered by the user
     final List<List<DataflowBroadcast>> channelGrid = []  //the sequence of life values (0 or 1) for each cell
-    final List<List<DataflowReadChannel>> valueGrid = []  //the sequence of life values (0 or 1) for each cell to read by the print method
+    final List<List<DataflowReadChannel>> printingGrid = []  //the sequence of life values (0 or 1) for each cell to read by the print method
     final List<List<DataflowOperator>> operatorGrid = []  //the grid of operators calculating values for their respective cells
     def gridWidth
     def gridHeight
@@ -92,7 +101,7 @@ class LifeGameWithDataflowOperators {
                 valueRow[it] = channelRow[it].createReadChannel()
             }
             initialGrid.add(initialRow)
-            valueGrid.add(valueRow)
+            printingGrid.add(valueRow)
             channelGrid.add(channelRow)
         }
     }
@@ -218,7 +227,7 @@ class LifeGameWithDataflowOperators {
             def line = it
             print "|"
             (0..<gridWidth).each {
-                if (valueGrid[line][it].val == 0)
+                if (printingGrid[line][it].val == 0)
                     print " "
                 else
                     print "X"
