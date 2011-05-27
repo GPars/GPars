@@ -1,0 +1,265 @@
+// GPars - Groovy Parallel Systems
+//
+// Copyright © 2008-11  The original author or authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package groovyx.gpars.samples.dataflow
+
+import groovyx.gpars.dataflow.DataflowBroadcast
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.operator.DataflowOperator
+import groovyx.gpars.group.NonDaemonPGroup
+
+/**
+ * A concurrent implementation of the Game of Life
+ * Inspired by https://github.com/mcmenaminadrian/Groovy-Life/blob/master/Life.groovy
+ *
+ * @author Vaclav Pech
+ */
+
+class LifeGameWithDataflowOperators {
+/* Controls the game */
+    final def initialGrid = []  //initial values entered by the user
+    final List<List<DataflowBroadcast>> channelGrid = []  //the sequence of life values (0 or 1) for each cell
+    final List<List<DataflowReadChannel>> valueGrid = []  //the sequence of life values (0 or 1) for each cell to read by the print method
+    final List<List<DataflowOperator>> operatorGrid = []  //the grid of operators calculating values for their respective cells
+    def gridWidth
+    def gridHeight
+    final def group = new NonDaemonPGroup()  //the thread pool to use by all the operators
+
+    void run() {
+        welcome()
+        printInitialGrid()
+        setupBeasties()
+        evolve(0)
+
+    }
+
+    void welcome() {
+        println "Welcome to the Game of Life"
+        println "Based on John Conway's famous article for the Scientific American."
+        println "To begin you must specify a grid size. Height and width are limited"
+        println "to 40 x 40 max."
+        println()
+        println "Please specify the width and height of your grid in the format"
+        println "width,height"
+        getGridDimensions()
+
+        setupCells()
+        setupOperators()
+
+    }
+
+    private def setupOperators() {
+        (0..<gridHeight).each {rowIndex ->
+            def operatorRow = []
+            (0..<gridWidth).each {columnIndex ->
+                def inputChannels = [channelGrid[rowIndex][columnIndex].createReadChannel()]
+                [rowIndex - 1, rowIndex, rowIndex + 1].each {currentRowIndex ->
+                    if (currentRowIndex in 0..<gridHeight) {
+                        if (columnIndex > 0) inputChannels.add(channelGrid[currentRowIndex][columnIndex - 1].createReadChannel())
+                        if (currentRowIndex != rowIndex) inputChannels.add(channelGrid[currentRowIndex][columnIndex].createReadChannel())
+                        if (columnIndex < gridHeight - 1) inputChannels.add(channelGrid[currentRowIndex][columnIndex + 1].createReadChannel())
+                    }
+                }
+
+                final Closure code = new LifeClosure(this, inputChannels.size)
+                operatorRow[columnIndex] = group.operator(inputs: inputChannels, outputs: [channelGrid[rowIndex][columnIndex]], code)
+            }
+            operatorGrid.add(operatorRow)
+        }
+    }
+
+    private def setupCells() {
+        (0..<gridHeight).each {
+            def initialRow = []
+            def valueRow = []
+            List<DataflowBroadcast> channelRow = []
+            (0..<gridWidth).each {
+                initialRow[it] = 0
+                channelRow[it] = new DataflowBroadcast()
+                valueRow[it] = channelRow[it].createReadChannel()
+            }
+            initialGrid.add(initialRow)
+            valueGrid.add(valueRow)
+            channelGrid.add(channelRow)
+        }
+    }
+
+    void setupBeasties() {
+        println()
+        println "You now need to specify the cells in which the automata live."
+        println "Please enter in the format (x, y). Enter -1, -1 to end this phase."
+        getBeastiePlaces()
+        println "Game will now begin..."
+    }
+
+    void evolve(def generation) {
+        //initialize the dataflow network by copying the values to the cells (channels)
+        (0..<gridHeight).each {rowIndex ->
+            (0..<gridWidth).each {columnIndex ->
+                channelGrid[rowIndex][columnIndex] << initialGrid[rowIndex][columnIndex]
+            }
+        }
+
+        while (true) {
+            println "Generation $generation"
+            printGrid()
+            ++generation
+        }
+    }
+
+    void getBeastiePlaces() {
+        String gridPoint = new Scanner(System.in).nextLine()
+        def comma = ","
+        def gridBits = gridPoint.tokenize(comma)
+        if (gridBits.isEmpty()) {
+            errorXY(gridPoint + " does not evaluate")
+            getBeastiePlaces()
+            return
+        }
+        if (gridBits[1] == null) {
+            errorXY(gridPoint + " badly formed")
+            getBeastiePlaces()
+            return
+        }
+        if (!gridBits[0].isInteger() || !gridBits[1].isInteger()) {
+            errorXY(gridPoint + " not numerical")
+            getBeastiePlaces()
+            return
+        }
+        def gridW = gridBits[0].toInteger()
+        def gridH = gridBits[1].toInteger()
+        if ((gridW == -1) && (gridH == -1))
+            return
+        if (!(gridW in 1..gridWidth) || !(gridH in 1..gridHeight)) {
+            errorXY(gridPoint + " out of range")
+            getBeastiePlaces()
+            return
+        }
+        initialGrid[gridH - 1][gridW - 1] = 1;
+        printInitialGrid()
+        println "Next place x,y... or -1,-1 to finish"
+        getBeastiePlaces()
+        return
+    }
+
+    void getGridDimensions() {
+        String gridSize = new Scanner(System.in).nextLine()
+        def comma = ","
+        def gridBits = gridSize.tokenize(comma)
+        if (gridBits.isEmpty()) {
+            errorXY(gridSize + " does not evaluate")
+            getGridDimensions()
+            return
+        }
+        if (gridBits[1] == null) {
+            errorXY(gridSize + " badly formed")
+            getGridDimensions()
+            return
+        }
+        if (!gridBits[0].isInteger() || !gridBits[1].isInteger()) {
+            errorXY(gridSize + " not numerical")
+            getGridDimensions()
+            return
+        }
+        gridWidth = gridBits[0].toInteger()
+        gridHeight = gridBits[1].toInteger()
+        if (!(gridWidth in 1..40) || !(gridHeight in 1..40)) {
+            errorXY(gridSize + "out of range")
+            getGridDimensions()
+        }
+    }
+
+    void errorXY(String strMsg) {
+        println strMsg
+    }
+
+    void printInitialGrid() {
+        (0..gridWidth + 1).each {
+            print "*"
+        }
+        println()
+        (0..<gridHeight).each {
+            def line = it
+            print "|"
+            (0..<gridWidth).each {
+                if (initialGrid[line][it] == 0)
+                    print " "
+                else
+                    print "X"
+            }
+            print "|"
+            println()
+        }
+        (0..gridWidth + 1).each {
+            print "*"
+        }
+        println()
+    }
+
+    void printGrid() {
+        (0..gridWidth + 1).each {
+            print "*"
+        }
+        println()
+        (0..<gridHeight).each {
+            def line = it
+            print "|"
+            (0..<gridWidth).each {
+                if (valueGrid[line][it].val == 0)
+                    print " "
+                else
+                    print "X"
+            }
+            print "|"
+            println()
+        }
+        (0..gridWidth + 1).each {
+            print "*"
+        }
+        println()
+    }
+}
+
+def lifer = new LifeGameWithDataflowOperators()
+lifer.run()
+
+class LifeClosure extends Closure {
+    final int numberOfArguments
+
+    LifeClosure(final Object owner, final int numberOfArguments) {
+        super(owner)
+        this.numberOfArguments = numberOfArguments
+    }
+
+    @Override
+    int getMaximumNumberOfParameters() {
+        return numberOfArguments
+    }
+
+    @Override
+    Object call(Object[] args) {
+        def result = args[0]
+        def mates = args[1..-1].findAll {it > 0}.size()
+        if (mates > 3) result = 0
+        else if (mates == 3) result = 1
+        else if (result == 1 && mates == 2)
+            result = 1
+        else
+            result = 0
+
+        bindOutput result
+    }
+}
