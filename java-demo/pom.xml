@@ -50,12 +50,12 @@
         <dependency>
             <groupId>org.codehaus.jsr166-mirror</groupId>
             <artifactId>jsr166y</artifactId>
-            <version>1.7.0.1-SNAPSHOT</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jsr166-mirror</groupId>
             <artifactId>extra166y</artifactId>
-            <version>1.7.0.1-SNAPSHOT</version>
+            <version>1.7.0</version>
         </dependency>
 
     </dependencies>

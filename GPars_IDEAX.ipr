@@ -6437,6 +6437,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.8/groovy-all-1.7.8-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: org.codehaus.jsr166-mirror:extra166y:1.7.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: org.codehaus.jsr166-mirror:extra166y:1.7.0.1-SNAPSHOT">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0.1-SNAPSHOT/extra166y-1.7.0.1-SNAPSHOT.jar!/" />
@@ -6446,6 +6457,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0.1-SNAPSHOT/extra166y-1.7.0.1-SNAPSHOT-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.codehaus.jsr166-mirror:jsr166y:1.7.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.codehaus.jsr166-mirror:jsr166y:1.7.0.1-SNAPSHOT">
