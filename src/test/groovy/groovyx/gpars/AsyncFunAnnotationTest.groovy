@@ -21,12 +21,14 @@ import spock.lang.Specification
 
 class AsyncFunAnnotationTest extends Specification {
 
+
     def "test basic annotation usage"() {
 
         when:
         boolean wasCalled = false
         groovyx.gpars.GParsPool.withPool(5) {
             def tester = new TestSum()
+
             assert tester.sum(1, 2).val == 3
             assert tester.sum(10, 15) instanceof Promise
             wasCalled = true

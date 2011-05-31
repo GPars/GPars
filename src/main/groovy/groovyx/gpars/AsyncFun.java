@@ -14,15 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars
+package groovyx.gpars;
 
-import org.codehaus.groovy.transform.GroovyASTTransformationClass
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-import java.lang.annotation.Target
-import java.lang.annotation.ElementType
-import groovyx.gpars.util.AsyncFunASTTransformation
-import java.lang.annotation.Documented
+import groovyx.gpars.util.AsyncFunASTTransformation;
+import org.codehaus.groovy.transform.GroovyASTTransformationClass;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * This annotation makes a field or local variable as an asynchronous function, and the field/variable should be
@@ -30,17 +31,19 @@ import java.lang.annotation.Documented
  *
  * @author Vladimir Orany
  * @author Hamlet D'Arcy
- * Date: May 14, 2011
+ *         Date: May 14, 2011
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target([ElementType.FIELD])
-@GroovyASTTransformationClass(classes = [AsyncFunASTTransformation])
-@interface AsyncFun {
-    Class value() default GParsPoolUtil
+@Target({ElementType.FIELD})
+@GroovyASTTransformationClass(classes = {AsyncFunASTTransformation.class})
+public @interface AsyncFun {
+    Class value() default GParsPoolUtil.class;
 
     /**
      * Set to true to execute the closure in blocking mode.
+     *
+     * @return The current value
      */
-    boolean blocking() default false
+    boolean blocking() default false;
 }
