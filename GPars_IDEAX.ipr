@@ -171,6 +171,7 @@
       <option name="prefixLines" value="false" />
     </LanguageOptions>
   </component>
+  <component name="CppTools.Loader" reportImplicitCastToBool="false" reportNameReferencedOnce="false" version="3" compilerSelect="AUTO" />
   <component name="DependenciesAnalyzeManager">
     <option name="myForwardDirection" value="false" />
   </component>
@@ -218,6 +219,9 @@
       </facet-type>
     </autodetection-disabled>
   </component>
+  <component name="GradleSettings">
+    <option name="SDK_HOME" value="$GRADLE_HOME" />
+  </component>
   <component name="GradleUISettings">
     <setting name="root" />
   </component>
@@ -249,6 +253,8 @@
       <setting name="setup-tab">
         <setting name="setup">
           <setting name="custom-gradle-executor" />
+          <setting name="current-directory" value="$PROJECT_DIR$" />
+          <setting name="log-level" value="LIFECYCLE" />
         </setting>
       </setting>
       <setting name="main_panel">
