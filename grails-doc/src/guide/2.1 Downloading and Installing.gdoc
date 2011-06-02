@@ -10,12 +10,12 @@ jar files, which are the artifacts of the "JSR-166 initiative":http://g.oswego.e
 <dependency>
     <groupId>org.codehaus.jsr166-mirror</groupId>
     <artifactId>jsr166y</artifactId>
-    <version>0.4.40-SNAPSHOT</version>
+    <version>1.7.0</version>
 </dependency>
 <dependency>
     <groupId>org.codehaus.jsr166-mirror</groupId>
     <artifactId>extra166y</artifactId>
-    <version>0.4.40-SNAPSHOT</version>
+    <version>1.7.0</version>
 </dependency>
 {code}
 

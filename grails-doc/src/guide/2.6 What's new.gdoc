@@ -44,7 +44,7 @@ h3. Other
 * Switched to the most recent Java 7 Fork/Join library to ensure compatibility with future JDKs
 * Raised the Groovy level used for compilation to 1.7
 * Created a pdf version of the user guide
-* An update to the stand-alone maven-based Java API "demo application":http://bamboo.ci.codehaus.org/browse/GPARS-REL-9/artifact/GPars-Java-API-integration-demo-project/gpars-mvn-java-demo-0.11.zip was added to show GPars integration and use from Java
+* An update to the stand-alone maven-based Java API "demo application":http://gpars.codehaus.org/Demos was added to show GPars integration and use from Java
 * Added numerous code examples and demos
 * Enhanced project documentation
 
