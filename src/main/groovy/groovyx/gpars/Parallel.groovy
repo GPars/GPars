@@ -311,20 +311,6 @@ final class Parallel {
     public def boolean isConcurrent() {return false}
 
     /**
-     * Creates a TransparentParallel class instance and mixes it in the object it is invoked on. The TransparentParallel class
-     * overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
-     * like eachParallel(), collectParallel() and such.
-     * After mixing-in, the isConcurrent() method will return true.
-     * Delegates to GParsPoolUtil.makeConcurrent().
-     * @param collection The object to make transparent
-     * @return The instance of the TransparentParallel class wrapping the original object and overriding the iterative methods with new parallel behavior
-     * @deprecated Use makeConcurrent() instead
-     */
-    static Object makeTransparent(Object collection) {
-        makeConcurrent(collection)
-    }
-
-    /**
      * Overrides the iterative methods like each(), collect() and such, so that they call their parallel variants from the GParsPoolUtil class
      * like eachParallel(), collectParallel() and such.
      * The first time it is invoked on a collection the method creates a TransparentParallel class instance and mixes it

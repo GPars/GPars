@@ -46,7 +46,7 @@ h3. Transparently parallel collections
 ForkJoinPool.withPool {
 
     //The selectImportantNames() will process the name collections concurrently
-    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeTransparent())
+    assert ['ALICE', 'JASON'] == selectImportantNames(['Joe', 'Alice', 'Dave', 'Jason'].makeConcurrent())
 }
 
 /**

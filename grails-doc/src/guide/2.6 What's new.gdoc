@@ -1,6 +1,6 @@
 Again, the new release, this time GPars 0.12, introduces a lot of gradual enhancements and improvements on top of the previous release.
 
-Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=16994
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=17007
 
 h3. Project changes
 
@@ -10,26 +10,11 @@ See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes fo
 
 h3. Asynchronous functions
 
-* The asyncFun() method now creates composable asynchronous functions
-* The @AsyncFun annotation can be used to create composable asynchronous functions stored in fields in a more declarative way
-
 h3. Parallel collections
-
-* Collections can now repeatedly be made transparently concurrent or sequential using makeConcurrent() and makeSequential() methods
-* Renamed makeTransparent() to makeConcurrent()
 
 h3. Fork / Join
 
-* A few new demos illustrating Fork/Join applicability to recursive functions have been added
-* Leveraging the new and efficient implementation of the jsr-166y (aka Java 7) Fork/Join library
-* The runChildDirectly() method allowing to mix asynchronous and synchronous child task execution
-
 h3. Actors
-
-* Active Objects wrapping actors with an OO facade
-* Enhanced DynamicDispatchActor's API for dynamic message handler registration
-* Added BlockingActor to allow for non-continuation style actors
-* Removed the deprecated actor classes
 
 h3. Dataflow
 
@@ -37,19 +22,12 @@ h3. Agent
 
 h3. Stm
 
-* Initial support for Stm through Multiverse was added
-
 h3. Other
 
-* Switched to the most recent Java 7 Fork/Join library to ensure compatibility with future JDKs
-* Raised the Groovy level used for compilation to 1.7
-* Created a pdf version of the user guide
-* An update to the stand-alone maven-based Java API "demo application":http://gpars.codehaus.org/Demos was added to show GPars integration and use from Java
+* Removed deprecated classes and methods
 * Added numerous code examples and demos
 * Enhanced project documentation
 
 h3. Renaming hints
 
-* The _makeTransparent()_ method that forces concurrent semantics to iteration methods (each, collect, find, etc.) has been renamed to _makeConcurrent()_
-* Capitalization has changed in the names of dataflow classes DataFlow -> Dataflow e.g. DataFlowVariable is now called DataflowVariable
-* The _DataFlowPoisson_ class has been renamed to _PoisonPill_
+* The _makeTransparent()_ method that forces concurrent semantics to iteration methods (each, collect, find, etc.) has been removed
