@@ -16,27 +16,15 @@
 
 package groovyx.gpars.groups
 
-import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.BlockingActor
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 
-/**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 20.4.2010
- * Time: 16:55:32
- * To change this template use File | Settings | File Templates.
- */
-public class PGroupTest extends GroovyTestCase { /**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 20.4.2010
- * Time: 16:55:32
- * To change this template use File | Settings | File Templates.
- */
+public class PGroupTest extends GroovyTestCase {
     public void testDefaultGroupDaemon() {
         volatile boolean daemon = false;
         final CountDownLatch latch = new CountDownLatch(1)
@@ -82,36 +70,29 @@ public class PGroupTest extends GroovyTestCase { /**
     }
 
     public void testGroupsWithActorInheritance() {
-//        volatile boolean daemon = false;
-        //        final CountDownLatch latch1 = new CountDownLatch(1)
-        //        final CountDownLatch latch2 = new CountDownLatch(1)
-        //
-        //        final DefaultPGroup daemonGroup = new DefaultPGroup()
-        //        final PGroup nonDaemonGroup = new NonDaemonPGroup()
-        //
-        //        final GroupTestActor actor1 = new GroupTestActor(daemonGroup)
-        //        actor1.metaClass.act = {->
-        //            daemon = Thread.currentThread().isDaemon()
-        //            latch1.countDown()
-        //        }
-        //        actor1.start()
-        //
-        //        assertEquals daemonGroup, actor1.parallelGroup
-        //        latch1.await()
-        //        assert daemon
-        //
-        //        final GroupTestActor actor2 = new GroupTestActor(nonDaemonGroup)
-        //        actor2.metaClass.act = {->
-        //            daemon = Thread.currentThread().isDaemon()
-        //            latch2.countDown()
-        //        }
-        //        actor2.start()
-        //
-        //        assertEquals nonDaemonGroup, actor2.parallelGroup
-        //        latch2.await()
-        //        assertFalse daemon
-        //        daemonGroup.shutdown()
-        //        nonDaemonGroup.shutdown()
+        def daemon = new DataflowVariable();
+        final CountDownLatch latch1 = new CountDownLatch(1)
+        final CountDownLatch latch2 = new CountDownLatch(1)
+
+        final DefaultPGroup daemonGroup = new DefaultPGroup()
+        final PGroup nonDaemonGroup = new NonDaemonPGroup()
+
+        final InheritanceGroupTestActor actor1 = new InheritanceGroupTestActor(daemonGroup, daemon, latch1)
+        actor1.start()
+
+        assertEquals daemonGroup, actor1.parallelGroup
+        latch1.await()
+        assert daemon.val
+
+        daemon = new DataflowVariable()
+        final InheritanceGroupTestActor actor2 = new InheritanceGroupTestActor(nonDaemonGroup, daemon, latch2)
+        actor2.start()
+
+        assertEquals nonDaemonGroup, actor2.parallelGroup
+        latch2.await()
+        assertFalse daemon.val
+        daemonGroup.shutdown()
+        nonDaemonGroup.shutdown()
     }
 
     public void testValidGroupReset() {
@@ -169,5 +150,20 @@ class GroupTestActor extends BlockingActor {
     }
 
     protected void act() {
+    }
+}
+
+class InheritanceGroupTestActor extends BlockingActor {
+
+    private def daemon
+
+    def InheritanceGroupTestActor(PGroup group, daemon, latch) {
+        parallelGroup = group
+        this.daemon = daemon
+    }
+
+    @Override
+    protected void act() {
+        daemon << Thread.currentThread().isDaemon()
     }
 }
