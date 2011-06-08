@@ -71,25 +71,21 @@ public class PGroupTest extends GroovyTestCase {
 
     public void testGroupsWithActorInheritance() {
         def daemon = new DataflowVariable();
-        final CountDownLatch latch1 = new CountDownLatch(1)
-        final CountDownLatch latch2 = new CountDownLatch(1)
 
         final DefaultPGroup daemonGroup = new DefaultPGroup()
         final PGroup nonDaemonGroup = new NonDaemonPGroup()
 
-        final InheritanceGroupTestActor actor1 = new InheritanceGroupTestActor(daemonGroup, daemon, latch1)
+        final InheritanceGroupTestActor actor1 = new InheritanceGroupTestActor(daemonGroup, daemon)
         actor1.start()
 
         assertEquals daemonGroup, actor1.parallelGroup
-        latch1.await()
         assert daemon.val
 
         daemon = new DataflowVariable()
-        final InheritanceGroupTestActor actor2 = new InheritanceGroupTestActor(nonDaemonGroup, daemon, latch2)
+        final InheritanceGroupTestActor actor2 = new InheritanceGroupTestActor(nonDaemonGroup, daemon)
         actor2.start()
 
         assertEquals nonDaemonGroup, actor2.parallelGroup
-        latch2.await()
         assertFalse daemon.val
         daemonGroup.shutdown()
         nonDaemonGroup.shutdown()
@@ -157,7 +153,7 @@ class InheritanceGroupTestActor extends BlockingActor {
 
     private def daemon
 
-    def InheritanceGroupTestActor(PGroup group, daemon, latch) {
+    def InheritanceGroupTestActor(PGroup group, daemon) {
         parallelGroup = group
         this.daemon = daemon
     }
