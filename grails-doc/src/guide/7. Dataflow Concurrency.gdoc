@@ -375,9 +375,9 @@ println 'Total distance ' + result.val
 
 We use DataflowVariables that represent several parameters to a mathematical equation calculating total distance of an accelerating object.
 In the equation itself, however, we use the DataflowVariables directly. We do not refer to the values they represent
-and yet we are able to do the correct math. This shows that DataflowVariables can be very flexible.
+and yet we are able to do the math correctly. This shows that DataflowVariables can be very flexible.
 
-for example, you can call methods on them and these methods will get dispatched to the bound values:
+For example, you can call methods on them and these methods will get dispatched to the bound values:
 
 {code}
 def name = new DataflowVariable()
@@ -403,13 +403,16 @@ task {
 println title.trim().contains(searchPhrase).val
 {code}
 
-And you can also query properties of the bound value on the DataflowVariable directly:
+And you can also query properties of the bound value using directly the DataflowVariable:
 
 {code}
 def book = new DataflowVariable()
 def searchPhrase = new DataflowVariable()
 task {
-    book << [title:'Groovy in Action 2nd edition   ', author:'Dierk Koenig', publisher:'Manning']
+    book << [
+             title:'Groovy in Action 2nd edition   ',
+             author:'Dierk Koenig',
+             publisher:'Manning']
 }
 
 task {
