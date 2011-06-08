@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ package groovyx.gpars.remote;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.Actor;
-import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
-import groovyx.gpars.scheduler.DefaultPool;
+import groovyx.gpars.group.PGroupBuilder;
 import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.serial.SerialHandles;
 
@@ -87,7 +86,7 @@ public class LocalNode {
                 });
 
         //todo who is the group's owner?
-        final PGroup group = new DefaultPGroup(new DefaultPool(scheduler));
+        final PGroup group = PGroupBuilder.createFromPool(scheduler);
 
         if (runnable != null) {
             if (runnable instanceof Closure) {

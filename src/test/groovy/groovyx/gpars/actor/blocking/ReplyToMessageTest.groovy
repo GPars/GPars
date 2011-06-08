@@ -17,7 +17,7 @@
 package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroupBuilder
 import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
@@ -29,7 +29,7 @@ public class ReplyToMessageTest extends GroovyTestCase {
 
     protected void setUp() {
         super.setUp();
-        group = new DefaultPGroup(new DefaultPool(true, 10))
+        group = PGroupBuilder.createFromPool(new DefaultPool(true, 10))
     }
 
     protected void tearDown() {

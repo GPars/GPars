@@ -19,9 +19,8 @@ package groovyx.gpars.agent
 import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
-import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
-import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.group.PGroupBuilder
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ThreadPoolExecutor
@@ -70,7 +69,7 @@ public class AgentTest extends GroovyTestCase {
     public void testCustomThreadPool() {
         def jugMembers = new Agent<List>(['Me'])  //add Me
         final ThreadPoolExecutor pool = Executors.newFixedThreadPool(1)
-        final def group = new DefaultPGroup(new DefaultPool(pool))
+        final def group = PGroupBuilder.createFromPool(pool)
         jugMembers.attachToThreadPool group.threadPool
 
         jugMembers.send {it.add 'James'}  //add James
