@@ -19,7 +19,7 @@ package groovyx.gpars.dataflow;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 /**
- * Data flow expression which invokes method of object after receiver and all arguments became available
+ * A dataflow expression, which invokes a method after the receiver as well as all the arguments become available
  *
  * @author Alex Tkachman
  */

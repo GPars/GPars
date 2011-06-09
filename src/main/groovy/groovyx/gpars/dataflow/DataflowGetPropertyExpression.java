@@ -19,7 +19,7 @@ package groovyx.gpars.dataflow;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 /**
- * DFE which evaluate property when receiver became available
+ * A DFE, which evaluates a property when the receiver becomes available
  *
  * @author Alex Tkachman
  */
@@ -39,6 +39,9 @@ public class DataflowGetPropertyExpression<T> extends DataflowExpression<T> {
         listener.subscribe(receiver);
     }
 
+    /**
+     * Retrieves the receiver's property value
+     */
     @Override
     @SuppressWarnings("unchecked")
     protected T evaluate() {

@@ -17,6 +17,9 @@
 package groovyx.gpars.dataflow;
 
 /**
+ * Provides the infrastructure for dataflow expressions to evaluate arguments.
+ * The arguments may be dataflow expressions of themselves and so we cannot evaluate them before they all have real values bound to them.
+ *
  * @author Alex Tkachman
  */
 public abstract class DataflowComplexExpression<T> extends DataflowExpression<T> {
@@ -27,6 +30,9 @@ public abstract class DataflowComplexExpression<T> extends DataflowExpression<T>
         this.args = elements.clone();
     }
 
+    /**
+     * Subscribes the listener to all the arguments
+     */
     @Override
     protected void subscribe(final DataflowExpressionsCollector listener) {
         for (int i = 0; i != args.length; ++i) {
@@ -34,6 +40,9 @@ public abstract class DataflowComplexExpression<T> extends DataflowExpression<T>
         }
     }
 
+    /**
+     * Evaluates all the arguments
+     */
     @Override
     protected T evaluate() {
         for (int i = 0; i != args.length; ++i) {

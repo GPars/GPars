@@ -16,6 +16,8 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.GParsPool
+
 /**
  * @author Alex Tkachman
  */
@@ -78,6 +80,26 @@ public class DataflowExpressionTest extends GroovyTestCase {
 
         shouldFail(IllegalArgumentException) {
             DataflowExpression.transform([a]) {->}
+        }
+    }
+
+    public void testTransformWithAsyncFun() {
+        final DataflowVariable a = new DataflowVariable()
+        final DataflowVariable b = new DataflowVariable()
+
+        GParsPool.withPool {
+            final Closure transformation = {x, y ->
+                x + y
+            }.asyncFun()
+
+            def prod = transformation(a, b)
+
+            Dataflow.task {
+                a << 5
+                b << 7
+            }
+
+            assertEquals(13, (prod + 1).val)
         }
     }
 }

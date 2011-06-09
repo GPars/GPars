@@ -538,6 +538,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         whenBound(stream);
     }
 
+    /**
+     * Transforms values bound eventually to dataflow variables using the supplied closure.
+     *
+     * @param another A list of DataflowVariables to transform
+     * @param closure The transformation function, which must take the same number of arguments as there are elements in the "another" list
+     * @param <V>     Type of the bound values
+     * @return The value returned from the transformation closure.
+     */
     public static <V> DataflowExpression<V> transform(final Object another, final Closure closure) {
         final int pnum = closure.getMaximumNumberOfParameters();
         if (pnum == 0) {
@@ -549,7 +557,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             if (another instanceof Collection) {
                 final Collection<?> collection = (Collection<?>) another;
                 if (collection.size() != pnum) {
-                    throw new IllegalArgumentException("Closure parameters don't match #of arguments");
+                    throw new IllegalArgumentException("Closure parameters don't match the # of arguments");
                 }
                 return new TransformMany<V>(collection, closure);
             }
@@ -558,8 +566,8 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Utility method to call at the very end of constructor of derived expressions.
-     * Create and subscribe listener
+     * A utility method to call at the very end of constructors of derived expressions.
+     * Creates and subscribes a listener to monitor the expression
      */
     protected final void subscribe() {
         final DataflowExpressionsCollector listener = new DataflowExpressionsCollector();
@@ -568,9 +576,9 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Evaluate expression after the ones we depend on are ready
+     * Evaluates the expression after the ones we depend on are ready
      *
-     * @return value to bind
+     * @return The value to bind
      */
     protected T evaluate() {
         return value;
@@ -580,6 +588,10 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         listener.subscribe(this);
     }
 
+    /**
+     * Invokes the method on itself or creates an expression, which will invoke the method n the bound value,
+     * once it is available.
+     */
     @Override
     public final Object invokeMethod(final String name, final Object args) {
         if (getMetaClass().respondsTo(this, name).isEmpty()) {
@@ -589,8 +601,8 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Returns either standard property of expression or
-     * creates expression, which will request given property when receiver became available
+     * Returns either standard property of the expression or
+     * creates an expression, which will request given property when the receiver becomes available
      *
      * @param propertyName The name of the property to retrieve
      * @return The property value, instance of DataflowGetPropertyExpression
@@ -620,7 +632,9 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Listener for availability of data flow expressions we depend from
+     * Listener for availability of data flow expressions we depend on.
+     * Keeps a counter of monitored dataflow expressions. The counter gets decreased with each expression becoming available.
+     * Once the counter reaches 0, the Collector evaluates itself and becomes bound to the resulting value.
      */
     final class DataflowExpressionsCollector extends MessageStream {
         private static final long serialVersionUID = 3414942165521113575L;
