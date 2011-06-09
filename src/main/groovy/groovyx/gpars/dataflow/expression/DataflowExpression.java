@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow;
+package groovyx.gpars.dataflow.expression;
 
 import groovy.lang.Closure;
 import groovy.lang.GroovyObject;
@@ -22,6 +22,10 @@ import groovy.lang.MetaClass;
 import groovy.lang.MetaProperty;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.DataCallback;
+import groovyx.gpars.dataflow.DataCallbackWithPool;
+import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;

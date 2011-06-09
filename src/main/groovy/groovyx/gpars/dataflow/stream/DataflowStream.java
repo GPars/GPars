@@ -20,9 +20,9 @@ import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.Dataflow;
-import groovyx.gpars.dataflow.DataflowExpression;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.expression.DataflowExpression;
 
 import java.util.Collection;
 import java.util.Iterator;

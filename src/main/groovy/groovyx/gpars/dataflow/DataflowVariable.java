@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow;
 
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.remote.RemoteHost;
 import groovyx.gpars.serial.RemoteSerialized;
 

@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 

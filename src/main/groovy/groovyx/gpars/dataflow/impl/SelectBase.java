@@ -17,9 +17,9 @@
 package groovyx.gpars.dataflow.impl;
 
 import groovyx.gpars.dataflow.Dataflow;
-import groovyx.gpars.dataflow.DataflowExpression;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.group.PGroup;
 
 import java.util.ArrayList;
