@@ -11,5 +11,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/spock-core-0.6-groovy-1.8-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/multiverse-beta-0.7-RC-1.jar"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
