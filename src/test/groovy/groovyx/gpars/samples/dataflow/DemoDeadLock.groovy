@@ -34,7 +34,7 @@ final def actor = Actors.actor {
 
     delegate.metaClass.onTimeout = {
         println 'Deadlock detected'
-        stop()
+        terminate()
     }
 
     react(5, TimeUnit.SECONDS) {x ->

@@ -65,7 +65,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val] == [5, 20, 40, 50]
         assert [e.val, e.val, e.val, e.val] == [10, 40, 80, 100]
 
-        op.stop()
+        op.terminate()
     }
 
     public void testSelectorWithValuesBoundBeforeCreation() {
@@ -88,7 +88,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val] == [5, 20, 50, 40]
         assert [e.val, e.val, e.val, e.val] == [10, 40, 100, 80]
 
-        op.stop()
+        op.terminate()
     }
 
     public void testSelectorNotResubscribedOnDFVs() {
@@ -112,7 +112,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
 
         assert [d.val, d.val, d.val, d.val, d.val] == [5, 20, 40, 50, 60]
 
-        op.stop()
+        op.terminate()
     }
 
     public void testDefaultCopySelector() {
@@ -134,7 +134,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val] == [5, 20, 40, 50]
         assert [e.val, e.val, e.val, e.val] == [5, 20, 40, 50]
 
-        op.stop()
+        op.terminate()
     }
 
     public void testSelectorWithIndex() {
@@ -161,7 +161,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val, d.val] == [5, 20, 40, 50, 60]
         assert [e.val, e.val, e.val, e.val, e.val] == [0, 1, 2, 1, 2]
 
-        op.stop()
+        op.terminate()
     }
 
     public void testOperatorWithDoubleWaitOnChannel() {
@@ -185,7 +185,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
 
         assert [b.val, b.val, b.val, b.val] == [1, 2, 3, 4]
 
-        op.stop()
+        op.terminate()
     }
 
     public void testStop() {
@@ -205,7 +205,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         a << 'Delivered'
         barrier1.await()
         a << 'Never delivered'
-        op1.stop()
+        op1.terminate()
         barrier2.await()
         op1.join()
         assert counter == 1
@@ -226,7 +226,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         a << 'Message'
         assertEquals 'a', b.val
         assertTrue flag
-        op1.stop()
+        op1.terminate()
         op1.join()
     }
 
@@ -237,7 +237,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         shouldFail(IllegalArgumentException) {
             def op1 = group.prioritySelector(inputs: [], outputs: [b]) {->
                 flag = true
-                stop()
+                terminate()
             }
             op1.join()
         }
@@ -252,7 +252,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
 
         def op1 = group.prioritySelector(inputs: [a], outputs: [b, c]) {
             flag = (output == b) && (outputs[0] == b) && (outputs[1] == c)
-            stop()
+            terminate()
         }
         a << null
         op1.join()
@@ -267,7 +267,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
 
         def op1 = group.prioritySelector(inputs: [b], outputs: []) {
             flag = (output == null)
-            stop()
+            terminate()
         }
         b << null
         op1.join()
@@ -281,9 +281,9 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         final DataflowQueue c = new DataflowQueue()
         final DataflowQueue d = new DataflowQueue()
 
-        group.prioritySelector(inputs: [a, b], outputs: [d]) {}.stop()
-        group.prioritySelector(inputs: [a, b], outputs: [d]) {x ->}.stop()
-        group.prioritySelector(inputs: [a, b], outputs: [d]) {x, y ->}.stop()
+        group.prioritySelector(inputs: [a, b], outputs: [d]) {}.terminate()
+        group.prioritySelector(inputs: [a, b], outputs: [d]) {x ->}.terminate()
+        group.prioritySelector(inputs: [a, b], outputs: [d]) {x, y ->}.terminate()
 
         shouldFail(IllegalArgumentException) {
             group.prioritySelector(inputs: [a, b, c], outputs: [d]) {x, y, z -> }
@@ -296,27 +296,27 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         }
 
         def op1 = group.prioritySelector(inputs: [a], outputs: [d]) { }
-        op1.stop()
+        op1.terminate()
 
         op1 = group.prioritySelector(inputs: [a], outputs: [d]) {x -> }
-        op1.stop()
+        op1.terminate()
 
         op1 = group.prioritySelector(inputs: [a, b], outputs: [d]) {x, y -> }
-        op1.stop()
+        op1.terminate()
     }
 
     public void testOutputNumber() {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue d = new DataflowQueue()
 
-        def selector1 = group.prioritySelector(inputs: [a], outputs: []) {v -> stop()}
-        def selector2 = group.prioritySelector(inputs: [a]) {v -> stop()}
-        def selector3 = group.prioritySelector(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
+        def selector1 = group.prioritySelector(inputs: [a], outputs: []) {v -> terminate()}
+        def selector2 = group.prioritySelector(inputs: [a]) {v -> terminate()}
+        def selector3 = group.prioritySelector(inputs: [a], mistypedOutputs: [d]) {v -> terminate()}
 
         a << 'value'
         a << 'value'
         a << 'value'
-        [selector1, selector2, selector3]*.stop()
+        [selector1, selector2, selector3]*.terminate()
         [selector1, selector2, selector3]*.join()
     }
 
@@ -340,7 +340,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         }
         op.metaClass.reportError = {Throwable e ->
             a << e
-            stop()
+            terminate()
         }
         stream << 'value'
         assert a.val instanceof RuntimeException
@@ -379,7 +379,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         assert [c.val, c.val, c.val, c.val, c.val] == [1, 2, 5, 3, 4]
         assert [d.val, d.val, d.val, d.val, d.val] == [0, 0, 0, 1, 1]
         barrier.await()
-        op1.stop()
+        op1.terminate()
         op1.join()
     }
 }

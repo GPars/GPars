@@ -60,5 +60,5 @@ task {
 }
 
 sleep 3000
-sel.stop()
+sel.terminate()
 sel.join()

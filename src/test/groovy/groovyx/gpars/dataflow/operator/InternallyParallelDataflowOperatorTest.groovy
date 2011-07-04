@@ -63,7 +63,7 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         assertEquals 65, d.val
         assertEquals 4000, e.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testTwoForkOperator() {
@@ -85,7 +85,7 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         assertEquals 65, d.val
         assertEquals 4000, e.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testParallelism() {
@@ -125,7 +125,7 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         assertEquals 16, threads.size()
         assert threads.unique().size() in (parties..[poolSize, forks].max())
 
-        op.stop()
+        op.terminate()
         op.join()
         group.shutdown()
     }
@@ -149,14 +149,14 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue d = new DataflowQueue()
 
-        def selector1 = group.operator(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
-        def selector2 = group.operator(inputs: [a], maxForks: 2) {v -> stop()}
-        def selector3 = group.operator(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> stop()}
+        def selector1 = group.operator(inputs: [a], outputs: [], maxForks: 2) {v -> terminate()}
+        def selector2 = group.operator(inputs: [a], maxForks: 2) {v -> terminate()}
+        def selector3 = group.operator(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> terminate()}
 
         a << 'value'
         a << 'value'
         a << 'value'
-        [selector1, selector2, selector3]*.stop()
+        [selector1, selector2, selector3]*.terminate()
         [selector1, selector2, selector3]*.join()
     }
 
@@ -184,7 +184,7 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         }
         op.metaClass.reportError = {Throwable e ->
             a << e
-            stop()
+            terminate()
         }
         stream << 'value'
         assert a.val instanceof RuntimeException

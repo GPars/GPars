@@ -84,7 +84,7 @@ public class DataflowSelector extends DataflowProcessor {
      */
     protected final void reportError(Throwable e) {
         System.err.println "The dataflow selector experienced an exception and is about to terminate. $e"
-        stop()
+        terminate()
     }
 
     /**

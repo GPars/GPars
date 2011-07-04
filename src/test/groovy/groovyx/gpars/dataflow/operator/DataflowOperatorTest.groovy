@@ -61,7 +61,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assertEquals 65, d.val
         assertEquals 4000, e.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testOperatorWithDoubleWaitOnChannel() {
@@ -80,7 +80,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assertEquals 3, b.val
         assertEquals 7, b.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testNonCommutativeOperator() {
@@ -97,7 +97,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
 
         assertEquals 30, c.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testGroupingOperatorsAndTasks() {
@@ -114,7 +114,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
 
         assertEquals 30, c.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testSimpleOperators() {
@@ -139,7 +139,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assertEquals 7, c.val
         assertEquals 9, c.val
         assertEquals 11, c.val
-        [op1, op2]*.stop()
+        [op1, op2]*.terminate()
     }
 
     public void testCombinedOperators() {
@@ -171,7 +171,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assertEquals 17, c.val
         assertEquals 29, c.val
         assertEquals 45, c.val
-        [op1, op2, op3]*.stop()
+        [op1, op2, op3]*.terminate()
     }
 
     public void testStop() {
@@ -184,7 +184,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
             flag = true
         }
         a << 'Never delivered'
-        op1.stop()
+        op1.terminate()
         op1.join()
         assertFalse flag
     }
@@ -204,7 +204,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         a << 'Message'
         assertEquals 'a', b.val
         assertTrue flag
-        op1.stop()
+        op1.terminate()
         op1.join()
     }
 
@@ -215,7 +215,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         shouldFail(IllegalArgumentException) {
             def op1 = group.operator(inputs: [], outputs: [b]) {->
                 flag = true
-                stop()
+                terminate()
             }
             op1.join()
         }
@@ -230,7 +230,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
 
         def op1 = group.operator(inputs: [a], outputs: [b, c]) {
             flag = (output == b) && (outputs[0] == b) && (outputs[1] == c)
-            stop()
+            terminate()
         }
         a << null
         op1.join()
@@ -245,7 +245,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
 
         def op1 = group.operator(inputs: [b], outputs: []) {
             flag = (output == null)
-            stop()
+            terminate()
         }
         b << null
         op1.join()
@@ -282,11 +282,11 @@ public class DataflowOperatorTest extends GroovyTestCase {
                 operator(inputs: [a], outputs: [d]) {-> }
             }
             def op1 = operator(inputs: [a], outputs: [d]) { }
-            op1.stop()
+            op1.terminate()
             op1 = operator(inputs: [a], outputs: [d]) {x -> }
-            op1.stop()
+            op1.terminate()
             op1 = operator(inputs: [a, b], outputs: [d]) {x, y -> }
-            op1.stop()
+            op1.terminate()
         }
 
     }
@@ -295,9 +295,9 @@ public class DataflowOperatorTest extends GroovyTestCase {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue d = new DataflowQueue()
 
-        group.operator(inputs: [a], outputs: []) {v -> stop()}
-        group.operator(inputs: [a]) {v -> stop()}
-        group.operator(inputs: [a], mistypedOutputs: [d]) {v -> stop()}
+        group.operator(inputs: [a], outputs: []) {v -> terminate()}
+        group.operator(inputs: [a]) {v -> terminate()}
+        group.operator(inputs: [a], mistypedOutputs: [d]) {v -> terminate()}
 
         a << 'value'
         a << 'value'
@@ -328,7 +328,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         }
         op.metaClass.reportError = {Throwable e ->
             a << e
-            stop()
+            terminate()
         }
         stream << 'value'
         assert a.val instanceof RuntimeException
@@ -363,7 +363,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assert bs.size() == range.to
         assert cs.size() == range.to
         assert ds.size() == range.to
-        op1.stop()
+        op1.terminate()
         op1.join()
         group.shutdown()
     }
@@ -386,7 +386,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assert bs.size() == range.to
         assert cs.size() == range.to
         assert ds.size() == range.to
-        op1.stop()
+        op1.terminate()
         op1.join()
         group.shutdown()
     }
@@ -412,7 +412,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assert bs == cs
         assert bs == ds
         assert cs == ds
-        op1.stop()
+        op1.terminate()
         op1.join()
         group.shutdown()
     }
@@ -438,7 +438,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assert bs == cs
         assert bs == ds
         assert cs == ds
-        op1.stop()
+        op1.terminate()
         op1.join()
         group.shutdown()
     }
@@ -463,7 +463,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         assert ds.size() == range.to
         assert cs == bs.collect {2 * it}
         assert ds == bs.collect {3 * it}
-        op1.stop()
+        op1.terminate()
         op1.join()
         group.shutdown()
     }
@@ -474,7 +474,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
 
         group.operator(inputs: [a], outputs: [b]) {
             bindOutput 0, it
-            stop()
+            terminate()
         }
 
         a << 1

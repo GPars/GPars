@@ -47,8 +47,8 @@ aw << 1
 aw << 2
 aw << 3
 assert ([1, 2, 3] == [result.val, result.val, result.val])
-op1.stop()
-op2.stop()
+op1.terminate()
+op2.terminate()
 op1.join()
 op2.join()
 

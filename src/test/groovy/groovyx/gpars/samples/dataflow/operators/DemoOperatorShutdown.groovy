@@ -40,7 +40,7 @@ def op2 = group.selector(inputs: [d], outputs: [f, out]) { }
 
 def op3 = group.prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-[op1, op2, op3]*.stop()
+[op1, op2, op3]*.terminate()
 op1.join()
 op2.join()
 op3.join()

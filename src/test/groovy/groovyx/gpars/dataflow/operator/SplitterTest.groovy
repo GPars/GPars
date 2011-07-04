@@ -59,7 +59,7 @@ public class SplitterTest extends GroovyTestCase {
         assert [c.val, c.val, c.val, c.val, c.val] == [1, 2, 3, 4, 5]
         assert [d.val, d.val, d.val, d.val, d.val] == [1, 2, 3, 4, 5]
 
-        op.stop()
+        op.terminate()
     }
 
     public void testSplitWithMultipleForks() {
@@ -80,7 +80,7 @@ public class SplitterTest extends GroovyTestCase {
         assert [c.val, c.val, c.val, c.val, c.val].containsAll([1, 2, 3, 4, 5])
         assert [d.val, d.val, d.val, d.val, d.val].containsAll([1, 2, 3, 4, 5])
 
-        op.stop()
+        op.terminate()
     }
 
     public void testStop() {
@@ -93,7 +93,7 @@ public class SplitterTest extends GroovyTestCase {
 
         a << 'Delivered'
         assert b.val == 'Delivered'
-        op.stop()
+        op.terminate()
         a << 'Never delivered'
         op.join()
         assert c.val == 'Delivered'

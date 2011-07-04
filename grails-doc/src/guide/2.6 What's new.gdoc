@@ -31,3 +31,4 @@ h3. Other
 h3. Renaming hints
 
 * The _makeTransparent()_ method that forces concurrent semantics to iteration methods (each, collect, find, etc.) has been removed
+* The stop() method on dataflow operators and selectors has been renamed to terminate() to match naming used for actor

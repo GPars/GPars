@@ -63,7 +63,7 @@ on the operator:
 {code}
     op.metaClass.reportError = {Throwable e ->
         //handle the exception
-        stop()  //You can also stop the operator
+        terminate()  //You can also terminate the operator
     }
 {code}
 
@@ -184,10 +184,10 @@ operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
 h4. Stopping operators
 
 Dataflow operators and selectors can be stopped in two ways:
-# by calling the stop() method on all operators that need to be stopped
+# by calling the terminate() method on all operators that need to be stopped
 # by sending a poisson message.
 
-Using the stop() method:
+Using the terminate() method:
 {code}
 def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
 
@@ -195,7 +195,7 @@ def op2 = selector(inputs: [d], outputs: [f, out]) { }
 
 def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-[op1, op2, op3]*.stop()  //Stop all operators by calling the stop() method on them
+[op1, op2, op3]*.terminate()  //Terminate all operators by calling the terminate() method on them
 op1.join()
 op2.join()
 op3.join()
@@ -217,7 +217,15 @@ op2.join()
 op3.join()
 {code}
 
-After receiving a poisson an operator stops. It only makes sure the poisson is first sent to all its output channels, so that the poisson can spread to the connected operators.
+After receiving a poisson an operator terminates. It only makes sure the poisson is first sent to all its output channels, so that the poisson can spread to the connected operators.
+
+{note}
+Given the potential variety of operator networks and their asynchronous nature, a good termination strategy is that
+operators and selectors should only ever terminate themselves.
+All ways of terminating them from outside (either by calling the terminate() method or by sending poisson down the stream)
+may result in messages being lost somewhere in the pipes, when the reading operators terminate before they fully handle
+the messages waiting in their input channels.
+{note}
 
 h3. Grouping operators
 

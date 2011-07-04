@@ -65,7 +65,7 @@ public final class DataflowOperator extends DataflowProcessor {
      */
     void reportError(Throwable e) {
         System.err.println "The dataflow operator experienced an exception and is about to terminate. $e"
-        stop()
+        terminate()
     }
 }
 

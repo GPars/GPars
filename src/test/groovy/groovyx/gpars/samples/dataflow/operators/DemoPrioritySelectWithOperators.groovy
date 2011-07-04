@@ -66,5 +66,5 @@ println 'Starting to monitor our IT department'
 sleep 3000
 10.times {println "Received: ${results.val}"}
 
-selector.stop()
-op.stop()
+selector.terminate()
+op.terminate()

@@ -59,7 +59,7 @@ public class InternallyParallelDataflowSelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val].containsAll([5, 20, 40])
         assert [e.val, e.val, e.val].containsAll([10, 40, 80])
 
-        op.stop()
+        op.terminate()
     }
 
     public void testDefaultCopySelector() {
@@ -79,7 +79,7 @@ public class InternallyParallelDataflowSelectorTest extends GroovyTestCase {
         assert [d.val, d.val, d.val, d.val].containsAll([5, 20, 40, 50])
         assert [e.val, e.val, e.val, e.val].containsAll([5, 20, 40, 50])
 
-        op.stop()
+        op.terminate()
     }
 
     public void testInvalidMaxForks() {
@@ -101,14 +101,14 @@ public class InternallyParallelDataflowSelectorTest extends GroovyTestCase {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue d = new DataflowQueue()
 
-        def selector1 = group.selector(inputs: [a], outputs: [], maxForks: 2) {v -> stop()}
-        def selector2 = group.selector(inputs: [a], maxForks: 2) {v -> stop()}
-        def selector3 = group.selector(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> stop()}
+        def selector1 = group.selector(inputs: [a], outputs: [], maxForks: 2) {v -> terminate()}
+        def selector2 = group.selector(inputs: [a], maxForks: 2) {v -> terminate()}
+        def selector3 = group.selector(inputs: [a], mistypedOutputs: [d], maxForks: 2) {v -> terminate()}
 
         a << 'value'
         a << 'value'
         a << 'value'
-        [selector1, selector2, selector3]*.stop()
+        [selector1, selector2, selector3]*.terminate()
         [selector1, selector2, selector3]*.join()
     }
 
@@ -136,7 +136,7 @@ public class InternallyParallelDataflowSelectorTest extends GroovyTestCase {
         }
         op.metaClass.reportError = {Throwable e ->
             a << e
-            stop()
+            terminate()
         }
         stream << 'value'
         assert a.val instanceof RuntimeException

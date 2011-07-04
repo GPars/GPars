@@ -44,7 +44,7 @@ final class CallCenter {
                 if (it == -1) {
                     println "Agent $agentIndex going home"
                     bindOutput true
-                    stop()
+                    terminate()
                 } else {
                     println "Agent $agentIndex answering a call num $it"
                     sleep 100

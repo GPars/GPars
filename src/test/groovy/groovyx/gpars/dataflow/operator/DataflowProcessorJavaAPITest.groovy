@@ -54,7 +54,7 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
 
         assertEquals 30, c.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testSelector() {
@@ -69,7 +69,7 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         b << 20
         assertEquals 40, c.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testSelectorWithIndex() {
@@ -84,7 +84,7 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         b << 20
         assertEquals([40, 1], c.val)
 
-        op.stop()
+        op.terminate()
     }
 
     public void testPrioritySelector() {
@@ -99,7 +99,7 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         b << 20
         assertEquals 40, c.val
 
-        op.stop()
+        op.terminate()
     }
 
     public void testPrioritySelectorWithIndex() {
@@ -114,7 +114,7 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         b << 20
         assertEquals([40, 1], c.val)
 
-        op.stop()
+        op.terminate()
     }
 }
 

@@ -130,7 +130,7 @@ Thread.start {
 //        println "============================================================= Result: " + finder.output.val
         //        println "============================================================= Result: " + finder.outputs[0].val
     }
-    finder.stop()
-    cache.stop()
-    downloader.stop()
+    finder.terminate()
+    cache.terminate()
+    downloader.terminate()
 }

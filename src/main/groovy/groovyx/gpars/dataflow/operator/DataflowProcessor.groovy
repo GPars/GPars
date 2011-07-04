@@ -77,9 +77,9 @@ abstract class DataflowProcessor {
     }
 
     /**
-     * Stops the processor
+     * Stops the processor immediately, potentially loosing unhandled messages
      */
-    public final void stop() { actor.stop() }
+    public final void terminate() { actor.stop() }
 
     /**
      * Joins the processor waiting for it to finish
@@ -205,7 +205,7 @@ protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
     boolean checkPoison(def data) {
         if (data instanceof PoisonPill) {
             owningProcessor.bindAllOutputsAtomically data
-            owningProcessor.stop()
+            owningProcessor.terminate()
             return true
         }
         return false
