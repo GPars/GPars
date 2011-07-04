@@ -34,11 +34,6 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
             variable << 20
         }
 
-        shouldFail(IllegalStateException) {
-            final def v = new SyncDataflowVariable()
-            v << 1
-            variable << v
-        }
         assertEquals 10, variable.val
     }
 
