@@ -55,7 +55,7 @@ public class DataflowOperatorGentlyStopTest extends GroovyTestCase {
         c << 40
 
         assertEquals 65, d.val
-        op.stopAfterNextRun()
+        op.terminateAfterNextRun()
 
         a << 10
         b << 20
@@ -76,7 +76,7 @@ public class DataflowOperatorGentlyStopTest extends GroovyTestCase {
         }
 
         a << 10
-        op.stopAfterNextRun()
+        op.terminateAfterNextRun()
         b << 20
         c << 40
 
@@ -99,7 +99,7 @@ public class DataflowOperatorGentlyStopTest extends GroovyTestCase {
         c << 40
 
         assert [5, 20, 40] as Set == [d.val, d.val, d.val] as Set
-        op.stopAfterNextRun()
+        op.terminateAfterNextRun()
 
         a << 10
         b << 20

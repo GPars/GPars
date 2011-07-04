@@ -231,10 +231,10 @@ h4. Stopping operators gently
 
 Operators handle incoming messages repeatedly. The only safe moment for stopping an operator without the risk of loosing
 any messages is right after the operator has finished processing messages is just about to look for more messages in its incoming pipes.
-This is exactly what the stopAfterNextRun() method does. It will schedule the operator for shutdown after the next set
+This is exactly what the terminateAfterNextRun() method does. It will schedule the operator for shutdown after the next set
 of messages gets handled.
 This may be particularly handy when you use a group of operators/selectors to load-balance messages coming from a channel.
-Once the work-load decreases, the stopAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
+Once the work-load decreases, the terminateAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
 
 h3. Grouping operators
 

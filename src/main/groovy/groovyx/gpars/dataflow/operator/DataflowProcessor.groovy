@@ -83,9 +83,9 @@ abstract class DataflowProcessor {
 
     /**
      * Gently stops the processor after the next set of messages is handled. Unlike with terminate(), no messages will get lost.
-     * If the operator never gets triggered after calling the stopAfterNextRun() method, the operator never really stops.
+     * If the operator never gets triggered after calling the terminateAfterNextRun() method, the operator never really stops.
      */
-    public final void stopAfterNextRun() {
+    public final void terminateAfterNextRun() {
         actor.send(StopGently.instance)
     }
 
