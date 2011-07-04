@@ -86,9 +86,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
     }
 
     public void testAsyncRead() {
-        final SyncDataflowVariable variable = new SyncDataflowVariable(3)
-        Thread.start {assertEquals 10, variable.val}
-
+        final SyncDataflowVariable variable = new SyncDataflowVariable(2)
         def result1 = new DataflowVariable()
         def actor = actor {
             react {
@@ -110,5 +108,4 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         assertEquals 10, result1.val
         assertEquals 10, result2.val
     }
-
 }

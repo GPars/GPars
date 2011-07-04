@@ -18,45 +18,106 @@ package groovyx.gpars.dataflow
 
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
+import static groovyx.gpars.actor.Actors.actor
 
 public class SyncSyncDataflowQueueTest extends GroovyTestCase {
 
-    public void testStream() {
-        final CountDownLatch latch = new CountDownLatch(1)
+    public void testWriterBlocking() {
+        final SyncDataflowQueue queue = new SyncDataflowQueue()
+        volatile boolean reached = false
 
-        final SyncDataflowQueue stream = new SyncDataflowQueue()
-        final Actor thread = Actors.blockingActor {
-            stream << 10
-            final SyncDataflowVariable variable = new SyncDataflowVariable()
-            stream << variable
-            latch.countDown()
-            receive {
-                variable << 20
+        def t = Thread.start {
+            queue << 10
+            reached = true
+            queue << 20
+        }
+        sleep 1000
+        assert !reached
+        assertEquals 10, queue.val
+        assertEquals 20, queue.val
+        t.join()
+        assert queue.length() == 0
+        assert reached
+    }
+
+    @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
+    public void testMultipleWriters() {
+        final SyncDataflowQueue queue = new SyncDataflowQueue()
+        volatile boolean reached1 = false
+        volatile boolean reached2 = false
+
+        def t1 = Thread.start {
+            queue << 10
+            queue << 20
+            reached1 = true
+        }
+        def t2 = Thread.start {
+            queue << 30
+            queue << 40
+            reached2 = true
+        }
+        sleep 1000
+        assert !reached1
+        assert !reached2
+        assert queue.val in [10, 30]
+        assert queue.val in [10, 30]
+
+        assert !reached1
+        assert !reached2
+        assert queue.val in [20, 40]
+        assert queue.val in [20, 40]
+
+        [t1, t2]*.join()
+        assert reached1
+        assert reached2
+    }
+
+    public void testTimeoutGet() {
+        final SyncDataflowQueue queue = new SyncDataflowQueue()
+        assert queue.getVal(1, TimeUnit.SECONDS) == null
+        Thread.start {queue << 10}
+        assertEquals 10, queue.getVal(10, TimeUnit.SECONDS)
+    }
+
+    public void testAsyncRead() {
+        final SyncDataflowQueue queue = new SyncDataflowQueue()
+
+        def result1 = new DataflowVariable()
+        def actor = actor {
+            react {
+                result1 << it
             }
         }
 
-        latch.await()
-        assertEquals 2, stream.length()
-        assertEquals 10, stream.val
-        assertEquals 1, stream.length()
-        thread << 'Proceed'
-        assertEquals 20, stream.val
-        assertEquals 0, stream.length()
+        Thread.start {
+            queue.getValAsync(actor)
+        }
+
+        def result2 = new DataflowVariable()
+        Thread.start {
+            queue.whenBound({result2 << it})
+        }
+
+        Thread.start {queue << 10}
+        Thread.start {queue << 20}
+
+        assert result1.val in [10, 20]
+        assert result2.val in [10, 20]
+        assert result1.val != result2.val
     }
 
     public void testStreamPoll() {
-        final CountDownLatch latch = new CountDownLatch(1)
-
         final SyncDataflowQueue stream = new SyncDataflowQueue()
         assert stream.poll() == null
         assert stream.poll() == null
-        stream << 1
+        Thread.start {stream << 1}
+        sleep 1000
         assert stream.poll()?.val == 1
         assert stream.poll()?.val == null
-        stream << 2
+        Thread.start {stream << 2}
+        sleep 1000
         assert stream.poll()?.val == 2
         assert stream.poll()?.val == null
         final Actor thread = Actors.blockingActor {
@@ -69,10 +130,8 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
             }
         }
 
-        latch.await()
-        assertEquals 2, stream.length()
+        sleep 1000
         assertEquals 10, stream.poll()?.val
-        assertEquals 1, stream.length()
         assert stream.poll() == null
         thread << 'Proceed'
         assertEquals 20, stream.val
@@ -81,47 +140,20 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
     }
 
     public void testNullValues() {
-        final CountDownLatch latch = new CountDownLatch(1)
-
         final SyncDataflowQueue stream = new SyncDataflowQueue()
         final Actor thread = Actors.blockingActor {
             stream << null
             final SyncDataflowVariable variable = new SyncDataflowVariable()
             stream << variable
-            latch.countDown()
             receive {
                 variable << null
             }
         }
 
-        latch.await()
-        assertEquals 2, stream.length()
         assertNull stream.val
-        assertEquals 1, stream.length()
         thread << 'Proceed'
         assertNull stream.val
         assertEquals 0, stream.length()
-    }
-
-    public void testTake() {
-        final CountDownLatch latch = new CountDownLatch(1)
-
-        final SyncDataflowQueue stream = new SyncDataflowQueue()
-        final Actor thread = Actors.blockingActor {
-            final SyncDataflowVariable variable = new SyncDataflowVariable()
-            stream << variable
-            latch.countDown()
-            receive {
-                variable << 20
-            }
-        }
-
-        latch.await()
-        assertEquals 1, stream.length()
-        thread << 'Proceed'
-        def value = stream.val
-        assertEquals 0, stream.length()
-        assertEquals 20, value
     }
 
     public void testIteration() {
@@ -129,11 +161,11 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
 
         final SyncDataflowQueue stream = new SyncDataflowQueue()
         final Actor thread = Actors.blockingActor {
-            (0..10).each {stream << it}
+            (0..10).each {Thread.start {stream << it}}
+            sleep 1000
             barrier.await()
             receive {
                 stream << 11
-                barrier.await()
             }
         }
 
@@ -143,8 +175,6 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
         assertEquals 11, stream.length()
 
         thread << 'Proceed'
-        barrier.await()
-        assertEquals 12, stream.length()
         (0..10).each {
             assertEquals it, stream.val
         }
@@ -257,12 +287,9 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
 
     public void testGetValWithTimeout() {
         final SyncDataflowQueue stream = new SyncDataflowQueue()
-        final CyclicBarrier barrier = new CyclicBarrier(2)
         Actors.actor {
             stream << 10
-            barrier.await()
         }
-        barrier.await()
         assert stream.getVal(10, TimeUnit.DAYS) == 10
         assert stream.getVal(3, TimeUnit.SECONDS) == null
         assert stream.getVal(3, TimeUnit.SECONDS) == null
@@ -271,28 +298,28 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
     public void testMissedTimeout() {
         final SyncDataflowQueue stream = new SyncDataflowQueue()
         assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
-        stream << 10
-        assert 10 == stream.getVal(10, TimeUnit.MILLISECONDS)
-        stream << 20
-        stream << 30
-        assert 20 == stream.getVal(10, TimeUnit.MILLISECONDS)
-        assert 30 == stream.getVal(10, TimeUnit.MILLISECONDS)
-        assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
-        stream << 40
-        assert 40 == stream.getVal(10, TimeUnit.MILLISECONDS)
+        Thread.start {stream << 10}
+        assert 10 == stream.getVal(10, TimeUnit.SECONDS)
+        Thread.start {stream << 20}
+        assert 20 == stream.getVal(10, TimeUnit.SECONDS)
+        Thread.start {stream << 30}
+        assert 30 == stream.getVal(10, TimeUnit.SECONDS)
+        assertNull stream.getVal(2, TimeUnit.SECONDS)
+        Thread.start {stream << 40}
+        assert 40 == stream.getVal(10, TimeUnit.SECONDS)
     }
 
     public void testMissedTimeoutWithNull() {
         final SyncDataflowQueue stream = new SyncDataflowQueue()
         assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
-        stream << null
+        Thread.start {stream << null}
         assert null == stream.getVal(10, TimeUnit.MINUTES)
-        stream << null
-        stream << 30
-        assert null == stream.getVal(10, TimeUnit.MILLISECONDS)
-        assert 30 == stream.getVal(10, TimeUnit.MILLISECONDS)
-        assertNull stream.getVal(10, TimeUnit.MILLISECONDS)
-        stream << null
-        assert null == stream.getVal(10, TimeUnit.MILLISECONDS)
+        Thread.start {stream << null}
+        assert null == stream.getVal(10, TimeUnit.SECONDS)
+        Thread.start {stream << 30}
+        assert 30 == stream.getVal(10, TimeUnit.SECONDS)
+        assertNull stream.getVal(2, TimeUnit.SECONDS)
+        Thread.start {stream << null}
+        assert null == stream.getVal(10, TimeUnit.SECONDS)
     }
 }
