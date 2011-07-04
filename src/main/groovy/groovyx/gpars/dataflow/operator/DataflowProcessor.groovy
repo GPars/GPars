@@ -82,6 +82,14 @@ abstract class DataflowProcessor {
     public final void terminate() { actor.stop() }
 
     /**
+     * Gently stops the processor after the next set of messages is handled. Unlike with terminate(), no messages will get lost.
+     * If the operator never gets triggered after calling the stopAfterNextRun() method, the operator never really stops.
+     */
+    public final void stopAfterNextRun() {
+        actor.send(StopGently.instance)
+    }
+
+    /**
      * Joins the processor waiting for it to finish
      */
     public final void join() { actor.join() }
@@ -162,6 +170,7 @@ protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
     protected final List outputs
     protected final Closure code
     protected final def owningProcessor
+    protected boolean stoppingGently = false
 
     def DataflowProcessorActor(owningProcessor, group, outputs, inputs, code) {
         super()
@@ -196,6 +205,10 @@ protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
         throw new IllegalStateException("The dataflow actor doesn't recognize the message $message")
     }
 
+    void onMessage(StopGently message) {
+        stoppingGently = true
+    }
+
     /**
      * Handles the poisson message.
      * After receiving the poisson a dataflow operator will send the poisson to all its output channels and terminate.
@@ -215,3 +228,6 @@ protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
         owningProcessor.reportError(e)
     }
 }
+
+@Singleton
+protected final class StopGently {}

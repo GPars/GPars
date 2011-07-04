@@ -56,7 +56,7 @@ operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 }
 {code}
 
-The standard error handling will print out an error message to standard error output and stop the operator in case an uncaught
+The standard error handling will print out an error message to standard error output and terminate the operator in case an uncaught
 exception is thrown from withing the operator's body. To alter the behavior, you can redefine the _reportError()_ method
 on the operator:
 
@@ -181,10 +181,10 @@ operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
  If preserving the order of messages in multiple output channels is not an issue, _bindAllOutputs_ as well as _bindAllOutputValues_ will provide better performance over the atomic variants.
 {note}
 
-h4. Stopping operators
+h4. Terminating operators
 
-Dataflow operators and selectors can be stopped in two ways:
-# by calling the terminate() method on all operators that need to be stopped
+Dataflow operators and selectors can be terminated in two ways:
+# by calling the terminate() method on all operators that need to be terminated
 # by sending a poisson message.
 
 Using the terminate() method:
@@ -226,6 +226,15 @@ All ways of terminating them from outside (either by calling the terminate() met
 may result in messages being lost somewhere in the pipes, when the reading operators terminate before they fully handle
 the messages waiting in their input channels.
 {note}
+
+h4. Stopping operators gently
+
+Operators handle incoming messages repeatedly. The only safe moment for stopping an operator without the risk of loosing
+any messages is right after the operator has finished processing messages is just about to look for more messages in its incoming pipes.
+This is exactly what the stopAfterNextRun() method does. It will schedule the operator for shutdown after the next set
+of messages gets handled.
+This may be particularly handy when you use a group of operators/selectors to load-balance messages coming from a channel.
+Once the work-load decreases, the stopAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
 
 h3. Grouping operators
 

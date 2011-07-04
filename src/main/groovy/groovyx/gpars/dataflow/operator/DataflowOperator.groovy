@@ -105,6 +105,9 @@ private class DataflowOperatorActor extends DataflowProcessorActor {
             def results = values.sort {it.key}.values() as List
             startTask(results)
             values = [:]
+            if (stoppingGently) {
+                stop()
+            }
             if (!hasBeenStopped()) queryInputs(false)
         }
     }
