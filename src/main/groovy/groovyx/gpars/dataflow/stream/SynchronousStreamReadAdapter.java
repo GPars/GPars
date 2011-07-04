@@ -209,7 +209,7 @@ public final class SynchronousStreamReadAdapter<T> implements DataflowReadChanne
         final DataflowVariable<SynchronousValue<T>> firstDFV = head.getFirstDFV();
         if (firstDFV.isBound()) {
             moveHead();
-            return firstDFV;
+            return null;  //firstDFV;
         } else return null;
     }
 
