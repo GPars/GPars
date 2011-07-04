@@ -124,10 +124,12 @@ once you start using them to wire _tasks_ , _operators_ or _selectors_ together.
 
 {note}
 The _DataflowChannel_ interface combines two interfaces, each serving its purpose:
-* DataflowReadChannel holding all the methods necessary for reading values from a channel
-* DataflowWriteChannel holding all the methods necessary for writing values into a channel
+* DataflowReadChannel holding all the methods necessary for reading values from a channel - getVal(), getValAsync(), whenBound(), etc.
+* DataflowWriteChannel holding all the methods necessary for writing values into a channel - bind(), <<
 You may prefer using these dedicated interfaces instead of the general _DataflowChannel_ interface, to better express the intended usage.
 {note}
+
+Please refer to the "API doc":http://gpars.codehaus.org/API+doc for more details on the channel interfaces.
 
 h3. Point-to-point communication
 
@@ -340,7 +342,7 @@ a.whenBound {println "Just to confirm that the variable has been really set to $
 ...
 {code}
 
-A bound handlers can be registered on all dataflow channels (variables, queues or broadcasts) either using the >> operator or the _whenBound()_ method. They will be run once a value is bound to the variable.
+Bind handlers can be registered on all dataflow channels (variables, queues or broadcasts) either using the >> operator or the _whenBound()_ method. They will be run once a value is bound to the variable.
 
 Dataflow queues and broadcasts also support a _wheneverBound_ method to register a closure or a message handler to run each time a value is bound to them.
 
