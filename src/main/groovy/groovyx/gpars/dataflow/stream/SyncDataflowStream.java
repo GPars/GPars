@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow.stream;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
-import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.SyncDataflowVariable;
 
 import java.util.Collection;
 
@@ -38,39 +38,49 @@ import java.util.Collection;
  * @author Johannes Link, Vaclav Pech
  */
 @SuppressWarnings({"rawtypes", "TailRecursion", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
-public final class DataflowStream<T> extends StreamCore<T> {
+public final class SyncDataflowStream<T> extends StreamCore<T> {
 
-    public DataflowStream() {
-        super(new DataflowVariable<T>());
+    private int parties;
+
+    public SyncDataflowStream(final int parties) {
+        super(new SyncDataflowVariable<T>(parties));
+        this.parties = parties;
     }
 
-    public DataflowStream(final Closure toBeApplied) {
-        super(new DataflowVariable<T>(), toBeApplied);
+    public SyncDataflowStream(final int parties, final Closure toBeApplied) {
+        super(new SyncDataflowVariable<T>(parties), toBeApplied);
+        this.parties = parties;
     }
 
-    public DataflowStream(final Collection<MessageStream> wheneverBoundListeners) {
-        super(new DataflowVariable<T>(), wheneverBoundListeners);
+    public SyncDataflowStream(final int parties, final Collection<MessageStream> wheneverBoundListeners) {
+        super(new SyncDataflowVariable<T>(parties), wheneverBoundListeners);
+        this.parties = parties;
     }
 
+    /**
+     * Retrieves a DataflowStream representing the rest of this Stream after removing the first element
+     *
+     * @return The remaining stream elements
+     */
     @Override
     public FList<T> getRest() {
         if (rest.get() == null)
-            rest.compareAndSet(null, new DataflowStream<T>(wheneverBoundListeners));
+            rest.compareAndSet(null, new SyncDataflowStream<T>(parties, wheneverBoundListeners));
         return rest.get();
     }
 
     @Override
     protected StreamCore<T> createNewStream() {
-        return new DataflowStream<T>();
+        return new SyncDataflowStream<T>(parties);
     }
 
     @Override
     public String toString() {
         if (!first.isBound())
-            return "DataflowStream[?]";
+            return "SyncDataflowStream[?]";
         if (isEmpty())
-            return "DataflowStream[]";
-        return "DataflowStream[" + getFirst() + getRest().appendingString() + ']';
+            return "SyncDataflowStream[]";
+        return "SyncDataflowStream[" + getFirst() + getRest().appendingString() + ']';
     }
 }
 

@@ -29,35 +29,35 @@ import groovyx.gpars.dataflow.DataflowWriteChannel;
 @SuppressWarnings({"SynchronizedMethod"})
 public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
 
-    private DataflowStream<T> head;
+    private StreamCore<T> head;
 
     /**
      * Creates a new adapter
      *
      * @param stream The stream to wrap
      */
-    public DataflowStreamWriteAdapter(final DataflowStream<T> stream) {
+    public DataflowStreamWriteAdapter(final StreamCore<T> stream) {
         this.head = stream;
     }
 
     @Override
     public final synchronized DataflowWriteChannel<T> leftShift(final T value) {
         head.leftShift(value);
-        head = (DataflowStream<T>) head.getRest();
+        head = (StreamCore<T>) head.getRest();
         return this;
     }
 
     @Override
     public final synchronized DataflowWriteChannel<T> leftShift(final DataflowReadChannel<T> ref) {
         head.leftShift(ref);
-        head = (DataflowStream<T>) head.getRest();
+        head = (StreamCore<T>) head.getRest();
         return this;
     }
 
     @Override
     public final synchronized void bind(final T value) {
         head.leftShift(value);
-        head = (DataflowStream<T>) head.getRest();
+        head = (StreamCore<T>) head.getRest();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class DataflowStreamWriteAdapter<T> implements DataflowWriteChannel<T> {
         return head.toString();
     }
 
-    protected final synchronized DataflowStream<T> getHead() {
+    protected final synchronized StreamCore<T> getHead() {
         return head;
     }
 }

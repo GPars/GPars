@@ -40,7 +40,7 @@ public class SynchronousStreamWriteAdapter<T> implements DataflowWriteChannel<T>
      *
      * @param stream The stream to wrap
      */
-    public SynchronousStreamWriteAdapter(final DataflowStream<SynchronousValue<T>> stream) {
+    public SynchronousStreamWriteAdapter(final StreamCore<SynchronousValue<T>> stream) {
         internalStream = new DataflowStreamWriteAdapter<SynchronousValue<T>>(stream);
     }
 
@@ -92,7 +92,7 @@ public class SynchronousStreamWriteAdapter<T> implements DataflowWriteChannel<T>
         return internalStream.toString();
     }
 
-    protected final DataflowStream<SynchronousValue<T>> getHead() {
+    protected final StreamCore<SynchronousValue<T>> getHead() {
         return internalStream.getHead();
     }
 }

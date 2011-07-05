@@ -38,15 +38,15 @@ import java.util.concurrent.TimeUnit;
  */
 public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
-    private DataflowStream<T> head;
-    private DataflowStream<T> asyncHead;
+    private StreamCore<T> head;
+    private StreamCore<T> asyncHead;
 
     /**
      * Creates a new adapter
      *
      * @param stream The stream to wrap
      */
-    public DataflowStreamReadAdapter(final DataflowStream<T> stream) {
+    public DataflowStreamReadAdapter(final StreamCore<T> stream) {
         this.head = stream;
         this.asyncHead = head;
     }
@@ -154,11 +154,11 @@ public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T
 
     private void moveHead() {
         if (head == asyncHead) moveAsyncHead();
-        head = (DataflowStream<T>) head.getRest();
+        head = (StreamCore<T>) head.getRest();
     }
 
     private void moveAsyncHead() {
-        asyncHead = (DataflowStream<T>) asyncHead.getRest();
+        asyncHead = (StreamCore<T>) asyncHead.getRest();
     }
 }
 

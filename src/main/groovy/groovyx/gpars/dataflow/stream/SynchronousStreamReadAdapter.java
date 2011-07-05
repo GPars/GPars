@@ -41,8 +41,8 @@ import java.util.concurrent.TimeUnit;
 public final class SynchronousStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     private static final String ERROR_READING_FROM_THE_SYNCHRONOUS_CHANNEL = "Error reading from the synchronous channel";
-    private DataflowStream<SynchronousValue<T>> head;
-    private DataflowStream<SynchronousValue<T>> asyncHead;
+    private StreamCore<SynchronousValue<T>> head;
+    private StreamCore<SynchronousValue<T>> asyncHead;
     private boolean disabled = false;
 
     /**
@@ -50,7 +50,7 @@ public final class SynchronousStreamReadAdapter<T> implements DataflowReadChanne
      *
      * @param stream The stream to wrap
      */
-    public SynchronousStreamReadAdapter(final DataflowStream<SynchronousValue<T>> stream) {
+    public SynchronousStreamReadAdapter(final StreamCore<SynchronousValue<T>> stream) {
         disabled = true;
         this.head = stream;
         this.asyncHead = head;
@@ -215,11 +215,11 @@ public final class SynchronousStreamReadAdapter<T> implements DataflowReadChanne
 
     private void moveHead() {
         if (head == asyncHead) moveAsyncHead();
-        head = (DataflowStream<SynchronousValue<T>>) head.getRest();
+        head = (StreamCore<SynchronousValue<T>>) head.getRest();
     }
 
     private void moveAsyncHead() {
-        asyncHead = (DataflowStream<SynchronousValue<T>>) asyncHead.getRest();
+        asyncHead = (StreamCore<SynchronousValue<T>>) asyncHead.getRest();
     }
 
     private void awaitParties(final SynchronousValue<T> synchronousValue) {

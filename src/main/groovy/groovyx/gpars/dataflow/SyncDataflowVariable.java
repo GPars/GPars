@@ -97,5 +97,4 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
             throw new RuntimeException(ERROR_WRITING_INTO_A_SYNCHRONOUS_CHANNEL, e);
         }
     }
-
 }
