@@ -1,0 +1,119 @@
+h3. Synchronous dataflow queue
+
+{code}
+import groovyx.gpars.dataflow.SyncDataflowQueue
+import groovyx.gpars.group.NonDaemonPGroup
+
+/**
+ * Shows how synchronous dataflow queues can be used to throttle fast producer when serving data to a slow consumer.
+ * Unlike when using asynchronous channels, synchronous channels block both the writer and the readers until all parties are ready to exchange messages.
+ */
+
+def group = new NonDaemonPGroup()
+
+final SyncDataflowQueue channel = new SyncDataflowQueue()
+
+def producer = group.task {
+    (1..30).each {
+        channel << it
+        println "Just sent $it"
+    }
+    channel << -1
+}
+
+def consumer = group.task {
+    while (true) {
+        sleep 500  //simulating a slow consumer
+        final Object msg = channel.val
+        if (msg == -1) return
+        println "Received $msg"
+    }
+}
+
+consumer.join()
+
+group.shutdown()
+{code}
+
+h3. Synchronous dataflow broadcast
+
+{code}
+import groovyx.gpars.dataflow.SyncDataflowBroadcast
+import groovyx.gpars.group.NonDaemonPGroup
+
+/**
+ * Shows how synchronous dataflow broadcasts can be used to throttle fast producer when serving data to slow consumers.
+ * Unlike when using asynchronous channels, synchronous channels block both the writer and the readers until all parties are ready to exchange messages.
+ */
+
+def group = new NonDaemonPGroup()
+
+final SyncDataflowBroadcast channel = new SyncDataflowBroadcast(2)  //We will synchronize on two readers
+
+def producer = group.task {
+    (1..30).each {
+        channel << it
+        println "Just sent $it"
+    }
+    channel << -1
+}
+
+def fastConsumer = group.task {
+    def mySubscription = channel.createReadChannel()
+    while (true) {
+        sleep 10  //simulating a fast consumer
+        final Object msg = mySubscription.val
+        if (msg == -1) return
+        println "Fast consumer received $msg"
+    }
+}
+
+def slowConsumer = group.task {
+    def mySubscription = channel.createReadChannel()
+    while (true) {
+        sleep 500  //simulating a slow consumer
+        final Object msg = mySubscription.val
+        if (msg == -1) return
+        println "Slow consumer received $msg"
+    }
+}
+
+[fastConsumer, slowConsumer]*.join()
+
+group.shutdown()
+{code}
+
+h3. Synchronous dataflow variable
+
+Unlike DataflowVariable, which is asynchronous and only blocks the readers until a value is bound to the variable,
+the SyncDataflowVariable blocks the writer and all readers until a specified number of waiting parties is reached.
+
+{code}
+import groovyx.gpars.dataflow.SyncDataflowVariable
+import groovyx.gpars.group.NonDaemonPGroup
+
+final NonDaemonPGroup group = new NonDaemonPGroup()
+
+final SyncDataflowVariable value = new SyncDataflowVariable(2)  //two readers required to exchange the message
+
+def writer = group.task {
+    println "Writer about to write a value"
+    value << 'Hello'
+    println "Writer has written the value"
+}
+
+def reader = group.task {
+    println "Reader about to read a value"
+    println "Reader has read the value: ${value.val}"
+}
+
+def slowReader = group.task {
+    sleep 5000
+    println "Slow reader about to read a value"
+    println "Slow reader has read the value: ${value.val}"
+}
+
+[reader, slowReader]*.join()
+
+group.shutdown()
+{code}
