@@ -124,7 +124,6 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
             stream << 10
             final SyncDataflowVariable variable = new SyncDataflowVariable()
             stream << variable
-            latch.countDown()
             receive {
                 variable << 20
             }
@@ -161,8 +160,8 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
 
         final SyncDataflowQueue stream = new SyncDataflowQueue()
         final Actor thread = Actors.blockingActor {
-            (0..10).each {Thread.start {stream << it}}
-            sleep 1000
+            (0..10).each {num -> Thread.start {stream << num}}
+            sleep 3000
             barrier.await()
             receive {
                 stream << 11
@@ -171,12 +170,12 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
 
         barrier.await()
         assertEquals 11, stream.length()
-        stream.eachWithIndex {index, element -> assertEquals index, element }
+        stream.collect {it}.sort().eachWithIndex {element, index -> assert index == element }
         assertEquals 11, stream.length()
 
         thread << 'Proceed'
-        (0..10).each {
-            assertEquals it, stream.val
+        (0..11).each {
+            assert stream.val in (0..11)
         }
     }
 
@@ -185,7 +184,8 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
 
         final SyncDataflowQueue stream = new SyncDataflowQueue()
         Actors.blockingActor {
-            (0..10).each {stream << null}
+            (0..10).each {Thread.start {stream << null}}
+            sleep 3000
             barrier.await()
         }
 
@@ -200,19 +200,23 @@ public class SyncSyncDataflowQueueTest extends GroovyTestCase {
     public void testToString() {
         final SyncDataflowQueue<Integer> stream = new SyncDataflowQueue<Integer>()
         assertEquals 'SyncDataflowQueue(queue=[])', stream.toString()
-        stream << 10
+        Thread.start {stream << 10}
+        sleep 1000
         assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=10)])', stream.toString()
-        stream << 20
+        Thread.start {stream << 20}
+        sleep 1000
         assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=10), SyncDataflowVariable(value=20)])', stream.toString()
         stream.val
         assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=20)])', stream.toString()
         stream.val
         assertEquals 'SyncDataflowQueue(queue=[])', stream.toString()
+
         final SyncDataflowVariable variable = new SyncDataflowVariable()
-        stream << variable
+        Thread.start {stream << variable}
+        sleep 1000
         assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=null)])', stream.toString()
-        variable << '30'
-        Thread.sleep 1000  //let the value propagate asynchronously into the variable stored in the stream
+        Thread.start {variable << '30'}
+        Thread.sleep 3000  //let the value propagate asynchronously into the variable stored in the stream
         assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=30)])', stream.toString()
         assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=30)])', stream.toString()
         stream.val
