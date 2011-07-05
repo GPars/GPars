@@ -42,9 +42,11 @@ public final class SyncDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T
 
     /**
      * Creates a new adapter
+     *
+     * @param parties The number of readers to wait for before the message gets exchanged.
      */
-    public SyncDataflowBroadcast() {
-        super(new SyncDataflowStream<T>(0));
+    public SyncDataflowBroadcast(final int parties) {
+        super(new SyncDataflowStream<T>(parties));
     }
 
     @SuppressWarnings({"SynchronizedMethod"})
