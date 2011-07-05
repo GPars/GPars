@@ -304,8 +304,11 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoProducerConsumer1',                      //Never stops
             'DemoPhysicalCalculations',                   //Needs user input
             'DemoFibonacci1',                             //Needs classes from its source folder
+            'DemoFibonacci1WithSynchronousChannels',      //Needs classes from its source folder
             'DemoFibonacci2',                             //Needs classes from its source folder
+            'DemoFibonacci2WithSynchronousChannels',      //Needs classes from its source folder
             'DemoNumbers',                                //Needs classes from its source folder
+            'DemoNumbersWithSynchronousChannels',         //Needs classes from its source folder
             'DemoActor_4_4',                              //Specifies absolute paths
             'RunReset',                                   //Starts UI
             'DemoSwingMergeSort',                         //Starts UI
