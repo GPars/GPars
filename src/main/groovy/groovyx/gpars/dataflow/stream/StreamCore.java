@@ -350,4 +350,16 @@ public abstract class StreamCore<T> implements FList<T> {
         }
         return expr;
     }
+
+    /**
+     * Increases the number of parties required to perform the data exchange
+     */
+    public void incrementParties() {
+    }
+
+    /**
+     * Decreases the number of parties required to perform the data exchange
+     */
+    public void decrementParties() {
+    }
 }

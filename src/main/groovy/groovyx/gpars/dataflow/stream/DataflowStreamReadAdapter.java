@@ -160,5 +160,13 @@ public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T
     private void moveAsyncHead() {
         asyncHead = (StreamCore<T>) asyncHead.getRest();
     }
+
+    /**
+     * Closes the channel so that it cannot be used any longer
+     */
+    public void close() {
+        head = null;
+        asyncHead = null;
+    }
 }
 

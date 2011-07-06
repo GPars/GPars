@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow;
 
 import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
 import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
+import groovyx.gpars.dataflow.stream.StreamCore;
 import groovyx.gpars.dataflow.stream.SyncDataflowStream;
 
 /**
@@ -42,11 +43,9 @@ public final class SyncDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T
 
     /**
      * Creates a new instance
-     *
-     * @param parties The number of readers to wait for before the message gets exchanged.
      */
-    public SyncDataflowBroadcast(final int parties) {
-        super(new SyncDataflowStream<T>(parties));
+    public SyncDataflowBroadcast() {
+        super(new SyncDataflowStream<T>(0));
     }
 
     @SuppressWarnings({"SynchronizedMethod"})
@@ -62,8 +61,21 @@ public final class SyncDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T
      *
      * @return A read channel to receive messages submitted to the broadcast channel from now on.
      */
-    public DataflowReadChannel<T> createReadChannel() {
-        return new DataflowStreamReadAdapter<T>(getHead());
+    public synchronized DataflowReadChannel<T> createReadChannel() {
+        final StreamCore<T> head = getHead();
+        head.incrementParties();
+        return new DataflowStreamReadAdapter<T>(head);
+    }
+
+    /**
+     * Un-registers the supplied read channel from the broadcast. The number of parties that have to meet at data exchange is reduced by one.
+     *
+     * @param channel The channel to unsubscribe. The channel won't be able to read further messages.
+     */
+    public synchronized void unsubscribeReadChannel(final DataflowReadChannel<T> channel) {
+        final StreamCore<T> head = getHead();
+        head.decrementParties();
+        ((DataflowStreamReadAdapter<T>) channel).close();
     }
 }
 

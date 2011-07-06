@@ -69,34 +69,34 @@ import groovyx.gpars.group.NonDaemonPGroup
 
 def group = new NonDaemonPGroup()
 
-final SyncDataflowBroadcast channel = new SyncDataflowBroadcast(2)  //We will synchronize on two readers
+final SyncDataflowBroadcast channel = new SyncDataflowBroadcast()
 
-def producer = group.task {
-    (1..30).each {
-        channel << it
-        println "Just sent $it"
-    }
-    channel << -1
-}
-
+def subscription1 = channel.createReadChannel()
 def fastConsumer = group.task {
-    def mySubscription = channel.createReadChannel()
     while (true) {
         sleep 10  //simulating a fast consumer
-        final Object msg = mySubscription.val
+        final Object msg = subscription1.val
         if (msg == -1) return
         println "Fast consumer received $msg"
     }
 }
 
+def subscription2 = channel.createReadChannel()
 def slowConsumer = group.task {
-    def mySubscription = channel.createReadChannel()
     while (true) {
         sleep 500  //simulating a slow consumer
-        final Object msg = mySubscription.val
+        final Object msg = subscription2.val
         if (msg == -1) return
         println "Slow consumer received $msg"
     }
+}
+
+def producer = group.task {
+    (1..30).each {
+        println "Sending $it"
+        channel << it
+    }
+    channel << -1
 }
 
 [fastConsumer, slowConsumer]*.join()

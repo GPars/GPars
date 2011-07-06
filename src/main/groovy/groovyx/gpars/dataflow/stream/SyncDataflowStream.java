@@ -45,7 +45,7 @@ import java.util.Collection;
 @SuppressWarnings({"rawtypes", "TailRecursion", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
 public final class SyncDataflowStream<T> extends StreamCore<T> {
 
-    private final int parties;
+    private int parties;
 
     /**
      * Creates an empty stream
@@ -108,6 +108,25 @@ public final class SyncDataflowStream<T> extends StreamCore<T> {
         if (isEmpty())
             return "SyncDataflowStream[]";
         return "SyncDataflowStream[" + getFirst() + getRest().appendingString() + ']';
+    }
+
+    /**
+     * Increases the number of parties required to perform the data exchange
+     */
+    @Override
+    public synchronized void incrementParties() {
+        parties++;
+        ((SyncDataflowVariable) first).incrementParties();
+    }
+
+    /**
+     * Decreases the number of parties required to perform the data exchange
+     */
+    @Override
+    public synchronized void decrementParties() {
+        if (parties == 0) throw new IllegalArgumentException("Cannot decrease the number of parties. Already at zero.");
+        parties--;
+        ((SyncDataflowVariable) first).decrementParties();
     }
 }
 

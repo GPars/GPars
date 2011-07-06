@@ -18,8 +18,8 @@ package groovyx.gpars.dataflow;
 
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.impl.ResizeableCountDownLatch;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
     private static final String ERROR_WRITING_INTO_A_SYNCHRONOUS_CHANNEL = "Error writing into a synchronous channel.";
-    private final CountDownLatch parties;
+    private final ResizeableCountDownLatch parties;
 
     /**
      * Creates a new variable, which will never block writers.
@@ -45,7 +45,7 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
      * @param parties Number of readers that have to match a writer before the message gets transferred
      */
     public SyncDataflowVariable(final int parties) {
-        this.parties = new CountDownLatch(parties);
+        this.parties = new ResizeableCountDownLatch(parties);
     }
 
     @Override
@@ -110,5 +110,19 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
         } catch (InterruptedException e) {
             throw new RuntimeException(ERROR_WRITING_INTO_A_SYNCHRONOUS_CHANNEL, e);
         }
+    }
+
+    /**
+     * Increases the number of parties required to perform data exchange by one
+     */
+    public void incrementParties() {
+        parties.increaseCount();
+    }
+
+    /**
+     * Decreases the number of parties required to perform data exchange by one
+     */
+    public void decrementParties() {
+        parties.decreaseCount();
     }
 }
