@@ -25,9 +25,7 @@ class SyncDataflowStreamDefaultTest extends GroovyTestCase {
     def stream = new SyncDataflowStream(0)
 
     void testEmptyStream() {
-        task {
-            stream << SyncDataflowStream.eos()
-        }
+        stream << SyncDataflowStream.eos()
         assert stream.isEmpty()
     }
 
