@@ -24,7 +24,9 @@ import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
-public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
+public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     private StreamCore<T> head;
     private StreamCore<T> asyncHead;
@@ -56,7 +58,7 @@ public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return head.toString();
     }
 
@@ -152,6 +154,16 @@ public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T
         } else return null;
     }
 
+    protected final List<DataflowVariable<T>> allUnprocessedDFVs() throws InterruptedException {
+        final List<DataflowVariable<T>> values = new ArrayList<DataflowVariable<T>>();
+        StreamCore<T> currentHead = head;
+        while (currentHead != null) {
+            values.add(currentHead.getFirstDFV());
+            currentHead = (StreamCore<T>) currentHead.rest.get();
+        }
+        return values;
+    }
+
     private void moveHead() {
         if (head == asyncHead) moveAsyncHead();
         head = (StreamCore<T>) head.getRest();
@@ -159,14 +171,6 @@ public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T
 
     private void moveAsyncHead() {
         asyncHead = (StreamCore<T>) asyncHead.getRest();
-    }
-
-    /**
-     * Closes the channel so that it cannot be used any longer
-     */
-    public void close() {
-        head = null;
-        asyncHead = null;
     }
 }
 

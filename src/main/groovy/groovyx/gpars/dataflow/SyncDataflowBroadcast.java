@@ -16,7 +16,6 @@
 
 package groovyx.gpars.dataflow;
 
-import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
 import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
 import groovyx.gpars.dataflow.stream.StreamCore;
 import groovyx.gpars.dataflow.stream.SyncDataflowStream;
@@ -64,18 +63,21 @@ public final class SyncDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T
     public synchronized DataflowReadChannel<T> createReadChannel() {
         final StreamCore<T> head = getHead();
         head.incrementParties();
-        return new DataflowStreamReadAdapter<T>(head);
+        return new SyncDataflowStreamReadAdapter<T>(head);
     }
 
     /**
      * Un-registers the supplied read channel from the broadcast. The number of parties that have to meet at data exchange is reduced by one.
      *
      * @param channel The channel to unsubscribe. The channel won't be able to read further messages.
+     * @throws InterruptedException If the thread got interrupted
      */
-    public synchronized void unsubscribeReadChannel(final DataflowReadChannel<T> channel) {
+    public synchronized void unsubscribeReadChannel(final DataflowReadChannel<T> channel) throws InterruptedException {
+        if (!(channel instanceof SyncDataflowStreamReadAdapter))
+            throw new IllegalArgumentException("The supplied channel has not been subscribed to this synchronous broadcast - " + channel);
         final StreamCore<T> head = getHead();
-        head.decrementParties();
-        ((DataflowStreamReadAdapter<T>) channel).close();
+//        head.decrementParties();
+        ((SyncDataflowStreamReadAdapter<T>) channel).close();
     }
 }
 

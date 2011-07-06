@@ -148,7 +148,18 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
 
         Thread.start {subscription2.val}
         assert subscription3.val == 1
-        assert subscription1.val == 1
+        shouldFail(IllegalStateException) {
+            subscription1.val
+        }
+        shouldFail(IllegalStateException) {
+            subscription1.bound
+        }
+        shouldFail(IllegalStateException) {
+            subscription1.whenBound {}
+        }
+        shouldFail(IllegalStateException) {
+            subscription1.wheneverBound {}
+        }
 
         sleep 2000
         assert writerReached
@@ -178,13 +189,20 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         sleep 1000
         assert !writerReached
 
-        def readerResult = new DataflowVariable()
-        Thread.start {readerResult << subscription1.val}
-        assert subscription2.val == 2
-        assert subscription3.val == 2
-        assert readerResult.val == 2
+        broadcast.unsubscribeReadChannel(subscription3)
+
+        assert subscription1.val == 2
+
+        shouldFail(IllegalStateException) {
+            subscription2.val
+        }
+        shouldFail(IllegalStateException) {
+            subscription3.val
+        }
 
         sleep 2000
         assert writerReached
     }
+
+    //todo test whenBound after subscription, un-subscription - asyncHead, select, operators
 }
