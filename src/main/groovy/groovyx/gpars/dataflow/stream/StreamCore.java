@@ -30,11 +30,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 5.7.11
- * Time: 15:54
- * To change this template use File | Settings | File Templates.
+ * Represents a common base for publish-subscribe deterministic channels.
+ *
+ * @param <T> Type for values to pass through the channels
+ * @author Johannes Link, Vaclav Pech
  */
 public abstract class StreamCore<T> implements FList<T> {
 
@@ -322,6 +321,11 @@ public abstract class StreamCore<T> implements FList<T> {
         return result;
     }
 
+    /**
+     * A factory method to create new instances of the correct class when needed
+     *
+     * @return An instance of the appropriate sub-class
+     */
     protected abstract StreamCore<T> createNewStream();
 
     public final void wheneverBound(final Closure closure) {

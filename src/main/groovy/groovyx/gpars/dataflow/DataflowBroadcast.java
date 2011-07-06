@@ -41,7 +41,7 @@ import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
 public final class DataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
 
     /**
-     * Creates a new adapter
+     * Creates a new instance
      */
     public DataflowBroadcast() {
         super(new DataflowStream<T>());

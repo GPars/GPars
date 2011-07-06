@@ -40,18 +40,31 @@ import java.util.Collection;
 @SuppressWarnings({"rawtypes", "TailRecursion", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
 public final class DataflowStream<T> extends StreamCore<T> {
 
+    /**
+     * Creates an empty stream
+     */
     public DataflowStream() {
         super(new DataflowVariable<T>());
     }
 
+    /**
+     * Creates a stream while applying the supplied initialization closure to it
+     *
+     * @param toBeApplied The closure to use for initialization
+     */
     public DataflowStream(final Closure toBeApplied) {
         super(new DataflowVariable<T>(), toBeApplied);
     }
 
-    public DataflowStream(final Collection<MessageStream> wheneverBoundListeners) {
+    private DataflowStream(final Collection<MessageStream> wheneverBoundListeners) {
         super(new DataflowVariable<T>(), wheneverBoundListeners);
     }
 
+    /**
+     * Retrieves a DataflowStream representing the rest of this Stream after removing the first element
+     *
+     * @return The remaining stream elements
+     */
     @Override
     public FList<T> getRest() {
         if (rest.get() == null)
@@ -59,6 +72,11 @@ public final class DataflowStream<T> extends StreamCore<T> {
         return rest.get();
     }
 
+    /**
+     * A factory method to create new instances of the correct class when needed
+     *
+     * @return An instance of the appropriate sub-class
+     */
     @Override
     protected StreamCore<T> createNewStream() {
         return new DataflowStream<T>();

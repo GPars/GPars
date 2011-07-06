@@ -54,6 +54,12 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
         awaitParties();
     }
 
+    /**
+     * Reads the value of the variable. Blocks, if the value has not been assigned yet.
+     *
+     * @return The actual value
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
     @Override
     public T getVal() throws InterruptedException {
         final T val = super.getVal();
@@ -61,6 +67,14 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
         return val;
     }
 
+    /**
+     * Reads the value of the variable. Blocks up to given timeout, if the value has not been assigned yet.
+     *
+     * @param timeout The timeout value
+     * @param units   Units for the timeout
+     * @return The actual value
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
     @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final T result = super.getVal(timeout, units);

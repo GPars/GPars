@@ -146,6 +146,11 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
         return ref;
     }
 
+    /**
+     * Creates a new variable to perform the next data exchange
+     *
+     * @return The newly created DataflowVariable instance
+     */
     protected DataflowVariable<T> createVariable() {
         return new DataflowVariable<T>();
     }

@@ -23,36 +23,58 @@ import groovyx.gpars.dataflow.SyncDataflowVariable;
 import java.util.Collection;
 
 /**
- * Represents a deterministic dataflow channel. Unlike a DataflowQueue, DataflowStream allows multiple readers each to read all the messages.
- * Essentially, you may think of DataflowStream as a 1 to many communication channel, since when a reader consumes a messages,
+ * Represents a synchronous deterministic dataflow channel. Unlike a SyncDataflowQueue, syncDataflowStream allows multiple readers each to read all the messages.
+ * Essentially, you may think of SyncDataflowStream as a 1 to many communication channel, since when a reader consumes a messages,
  * other readers will still be able to read the message. Also, all messages arrive to all readers in the same order.
- * DataflowStream is implemented as a functional queue, which impacts the API in that users have to traverse the values in the stream themselves.
+ * SyncDataflowStream is implemented as a functional queue, which impacts the API in that users have to traverse the values in the stream themselves.
  * On the other hand in offers handy methods for value filtering or transformation together with interesting performance characteristics.
- * For convenience and for the ability to use DataflowStream with other dataflow constructs, like e.g. operators,
- * you can wrap DataflowStreams with DataflowReadAdapter for read access or DataflowWriteAdapter for write access.
+ * For convenience and for the ability to use SyncDataflowStream with other dataflow constructs, like e.g. operators,
+ * you can wrap SyncDataflowStreams with DataflowReadAdapter for read access or DataflowWriteAdapter for write access.
  * <p/>
- * The DataflowStream class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
+ * The SyncDataflowStream class is designed for single-threaded producers and consumers. If multiple threads are supposed to read or write values
  * to the stream, their access to the stream must be serialized externally or the adapters should be used.
+ * <p/>
+ * SyncDataflowStream uses SyncDataflowVariables to preform the actual data exchange. Unlike DataflowStream, which exchanges data
+ * in asynchronous manner, SyncDataflowStream is synchronous. The writer as well as the readers are blocked until all the required
+ * parties become ready for the data exchange. Writers can thus never get too far ahead of readers and also all the readers themselves
+ * are always processing the same message in parallel and wait for one-another before getting the next one.
  *
  * @param <T> Type for values to pass through the stream
- * @author Johannes Link, Vaclav Pech
+ * @author Vaclav Pech
  */
 @SuppressWarnings({"rawtypes", "TailRecursion", "unchecked", "StaticMethodNamingConvention", "ClassWithTooManyMethods"})
 public final class SyncDataflowStream<T> extends StreamCore<T> {
 
-    private int parties;
+    private final int parties;
 
+    /**
+     * Creates an empty stream
+     *
+     * @param parties The number of readers to ask for a value before the message gets exchanged.
+     */
     public SyncDataflowStream(final int parties) {
         super(new SyncDataflowVariable<T>(parties));
         this.parties = parties;
     }
 
+    /**
+     * Creates an empty stream while applying the supplied initialization closure to it
+     *
+     * @param parties     The number of readers to ask for a value before the message gets exchanged.
+     * @param toBeApplied The closure to use for initialization
+     */
     public SyncDataflowStream(final int parties, final Closure toBeApplied) {
         super(new SyncDataflowVariable<T>(parties), toBeApplied);
         this.parties = parties;
     }
 
-    public SyncDataflowStream(final int parties, final Collection<MessageStream> wheneverBoundListeners) {
+    /**
+     * Creates an empty stream with the specified listeners set
+     *
+     * @param parties                The number of readers to ask for a value before the message gets exchanged.
+     * @param wheneverBoundListeners The collection of listeners to bind to the stream
+     */
+    private SyncDataflowStream(final int parties, final Collection<MessageStream> wheneverBoundListeners) {
         super(new SyncDataflowVariable<T>(parties), wheneverBoundListeners);
         this.parties = parties;
     }
@@ -69,6 +91,11 @@ public final class SyncDataflowStream<T> extends StreamCore<T> {
         return rest.get();
     }
 
+    /**
+     * A factory method to create new instances of the correct class when needed
+     *
+     * @return An instance of the appropriate sub-class
+     */
     @Override
     protected StreamCore<T> createNewStream() {
         return new SyncDataflowStream<T>(parties);

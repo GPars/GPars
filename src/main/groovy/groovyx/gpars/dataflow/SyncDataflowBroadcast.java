@@ -21,8 +21,8 @@ import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
 import groovyx.gpars.dataflow.stream.SyncDataflowStream;
 
 /**
- * Offers a deterministic one-to-many and many-to-many messaging alternative to DataflowQueue.
- * Internally it wraps a DataflowStream class with a DataflowStreamWriteAdapter and so
+ * Offers a synchronous deterministic one-to-many and many-to-many messaging alternative to SyncDataflowQueue.
+ * Internally it wraps a SyncDataflowStream class with a DataflowStreamWriteAdapter and so
  * synchronizes all writes to the underlying stream allowing multiple threads accessing the stream concurrently.
  * On demand through the createReadChannel() method it will return an DataflowReadChannel through which the reader will receive
  * all messages written to the channel since then.
@@ -41,7 +41,7 @@ import groovyx.gpars.dataflow.stream.SyncDataflowStream;
 public final class SyncDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
 
     /**
-     * Creates a new adapter
+     * Creates a new instance
      *
      * @param parties The number of readers to wait for before the message gets exchanged.
      */

@@ -19,19 +19,26 @@ package groovyx.gpars.dataflow;
 import java.util.ArrayList;
 
 /**
- * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '<<' operator
+ * Represents a thread-safe synchronous data flow stream. Values or DataflowVariables are added using the '<<' operator
  * and safely read once available using the 'val' property.
  * The iterative methods like each(), collect(), iterator(), any(), all() or the for loops work with snapshots
  * of the stream at the time of calling the particular method.
  * For actors and Dataflow Operators the asynchronous non-blocking variants of the getValAsync() methods can be used.
  * They register the request to read a value and will send a message to the actor or operator once the value is available.
- * todo
+ * <p/>
+ * Unlike DataflowQueue, which exchanges data asynchronously, SyncDataflowQueue blocks the writer until a reader is ready to consume the message.
  *
  * @author Vaclav Pech
  *         Date: Jun 5, 2009
  */
 @SuppressWarnings({"ClassWithTooManyMethods"})
 public final class SyncDataflowQueue<T> extends DataflowQueue<T> {
+
+    /**
+     * Creates a new variable to perform the next data exchange
+     *
+     * @return The newly created SyncDataflowVariable instance with exactly one expected reader
+     */
     @Override
     protected DataflowVariable<T> createVariable() {
         return new SyncDataflowVariable<T>(1);
