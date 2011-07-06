@@ -75,7 +75,7 @@ public final class SyncDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T
     public synchronized void unsubscribeReadChannel(final DataflowReadChannel<T> channel) throws InterruptedException {
         if (!(channel instanceof SyncDataflowStreamReadAdapter))
             throw new IllegalArgumentException("The supplied channel has not been subscribed to this synchronous broadcast - " + channel);
-        final StreamCore<T> head = getHead();
+//        final StreamCore<T> head = getHead();
 //        head.decrementParties();
         ((SyncDataflowStreamReadAdapter<T>) channel).close();
     }

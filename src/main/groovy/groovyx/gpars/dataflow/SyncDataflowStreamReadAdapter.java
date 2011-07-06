@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T> {
 
     private boolean closed = false;
+    private boolean wheneverBoundSet = false;
 
     /**
      * Creates a new adapter
@@ -117,12 +118,14 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
     @Override
     public void wheneverBound(final Closure closure) {
         checkClosed();
+        wheneverBoundSet = true;
         super.wheneverBound(closure);
     }
 
     @Override
     public void wheneverBound(final MessageStream stream) {
         checkClosed();
+        wheneverBoundSet = true;
         super.wheneverBound(stream);
     }
 
@@ -149,6 +152,10 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
      * @throws InterruptedException When the thread gets interrupted
      */
     void close() throws InterruptedException {
+        if (wheneverBoundSet)
+            throw new IllegalStateException("The subscription cannot be closed since it has active wheneverBound handlers.");
+        if (closed)
+            throw new IllegalStateException("The subscription has already been closed before.");
         closed = true;
         final List<DataflowVariable<T>> dataflowVariables = allUnprocessedDFVs();
         for (final DataflowVariable<T> dataflowVariable : dataflowVariables) {
