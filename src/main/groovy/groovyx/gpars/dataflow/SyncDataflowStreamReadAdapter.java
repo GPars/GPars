@@ -149,11 +149,13 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
      * @throws InterruptedException When the thread gets interrupted
      */
     void close() throws InterruptedException {
+        closed = true;
         final List<DataflowVariable<T>> dataflowVariables = allUnprocessedDFVs();
         for (final DataflowVariable<T> dataflowVariable : dataflowVariables) {
             ((SyncDataflowVariable<T>) dataflowVariable).decrementParties();
         }
-        closed = true;
+
+
     }
 }
 

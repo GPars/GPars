@@ -204,5 +204,156 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    //todo test whenBound after subscription, un-subscription - asyncHead, select, operators
+    public void testSubscribingWithAsyncOperations() {
+        final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
+        volatile boolean writerReached1 = false
+        volatile boolean writerReached2 = false
+        final DataflowReadChannel subscription1 = broadcast.createReadChannel()
+        final DataflowReadChannel subscription2 = broadcast.createReadChannel()
+        final DataflowReadChannel subscription3 = broadcast.createReadChannel()
+
+        Thread.start {
+            broadcast << 1
+            writerReached1 = true
+        }
+
+        def result1 = new DataflowVariable()
+        def result2 = new DataflowVariable()
+        subscription1.whenBound {
+            result1 << it
+        }
+        Thread.start {subscription2.val}
+        assert subscription3.val == 1
+        assert result1.val == 1
+        assert writerReached1
+
+
+
+        subscription2.whenBound {
+            result2 << it
+        }
+        broadcast.unsubscribeReadChannel(subscription2)
+
+        Thread.start {
+            broadcast << 2
+            writerReached2 = true
+        }
+
+        sleep 1000
+        assert !writerReached2
+
+        broadcast.unsubscribeReadChannel(subscription1)
+
+        assert subscription3.val == 2
+        assert result2.val == 2
+
+        shouldFail(IllegalStateException) {
+            subscription2.val
+        }
+        shouldFail(IllegalStateException) {
+            subscription1.val
+        }
+
+        sleep 2000
+        assert writerReached2
+    }
+
+    public void testSubscribingWithMultipleAsyncOperations() {
+        final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
+        volatile boolean writerReached1 = false
+        volatile boolean writerReached2 = false
+        final DataflowReadChannel subscription1 = broadcast.createReadChannel()
+        final DataflowReadChannel subscription2 = broadcast.createReadChannel()
+
+        Thread.start {
+            broadcast << 1
+            writerReached1 = true
+            broadcast << 2
+            writerReached2 = true
+        }
+
+        def result1 = new DataflowVariable()
+        def result2 = new DataflowVariable()
+        subscription1.whenBound {
+            result1 << it
+        }
+        subscription1.whenBound {
+            result2 << it
+        }
+        broadcast.unsubscribeReadChannel(subscription1)
+
+        assert subscription2.val == 1
+        assert result1.val == 1
+        sleep 1000
+        assert writerReached1
+        assert !writerReached2
+        assert subscription2.val == 2
+        assert result2.val == 2
+
+        sleep 1000
+        assert writerReached2
+
+        Thread.start {
+            broadcast << 3
+        }
+        assert subscription2.val == 3
+    }
+
+    public void testWheneverBound() {
+        final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
+        volatile boolean writerReached1 = false
+        volatile boolean writerReached2 = false
+        final DataflowReadChannel subscription1 = broadcast.createReadChannel()
+        final DataflowReadChannel subscription2 = broadcast.createReadChannel()
+        final DataflowReadChannel subscription3 = broadcast.createReadChannel()
+
+        def result1 = new DataflowVariable()
+        def result2 = new DataflowVariable()
+        subscription1.wheneverBound {
+            result1 << it
+        }
+
+        Thread.start {
+            broadcast << 1
+            writerReached1 = true
+        }
+
+        Thread.start {subscription2.val}
+        assert subscription3.val == 1
+        assert result1.val == 1
+        assert writerReached1
+
+
+
+        broadcast.unsubscribeReadChannel(subscription1)
+        subscription2.wheneverBound {
+            result2 << it
+        }
+
+
+        Thread.start {
+            broadcast << 2
+            writerReached2 = true
+        }
+
+        sleep 1000
+        assert !writerReached2
+
+        broadcast.unsubscribeReadChannel(subscription2)
+
+        assert subscription3.val == 2
+        assert result2.val == 2
+
+        shouldFail(IllegalStateException) {
+            subscription2.val
+        }
+        shouldFail(IllegalStateException) {
+            subscription1.val
+        }
+
+        sleep 2000
+        assert writerReached2
+    }
+
+    //todo test wheneverBound, multiple handlers - wheneverBound
 }

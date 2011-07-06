@@ -156,7 +156,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     protected final List<DataflowVariable<T>> allUnprocessedDFVs() throws InterruptedException {
         final List<DataflowVariable<T>> values = new ArrayList<DataflowVariable<T>>();
-        StreamCore<T> currentHead = head;
+        StreamCore<T> currentHead = asyncHead;
         while (currentHead != null) {
             values.add(currentHead.getFirstDFV());
             currentHead = (StreamCore<T>) currentHead.rest.get();

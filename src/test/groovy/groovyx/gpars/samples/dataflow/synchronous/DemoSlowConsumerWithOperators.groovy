@@ -16,47 +16,32 @@
 
 package groovyx.gpars.samples.dataflow.synchronous
 
-import groovyx.gpars.dataflow.SyncDataflowBroadcast
+import groovyx.gpars.dataflow.SyncDataflowQueue
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
- * Shows how synchronous dataflow broadcasts can be used to throttle fast producer when serving data to slow consumers.
+ * Shows how synchronous dataflow queues can be used to throttle fast producer when serving data to a slow consumer.
  * Unlike when using asynchronous channels, synchronous channels block both the writer and the readers until all parties are ready to exchange messages.
  */
 
 def group = new NonDaemonPGroup()
 
-final SyncDataflowBroadcast channel = new SyncDataflowBroadcast()
-
-def subscription1 = channel.createReadChannel()
-def fastConsumer = group.task {
-    while (true) {
-        sleep 10  //simulating a fast consumer
-        final Object msg = subscription1.val
-        if (msg == -1) return
-        println "Fast consumer received $msg"
-    }
-}
-
-def subscription2 = channel.createReadChannel()
-def slowConsumer = group.task {
-    while (true) {
-        sleep 500  //simulating a slow consumer
-        final Object msg = subscription2.val
-        if (msg == -1) return
-        println "Slow consumer received $msg"
-    }
-}
+final SyncDataflowQueue channel = new SyncDataflowQueue()
 
 def producer = group.task {
     (1..30).each {
-        println "Sending $it"
         channel << it
-        println "Sent $it"
+        println "Just sent $it"
     }
     channel << -1
 }
 
-[fastConsumer, slowConsumer]*.join()
+def consumer = group.operator(inputs: [channel], outputs: []) {value ->
+    sleep 500  //simulating a slow consumer
+    if (value == -1) terminate()
+    else println "Received $value"
+}
+
+consumer.join()
 
 group.shutdown()
