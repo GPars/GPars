@@ -24,7 +24,9 @@ import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,17 +38,17 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
-public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
+public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
-    private DataflowStream<T> head;
-    private DataflowStream<T> asyncHead;
+    private StreamCore<T> head;
+    private StreamCore<T> asyncHead;
 
     /**
      * Creates a new adapter
      *
      * @param stream The stream to wrap
      */
-    public DataflowStreamReadAdapter(final DataflowStream<T> stream) {
+    public DataflowStreamReadAdapter(final StreamCore<T> stream) {
         this.head = stream;
         this.asyncHead = head;
     }
@@ -56,7 +58,7 @@ public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return head.toString();
     }
 
@@ -152,13 +154,23 @@ public final class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T
         } else return null;
     }
 
+    protected final List<DataflowVariable<T>> allUnprocessedDFVs() throws InterruptedException {
+        final List<DataflowVariable<T>> values = new ArrayList<DataflowVariable<T>>();
+        StreamCore<T> currentHead = asyncHead;
+        while (currentHead != null) {
+            values.add(currentHead.getFirstDFV());
+            currentHead = (StreamCore<T>) currentHead.rest.get();
+        }
+        return values;
+    }
+
     private void moveHead() {
         if (head == asyncHead) moveAsyncHead();
-        head = (DataflowStream<T>) head.getRest();
+        head = (StreamCore<T>) head.getRest();
     }
 
     private void moveAsyncHead() {
-        asyncHead = (DataflowStream<T>) asyncHead.getRest();
+        asyncHead = (StreamCore<T>) asyncHead.getRest();
     }
 }
 

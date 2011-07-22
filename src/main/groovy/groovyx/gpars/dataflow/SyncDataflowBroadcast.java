@@ -16,13 +16,13 @@
 
 package groovyx.gpars.dataflow;
 
-import groovyx.gpars.dataflow.stream.DataflowStream;
-import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
 import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
+import groovyx.gpars.dataflow.stream.StreamCore;
+import groovyx.gpars.dataflow.stream.SyncDataflowStream;
 
 /**
- * Offers a deterministic one-to-many and many-to-many messaging alternative to DataflowQueue.
- * Internally it wraps a DataflowStream class with a DataflowStreamWriteAdapter and so
+ * Offers a synchronous deterministic one-to-many and many-to-many messaging alternative to SyncDataflowQueue.
+ * Internally it wraps a SyncDataflowStream class with a DataflowStreamWriteAdapter and so
  * synchronizes all writes to the underlying stream allowing multiple threads accessing the stream concurrently.
  * On demand through the createReadChannel() method it will return an DataflowReadChannel through which the reader will receive
  * all messages written to the channel since then.
@@ -38,19 +38,19 @@ import groovyx.gpars.dataflow.stream.DataflowStreamWriteAdapter;
  * @param <T> The type of messages to pass through the stream
  * @author Vaclav Pech
  */
-public final class DataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
+public final class SyncDataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
 
     /**
      * Creates a new instance
      */
-    public DataflowBroadcast() {
-        super(new DataflowStream<T>());
+    public SyncDataflowBroadcast() {
+        super(new SyncDataflowStream<T>(0));
     }
 
     @SuppressWarnings({"SynchronizedMethod"})
     @Override
     public synchronized String toString() {
-        return "DataflowBroadcast around " + super.toString();
+        return "SyncDataflowBroadcast around " + super.toString();
     }
 
     /**
@@ -60,8 +60,24 @@ public final class DataflowBroadcast<T> extends DataflowStreamWriteAdapter<T> {
      *
      * @return A read channel to receive messages submitted to the broadcast channel from now on.
      */
-    public DataflowReadChannel<T> createReadChannel() {
-        return new DataflowStreamReadAdapter<T>(getHead());
+    public synchronized DataflowReadChannel<T> createReadChannel() {
+        final StreamCore<T> head = getHead();
+        head.incrementParties();
+        return new SyncDataflowStreamReadAdapter<T>(head);
+    }
+
+    /**
+     * Un-registers the supplied read channel from the broadcast. The number of parties that have to meet at data exchange is reduced by one.
+     *
+     * @param channel The channel to unsubscribe. The channel won't be able to read further messages.
+     * @throws InterruptedException If the thread got interrupted
+     */
+    public synchronized void unsubscribeReadChannel(final DataflowReadChannel<T> channel) throws InterruptedException {
+        if (!(channel instanceof SyncDataflowStreamReadAdapter))
+            throw new IllegalArgumentException("The supplied channel has not been subscribed to this synchronous broadcast - " + channel);
+//        final StreamCore<T> head = getHead();
+//        head.decrementParties();
+        ((SyncDataflowStreamReadAdapter<T>) channel).close();
     }
 }
 

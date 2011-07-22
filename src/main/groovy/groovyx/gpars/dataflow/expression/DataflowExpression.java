@@ -230,7 +230,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     @Override
-    public final T getVal() throws InterruptedException {
+    public T getVal() throws InterruptedException {
         WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
             if (newWaiting == null) {
@@ -265,7 +265,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
      */
     @Override
-    public final T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
+    public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final long endNano = System.nanoTime() + units.toNanos(timeout);
         WaitingThread newWaiting = null;
         while (state != S_INITIALIZED) {
@@ -375,7 +375,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         notifyRemote(null);
     }
 
-    private void doBindImpl(final T value) {
+    protected void doBindImpl(final T value) {
         this.value = value;
         state = S_INITIALIZED;
 
@@ -451,7 +451,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param callback   The actor to send the message to
      */
     @SuppressWarnings({"TypeMayBeWeakened"})
-    private void scheduleCallback(final Object attachment, final MessageStream callback) {
+    protected void scheduleCallback(final Object attachment, final MessageStream callback) {
         if (attachment == null) {
             callback.send(value);
         } else {
