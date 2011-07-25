@@ -139,7 +139,7 @@ public class DataflowQueueTest extends GroovyTestCase {
 
         barrier.await()
         assertEquals 11, stream.length()
-        stream.eachWithIndex {index, element -> assertEquals index, element }
+        stream.eachWithIndex {element, index -> assert index == element }
         assertEquals 11, stream.length()
 
         thread << 'Proceed'
