@@ -63,7 +63,7 @@ class SyncChannelsWithOperatorsTest extends GroovyTestCase {
             queue << 5
         }
 
-        final NonDaemonPGroup group = new NonDaemonPGroup()
+        final NonDaemonPGroup group = new NonDaemonPGroup(2)
         group.selector([queue], [broadcast]) {value ->
             bindOutput(2 * value)
         }
