@@ -21,7 +21,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import groovyx.gpars.group.NonDaemonPGroup
 
-public class SyncDataflowQueueTest extends GroovyTestCase {
+public abstract class SyncDataflowQueueTest extends GroovyTestCase {
 
     public void testWriterBlocking() {
         final SyncDataflowQueue queue = new SyncDataflowQueue()

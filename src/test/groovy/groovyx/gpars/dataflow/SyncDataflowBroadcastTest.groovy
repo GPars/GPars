@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.CyclicBarrier
 
-class SyncDataflowBroadcastTest extends GroovyTestCase {
+abstract class SyncDataflowBroadcastTest extends GroovyTestCase {
     public void testBlocking() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
