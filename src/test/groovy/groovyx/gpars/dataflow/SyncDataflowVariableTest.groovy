@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import static groovyx.gpars.actor.Actors.actor
+import groovyx.gpars.group.NonDaemonPGroup
 
 public class SyncDataflowVariableTest extends GroovyTestCase {
 
@@ -88,7 +88,8 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
     public void testAsyncRead() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(2)
         def result1 = new DataflowVariable()
-        def actor = actor {
+        def group = new NonDaemonPGroup(1)
+        def actor = group.actor {
             react {
                 result1 << it
             }
@@ -107,6 +108,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
 
         assertEquals 10, result1.val
         assertEquals 10, result2.val
+        group.shutdown()
     }
 
     public void testWriterBlockingWithResizing() {

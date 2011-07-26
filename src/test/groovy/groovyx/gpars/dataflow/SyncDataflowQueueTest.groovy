@@ -17,10 +17,9 @@
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
-import static groovyx.gpars.actor.Actors.actor
+import groovyx.gpars.group.NonDaemonPGroup
 
 public class SyncDataflowQueueTest extends GroovyTestCase {
 
@@ -85,7 +84,8 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         final SyncDataflowQueue queue = new SyncDataflowQueue()
 
         def result1 = new DataflowVariable()
-        def actor = actor {
+        def group = new NonDaemonPGroup(2)
+        def actor = group.actor {
             react {
                 result1 << it
             }
@@ -106,6 +106,7 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         assert result1.val in [10, 20]
         assert result2.val in [10, 20]
         assert result1.val != result2.val
+        group.shutdown()
     }
 
     public void testStreamPoll() {
@@ -120,7 +121,9 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         sleep 1000
         assert stream.poll()?.val == 2
         assert stream.poll()?.val == null
-        final Actor thread = Actors.blockingActor {
+
+        def group = new NonDaemonPGroup(2)
+        final Actor thread = group.blockingActor {
             stream << 10
             final SyncDataflowVariable variable = new SyncDataflowVariable()
             stream << variable
@@ -136,11 +139,13 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         assertEquals 20, stream.val
         assertEquals 0, stream.length()
         assert stream.poll() == null
+        group.shutdown()
     }
 
     public void testNullValues() {
         final SyncDataflowQueue stream = new SyncDataflowQueue()
-        final Actor thread = Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        final Actor thread = group.blockingActor {
             stream << null
             final SyncDataflowVariable variable = new SyncDataflowVariable()
             stream << variable
@@ -153,13 +158,15 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         thread << 'Proceed'
         assertNull stream.val
         assertEquals 0, stream.length()
+        group.shutdown()
     }
 
     public void testIteration() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final SyncDataflowQueue stream = new SyncDataflowQueue()
-        final Actor thread = Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        final Actor thread = group.blockingActor {
             (0..10).each {num -> Thread.start {stream << num}}
             sleep 3000
             barrier.await()
@@ -177,13 +184,15 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         (0..11).each {
             assert stream.val in (0..11)
         }
+        group.shutdown()
     }
 
     public void testIterationWithNulls() {
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
         final SyncDataflowQueue stream = new SyncDataflowQueue()
-        Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        group.blockingActor {
             (0..10).each {Thread.start {stream << null}}
             sleep 3000
             barrier.await()
@@ -195,6 +204,7 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         assertEquals 11, stream.length()
 
         for (i in (0..10)) { assertNull stream.val }
+        group.shutdown()
     }
 
     public void testToString() {
@@ -229,7 +239,9 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         final Dataflows df = new Dataflows()
         stream >> {df.x1 = it}
         stream >> {df.x2 = it}
-        def actor = Actors.actor {
+
+        def group = new NonDaemonPGroup(2)
+        def actor = group.actor {
             react {
                 df.x3 = it
             }
@@ -241,6 +253,7 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         assertEquals 10, df.x1
         assertEquals 20, df.x2
         assertEquals 30, df.x3
+        group.shutdown()
     }
 
     public void testWheneverBound() {
@@ -250,7 +263,9 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         final SyncDataflowQueue dfs3 = new SyncDataflowQueue()
         stream.wheneverBound {dfs1 << it}
         stream.wheneverBound {dfs2 << it}
-        def actor = Actors.actor {
+
+        def group = new NonDaemonPGroup(2)
+        def actor = group.actor {
             react {
                 dfs3 << it
                 react {
@@ -274,29 +289,37 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         assert [10, 20, 30, 40] as Set == [dfs1.val, dfs1.val, dfs1.val, dfs1.val] as Set
         assert [10, 20, 30, 40] as Set == [dfs2.val, dfs2.val, dfs2.val, dfs2.val] as Set
         assert [10, 20, 30, 40] as Set == [dfs3.val, dfs3.val, dfs3.val, dfs3.val] as Set
+
+        group.shutdown()
     }
 
     public void testAsyncValueRetrieval() {
         def result = new Dataflows()
         final SyncDataflowQueue stream = new SyncDataflowQueue()
-        Actors.actor {
+
+        def group = new NonDaemonPGroup(2)
+        group.actor {
             stream << 10
         }
-        def handler = Actors.actor {
+        def handler = group.actor {
             react {result.value = it}
         }
         stream.getValAsync(handler)
         assert result.value == 10
+        group.shutdown()
     }
 
     public void testGetValWithTimeout() {
         final SyncDataflowQueue stream = new SyncDataflowQueue()
-        Actors.actor {
+
+        def group = new NonDaemonPGroup(2)
+        group.actor {
             stream << 10
         }
         assert stream.getVal(10, TimeUnit.DAYS) == 10
         assert stream.getVal(3, TimeUnit.SECONDS) == null
         assert stream.getVal(3, TimeUnit.SECONDS) == null
+        group.shutdown()
     }
 
     public void testMissedTimeout() {

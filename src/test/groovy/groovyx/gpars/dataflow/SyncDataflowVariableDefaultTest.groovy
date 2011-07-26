@@ -16,11 +16,11 @@
 
 package groovyx.gpars.dataflow
 
-import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import groovyx.gpars.group.NonDaemonPGroup
 
 public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
 
@@ -85,13 +85,14 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
 
     public void testVariableFromThread() {
         final SyncDataflowVariable variable = new SyncDataflowVariable()
-        Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        group.blockingActor {
             variable << 10
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
         volatile List<Integer> result = []
-        Actors.blockingActor {
+        group.blockingActor {
             result << variable.val
             result << variable.val
             latch.countDown()
@@ -99,6 +100,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         latch.await()
         assertEquals 10, result[0]
         assertEquals 10, result[1]
+        group.shutdown()
     }
 
     public void testBlockedRead() {
@@ -106,11 +108,12 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         volatile int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
-        Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        group.blockingActor {
             result = variable.val
             latch.countDown()
         }
-        Actors.blockingActor {
+        group.blockingActor {
             Thread.sleep 3000
             variable << 10
         }
@@ -118,6 +121,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         assertEquals 10, variable.val
         latch.await()
         assertEquals 10, result
+        group.shutdown()
     }
 
     public void testNonBlockedRead() {
@@ -126,12 +130,13 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         final CountDownLatch latch = new CountDownLatch(1)
 
         volatile int result = 0
-        Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        group.blockingActor {
             barrier.await()
             result = variable.val
             latch.countDown()
         }
-        Actors.blockingActor {
+        group.blockingActor {
             variable << 10
             barrier.await()
         }
@@ -140,6 +145,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         assertEquals 10, variable.val
         latch.await()
         assertEquals 10, result
+        group.shutdown()
     }
 
     public void testToString() {
@@ -157,12 +163,14 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         variable >> {
             result << variable.val
         }
-        Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        group.blockingActor {
             variable << 10
         }
 
         assertEquals 10, variable.val
         assertEquals 10, result.val
+        group.shutdown()
     }
 
     public void testVariableNonBlockedBoundHandler() {
@@ -186,13 +194,15 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         variable >> {
             result << variable.poll()
         }
-        Actors.blockingActor {
+        def group = new NonDaemonPGroup(2)
+        group.blockingActor {
             variable << 10
         }
 
         assertEquals 10, variable.val
         assertEquals 10, result.val
         assertEquals 10, result.poll().val
+        group.shutdown()
     }
 
     public void testJoin() {
