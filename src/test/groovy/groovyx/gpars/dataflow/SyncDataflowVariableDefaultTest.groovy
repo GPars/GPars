@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import groovyx.gpars.group.NonDaemonPGroup
 
-public abstract class SyncDataflowVariableDefaultTest extends GroovyTestCase {
+public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
 
     public void testVariable() {
         final SyncDataflowVariable variable = new SyncDataflowVariable()
