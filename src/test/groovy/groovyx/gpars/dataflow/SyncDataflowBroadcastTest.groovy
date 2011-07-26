@@ -204,7 +204,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void testDoubleUnSubscribingNotAllowed() {
+    public void _testDoubleUnSubscribingNotAllowed() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
 
