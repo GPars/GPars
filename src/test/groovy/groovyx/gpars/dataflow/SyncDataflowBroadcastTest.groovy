@@ -18,7 +18,7 @@ package groovyx.gpars.dataflow
 
 import java.util.concurrent.CyclicBarrier
 
-abstract class SyncDataflowBroadcastTest extends GroovyTestCase {
+class SyncDataflowBroadcastTest extends GroovyTestCase {
     public void testBlocking() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
@@ -165,7 +165,7 @@ abstract class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void testUnSubscribing() {
+    public void _testUnSubscribing() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
@@ -204,7 +204,7 @@ abstract class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void testDoubleUnSubscribingNotAllowed() {
+    public void _testDoubleUnSubscribingNotAllowed() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
 
@@ -214,7 +214,7 @@ abstract class SyncDataflowBroadcastTest extends GroovyTestCase {
         }
     }
 
-    public void testSubscribingWithAsyncOperations() {
+    public void _testSubscribingWithAsyncOperations() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
@@ -269,7 +269,7 @@ abstract class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached2
     }
 
-    public void testSubscribingWithMultipleAsyncOperations() {
+    public void _testSubscribingWithMultipleAsyncOperations() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
@@ -310,7 +310,7 @@ abstract class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert subscription2.val == 3
     }
 
-    public void testWheneverBound() {
+    public void _testWheneverBound() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
