@@ -22,7 +22,7 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import static groovyx.gpars.actor.Actors.actor
 
-public class SyncSyncDataflowQueueTest extends GroovyTestCase {
+public class SyncDataflowQueueTest extends GroovyTestCase {
 
     public void testWriterBlocking() {
         final SyncDataflowQueue queue = new SyncDataflowQueue()
