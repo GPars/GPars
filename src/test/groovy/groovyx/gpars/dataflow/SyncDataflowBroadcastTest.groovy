@@ -129,7 +129,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
 
     }
 
-    public void testEarlyUnSubscribing() {
+    public void _testEarlyUnSubscribing() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
@@ -165,7 +165,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void testUnSubscribing() {
+    public void _testUnSubscribing() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
@@ -204,7 +204,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void testDoubleUnSubscribingNotAllowed() {
+    public void _testDoubleUnSubscribingNotAllowed() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
 
@@ -214,7 +214,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         }
     }
 
-    public void _testSubscribingWithAsyncOperations() {
+    public void testSubscribingWithAsyncOperations() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
@@ -269,7 +269,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached2
     }
 
-    public void _testSubscribingWithMultipleAsyncOperations() {
+    public void testSubscribingWithMultipleAsyncOperations() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
@@ -310,7 +310,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert subscription2.val == 3
     }
 
-    public void _testWheneverBound() {
+    public void testWheneverBound() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
