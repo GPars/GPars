@@ -143,7 +143,7 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
 
     private void checkClosed() {
         if (closed)
-            throw new IllegalStateException("The subscription channel has already been unsubscribed and closed");
+            throw new IllegalStateException("The subscription channel has already been un-subscribed and closed");
     }
 
     /**

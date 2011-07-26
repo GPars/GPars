@@ -6403,6 +6403,11 @@
         <w>yyyy</w>
       </words>
     </dictionary>
+    <dictionary name="vaclavpech">
+      <words>
+        <w>nextc</w>
+      </words>
+    </dictionary>
     <dictionary name="dierkkonig" />
   </component>
   <component name="ProjectModuleManager">
