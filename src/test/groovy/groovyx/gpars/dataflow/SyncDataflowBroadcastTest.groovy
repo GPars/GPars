@@ -165,7 +165,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void _testUnSubscribing() {
+    public void testUnSubscribing() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
@@ -204,7 +204,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void _testDoubleUnSubscribingNotAllowed() {
+    public void testDoubleUnSubscribingNotAllowed() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
 
