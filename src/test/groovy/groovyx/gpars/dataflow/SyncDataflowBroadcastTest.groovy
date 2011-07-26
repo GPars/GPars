@@ -129,7 +129,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
 
     }
 
-    public void _testEarlyUnSubscribing() {
+    public void testEarlyUnSubscribing() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
@@ -165,9 +165,11 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void _testUnSubscribing() {
+    public void testUnSubscribing() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached = false
+        def barrier = new CyclicBarrier(3)
+
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
         final DataflowReadChannel subscription2 = broadcast.createReadChannel()
         final DataflowReadChannel subscription3 = broadcast.createReadChannel()
@@ -175,9 +177,17 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         Thread.start {
             broadcast << 1
         }
-        Thread.start {subscription2.val}
-        Thread.start {subscription1.val}
+        Thread.start {
+            subscription2.val
+            barrier.await()
+        }
+        Thread.start {
+            subscription1.val
+            barrier.await()
+        }
+
         assert subscription3.val == 1
+        barrier.await()
 
         broadcast.unsubscribeReadChannel(subscription2)
 
@@ -204,7 +214,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached
     }
 
-    public void _testDoubleUnSubscribingNotAllowed() {
+    public void testDoubleUnSubscribingNotAllowed() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
 
@@ -232,7 +242,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         subscription1.whenBound {
             result1 << it
         }
-        Thread.start {subscription2.val}
+        subscription2.whenBound {}
         assert subscription3.val == 1
         assert result1.val == 1
         t1.join()
@@ -328,7 +338,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
             writerReached1 = true
         }
 
-        Thread.start {subscription2.val}
+        subscription2.whenBound {}
         assert subscription3.val == 1
         assert result1.val == 1
         t1.join()
