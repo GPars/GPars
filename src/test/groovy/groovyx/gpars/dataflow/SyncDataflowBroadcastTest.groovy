@@ -214,7 +214,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         }
     }
 
-    public void testSubscribingWithAsyncOperations() {
+    public void _testSubscribingWithAsyncOperations() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
@@ -269,7 +269,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert writerReached2
     }
 
-    public void testSubscribingWithMultipleAsyncOperations() {
+    public void _testSubscribingWithMultipleAsyncOperations() {
         final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
         volatile boolean writerReached1 = false
         volatile boolean writerReached2 = false
