@@ -26,7 +26,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         def subscription1 = broadcast.createReadChannel()
         def subscription2 = broadcast.createReadChannel()
 
-        Thread.start {
+        def t1 = Thread.start {
             broadcast << 10
             writerReached = true
         }
@@ -40,7 +40,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert readerReached == 0
 
         assert subscription2.val == 10
-        sleep 2000
+        t1.join()
         assert writerReached
         assert readerReached == 10
     }
@@ -52,7 +52,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         final DataflowReadChannel subscription2 = broadcast.createReadChannel()
 
         final CyclicBarrier barrier = new CyclicBarrier(2)
-        Thread.start {
+        def t1 = Thread.start {
             barrier.await()
             broadcast << 10
             writerReached = true
@@ -70,7 +70,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
 
         assert subscription2.val == 10
 
-        sleep 2000
+        t1.join()
         assert writerReached
         assert readerReached == 10
     }
@@ -82,7 +82,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         broadcast << 1
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
 
-        Thread.start {
+        def t1 = Thread.start {
             broadcast << 2
             writerReached1 = true
         }
@@ -94,7 +94,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
 
         final DataflowReadChannel subscription2 = broadcast.createReadChannel()
 
-        Thread.start {
+        def t2 = Thread.start {
             broadcast << 3
             writerReached2 = true
         }
@@ -107,7 +107,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert subscription2.val == 3
         assert readerResult.val == 3
 
-        sleep 2000
+        [t1, t2]*.join()
         assert writerReached1
         assert writerReached2
     }
@@ -138,7 +138,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
 
         broadcast.unsubscribeReadChannel(subscription1)
 
-        Thread.start {
+        def t1 = Thread.start {
             broadcast << 1
             writerReached = true
         }
@@ -161,7 +161,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
             subscription1.wheneverBound {}
         }
 
-        sleep 2000
+        t1.join()
         assert writerReached
     }
 
@@ -181,7 +181,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
 
         broadcast.unsubscribeReadChannel(subscription2)
 
-        Thread.start {
+        def t1 = Thread.start {
             broadcast << 2
             writerReached = true
         }
@@ -200,7 +200,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
             subscription3.val
         }
 
-        sleep 2000
+        t1.join()
         assert writerReached
     }
 
@@ -222,7 +222,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         final DataflowReadChannel subscription2 = broadcast.createReadChannel()
         final DataflowReadChannel subscription3 = broadcast.createReadChannel()
 
-        Thread.start {
+        def t1 = Thread.start {
             broadcast << 1
             writerReached1 = true
         }
@@ -235,6 +235,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         Thread.start {subscription2.val}
         assert subscription3.val == 1
         assert result1.val == 1
+        t1.join()
         assert writerReached1
 
 
@@ -244,7 +245,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         }
         broadcast.unsubscribeReadChannel(subscription2)
 
-        Thread.start {
+        def t2 = Thread.start {
             broadcast << 2
             writerReached2 = true
         }
@@ -264,7 +265,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
             subscription1.val
         }
 
-        sleep 2000
+        t2.join()
         assert writerReached2
     }
 
@@ -275,7 +276,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         final DataflowReadChannel subscription1 = broadcast.createReadChannel()
         final DataflowReadChannel subscription2 = broadcast.createReadChannel()
 
-        Thread.start {
+        def t1 = Thread.start {
             broadcast << 1
             writerReached1 = true
             broadcast << 2
@@ -300,7 +301,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         assert subscription2.val == 2
         assert result2.val == 2
 
-        sleep 1000
+        t1.join()
         assert writerReached2
 
         Thread.start {
@@ -322,7 +323,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
             result1 << it
         }
 
-        Thread.start {
+        def t1 = Thread.start {
             broadcast << 1
             writerReached1 = true
         }
@@ -330,7 +331,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         Thread.start {subscription2.val}
         assert subscription3.val == 1
         assert result1.val == 1
-        sleep 1000
+        t1.join()
         assert writerReached1
 
 
@@ -343,7 +344,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         }
 
 
-        Thread.start {
+        def t2 = Thread.start {
             broadcast << 2
             writerReached2 = true
         }
@@ -362,7 +363,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
             subscription2.val
         }
 
-        sleep 2000
+        t2.join()
         assert writerReached2
     }
 }
