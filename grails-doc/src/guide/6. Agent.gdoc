@@ -40,7 +40,7 @@ At some point after reception of a closure / command, the closure is invoked aga
 The whole update process is of the fire-and-forget type, since once the message (closure) is sent to the Agent, the caller thread can go off to do other things and come back later to check the current value with Agent.val or Agent.valAsync(closure).
 
 h3. Basic rules
-* When executed, the submitted commands obtain the agent's state ar a parameter.
+* When executed, the submitted commands obtain the agent's state as a parameter.
 * The submitted commands /closures can call any methods on the agent's state.
 * Replacing the state object with a new one is also possible and is done using the *updateValue() method*.
 * The *return value* of the submitted closure doesn't have a special meaning and is ignored.
