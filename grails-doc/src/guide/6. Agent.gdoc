@@ -46,8 +46,8 @@ h3. Basic rules
 * The *return value* of the submitted closure doesn't have a special meaning and is ignored.
 * If the message sent to an _Agent_ is *not a closure*, it is considered to be a *new value* for the internal reference field.
 * The _val_ property of an _Agent_ will wait until all preceding commands in the agent's queue are consumed and then safely return the value of the Agent.
-* The _instantVal_ property will return an immediate snapshot of the internal agent's state.
 * The _valAsync()_ method will do the same *without blocking* the caller.
+* The _instantVal_ property will return an immediate snapshot of the internal agent's state.
 * All Agent instances share a default daemon thread pool. Setting the _threadPool_ property of an Agent instance will allow it to use a different thread pool.
 * Exceptions thrown by the commands can be collected using the _errors_ property.
 
