@@ -293,7 +293,7 @@ public abstract class StreamCore<T> implements FList<T> {
     }
 
     @Override
-    public final String appendingString() {
+    public String appendingString() {
         if (!first.isBound())
             return ", ?";
         if (isEmpty())

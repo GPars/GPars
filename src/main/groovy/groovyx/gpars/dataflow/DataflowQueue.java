@@ -329,6 +329,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      *
      * @return Number of DFVs in the queue
      */
+    @Override
     public final int length() {
         return queue.size();
     }

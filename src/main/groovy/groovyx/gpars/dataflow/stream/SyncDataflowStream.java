@@ -21,6 +21,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.SyncDataflowVariable;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a synchronous deterministic dataflow channel. Unlike a SyncDataflowQueue, syncDataflowStream allows multiple readers each to read all the messages.
@@ -102,12 +103,30 @@ public final class SyncDataflowStream<T> extends StreamCore<T> {
     }
 
     @Override
+    public String appendingString() {
+        if (!first.isBound())
+            return ", ?";
+        if (isEmptyWithRespectToSync())
+            return "";
+        return ", " + getFirst() + getRest().appendingString();
+    }
+
+    @Override
     public String toString() {
         if (!first.isBound())
             return "SyncDataflowStream[?]";
-        if (isEmpty())
+        if (isEmptyWithRespectToSync())
             return "SyncDataflowStream[]";
         return "SyncDataflowStream[" + getFirst() + getRest().appendingString() + ']';
+    }
+
+    private boolean isEmptyWithRespectToSync() {
+        try {
+            final T val = getFirstDFV().getVal(0L, TimeUnit.MILLISECONDS);
+            return val == eos() || val == null;
+        } catch (InterruptedException e) {
+            throw new IllegalStateException("Interrupted while checking the oes.", e);
+        }
     }
 
     /**

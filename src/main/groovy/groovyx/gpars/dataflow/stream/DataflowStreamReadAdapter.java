@@ -145,6 +145,22 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
         return head.getFirstDFV().isBound();
     }
 
+    /**
+     * Returns the current size of the buffer
+     *
+     * @return Number of DFVs in the queue
+     */
+    @Override
+    public int length() {
+        StreamCore<T> current = head;
+        int length = 0;
+        while (current.getFirstDFV().isBound()) {
+            length += 1;
+            current = (StreamCore<T>) current.getRest();
+        }
+        return length;
+    }
+
     @Override
     public DataflowExpression<T> poll() throws InterruptedException {
         final DataflowVariable<T> firstDFV = head.getFirstDFV();

@@ -16,9 +16,9 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.group.NonDaemonPGroup
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import groovyx.gpars.group.NonDaemonPGroup
 
 public class SyncDataflowVariableTest extends GroovyTestCase {
 
@@ -82,6 +82,19 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
             variable.get(1, TimeUnit.SECONDS)
         }
         Thread.start {variable << 10}
+        assertEquals 10, variable.get(10, TimeUnit.SECONDS)
+    }
+
+    public void _testTimeoutGetWithMultipleParties() {
+        final SyncDataflowVariable variable = new SyncDataflowVariable(2)
+        Thread.start {variable << 10}
+        shouldFail(TimeoutException) {
+            variable.get(1, TimeUnit.SECONDS)
+        }
+
+        Thread.start {
+            variable.get(10, TimeUnit.SECONDS)
+        }
         assertEquals 10, variable.get(10, TimeUnit.SECONDS)
     }
 

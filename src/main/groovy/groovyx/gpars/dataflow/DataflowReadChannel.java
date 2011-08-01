@@ -140,6 +140,13 @@ public interface DataflowReadChannel<T> {
     boolean isBound();
 
     /**
+     * Reports the current number of elements in the channel
+     *
+     * @return The current snapshot of the number of elements in the channel
+     */
+    int length();
+
+    /**
      * Retrieves the value at the head of the buffer. Returns null, if no value is available.
      *
      * @return The value bound to the DFV at the head of the stream or null

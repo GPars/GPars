@@ -151,6 +151,11 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         return state == S_INITIALIZED;
     }
 
+    @Override
+    public final int length() {
+        return isBound() ? 1 : 0;
+    }
+
     /**
      * Asynchronously retrieves the value of the variable. Sends the actual value of the variable as a message
      * back the the supplied actor once the value has been bound.
