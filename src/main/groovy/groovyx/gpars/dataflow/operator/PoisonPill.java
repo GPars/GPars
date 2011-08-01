@@ -14,14 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.operator
+package groovyx.gpars.dataflow.operator;
 
 /**
  * Represents the poisson for dataflow operators.
  * After receiving the poisson a dataflow operator will send the poisson to all its output channels and terminate.
  *
  * @author Vaclav Pech
- * Date: Oct 6, 2010
+ *         Date: Oct 6, 2010
  */
-@Singleton
-class PoisonPill {}
+@SuppressWarnings({"ALL"})
+class PoisonPill {
+    private static PoisonPill ourInstance = new PoisonPill();
+
+    public static PoisonPill getInstance() {
+        return ourInstance;
+    }
+
+    private PoisonPill() {
+    }
+}
