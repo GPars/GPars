@@ -31,6 +31,7 @@ import java.util.List;
  */
 @SuppressWarnings({"RawUseOfParameterizedType"})
 abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
+    protected static final String CANNOT_OBTAIN_THE_SEMAPHORE_TO_FORK_OPERATOR_S_BODY = "Cannot obtain the semaphore to fork operator's body.";
     protected final List inputs;
     protected final List outputs;
     protected final Closure code;

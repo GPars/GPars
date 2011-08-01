@@ -55,8 +55,7 @@ public final class DataflowOperator extends DataflowProcessor {
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The operator's body accepts " + parameters + " parameters while it is given " + countInputChannels(channels) + " input streams. The numbers must match.");
         if (shouldBeMultiThreaded(channels)) {
-            if ((Integer) channels.get(MAX_FORKS) < 1)
-                throw new IllegalArgumentException("The maxForks argument must be a positive value. " + channels.get(MAX_FORKS) + " was provided.");
+            checkMaxForks(channels);
             this.actor = new ForkingDataflowOperatorActor(this, group, extractOutputs(channels), extractInputs(channels), (Closure) code.clone(), (Integer) channels.get(MAX_FORKS));
         } else {
             this.actor = new DataflowOperatorActor(this, group, extractOutputs(channels), extractInputs(channels), (Closure) code.clone());

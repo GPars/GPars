@@ -69,7 +69,7 @@ class DataflowOperatorActor extends DataflowProcessorActor {
         }
     }
 
-    void startTask(results) {
+    void startTask(List results) {
         try {
             code.call(* results)
         } catch (Throwable e) {

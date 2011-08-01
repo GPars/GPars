@@ -87,6 +87,11 @@ public abstract class DataflowProcessor {
         return null;
     }
 
+    protected static void checkMaxForks(final Map channels) {
+        if ((Integer) channels.get(MAX_FORKS) < 1)
+            throw new IllegalArgumentException("The maxForks argument must be a positive value. " + channels.get(MAX_FORKS) + " was provided.");
+    }
+
     /**
      * Starts a processor using the specified parallel group
      *

@@ -17,8 +17,12 @@
 package groovyx.gpars.dataflow.operator;
 
 
-import groovyx.gpars.group.PGroup
-import java.util.concurrent.Semaphore
+import groovy.lang.Closure;
+import groovyx.gpars.group.PGroup;
+import groovyx.gpars.scheduler.Pool;
+
+import java.util.List;
+import java.util.concurrent.Semaphore;
 
 /**
  * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
@@ -27,25 +31,33 @@ import java.util.concurrent.Semaphore
  *
  * @author Vaclav Pech
  */
+@SuppressWarnings({"RawUseOfParameterizedType"})
 final class ForkingDataflowOperatorActor extends DataflowOperatorActor {
     private final Semaphore semaphore;
-    private final def threadPool;
+    private final Pool threadPool;
 
-    def ForkingDataflowOperatorActor(DataflowOperator owningOperator, PGroup group, List outputs, List inputs, Closure code, int maxForks) {
-        super(owningOperator, group, outputs, inputs, code)
-        this.semaphore = new Semaphore(maxForks)
-        this.threadPool = group.threadPool
+    ForkingDataflowOperatorActor(final DataflowOperator owningOperator, final PGroup group, final List outputs, final List inputs, final Closure code, final int maxForks) {
+        super(owningOperator, group, outputs, inputs, code);
+        this.semaphore = new Semaphore(maxForks);
+        this.threadPool = group.getThreadPool();
     }
 
     @Override
-    void startTask(results) {
-        semaphore.acquire()
-        threadPool.execute {
-            try {
-                super.startTask(results)
-            } finally {
-                semaphore.release()
-            }
+    public void startTask(final List results) {
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(CANNOT_OBTAIN_THE_SEMAPHORE_TO_FORK_OPERATOR_S_BODY, e);
         }
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ForkingDataflowOperatorActor.super.startTask(results);
+                } finally {
+                    semaphore.release();
+                }
+            }
+        });
     }
 }
