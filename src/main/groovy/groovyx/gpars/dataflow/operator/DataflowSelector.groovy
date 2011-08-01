@@ -79,14 +79,6 @@ public class DataflowSelector extends DataflowProcessor {
     }
 
     /**
-     * Is invoked in case the actor throws an exception.
-     */
-    protected final void reportError(Throwable e) {
-        System.err.println "The dataflow selector experienced an exception and is about to terminate. $e"
-        terminate()
-    }
-
-    /**
      * Used to enable/disable individual input channels from next selections
      * @param index The index of the channel to enable/disable
      * @param flag True, if the channel should be included in selection, false otherwise

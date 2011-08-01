@@ -338,7 +338,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         def op = group.prioritySelector(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
         }
-        op.metaClass.reportError = {Throwable e ->
+        op.addErrorHandler {Throwable e ->
             a << e
             terminate()
         }

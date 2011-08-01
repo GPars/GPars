@@ -314,7 +314,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
         def op = group.selector(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
         }
-        op.metaClass.reportError = {Throwable e ->
+        op.addErrorHandler {Throwable e ->
             a << e
             terminate()
         }

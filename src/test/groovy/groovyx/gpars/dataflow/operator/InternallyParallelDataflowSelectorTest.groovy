@@ -134,7 +134,7 @@ public class InternallyParallelDataflowSelectorTest extends GroovyTestCase {
         def op = group.selector(inputs: [stream], outputs: [], maxFork: 3) {
             throw new RuntimeException('test')
         }
-        op.metaClass.reportError = {Throwable e ->
+        op.addErrorHandler {Throwable e ->
             a << e
             terminate()
         }

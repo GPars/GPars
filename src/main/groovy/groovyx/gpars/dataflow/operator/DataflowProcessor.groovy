@@ -17,8 +17,6 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.StaticDispatchActor
-import groovyx.gpars.actor.impl.MessageStream
 import groovyx.gpars.group.PGroup
 
 /**
@@ -42,6 +40,8 @@ abstract class DataflowProcessor {
      * The internal actor performing on behalf of the processor
      */
     protected Actor actor
+
+    private List<Closure> errorHandlers;
 
     /**
      * Creates a processor
@@ -160,70 +160,26 @@ abstract class DataflowProcessor {
     /**
      * Is invoked in case the actor throws an exception.
      */
-    protected abstract void reportError(Throwable e)
-
-    ;
-}
-
-protected abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
-    protected final List inputs
-    protected final List outputs
-    protected final Closure code
-    protected final def owningProcessor
-    protected boolean stoppingGently = false
-
-    def DataflowProcessorActor(owningProcessor, group, outputs, inputs, code) {
-        super()
-        parallelGroup = group
-
-        this.owningProcessor = owningProcessor
-        this.outputs = outputs
-        this.inputs = inputs
-        this.code = code
-    }
-
-    /**
-     * Sends the message, ignoring exceptions caused by the actor not being active anymore
-     * @param message The message to send
-     * @return The current actor
-     */
-    @Override
-    public MessageStream send(Object message) {
-        try {
-            super.send(message)
-        } catch (IllegalStateException e) {
-            if (!hasBeenStopped()) throw e
+    final synchronized void reportError(Throwable e) {
+        if ((errorHandlers == null) || (errorHandlers.empty)) {
+            System.err.println "The dataflow processor experienced an exception and is about to terminate. $e"
+        } else {
+            errorHandlers.each {
+                it.call(e)
+            }
         }
-        return this
+        terminate()
     }
 
     /**
-     * All messages unhandled by sub-classes will result in an exception being thrown
-     * @param message The unhandled message
+     * Registers a new error handler closure that will be invoked once the operator detects an error
+     * @param handler A one-argument closure, expecting an exception (a Throwable instance) as a parameter
      */
-    void onMessage(Object message) {
-        throw new IllegalStateException("The dataflow actor doesn't recognize the message $message")
-    }
-
-    /**
-     * Handles the poisson message.
-     * After receiving the poisson a dataflow operator will send the poisson to all its output channels and terminate.
-     * @param poisson The poisson to re-send
-     * return True, if poisson has been received
-     */
-    boolean checkPoison(def data) {
-        if (data instanceof PoisonPill) {
-            owningProcessor.bindAllOutputsAtomically data
-            owningProcessor.terminate()
-            return true
-        }
-        return false
-    }
-
-    final reportException(Throwable e) {
-        owningProcessor.reportError(e)
+    public final synchronized void addErrorHandler(final Closure handler) {
+        if (handler == null) throw new IllegalArgumentException("Error handler must not be null.");
+        if (errorHandlers == null) errorHandlers = new ArrayList<Closure>();
+        handler.setDelegate(this);
+        handler.setResolveStrategy(Closure.DELEGATE_FIRST);
+        errorHandlers.add(handler);
     }
 }
-
-@Singleton
-protected final class StopGently {}

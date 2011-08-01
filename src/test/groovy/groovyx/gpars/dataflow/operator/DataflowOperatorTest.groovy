@@ -326,7 +326,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         def op = group.operator(inputs: [stream], outputs: []) {
             throw new RuntimeException('test')
         }
-        op.metaClass.reportError = {Throwable e ->
+        op.addErrorHandler {Throwable e ->
             a << e
             terminate()
         }
