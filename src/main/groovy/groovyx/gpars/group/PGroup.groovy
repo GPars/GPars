@@ -21,6 +21,7 @@ import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.actor.DefaultActor
 import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.actor.ReactiveActor
+import groovyx.gpars.actor.StaticDispatchActor
 import groovyx.gpars.actor.impl.RunnableBackedBlockingActor
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.dataflow.Dataflow
@@ -144,6 +145,43 @@ public abstract class PGroup {
      */
     public final Actor fairMessageHandler(final Closure code) {
         final def actor = new DynamicDispatchActor().become(code)
+        actor.parallelGroup = this
+        actor.makeFair()
+        actor.start()
+        actor
+    }
+
+    /**
+     * Creates an instance of StaticDispatchActor.
+     * @param code The closure specifying the only statically dispatched message handler.
+     */
+    public final Actor staticMessageHandler(final Closure code) {
+        final def actor = new StaticDispatchActor() {
+            @Override
+            void onMessage(Object message) {
+                code(message)
+            }
+        }
+        code.delegate = actor
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        actor.parallelGroup = this
+        actor.start()
+        actor
+    }
+
+    /**
+     * Creates an instance of StaticDispatchActor, which will cooperate in thread sharing with other actors sharing the same thread pool.
+     * @param code The closure specifying the only statically dispatched message handler.
+     */
+    public final Actor fairStaticMessageHandler(final Closure code) {
+        final def actor = new StaticDispatchActor() {
+            @Override
+            void onMessage(Object message) {
+                code(message)
+            }
+        }
+        code.delegate = actor
+        code.resolveStrategy = Closure.DELEGATE_FIRST
         actor.parallelGroup = this
         actor.makeFair()
         actor.start()

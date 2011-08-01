@@ -131,4 +131,24 @@ public abstract class Actors {
     public static Actor fairMessageHandler(final Closure code) {
         return defaultActorPGroup.fairMessageHandler(code);
     }
+
+    /**
+     * Creates an instance of StaticDispatchActor.
+     *
+     * @param code The closure specifying the only statically dispatched message handler.
+     * @return A new started instance of a StaticDispatchActor
+     */
+    public static Actor staticMessageHandler(final Closure code) {
+        return defaultActorPGroup.staticMessageHandler(code);
+    }
+
+    /**
+     * Creates an instance of StaticDispatchActor, which will cooperate in thread sharing with other actors sharing the same thread pool.
+     *
+     * @param code The closure specifying the only statically dispatched message handler.
+     * @return A new started instance of a fair StaticDispatchActor
+     */
+    public static Actor fairStaticMessageHandler(final Closure code) {
+        return defaultActorPGroup.fairStaticMessageHandler(code);
+    }
 }
