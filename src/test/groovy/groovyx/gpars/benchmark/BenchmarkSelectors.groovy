@@ -19,13 +19,12 @@ package groovyx.gpars.benchmark
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
-import java.util.concurrent.CountDownLatch
 
 final def concurrencyLevel = 8
 group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
 final DataflowQueue queue = new DataflowQueue()
-final CountDownLatch latch = new CountDownLatch(1)
+
 (1..2000000).each {
     queue << it
 }
@@ -34,17 +33,16 @@ queue << -1
 final def t1 = System.currentTimeMillis()
 
 long sum = 0
-group.selector([queue], []) {
+def op = group.selector([queue], []) {
     if (it == -1) {
         println sum
         terminate()
-        latch.countDown()
     } else {
         sum += it
     }
 }
 
-latch.await()
+op.join()
 group.shutdown()
 final def t2 = System.currentTimeMillis()
 println(t2 - t1)
