@@ -43,7 +43,7 @@ final class ForkingDataflowOperatorActor extends DataflowOperatorActor {
     }
 
     @Override
-    public void startTask(final List results) {
+    void startTask(final List results) {
         try {
             semaphore.acquire();
         } catch (InterruptedException e) {
