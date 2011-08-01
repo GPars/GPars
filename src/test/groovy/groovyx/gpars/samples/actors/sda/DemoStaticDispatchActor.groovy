@@ -23,11 +23,16 @@ import groovyx.gpars.actor.StaticDispatchActor
  */
 
 final class MyActor extends StaticDispatchActor<String> {
-
     void onMessage(String message) {
         println 'Received string ' + message
-        if (message == 'hello') reply 'Hi!'
-        if (message == 'stop') stop()
+
+        switch (message) {
+            case 'hello':
+                reply 'Hi!'
+                break
+            case 'stop':
+                stop()
+        }
     }
 }
 

@@ -112,6 +112,58 @@ Use either the _fairMessageHandler()_ factory method or the actor's makeFair() m
     def fairActor = Actors.fairMessageHandler {...}
 {code}
 
+h3. StaticDispatchActor
+
+While _DynamicDispatchActor_ dispatches messages based on their run-time type and so pays extra performance penalty for each message,
+_StaticDispatchActor_ avoids run-time message checks and dispatches the message solely based on the compile-time information.
+
+{code}
+final class MyActor extends StaticDispatchActor<String> {
+    void onMessage(String message) {
+        println 'Received string ' + message
+
+        switch (message) {
+            case 'hello':
+                reply 'Hi!'
+                break
+            case 'stop':
+                stop()
+        }
+    }
+}
+{code}
+
+Instances of _StaticDispatchActor_ have to override the _onMessage_ method appropriate for the actor's declared type parameter.
+The _onMessage(T message)_ method is then invoked with every received message.
+
+A shorter route through both fair and non-fair helper factory methods are also available:
+
+{code}
+staticMessageHandler {String message ->
+    println 'Received string ' + message
+
+    switch (message) {
+        case 'hello':
+            reply 'Hi!'
+            break
+        case 'stop':
+            stop()
+    }
+}
+
+final def actor = new MyActor().start()
+
+println 'Reply: ' + actor.sendAndWait('hello')
+actor 'bye'
+actor 'stop'
+actor.join()
+{code}
+
+Although when compared to _DynamicDispatchActor_ the  _StaticDispatchActor_ class is limited to a single handler method,
+the simplified creation without any _when_ handlers plus the considerable performance benefits should make _StaticDispatchActor_
+your default choice for straightforward message handlers, when dispatching based on message run-time type is not necessary.
+For example, _StaticDispatchActors_ make dataflow operators four times faster compared to when using _DynamicDispatchActor_ .
+
 h3. Reactive Actor
 
 The _ReactiveActor_ class, constructed typically by calling _Actors.reactor()_ or _DefaultPGroup.reactor()_, allow for more event-driven like approach. When a reactive actor receives a message, the supplied block of code, which makes up the reactive actor's body, is run with the message as a parameter. The result returned from the code is sent in reply.

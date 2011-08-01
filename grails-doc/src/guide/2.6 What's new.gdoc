@@ -16,6 +16,8 @@ h3. Fork / Join
 
 h3. Actors
 
+* StaticDispatchActor has been added to provide easier to create and better performing alternative to _DynamicDispatchActor_
+
 h3. Dataflow
 
 * Operator and selector speed-up

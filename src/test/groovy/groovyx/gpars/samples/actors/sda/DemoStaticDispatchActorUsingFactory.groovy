@@ -25,8 +25,14 @@ import static groovyx.gpars.actor.Actors.staticMessageHandler
 
 staticMessageHandler {String message ->
     println 'Received string ' + message
-    if (message == 'hello') reply 'Hi!'
-    if (message == 'stop') stop()
+
+    switch (message) {
+        case 'hello':
+            reply 'Hi!'
+            break
+        case 'stop':
+            stop()
+    }
 }
 
 final def actor = new MyActor().start()
