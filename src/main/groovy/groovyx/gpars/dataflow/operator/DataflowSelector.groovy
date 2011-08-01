@@ -17,7 +17,6 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.dataflow.Select
-import groovyx.gpars.dataflow.SelectResult
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
@@ -134,7 +133,11 @@ private class DataflowSelectorActor extends DataflowProcessorActor {
         owningProcessor.doSelect()
     }
 
-    final void onMessage(SelectResult message) {
+    final void onMessage(Object message) {
+        if (message instanceof StopGently) {
+            stoppingGently = true
+            return
+        }
         final def index = message.index
         final def value = message.value
         if (checkPoison(value)) return

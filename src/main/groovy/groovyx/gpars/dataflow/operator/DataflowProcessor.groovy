@@ -17,7 +17,7 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.actor.StaticDispatchActor
 import groovyx.gpars.actor.impl.MessageStream
 import groovyx.gpars.group.PGroup
 
@@ -165,7 +165,7 @@ abstract class DataflowProcessor {
     ;
 }
 
-protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
+protected abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
     protected final List inputs
     protected final List outputs
     protected final Closure code
@@ -201,12 +201,8 @@ protected abstract class DataflowProcessorActor extends DynamicDispatchActor {
      * All messages unhandled by sub-classes will result in an exception being thrown
      * @param message The unhandled message
      */
-    void onMessage(def message) {
+    void onMessage(Object message) {
         throw new IllegalStateException("The dataflow actor doesn't recognize the message $message")
-    }
-
-    void onMessage(StopGently message) {
-        stoppingGently = true
     }
 
     /**
