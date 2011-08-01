@@ -80,6 +80,17 @@ public class StaticDispatchActorTest extends GroovyTestCase {
         assert actor.objectFlag != null
     }
 
+    public void testSendingInvalidClass() {
+        TestStaticDispatchActor actor = new TestStaticDispatchActor<Number>()
+        actor.start()
+
+        assert !actor.sendAndWait('Foo')
+        assert actor.stringFlag
+        assert !actor.integerFlag
+        assert !actor.listFlag
+        assert actor.objectFlag != null
+    }
+
     public void testGroup() {
         final DefaultPGroup group = new DefaultPGroup()
         final StaticDispatchActor handler = group.staticMessageHandler {}
