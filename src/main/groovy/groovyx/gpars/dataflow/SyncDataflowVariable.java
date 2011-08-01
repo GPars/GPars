@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  */
 public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
-    private static final String ERROR_WRITING_INTO_A_SYNCHRONOUS_CHANNEL = "Error writing into a synchronous channel.";
+    private static final String ERROR_READING_A_SYNCHRONOUS_CHANNEL = "Error reading a synchronous channel.";
     private final ResizeableCountDownLatch parties;
 
     /**
@@ -77,14 +77,16 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
      */
     @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
+        final long start = System.currentTimeMillis();
+        final long duration = units.toMillis(timeout);
         final T result = super.getVal(timeout, units);
         if (result == null) {
             if (!this.isBound()) return null;
             final T val = getVal();
-            readerIsReady();
+            readerIsReady(duration - (System.currentTimeMillis() - start));
             return val;
         }
-        readerIsReady();
+        readerIsReady(duration - (System.currentTimeMillis() - start));
         return result;
     }
 
@@ -104,11 +106,24 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
         awaitParties();
     }
 
+    private void readerIsReady(final long timeout) {
+        parties.countDown();
+        awaitParties(timeout);
+    }
+
     private void awaitParties() {
         try {
             parties.await();
         } catch (InterruptedException e) {
-            throw new RuntimeException(ERROR_WRITING_INTO_A_SYNCHRONOUS_CHANNEL, e);
+            throw new RuntimeException(ERROR_READING_A_SYNCHRONOUS_CHANNEL, e);
+        }
+    }
+
+    private boolean awaitParties(final long timeout) {
+        try {
+            return parties.await(timeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(ERROR_READING_A_SYNCHRONOUS_CHANNEL, e);
         }
     }
 
