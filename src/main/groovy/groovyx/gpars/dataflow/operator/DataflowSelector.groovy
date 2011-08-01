@@ -18,7 +18,6 @@ package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.dataflow.Select
 import groovyx.gpars.group.PGroup
-import java.util.concurrent.Semaphore
 
 /**
  * Dataflow selectors and operators (processors) form the basic units in dataflow networks. They are typically combined into oriented graphs that transform data.
@@ -50,13 +49,13 @@ public class DataflowSelector extends DataflowProcessor {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code The selector's body to run each time all inputs have a value to read
      */
-    protected def DataflowSelector(final PGroup group, final Map channels, final Closure code) {
+    public DataflowSelector(final PGroup group, final Map channels, final Closure code) {
         super(channels, code)
         final int parameters = code.maximumNumberOfParameters
         if (verifyChannelParameters(channels, parameters))
             throw new IllegalArgumentException("The selector's body must accept 1 or two parameters, while it currently requests ${parameters} parameters.")
-        final def inputs = channels.inputs.asImmutable()
-        final def outputs = channels.outputs?.asImmutable()
+        final def inputs = extractInputs(channels);
+        final def outputs = extractOutputs(channels);
 
         if (shouldBeMultiThreaded(channels)) {
             if (channels.maxForks < 1) throw new IllegalArgumentException("The maxForks argument must be a positive value. ${channels.maxForks} was provided.")
@@ -102,82 +101,6 @@ public class DataflowSelector extends DataflowProcessor {
      */
     protected void doSelect() {
         select(this.actor, guards)
-    }
-}
-
-/**
- * An selector's internal actor. Repeatedly polls inputs and once they're all available it performs the selector's body.
- *
- * Iteratively waits for enough values from inputs.
- * Once all required inputs are available (received as messages), the selector's body is run.
- */
-private class DataflowSelectorActor extends DataflowProcessorActor {
-    protected final boolean passIndex = false
-
-    def DataflowSelectorActor(owningOperator, group, outputs, inputs, code) {
-        super(owningOperator, group, outputs, inputs, code)
-        if (code.maximumNumberOfParameters == 2) {
-            passIndex = true
-        }
-    }
-
-    void afterStart() {
-        owningProcessor.doSelect()
-    }
-
-    final void onMessage(Object message) {
-        if (message instanceof StopGently) {
-            stoppingGently = true
-            return
-        }
-        final def index = message.index
-        final def value = message.value
-        if (checkPoison(value)) return
-        startTask(index, value)
-        if (stoppingGently) {
-            stop()
-        }
-        if (!hasBeenStopped()) owningProcessor.doSelect()
-    }
-
-    def startTask(index, result) {
-        try {
-            if (passIndex) {
-                code.call(result, index)
-            } else {
-                code.call(result)
-            }
-        } catch (Throwable e) {
-            reportException(e)
-        }
-    }
-}
-
-/**
- * An selector's internal actor. Repeatedly polls inputs and once they're all available it performs the selector's body.
- * The selector's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
- * The maxForks property guards the maximum number or concurrently run copies.
- */
-private final class ForkingDataflowSelectorActor extends DataflowSelectorActor {
-    private final Semaphore semaphore
-    private final def threadPool
-
-    def ForkingDataflowSelectorActor(owningOperator, group, outputs, inputs, code, maxForks) {
-        super(owningOperator, group, outputs, inputs, code)
-        this.semaphore = new Semaphore(maxForks)
-        this.threadPool = group.threadPool
-    }
-
-    @Override
-    def startTask(index, result) {
-        semaphore.acquire()
-        threadPool.execute {
-            try {
-                super.startTask(index, result)
-            } finally {
-                semaphore.release()
-            }
-        }
     }
 }
 

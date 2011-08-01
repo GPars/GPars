@@ -14,35 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.operator;
+package groovyx.gpars.dataflow.operator
 
-
-import groovyx.gpars.group.PGroup
 import java.util.concurrent.Semaphore
 
 /**
- * An operator's internal actor. Repeatedly polls inputs and once they're all available it performs the operator's body.
- * The operator's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
+ * An selector's internal actor. Repeatedly polls inputs and once they're all available it performs the selector's body.
+ * The selector's body is executed in as a separate task, allowing multiple copies of the body to be run concurrently.
  * The maxForks property guards the maximum number or concurrently run copies.
  *
  * @author Vaclav Pech
  */
-final class ForkingDataflowOperatorActor extends DataflowOperatorActor {
-    private final Semaphore semaphore;
-    private final def threadPool;
+private final class ForkingDataflowSelectorActor extends DataflowSelectorActor {
+    private final Semaphore semaphore
+    private final def threadPool
 
-    def ForkingDataflowOperatorActor(DataflowOperator owningOperator, PGroup group, List outputs, List inputs, Closure code, int maxForks) {
+    def ForkingDataflowSelectorActor(owningOperator, group, outputs, inputs, code, maxForks) {
         super(owningOperator, group, outputs, inputs, code)
         this.semaphore = new Semaphore(maxForks)
         this.threadPool = group.threadPool
     }
 
     @Override
-    void startTask(results) {
+    def startTask(index, result) {
         semaphore.acquire()
         threadPool.execute {
             try {
-                super.startTask(results)
+                super.startTask(index, result)
             } finally {
                 semaphore.release()
             }

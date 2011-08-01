@@ -19,13 +19,6 @@ package groovyx.gpars.dataflow
 import groovyx.gpars.dataflow.operator.PoisonPill
 import static groovyx.gpars.dataflow.Dataflow.operator
 
-/**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 30.3.11
- * Time: 14:28
- * To change this template use File | Settings | File Templates.
- */
 class DataflowChannelFilterTest extends GroovyTestCase {
 
     public void testCreationFromQueue() {

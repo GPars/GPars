@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author Vaclav Pech
  */
+@SuppressWarnings({"RawUseOfParameterizedType"})
 abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
     protected final List inputs;
     protected final List outputs;
@@ -36,6 +37,7 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
     protected final DataflowProcessor owningProcessor;
     protected boolean stoppingGently = false;
 
+    @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter"})
     DataflowProcessorActor(final DataflowProcessor owningProcessor, final PGroup group, final List outputs, final List inputs, final Closure code) {
         super();
         parallelGroup = group;
@@ -77,7 +79,7 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
      * After receiving the poisson a dataflow operator will send the poisson to all its output channels and terminate.
      *
      * @param data The poisson to re-send
-     *             return True, if poisson has been received
+     * @return True, if poisson has been received
      */
     boolean checkPoison(final Object data) {
         if (data instanceof PoisonPill) {
