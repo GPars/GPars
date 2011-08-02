@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.SyncDataflowVariable;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
@@ -71,14 +72,28 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        head.getFirstDFV().getVal(timeout, units);
-        if (head.getFirstDFV().isBound()) {
-            final T result = head.getFirst();
-            moveHead();
-            return result;
+        final T value = head.getFirstDFV().getVal(timeout, units);
+        if (value == null) {
+            if (shouldReportTimeout()) {
+                return null;
+            } else {
+                final T result = head.getFirstDFV().getVal();
+                moveHead();
+                return result;
+            }
         } else {
-            return null;
+            moveHead();
+            return value;
         }
+    }
+
+    private boolean shouldReportTimeout() {
+        final DataflowVariable<T> firstDFV = head.getFirstDFV();
+        if (!firstDFV.isBound()) return true;
+        if (firstDFV instanceof SyncDataflowVariable) {
+            return ((SyncDataflowVariable) firstDFV).awaitingParties();
+        }
+        return false;
     }
 
     @Override

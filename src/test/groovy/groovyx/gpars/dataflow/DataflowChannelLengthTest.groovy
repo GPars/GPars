@@ -114,7 +114,7 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
 
     }
 
-    public void _testSyncDataflowBroadcast() {
+    public void testSyncDataflowBroadcast() {
         final SyncDataflowBroadcast channel = new SyncDataflowBroadcast()
         final CyclicBarrier barrier = new CyclicBarrier(2)
         final DataflowReadChannel subscription1 = channel.createReadChannel()
@@ -150,6 +150,6 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
         barrier.await()
         assertEquals 1, subscription1.length()
         assertEquals 1, subscription2.length()
-        assert subscription1.length() == 2
+        assert subscription1.length() == 1
     }
 }

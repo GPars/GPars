@@ -21,24 +21,27 @@ import java.util.concurrent.TimeUnit
 public class ResizeableCountDownLatchTest extends GroovyTestCase {
 
     public void testIncreaseCount() throws Exception {
-        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(0)
-        assert latch.count == 0
-        latch.increaseCount()
+        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(1)
         assert latch.count == 1
+        latch.increaseCount()
+        assert latch.count == 2
         assert !latch.await(10, TimeUnit.MILLISECONDS)
         assert !latch.await(10, TimeUnit.MILLISECONDS)
+        latch.countDown()
         latch.countDown()
         assert latch.await(10, TimeUnit.MILLISECONDS)
     }
 
     public void testIncreaseCountAfterReachingZero() throws Exception {
-        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(0)
-        assert latch.count == 0
+        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(1)
+        assert latch.count == 1
         latch.increaseCount()
         latch.countDown()
-        assert latch.count == 0
+        assert latch.count == 1
 
         latch.increaseCount()
+        assert !latch.await(10, TimeUnit.MILLISECONDS)
+        latch.countDown()
         assert !latch.await(10, TimeUnit.MILLISECONDS)
         latch.countDown()
         assert latch.await(10, TimeUnit.MILLISECONDS)
@@ -46,20 +49,21 @@ public class ResizeableCountDownLatchTest extends GroovyTestCase {
 
     @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
     public void testGradualIncreaseCount() throws Exception {
-        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(0)
-        assert latch.count == 0
-        latch.increaseCount()
+        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(1)
         assert latch.count == 1
-        assert !latch.await(10, TimeUnit.MILLISECONDS)
         latch.increaseCount()
         assert latch.count == 2
+        assert !latch.await(10, TimeUnit.MILLISECONDS)
+        latch.increaseCount()
+        assert latch.count == 3
         assert !latch.await(10, TimeUnit.MILLISECONDS)
         latch.countDown()
-        assert latch.count == 1
-        assert !latch.await(10, TimeUnit.MILLISECONDS)
-        latch.increaseCount()
         assert latch.count == 2
         assert !latch.await(10, TimeUnit.MILLISECONDS)
+        latch.increaseCount()
+        assert latch.count == 3
+        assert !latch.await(10, TimeUnit.MILLISECONDS)
+        latch.countDown()
         latch.countDown()
         latch.countDown()
         assert latch.await(10, TimeUnit.MILLISECONDS)
@@ -95,5 +99,61 @@ public class ResizeableCountDownLatchTest extends GroovyTestCase {
         latch.decreaseCount()
         assert latch.count == -1
         assert !latch.await(10, TimeUnit.MILLISECONDS)
+    }
+
+    public void testSimpleAwaitWithTimeout() throws Exception {
+        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(3)
+        assert latch.count == 3
+        latch.countDown()
+        assert !latch.attemptToCountDownAndAwait(500)
+        assert latch.count == 3
+        assert !latch.await(10, TimeUnit.MILLISECONDS)
+    }
+
+    public void testAwaitWithTimeoutWithManyParties() throws Exception {
+        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(3)
+        assert latch.count == 3
+        latch.countDown()
+        latch.countDown()
+        latch.countDown()
+        latch.countDown()
+        latch.countDown()
+        assert latch.attemptToCountDownAndAwait(500)
+        assert latch.count == 0
+        assert latch.await(10, TimeUnit.MILLISECONDS)
+    }
+
+    public void testAwaitWithTimeoutWithTrickyScenario() throws Exception {
+        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(3)
+        assert latch.count == 3
+        latch.countDown()
+        latch.countDown()
+        assert !latch.await(10, TimeUnit.MILLISECONDS)
+        latch.countDown()
+
+        latch.increaseCount()
+        assert latch.count == 1
+        latch.countDown()
+        assert latch.isReleasedFlag()
+        assert latch.await(10, TimeUnit.MILLISECONDS)
+        assert latch.count == 0
+    }
+
+    public void testCompetingAwaitWithTimeout() throws Exception {
+        final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(3)
+        assert latch.count == 3
+        Thread.start {
+            latch.countDown()
+            latch.await()
+        }
+        Thread.start {
+            latch.countDown()
+            latch.await()
+        }
+        latch.countDown()
+        assert latch.attemptToCountDownAndAwait(5000)
+        latch.increaseCount()
+        assert latch.count == 1
+        assert !latch.await(0, TimeUnit.MILLISECONDS)
     }
 }

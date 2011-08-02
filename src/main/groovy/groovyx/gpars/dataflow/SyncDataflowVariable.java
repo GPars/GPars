@@ -79,15 +79,30 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
         final long start = System.currentTimeMillis();
         final long duration = units.toMillis(timeout);
+
         final T result = super.getVal(timeout, units);
         if (result == null) {
             if (!this.isBound()) return null;
-            final T val = getVal();
-            readerIsReady(duration - (System.currentTimeMillis() - start));
-            return val;
+            if (readerIsReady(duration - (System.currentTimeMillis() - start))) return getVal();
+            else return null;
         }
-        readerIsReady(duration - (System.currentTimeMillis() - start));
-        return result;
+
+        if (readerIsReady(duration - (System.currentTimeMillis() - start))) return result;
+        else return null;
+    }
+
+    @Override
+    boolean shouldThrowTimeout() {
+        return super.shouldThrowTimeout() || awaitingParties();
+    }
+
+    /**
+     * Reports whether the variable is still waiting for parties to arrive for the rendezvous.
+     *
+     * @return True if not all parties have shown yet
+     */
+    public boolean awaitingParties() {
+        return !parties.isReleasedFlag();
     }
 
     @Override
@@ -106,11 +121,6 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
         awaitParties();
     }
 
-    private void readerIsReady(final long timeout) {
-        parties.countDown();
-        awaitParties(timeout);
-    }
-
     private void awaitParties() {
         try {
             parties.await();
@@ -119,16 +129,17 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
         }
     }
 
-    private boolean awaitParties(final long timeout) {
+    private boolean readerIsReady(final long timeout) {
+        parties.countDown();
         try {
-            return parties.await(timeout, TimeUnit.MILLISECONDS);
+            return parties.attemptToCountDownAndAwait(timeout);
         } catch (InterruptedException e) {
-            throw new RuntimeException(ERROR_READING_A_SYNCHRONOUS_CHANNEL, e);
+            throw new IllegalStateException("The thread has been interrupted while waiting.", e);
         }
     }
 
     /**
-     * Increases the number of parties required to perform data exchange by one
+     * Increases the number of parties required to perform data exchange by one.
      */
     public void incrementParties() {
         parties.increaseCount();

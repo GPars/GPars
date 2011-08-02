@@ -89,6 +89,7 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      * @return The value stored in the variable
      * @throws Throwable If the stored value is an exception instance it gets re-thrown
      */
+    @Override
     @SuppressWarnings({"ProhibitedExceptionDeclared"})
     public T get() throws Throwable {
         final T result = getVal();
@@ -106,17 +107,22 @@ public class DataflowVariable<T> extends DataflowExpression<T> implements Datafl
      * @return The value stored in the variable
      * @throws Throwable If the stored value is an exception instance it gets re-thrown
      */
+    @Override
     @SuppressWarnings({"ProhibitedExceptionDeclared"})
-    public T get(final long timeout, final TimeUnit units) throws Throwable {
+    public final T get(final long timeout, final TimeUnit units) throws Throwable {
         final T result = getVal(timeout, units);
         if (result instanceof Throwable) {
             throw (Throwable) result;
         }
         if (result == null) {
-            if (!this.isBound()) throw new TimeoutException("Timeout expired in DataflowVariable.get().");
+            if (shouldThrowTimeout()) throw new TimeoutException("Timeout expired in DataflowVariable.get().");
             return getVal();
         }
         return result;
+    }
+
+    boolean shouldThrowTimeout() {
+        return !this.isBound();
     }
 
     @Override

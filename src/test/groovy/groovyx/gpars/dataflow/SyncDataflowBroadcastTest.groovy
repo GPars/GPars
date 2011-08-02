@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow
 
 import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 class SyncDataflowBroadcastTest extends GroovyTestCase {
     public void testBlocking() {
@@ -376,4 +377,22 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         t2.join()
         assert writerReached2
     }
+
+    public void testTimeoutGetWithMultipleParties() {
+        final SyncDataflowBroadcast broadcast = new SyncDataflowBroadcast()
+        DataflowReadChannel subscription1 = broadcast.createReadChannel()
+        DataflowReadChannel subscription2 = broadcast.createReadChannel()
+        Thread.start {broadcast << 10}
+
+        assert null == subscription1.getVal(1, TimeUnit.MILLISECONDS)
+        assert null == subscription1.getVal(1, TimeUnit.MILLISECONDS)
+        assert null == subscription2.getVal(1, TimeUnit.MILLISECONDS)
+        assert null == subscription1.getVal(1, TimeUnit.MILLISECONDS)
+
+        Thread.start {
+            subscription1.getVal(10, TimeUnit.SECONDS)
+        }
+        assertEquals 10, subscription2.getVal(10, TimeUnit.SECONDS)
+    }
+
 }

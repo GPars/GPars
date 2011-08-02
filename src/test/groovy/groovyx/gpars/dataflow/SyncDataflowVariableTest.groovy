@@ -85,13 +85,17 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         assertEquals 10, variable.get(10, TimeUnit.SECONDS)
     }
 
-    public void _testTimeoutGetWithMultipleParties() {
+    public void testTimeoutGetWithMultipleParties() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(2)
         Thread.start {variable << 10}
+
+        assert null == variable.getVal(1, TimeUnit.MILLISECONDS)
+        assert null == variable.getVal(1, TimeUnit.MILLISECONDS)
+        assert null == variable.getVal(1, TimeUnit.MILLISECONDS)
+
         shouldFail(TimeoutException) {
             variable.get(1, TimeUnit.SECONDS)
         }
-
         Thread.start {
             variable.get(10, TimeUnit.SECONDS)
         }
@@ -125,10 +129,10 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
     }
 
     public void testWriterBlockingWithResizing() {
-        final SyncDataflowVariable variable = new SyncDataflowVariable(0)
+        final SyncDataflowVariable variable = new SyncDataflowVariable(2)
         volatile boolean reached = false
 
-        variable.incrementParties()
+        variable.decrementParties()
 
         def t = Thread.start {
             variable << 10
@@ -224,5 +228,27 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         variable.decrementParties()
         variable.decrementParties()
         variable.decrementParties()
+    }
+
+    public void testAwaitingParties() {
+        final SyncDataflowVariable variable = new SyncDataflowVariable(2)
+        assert variable.awaitingParties()
+        assert variable.shouldThrowTimeout()
+
+        def t = Thread.start {
+            variable << 10
+        }
+        def t2 = Thread.start {
+            variable.val
+        }
+
+        sleep 1000
+        assert variable.awaitingParties()
+        assert variable.shouldThrowTimeout()
+        assertEquals 10, variable.val
+        assert !variable.awaitingParties()
+        t.join()
+        assert !variable.awaitingParties()
+        assert !variable.shouldThrowTimeout()
     }
 }

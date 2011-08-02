@@ -26,6 +26,7 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
  * @author Doug Lea
  */
 public final class ResizeableCountDownLatch {
+
     /**
      * Synchronization control For CountDownLatch.
      * Uses AQS state to represent count.
@@ -163,6 +164,28 @@ public final class ResizeableCountDownLatch {
     public boolean await(final long timeout, final TimeUnit unit)
             throws InterruptedException {
         return sync.tryAcquireSharedNanos(1, unit.toNanos(timeout));
+    }
+
+    /**
+     * Attempts to atomically count down the latch and await release with a timeout.
+     * If the timeout expires, the count is increased and the latch is re-tested before reporting failed timeout.
+     *
+     * @param timeout The time in milliseconds to await
+     * @return True, if successful, false, is the timeout elapses without the latch being released
+     * @throws InterruptedException If the thread gets interrupted while waiting for the release
+     */
+    public boolean attemptToCountDownAndAwait(final long timeout) throws InterruptedException {
+        if (await(timeout, TimeUnit.MILLISECONDS)) return true;
+        increaseCount();
+        if (getCount() <= 1L) {
+            countDown();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isReleasedFlag() {
+        return sync.getCount() == 0;
     }
 
     /**
