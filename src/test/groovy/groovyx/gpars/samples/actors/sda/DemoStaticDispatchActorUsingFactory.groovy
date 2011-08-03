@@ -23,7 +23,7 @@ import static groovyx.gpars.actor.Actors.staticMessageHandler
  * which offers quick actor implementation leveraging compile-time binding of the message handler.
  */
 
-staticMessageHandler {String message ->
+final actor = staticMessageHandler {String message ->
     println 'Received string ' + message
 
     switch (message) {
@@ -34,8 +34,6 @@ staticMessageHandler {String message ->
             stop()
     }
 }
-
-final def actor = new MyActor().start()
 
 println 'Reply: ' + actor.sendAndWait('hello')
 actor 'bye'

@@ -112,7 +112,7 @@ Use either the _fairMessageHandler()_ factory method or the actor's makeFair() m
     def fairActor = Actors.fairMessageHandler {...}
 {code}
 
-h3. StaticDispatchActor
+h3. Static Dispatch Actor
 
 While _DynamicDispatchActor_ dispatches messages based on their run-time type and so pays extra performance penalty for each message,
 _StaticDispatchActor_ avoids run-time message checks and dispatches the message solely based on the compile-time information.
@@ -136,10 +136,10 @@ final class MyActor extends StaticDispatchActor<String> {
 Instances of _StaticDispatchActor_ have to override the _onMessage_ method appropriate for the actor's declared type parameter.
 The _onMessage(T message)_ method is then invoked with every received message.
 
-A shorter route through both fair and non-fair helper factory methods are also available:
+A shorter route towards both fair and non-fair static dispatch actors is available through the helper factory methods:
 
 {code}
-staticMessageHandler {String message ->
+final actor = staticMessageHandler {String message ->
     println 'Received string ' + message
 
     switch (message) {
@@ -150,8 +150,6 @@ staticMessageHandler {String message ->
             stop()
     }
 }
-
-final def actor = new MyActor().start()
 
 println 'Reply: ' + actor.sendAndWait('hello')
 actor 'bye'
