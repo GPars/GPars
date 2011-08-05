@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,23 +14,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa
+package groovyx.gpars.pa;
+
+import groovy.lang.Closure;
+import org.codehaus.groovy.runtime.InvokerHelper;
 
 /**
  * Represents a {a, b -> a + b} closure
  *
  * @author Vaclav Pech
  */
-@Singleton
 public final class SumClosure extends Closure {
     private static final long serialVersionUID = 209099114666842715L;
 
+    private static final SumClosure ourInstance = new SumClosure();
+
+    public static SumClosure getInstance() {
+        return ourInstance;
+    }
+
     private SumClosure() {
-        super(null)
+        super(null);
     }
 
     @Override
     public Object call(final Object[] args) {
-        return args[0] + args[1];
+        return InvokerHelper.invokeMethod(args[0], "plus", args[1]);
     }
 }
