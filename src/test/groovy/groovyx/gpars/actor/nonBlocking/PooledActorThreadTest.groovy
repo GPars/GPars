@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,18 +19,19 @@ package groovyx.gpars.actor.nonBlocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicBoolean
 
 public class PooledActorThreadTest extends GroovyTestCase {
     public void testActorThread() {
-        volatile boolean flag1 = false
-        volatile boolean flag2 = false
+        AtomicBoolean flag1 = new AtomicBoolean()
+        AtomicBoolean flag2 = new AtomicBoolean()
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor
         actor = Actors.actor {
-            flag1 = isActorThread()
+            flag1.set(isActorThread())
             react {
-                flag2 = isActorThread()
+                flag2.set(isActorThread())
                 latch.countDown()
             }
 
@@ -39,7 +40,7 @@ public class PooledActorThreadTest extends GroovyTestCase {
         assertFalse actor.isActorThread()
         actor.send 'Message'
         latch.await()
-        assert flag1
-        assert flag2
+        assert flag1.get()
+        assert flag2.get()
     }
 }

@@ -18,6 +18,7 @@ package groovyx.gpars.samples.collections
 
 import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.atomic.AtomicBoolean
 
 /*
 Demo for solving the classic sleeping barber problem with the help
@@ -29,7 +30,7 @@ are placeholders for business operations.
 @author Dierk Koenig, Vaclav Pech
 */
 
-/** The constants that define the world context of the barber shop.    */
+/** The constants that define the world context of the barber shop.     */
 class Shop {
     static final shaveTime = 100
     static final seatCount = 3
@@ -61,10 +62,10 @@ class Customer extends DefaultActor {
 /**
  * The barber serves its customers and is therefore a classic daemon thread.
  */
-volatile boolean shopOpen = true
+AtomicBoolean shopOpen = new AtomicBoolean(true)
 def barber = Thread.startDaemon {
     final NO_MESSAGE = null
-    while (shopOpen) {
+    while (shopOpen.get()) {
         // here is a gotcha if a customer enters the shop after the empty check but before the println!
         if (Shop.seats.empty) {
             println "sleeping"
@@ -83,4 +84,4 @@ for (customer in customers) {
 }
 // make sure the simulation ends after all customers visited the shop
 customers*.join()
-shopOpen = false
+shopOpen.set(false)
