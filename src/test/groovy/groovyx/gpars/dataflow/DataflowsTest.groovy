@@ -55,7 +55,7 @@ public class DataflowsTest extends GroovyTestCase {
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
-        volatile List<Integer> result = []
+        final List<Integer> result = []
         Actors.blockingActor {
             result << data.variable
             result << data.variable
@@ -69,7 +69,7 @@ public class DataflowsTest extends GroovyTestCase {
     public void testBlockedRead() {
         final Dataflows data = new Dataflows()
 
-        volatile int result = 0
+        int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
         Actors.blockingActor {
@@ -91,7 +91,7 @@ public class DataflowsTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        volatile int result = 0
+        int result = 0
         Actors.blockingActor {
             barrier.await()
             result = data.variable

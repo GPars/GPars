@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 public class TimeCategoryActorsTest extends GroovyTestCase {
     public void testReceive() {
-        volatile def result = ''
+        def result = ''
         AtomicBoolean timeoutFlag = new AtomicBoolean()
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -54,7 +54,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
     }
 
     public void testTimeCategoryNotAvailable() {
-        volatile def exceptions = 0
+        def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
         def actor = Actors.blockingActor {
@@ -79,7 +79,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
     }
 
     public void testReceiveWithHandler() {
-        volatile def result = ''
+        def result = ''
         final CountDownLatch latch = new CountDownLatch(1)
 
         Actors.blockingActor {

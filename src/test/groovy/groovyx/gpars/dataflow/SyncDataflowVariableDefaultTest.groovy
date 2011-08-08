@@ -16,11 +16,11 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.group.NonDaemonPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import groovyx.gpars.group.NonDaemonPGroup
 
 public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
 
@@ -91,7 +91,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
-        volatile List<Integer> result = []
+        List<Integer> result = []
         group.blockingActor {
             result << variable.val
             result << variable.val
@@ -105,7 +105,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
 
     public void testBlockedRead() {
         final SyncDataflowVariable<Integer> variable = new SyncDataflowVariable<Integer>()
-        volatile int result = 0
+        int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
         def group = new NonDaemonPGroup(2)
@@ -129,7 +129,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        volatile int result = 0
+        int result = 0
         def group = new NonDaemonPGroup(2)
         group.blockingActor {
             barrier.await()
@@ -158,7 +158,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
 
     public void testVariableBlockedBoundHandler() {
         final SyncDataflowVariable<Integer> variable = new SyncDataflowVariable<Integer>()
-        volatile def result = new SyncDataflowVariable()
+        def result = new SyncDataflowVariable()
 
         variable >> {
             result << variable.val
@@ -177,7 +177,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         final SyncDataflowVariable variable = new SyncDataflowVariable()
         variable << 10
 
-        volatile def result = new SyncDataflowVariable()
+        def result = new SyncDataflowVariable()
 
         variable >> {
             result << it
@@ -187,7 +187,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
 
     public void testVariablePoll() {
         final SyncDataflowVariable<Integer> variable = new SyncDataflowVariable<Integer>()
-        volatile def result = new SyncDataflowVariable()
+        def result = new SyncDataflowVariable()
 
         assert variable.poll() == null
         assert variable.poll() == null

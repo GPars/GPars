@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package groovyx.gpars.actor.nonBlocking
 
-import groovyx.gpars.group.PGroup
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -94,7 +94,7 @@ public class PooledMergeSortTest extends GroovyTestCase {
 
     public void testDefaultMergeSortWithOneThreadPool() {
         group.resize(1)
-        volatile def result = null;
+        def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
         def resultActor = group.actor {
@@ -114,7 +114,7 @@ public class PooledMergeSortTest extends GroovyTestCase {
 
     public void testDefaultMergeSort() {
         group.resize(10)
-        volatile def result = null;
+        def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
         def resultActor = group.actor {

@@ -171,7 +171,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
         final DataflowQueue b = new DataflowQueue()
         final DataflowQueue c = new DataflowQueue()
         final CyclicBarrier barrier = new CyclicBarrier(2)
-        volatile int counter = 0
+        int counter = 0
 
         def op1 = group.selector(inputs: [a, b], outputs: [c]) {x ->
             counter++
@@ -190,7 +190,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
     public void testInterrupt() {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.selector(inputs: [a], outputs: [b]) {v ->
             Thread.currentThread().interrupt()
@@ -208,7 +208,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
 
     public void testEmptyInputs() {
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         shouldFail(IllegalArgumentException) {
             def op1 = group.selector(inputs: [], outputs: [b]) {->
@@ -224,7 +224,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue b = new DataflowQueue()
         final DataflowQueue c = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.selector(inputs: [a], outputs: [b, c]) {
             flag = (output == b) && (outputs[0] == b) && (outputs[1] == c)
@@ -239,7 +239,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
 
     public void testEmptyOutputs() {
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.selector(inputs: [b], outputs: []) {
             flag = (output == null)

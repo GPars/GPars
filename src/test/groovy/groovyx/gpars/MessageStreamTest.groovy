@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,9 +45,9 @@ class MessageStreamTest extends GroovyTestCase {
     }
 
     public void testForward() {
-        volatile def flag1 = false
-        volatile def flag2 = false
-        volatile def flag3 = false
+        def flag1 = false
+        def flag2 = false
+        def flag3 = false
 
         def receiver = Actors.actor {
             react {

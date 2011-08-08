@@ -53,8 +53,8 @@ public class DataflowTaskTest extends GroovyTestCase {
     public void testJoin() {
         assert 5 == task {5}.val
 
-        def volatile a
-        def volatile b
+        def a
+        def b
 
         def t1 = task {a = 10}
         def t2 = task {b = 20}

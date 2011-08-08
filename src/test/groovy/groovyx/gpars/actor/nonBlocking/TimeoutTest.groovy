@@ -111,7 +111,7 @@ public class TimeoutTest extends GroovyTestCase {
         final AtomicBoolean codeFlag = new AtomicBoolean(false)
         final AtomicBoolean nestedCodeFlag = new AtomicBoolean(false)
         final AtomicBoolean timeoutFlag = new AtomicBoolean(false)
-        volatile def nestedMessage = null
+        def nestedMessage = null
 
         final def actor = actor {
             loop {
