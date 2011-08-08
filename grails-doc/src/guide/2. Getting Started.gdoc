@@ -19,20 +19,20 @@ software easier and less error prone.
 
 The concepts available in *GPars* can be categorized into three groups:
 
-# _Code-level helpers_: constructs that can be applied to small parts of the code-base such as individual algorithms or data structures without any major changes in the overall project architecture
-** Parallel Collections
-** Asynchronous Processing
-** Fork/Join (Divide/Conquer)
+# _Code-level helpers_ Constructs that can be applied to small parts of the code-base such as individual algorithms or data structures without any major changes in the overall project architecture
+## Parallel Collections
+## Asynchronous Processing
+## Fork/Join (Divide/Conquer)
 
-# _Architecture-level concepts_: constructs that need to be taken into account when designing the project structure
-** Actors
-** Communicating Sequential Processes (CSP)
-** Dataflow
-** Data Parallelism
+# _Architecture-level concepts_ Constructs that need to be taken into account when designing the project structure
+## Actors
+## Communicating Sequential Processes (CSP)
+## Dataflow
+## Data Parallelism
 
-# _Shared Mutable State Protection_: although about 95% of current use of shared mutable state can be avoided using proper abstractions, good abstractions are still necessary for the remaining 5% use cases, when shared mutable state cannot be avoided
-** Agents
-** Software Transactional Memory (not fully implemented in GPars as yet)
+# _Shared Mutable State Protection_ Although about 95% of current use of shared mutable state can be avoided using proper abstractions, good abstractions are still necessary for the remaining 5% use cases, when shared mutable state cannot be avoided
+## Agents
+## Software Transactional Memory (not fully implemented in GPars as yet)
 
 
 
