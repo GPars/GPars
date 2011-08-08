@@ -42,11 +42,12 @@ import java.util.Map;
  * @author Vaclav Pech
  *         Date: Sep 9, 2009
  */
-@SuppressWarnings({"RawUseOfParameterizedType", "AccessingNonPublicFieldOfAnotherObject", "unchecked", "AbstractClassWithoutAbstractMethods"})
+@SuppressWarnings({"RawUseOfParameterizedType", "AccessingNonPublicFieldOfAnotherObject", "unchecked", "AbstractClassWithoutAbstractMethods", "ConstantDeclaredInAbstractClass"})
 public abstract class DataflowProcessor {
 
-    protected static final String INPUTS = "inputs";
-    protected static final String MAX_FORKS = "maxForks";
+    public static final String INPUTS = "inputs";
+    public static final String OUTPUTS = "outputs";
+    public static final String MAX_FORKS = "maxForks";
     /**
      * The internal actor performing on behalf of the processor
      */
@@ -82,7 +83,7 @@ public abstract class DataflowProcessor {
     }
 
     static List<DataflowWriteChannel> extractOutputs(final Map<String, Object> channels) {
-        final List<DataflowWriteChannel> outputs = (List<DataflowWriteChannel>) channels.get("outputs");
+        final List<DataflowWriteChannel> outputs = (List<DataflowWriteChannel>) channels.get(OUTPUTS);
         if (outputs != null) return Collections.unmodifiableList(outputs);
         return null;
     }
