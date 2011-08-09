@@ -25,7 +25,7 @@ import java.util.concurrent.CountDownLatch
 
 public class NullMessageTest extends GroovyTestCase {
     public void testNullMessage() {
-        volatile def result = ''
+        def result = ''
         final def latch = new CountDownLatch(1)
         final Actor actor = Actors.blockingActor {
             receive {
@@ -40,7 +40,7 @@ public class NullMessageTest extends GroovyTestCase {
 
     public void testNullMessageFromActor() {
         final def group = PGroupBuilder.createFromPool(new DefaultPool(true, 100))
-        volatile def result = ''
+        def result = ''
         final def latch = new CountDownLatch(1)
         final Actor actor = group.blockingActor {
             receive {

@@ -60,7 +60,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
     }
 
     public void testTimeCategoryNotAvailable() {
-        volatile def exceptions = 0
+        def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
         final def actor = actor {

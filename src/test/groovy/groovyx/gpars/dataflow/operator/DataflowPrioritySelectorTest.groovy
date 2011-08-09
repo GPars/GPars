@@ -21,6 +21,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.atomic.AtomicBoolean
 import static groovyx.gpars.dataflow.Dataflow.prioritySelector
 
 /**
@@ -194,7 +195,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         final DataflowQueue c = new DataflowQueue()
         final CyclicBarrier barrier1 = new CyclicBarrier(2)
         final CyclicBarrier barrier2 = new CyclicBarrier(2)
-        volatile int counter = 0
+        int counter = 0
 
         def op1 = group.prioritySelector(inputs: [a, b], outputs: [c]) {x ->
             barrier1.await()
@@ -214,25 +215,25 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
     public void testInterrupt() {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        final AtomicBoolean flag = new AtomicBoolean(false)
 
         def op1 = group.prioritySelector(inputs: [a], outputs: [b]) {v ->
             Thread.currentThread().interrupt()
-            flag = true
+            flag.set(true)
             bindOutput 'a'
         }
         op1.actor.metaClass.onInterrupt = {}
-        assertFalse flag
+        assert !flag.get()
         a << 'Message'
         assertEquals 'a', b.val
-        assertTrue flag
+        assert flag.get()
         op1.terminate()
         op1.join()
     }
 
     public void testEmptyInputs() {
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         shouldFail(IllegalArgumentException) {
             def op1 = group.prioritySelector(inputs: [], outputs: [b]) {->
@@ -248,7 +249,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue b = new DataflowQueue()
         final DataflowQueue c = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.prioritySelector(inputs: [a], outputs: [b, c]) {
             flag = (output == b) && (outputs[0] == b) && (outputs[1] == c)
@@ -263,7 +264,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
 
     public void testEmptyOutputs() {
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.prioritySelector(inputs: [b], outputs: []) {
             flag = (output == null)

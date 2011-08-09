@@ -17,60 +17,61 @@
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.group.NonDaemonPGroup
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
-import groovyx.gpars.group.NonDaemonPGroup
+import java.util.concurrent.atomic.AtomicBoolean
 
 public class SyncDataflowQueueTest extends GroovyTestCase {
 
     public void testWriterBlocking() {
         final SyncDataflowQueue queue = new SyncDataflowQueue()
-        volatile boolean reached = false
+        AtomicBoolean reached = new AtomicBoolean()
 
         def t = Thread.start {
             queue << 10
-            reached = true
+            reached.set(true)
             queue << 20
         }
         sleep 1000
-        assert !reached
+        assert !reached.get()
         assertEquals 10, queue.val
         assertEquals 20, queue.val
         t.join()
         assert queue.length() == 0
-        assert reached
+        assert reached.get()
     }
 
     @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
     public void testMultipleWriters() {
         final SyncDataflowQueue queue = new SyncDataflowQueue()
-        volatile boolean reached1 = false
-        volatile boolean reached2 = false
+        AtomicBoolean reached1 = new AtomicBoolean()
+        AtomicBoolean reached2 = new AtomicBoolean()
 
         def t1 = Thread.start {
             queue << 10
             queue << 20
-            reached1 = true
+            reached1.set(true)
         }
         def t2 = Thread.start {
             queue << 30
             queue << 40
-            reached2 = true
+            reached2.set(true)
         }
         sleep 1000
-        assert !reached1
-        assert !reached2
+        assert !reached1.get()
+        assert !reached2.get()
         assert queue.val in [10, 30]
         assert queue.val in [10, 30]
 
-        assert !reached1
-        assert !reached2
+        assert !reached1.get()
+        assert !reached2.get()
         assert queue.val in [20, 40]
         assert queue.val in [20, 40]
 
         [t1, t2]*.join()
-        assert reached1
-        assert reached2
+        assert reached1.get()
+        assert reached2.get()
     }
 
     public void testTimeoutGet() {

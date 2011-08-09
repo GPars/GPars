@@ -21,6 +21,7 @@ import groovyx.gpars.group.PGroupBuilder
 import groovyx.gpars.scheduler.DefaultPool
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.atomic.AtomicBoolean
 
 public class DeliveryErrorTest extends GroovyTestCase {
 
@@ -37,7 +38,7 @@ public class DeliveryErrorTest extends GroovyTestCase {
     }
 
     public void testSuccessfulMessages() {
-        volatile boolean flag = false
+        AtomicBoolean flag = new AtomicBoolean()
         CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = group.actor {
@@ -49,17 +50,17 @@ public class DeliveryErrorTest extends GroovyTestCase {
         }
         def message = 1
         message.metaClass.onDeliveryError = {->
-            flag = true
+            flag.set(true)
         }
         actor << message
 
         latch.await()
-        assertFalse flag
+        assertFalse flag.get()
     }
 
     public void testFailedMessages() {
-        volatile boolean flag1 = false
-        volatile boolean flag2 = false
+        AtomicBoolean flag1 = new AtomicBoolean()
+        AtomicBoolean flag2 = new AtomicBoolean()
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
@@ -75,25 +76,25 @@ public class DeliveryErrorTest extends GroovyTestCase {
 
         def message1 = 1
         message1.metaClass.onDeliveryError = {->
-            flag1 = true
+            flag1.set(true)
         }
 
         def message2 = 2
         message2.metaClass.onDeliveryError = {->
-            flag2 = true
+            flag2.set(true)
         }
         actor << message1
         actor << message2
         barrier.await()
 
         latch.await()
-        assertFalse flag1
-        assert flag2
+        assertFalse flag1.get()
+        assert flag2.get()
     }
 
     public void testFailedMessagesOnException() {
-        volatile boolean flag1 = false
-        volatile boolean flag2 = false
+        AtomicBoolean flag1 = new AtomicBoolean()
+        AtomicBoolean flag2 = new AtomicBoolean()
         CountDownLatch latch = new CountDownLatch(1)
         final CyclicBarrier barrier = new CyclicBarrier(2)
 
@@ -114,24 +115,24 @@ public class DeliveryErrorTest extends GroovyTestCase {
 
         def message1 = 1
         message1.metaClass.onDeliveryError = {->
-            flag1 = true
+            flag1.set(true)
         }
 
         def message2 = 2
         message2.metaClass.onDeliveryError = {->
-            flag2 = true
+            flag2.set(true)
         }
         actor << message1
         actor << message2
         barrier.await()
 
         latch.await()
-        assertFalse flag1
-        assert flag2
+        assertFalse flag1.get()
+        assert flag2.get()
     }
 
     public void testMessagesWithoutAfterStop() {
-        volatile boolean flag = false
+        AtomicBoolean flag = new AtomicBoolean()
         CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = group.actor {
@@ -140,16 +141,16 @@ public class DeliveryErrorTest extends GroovyTestCase {
 
         def message = 1
         message.metaClass.onDeliveryError = {->
-            flag = true
+            flag.set(true)
         }
         actor << message
         latch.countDown()
         Thread.sleep 1000
-        assert flag
+        assert flag.get()
     }
 
     public void testInterruptionFlag() {
-        volatile boolean flag = true
+        AtomicBoolean flag = new AtomicBoolean()
         CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor = group.actor {
@@ -159,11 +160,11 @@ public class DeliveryErrorTest extends GroovyTestCase {
 
         def message = 1
         message.metaClass.onDeliveryError = {->
-            flag = Thread.currentThread().isInterrupted()
+            flag.set(Thread.currentThread().isInterrupted())
         }
         actor << message
         latch.countDown()
         Thread.sleep 1000
-        assertFalse flag
+        assertFalse flag.get()
     }
 }

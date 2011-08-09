@@ -95,7 +95,7 @@ abstract public class MergeSortTest extends GroovyTestCase {
     }
 
     public void testDefaultMergeSort() {
-        volatile def result = null;
+        def result = null;
         final CountDownLatch latch = new CountDownLatch(1)
 
         def resultActor = Actors.blockingActor {

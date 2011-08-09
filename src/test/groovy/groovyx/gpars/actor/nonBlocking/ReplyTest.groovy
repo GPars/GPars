@@ -255,7 +255,7 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testReplyToReply() {
-        volatile String result
+        String result
 
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -288,7 +288,6 @@ public class ReplyTest extends GroovyTestCase {
                     }
                 }
             }
-
         }
 
         latch.await()
@@ -296,7 +295,7 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testReplyFromNoArgHandler() {
-        volatile String result
+        String result
 
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -322,7 +321,7 @@ public class ReplyTest extends GroovyTestCase {
 
     public void testMultipleClientsWithReply() {
         final List<CountDownLatch> latches = [new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(2)]
-        def volatile issues = []
+        def issues = []
 
         final def bouncer = actor {
             latches[0].await()

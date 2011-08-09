@@ -23,24 +23,25 @@ import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicBoolean
 
 public class PGroupTest extends GroovyTestCase {
     public void testDefaultGroupDaemon() {
-        volatile boolean daemon = false;
+        AtomicBoolean daemon = new AtomicBoolean()
         final CountDownLatch latch = new CountDownLatch(1)
 
         def actor = Actors.actor {
-            daemon = Thread.currentThread().isDaemon()
+            daemon.set(Thread.currentThread().isDaemon())
             latch.countDown()
         }
 
         assertEquals Actors.defaultActorPGroup, actor.parallelGroup
         latch.await()
-        assert daemon
+        assert daemon.get()
     }
 
     public void testGroupDaemonFlag() {
-        volatile boolean daemon = false;
+        AtomicBoolean daemon = new AtomicBoolean();
         final CountDownLatch latch1 = new CountDownLatch(1)
         final CountDownLatch latch2 = new CountDownLatch(1)
 
@@ -48,22 +49,22 @@ public class PGroupTest extends GroovyTestCase {
         final PGroup nonDaemonGroup = new NonDaemonPGroup()
 
         def actor1 = daemonGroup.actor {
-            daemon = Thread.currentThread().isDaemon()
+            daemon.set(Thread.currentThread().isDaemon())
             latch1.countDown()
         }
 
         assertEquals daemonGroup, actor1.parallelGroup
         latch1.await()
-        assert daemon
+        assert daemon.get()
 
         def actor2 = nonDaemonGroup.actor {
-            daemon = Thread.currentThread().isDaemon()
+            daemon.set(Thread.currentThread().isDaemon())
             latch2.countDown()
         }
 
         assertEquals nonDaemonGroup, actor2.parallelGroup
         latch2.await()
-        assertFalse daemon
+        assertFalse daemon.get()
 
         daemonGroup.shutdown()
         nonDaemonGroup.shutdown()

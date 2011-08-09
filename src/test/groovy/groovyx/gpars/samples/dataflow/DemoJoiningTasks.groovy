@@ -37,7 +37,7 @@ task {
     println 'Both sub-tasks finished now'
 }.join()
 
-def volatile a, b, c
+def a, b, c
 
 task {
     final DataflowVariable t1 = task {
@@ -51,5 +51,6 @@ task {
     println 'Both sub-tasks finished now, calculating the sum...'
     c = (a + b) / 2
     println "The result is: $c"
+    println "The result using tasks directly is: ${(t1.val + t2.val) / 2}"
 }.join()
 

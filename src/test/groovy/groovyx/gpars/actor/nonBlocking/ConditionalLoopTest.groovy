@@ -24,7 +24,7 @@ import static groovyx.gpars.actor.Actors.actor
  */
 @SuppressWarnings("GroovyEmptyCatchBlock") class ConditionalLoopTest extends GroovyTestCase {
     public void testNoLoop() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop({-> false}) {
                 result = 1
@@ -36,7 +36,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testNoLoopWithTail() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop({-> false}) {
                 result = 1
@@ -48,7 +48,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testNoLoopOnNumberOfIterations() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop(0) {
                 result = 1
@@ -60,7 +60,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testSingleLoop() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 
@@ -75,7 +75,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testSingleLoopOnNumberOfIterations() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop(1) {
                 result++
@@ -87,7 +87,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoop() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 
@@ -102,7 +102,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopOnNumberOfIterations() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop(5) {
                 result++
@@ -114,7 +114,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopWithStop() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 
@@ -130,7 +130,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopOnNumberOfIterationsWithStop() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop(5) {
                 result++
@@ -143,7 +143,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopWithTerminate() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 
@@ -159,7 +159,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopOnNumberOfIterationsWithTerminate() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop(5) {
                 result++
@@ -172,7 +172,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopWithReact() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 
@@ -194,7 +194,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopOnNumberOfIterationsWithReact() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop(5) {
                 result++
@@ -213,7 +213,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testNoLoopWithAfterLoopCode() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             loop({-> false}, {-> result += 3}) {
                 result = 1
@@ -225,7 +225,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testSingleLoopWithAfterLoopCode() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 
@@ -240,7 +240,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testRepeatedLoopWithAfterLoopCode() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 
@@ -255,7 +255,7 @@ import static groovyx.gpars.actor.Actors.actor
     }
 
     public void testComplexAfterLoopCode() {
-        volatile int result = 0
+        int result = 0
         def actor = actor {
             Integer counter = 0
 

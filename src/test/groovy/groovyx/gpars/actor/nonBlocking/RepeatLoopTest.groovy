@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch
 public class RepeatLoopTest extends GroovyTestCase {
 
     public void testLoopWithoutReact() {
-        volatile int count = 0
+        int count = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
         Actors.actor {

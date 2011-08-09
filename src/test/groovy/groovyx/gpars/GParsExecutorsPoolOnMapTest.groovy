@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ public class GParsExecutorsPoolOnMapTest extends GroovyTestCase {
     public void testMapSpecificsForEach() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsExecutorsPool.withPool {
-            volatile def keyResults = [].asSynchronized()
-            volatile def valueResults = [].asSynchronized()
+            final def keyResults = [].asSynchronized()
+            final def valueResults = [].asSynchronized()
             map.eachParallel {item -> keyResults << item.key; valueResults << item.value}
             processResults(keyResults, valueResults)
 
@@ -38,8 +38,8 @@ public class GParsExecutorsPoolOnMapTest extends GroovyTestCase {
     public void testMapSpecificsForEachWithIndex() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsExecutorsPool.withPool {
-            volatile def keyResults = [].asSynchronized()
-            volatile def valueResults = [].asSynchronized()
+            final def keyResults = [].asSynchronized()
+            final def valueResults = [].asSynchronized()
             map.eachWithIndexParallel {item, index -> keyResults << item.key; valueResults << item.value}
             processResults(keyResults, valueResults)
 
@@ -51,8 +51,8 @@ public class GParsExecutorsPoolOnMapTest extends GroovyTestCase {
     public void testMapSpecificsForCollect() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsExecutorsPool.withPool {
-            volatile def keyResults = [].asSynchronized()
-            volatile def valueResults = [].asSynchronized()
+            final def keyResults = [].asSynchronized()
+            final def valueResults = [].asSynchronized()
 
             keyResults = map.collectParallel {item -> item.key}
             valueResults = map.collectParallel {item -> item.value}

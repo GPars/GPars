@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.ThreadFactory
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author Vaclav Pech
@@ -45,13 +46,13 @@ public class ThreadPoolExceptionTest extends GroovyTestCase {
     }
 
     public void testThreadException() {
-        volatile def thrownException = null
+        final AtomicReference thrownException = new AtomicReference()
         final def latch = new CountDownLatch(1)
         final def thread = new Thread({throw new RuntimeException('test')} as Runnable)
-        thread.uncaughtExceptionHandler = {t, throwable -> thrownException = throwable; latch.countDown()} as UncaughtExceptionHandler
+        thread.uncaughtExceptionHandler = {t, throwable -> thrownException.set(throwable); latch.countDown()} as UncaughtExceptionHandler
         thread.start()
         latch.await()
-        assert thrownException instanceof RuntimeException
+        assert thrownException.get() instanceof RuntimeException
     }
 
     public void testThreadPoolException() {

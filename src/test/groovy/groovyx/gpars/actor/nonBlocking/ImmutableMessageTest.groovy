@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch
 public class ImmutableMessageTest extends GroovyTestCase {
 
     public void testSend() {
-        volatile String result
+        String result
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor bouncer = Actors.actor {

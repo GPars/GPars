@@ -19,47 +19,49 @@ package groovyx.gpars.dataflow
 import groovyx.gpars.group.NonDaemonPGroup
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 public class SyncDataflowVariableTest extends GroovyTestCase {
 
     public void testWriterBlocking() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(1)
-        volatile boolean reached = false
+        final AtomicBoolean reached = new AtomicBoolean(false)
 
         def t = Thread.start {
             variable << 10
-            reached = true
+            reached.set(true);
         }
         sleep 1000
-        assert !reached
+        assert !reached.get()
         assertEquals 10, variable.val
         t.join()
         assertEquals 10, variable.val
         assertEquals 10, variable.val
         assertEquals 10, variable.val
 
-        assert reached
+        assert reached.get()
     }
 
     public void testReaderBlocking() {
-        final SyncDataflowVariable variable = new SyncDataflowVariable(2)
-        volatile boolean writerReached = false
-        volatile int readerReached = 0
+        final SyncDataflowVariable<Integer> variable = new SyncDataflowVariable<Integer>(2)
+        final AtomicBoolean writerReached = new AtomicBoolean(false)
+        final AtomicInteger readerReached = new AtomicInteger(0)
 
         def t1 = Thread.start {
             variable << 10
-            writerReached = true
+            writerReached.set(true)
         }
         def t2 = Thread.start {
-            readerReached = variable.val
+            readerReached.set(variable.val)
         }
         sleep 1000
-        assert !writerReached
-        assert readerReached == 0
+        assert !writerReached.get()
+        assert readerReached.get() == 0
         assertEquals 10, variable.val
         [t1, t2]*.join()
-        assert writerReached
-        assert readerReached == 10
+        assert writerReached.get()
+        assert readerReached.get() == 10
     }
 
     public void testGet() {
@@ -130,96 +132,96 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
 
     public void testWriterBlockingWithResizing() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(2)
-        volatile boolean reached = false
+        final AtomicBoolean reached = new AtomicBoolean(false)
 
         variable.decrementParties()
 
         def t = Thread.start {
             variable << 10
-            reached = true
+            reached.set(true)
         }
         sleep 1000
-        assert !reached
+        assert !reached.get()
         assertEquals 10, variable.val
         t.join()
         assertEquals 10, variable.val
         assertEquals 10, variable.val
         assertEquals 10, variable.val
 
-        assert reached
+        assert reached.get()
     }
 
     public void testReaderBlockingWithResizing() {
-        final SyncDataflowVariable variable = new SyncDataflowVariable(1)
-        volatile boolean writerReached = false
-        volatile int readerReached = 0
+        final SyncDataflowVariable<Integer> variable = new SyncDataflowVariable<Integer>(1)
+        final AtomicBoolean writerReached = new AtomicBoolean(false)
+        final AtomicInteger readerReached = new AtomicInteger(0)
 
         def t1 = Thread.start {
             variable << 10
-            writerReached = true
+            writerReached.set(true)
         }
 
         sleep 1000
         variable.incrementParties()
 
         def t2 = Thread.start {
-            readerReached = variable.val
+            readerReached.set(variable.val)
         }
         sleep 1000
-        assert !writerReached
-        assert readerReached == 0
+        assert !writerReached.get()
+        assert readerReached.get() == 0
         assertEquals 10, variable.val
         [t1, t2]*.join()
-        assert writerReached
-        assert readerReached == 10
+        assert writerReached.get()
+        assert readerReached.get() == 10
     }
 
     public void testWriterBlockingWithDecrease() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(3)
-        volatile boolean reached = false
+        final AtomicBoolean reached = new AtomicBoolean(false)
 
         variable.decrementParties()
 
         def t = Thread.start {
             variable << 10
-            reached = true
+            reached.set(true)
         }
         variable.decrementParties()
 
         sleep 1000
-        assert !reached
+        assert !reached.get()
         assertEquals 10, variable.val
         t.join()
         assertEquals 10, variable.val
         assertEquals 10, variable.val
         assertEquals 10, variable.val
 
-        assert reached
+        assert reached.get()
     }
 
     public void testReaderBlockingWithDecrease() {
-        final SyncDataflowVariable variable = new SyncDataflowVariable(3)
-        volatile boolean writerReached = false
-        volatile int readerReached = 0
+        final SyncDataflowVariable<Integer> variable = new SyncDataflowVariable<Integer>(3)
+        final AtomicBoolean writerReached = new AtomicBoolean(false)
+        final AtomicInteger readerReached = new AtomicInteger(0)
 
         def t1 = Thread.start {
             variable << 10
-            writerReached = true
+            writerReached.set(true)
         }
 
         sleep 1000
         variable.decrementParties()
 
         def t2 = Thread.start {
-            readerReached = variable.val
+            readerReached.set(variable.val)
         }
         sleep 1000
-        assert !writerReached
-        assert readerReached == 0
+        assert !writerReached.get()
+        assert readerReached.get() == 0
         assertEquals 10, variable.val
         [t1, t2]*.join()
-        assert writerReached
-        assert readerReached == 10
+        assert writerReached.get()
+        assert readerReached.get() == 10
     }
 
     public void testDecreaseBelowZero() {

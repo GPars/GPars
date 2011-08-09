@@ -27,7 +27,7 @@ public class DataflowTest extends GroovyTestCase {
         DataflowVariable<Integer> y = new DataflowVariable()
         DataflowVariable<Integer> z = new DataflowVariable()
 
-        volatile def result = 0
+        def result = 0
         final def latch = new CountDownLatch(1)
 
         blockingActor {
@@ -64,7 +64,7 @@ public class DataflowTest extends GroovyTestCase {
         def x = new DataflowVariable<List<Integer>>()
         def y = new DataflowVariable<List<Integer>>()
 
-        volatile def result = 0
+        def result = 0
         final def latch = new CountDownLatch(1)
 
         blockingActor { x << ints(0, 10) }
@@ -83,7 +83,7 @@ public class DataflowTest extends GroovyTestCase {
         DataflowVariable<Integer> y = new DataflowVariable()
         DataflowVariable<Integer> z = new DataflowVariable()
 
-        volatile def result = 0
+        def result = 0
         final def latch = new CountDownLatch(1)
 
         z >> {res ->
@@ -105,7 +105,7 @@ public class DataflowTest extends GroovyTestCase {
     void testMethodSyntax() {
         def df = new Dataflows()
 
-        volatile def result = 0
+        def result = 0
         final def latch = new CountDownLatch(1)
 
         df.z {res ->

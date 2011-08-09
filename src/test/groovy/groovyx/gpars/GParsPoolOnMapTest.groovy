@@ -25,8 +25,8 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     public void testMapSpecificsForEach() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsPool.withPool {
-            volatile def keyResults = [].asSynchronized()
-            volatile def valueResults = [].asSynchronized()
+            final def keyResults = [].asSynchronized()
+            final def valueResults = [].asSynchronized()
             map.eachParallel {item -> keyResults << item.key; valueResults << item.value}
             processResults(keyResults, valueResults)
 
@@ -38,8 +38,8 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     public void testMapSpecificsForEachWithIndex() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsPool.withPool {
-            volatile def keyResults = [].asSynchronized()
-            volatile def valueResults = [].asSynchronized()
+            final def keyResults = [].asSynchronized()
+            final def valueResults = [].asSynchronized()
             map.eachWithIndexParallel {item, index -> keyResults << item.key; valueResults << item.value}
             processResults(keyResults, valueResults)
 
@@ -51,8 +51,8 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     public void testMapSpecificsForCollect() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsPool.withPool {
-            volatile def keyResults = [].asSynchronized()
-            volatile def valueResults = [].asSynchronized()
+            final def keyResults = [].asSynchronized()
+            final def valueResults = [].asSynchronized()
 
             keyResults = map.collectParallel {item -> item.key}
             valueResults = map.collectParallel {item -> item.value}
@@ -135,19 +135,24 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
         valueResults.clear()
     }
 
-    public void testMapSpecificsForTransparentCollect() {
+    public void testMapSpecificsForTransparentCollectWithSingleArgClosure() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         GParsPool.withPool {
-            volatile def keyResults = [].asSynchronized()
-            volatile def valueResults = [].asSynchronized()
             map = map.makeConcurrent()
 
-            keyResults = map.collect {item -> item.key}
-            valueResults = map.collect {item -> item.value}
+            final def keyResults = map.collect {item -> item.key}
+            final def valueResults = map.collect {item -> item.value}
             processResults(keyResults, valueResults)
+        }
+    }
 
-            keyResults = map.collect {k, v -> k}
-            valueResults = map.collect {k, v -> v}
+    public void testMapSpecificsForTransparentCollectWithTwoArgClosure() {
+        def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
+        GParsPool.withPool {
+            map = map.makeConcurrent()
+
+            final def keyResults = map.collect {k, v -> k}
+            final def valueResults = map.collect {k, v -> v}
             processResults(keyResults, valueResults)
         }
     }
@@ -166,8 +171,8 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     public void testEnhancerForEach() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
-        volatile def keyResults = [].asSynchronized()
-        volatile def valueResults = [].asSynchronized()
+        final def keyResults = [].asSynchronized()
+        final def valueResults = [].asSynchronized()
         map.eachParallel {item -> keyResults << item.key; valueResults << item.value}
         processResults(keyResults, valueResults)
 
@@ -178,8 +183,8 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     public void testEnhancerForEachWithIndex() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
-        volatile def keyResults = [].asSynchronized()
-        volatile def valueResults = [].asSynchronized()
+        final def keyResults = [].asSynchronized()
+        final def valueResults = [].asSynchronized()
         map.eachWithIndexParallel {item, index -> keyResults << item.key; valueResults << item.value}
         processResults(keyResults, valueResults)
 
@@ -190,11 +195,9 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
     public void testEnhancerForCollect() {
         def map = [a: 1, b: 2, c: 3, d: 4, e: 5]
         ParallelEnhancer.enhanceInstance map
-        volatile def keyResults = [].asSynchronized()
-        volatile def valueResults = [].asSynchronized()
 
-        keyResults = map.collectParallel {item -> item.key}
-        valueResults = map.collectParallel {item -> item.value}
+        def keyResults = map.collectParallel {item -> item.key}
+        def valueResults = map.collectParallel {item -> item.value}
         processResults(keyResults, valueResults)
 
         keyResults = map.collectParallel {k, v -> k}

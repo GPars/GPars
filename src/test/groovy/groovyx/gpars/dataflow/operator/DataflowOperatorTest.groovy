@@ -22,6 +22,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * @author Vaclav Pech
@@ -178,7 +179,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue b = new DataflowQueue()
         final DataflowQueue c = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.operator(inputs: [a, b], outputs: [c]) {x, y ->
             flag = true
@@ -186,47 +187,47 @@ public class DataflowOperatorTest extends GroovyTestCase {
         a << 'Never delivered'
         op1.terminate()
         op1.join()
-        assertFalse flag
+        assert !flag
     }
 
     public void testInterrupt() {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        final AtomicBoolean flag = new AtomicBoolean(false)
 
         def op1 = group.operator(inputs: [a], outputs: [b]) {v ->
             Thread.currentThread().interrupt()
-            flag = true
+            flag.set(true)
             bindOutput 'a'
         }
         op1.actor.metaClass.onInterrupt = {}
-        assertFalse flag
+        assert !flag.get()
         a << 'Message'
         assertEquals 'a', b.val
-        assertTrue flag
+        assert flag.get()
         op1.terminate()
         op1.join()
     }
 
     public void testEmptyInputs() {
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        final AtomicBoolean flag = new AtomicBoolean(false)
 
         shouldFail(IllegalArgumentException) {
             def op1 = group.operator(inputs: [], outputs: [b]) {->
-                flag = true
+                flag.set(true)
                 terminate()
             }
             op1.join()
         }
-        assert !flag
+        assert !flag.get()
     }
 
     public void testOutputs() {
         final DataflowQueue a = new DataflowQueue()
         final DataflowQueue b = new DataflowQueue()
         final DataflowQueue c = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.operator(inputs: [a], outputs: [b, c]) {
             flag = (output == b) && (outputs[0] == b) && (outputs[1] == c)
@@ -241,7 +242,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
 
     public void testEmptyOutputs() {
         final DataflowQueue b = new DataflowQueue()
-        volatile boolean flag = false
+        boolean flag = false
 
         def op1 = group.operator(inputs: [b], outputs: []) {
             flag = (output == null)

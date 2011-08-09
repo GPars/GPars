@@ -58,9 +58,9 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testDispatchWithWhen() {
-        volatile boolean stringFlag = false
-        volatile boolean doubleFlag = false
-        volatile boolean objectFlag = false
+        boolean stringFlag = false
+        boolean doubleFlag = false
+        boolean objectFlag = false
 
         final Actor actor = new DynamicDispatchActor().become {
             when {String msg -> stringFlag = true; reply false}
@@ -89,7 +89,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testSendingListViaWhen() {
-        volatile boolean flag = false
+        boolean flag = false
 
         final Actor actor = new DynamicDispatchActor().become {
             when {List msg -> flag = true; reply false}
@@ -101,8 +101,8 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testSendingSubclassViaWhen() {
-        volatile boolean numberFlag = false
-        volatile boolean doubleFlag = false
+        boolean numberFlag = false
+        boolean doubleFlag = false
 
         final Actor actor = new DynamicDispatchActor().become {
             when {Number msg -> numberFlag = true; reply false}
@@ -121,9 +121,9 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testDispatcher() {
-        volatile boolean stringFlag = false
-        volatile boolean integerFlag = false
-        volatile boolean objectFlag = false
+        boolean stringFlag = false
+        boolean integerFlag = false
+        boolean objectFlag = false
 
         def actor = Actors.messageHandler {
             when {String message ->
@@ -164,8 +164,8 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testWhenAttachedAfterStart() {
-        volatile boolean stringFlag = false
-        volatile boolean integerFlag = false
+        boolean stringFlag = false
+        boolean integerFlag = false
 
         def dda = new DynamicDispatchActor().become {when {msg ->}}
         dda.when {String message ->
@@ -188,7 +188,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testNullHandlerForSendWithNull() {
-        volatile boolean nullFlag = false
+        boolean nullFlag = false
 
         def dda = new DynamicDispatchActor()
         dda.when {NullObject message ->
@@ -202,7 +202,7 @@ public class DynamicDispatchActorTest extends GroovyTestCase {
     }
 
     public void testClosureMessage() {
-        volatile boolean flag = false
+        boolean flag = false
 
         def dda = new DynamicDispatchActor()
         dda.when {Closure cl ->

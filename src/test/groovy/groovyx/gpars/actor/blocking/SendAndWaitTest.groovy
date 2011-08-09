@@ -199,7 +199,7 @@ abstract public class SendAndWaitTest extends GroovyTestCase {
             }
         }
 
-        volatile def result
+        def result
 
         group.actor {
             result = actor.sendAndWait(1)

@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch
 
 public class ImmutableMessageTest extends GroovyTestCase {
     public void testSend() {
-        volatile String result
+        String result
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor bouncer = Actors.blockingActor {

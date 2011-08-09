@@ -95,7 +95,7 @@ public class DataflowVariableTest extends GroovyTestCase {
         }
 
         final CountDownLatch latch = new CountDownLatch(1)
-        volatile List<Integer> result = []
+        List<Integer> result = []
         Actors.blockingActor {
             result << variable.val
             result << variable.val
@@ -108,7 +108,7 @@ public class DataflowVariableTest extends GroovyTestCase {
 
     public void testBlockedRead() {
         final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
-        volatile int result = 0
+        int result = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
         Actors.blockingActor {
@@ -130,7 +130,7 @@ public class DataflowVariableTest extends GroovyTestCase {
         final CyclicBarrier barrier = new CyclicBarrier(3)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        volatile int result = 0
+        int result = 0
         Actors.blockingActor {
             barrier.await()
             result = variable.val
@@ -157,7 +157,7 @@ public class DataflowVariableTest extends GroovyTestCase {
 
     public void testVariableBlockedBoundHandler() {
         final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
-        volatile def result = new DataflowVariable()
+        def result = new DataflowVariable()
 
         variable >> {
             result << variable.val
@@ -174,7 +174,7 @@ public class DataflowVariableTest extends GroovyTestCase {
         final DataflowVariable variable = new DataflowVariable()
         variable << 10
 
-        volatile def result = new DataflowVariable()
+        def result = new DataflowVariable()
 
         variable >> {
             result << it
@@ -184,7 +184,7 @@ public class DataflowVariableTest extends GroovyTestCase {
 
     public void testVariablePoll() {
         final DataflowVariable<Integer> variable = new DataflowVariable<Integer>()
-        volatile def result = new DataflowVariable()
+        final def result = new DataflowVariable()
 
         assert variable.poll() == null
         assert variable.poll() == null

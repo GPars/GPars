@@ -19,17 +19,19 @@ package groovyx.gpars.actor.blocking
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicBoolean
 
 public class ActorThreadTest extends GroovyTestCase {
 
     public void testActorThread() {
-        volatile boolean flag1 = false
+        AtomicBoolean flag1 = new AtomicBoolean(false)
+
         final CountDownLatch latch = new CountDownLatch(1)
 
         final Actor actor
         actor = Actors.blockingActor {
             receive()
-            flag1 = isActorThread()
+            flag1.set(isActorThread())
             latch.countDown()
 
         }
@@ -37,6 +39,6 @@ public class ActorThreadTest extends GroovyTestCase {
         assertFalse actor.isActorThread()
         actor.send 'Message'
         latch.await()
-        assert flag1
+        assert flag1.get()
     }
 }

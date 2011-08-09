@@ -24,7 +24,7 @@ import static groovyx.gpars.actor.Actors.actor
 
 public class NullMessageTest extends GroovyTestCase {
     public void testNullMessage() {
-        volatile def result = ''
+        def result = ''
         final def latch = new CountDownLatch(1)
         final Actor actor = actor {
             react {
@@ -38,7 +38,7 @@ public class NullMessageTest extends GroovyTestCase {
     }
 
     public void testNullMessageFromActor() {
-        volatile def result = ''
+        def result = ''
         final def latch = new CountDownLatch(1)
         final Actor actor = actor {
             react {

@@ -21,6 +21,7 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  *
@@ -30,14 +31,14 @@ import java.util.concurrent.TimeUnit
 
 public class TimeCategoryActorsTest extends GroovyTestCase {
     public void testReceive() {
-        volatile def result = ''
-        volatile boolean timeoutFlag = false
+        def result = ''
+        AtomicBoolean timeoutFlag = new AtomicBoolean()
         final CountDownLatch latch = new CountDownLatch(1)
 
         Actors.blockingActor {
 
             delegate.metaClass {
-                onTimeout = {-> timeoutFlag = true; terminate() }
+                onTimeout = {-> timeoutFlag.set(true); terminate() }
                 afterStop = {messages -> latch.countDown() }
             }
 
@@ -49,11 +50,11 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
 
         latch.await(90, TimeUnit.SECONDS)
         assert '' == result
-        assert timeoutFlag
+        assert timeoutFlag.get()
     }
 
     public void testTimeCategoryNotAvailable() {
-        volatile def exceptions = 0
+        def exceptions = 0
         final CountDownLatch latch = new CountDownLatch(1)
 
         def actor = Actors.blockingActor {
@@ -78,7 +79,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
     }
 
     public void testReceiveWithHandler() {
-        volatile def result = ''
+        def result = ''
         final CountDownLatch latch = new CountDownLatch(1)
 
         Actors.blockingActor {

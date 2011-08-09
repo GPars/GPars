@@ -254,7 +254,7 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testReplyToReply() {
-        volatile String result
+        String result
 
         final CountDownLatch latch = new CountDownLatch(1)
 
@@ -294,7 +294,7 @@ public class ReplyTest extends GroovyTestCase {
     }
 
     public void testReplyFromNoArgHandler() {
-        volatile String result
+        String result
 
         final CountDownLatch latch = new CountDownLatch(1)
 
