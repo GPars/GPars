@@ -140,6 +140,8 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
         Thread.start {
             subscription1.val
             barrier.await()
+            barrier.await()
+            subscription1.val
         }
         sleep 1000
 
@@ -151,5 +153,8 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
         assertEquals 1, subscription1.length()
         assertEquals 1, subscription2.length()
         assert subscription1.length() == 1
+        barrier.await()
+        subscription2.val
+        assert subscription1.length() == 0
     }
 }

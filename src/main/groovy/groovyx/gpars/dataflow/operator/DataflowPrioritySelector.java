@@ -48,7 +48,7 @@ public final class DataflowPrioritySelector extends DataflowSelector {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @param code     The selector's body to run each time all inputs have a value to read
      */
-    DataflowPrioritySelector(final PGroup group, final Map<String, Object> channels, final Closure code) {
+    public DataflowPrioritySelector(final PGroup group, final Map<String, Object> channels, final Closure code) {
         super(group, channels, code);
     }
 
