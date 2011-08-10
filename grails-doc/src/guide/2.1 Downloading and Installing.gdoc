@@ -14,10 +14,11 @@ files for you.
 
 h3. The GPars artefact
 
-As noted above GPars is now distributed as standard with Groovy.  If however you have to manage this
-dependency manually: the GPars artefact is in the main Maven repository and in the Codehaus main and
+As noted above GPars is now distributed as standard with Groovy.  If however, you have to manage this
+dependency manually, the GPars artefact is in the main Maven repository and in the Codehaus main and
 snapshots repositories.  The current release version (0.12) is in the Maven and Codehaus main repositories,
-the current development version (1.0-SNAPSHOT).  To use from Gradle or Grapes use:
+the current development version (1.0-SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
+or Grapes use the specification:
 
 {code}
 "org.codehaus.gpars:gpars:0.12"
@@ -29,13 +30,24 @@ for the release version, and:
 "org.codehaus.gpars:gpars:1.0-SNAPSHOT"
 {code}
 
-for the development version.
+for the development version.  You will likely need to add the Codehaus snapshots repository manually to the
+search list in this latter case.  Using Maven the dependency is:
+
+{code}
+<dependency>
+    <groupId>org.codehaus.gpars</groupId>
+    <artifactId>gpars</artifactId>
+    <version>0.12</version>
+</dependency>
+{code}
+
+or version 1.0-SNAPSHOT if using the latest snapshot.
 
 h3. Transitive Dependencies
 
 GPars requires two compulsory dependencies - "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar
 and "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar jar files, both of which are artifacts
-from the "JSR-166 initiative":http://g.oswego.edu/dl/concurrency-interest/ . These must be on the classpath.
+from the "JSR-166 initiative":http://g.oswego.edu/dl/concurrency-interest/. These must be on the classpath.
 Release versions of these artefacts are in the main Maven and Codehaus repositories.  Development versions
 of the artefacts are available in the Codehaus snapshots repository.  Using Gradle or Grapes you would use
 dependency specifications:
@@ -60,7 +72,7 @@ For Maven, the specification would be:
 </dependency>
 {code}
 
-GPars defines both of the dependencies in its own descriptor, so both dependencies should be taken care of automatically,
-if you use Gradle, Maven, Ivy or other type of automatic dependency resolution tool.
+GPars defines both of these dependencies in its own descriptor, so adding them in should be taken care of
+automatically if you use Gradle, Maven, Ivy or other type of automatic dependency resolution tool.
 
 Please visit the "Integration page":http://gpars.codehaus.org/Integration of the project for details.
