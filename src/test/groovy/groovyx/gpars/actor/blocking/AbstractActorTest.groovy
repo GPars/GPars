@@ -16,10 +16,14 @@
 
 package groovyx.gpars.actor.blocking
 
-import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
+import groovyx.gpars.actor.BlockingActor
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Promise
+import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -139,6 +143,26 @@ public class AbstractActorTest extends GroovyTestCase {
         assert actor.undeliveredMessages.get().contains('Message 3')
         assertEquals 1, actor.deliveredMessages.size()
         assertEquals 2, actor.undeliveredMessages.get().size()
+    }
+
+    public void testSendAndPromise() {
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+        final DataflowVariable result = new DataflowVariable()
+
+        final DefaultPGroup group = new DefaultPGroup()
+        def a = group.actor {
+            barrier.await()
+            react {
+                reply it * 2
+            }
+        }
+        final Promise<Object> promise = a.sendAndPromise(10)
+        assert !promise.isBound()
+        promise >> {result << it}
+        barrier.await(90, TimeUnit.SECONDS)
+        assert promise.get() == 20
+        assert promise.isBound()
+        assert result.get() == 20
     }
 }
 

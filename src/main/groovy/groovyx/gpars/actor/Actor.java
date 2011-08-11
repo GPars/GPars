@@ -19,9 +19,11 @@ import groovy.lang.Closure;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaMethod;
 import groovy.time.BaseDuration;
+import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
@@ -132,7 +134,6 @@ public abstract class Actor extends MessageStream {
      * @param message message to send
      * @param closure closure to execute when reply became available
      * @return The message that came in reply to the original send.
-     * @throws InterruptedException if interrupted while waiting
      */
     @SuppressWarnings({"AssignmentToMethodParameter"})
     public final <T> MessageStream sendAndContinue(final T message, Closure closure) {
@@ -140,6 +141,24 @@ public abstract class Actor extends MessageStream {
         closure.setDelegate(this);
         closure.setResolveStrategy(Closure.DELEGATE_FIRST);
         return send(message, new DataCallback(closure, parallelGroup));
+    }
+
+    /**
+     * Sends a message and returns a promise for the reply.
+     *
+     * @param message message to send
+     * @return The message that came in reply to the original send.
+     */
+    @SuppressWarnings({"AssignmentToMethodParameter"})
+    public final <T> Promise<Object> sendAndPromise(final T message) {
+        final DataflowVariable<Object> result = new DataflowVariable<Object>();
+        sendAndContinue(message, new MessagingRunnable<Object>() {
+            @Override
+            protected void doRun(final Object argument) {
+                result.leftShift(argument);
+            }
+        });
+        return result;
     }
 
     /**
