@@ -1,4 +1,4 @@
-Once you got setup, try the following Groovy script to test that your setup is functional. For Java, see below.
+Once you are setup, try the following Groovy script to test that your setup is functioning as it should.
 {code}
 import static groovyx.gpars.actor.Actors.actor
 
@@ -12,7 +12,7 @@ import static groovyx.gpars.actor.Actors.actor
 
 def decryptor = actor {
     loop {
-        react {message ->
+        react { message ->
             if (message instanceof String) reply message.reverse()
             else stop()
         }
@@ -28,22 +28,20 @@ def console = actor {
 }
 
 [decryptor, console]*.join()
-
 {code}
-
 You should get a message "Decrypted message: Groovy is parallel" printed out on the console when you run the code.
 
-h4. GPars - a Java library
 {note:Title=Java API}
-Although GPars has been primarily designed for the Groovy programming language, the solid technical foundation plus good performance characteristics
-make GPars a good Java library as well. Since most of GPars is written in Java, there is no extra performance penalty Java applications
-would pay when using GPars.
+GPars has been designed primarily for use with the Groovy programming language.  Of course all Java and
+Groovy programs are just bytecodes running on the JVM, so GPars can be used with Java source.  Despite being
+aimed at Groovy code use, the solid technical foundation, plus the good performance characteristics, of GPars
+make it an excellent library for Java programs. In fact most of GPars is written in Java, so there
+is no performance penalty for Java applications using GPars.
 
 For details please refer to the Java API section.
 {note}
 
-To quick-test your integration through Java API, run the following Java actor code:
-
+To quick-test using GPars via the Java API, you can compile and run the following Java code:
 {code}
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.DynamicDispatchActor;
@@ -79,3 +77,6 @@ class MyStatelessActor extends DynamicDispatchActor {
     }
 }
 {code}
+Remember though that you will almost certainly have to add the Groovy artefact to the build as well as the
+GPars artefact.  GPars may well work at Java speeds with Java applications, but it still has some
+compilation dependencies on Groovy.
