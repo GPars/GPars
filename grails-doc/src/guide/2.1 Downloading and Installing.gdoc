@@ -1,11 +1,56 @@
-There are several ways to add GPars to your project. Either download and add all the jar files manually, specify a dependency in Maven, Ivy or Gradle build files or use Grape.
-If you're building a Grails or a Griffon application, you can leverage the appropriate plugins to fetch the jar files for you.
+GPars is now distributed as standard with Groovy.  So if you have a Groovy installation, you should have
+GPars already.  The exact version of GPars you have will, of course, depend of which version of Groovy.  If
+you don't already have GPars, and you do have Groovy, then perhaps you should upgrade your Groovy!
 
-h3. Dependency resolution
+If you do not have a Groovy installation, but get Groovy by using dependencies or just having the groovy-all
+artefact, then you will need to get GPars.  Also if you want to use a version of GPars different from the
+one with Groovy, or have an old GPars-less Groovy you cannot upgrade, you will need to get GPars.  The ways
+of getting GPars are:
+* Download the artefact from a repository and add it and all the transitive dependencies manually.
+* Specify a dependency in Gradle, Maven, or Ivy (or Gant, or Ant) build files.
+* Use Grapes (especially useful for Groovy scripts).
+If you're building a Grails or a Griffon application, you can use the appropriate plugins to fetch the jar
+files for you.
 
-_GPars_ requires two compulsory dependencies - the "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar and the "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar
-jar files, which are the artifacts of the "JSR-166 initiative":http://g.oswego.edu/dl/concurrency-interest/ . These must be on the classpath.
+h3. The GPars Artefact
 
+As noted above GPars is now distributed as standard with Groovy.  If however, you have to manage this
+dependency manually, the GPars artefact is in the main Maven repository and in the Codehaus main and
+snapshots repositories.  The current release version (0.12) is in the Maven and Codehaus main repositories,
+the current development version (1.0-SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
+or Grapes use the specification:
+{code}
+"org.codehaus.gpars:gpars:0.12"
+{code}
+for the release version, and:
+{code}
+"org.codehaus.gpars:gpars:1.0-SNAPSHOT"
+{code}
+for the development version.  You will likely need to add the Codehaus snapshots repository manually to the
+search list in this latter case.  Using Maven the dependency is:
+{code}
+<dependency>
+    <groupId>org.codehaus.gpars</groupId>
+    <artifactId>gpars</artifactId>
+    <version>0.12</version>
+</dependency>
+{code}
+or version 1.0-SNAPSHOT if using the latest snapshot.
+
+h3. Transitive Dependencies
+
+GPars requires that two dependencies, namely "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar
+and "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar (artifacts
+from the "JSR-166 Project":http://g.oswego.edu/dl/concurrency-interest/ ), be on the
+classpath for GPars using programs to compile and execute.
+Release versions of these artefacts are in the main Maven and Codehaus repositories.  Development versions
+of the artefacts are available in the Codehaus snapshots repository.  Using Gradle or Grapes you would use
+dependency specifications:
+{code}
+"org.codehaus.jsr166-mirror:jsr166y:1.7.0"
+"org.codehaus.jsr166-mirror:extra166y:1.7.0"
+{code}
+For Maven, the specification would be:
 {code}
 <dependency>
     <groupId>org.codehaus.jsr166-mirror</groupId>
@@ -18,8 +63,10 @@ jar files, which are the artifacts of the "JSR-166 initiative":http://g.oswego.e
     <version>1.7.0</version>
 </dependency>
 {code}
+The development versions have version number 1.7.0.1-SNAPSHOT.
 
-GPars defines both of the dependencies in its own descriptor, so both dependencies should be taken care of automatically,
-if you use Gradle, Maven, Ivy or other type of automatic dependency resolution tool.
+GPars defines both of these dependencies in its own descriptor, so adding them in should be taken care of
+automatically if you use Gradle, Maven, Ivy or other type of automatic dependency resolution tool.
 
-Please visit the "Integration page":http://gpars.codehaus.org/Integration of the project for details.
+Please visit the page "Integration":http://gpars.codehaus.org/Integration on the GPars website for more
+details.
