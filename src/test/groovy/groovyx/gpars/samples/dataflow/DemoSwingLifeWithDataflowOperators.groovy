@@ -22,7 +22,9 @@ import groovyx.gpars.dataflow.DataflowReadChannel
 import groovyx.gpars.dataflow.operator.DataflowOperator
 import groovyx.gpars.group.NonDaemonPGroup
 import java.awt.Color
+import java.awt.Font
 import java.awt.GridLayout
+import java.util.concurrent.Semaphore
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -31,7 +33,6 @@ import javax.swing.SwingUtilities
 
 /**
  * A concurrent implementation of the Game of Life using dataflow operators
- * Inspired by https://github.com/mcmenaminadrian/Groovy-Life/blob/master/Life.groovy
  *
  * Each cell of the world is represented by a DataflowBroadcast instance, which emits the current value to all subscribed listeners.
  * The printGrid() method is one of these listeners, so it can show the current state of the world to the user.
@@ -45,8 +46,7 @@ import javax.swing.SwingUtilities
  * @author Vaclav Pech
  */
 
-final SwingLifeGameWithDataflowOperators game = new SwingLifeGameWithDataflowOperators(30, 20)
-game.run()
+new SwingLifeGameWithDataflowOperators(30, 20).run()
 
 
 class SwingLifeGameWithDataflowOperators {
@@ -65,6 +65,7 @@ class SwingLifeGameWithDataflowOperators {
     private JLabel iteration
     private JPanel scene
     private List<List<JButton>> visualCells = []  //refers to the visual cells in the UI
+    private final Semaphore nextGenerationPermit = new Semaphore(0)
 
     SwingLifeGameWithDataflowOperators(final gridWidth, final gridHeight) {
         this.gridWidth = gridWidth
@@ -82,8 +83,11 @@ class SwingLifeGameWithDataflowOperators {
         frame = builder.frame(title: "Game of Life", defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
             vbox {
                 hbox {
-                    label('Iteration # ')
+                    JLabel caption = label('Iteration # ')
                     iteration = label('0')
+                    final Font font = new Font(caption.font.name, caption.font.style, 18)
+                    caption.font = font
+                    iteration.font = font
                 }
 
                 scene = builder.panel()
@@ -100,9 +104,17 @@ class SwingLifeGameWithDataflowOperators {
                     visualCells.add(cellRow)
                 }
                 hbox {
-                    button(text: 'Run')
-                    button(text: 'Pause')
-                    button(text: 'Step')
+                    button(text: 'Start', id: 'startButton', actionPerformed: {
+                        nextGenerationPermit.release()
+                        startButton.enabled = false
+                        pauseButton.enabled = true
+
+                    })
+                    button(text: 'Pause', id: 'pauseButton', enabled: false, actionPerformed: {
+                        nextGenerationPermit.acquire()
+                        pauseButton.enabled = false
+                        startButton.enabled = true
+                    })
                 }
             }
         }
@@ -138,7 +150,7 @@ class SwingLifeGameWithDataflowOperators {
             def valueRow = []
             List<DataflowBroadcast> channelRow = []
             (0..<gridWidth).each {
-                initialRow[it] = initialValue(random)
+                initialRow[it] = randomInitialValue(random)
                 channelRow[it] = new DataflowBroadcast()
                 valueRow[it] = channelRow[it].createReadChannel()
             }
@@ -149,7 +161,7 @@ class SwingLifeGameWithDataflowOperators {
         }
     }
 
-    private int initialValue(final Random random) {
+    private int randomInitialValue(final Random random) {
         final int value = random.nextInt(100)
         return value > 49 ? 1 : 0
     }
@@ -168,7 +180,9 @@ class SwingLifeGameWithDataflowOperators {
                 ++generation
                 iteration.text = generation
             }
-            sleep 500
+            nextGenerationPermit.acquire()
+            sleep 1000
+            nextGenerationPermit.release()
         }
     }
 }
