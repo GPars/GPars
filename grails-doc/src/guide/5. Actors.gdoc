@@ -143,6 +143,16 @@ friend.sendAndContinue 'I need money!', {money -> pocket money}
 println 'I can continue while my friend is collecting money for me'
 {code}
 
+The _sendAndPromise()_ method returns a _Promise_ (aka Future) to the final reply and so allows the caller to continue its processing
+while the actor is handling the submitted message.
+
+{code}
+Promise loan = friend.sendAndPromise 'I need money!'
+println 'I can continue while my friend is collecting money for me'
+loan.whenBound {money -> pocket money}  //asynchronous waiting for a reply
+println "Received ${loan.get()}"  //synchronous waiting for a reply
+{code}
+
 All _send()_ , _sendAndWait()_ or _sendAndContinue()_ methods will throw an exception if invoked on a non-active actor.
 
 h2. Receiving messages
