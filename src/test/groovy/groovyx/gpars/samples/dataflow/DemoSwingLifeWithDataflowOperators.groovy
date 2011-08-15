@@ -30,6 +30,8 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
+import javax.swing.UIManager
+import javax.swing.plaf.metal.MetalLookAndFeel
 
 /**
  * A concurrent implementation of the Game of Life using dataflow operators
@@ -80,6 +82,7 @@ class SwingLifeGameWithDataflowOperators {
     }
 
     private void setupUI() {
+        UIManager.setLookAndFeel(new MetalLookAndFeel())
         frame = builder.frame(title: "Game of Life", defaultCloseOperation: JFrame.EXIT_ON_CLOSE) {
             vbox {
                 hbox {
