@@ -27,6 +27,9 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
 
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
 //apply plugin: 'code-quality'
 
 defaultTasks 'test'
