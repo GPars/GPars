@@ -21,8 +21,6 @@
 //  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
-// gradle imports these by default, but IDEA doesn't know
-
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
