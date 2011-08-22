@@ -78,6 +78,6 @@ class MyStatelessActor extends DynamicDispatchActor {
     }
 }
 {code}
-Remember though that you will almost certainly have to add the Groovy artefact to the build as well as the
-GPars artefact.  GPars may well work at Java speeds with Java applications, but it still has some
+Remember though that you will almost certainly have to add the Groovy artifact to the build as well as the
+GPars artifact.  GPars may well work at Java speeds with Java applications, but it still has some
 compilation dependencies on Groovy.
