@@ -7,3 +7,6 @@ cobertura.ser
 buildSrc/.gradle
 buildSrc/build
 *.iws
+.classpath
+.project
+.settings
