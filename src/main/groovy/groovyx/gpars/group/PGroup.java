@@ -57,7 +57,7 @@ public abstract class PGroup {
     /**
      * Stores the group actors' thread pool
      */
-    private Pool threadPool;
+    private final Pool threadPool;
 
     public Pool getThreadPool() {
         return threadPool;
@@ -588,14 +588,14 @@ public abstract class PGroup {
      *
      * @param poolSize The new pool size
      */
-    void resize(final int poolSize) {
+    public void resize(final int poolSize) {
         threadPool.resize(poolSize);
     }
 
     /**
      * Sets the pool size to the default
      */
-    void resetDefaultSize() {
+    public void resetDefaultSize() {
         threadPool.resetDefaultSize();
     }
 
@@ -604,7 +604,7 @@ public abstract class PGroup {
      *
      * @return The pool size
      */
-    int getPoolSize() {
+    public int getPoolSize() {
         return threadPool.getPoolSize();
     }
 
@@ -613,14 +613,14 @@ public abstract class PGroup {
      *
      * @param task The task to schedule
      */
-    void execute(final Runnable task) {
+    public void execute(final Runnable task) {
         threadPool.execute(task);
     }
 
     /**
      * Gently stops the pool
      */
-    void shutdown() {
+    public void shutdown() {
         threadPool.shutdown();
     }
 }

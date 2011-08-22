@@ -471,7 +471,7 @@ public abstract class SequentialProcessingActor extends ReplyingMessageStream im
             } catch (GroovyRuntimeException gre) {
                 throw ScriptBytecodeAdapter.unwrap(gre);
             }
-        } catch (ActorTerminationException termination) {
+        } catch (ActorTerminationException ignore) {
         } catch (ActorStopException termination) {
             assert stopFlag != S_STOPPED;
             assert stopFlag != S_TERMINATED;

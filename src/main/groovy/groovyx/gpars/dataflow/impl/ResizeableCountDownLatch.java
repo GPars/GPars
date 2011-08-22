@@ -48,6 +48,7 @@ public final class ResizeableCountDownLatch {
 
         public boolean tryReleaseShared(final int releases) {
             // Decrement count; signal when transition to zero
+            //noinspection ForLoopWithMissingComponent
             for (; ; ) {
                 final int c = getState();
                 if (c == 0)

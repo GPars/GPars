@@ -19,13 +19,6 @@ package groovyx.gpars.forkjoin
 import static groovyx.gpars.GParsPool.runForkJoin
 import static groovyx.gpars.GParsPool.withPool
 
-/**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 30.3.11
- * Time: 9:40
- * To change this template use File | Settings | File Templates.
- */
 class DirectChildrenCallTest extends GroovyTestCase {
     public void testDirectFib() {
         Closure fib = {number ->

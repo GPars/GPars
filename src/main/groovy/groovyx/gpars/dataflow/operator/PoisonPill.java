@@ -24,7 +24,7 @@ package groovyx.gpars.dataflow.operator;
  *         Date: Oct 6, 2010
  */
 @SuppressWarnings({"ALL"})
-class PoisonPill {
+public class PoisonPill {
     private static PoisonPill ourInstance = new PoisonPill();
 
     public static PoisonPill getInstance() {
