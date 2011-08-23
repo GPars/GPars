@@ -16,7 +16,14 @@
 
 /**
  * @author Andres Almiray, Jan Novotny, Marcel Matula, Michal Bernhard, Rene Groeschke
+ *
+ *  @author Russel Winder
  */
+
+//  As at 2011-08-23T09:48+01:00 The PDF building only works if the directory is called manual.
+
+//  Ensure consistency with path in PdfGuide.groovy
+guideBuildDirectory = "${buildDir}/manual"
 
 task buildGuide(type: GrailsDoc) {
     srcDir = file('grails-doc/src')
@@ -24,16 +31,15 @@ task buildGuide(type: GrailsDoc) {
     styleDir = file('grails-doc/resources/style')
     cssDir = file('grails-doc/resources/css')
     imagesDir = file('grails-doc/resources/img')
-	outputDir = file("$buildDir/manual")
+	outputDir = file(guideBuildDirectory)
 }
 
-task pdfGuide(type:PdfGuide, dependsOn:buildGuide) {
-	inputs.files file("$buildDir/manual/guide")
+task pdfGuide(type: PdfGuide, dependsOn: buildGuide) {
+    inputs.files file(guideBuildDirectory + '/guide')
 	pdfName = "gpars-guide-${project.version}.pdf"
 }
 
-task zipGuide(type: Zip) {
-    dependsOn { [pdfGuide] }
+task zipGuide(type: Zip, dependsOn: pdfGuide) {
     appendix = 'guide'
-    from "$buildDir/manual"
+    from guideBuildDirectory
 }
