@@ -87,7 +87,7 @@ configurations {
 
 // NB If hasProperty is evaluated at the top level of the script, the method associated with the Project
 // instance is called, and everything works as expected.  When executed without qualification in the context
-// of the dependencies Closure then the hasPropeties associated with the DependencyHandler instance is
+// of the dependencies Closure then the hasProperties associated with the DependencyHandler instance is
 // called -- and so the test appears to fail unexpectedly as the properties are not defined in that context.
 // We must therefore be explicit about evaluating the hasProperty of the Project instance.  Thanks to
 // Ladislav Thon for pointing this out on the Gradle Developer email list.  The only question is why the
