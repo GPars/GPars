@@ -41,7 +41,7 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
     @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter"})
     DataflowProcessorActor(final DataflowProcessor owningProcessor, final PGroup group, final List outputs, final List inputs, final Closure code) {
         super();
-        parallelGroup = group;
+        setParallelGroup(group);
 
         this.owningProcessor = owningProcessor;
         this.outputs = outputs;
