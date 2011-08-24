@@ -18,13 +18,6 @@ package groovyx.gpars.dataflow.operator;
 
 import groovy.lang.Closure;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 8.8.11
- * Time: 16:02
- * To change this template use File | Settings | File Templates.
- */
 public class DataflowProcessorAtomicBoundAllClosure extends Closure {
     public DataflowProcessorAtomicBoundAllClosure() {
         super(null);

@@ -3,19 +3,19 @@ GPars already.  The exact version of GPars you have will, of course, depend of w
 you don't already have GPars, and you do have Groovy, then perhaps you should upgrade your Groovy!
 
 If you do not have a Groovy installation, but get Groovy by using dependencies or just having the groovy-all
-artefact, then you will need to get GPars.  Also if you want to use a version of GPars different from the
+artifact, then you will need to get GPars.  Also if you want to use a version of GPars different from the
 one with Groovy, or have an old GPars-less Groovy you cannot upgrade, you will need to get GPars.  The ways
 of getting GPars are:
-* Download the artefact from a repository and add it and all the transitive dependencies manually.
+* Download the artifact from a repository and add it and all the transitive dependencies manually.
 * Specify a dependency in Gradle, Maven, or Ivy (or Gant, or Ant) build files.
 * Use Grapes (especially useful for Groovy scripts).
 If you're building a Grails or a Griffon application, you can use the appropriate plugins to fetch the jar
 files for you.
 
-h3. The GPars Artefact
+h3. The GPars Artifact
 
 As noted above GPars is now distributed as standard with Groovy.  If however, you have to manage this
-dependency manually, the GPars artefact is in the main Maven repository and in the Codehaus main and
+dependency manually, the GPars artifact is in the main Maven repository and in the Codehaus main and
 snapshots repositories.  The current release version (0.12) is in the Maven and Codehaus main repositories,
 the current development version (1.0-SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
 or Grapes use the specification:
@@ -43,8 +43,8 @@ GPars requires that two dependencies, namely "jsr166y":http://gee.cs.oswego.edu/
 and "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar (artifacts
 from the "JSR-166 Project":http://g.oswego.edu/dl/concurrency-interest/ ), be on the
 classpath for GPars using programs to compile and execute.
-Release versions of these artefacts are in the main Maven and Codehaus repositories.  Development versions
-of the artefacts are available in the Codehaus snapshots repository.  Using Gradle or Grapes you would use
+Release versions of these artifacts are in the main Maven and Codehaus repositories.  Development versions
+of the artifacts are available in the Codehaus snapshots repository.  Using Gradle or Grapes you would use
 dependency specifications:
 {code}
 "org.codehaus.jsr166-mirror:jsr166y:1.7.0"

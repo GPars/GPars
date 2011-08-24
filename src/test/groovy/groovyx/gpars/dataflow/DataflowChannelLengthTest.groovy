@@ -137,24 +137,27 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
         assert subscription1.length() == 2
         assert subscription2.length() == 2
 
+        def sub1IntermediateLength1 = new DataflowVariable()
+        def sub1IntermediateLength2 = new DataflowVariable()
         Thread.start {
             subscription1.val
             barrier.await()
+            sub1IntermediateLength1 << subscription1.length()
             barrier.await()
             subscription1.val
+            sub1IntermediateLength2 << subscription1.length()
         }
         sleep 1000
 
-        assertEquals 2, subscription1.length()
         assertEquals 2, subscription2.length()
         subscription2.val
 
         barrier.await()
-        assertEquals 1, subscription1.length()
-        assertEquals 1, subscription2.length()
-        assert subscription1.length() == 1
+        assert sub1IntermediateLength1.val == 1
+        assert subscription2.length() == 1
         barrier.await()
         subscription2.val
-        assert subscription1.length() == 0
+        assert sub1IntermediateLength2.val == 0
+        assert subscription2.length() == 0
     }
 }

@@ -18,13 +18,6 @@ package groovyx.gpars.activeobject
 
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
-/**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 12.5.11
- * Time: 9:19
- * To change this template use File | Settings | File Templates.
- */
 class NonBlockingTypesTest extends GroovyTestCase {
     public void testDefault() {
         final GroovyShell shell = new GroovyShell()

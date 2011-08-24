@@ -267,6 +267,6 @@ public class GParsPoolOnMapTest extends GroovyTestCase {
         assert map.findAll {item -> item.key == 'c'} == ['c': 3]
         assert map.findAll {k, v -> k == 'c'} == ['c': 3]
         assert map.findAll {item -> item.value > 3} == ['d': 4, 'e': 5]
-        assert map.findAll {k, v -> v.value > 3} == ['d': 4, 'e': 5]
+        assert map.findAll {k, v -> v.intValue() > 3} == ['d': 4, 'e': 5]
     }
 }

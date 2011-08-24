@@ -199,7 +199,7 @@ abstract class AgentBase<T> extends AgentCore {
      * @throws InterruptedException If the thread gets interrupted while waiting for a value to be bound
      */
     @SuppressWarnings({"unchecked"})
-    final T sendAndWait(final Closure message) throws InterruptedException {
+    public final T sendAndWait(final Closure message) throws InterruptedException {
         final DataflowVariable<Object> result = new DataflowVariable<Object>();
         this.send(new Closure(message.getOwner()) {
             private static final long serialVersionUID = -4637623342002266534L;
