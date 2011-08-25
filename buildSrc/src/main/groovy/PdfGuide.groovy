@@ -15,9 +15,9 @@
  */
 
 /*
- *  @author <who were the original authors?
+ *  @author <who were the original authors?>
  *
- *  @author Russel Winder
+ *   @author Russel Winder.
  */
 
 import org.gradle.api.DefaultTask
