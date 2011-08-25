@@ -284,10 +284,9 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    jarFile = 'wrapper/gradle-wrapper.jar'
-    //gradleVersion = '1.0-milestone-4'
-    //  Revert to an actual working Gradle 
-    gradleVersion = '1.0-milestone-4-20110725000027+0200'
+  //  As at 20011-08-25T20:02+01:00 1.0-milestone-4 is deemed not usable, use the laste beta of this that didn't use Wharf. 
+  //gradleVersion = '1.0-milestone-4'
+  gradleVersion = '1.0-milestone-4-20110725000027+0200'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
