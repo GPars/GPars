@@ -43,7 +43,7 @@ def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
 
 apply {
-    from 'docs.gradle'
+    from 'gradle/docs.gradle'
     from 'gradle/docsDependencies.gradle'
 }
 
