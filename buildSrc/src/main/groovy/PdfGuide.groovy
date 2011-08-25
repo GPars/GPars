@@ -20,9 +20,7 @@
  *  @author Russel Winder
  */
 
-import org.gradle.api.file.FileCollection
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -30,15 +28,11 @@ import grails.doc.PdfBuilder
 
 class PdfGuide extends DefaultTask {
 
-  //  Ensure consistency with path in docs.gradle
-  final String guideBuildDirectory = "${project.buildDir}/manual"
-
-    @OutputDirectory File outputFile
+    @OutputDirectory @Input File outputDirectory
 	@Input String pdfName
 	
-	public PdfGuide(){
+	public PdfGuide() {
 		super()
-		outputFile = new File(guideBuildDirectory)
 	}
 	
 	@TaskAction
@@ -54,8 +48,7 @@ class PdfGuide extends DefaultTask {
             // the renderer 'finishes' but it actually does
             // ignore for now
         }
-    	
-		project.file(guideBuildDirectory + '/guide/single.pdf')
-			   .renameTo(new File(outputFile.absolutePath, pdfName).absolutePath)
+		project.file(outputDirectory.absolutePath + '/guide/single.pdf')
+			   .renameTo(new File(outputDirectory, pdfName).absolutePath)
 	}
 }

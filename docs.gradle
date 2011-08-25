@@ -36,6 +36,7 @@ task buildGuide(type: GrailsDoc) {
 
 task pdfGuide(type: PdfGuide, dependsOn: buildGuide) {
     inputs.files file(guideBuildDirectory + '/guide')
+    outputDirectory = new File(guideBuildDirectory)
 	pdfName = "gpars-guide-${project.version}.pdf"
 }
 
