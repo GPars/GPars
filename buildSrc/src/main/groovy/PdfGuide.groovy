@@ -39,7 +39,7 @@ class PdfGuide extends DefaultTask {
     def publish() {
 		try {
             PdfBuilder.build(
-                    basedir: project.buildDir.absolutePath,
+                    basedir: outputDirectory.absolutePath,
                     home: project.file('grails-doc').absolutePath,
                     tool: 'pdf/gpars'
             )

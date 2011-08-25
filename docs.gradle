@@ -20,10 +20,10 @@
  *  @author Russel Winder.
  */
 
-//  As at 2011-08-23T09:48+01:00 The PDF building only works if the directory is called manual.
+//  Grails-Doc 1.3.6 hardwires things into the PdfBuilder class such that ${buildDir}/manual is the only
+//  value for guideBuildDirectory that works.  Grails-Doc 1.3.7 and later remove this hardwired "mis-feature".
 
-//  Ensure consistency with path in PdfGuide.groovy
-guideBuildDirectory = "${buildDir}/manual"
+guideBuildDirectory = "${buildDir}/guide"
 
 task buildGuide(type: GrailsDoc) {
     srcDir = file('grails-doc/src')
