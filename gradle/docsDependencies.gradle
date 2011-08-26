@@ -1,5 +1,5 @@
-grailsDocs = 'org.grails:grails-docs:1.3.7'
-//grailsDocs = 'org.grails:grails-docs:2.0.0.M1'
+//grailsDocs = 'org.grails:grails-docs:1.3.7'
+grailsDocs = 'org.grails:grails-docs:2.0.0.M1'
 xhtmlRenderer = 'org.xhtmlrenderer:core-renderer:R8'
 lowagieItext = 'com.lowagie:itext:2.0.8'
 //lowagieItext = 'com.lowagie:itext:2.1.7'
