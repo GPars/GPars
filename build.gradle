@@ -340,3 +340,26 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
         exclude excludedDemos.collect {name -> "**/${name}.groovy" }
     }
 }
+
+idea {
+  module {
+    excludeDirs += file ( 'gradle/' ) // Gradle directory including the wrapper subdirectory.
+    excludeDirs += file ( '.settings/' ) // Eclipse settings directory.
+    excludeDirs += file ( 'bin' ) // Eclipse compilation directory.
+  }
+  project {
+    javaVersion = '1.6'
+    ipr {
+      withXml { provider ->
+        def node = provider.asNode ( )
+        def vcsConfig = node.component.find { it.'@name' == 'VcsDirectoryMappings' }
+        vcsConfig.mapping[0].'@vcs' = 'Git'
+        def gradleSettings = node.appendNode ( 'component' , [ name : 'GradleSettings' ] )
+        gradleSettings.appendNode ( 'option' , [ name : 'SDK_HOME' , value : gradle.gradleHomeDir.absolutePath ] )
+      }
+      whenMerged { project ->
+        project.jdk.languageLevel = '1.6'
+      }
+    }
+  }
+}
