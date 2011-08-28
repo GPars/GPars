@@ -7,6 +7,8 @@ cobertura.ser
 buildSrc/.gradle
 buildSrc/build
 *.iws
+GPars.ipr
+GPars.iml
 .classpath
 .project
 .settings
