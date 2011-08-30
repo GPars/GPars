@@ -355,6 +355,15 @@ idea {
                 def vcsConfig = node.component.find { it.'@name' == 'VcsDirectoryMappings' }
                 vcsConfig.mapping[0].'@vcs' = 'Git'
 
+                //Copy inspection profiles from the default project file
+                def inspectionConfig = provider.asNode().component.find { it.'@name' == 'InspectionProjectProfileManager' }
+                if (inspectionConfig) node.remove(inspectionConfig)
+                new File('GPars_IDEAX.ipr').withReader {reader ->
+                    def project = new XmlParser().parse(reader)
+                    def inspections = project.component.find {it.'@name' == 'InspectionProjectProfileManager'}
+                    node.append(inspections)
+                }
+
                 def gradleSettings = node.appendNode('component', [name: 'GradleSettings'])
                 gradleSettings.appendNode('option', [name: 'SDK_HOME', value: gradle.gradleHomeDir.absolutePath])
             }
