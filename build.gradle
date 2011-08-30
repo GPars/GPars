@@ -284,9 +284,9 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-  //  As at 20011-08-25T20:02+01:00 1.0-milestone-4 is deemed not usable, use the laste beta of this that didn't use Wharf. 
-  //gradleVersion = '1.0-milestone-4'
-  gradleVersion = '1.0-milestone-4-20110725000027+0200'
+    //  As at 20011-08-25T20:02+01:00 1.0-milestone-4 is deemed not usable, use the laste beta of this that didn't use Wharf.
+    //gradleVersion = '1.0-milestone-4'
+    gradleVersion = '1.0-milestone-4-20110725000027+0200'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
@@ -342,24 +342,34 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
 }
 
 idea {
-  module {
-    excludeDirs += file ( 'gradle/' ) // Gradle directory including the wrapper subdirectory.
-    excludeDirs += file ( '.settings/' ) // Eclipse settings directory.
-    excludeDirs += file ( 'bin' ) // Eclipse compilation directory.
-  }
-  project {
-    javaVersion = '1.6'
-    ipr {
-      withXml { provider ->
-        def node = provider.asNode ( )
-        def vcsConfig = node.component.find { it.'@name' == 'VcsDirectoryMappings' }
-        vcsConfig.mapping[0].'@vcs' = 'Git'
-        def gradleSettings = node.appendNode ( 'component' , [ name : 'GradleSettings' ] )
-        gradleSettings.appendNode ( 'option' , [ name : 'SDK_HOME' , value : gradle.gradleHomeDir.absolutePath ] )
-      }
-      whenMerged { project ->
-        project.jdk.languageLevel = '1.6'
-      }
+    module {
+        excludeDirs += file('gradle/') // Gradle directory including the wrapper subdirectory.
+        excludeDirs += file('.settings/') // Eclipse settings directory.
+        excludeDirs += file('bin') // Eclipse compilation directory.
     }
-  }
+    project {
+        javaVersion = '1.6'
+        ipr {
+            withXml { provider ->
+                def node = provider.asNode()
+                def vcsConfig = node.component.find { it.'@name' == 'VcsDirectoryMappings' }
+                vcsConfig.mapping[0].'@vcs' = 'Git'
+
+                //Copy inspection profiles from the default project file
+                def inspectionConfig = provider.asNode().component.find { it.'@name' == 'InspectionProjectProfileManager' }
+                if (inspectionConfig) node.remove(inspectionConfig)
+                new File('GPars_IDEAX.ipr').withReader {reader ->
+                    def project = new XmlParser().parse(reader)
+                    def inspections = project.component.find {it.'@name' == 'InspectionProjectProfileManager'}
+                    node.append(inspections)
+                }
+
+                def gradleSettings = node.appendNode('component', [name: 'GradleSettings'])
+                gradleSettings.appendNode('option', [name: 'SDK_HOME', value: gradle.gradleHomeDir.absolutePath])
+            }
+            whenMerged { project ->
+                project.jdk.languageLevel = 'JDK_1_6'
+            }
+        }
+    }
 }
