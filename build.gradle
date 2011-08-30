@@ -346,6 +346,10 @@ idea {
         excludeDirs += file('gradle/') // Gradle directory including the wrapper subdirectory.
         excludeDirs += file('.settings/') // Eclipse settings directory.
         excludeDirs += file('bin') // Eclipse compilation directory.
+        excludeDirs += file('out') // IDEA compilation directory.
+        excludeDirs += file('build') // Gradle compilation directory.
+        excludeDirs += file('docs') // Jon's book directory
+        excludeDirs += file('java-demo') // A separate module of a pure-java gpars usage
     }
     project {
         javaVersion = '1.6'
