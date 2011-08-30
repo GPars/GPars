@@ -37,13 +37,13 @@ import javax.swing.plaf.metal.MetalLookAndFeel
  * A concurrent implementation of the Game of Life using dataflow operators
  *
  * Each cell of the world is represented by a DataflowBroadcast instance, which emits the current value to all subscribed listeners.
- * The printGrid() method is one of these listeners, so it can show the current state of the world to the user.
  * To transform an old world into a new one, a dataflow operator exists for each cell, monitoring the cell as well as the surroundings of the cell
  * and calculating the new value for the cell, whenever all the monitored cells emit new values. The calculated value is written
  * back into the cell and so it can be observed by all interested operators in the next iteration of the system.
  *
  * The system iterates spontaneously without any external clock or synchronization. The inherent quality of operators to wait for all input values
  * before proceeding guarantees that the system evolves in phases/generations.
+ * A heart-beating mechanism ensures the whole population evolves in discrete steps.
  *
  * @author Vaclav Pech
  */
