@@ -314,6 +314,7 @@
         <inspection_tool class="BvConstraintMappingsInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="CStyleArrayDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="CallToStringConcatCanBeReplacedByOperator" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="CallerJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CanBeFinal" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="REPORT_CLASSES" value="false" />
           <option name="REPORT_METHODS" value="false" />
@@ -395,6 +396,7 @@
         <inspection_tool class="DuplicatePropertyOnObjectJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicateThrows" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicatedBeanNamesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="ELDeferredExpressionsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ELMethodSignatureInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ELSpecValidationInJSP" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ELValidationInJSP" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -475,6 +477,9 @@
         <inspection_tool class="GroovyUnreachableStatement" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyUnusedAssignment" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyVariableNotAssigned" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="GspInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="GspPropertiesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="GtkPreferredJComboBoxRenderer" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="HardwiredNamespacePrefix" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="HibernateConfigDomFacetInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="HibernateConfigDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -538,15 +543,35 @@
         <inspection_tool class="InvalidRequestParameters" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSDeprecatedSymbols" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSDuplicatedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSFieldCanBeLocalInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSImplicitlyInternalDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSLastCommaInArrayLiteral" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="JSLastCommaInObjectLiteral" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSLowercasedConstructorCall" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false" />
+        <inspection_tool class="JSMismatchedCollectionQueryUpdateInspection" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="queries" value="trace,write" />
+          <option name="updates" value="pop,push,shift,splice,unshift" />
+        </inspection_tool>
+        <inspection_tool class="JSPotentiallyInvalidConstructorUsages" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myConsiderUppercaseFunctionsToBeConstructors" value="true" />
+        </inspection_tool>
+        <inspection_tool class="JSSuspiciousNameCombinationInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false">
+          <group names="x,width,left,right" />
+          <group names="y,height,top,bottom" />
+          <exclude classes="Math" />
+        </inspection_tool>
+        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false">
+          <option name="myCheckGlobalDefinitions" value="false" />
+        </inspection_tool>
         <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedFunction" enabled="false" level="INFO" enabled_by_default="false" />
+        <inspection_tool class="JSUnresolvedLibraryURL" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedVariable" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUntypedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myReportUnusedDefinitions" value="false" />
+          <option name="myReportUnusedProperties" value="true" />
+        </inspection_tool>
         <inspection_tool class="JSUnusedLocalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSValidateJSON" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSValidateTypes" enabled="false" level="INFO" enabled_by_default="false" />
@@ -624,6 +649,7 @@
         <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ManualArrayCopy" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ManualArrayToCollectionCopy" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="MavenDuplicateDependenciesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MavenModelInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="Method with Unit result type defined like function" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="Method with Unit result type defined with equals sign" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -669,6 +695,7 @@
         </inspection_tool>
         <inspection_tool class="NumberEquality" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ObjectEqualsNull" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="OctalIntegerJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OctalLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OnDemandImport" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="OneWayWebMethod" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -826,6 +853,7 @@
           <option name="PARAMETER" value="true" />
           <option name="REPORT_PARAMETER_FOR_PUBLIC_METHODS" value="true" />
         </inspection_tool>
+        <inspection_tool class="UndesirableClassUsage" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnhandledExceptionInJSP" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UninstantiableBinding" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UninstantiableImplementedByClass" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -908,6 +936,7 @@
         <inspection_tool class="WebflowConfigModelInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="WebflowModelInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="WhileCanBeForeach" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="WithStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="WrongPackageStatement" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="XmlDuplicatedId" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="XmlHighlighting" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -1077,6 +1106,10 @@
         <inspection_tool class="CompareToUsesNonFinalVariable" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ComparisonOfShortAndChar" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ComparisonToNaN" enabled="true" level="WARNING" enabled_by_default="true" />
+        <inspection_tool class="ComponentNotRegistered" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="CHECK_ACTIONS" value="true" />
+          <option name="IGNORE_NON_PUBLIC" value="true" />
+        </inspection_tool>
         <inspection_tool class="ConditionSignal" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ConditionalExpressionWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ConflictingAnnotations" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1365,6 +1398,11 @@
           <option name="ignoreCharConversions" value="false" />
           <option name="ignoreConstantConversions" value="false" />
         </inspection_tool>
+        <inspection_tool class="ImplicitTypeConversion" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="BITS" value="1720" />
+          <option name="FLAG_EXPLICIT_CONVERSION" value="true" />
+          <option name="IGNORE_NODESET_TO_BOOLEAN_VIA_STRING" value="true" />
+        </inspection_tool>
         <inspection_tool class="ImplicitlyExposedWebServiceMethods" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="IncompatibleMaskJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="IncrementDecrementUsedAsExpression" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1378,6 +1416,7 @@
         <inspection_tool class="InnerClassVariableHidesOuterClassVariable" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignoreInvisibleFields" value="true" />
         </inspection_tool>
+        <inspection_tool class="InspectionDescriptionNotFoundInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InstanceVariableUninitializedUse" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignorePrimitives" value="false" />
           <option name="annotationNamesString" value="" />
@@ -1393,6 +1432,7 @@
         <inspection_tool class="IntegerMultiplicationImplicitCastToLong" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreNonOverflowingCompileTimeConstants" value="true" />
         </inspection_tool>
+        <inspection_tool class="IntentionDescriptionNotFoundInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InterceptionAnnotationWithoutRuntimeRetention" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InterfaceNeverImplemented" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreInterfacesThatOnlyDeclareConstants" value="false" />
@@ -1413,7 +1453,9 @@
         <inspection_tool class="JSDeprecatedSymbols" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSDuplicatedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSLowercasedConstructorCall" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false" />
+        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false">
+          <option name="myCheckGlobalDefinitions" value="false" />
+        </inspection_tool>
         <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedFunction" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedVariable" enabled="false" level="INFO" enabled_by_default="false" />
@@ -1637,6 +1679,7 @@
           <option name="m_limit" value="5" />
         </inspection_tool>
         <inspection_tool class="PathAnnotation" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="PluginXmlValidity" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="PointcutMethodStyleInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PointlessArithmeticExpressionJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PointlessBinding" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -3596,13 +3639,18 @@
           <group names="y,height,top,bottom" />
           <exclude classes="Math" />
         </inspection_tool>
-        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false" />
+        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false">
+          <option name="myCheckGlobalDefinitions" value="false" />
+        </inspection_tool>
         <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedFunction" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedLibraryURL" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedVariable" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUntypedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myReportUnusedDefinitions" value="false" />
+          <option name="myReportUnusedProperties" value="true" />
+        </inspection_tool>
         <inspection_tool class="JSUnusedLocalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSValidateJSON" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSValidateTypes" enabled="false" level="INFO" enabled_by_default="false" />
@@ -4326,6 +4374,7 @@
         <inspection_tool class="EjbStaticAccessInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EjbThisExpressionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="Empty-paren method accessed as parameterless" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="EmptyMethod" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EmptyStatementBody" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_reportEmptyBlocks" value="false" />
         </inspection_tool>
@@ -4494,13 +4543,18 @@
           <group names="y,height,top,bottom" />
           <exclude classes="Math" />
         </inspection_tool>
-        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false" />
+        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false">
+          <option name="myCheckGlobalDefinitions" value="false" />
+        </inspection_tool>
         <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedFunction" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedLibraryURL" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedVariable" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUntypedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myReportUnusedDefinitions" value="false" />
+          <option name="myReportUnusedProperties" value="true" />
+        </inspection_tool>
         <inspection_tool class="JSUnusedLocalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSValidateJSON" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSValidateTypes" enabled="false" level="INFO" enabled_by_default="false" />
@@ -5085,7 +5139,9 @@
         <inspection_tool class="JSDeprecatedSymbols" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSDuplicatedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSLowercasedConstructorCall" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false" />
+        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="INFO" enabled_by_default="false">
+          <option name="myCheckGlobalDefinitions" value="false" />
+        </inspection_tool>
         <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedFunction" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedVariable" enabled="false" level="INFO" enabled_by_default="false" />
@@ -5705,13 +5761,18 @@
           <group names="y,height,top,bottom" />
           <exclude classes="Math" />
         </inspection_tool>
-        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSUndeclaredVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false">
+          <option name="myCheckGlobalDefinitions" value="false" />
+        </inspection_tool>
         <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedFunction" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedLibraryURL" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnresolvedVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUntypedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="myReportUnusedDefinitions" value="false" />
+          <option name="myReportUnusedProperties" value="true" />
+        </inspection_tool>
         <inspection_tool class="JSUnusedLocalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSValidateJSON" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSValidateTypes" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
