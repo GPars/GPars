@@ -1,41 +1,52 @@
-introduction: Introduction
-  introduction_enterGPars: Enter GPars
-  introduction_credits: Credits
-gettingStarted: Getting Started
-  gettingStarted_downloadingAndInstalling: Downloading and Installing
-  gettingStarted_aHelloWorldExample: A Hello World Example
-  gettingStarted_codeConventions: Code conventions
-  gettingStarted_gettinSetUpInAnIDE: Getting Set Up in an IDE
-  gettingStarted_applicabilityOfConcepts: Applicability of concepts
-  gettingStarted_what'sNew: What's new
-  gettingStarted_JavaAPI-usingGParsFromJava: Java API - Using GPars from Java
-dataParallelism: Data Parallelism
-  dataParallelism_paralleCollections: Parallel Collections
-    dataParallelism_paralleCollections_GParsPool: GParsPool
-    dataParallelism_paralleCollections_GParsExecutorPool: GParsExecutorsPool
-    dataParallelism_paralleCollections_memoize: Memoize
-  dataParallelism_map-reduce: Map-Reduce
-  dataParallelism_parallelArrays: Parallel Arrays
-  dataParallelism_asynchronousInvocation: Asynchronous Invocation
-  dataParallelism_composableAsynchronousFunctions: Composable Asynchronous Functions
-  dataParallelism_fork-join: Fork-Join
-  dataParallelism_parallelSpeculations: Parallel Speculations
-GroovyCSP: Groovy CSP
-actors: Actors
-  actors_actorPrinciples: Actors Principles
-  actors_statelessActors: Stateless Actors
-  actors_tipsAndTricks: Tips and Tricks
-  actors_activeObject: Active Objects
-  actors_classicExamples: Classic Examples
-agents: Agents
-dataflow: Dataflow
-  dataflow_tasks: Tasks
-  dataflow_selects: Selects
-  dataflow_operators: Operators
-  dataflow_implementation: Implementation
-  dataflow_synchronousVariablesAndChannels: Synchronous variables and channels
-  dataflow_classicExamples: Classic examples
-STM: STM
-tips: Tips
-  tips_performance: Performance
-conclusion: Conclusion
+introduction :
+  title : Introduction
+  introduction_enterGPars : Enter GPars
+  introduction_credits : Credits
+gettingStarted :
+  title : Getting Started
+  gettingStarted_downloadingAndInstalling : Downloading and Installing
+  gettingStarted_aHelloWorldExample : A Hello World Example
+  gettingStarted_codeConventions : Code conventions
+  gettingStarted_gettinSetUpInAnIDE : Getting Set Up in an IDE
+  gettingStarted_applicabilityOfConcepts : Applicability of concepts
+  gettingStarted_what'sNew : What's new
+  gettingStarted_JavaAPI-usingGParsFromJava : Java API - Using GPars from Java
+dataParallelism :
+  title : Data Parallelism
+  dataParallelism_paralleCollections :
+    title : Parallel Collections
+    dataParallelism_paralleCollections_GParsPool : GParsPool
+    dataParallelism_paralleCollections_GParsExecutorPool : GParsExecutorsPool
+    dataParallelism_paralleCollections_memoize : Memoize
+  dataParallelism_map-reduce : Map-Reduce
+  dataParallelism_parallelArrays : Parallel Arrays
+  dataParallelism_asynchronousInvocation : Asynchronous Invocation
+  dataParallelism_composableAsynchronousFunctions : Composable Asynchronous Functions
+  dataParallelism_fork-join : Fork-Join
+  dataParallelism_parallelSpeculations : Parallel Speculations
+GroovyCSP :
+  title : Groovy CSP
+actors :
+  title : Actors
+  actors_actorPrinciples : Actors Principles
+  actors_statelessActors : Stateless Actors
+  actors_tipsAndTricks : Tips and Tricks
+  actors_activeObject : Active Objects
+  actors_classicExamples : Classic Examples
+agents :
+  title : Agents
+dataflow :
+  title : Dataflow
+  dataflow_tasks : Tasks
+  dataflow_selects : Selects
+  dataflow_operators : Operators
+  dataflow_implementation : Implementation
+  dataflow_synchronousVariablesAndChannels : Synchronous variables and channels
+  dataflow_classicExamples : Classic examples
+STM :
+  title : STM
+tips :
+  title : Tips
+  tips_performance : Performance
+conclusion :
+  title : Conclusion
