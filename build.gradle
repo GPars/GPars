@@ -109,6 +109,7 @@ dependencies {
     docs radeox
     docs lowagieItext
     docs 'org.slf4j:slf4j-api:1.6.2'
+    docs 'org.slf4j:slf4j-simple:1.6.2' // Needed by Grails-Doc 2.0.0.M1
     docs xhtmlRenderer
     docs 'commons-logging:commons-logging:1.1.1'
     //deployerJars 'org.apache.maven.wagon:wagon-webdav-jackrabbit:1.0-beta-7'
