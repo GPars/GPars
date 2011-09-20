@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008--2011  The original author or authors
+// Copyright © 2008–2011  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -285,9 +285,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    //  As at 20011-08-25T20:02+01:00 1.0-milestone-4 is deemed not usable, use the laste beta of this that didn't use Wharf.
-    //gradleVersion = '1.0-milestone-4'
-    gradleVersion = '1.0-milestone-4-20110725000027+0200'
+    gradleVersion = '1.0-milestone-5-20110920085801+0200'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
