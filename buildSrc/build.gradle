@@ -4,10 +4,10 @@ apply from: '../gradle/docsDependencies.gradle'
 
 repositories {
 	mavenCentral()
-    mavenRepo name: 'SpringSource', urls: 'http://repository.springsource.com/maven/bundles/release'
-    mavenRepo name: 'JavaNet', urls: 'http://download.java.net/maven/2/'
+    mavenRepo name: 'SpringSource', url: 'http://repository.springsource.com/maven/bundles/release'
+    mavenRepo name: 'JavaNet', url: 'http://download.java.net/maven/2/'
    //  To get the latest Grails-Doc.
-    mavenRepo name: 'grails' , urls: 'http://repo.grails.org/grails/core'
+    mavenRepo name: 'grails' , url: 'http://repo.grails.org/grails/core'
 }
 
 dependencies {

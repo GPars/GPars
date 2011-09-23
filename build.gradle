@@ -72,14 +72,14 @@ jar {
 
 repositories {
     mavenCentral()
-    mavenRepo urls: 'http://repository.jboss.org/maven2'
-    mavenRepo urls: 'http://repository.codehaus.org'
-    mavenRepo urls: 'http://snapshots.repository.codehaus.org'
-    mavenRepo urls: 'http://download.java.net/maven/2'
+    mavenRepo url: 'http://repository.jboss.org/maven2'
+    mavenRepo url: 'http://repository.codehaus.org'
+    mavenRepo url: 'http://snapshots.repository.codehaus.org'
+    mavenRepo url: 'http://download.java.net/maven/2'
     //  Needed for using Spock snapshots.
-    mavenRepo urls: 'http://m2repo.spockframework.org/snapshots'
+    mavenRepo url: 'http://m2repo.spockframework.org/snapshots'
     //  To get the latest Grails-Doc.
-    mavenRepo urls: 'http://repo.grails.org/grails/core'
+    mavenRepo url: 'http://repo.grails.org/grails/core'
 }
 
 configurations {
