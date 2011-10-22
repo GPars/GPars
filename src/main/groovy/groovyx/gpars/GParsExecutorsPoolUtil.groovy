@@ -55,7 +55,12 @@ public class GParsExecutorsPoolUtil {
     private static Future callParallel(Closure task) {
         final ExecutorService pool = GParsExecutorsPool.retrieveCurrentPool()
         if (!pool) throw new IllegalStateException("No ExecutorService available for the current thread.")
-        return pool.submit(task as Callable)
+        return pool.submit(new Callable() {
+            @Override
+            Object call() {
+                return task()
+            }
+        })
     }
 
     /**

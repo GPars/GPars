@@ -4242,6 +4242,7 @@
         <option name="myLocal" value="true" />
         <inspection_tool class="'var' could be a 'val'" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AbcComplexity" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="Abstract Value in Trait" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AbstractBeanReferencesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="AbstractClassExtendsConcreteClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AbstractClassName" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5861,6 +5862,7 @@
         <inspection_tool class="ReuseOfLocalVariableJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="RuntimeExec" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="RuntimeExecWithNonConstantString" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="SBT Light Configuration File Structure" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SSBasedInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SafeLock" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SafeVarargsDetector" enabled="false" level="WARNING" enabled_by_default="false" />
