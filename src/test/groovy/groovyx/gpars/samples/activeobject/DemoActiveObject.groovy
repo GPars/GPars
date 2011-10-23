@@ -36,7 +36,7 @@ class Decryptor {
 final Decryptor decryptor = new Decryptor()
 Promise<String> part1 = decryptor.decrypt(' noitcA ni yvoorG')
 Promise<Integer> part2 = decryptor.decrypt(140)
-Promise<String> part3 = decryptor.decrypt('noittide dn')
+Promise<String> part3 = decryptor.decrypt('noitide dn')
 
 print part1.get()
 print part2.get()
