@@ -471,6 +471,29 @@ new A()
     """)
         }
     }
+
+    public void testComposingDFVs() {
+        final GroovyShell shell = new GroovyShell()
+        def a = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.dataflow.DataflowVariable
+
+@ActiveObject
+class A {
+    @ActiveMethod
+    DataflowVariable foo() {
+        new DataflowVariable() << 10
+    }
+}
+
+new A()
+""")
+        assert 10 == a.foo().get().get()
+        assert a.foo().get().get() instanceof Integer
+        assert a.foo().get() instanceof Promise
+    }
+
 }
 @ActiveObject
 class MyWrapper {

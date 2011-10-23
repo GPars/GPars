@@ -20,6 +20,10 @@ import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.dataflow.DataflowVariable
 
+/**
+ * The demo shows that DataflowVariables are allowed return values from active methods.
+ */
+
 @ActiveObject
 class AsyncDecryptor {
     @ActiveMethod
@@ -38,7 +42,7 @@ def firstPart = decryptor.decrypt(' noitcA ni yvoorG')
 def secondPart = decryptor.decrypt(140)
 def thirdPart = decryptor.decrypt('noittide dn')
 
-print firstPart.get()
-print secondPart.get()
-println thirdPart.get()
+print firstPart.get().get()
+print secondPart.get().get()
+println thirdPart.get().get()
 
