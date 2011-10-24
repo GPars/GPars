@@ -21,26 +21,26 @@ import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.dataflow.DataflowVariable
 
 /**
- * The demo shows that DataflowVariables are allowed return values from active methods.
+ * The demo shows that DataflowVariables are allowed return values from active methods and will be propagated to the caller.
  */
 
 @ActiveObject
 class AsyncDecryptor {
     @ActiveMethod
     DataflowVariable<String> decrypt(String encryptedText) {
-        new DataflowVariable() << encryptedText.reverse()
+        return new DataflowVariable() << encryptedText.reverse()
     }
 
     @ActiveMethod
     DataflowVariable<Integer> decrypt(Integer encryptedNumber) {
-        new DataflowVariable() << -1 * encryptedNumber + 142
+        return new DataflowVariable() << -1 * encryptedNumber + 142
     }
 }
 
 final AsyncDecryptor decryptor = new AsyncDecryptor()
 def firstPart = decryptor.decrypt(' noitcA ni yvoorG')
 def secondPart = decryptor.decrypt(140)
-def thirdPart = decryptor.decrypt('noittide dn')
+def thirdPart = decryptor.decrypt('noitide dn')
 
 print firstPart.get().get()
 print secondPart.get().get()

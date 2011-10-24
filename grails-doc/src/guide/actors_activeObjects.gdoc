@@ -22,7 +22,7 @@ class Decryptor {
 final Decryptor decryptor = new Decryptor()
 def part1 = decryptor.decrypt(' noitcA ni yvoorG')
 def part2 = decryptor.decrypt(140)
-def part3 = decryptor.decrypt('noittide dn')
+def part3 = decryptor.decrypt('noitide dn')
 
 print part1.get()
 print part2.get()
@@ -72,7 +72,7 @@ class Decryptor {
 final Decryptor decryptor = new Decryptor()
 print decryptor.decrypt(' noitcA ni yvoorG')
 print decryptor.decrypt(140)
-println decryptor.decrypt('noittide dn')
+println decryptor.decrypt('noitide dn')
 {code}
 
 h3. Non-blocking semantics
