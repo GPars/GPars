@@ -25,6 +25,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.memoize.LRUProtectionStorage
 import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
+import groovyx.gpars.pa.CallAsyncTask
 import groovyx.gpars.pa.CallClosure
 import groovyx.gpars.pa.ClosureMapper
 import groovyx.gpars.pa.ClosurePredicate
@@ -76,7 +77,7 @@ public class GParsPoolUtil {
     private static Future callParallel(Closure task) {
         final ForkJoinPool pool = GParsPool.retrieveCurrentPool()
         if (!pool) throw new IllegalStateException("No ExecutorService available for the current thread.")
-        return pool.submit([compute: task] as RecursiveTask)
+        return pool.submit(new CallAsyncTask(task))
     }
 
     /**
@@ -124,7 +125,7 @@ public class GParsPoolUtil {
      * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
      */
     public static Closure async(Closure cl) {
-        return {Object... args -> callAsync(cl, * args)}
+        return asyncFun(cl, false)
     }
 
     /**

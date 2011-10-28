@@ -35,4 +35,4 @@ class BlockingDecryptor {
 final BlockingDecryptor decryptor = new BlockingDecryptor()
 print decryptor.decrypt(' noitcA ni yvoorG')
 print decryptor.decrypt(140)
-println decryptor.decrypt('noittide dn')
+println decryptor.decrypt('noitide dn')
