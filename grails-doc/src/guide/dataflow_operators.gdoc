@@ -94,6 +94,73 @@ def sp1 = splitter(op1.outputs[0], [e, f])                            //takes th
 selector(inputs:[sp1.outputs[0], op1.outputs[1]]: outputs:[]) {...}   //takes the first output of sp1 and the second output of op1
 {code}
 
+h3. Grouping operators
+
+Dataflow operators can be organized into groups to allow for performance fine-tuning. Groups provide a handy _operator()_ factory method
+to create tasks attached to the groups.
+
+{code}
+import groovyx.gpars.group.DefaultPGroup
+
+def group = new DefaultPGroup()
+
+group.with {
+    operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+        ...
+        bindOutput 0, x + y + z
+    }
+}
+{code}
+
+{note:Title=Custom thread pools for dataflow}
+The default thread pool for dataflow operators contains daemon threads, which means your application will exit as soon as the main thread finishes and won't wait for all tasks to complete.
+When grouping operators, make sure that your custom thread pools either use daemon threads, too, which can be achieved by
+using DefaultPGroup or by providing your own thread factory to a thread pool constructor,
+or in case your thread pools use non-daemon threads, such as when using the NonDaemonPGroup group class, make sure you shutdown the group or the thread pool explicitly by calling its shutdown() method,
+otherwise your applications will not exit.
+{note}
+
+h3. Constructing operators
+
+The construction properties of an operator, such as _inputs_, _outputs_ or _maxForks_ cannot be modified once the operator has been build.
+You may find the _groovyx.gpars.dataflow.ProcessingNode_ class helpful when gradually collecting channels and values into lists
+before you finally build an operator.
+
+{code}
+import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.dataflow.DataflowQueue
+import static groovyx.gpars.dataflow.ProcessingNode.node
+
+/**
+ * Shows how to build operators using the ProcessingNode class
+ */
+
+final DataflowQueue aValues = new DataflowQueue()
+final DataflowQueue bValues = new DataflowQueue()
+final DataflowQueue results = new DataflowQueue()
+
+//Create a config and gradually set the required properties - channels, code, etc.
+def adderConfig = node {valueA, valueB ->
+    bindOutput valueA + valueB
+}
+adderConfig.inputs << aValues
+adderConfig.inputs << bValues
+adderConfig.outputs << results
+
+//Build the operator
+final adder = adderConfig.operator(Dataflow.DATA_FLOW_GROUP)
+
+//Now the operator is running and processing the data
+aValues << 10
+aValues << 20
+bValues << 1
+bValues << 2
+
+assert [11, 22] == (1..2).collect {
+    results.val
+}
+{code}
+
 h3. Parallelize operators
 
 By default an operator's body is processed by a single thread at a time. While this is a safe setting allowing the operator's
@@ -235,32 +302,6 @@ This is exactly what the terminateAfterNextRun() method does. It will schedule t
 of messages gets handled.
 This may be particularly handy when you use a group of operators/selectors to load-balance messages coming from a channel.
 Once the work-load decreases, the terminateAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
-
-h3. Grouping operators
-
-Dataflow operators can be organized into groups to allow for performance fine-tuning. Groups provide a handy _operator()_ factory method
-to create tasks attached to the groups.
-
-{code}
-import groovyx.gpars.group.DefaultPGroup
-
-def group = new DefaultPGroup()
-
-group.with {
-    operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
-        ...
-        bindOutput 0, x + y + z
-    }
-}
-{code}
-
-{note:Title=Custom thread pools for dataflow}
-The default thread pool for dataflow operators contains daemon threads, which means your application will exit as soon as the main thread finishes and won't wait for all tasks to complete.
-When grouping operators, make sure that your custom thread pools either use daemon threads, too, which can be achieved by
-using DefaultPGroup or by providing your own thread factory to a thread pool constructor,
-or in case your thread pools use non-daemon threads, such as when using the NonDaemonPGroup group class, make sure you shutdown the group or the thread pool explicitly by calling its shutdown() method,
-otherwise your applications will not exit.
-{note}
 
 h2. Selectors
 

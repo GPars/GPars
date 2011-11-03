@@ -1,0 +1,110 @@
+h3. KanbanFlow
+
+A _KanbanFlow_ is a composed object that uses dataflow abstractions to define dependencies
+between multiple concurrent producer and consumer operators.
+
+Each link between a producer and a consumer is defined by a _KanbanLink_.
+
+Inside each KanbanLink, the communication between producer and consumer follows the
+KanbanFlow pattern as described in
+"http://people.canoo.com/mittie/kanbanflow.html":http://people.canoo.com/mittie/kanbanflow.html (recommended read).
+They use objects of type KanbanTray to send products downstream and signal requests
+for further products back to the producer.
+
+A _KanbanFlow_ object links producers to consumers thus creating KanbanLink objects.
+In the course of this activity, a second link may be constructed where the producer
+is the same object that acted as the consumer in a formerly created link such
+that the two links become connected to build a chain.
+
+Here is an example of a _KanbanFlow_ with only one link, e.g. one producer and one consumer.
+The producer always sends the number 1 downstream and the consumer prints this number.
+{code}
+import static groovyx.gpars.dataflow.ProcessingNode.node
+import groovyx.gpars.dataflow.KanbanFlow
+
+def producer = node { down -> down 1 }
+def consumer = node { up   -> println up.take() }
+
+new KanbanFlow().with {
+    link producer to consumer
+    start()
+    // run for a while
+    stop()
+}
+{code}
+
+For putting a product into a tray and sending the tray downstream, one can either
+use the _send()_ method, the _<<_ operator, or use the tray as a method object.
+The following lines are equivalent:
+{code}
+node { down -> down.send 1 }
+node { down -> down << 1 }
+node { down -> down 1 }
+{code}
+
+When a product is taken from the input tray with the _take()_ method, the empty
+tray is automatically returned. In other words: you can call _take()_ only once!
+
+h4. Various linking structures
+
+In addition to a linear chains, a _KanbanFlow_ can also link a single producer to multiple
+consumers (tree) or multiple producers to a single consumer (collector) or any combination
+of the above that results in a directed acyclic graph (DAG).
+
+The _KanbanFlowTest_ class has many examples for such structures, including scenarios where
+a single producer delegates work to multiple consumers with
+* a *work-stealing* strategy where all consumers get their pick from the downstream,
+* a *master-slave* strategy where a producer chooses from the available consumers, and
+* a *broadcast* strategy where a producer sends all products to all consumers.
+
+Cycles are forbidden by default but when enabled, they can be used as so-called
+generators. A producer can even be his own consumer that increases a product value
+in every cycle. The generator itself remains state-free since the value is only stored as
+a product riding on a tray.
+Such a generator can be used for e.g. lazy sequences or as a the "heartbeat" of a
+subsequent flow.
+
+h4. Composing KanbanFlows
+
+Just as _KanbanLink_ objects can be chained together to form a _KanbanFlow_, flows themselves
+can be composed again to form new greater flows from existing smaller ones.
+
+{code}
+def firstFlow = new KanbanFlow()
+def producer  = node(counter)
+def consumer  = node(repeater)
+firstFlow.link(producer).to(consumer)
+
+def secondFlow = new KanbanFlow()
+def producer2  = node(repeater)
+def consumer2  = node(reporter)
+secondFlow.link(producer2).to(consumer2)
+
+flow = firstFlow + secondFlow
+
+flow.start()
+{code}
+
+h4. Customizing concurrency characteristics
+
+The amount of concurrency in a kanban system is determined by the number
+of trays (sometimes called *WIP* = work in progress). With no trays in the
+streams, the system does nothing. With one tray only, the system is confined
+to sequential execution. With more trays, concurrency begins. With more
+trays than available processing units, the system begins to waste
+resources.
+
+The number of trays can be controlled in various ways. They are typically
+set when starting the flow.
+{code}
+flow.start(0) // start without trays
+flow.start(1) // start with one tray per link in the flow
+flow.start()  // start with the optimal number of trays
+{code}
+
+In addition to the trays, the _KanbanFlow_ may also be constrained by its
+underlying _ThreadPool_. A pool of size 1 for example will not allow much
+concurrency.
+
+_KanbanFlows_ use a default pool that is dimensioned by the number of available
+cores. This can be customized by setting the _pooledGroup_ property.

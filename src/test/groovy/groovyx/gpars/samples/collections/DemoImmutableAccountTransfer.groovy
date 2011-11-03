@@ -19,13 +19,19 @@ package groovyx.gpars.samples.collections
 import static groovyx.gpars.GParsPool.withPool
 
 /**
- * Demo the possible use of Groovy immutable support for the classical
+ * Demos one possible use of Groovy immutable support for the classical
  * account money transfer problem.
  * Account becomes immutable without knowing anything about synchronization.
  * However, since transferTo() returns two new Accounts, these references
  * must be assigned in one atomic action. This is what AtomicPair cares for.
  * Locks are restricted to the reference updates only, while potentially
  * long-running business tasks (longer than transferTo) can run lock-free.
+ * Note that in this example there is no consistent global "world view".
+ * All transfers happen, they all get rebalanced, no concurrent transfer
+ * is ever influenced by a temporarily inconsistent state of other
+ * transfers. However, since there is no atomic get-and-set operation on the AtomicPair,
+ * this example does not support the notion of updating an account
+ * based on the balance that a concurrent transfer has effected. 
  * @author Dierk König
  */
 @Immutable final class ImmutableAccount {
