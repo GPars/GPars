@@ -116,8 +116,8 @@ _KanbanFlows_ use a default pool that is dimensioned by the number of available
 cores. This can be customized by setting the @pooledGroup@ property.
 
 *Test:* \\
-groovyx.gpars.dataflow.KanbanFlowTest \\
+"KanbanFlowTest":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/dataflow/KanbanFlowTest.groovy \\
 *Demos:* \\
-groovyx.gpars.samples.dataflow.kanban.DemoKanbanFlow \\
-groovyx.gpars.samples.dataflow.kanban.DemoKanbanFlowBroadcast \\
-groovyx.gpars.samples.dataflow.kanban.DemoKanbanFlowCycle
+"DemoKanbanFlow":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlow.groovy \\
+"DemoKanbanFlowBroadcast":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlowBroadcast.groovy \\
+"DemoKanbanFlowCycle":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlowCycle.groovy
