@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.kanban
+package groovyx.gpars.dataflow
 
-import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 import java.util.concurrent.atomic.AtomicInteger
@@ -64,7 +63,7 @@ class KanbanFlowTest extends Specification {
     def "A -> B -> C flow with chain of three processing units"() {
         given:
         def producer = node(counter)
-        def middle = node(repeater)
+        def middle   = node(repeater)
         def consumer = node(reporter)
 
         flow.with {
@@ -82,7 +81,7 @@ class KanbanFlowTest extends Specification {
 
     def "A* -> B* simple flow with many producer and consumers forks"() {
         given:
-        def producer = node(counter); producer.maxForks = producerForks
+        def producer = node(counter);  producer.maxForks = producerForks
         def consumer = node(reporter); consumer.maxForks = consumerForks
         flow.link(producer).to(consumer)
 
@@ -126,7 +125,7 @@ class KanbanFlowTest extends Specification {
 
     def "A -> B,C flow with one producer and two consumers(master-slave)"() {
         given:
-        def producer = node {down1, down2 -> counter down1; counter down2 }
+        def producer  = node {down1, down2 -> counter down1; counter down2 }
         def consumer1 = node(reporter)
         def consumer2 = node(reporter)
         flow.link(producer).to(consumer1)
@@ -142,7 +141,7 @@ class KanbanFlowTest extends Specification {
 
     def "A -> B,C flow with one producer and two consumers(selector)"() {
         given:
-        def producer = node {down1, down2 -> counter down1; ~down2 }  // simple selection: always choose first
+        def producer  = node {down1, down2 -> counter down1; ~down2 }  // simple selection: always choose first
         def consumer1 = node(reporter)
         def consumer2 = node(reporter)
         flow.link(producer).to(consumer1)
@@ -160,7 +159,7 @@ class KanbanFlowTest extends Specification {
         given:
         def producer1 = node(counter)
         def producer2 = node(counter)
-        def consumer = node { a, b -> reporter a; reporter b }
+        def consumer  = node { a, b -> reporter a; reporter b }
         flow.link(producer1).to(consumer)
         flow.link(producer2).to(consumer)
 
@@ -175,8 +174,8 @@ class KanbanFlowTest extends Specification {
     def "A -> B,C -> D diamond"() {
         given:
         def producer = node {down1, down2 -> counter down1; counter down2 }
-        def middle1 = node(increment)
-        def middle2 = node(increment)
+        def middle1  = node(increment)
+        def middle2  = node(increment)
         def collector = node { a, b -> reporter a; reporter b }
 
         flow.with {
@@ -256,7 +255,7 @@ class KanbanFlowTest extends Specification {
         given:
         def heartbeat = node { fromSelf, toSelf, toTheRest ->
             def prod = fromSelf.take() + 1
-            toSelf prod
+            toSelf    prod
             toTheRest prod
         }
         def consumer = node(reporter)
@@ -324,13 +323,13 @@ class KanbanFlowTest extends Specification {
     def "flow composition with single append"() {
         given:
         def firstFlow = new KanbanFlow()
-        def producer = node(counter)
-        def consumer = node(repeater)
+        def producer  = node(counter)
+        def consumer  = node(repeater)
         firstFlow.link(producer).to(consumer)
 
         def secondFlow = new KanbanFlow()
-        def producer2 = node(repeater)
-        def consumer2 = node(reporter)
+        def producer2  = node(repeater)
+        def consumer2  = node(reporter)
         secondFlow.link(producer2).to(consumer2)
 
         flow = firstFlow + secondFlow

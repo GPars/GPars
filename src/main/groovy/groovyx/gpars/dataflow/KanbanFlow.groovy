@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.kanban
+package groovyx.gpars.dataflow
 
-import groovyx.gpars.dataflow.ProcessingNode
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import groovyx.gpars.scheduler.ResizeablePool
@@ -31,7 +30,7 @@ import groovyx.gpars.scheduler.ResizeablePool
  * resizeable pool of daemon threads, starting with the GPars default pool size. This can be overridden
  * by setting the <tt>pooledGroup</tt> property to a custom PGroup.
  * @see KanbanLink
- * @see groovyx.gpars.dataflow.kanban.KanbanFlowTest
+ * @see groovyx.gpars.dataflow.KanbanFlowTest
  * @author Dierk Koenig
  */
 class KanbanFlow {

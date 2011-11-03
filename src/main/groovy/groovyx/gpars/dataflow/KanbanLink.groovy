@@ -14,10 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.dataflow.kanban
+package groovyx.gpars.dataflow
 
-import groovyx.gpars.dataflow.DataflowQueue
-import groovyx.gpars.dataflow.ProcessingNode
 import groovyx.gpars.dataflow.operator.DataflowProcessor
 
 /**

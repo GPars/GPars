@@ -17,7 +17,7 @@
 package groovyx.gpars.samples.dataflow.kanban
 
 import groovyx.gpars.dataflow.DataflowQueue
-import groovyx.gpars.dataflow.kanban.KanbanFlow
+import groovyx.gpars.dataflow.KanbanFlow
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 import java.util.concurrent.atomic.AtomicInteger

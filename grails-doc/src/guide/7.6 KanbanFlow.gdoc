@@ -19,8 +19,8 @@ that the two links become connected to build a chain.
 Here is an example of a _KanbanFlow_ with only one link, e.g. one producer and one consumer.
 The producer always sends the number 1 downstream and the consumer prints this number.
 {code}
-import static groovyx.gpars.dataflow.kanban.ProcessingNode.node
-import groovyx.gpars.dataflow.kanban.KanbanFlow
+import static groovyx.gpars.dataflow.ProcessingNode.node
+import groovyx.gpars.dataflow.KanbanFlow
 
 def producer = node { down -> down 1 }
 def consumer = node { up   -> println up.take() }
@@ -71,13 +71,13 @@ can be composed again to form new greater flows from existing smaller ones.
 
 {code}
 def firstFlow = new KanbanFlow()
-def producer = node(counter)
-def consumer = node(repeater)
+def producer  = node(counter)
+def consumer  = node(repeater)
 firstFlow.link(producer).to(consumer)
 
 def secondFlow = new KanbanFlow()
-def producer2 = node(repeater)
-def consumer2 = node(reporter)
+def producer2  = node(repeater)
+def consumer2  = node(reporter)
 secondFlow.link(producer2).to(consumer2)
 
 flow = firstFlow + secondFlow

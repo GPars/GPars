@@ -17,9 +17,9 @@
 package groovyx.gpars.samples.dataflow.kanban
 
 import groovyx.gpars.dataflow.DataflowQueue
-import groovyx.gpars.dataflow.kanban.KanbanFlow
-import groovyx.gpars.dataflow.kanban.KanbanLink
-import groovyx.gpars.dataflow.kanban.KanbanTray
+import groovyx.gpars.dataflow.KanbanFlow
+import groovyx.gpars.dataflow.KanbanLink
+import groovyx.gpars.dataflow.KanbanTray
 import static groovyx.gpars.dataflow.ProcessingNode.node
 
 /**
