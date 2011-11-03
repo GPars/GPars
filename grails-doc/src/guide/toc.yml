@@ -8,8 +8,8 @@ gettingStarted :
   gettingStarted_aHelloWorldExample : A Hello World Example
   gettingStarted_codeConventions : Code conventions
   gettingStarted_gettingSetUpInAnIDE : Getting Set Up in an IDE
-  gettingStarted_applicabilityOfConcepts : Applicability of concepts
-  gettingStarted_what'sNew : What's new
+  gettingStarted_applicabilityOfConcepts : Applicability of Concepts
+  gettingStarted_what'sNew : What's New
   gettingStarted_JavaAPI-usingGParsFromJava : Java API - Using GPars from Java
 dataParallelism :
   title : Data Parallelism
@@ -41,8 +41,9 @@ dataflow :
   dataflow_selects : Selects
   dataflow_operators : Operators
   dataflow_implementation : Implementation
-  dataflow_synchronousVariablesAndChannels : Synchronous variables and channels
-  dataflow_classicExamples : Classic examples
+  dataflow_synchronousVariablesAndChannels : Synchronous Variables and Channels
+  dataflow_kanbanFlow : Kanban Flow
+  dataflow_classicExamples : Classic Examples
 STM :
   title : STM
 tips :
