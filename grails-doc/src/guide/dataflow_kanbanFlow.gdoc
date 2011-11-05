@@ -17,6 +17,14 @@ KanbanFlow pattern as described in
 They use objects of type _KanbanTray_ to send products downstream and signal requests
 for further products back to the producer.
 
+The figure below shows a _KanbanLink_ with one producer, one consumer and five trays
+numbered 0 to 4. Tray number 0 has been used to take a product from producer to
+consumer, has been emptied by the consumer and is now sent back to the producer's
+input queue. Trays 1 and 2 wait carry products waiting for consumption, trays 3 and 4 wait to be used
+by producers.
+
+!dataflow_kanban.png!
+
 A _KanbanFlow_ object links producers to consumers thus creating _KanbanLink_ objects.
 In the course of this activity, a second link may be constructed where the producer
 is the same object that acted as the consumer in a formerly created link such
@@ -49,7 +57,26 @@ node { down -> down 1 }
 {code}
 
 When a product is taken from the input tray with the @take()@ method, the empty
-tray is automatically returned. In other words: you can call @take()@ only once!
+tray is automatically released.
+
+{note}
+You should call @take()@ only once!
+{note}
+
+If you prefer to not using an empty tray for sending products downstream (as typically
+the case when a _ProcessingNode_ acts as a filter), you must
+release the tray in order to keep it in play. Otherwise, the number of trays in the
+system decreases. You can release a tray either by calling the @release()@ method
+or by using the @~@ operator (think "shake it off").
+The following lines are equivalent:
+{code}
+node { down -> down.release() }
+node { down -> ~down }
+{code}
+
+{note}
+Trays are automatically released, if you call any of the @take()@ or @send()@ methods.
+{note}
 
 h4. Various linking structures
 
@@ -69,6 +96,13 @@ in every cycle. The generator itself remains state-free since the value is only 
 a product riding on a tray.
 Such a generator can be used for e.g. lazy sequences or as a the "heartbeat" of a
 subsequent flow.
+
+The approach of generator "loops" can equally be applied to collectors, where a collector
+does not maintain any internal state but sends a collection onto itself, adding products
+at each call.
+
+Generally speaking, a _ProcessingNode_ can link to itself for exporting state to
+the tray/product that it sends to itself. Access to the product is then *thread-safe by design*.
 
 h4. Composing KanbanFlows
 
@@ -120,4 +154,5 @@ cores. This can be customized by setting the @pooledGroup@ property.
 *Demos:* \\
 "DemoKanbanFlow":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlow.groovy \\
 "DemoKanbanFlowBroadcast":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlowBroadcast.groovy \\
-"DemoKanbanFlowCycle":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlowCycle.groovy
+"DemoKanbanFlowCycle":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlowCycle.groovy \\
+"DemoKanbanLazyPrimeSequenceLoops":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanLazyPrimeSequenceLoops.groovy
