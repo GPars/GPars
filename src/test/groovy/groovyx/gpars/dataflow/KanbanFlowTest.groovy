@@ -340,6 +340,4 @@ class KanbanFlowTest extends Specification {
         results.val == 1
         flow.stop()
     }
-
-
 }
