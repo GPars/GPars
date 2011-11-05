@@ -4627,7 +4627,9 @@
         <inspection_tool class="Cyclic References" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="CyclicClassDependency" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CyclicPackageDependency" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="CyclomaticComplexity" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="CyclomaticComplexity" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_limit" value="10" />
+        </inspection_tool>
         <inspection_tool class="CyclomaticComplexityJS" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_limit" value="10" />
         </inspection_tool>
@@ -4657,7 +4659,9 @@
         <inspection_tool class="DivideByZeroJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DocumentWriteJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DollarSignInName" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="DoubleCheckedLocking" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="DoubleCheckedLocking" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="ignoreOnVolatileVariables" value="false" />
+        </inspection_tool>
         <inspection_tool class="DoubleLiteralMayBeFloatLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DoubleNegation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DoubleNegative" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -4713,7 +4717,11 @@
         <inspection_tool class="EjbThisExpressionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ElseBlockBraces" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="Empty-paren method accessed as parameterless" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="EmptyCatchBlock" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="EmptyCatchBlock" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_includeComments" value="true" />
+          <option name="m_ignoreTestCases" value="true" />
+          <option name="m_ignoreIgnoreParameter" value="true" />
+        </inspection_tool>
         <inspection_tool class="EmptyCatchBlockJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EmptyClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EmptyElseBlock" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5456,7 +5464,10 @@
         <inspection_tool class="Method with mutator-like name is parameterless" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MethodCallInLoopCondition" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MethodCanBeVariableArityMethod" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="MethodCount" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="MethodCount" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_limit" value="20" />
+          <option name="ignoreGettersAndSetters" value="false" />
+        </inspection_tool>
         <inspection_tool class="MethodCoupling" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_includeJavaClasses" value="false" />
           <option name="m_includeLibraryClasses" value="false" />
@@ -6083,7 +6094,9 @@
         <inspection_tool class="SynchronizeOnLock" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizeOnNonFinalField" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizeOnThis" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="SynchronizedMethod" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="SynchronizedMethod" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_includeNativeMethods" value="true" />
+        </inspection_tool>
         <inspection_tool class="SynchronizedOnBoxedPrimitive" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizedOnGetClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizedOnLiteralObject" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -6351,6 +6364,7 @@
           <option name="ADD_SERVLET_TO_ENTRIES" value="true" />
           <option name="ADD_NONJAVA_TO_ENTRIES" value="true" />
         </inspection_tool>
+        <inspection_tool class="UnusedDefine" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedImport" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedLabel" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedLibrary" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -8144,13 +8158,23 @@
       <words>
         <w>almiray</w>
         <w>bytecodes</w>
+        <w>diamond&quot;</w>
         <w>gant</w>
+        <w>groovydoc</w>
+        <w>itext</w>
         <w>jetensky</w>
+        <w>kanban</w>
+        <w>kanbanflow</w>
         <w>krecan</w>
         <w>ladislav</w>
+        <w>lowagie</w>
         <w>matula</w>
+        <w>mittie</w>
         <w>nextc</w>
+        <w>noitide</w>
         <w>novotny</w>
+        <w>peng</w>
+        <w>subdirectory</w>
         <w>thon</w>
       </words>
     </dictionary>
