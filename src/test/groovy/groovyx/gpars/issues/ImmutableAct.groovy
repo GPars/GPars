@@ -22,7 +22,7 @@ class FailingA {
     }
 }
 
-//@Immutable
+//@groovy.transform.Immutable
 final class FailingB extends FailingA {
     public void act() {
 

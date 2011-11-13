@@ -17,6 +17,7 @@
 package groovyx.gpars.samples
 
 import static groovyx.gpars.GParsPool.withPool
+import groovy.transform.Immutable
 
 /**
  * Demos another possible use of Groovy immutable support for the classical

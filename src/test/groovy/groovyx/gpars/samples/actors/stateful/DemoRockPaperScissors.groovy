@@ -18,6 +18,7 @@ package groovyx.gpars.samples.actors.stateful
 
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroup
+import groovy.transform.Immutable
 
 /**
  * A popular game implemented with actors.

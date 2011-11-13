@@ -16,6 +16,7 @@
 
 package groovyx.gpars.samples.collections
 
+import groovy.transform.Immutable
 import static groovyx.gpars.GParsPool.withPool
 
 /**
