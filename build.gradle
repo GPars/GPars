@@ -97,9 +97,9 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.7.10'
-    testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.8.2'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.5-groovy-1.7'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.4'
+    testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.5-groovy-1.8'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile 'org.multiverse:multiverse-beta:0.7-RC-1'
