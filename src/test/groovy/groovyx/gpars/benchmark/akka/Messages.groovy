@@ -16,6 +16,8 @@
 
 package groovyx.gpars.benchmark.akka
 
+import groovy.transform.Immutable
+
 /**
  * @author Jiri Mares, Vaclav Pech
  */

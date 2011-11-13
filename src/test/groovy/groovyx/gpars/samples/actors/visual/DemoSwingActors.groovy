@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.actors.visual
 
 import groovy.swing.SwingBuilder
+import groovy.transform.Immutable
 import groovyx.gpars.actor.Actors
 import java.awt.Font
 import javax.swing.JFrame
