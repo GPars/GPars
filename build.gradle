@@ -97,9 +97,9 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.7.10'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.4'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.5-groovy-1.7'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8-SNAPSHOT'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile 'org.multiverse:multiverse-beta:0.7-RC-1'
@@ -287,7 +287,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-5'
+    gradleVersion = '1.0-milestone-6'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
