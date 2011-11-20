@@ -1,3 +1,9 @@
+APIs:
+[KanbanFlow|api:groovyx.gpars.dataflow.KanbanFlow] |
+[KanbanLink|api:groovyx.gpars.dataflow.KanbanLink] |
+[KanbanTray|api:groovyx.gpars.dataflow.KanbanTray] |
+[ProcessingNode|api:groovyx.gpars.dataflow.ProcessingNode]
+
 h3. KanbanFlow
 
 A _KanbanFlow_ is a composed object that uses dataflow abstractions to define dependencies
@@ -7,11 +13,19 @@ Each link between a producer and a consumer is defined by a _KanbanLink_.
 
 Inside each KanbanLink, the communication between producer and consumer follows the
 KanbanFlow pattern as described in
-"http://people.canoo.com/mittie/kanbanflow.html":http://people.canoo.com/mittie/kanbanflow.html (recommended read).
-They use objects of type KanbanTray to send products downstream and signal requests
+"The KanbanFlow Pattern":http://people.canoo.com/mittie/kanbanflow.html (recommended read).
+They use objects of type _KanbanTray_ to send products downstream and signal requests
 for further products back to the producer.
 
-A _KanbanFlow_ object links producers to consumers thus creating KanbanLink objects.
+The figure below shows a _KanbanLink_ with one producer, one consumer and five trays
+numbered 0 to 4. Tray number 0 has been used to take a product from producer to
+consumer, has been emptied by the consumer and is now sent back to the producer's
+input queue. Trays 1 and 2 wait carry products waiting for consumption, trays 3 and 4 wait to be used
+by producers.
+
+!dataflow_kanban.png!
+
+A _KanbanFlow_ object links producers to consumers thus creating _KanbanLink_ objects.
 In the course of this activity, a second link may be constructed where the producer
 is the same object that acted as the consumer in a formerly created link such
 that the two links become connected to build a chain.
@@ -34,7 +48,7 @@ new KanbanFlow().with {
 {code}
 
 For putting a product into a tray and sending the tray downstream, one can either
-use the _send()_ method, the _<<_ operator, or use the tray as a method object.
+use the @send()@ method, the @<<@ operator, or use the tray as a method object.
 The following lines are equivalent:
 {code}
 node { down -> down.send 1 }
@@ -42,8 +56,27 @@ node { down -> down << 1 }
 node { down -> down 1 }
 {code}
 
-When a product is taken from the input tray with the _take()_ method, the empty
-tray is automatically returned. In other words: you can call _take()_ only once!
+When a product is taken from the input tray with the @take()@ method, the empty
+tray is automatically released.
+
+{note}
+You should call @take()@ only once!
+{note}
+
+If you prefer to not using an empty tray for sending products downstream (as typically
+the case when a _ProcessingNode_ acts as a filter), you must
+release the tray in order to keep it in play. Otherwise, the number of trays in the
+system decreases. You can release a tray either by calling the @release()@ method
+or by using the @~@ operator (think "shake it off").
+The following lines are equivalent:
+{code}
+node { down -> down.release() }
+node { down -> ~down }
+{code}
+
+{note}
+Trays are automatically released, if you call any of the @take()@ or @send()@ methods.
+{note}
 
 h4. Various linking structures
 
@@ -63,6 +96,13 @@ in every cycle. The generator itself remains state-free since the value is only 
 a product riding on a tray.
 Such a generator can be used for e.g. lazy sequences or as a the "heartbeat" of a
 subsequent flow.
+
+The approach of generator "loops" can equally be applied to collectors, where a collector
+does not maintain any internal state but sends a collection onto itself, adding products
+at each call.
+
+Generally speaking, a _ProcessingNode_ can link to itself for exporting state to
+the tray/product that it sends to itself. Access to the product is then *thread-safe by design*.
 
 h4. Composing KanbanFlows
 
@@ -89,10 +129,10 @@ h4. Customizing concurrency characteristics
 
 The amount of concurrency in a kanban system is determined by the number
 of trays (sometimes called *WIP* = work in progress). With no trays in the
-streams, the system does nothing. With one tray only, the system is confined
-to sequential execution. With more trays, concurrency begins. With more
-trays than available processing units, the system begins to waste
-resources.
+streams, the system does nothing.
+* With one tray only, the system is confined to sequential execution.
+* With more trays, concurrency begins.
+* With more trays than available processing units, the system begins to waste resources.
 
 The number of trays can be controlled in various ways. They are typically
 set when starting the flow.
@@ -107,4 +147,12 @@ underlying _ThreadPool_. A pool of size 1 for example will not allow much
 concurrency.
 
 _KanbanFlows_ use a default pool that is dimensioned by the number of available
-cores. This can be customized by setting the _pooledGroup_ property.
+cores. This can be customized by setting the @pooledGroup@ property.
+
+*Test:* \\
+"KanbanFlowTest":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/dataflow/KanbanFlowTest.groovy \\
+*Demos:* \\
+"DemoKanbanFlow":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlow.groovy \\
+"DemoKanbanFlowBroadcast":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlowBroadcast.groovy \\
+"DemoKanbanFlowCycle":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanFlowCycle.groovy \\
+"DemoKanbanLazyPrimeSequenceLoops":https://github.com/GPars/GPars/blob/master/src/test/groovy/groovyx/gpars/samples/dataflow/kanban/DemoKanbanLazyPrimeSequenceLoops.groovy

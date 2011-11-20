@@ -6365,6 +6365,7 @@
           <option name="ADD_SERVLET_TO_ENTRIES" value="true" />
           <option name="ADD_NONJAVA_TO_ENTRIES" value="true" />
         </inspection_tool>
+        <inspection_tool class="UnusedDefine" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedImport" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedLabel" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnusedLibrary" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -8158,13 +8159,23 @@
       <words>
         <w>almiray</w>
         <w>bytecodes</w>
+        <w>diamond&quot;</w>
         <w>gant</w>
+        <w>groovydoc</w>
+        <w>itext</w>
         <w>jetensky</w>
+        <w>kanban</w>
+        <w>kanbanflow</w>
         <w>krecan</w>
         <w>ladislav</w>
+        <w>lowagie</w>
         <w>matula</w>
+        <w>mittie</w>
         <w>nextc</w>
+        <w>noitide</w>
         <w>novotny</w>
+        <w>peng</w>
+        <w>subdirectory</w>
         <w>thon</w>
       </words>
     </dictionary>
