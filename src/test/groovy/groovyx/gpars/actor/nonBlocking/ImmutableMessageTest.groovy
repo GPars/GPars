@@ -16,6 +16,7 @@
 
 package groovyx.gpars.actor.nonBlocking
 
+import groovy.transform.Immutable
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.Actors
 import java.util.concurrent.CountDownLatch
