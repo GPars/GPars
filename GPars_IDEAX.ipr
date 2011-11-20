@@ -4627,7 +4627,9 @@
         <inspection_tool class="Cyclic References" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="CyclicClassDependency" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CyclicPackageDependency" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="CyclomaticComplexity" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="CyclomaticComplexity" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_limit" value="10" />
+        </inspection_tool>
         <inspection_tool class="CyclomaticComplexityJS" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_limit" value="10" />
         </inspection_tool>
@@ -4657,7 +4659,9 @@
         <inspection_tool class="DivideByZeroJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DocumentWriteJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DollarSignInName" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="DoubleCheckedLocking" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="DoubleCheckedLocking" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="ignoreOnVolatileVariables" value="false" />
+        </inspection_tool>
         <inspection_tool class="DoubleLiteralMayBeFloatLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DoubleNegation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DoubleNegative" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -4712,8 +4716,13 @@
         <inspection_tool class="EjbStaticAccessInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EjbThisExpressionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ElseBlockBraces" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="Empty-paren Scala method overriden as parameterless" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="Empty-paren method accessed as parameterless" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="EmptyCatchBlock" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="EmptyCatchBlock" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_includeComments" value="true" />
+          <option name="m_ignoreTestCases" value="true" />
+          <option name="m_ignoreIgnoreParameter" value="true" />
+        </inspection_tool>
         <inspection_tool class="EmptyCatchBlockJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EmptyClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EmptyElseBlock" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5456,7 +5465,10 @@
         <inspection_tool class="Method with mutator-like name is parameterless" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MethodCallInLoopCondition" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MethodCanBeVariableArityMethod" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="MethodCount" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="MethodCount" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_limit" value="20" />
+          <option name="ignoreGettersAndSetters" value="false" />
+        </inspection_tool>
         <inspection_tool class="MethodCoupling" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_includeJavaClasses" value="false" />
           <option name="m_includeLibraryClasses" value="false" />
@@ -6083,7 +6095,9 @@
         <inspection_tool class="SynchronizeOnLock" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizeOnNonFinalField" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizeOnThis" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="SynchronizedMethod" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="SynchronizedMethod" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="m_includeNativeMethods" value="true" />
+        </inspection_tool>
         <inspection_tool class="SynchronizedOnBoxedPrimitive" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizedOnGetClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizedOnLiteralObject" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -8223,15 +8237,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.2/junit-4.8.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.gpars:gpars:0.12-SNAPSHOT">
+    <library name="Maven: org.codehaus.gpars:gpars:0.12">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-SNAPSHOT/gpars-0.12-SNAPSHOT.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12/gpars-0.12.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-SNAPSHOT/gpars-0.12-SNAPSHOT-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12/gpars-0.12-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12-SNAPSHOT/gpars-0.12-SNAPSHOT-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/0.12/gpars-0.12-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.codehaus.groovy:groovy-all:1.7.8">
@@ -8245,6 +8259,28 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.7.8/groovy-all-1.7.8-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: org.codehaus.groovy:groovy-all:1.8.4">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.codehaus.groovy:groovy-all:1.8.4">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: org.codehaus.jsr166-mirror:extra166y:1.7.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0.jar!/" />
@@ -8256,17 +8292,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0/extra166y-1.7.0-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.jsr166-mirror:extra166y:1.7.0.1-SNAPSHOT">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0.1-SNAPSHOT/extra166y-1.7.0.1-SNAPSHOT.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0.1-SNAPSHOT/extra166y-1.7.0.1-SNAPSHOT-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/extra166y/1.7.0.1-SNAPSHOT/extra166y-1.7.0.1-SNAPSHOT-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.codehaus.jsr166-mirror:jsr166y:1.7.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0.jar!/" />
@@ -8276,17 +8301,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.codehaus.jsr166-mirror:jsr166y:1.7.0.1-SNAPSHOT">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0.1-SNAPSHOT/jsr166y-1.7.0.1-SNAPSHOT.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0.1-SNAPSHOT/jsr166y-1.7.0.1-SNAPSHOT-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0.1-SNAPSHOT/jsr166y-1.7.0.1-SNAPSHOT-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
