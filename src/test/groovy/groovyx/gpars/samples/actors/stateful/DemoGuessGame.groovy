@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ class Player extends DefaultActor {
                 switch (it) {
                     case 'too large': println "$name: $myNum was too large"; break
                     case 'too small': println "$name: $myNum was too small"; break
-                    case 'you win': println "$name: I won $myNum"; stop(); break
+                    case 'you win': println "$name: I won $myNum"; terminate(); break
                 }
             }
         }
