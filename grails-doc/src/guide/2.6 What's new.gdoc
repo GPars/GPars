@@ -27,6 +27,7 @@ h3. Dataflow
 * Added support for custom error handlers
 * Added synchronous dataflow variables and channels
 * Read channels can report their length
+* Chaining of Promises through the then() method
 
 h3. Agent
 
@@ -43,3 +44,4 @@ h3. Renaming hints
 * The _makeTransparent()_ method that forces concurrent semantics to iteration methods (each, collect, find, etc.) has been removed
 * The stop() method on dataflow operators and selectors has been renamed to terminate() to match naming used for actor
 * The _reportError()_ method on dataflow operators and selectors has been replaced with the _addErrorHandler()_ method
+* The RightShift (>>) operator of DataflowVariables and channels now calls _then()_ instead of _whenBound()_ and so can be chained
