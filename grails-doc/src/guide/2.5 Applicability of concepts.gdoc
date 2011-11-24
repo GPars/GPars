@@ -1,4 +1,7 @@
-Here you could find basic guide-lines helping you decide on which GPars abstraction to apply to your code at hands.
+GPars provides a lot of concepts to pick from. We're continuously building and updating a page that tries to help user choose the right abstraction for their tasks at hands.
+Please, refer to the "Concepts compared":http://gpars.codehaus.org/Concepts+compared page for details.
+
+To briefly summarize the suggestions, below you can find basic guide-lines distilled from the page:
 
  # You're looking at a collection, which needs to be *iterated* or processed using one of the many beautiful Groovy collections method, like _each()_ , _collect()_ , _find()_ and such. Proposing that processing each element of the collection is independent of the other items, using GPars *parallel collections* can be recommended.
 
