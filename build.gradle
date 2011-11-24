@@ -107,7 +107,7 @@ dependencies {
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs 'org.codehaus.groovy:groovy-all:1.8.3'
+    docs 'org.codehaus.groovy:groovy-all:1.8.4'
     docs 'org.yaml:snakeyaml:1.9'
     docs 'commons-lang:commons-lang:2.6'
     //
