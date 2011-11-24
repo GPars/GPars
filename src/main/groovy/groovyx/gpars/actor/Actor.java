@@ -361,7 +361,12 @@ public abstract class Actor extends MessageStream {
         final MetaClass metaClass = InvokerHelper.getMetaClass(this);
         final List<MetaMethod> list = metaClass.respondsTo(this, method);
         if (list != null && !list.isEmpty()) {
-            InvokerHelper.invokeMethod(this, method, args);
+            boolean hasArgs = false;
+            for (final MetaMethod metaMethod : list) {
+                if (metaMethod.getParameterTypes().length > 0) hasArgs = true;
+            }
+            if (hasArgs) InvokerHelper.invokeMethod(this, method, args);
+            else InvokerHelper.invokeMethod(this, method, EMPTY_ARGUMENTS);
             return true;
         }
         return false;
