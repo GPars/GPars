@@ -76,28 +76,24 @@ class WhenBoundChainingTest extends GroovyTestCase {
         final DataflowVariable variable = new DataflowVariable()
         final DataflowVariable result = new DataflowVariable()
 
-        withPool {
-            final doubler = {it * 2}
-            final adder = {it + 1}
+        final doubler = {it * 2}
+        final adder = {it + 1}
 
-            variable.then doubler then adder then {result << it}
-            variable << 4
-            assert 9 == result.val
-        }
+        variable.then doubler then adder then {result << it}
+        variable << 4
+        assert 9 == result.val
     }
 
     public void testFunctionChainingWithRightShift() {
         final DataflowVariable variable = new DataflowVariable()
         final DataflowVariable result = new DataflowVariable()
 
-        withPool {
-            final doubler = {it * 2}
-            final adder = {it + 1}
+        final doubler = {it * 2}
+        final adder = {it + 1}
 
-            variable >> doubler >> adder >> {result << it}
-            variable << 4
-            assert 9 == result.val
-        }
+        variable >> doubler >> adder >> {result << it}
+        variable << 4
+        assert 9 == result.val
     }
 
     public void testAsyncFunctionChaining() {
