@@ -27,7 +27,7 @@ h3. Dataflow
 * Added support for custom error handlers
 * Added synchronous dataflow variables and channels
 * Read channels can report their length
-* Chaining of Promises through the then() method
+* Chaining of Promises using the new _then()_ method
 
 h3. Agent
 
