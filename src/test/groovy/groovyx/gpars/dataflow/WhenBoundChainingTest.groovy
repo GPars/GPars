@@ -131,6 +131,15 @@ class WhenBoundChainingTest extends GroovyTestCase {
         assert 9 == result.val
     }
 
+    public void testActiveObjectAsFunctionsChaining() {
+        final DataflowVariable result = new DataflowVariable()
+        final DataflowVariable variable = new DataflowVariable()
+        final calculator = new ActiveCalculator();
+        variable.then calculator.&doubler then calculator.&adder then {result << it}
+        variable << 4
+        assert 9 == result.val
+    }
+
     public void testActiveObjectChainingWithRightShift() {
         final DataflowVariable result = new DataflowVariable()
         final calculator = new ActiveCalculator();

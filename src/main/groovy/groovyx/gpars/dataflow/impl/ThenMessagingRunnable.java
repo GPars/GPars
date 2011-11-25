@@ -38,6 +38,6 @@ public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
 
     @Override
     protected void doRun(final T argument) {
-        result.bind((V) closure.call(argument));
+        result.leftShift((V) closure.call(argument));
     }
 }
