@@ -14,12 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow
+package groovyx.gpars.samples.activeobject
 
 import groovy.swing.SwingBuilder
-import groovy.transform.Immutable
-import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.actor.StaticDispatchActor
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveObjectRegistry
+import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.NonDaemonPGroup
 import java.awt.Color
 import java.awt.Font
@@ -43,19 +44,20 @@ import javax.swing.plaf.metal.MetalLookAndFeel
  * @author Vaclav Pech
  */
 
-new SwingLifeGameWithActors(30, 20).run()
+new SwingLifeGameWithActiveObjects(30, 20).run()
 
-final class CellActor extends DynamicDispatchActor {
+@ActiveObject("GOLDemo")
+final class Cell {
     private boolean alive
     private final int row
     private final int col
     private int numAliveNeighbors
     private int numEmptyNeighbors
     final List<Cell> neighbors = []
-    private PrinterActor printer
-    private SwingLifeGameWithActors owner
+    private SwingLifePrinter printer
+    private SwingLifeGameWithActiveObjects owner
 
-    CellActor(final int row, final int col, final boolean alive, PrinterActor printer, SwingLifeGameWithActors owner) {
+    Cell(final int row, final int col, final boolean alive, SwingLifePrinter printer, SwingLifeGameWithActiveObjects owner) {
         this.alive = alive
         this.row = row
         this.col = col
@@ -63,15 +65,22 @@ final class CellActor extends DynamicDispatchActor {
         this.owner = owner
     }
 
-    void onMessage(Heartbeat heartbeat) {
+    @ActiveMethod
+    void heartBeat() {
         numEmptyNeighbors += 1
-        neighbors.each {it.send(alive)}
+        neighbors.each {alive ? it.reportBeingAlive() : it.reportBeingEmpty()}
         progress()
     }
 
-    void onMessage(Boolean alive) {
-        if (alive) numAliveNeighbors += 1
-        else numEmptyNeighbors += 1
+    @ActiveMethod
+    void reportBeingAlive() {
+        numAliveNeighbors += 1
+        progress()
+    }
+
+    @ActiveMethod
+    void reportBeingEmpty() {
+        numEmptyNeighbors += 1
         progress()
     }
 
@@ -84,8 +93,8 @@ final class CellActor extends DynamicDispatchActor {
             else
                 alive = false
             initializeCounters()
-            printer.send(new PrintMessage(row, col, alive))
-            owner.send('done')
+            printer.printMe(row, col, alive)
+            owner.done()
         }
     }
 
@@ -95,10 +104,11 @@ final class CellActor extends DynamicDispatchActor {
     }
 }
 
-final class SwingLifeGameWithActors extends StaticDispatchActor {
+@ActiveObject
+final class SwingLifeGameWithActiveObjects {
     /* Controls the game */
-    private final List<List<CellActor>> cellGrid = []
-    private PrinterActor printer
+    private final List<List<Cell>> cellGrid = []
+    private SwingLifePrinter printer
 
     private final gridWidth
     private final gridHeight
@@ -109,13 +119,13 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
     private JLabel iteration
     private JPanel scene
 
-    private final group = new NonDaemonPGroup(8)
-
     private final Semaphore nextGenerationPermit = new Semaphore(0)
     private int finishedCells
     private final int totalCells
 
-    SwingLifeGameWithActors(final gridWidth, final gridHeight) {
+    SwingLifeGameWithActiveObjects(final gridWidth, final gridHeight) {
+        ActiveObjectRegistry.instance.register("GOLDemo", new NonDaemonPGroup(8))
+        ActiveObjectRegistry.instance.register("GOLDemoGUI", new DefaultPGroup(1))
         this.gridWidth = gridWidth
         this.gridHeight = gridHeight
         setupUI()
@@ -124,7 +134,6 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
     }
 
     void run() {
-        this.start()
         evolve(0)
     }
 
@@ -172,7 +181,7 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
         }
         frame.visible = true
         frame.pack()
-        printer = new PrinterActor(visualCells).start()
+        printer = new SwingLifePrinter(visualCells)
     }
 
     private def setupCells() {
@@ -180,10 +189,7 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
         (0..<gridHeight).each {rowIndex ->
             def cellRow = []
             (0..<gridWidth).each {colIndex ->
-                final CellActor actor = new CellActor(rowIndex, colIndex, randomInitialValue(random), printer, this)
-                actor.parallelGroup = group
-                actor.start()
-                cellRow[colIndex] = actor
+                cellRow[colIndex] = new Cell(rowIndex, colIndex, randomInitialValue(random), printer, this)
             }
             cellGrid.add(cellRow)
         }
@@ -209,8 +215,8 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
         return value > 49 ? true : false
     }
 
-    @Override
-    void onMessage(Object message) {
+    @ActiveMethod
+    void done() {
         finishedCells += 1
         if (finishedCells == totalCells) {
             finishedCells = 0
@@ -223,7 +229,7 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
             //Send heartbeats to all cells
             (0..<gridHeight).each {rowIndex ->
                 (0..<gridWidth).each {columnIndex ->
-                    cellGrid[rowIndex][columnIndex].send(new Heartbeat())
+                    cellGrid[rowIndex][columnIndex].heartBeat()
                 }
             }
 
@@ -238,29 +244,20 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
     }
 }
 
-final class PrinterActor extends StaticDispatchActor {
+@ActiveObject("GOLDemoGUI")
+final class SwingLifePrinter {
     private final List<List<JButton>> visualCells
 
-    PrinterActor(final List<List<JButton>> visualCells) {
+    SwingLifePrinter(final List<List<JButton>> visualCells) {
         this.visualCells = visualCells
     }
 
-    @Override
-    void onMessage(Object message) {
-        PrintMessage msg = (PrintMessage) message
-        final cell = visualCells[msg.row][msg.col]
+    @ActiveMethod
+    void printMe(final int row, final int col, final boolean aliveFlag) {
+        final cell = visualCells[row][col]
+        final localAliveFlag = aliveFlag
         SwingUtilities.invokeLater {
-            cell.background = msg.aliveFlag ? Color.BLUE : Color.WHITE
+            cell.background = localAliveFlag ? Color.BLUE : Color.WHITE
         }
     }
-}
-
-@Immutable
-final class Heartbeat {}
-
-@Immutable
-final class PrintMessage {
-    final int row
-    final int col
-    final boolean aliveFlag
 }
