@@ -27,29 +27,38 @@ import groovyx.gpars.dataflow.Promise
  */
 
 @ActiveObject
-class UpperCase {
+class UpperCaseWithLogging {
     @ActiveMethod
     def toUpperCase(String text) {
+        println "Starting toUpperCase() for $text"
         sleep 3000
+        println "Finished toUpperCase() for $text"
         return text.toUpperCase()
     }
 }
 
 @ActiveObject
-class Revert {
-    private UpperCase upperCase = new UpperCase()
+class RevertWithLogging {
+    private UpperCaseWithLogging upperCase = new UpperCaseWithLogging()
 
     @ActiveMethod
     def revert(String text) {
+        println "Starting revert() for $text"
         Promise<String> promise = upperCase.toUpperCase(text)
-        promise >> {
+        def myResultPromise = promise >> {
+            println "Started the actual revert() for $it"
             sleep 3000
+            println "Finished the actual revert() for $it"
             it.reverse()
         }
+        println "Finished revert() for $text"
+        return myResultPromise
     }
 }
 
-final revert = new Revert()
-final promiseForRevert = revert.revert("!ecneirepxe ynnuf dna lufesu a si sesimorP gnisopmoC")
-println "The computation is running at full speed. We will now wait for the result:"
-println promiseForRevert.get()
+final revert = new RevertWithLogging()
+final promiseForRevert1 = revert.revert("Message1")
+final promiseForRevert2 = revert.revert("Message2")
+println "The computations are running at full speed. We will now wait for the results:"
+println promiseForRevert1.get()
+println promiseForRevert2.get()
