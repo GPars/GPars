@@ -328,6 +328,9 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
             'DemoCustomBlocks',                           //Stm
             'DemoLifeWithDataflowOperators',              //Interacts with the user
             'DemoSwingLifeWithDataflowOperators',         //Interacts with the user
+            'DemoSwingLifeWithActors',                    //Interacts with the user
+            'DemoSwingLifeWithActiveObjects',             //Interacts with the user
+            'DemoSwingLifeWithAsyncFunctions',            //Interacts with the user
     ]
 
     classpath = sourceSets.main.runtimeClasspath

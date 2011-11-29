@@ -382,10 +382,11 @@ class A {
     def result = new DataflowQueue()
     def nonActiveFoo(value) {
         result << Thread.currentThread()
+        return null
     }
 
     @ActiveMethod
-    def activeFoo(value) {
+    void activeFoo(value) {
         result << Thread.currentThread()
         nonActiveFoo(value)
     }
@@ -417,6 +418,7 @@ class A {
     @ActiveMethod(blocking=true)
     def activeFoo1(value) {
         result << Thread.currentThread()
+        return null
     }
 
     @ActiveMethod(blocking=true)
@@ -489,9 +491,87 @@ class A {
 
 new A()
 """)
-        assert 10 == a.foo().get().get()
-        assert a.foo().get().get() instanceof Integer
-        assert a.foo().get() instanceof Promise
+        assert 10 == a.foo().get()
+        assert a.foo().get() instanceof Integer
+        assert a.foo() instanceof Promise
+    }
+
+    public void testComposingDFVsWithDelayedBind() {
+        final GroovyShell shell = new GroovyShell()
+        def a = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Promise
+
+@ActiveObject
+class A {
+    @ActiveMethod
+    Promise foo() {
+        final DataflowVariable r = new DataflowVariable()
+        Thread.start {
+            sleep 1000
+            r.bind(10)
+        }
+        return r
+    }
+}
+
+new A()
+""")
+        assert 10 == a.foo().get()
+        assert a.foo().get() instanceof Integer
+        assert a.foo() instanceof Promise
+    }
+
+    public void testComposingDFVsWithoutExplicitReturnType() {
+        final GroovyShell shell = new GroovyShell()
+        def a = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.dataflow.DataflowVariable
+
+@ActiveObject
+class A {
+    @ActiveMethod
+    def foo() {
+        new DataflowVariable() << 10
+    }
+}
+
+new A()
+""")
+        assert 10 == a.foo().get()
+        assert a.foo().get() instanceof Integer
+        assert a.foo() instanceof Promise
+    }
+
+    public void testComposingDFVsWithDelayedBindAndWithoutExplicitReturnType() {
+        final GroovyShell shell = new GroovyShell()
+        def a = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Promise
+
+@ActiveObject
+class A {
+    @ActiveMethod
+    def foo() {
+        final DataflowVariable r = new DataflowVariable()
+        Thread.start {
+            sleep 1000
+            r.bind(10)
+        }
+        return r
+    }
+}
+
+new A()
+""")
+        assert 10 == a.foo().get()
+        assert a.foo().get() instanceof Integer
+        assert a.foo() instanceof Promise
     }
 
 }

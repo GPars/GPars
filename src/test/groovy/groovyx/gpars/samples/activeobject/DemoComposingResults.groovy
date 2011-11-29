@@ -19,30 +19,40 @@ package groovyx.gpars.samples.activeobject
 import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Promise
 
 /**
  * The demo shows that DataflowVariables returned from active methods are composed.
  */
 
 @ActiveObject
-class AsyncDecryptor {
+class UpperCase {
     @ActiveMethod
-    DataflowVariable<String> decrypt(String encryptedText) {
-        return new DataflowVariable() << encryptedText.reverse()
-    }
-
-    @ActiveMethod
-    DataflowVariable<Integer> decrypt(Integer encryptedNumber) {
-        return new DataflowVariable() << -1 * encryptedNumber + 142
+    def toUpperCase(String text) {
+        sleep 3000
+        return text.toUpperCase()
     }
 }
 
-final AsyncDecryptor decryptor = new AsyncDecryptor()
-def firstPart = decryptor.decrypt(' noitcA ni yvoorG')
-def secondPart = decryptor.decrypt(140)
-def thirdPart = decryptor.decrypt('noitide dn')
+@ActiveObject
+class Revert {
+    private UpperCase upperCase = new UpperCase()
 
-print firstPart.get()
-print secondPart.get()
-println thirdPart.get()
+    @ActiveMethod
+    def revert(String text) {
+        Promise<String> promise = upperCase.toUpperCase(text)
+        def result = new DataflowVariable()
+        promise >> {
+            sleep 3000
+            result << it.reverse()
+        }
+        return result
+    }
+}
 
+//todo use >> instead
+
+final revert = new Revert()
+final promiseForRevert = revert.revert("!ecneirepxe ynnuf dna lufesu a si sesimorP gnisopmoC")
+println "The computation is running at full speed. We will now wait for the result:"
+println promiseForRevert.get()
