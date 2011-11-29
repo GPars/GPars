@@ -21,7 +21,7 @@ import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.dataflow.DataflowVariable
 
 /**
- * The demo shows that DataflowVariables are allowed return values from active methods and will be propagated to the caller.
+ * The demo shows that DataflowVariables returned from active methods are composed.
  */
 
 @ActiveObject
@@ -42,7 +42,7 @@ def firstPart = decryptor.decrypt(' noitcA ni yvoorG')
 def secondPart = decryptor.decrypt(140)
 def thirdPart = decryptor.decrypt('noitide dn')
 
-print firstPart.get().get()
-print secondPart.get().get()
-println thirdPart.get().get()
+print firstPart.get()
+print secondPart.get()
+println thirdPart.get()
 
