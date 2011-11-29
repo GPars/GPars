@@ -134,7 +134,7 @@ class SwingLifeGameWithDataflowOperators {
                     if (currentRowIndex in 0..<gridHeight) {
                         if (columnIndex > 0) inputChannels.add(channelGrid[currentRowIndex][columnIndex - 1].createReadChannel())
                         if (currentRowIndex != rowIndex) inputChannels.add(channelGrid[currentRowIndex][columnIndex].createReadChannel())
-                        if (columnIndex < gridHeight - 1) inputChannels.add(channelGrid[currentRowIndex][columnIndex + 1].createReadChannel())
+                        if (columnIndex < gridWidth - 1) inputChannels.add(channelGrid[currentRowIndex][columnIndex + 1].createReadChannel())
                     }
                 }
                 inputChannels.add(heartbeats.createReadChannel())
