@@ -16,6 +16,8 @@
 
 package groovyx.gpars.samples.dataflow.thenChaining
 
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.activeobject.ActiveObject
 import groovyx.gpars.dataflow.DataflowVariable
 
 /**
@@ -27,3 +29,15 @@ final calculator = new ActiveDemoCalculator()
 calculator.doubler(4).then {calculator.adder it}.then {result << it}
 assert 9 == result.val
 
+@ActiveObject
+class ActiveDemoCalculator {
+    @ActiveMethod
+    def doubler(int value) {
+        value * 2
+    }
+
+    @ActiveMethod
+    def adder(int value) {
+        value + 1
+    }
+}

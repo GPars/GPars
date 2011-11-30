@@ -37,7 +37,11 @@ task {
     for (url in urls) {
         final def site = new DataflowVariable()
         buffer << site
-        site << url.toURL().text
+        try {
+            site << url.toURL().text
+        } catch (all) {
+            site << 'Error donwloading page'
+        }
     }
 }
 
