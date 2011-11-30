@@ -25,7 +25,6 @@ import groovyx.gpars.samples.activeobject.Cell
 import java.awt.Color
 import java.awt.Font
 import java.awt.GridLayout
-import java.util.concurrent.Semaphore
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -86,7 +85,7 @@ final class CellActor extends DynamicDispatchActor {
                 alive = false
             initializeCounters()
             printer.send(new PrintMessage(row, col, alive))
-            owner.send('done')
+            owner.send(new Done())
         }
     }
 
@@ -96,7 +95,7 @@ final class CellActor extends DynamicDispatchActor {
     }
 }
 
-final class SwingLifeGameWithActors extends StaticDispatchActor {
+final class SwingLifeGameWithActors extends DynamicDispatchActor {
     /* Controls the game */
     private final List<List<CellActor>> cellGrid = []
     private PrinterActor printer
@@ -112,13 +111,15 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
 
     private final group = new NonDaemonPGroup(8)
 
-    private final Semaphore nextGenerationPermit = new Semaphore(0)
     private int finishedCells
     private final int totalCells
+    private int generation = 0
+    private boolean running = false
 
     SwingLifeGameWithActors(final gridWidth, final gridHeight) {
         this.gridWidth = gridWidth
         this.gridHeight = gridHeight
+        this.parallelGroup = group
         setupUI()
         setupCells()
         totalCells = gridWidth * gridHeight
@@ -126,7 +127,7 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
 
     void run() {
         this.start()
-        evolve(0)
+        evolve()
     }
 
     private void setupUI() {
@@ -158,13 +159,13 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
                 }
                 hbox {
                     button(text: 'Start', id: 'startButton', actionPerformed: {
-                        nextGenerationPermit.release()
+                        send(new StartEvolution())
                         startButton.enabled = false
                         pauseButton.enabled = true
 
                     })
                     button(text: 'Pause', id: 'pauseButton', enabled: false, actionPerformed: {
-                        nextGenerationPermit.acquire()
+                        send(new PauseEvolution())
                         pauseButton.enabled = false
                         startButton.enabled = true
                     })
@@ -210,31 +211,37 @@ final class SwingLifeGameWithActors extends StaticDispatchActor {
         return value > 49 ? true : false
     }
 
-    @Override
-    void onMessage(Object message) {
-        finishedCells += 1
-        if (finishedCells == totalCells) {
-            finishedCells = 0
-            nextGenerationPermit.release()
+    void onMessage(StartEvolution message) {
+        if (!running) {
+            running = true
+            evolve()
         }
     }
 
-    private void evolve(def generation) {
-        while (true) {
-            //Send heartbeats to all cells
-            (0..<gridHeight).each {rowIndex ->
-                (0..<gridWidth).each {columnIndex ->
-                    cellGrid[rowIndex][columnIndex].send(new Heartbeat())
-                }
-            }
+    void onMessage(PauseEvolution message) {
+        running = false
+    }
 
-            builder.edt {
-                ++generation
-                iteration.text = generation
+    void onMessage(Done message) {
+        finishedCells += 1
+        if (finishedCells == totalCells) {
+            finishedCells = 0
+            if (running) evolve()
+        }
+    }
+
+    private void evolve() {
+        sleep 1000
+        //Send heartbeats to all cells
+        (0..<gridHeight).each {rowIndex ->
+            (0..<gridWidth).each {columnIndex ->
+                cellGrid[rowIndex][columnIndex].send(new Heartbeat())
             }
-            nextGenerationPermit.acquire(2)
-            sleep 1000
-            nextGenerationPermit.release()
+        }
+
+        builder.edt {
+            ++generation
+            iteration.text = generation
         }
     }
 }
@@ -265,3 +272,12 @@ final class PrintMessage {
     final int col
     final boolean aliveFlag
 }
+
+@Immutable
+final class StartEvolution {}
+
+@Immutable
+final class PauseEvolution {}
+
+@Immutable
+final class Done {}

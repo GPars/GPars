@@ -25,7 +25,6 @@ import groovyx.gpars.group.NonDaemonPGroup
 import java.awt.Color
 import java.awt.Font
 import java.awt.GridLayout
-import java.util.concurrent.Semaphore
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -43,6 +42,8 @@ import javax.swing.plaf.metal.MetalLookAndFeel
  *
  * @author Vaclav Pech
  */
+
+ActiveObjectRegistry.instance.register("GOLDemo", new NonDaemonPGroup(8))
 
 new SwingLifeGameWithActiveObjects(30, 20).run()
 
@@ -104,7 +105,7 @@ final class Cell {
     }
 }
 
-@ActiveObject
+@ActiveObject("GOLDemo")
 final class SwingLifeGameWithActiveObjects {
     /* Controls the game */
     private final List<List<Cell>> cellGrid = []
@@ -119,12 +120,12 @@ final class SwingLifeGameWithActiveObjects {
     private JLabel iteration
     private JPanel scene
 
-    private final Semaphore nextGenerationPermit = new Semaphore(0)
     private int finishedCells
     private final int totalCells
+    private int generation = 0
+    boolean running = false
 
     SwingLifeGameWithActiveObjects(final gridWidth, final gridHeight) {
-        ActiveObjectRegistry.instance.register("GOLDemo", new NonDaemonPGroup(8))
         ActiveObjectRegistry.instance.register("GOLDemoGUI", new DefaultPGroup(1))
         this.gridWidth = gridWidth
         this.gridHeight = gridHeight
@@ -133,8 +134,9 @@ final class SwingLifeGameWithActiveObjects {
         totalCells = gridWidth * gridHeight
     }
 
+    @ActiveMethod
     void run() {
-        evolve(0)
+        evolve()
     }
 
     private void setupUI() {
@@ -166,13 +168,13 @@ final class SwingLifeGameWithActiveObjects {
                 }
                 hbox {
                     button(text: 'Start', id: 'startButton', actionPerformed: {
-                        nextGenerationPermit.release()
+                        startEvolution()
                         startButton.enabled = false
                         pauseButton.enabled = true
 
                     })
                     button(text: 'Pause', id: 'pauseButton', enabled: false, actionPerformed: {
-                        nextGenerationPermit.acquire()
+                        pauseEvolution()
                         pauseButton.enabled = false
                         startButton.enabled = true
                     })
@@ -216,30 +218,39 @@ final class SwingLifeGameWithActiveObjects {
     }
 
     @ActiveMethod
+    void startEvolution() {
+        if (!running) {
+            running = true
+            evolve()
+        }
+    }
+
+    @ActiveMethod
+    void pauseEvolution() {
+        running = false
+    }
+
+    @ActiveMethod
     void done() {
         finishedCells += 1
         if (finishedCells == totalCells) {
             finishedCells = 0
-            nextGenerationPermit.release()
+            if (running) evolve()
         }
     }
 
-    private void evolve(def generation) {
-        while (true) {
-            //Send heartbeats to all cells
-            (0..<gridHeight).each {rowIndex ->
-                (0..<gridWidth).each {columnIndex ->
-                    cellGrid[rowIndex][columnIndex].heartBeat()
-                }
+    private void evolve() {
+        sleep 1000
+        //Send heartbeats to all cells
+        (0..<gridHeight).each {rowIndex ->
+            (0..<gridWidth).each {columnIndex ->
+                cellGrid[rowIndex][columnIndex].heartBeat()
             }
+        }
 
-            builder.edt {
-                ++generation
-                iteration.text = generation
-            }
-            nextGenerationPermit.acquire(2)
-            sleep 1000
-            nextGenerationPermit.release()
+        builder.edt {
+            ++generation
+            iteration.text = generation
         }
     }
 }
