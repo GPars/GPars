@@ -28,6 +28,7 @@ h3. Dataflow
 * Added synchronous dataflow variables and channels
 * Read channels can report their length
 * Chaining of Promises using the new _then()_ method
+* Easy operator pipe-lining
 
 h3. Agent
 
