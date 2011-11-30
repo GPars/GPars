@@ -165,6 +165,8 @@ public interface DataflowReadChannel<T> {
      */
     void wheneverBound(final MessageStream stream);
 
+    <V> DataflowReadChannel<V> chainWith(final Closure closure);
+
     /**
      * Check if value has been set already for this expression
      *

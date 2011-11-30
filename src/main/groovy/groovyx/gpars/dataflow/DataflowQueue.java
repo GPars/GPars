@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
+import groovyx.gpars.dataflow.operator.ChainWithClosure;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
@@ -350,6 +351,13 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public final void wheneverBound(final MessageStream stream) {
         wheneverBoundListeners.add(stream);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final Closure closure) {
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        Dataflow.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
     }
 
     /**

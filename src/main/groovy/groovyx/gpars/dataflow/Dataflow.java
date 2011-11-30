@@ -17,7 +17,6 @@
 package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
-import groovyx.gpars.actor.Actor;
 import groovyx.gpars.dataflow.operator.DataflowProcessor;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
