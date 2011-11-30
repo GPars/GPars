@@ -165,7 +165,34 @@ public interface DataflowReadChannel<T> {
      */
     void wheneverBound(final MessageStream stream);
 
-    <V> DataflowReadChannel<V> chainWith(final Closure closure);
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final Pool pool, final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param group   The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure);
 
     /**
      * Check if value has been set already for this expression

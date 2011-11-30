@@ -27,6 +27,7 @@ import groovyx.gpars.dataflow.SyncDataflowVariable;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
@@ -208,9 +209,19 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     @Override
-    public <V> DataflowReadChannel<V> chainWith(final Closure closure) {
+    public final <V> DataflowReadChannel<V> chainWith(final Closure<V> closure) {
+        return chainWith(Dataflow.DATA_FLOW_GROUP, closure);
+    }
+
+    @Override
+    public final <V> DataflowReadChannel<V> chainWith(final Pool pool, final Closure<V> closure) {
+        return chainWith(new DefaultPGroup(pool), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
         final DataflowQueue<V> result = new DataflowQueue<V>();
-        Dataflow.operator(this, result, new ChainWithClosure<V>(closure));
+        group.operator(this, result, new ChainWithClosure<V>(closure));
         return result;
     }
 

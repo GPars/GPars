@@ -16,6 +16,10 @@
 
 package groovyx.gpars.dataflow;
 
+import groovy.lang.Closure;
+import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.group.PGroup;
+
 import java.util.ArrayList;
 
 /**
@@ -42,6 +46,13 @@ public final class SyncDataflowQueue<T> extends DataflowQueue<T> {
     @Override
     protected DataflowVariable<T> createVariable() {
         return new SyncDataflowVariable<T>(1);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
+        final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
+        group.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
     }
 
     @Override

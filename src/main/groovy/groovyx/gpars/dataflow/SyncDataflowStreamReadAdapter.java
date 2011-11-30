@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
+import groovyx.gpars.dataflow.operator.ChainWithClosure;
 import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
 import groovyx.gpars.dataflow.stream.StreamCore;
 import groovyx.gpars.group.PGroup;
@@ -127,6 +128,13 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
         checkClosed();
         wheneverBoundSet = true;
         super.wheneverBound(stream);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
+        final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
+        group.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
     }
 
     @Override

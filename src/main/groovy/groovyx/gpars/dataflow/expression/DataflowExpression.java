@@ -25,12 +25,12 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.DataCallbackWithPool;
 import groovyx.gpars.dataflow.Dataflow;
-import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
@@ -600,10 +600,22 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
-    public <V> DataflowReadChannel<V> chainWith(final Closure closure) {
-        final DataflowQueue<V> result = new DataflowQueue<V>();
-        Dataflow.operator(this, result, new ChainWithClosure<V>(closure));
+    public final <V> DataflowReadChannel<V> chainWith(final Closure<V> closure) {
+        return chainWith(Dataflow.DATA_FLOW_GROUP, closure);
+    }
+
+    @Override
+    public final <V> DataflowReadChannel<V> chainWith(final Pool pool, final Closure<V> closure) {
+        return chainWith(new DefaultPGroup(pool), closure);
+    }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        group.operator(this, result, new ChainWithClosure<V>(closure));
         return result;
+
     }
 
     /**
