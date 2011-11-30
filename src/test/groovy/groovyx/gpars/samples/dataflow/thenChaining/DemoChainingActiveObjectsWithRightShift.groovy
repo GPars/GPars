@@ -23,7 +23,7 @@ import groovyx.gpars.dataflow.DataflowVariable
  */
 
 final DataflowVariable result = new DataflowVariable()
-final calculator = new ActiveDemoCalculator();
+final calculator = new ActiveDemoCalculator()
 calculator.doubler(4) >> {calculator.adder it} >> {result << it}
 assert 9 == result.val
 

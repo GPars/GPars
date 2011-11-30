@@ -24,7 +24,7 @@ import groovyx.gpars.dataflow.DataflowVariable
 
 final DataflowVariable result = new DataflowVariable()
 final DataflowVariable variable = new DataflowVariable()
-final calculator = new ActiveDemoCalculator();
+final calculator = new ActiveDemoCalculator()
 
 variable.then calculator.&doubler then calculator.&adder then {result << it}
 
