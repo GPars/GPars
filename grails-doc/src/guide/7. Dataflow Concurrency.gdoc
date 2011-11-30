@@ -410,6 +410,30 @@ calculator.doubler(4).then {calculator.adder it}.then {result << it}
 assert 9 == result.val
 {code}
 
+{note:Title=Motivation for chaining Promises}
+Chaining can save quite some code when calling asynchronous services from within _whenBound()_ handlers. Asynchronous services,
+such as _Asynchronous Functions_ or _Active Methods_, return _Promises_ for their results. To obtain the actual results
+your handlers would either have to block to wait for the value to be bound, which would lock the current thread in an unproductive state,
+{code}
+variable.whenBound {
+    Promise promise = asyncFunction()
+    println promise.get()
+}
+{code}
+or, alternatively, it would register another (nested) _whenBound()_ handler, which would result in unnecessarily complex code.
+{code}
+variable.whenBound {
+    asyncFunction().whenBound {
+        println it
+    }
+}
+{code}
+Chaining Promises solves both of these issues elegantly:
+{code}
+variable >> asyncFunction >> {println it}
+{code}
+{note}
+
 The _RightShift_ (_>>_) operator has been overloaded to call _then()_ and so can be chained the same way:
 
 {code}
