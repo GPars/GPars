@@ -76,7 +76,7 @@ There are specialized versions of operators serving specific purposes:
   * prioritySelector - a selector that prefers delivering messages from lower-indexed input channels over higher-indexed ones
   * splitter - a single-input operator copying its input values to all of its output channels
 
-h4. Chaining operators
+h4. Wiring operators together
 
 Operators are typically combined into networks, when some operators consume output by other operators.
 
