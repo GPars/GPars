@@ -79,8 +79,8 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
     }
 
     @Override
-    public void rightShift(final Closure closure) {
-        whenBound(closure);
+    public <V> Promise<V> rightShift(final Closure closure) {
+        return then(closure);
     }
 
     @Override

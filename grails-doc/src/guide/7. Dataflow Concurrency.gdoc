@@ -356,6 +356,76 @@ Dataflow variables and broadcasts are one of several possible ways to implement 
 of the User Guide.
 {note}
 
+h2. Bind handlers chaining
+
+All dataflow channels also support the _then()_ method to register a handler (a callback) that should be invoked when a value becomes available. Unlike _whenBound()_ the _then()_ method allows for chaining,
+giving you the option to pass result values between functions asynchronously.
+{note}
+Notice that Groovy allows us to leave out some of the _dots_ in the _then()_ method chains.
+{note}
+
+{code}
+final DataflowVariable variable = new DataflowVariable()
+final DataflowVariable result = new DataflowVariable()
+
+variable.then {it * 2} then {it + 1} then {result << it}
+variable << 4
+assert 9 == result.val
+{code}
+
+This could be nicely combined with _Asynchronous functions_
+
+{code}
+final DataflowVariable variable = new DataflowVariable()
+final DataflowVariable result = new DataflowVariable()
+
+final doubler = {it * 2}
+final adder = {it + 1}
+
+variable.then doubler then adder then {result << it}
+
+Thread.start {variable << 4}
+assert 9 == result.val
+{code}
+
+or _ActiveObjects_
+
+{code}
+@ActiveObject
+class ActiveDemoCalculator {
+    @ActiveMethod
+    def doubler(int value) {
+        value * 2
+    }
+
+    @ActiveMethod
+    def adder(int value) {
+        value + 1
+    }
+}
+
+final DataflowVariable result = new DataflowVariable()
+final calculator = new ActiveDemoCalculator();
+calculator.doubler(4).then {calculator.adder it}.then {result << it}
+assert 9 == result.val
+{code}
+
+The _RightShift_ (_>>_) operator has been overloaded to call _then()_ and so can be chained the same way:
+
+{code}
+final DataflowVariable variable = new DataflowVariable()
+final DataflowVariable result = new DataflowVariable()
+
+final doubler = {it * 2}
+final adder = {it + 1}
+
+variable >> doubler >> adder >> {result << it}
+
+Thread.start {variable << 4}
+
+assert 9 == result.val
+{code}
+
 h2. Dataflow Expressions
 
 Look at the magic below:

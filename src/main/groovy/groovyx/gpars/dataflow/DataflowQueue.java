@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
+import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
@@ -240,8 +241,8 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @param closure closure to execute when data available
      */
     @Override
-    public final void rightShift(final Closure closure) {
-        whenBound(closure);
+    public final <V> Promise<V> rightShift(final Closure closure) {
+        return then(closure);
     }
 
     /**
@@ -282,6 +283,53 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public final void whenBound(final MessageStream stream) {
         getValAsync(stream);
+    }
+
+    /**
+     * Schedule closure to be executed after data became available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled
+     *
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    @Override
+    public final <V> Promise<V> then(final Closure closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
+    }
+
+    /**
+     * Schedule closure to be executed after data becomes available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    @Override
+    public <V> Promise<V> then(final Pool pool, final Closure closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(pool, new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
+    }
+
+    /**
+     * Schedule closure to be executed after data becomes available
+     * It is important to notice that even if data already available the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param group   The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    @Override
+    public <V> Promise<V> then(final PGroup group, final Closure closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(group, new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
     }
 
     /**
