@@ -122,8 +122,8 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed by pooled actor after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
@@ -148,8 +148,8 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     /**
-     * Schedule closure to be executed after data became available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
      * @param closure closure to execute when data available
@@ -163,8 +163,8 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     /**
-     * Schedule closure to be executed after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
@@ -179,8 +179,8 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     /**
-     * Schedule closure to be executed after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery

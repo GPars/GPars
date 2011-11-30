@@ -74,8 +74,8 @@ public interface DataflowReadChannel<T> {
     T getVal(final long timeout, final TimeUnit units) throws InterruptedException;
 
     /**
-     * Schedule closure to be executed after data became available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
      * @param closure closure to execute when data available
@@ -84,8 +84,8 @@ public interface DataflowReadChannel<T> {
     <V> Promise<V> rightShift(final Closure closure);
 
     /**
-     * Schedule closure to be executed after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param closure closure to execute when data available
@@ -93,8 +93,8 @@ public interface DataflowReadChannel<T> {
     void whenBound(final Closure closure);
 
     /**
-     * Schedule closure to be executed after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
@@ -103,8 +103,8 @@ public interface DataflowReadChannel<T> {
     void whenBound(final Pool pool, final Closure closure);
 
     /**
-     * Schedule closure to be executed after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
@@ -120,8 +120,8 @@ public interface DataflowReadChannel<T> {
     void whenBound(final MessageStream stream);
 
     /**
-     * Schedule closure to be executed after data became available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
      * @param closure closure to execute when data available
@@ -130,8 +130,8 @@ public interface DataflowReadChannel<T> {
     <V> Promise<V> then(final Closure closure);
 
     /**
-     * Schedule closure to be executed after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
@@ -141,8 +141,8 @@ public interface DataflowReadChannel<T> {
     <V> Promise<V> then(final Pool pool, final Closure closure);
 
     /**
-     * Schedule closure to be executed after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
@@ -152,14 +152,14 @@ public interface DataflowReadChannel<T> {
     <V> Promise<V> then(final PGroup group, final Closure closure);
 
     /**
-     * Send all pieces of data bound in the future to the provided stream when it becomes available     *
+     * Send all pieces of data bound in the future to the provided stream when it becomes available.     *
      *
      * @param closure closure to execute when data available
      */
     void wheneverBound(final Closure closure);
 
     /**
-     * Send all pieces of data bound in the future to the provided stream when it becomes available
+     * Send all pieces of data bound in the future to the provided stream when it becomes available.
      *
      * @param stream stream where to send result
      */
