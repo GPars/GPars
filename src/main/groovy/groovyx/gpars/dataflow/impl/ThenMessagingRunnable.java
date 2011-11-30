@@ -21,12 +21,9 @@ import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.dataflow.DataflowVariable;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 24.11.11
- * Time: 13:46
- * To change this template use File | Settings | File Templates.
+ * @author Vaclav Pech
  */
+
 public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
     private final DataflowVariable<V> result;
     private final Closure closure;

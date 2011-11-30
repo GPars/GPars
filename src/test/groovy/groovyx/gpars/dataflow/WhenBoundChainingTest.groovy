@@ -21,12 +21,9 @@ import groovyx.gpars.activeobject.ActiveObject
 import static groovyx.gpars.GParsPool.withPool
 
 /**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 24.11.11
- * Time: 12:15
- * To change this template use File | Settings | File Templates.
+ * @author Vaclav Pech
  */
+
 class WhenBoundChainingTest extends GroovyTestCase {
     public void testBasicChaining() {
         final DataflowVariable variable = new DataflowVariable()

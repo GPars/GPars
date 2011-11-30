@@ -20,12 +20,9 @@ import groovyx.gpars.activeobject.ActiveMethod
 import groovyx.gpars.activeobject.ActiveObject
 
 /**
- * Created by IntelliJ IDEA.
- * User: Vaclav
- * Date: 24.11.11
- * Time: 14:26
- * To change this template use File | Settings | File Templates.
+ * @author Vaclav Pech
  */
+
 @ActiveObject
 class ActiveDemoCalculator {
     @ActiveMethod
