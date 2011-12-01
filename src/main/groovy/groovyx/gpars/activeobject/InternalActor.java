@@ -58,7 +58,7 @@ public final class InternalActor extends AbstractLoopingActor {
      */
     DataflowVariable<Object> submit(final Object... args) {
         final DataflowVariable<Object> result = new DataflowVariable<Object>();
-        if (this.currentThread == Thread.currentThread()) result.bind(handleCurrentMessage(args));
+        if (this.currentThread == Thread.currentThread()) result.leftShift(handleCurrentMessage(args));
         else send(new Object[]{args, result});
         return result;
     }
@@ -90,7 +90,7 @@ public final class InternalActor extends AbstractLoopingActor {
     @SuppressWarnings({"unchecked", "MethodMayBeStatic"})
     public void onMessage(final Object[] msg) {
         final DataflowVariable<Object> promise = (DataflowVariable<Object>) msg[1];
-        promise.bind(handleCurrentMessage(msg[0]));
+        promise.leftShift(handleCurrentMessage(msg[0]));
     }
 
     @SuppressWarnings({"unchecked"})

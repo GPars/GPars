@@ -17,11 +17,11 @@
 package groovyx.gpars.samples.dataflow
 
 import groovy.swing.SwingBuilder
+import groovyx.gpars.GParsPool
 import groovyx.gpars.dataflow.DataflowBroadcast
 import groovyx.gpars.dataflow.DataflowReadChannel
 import groovyx.gpars.dataflow.operator.DataflowOperator
 import groovyx.gpars.group.NonDaemonPGroup
-import java.awt.Color
 import java.awt.Font
 import java.awt.GridLayout
 import java.util.concurrent.Semaphore
@@ -29,7 +29,6 @@ import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.metal.MetalLookAndFeel
 
@@ -51,7 +50,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel
 new SwingLifeGameWithDataflowOperators(30, 20).run()
 
 
-class SwingLifeGameWithDataflowOperators {
+class SwingLifeGameWithAsyncFunctions {
     /* Controls the game */
     final def initialGrid = []  //initial values entered by the user
     final List<List<DataflowBroadcast>> channelGrid = []  //the sequence of life values (0 or 1) for each cell
@@ -69,7 +68,7 @@ class SwingLifeGameWithDataflowOperators {
     private List<List<JButton>> visualCells = []  //refers to the visual cells in the UI
     private final Semaphore nextGenerationPermit = new Semaphore(0)
 
-    SwingLifeGameWithDataflowOperators(final gridWidth, final gridHeight) {
+    SwingLifeGameWithAsyncFunctions(final gridWidth, final gridHeight) {
         this.gridWidth = gridWidth
         this.gridHeight = gridHeight
         setupUI()
@@ -126,24 +125,32 @@ class SwingLifeGameWithDataflowOperators {
     }
 
     private def setupOperators() {
-        (0..<gridHeight).each {rowIndex ->
-            def operatorRow = []
-            (0..<gridWidth).each {columnIndex ->
-                def inputChannels = [channelGrid[rowIndex][columnIndex].createReadChannel()]
-                [rowIndex - 1, rowIndex, rowIndex + 1].each {currentRowIndex ->
-                    if (currentRowIndex in 0..<gridHeight) {
-                        if (columnIndex > 0) inputChannels.add(channelGrid[currentRowIndex][columnIndex - 1].createReadChannel())
-                        if (currentRowIndex != rowIndex) inputChannels.add(channelGrid[currentRowIndex][columnIndex].createReadChannel())
-                        if (columnIndex < gridWidth - 1) inputChannels.add(channelGrid[currentRowIndex][columnIndex + 1].createReadChannel())
-                    }
-                }
-                inputChannels.add(heartbeats.createReadChannel())
+        GParsPool.withExistingPool(group.threadPool) {
 
-                final Closure code = new SwingLifeClosure(this, inputChannels.size)
-                operatorRow[columnIndex] = group.operator(inputs: inputChannels, outputs: [channelGrid[rowIndex][columnIndex]], code)
+            final calculation = {heartbeat, myValue, value1, value2, value3, value4, value6, value7, value8, value9 ->
+
             }
-            operatorGrid.add(operatorRow)
+            (0..<gridHeight).each {rowIndex ->
+                def operatorRow = []
+                (0..<gridWidth).each {columnIndex ->
+                    def inputChannels = [channelGrid[rowIndex][columnIndex].createReadChannel()]
+                    [rowIndex - 1, rowIndex, rowIndex + 1].each {currentRowIndex ->
+                        if (currentRowIndex in 0..<gridHeight) {
+                            if (columnIndex > 0) inputChannels.add(channelGrid[currentRowIndex][columnIndex - 1].createReadChannel())
+                            if (currentRowIndex != rowIndex) inputChannels.add(channelGrid[currentRowIndex][columnIndex].createReadChannel())
+                            if (columnIndex < gridHeight - 1) inputChannels.add(channelGrid[currentRowIndex][columnIndex + 1].createReadChannel())
+                        }
+                    }
+                    inputChannels.add(heartbeats.createReadChannel())
+
+                    final Closure code = new SwingLifeClosure(this, inputChannels.size)
+                    operatorRow[columnIndex] = calculation.asyncFun()
+                    //group.operator(inputs: inputChannels, outputs: [channelGrid[rowIndex][columnIndex]], code)
+                }
+                operatorGrid.add(operatorRow)
+            }
         }
+
     }
 
     private def setupCells() {
@@ -190,49 +197,4 @@ class SwingLifeGameWithDataflowOperators {
     }
 }
 
-class SwingLifeClosure extends Closure {
-    final int numberOfArguments
 
-    SwingLifeClosure(final Object owner, final int numberOfArguments) {
-        super(owner)
-        this.numberOfArguments = numberOfArguments
-    }
-
-    @Override
-    final int getMaximumNumberOfParameters() {
-        return numberOfArguments
-    }
-
-    @Override
-    Object call(Object[] args) {
-        def result = args[0]
-        def mates = args[1..-2].findAll {it > 0}.size()
-        if (mates > 3) result = 0
-        else if (mates == 3) result = 1
-        else if (result == 1 && mates == 2)
-            result = 1
-        else
-            result = 0
-
-        bindOutput result
-    }
-}
-
-final class SwingLifePrintClosure extends SwingLifeClosure {
-    private final List<JButton> visualCellRow
-
-    SwingLifePrintClosure(final Object owner, final int numberOfArguments, final List<JButton> visualCellRow) {
-        super(owner, numberOfArguments)
-        this.visualCellRow = visualCellRow
-    }
-
-    @Override
-    Object call(Object[] args) {
-        final row = visualCellRow
-        SwingUtilities.invokeLater {
-            args.eachWithIndex {value, index ->
-                row[index].background = value == 1 ? Color.BLUE : Color.WHITE
-            }
-        }
-    }
-}
