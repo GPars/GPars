@@ -41,6 +41,8 @@ public final class DataCallbackWithPool extends MessageStream {
     public DataCallbackWithPool(final Pool pool, final Closure code) {
         if (pool == null)
             throw new IllegalArgumentException("Cannot create a DataCallbackWithPool without a pool parameter specified");
+        if (code.getMaximumNumberOfParameters() > 1)
+            throw new IllegalArgumentException("The supplied closure expects more than one argument.");
         this.pool = pool;
         this.code = code;
     }
@@ -55,7 +57,8 @@ public final class DataCallbackWithPool extends MessageStream {
         pool.execute(new Runnable() {
             @Override
             public void run() {
-                code.call(message);
+                if (code.getMaximumNumberOfParameters() == 1) code.call(message);
+                else code.call();
             }
         });
         return this;

@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
+import groovyx.gpars.dataflow.operator.ChainWithClosure;
 import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
 import groovyx.gpars.dataflow.stream.StreamCore;
 import groovyx.gpars.group.PGroup;
@@ -95,7 +96,7 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
     public void whenBound(final Pool pool, final Closure closure) {
@@ -127,6 +128,13 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
         checkClosed();
         wheneverBoundSet = true;
         super.wheneverBound(stream);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
+        final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
+        group.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
     }
 
     @Override

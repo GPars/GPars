@@ -16,9 +16,12 @@
 
 package groovyx.gpars.dataflow;
 
+import groovy.lang.Closure;
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.impl.ResizeableCountDownLatch;
+import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.group.PGroup;
 
 import java.util.concurrent.TimeUnit;
 
@@ -103,6 +106,13 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
      */
     public boolean awaitingParties() {
         return !parties.isReleasedFlag();
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
+        final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
+        group.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
     }
 
     @Override

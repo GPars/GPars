@@ -41,6 +41,8 @@ public final class DataCallback extends MessageStream {
     public DataCallback(final Closure code, final PGroup pGroup) {
         if (pGroup == null)
             throw new IllegalArgumentException("Cannot create a DataCallback without a parallelGroup parameter");
+        if (code.getMaximumNumberOfParameters() > 1)
+            throw new IllegalArgumentException("The supplied closure expects more than one argument.");
         this.parallelGroup = pGroup;
         this.code = code;
     }
@@ -57,7 +59,8 @@ public final class DataCallback extends MessageStream {
             public void run() {
                 Dataflow.activeParallelGroup.set(parallelGroup);
                 try {
-                    code.call(message);
+                    if (code.getMaximumNumberOfParameters() == 1) code.call(message);
+                    else code.call();
                 } finally {
                     Dataflow.activeParallelGroup.remove();
                 }

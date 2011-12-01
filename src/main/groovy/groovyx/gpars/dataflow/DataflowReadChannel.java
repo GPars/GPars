@@ -78,7 +78,7 @@ public interface DataflowReadChannel<T> {
      * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     <V> Promise<V> rightShift(final Closure closure);
@@ -88,7 +88,7 @@ public interface DataflowReadChannel<T> {
      * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     void whenBound(final Closure closure);
 
@@ -98,7 +98,7 @@ public interface DataflowReadChannel<T> {
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     void whenBound(final Pool pool, final Closure closure);
 
@@ -108,7 +108,7 @@ public interface DataflowReadChannel<T> {
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     void whenBound(final PGroup group, final Closure closure);
 
@@ -124,7 +124,7 @@ public interface DataflowReadChannel<T> {
      * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     <V> Promise<V> then(final Closure closure);
@@ -135,7 +135,7 @@ public interface DataflowReadChannel<T> {
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     <V> Promise<V> then(final Pool pool, final Closure closure);
@@ -146,7 +146,7 @@ public interface DataflowReadChannel<T> {
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     <V> Promise<V> then(final PGroup group, final Closure closure);
@@ -154,7 +154,7 @@ public interface DataflowReadChannel<T> {
     /**
      * Send all pieces of data bound in the future to the provided stream when it becomes available.     *
      *
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     void wheneverBound(final Closure closure);
 
@@ -164,6 +164,35 @@ public interface DataflowReadChannel<T> {
      * @param stream stream where to send result
      */
     void wheneverBound(final MessageStream stream);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final Pool pool, final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param group   The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure);
 
     /**
      * Check if value has been set already for this expression

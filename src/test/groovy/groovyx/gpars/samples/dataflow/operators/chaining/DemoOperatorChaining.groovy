@@ -14,24 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow.thenChaining
+package groovyx.gpars.samples.dataflow.operators.chaining
 
-import groovyx.gpars.activeobject.ActiveMethod
-import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.dataflow.DataflowQueue
 
 /**
+ * The chainWith() method available on all channels allows you to build pipe-lines off the original channel.
+ * The type of the channel gets preserved across the whole chain.
+ *
  * @author Vaclav Pech
  */
 
-@ActiveObject
-class ActiveDemoCalculator {
-    @ActiveMethod
-    def doubler(int value) {
-        value * 2
-    }
+final DataflowQueue queue = new DataflowQueue()
+queue.chainWith {it * 2}.chainWith {it + 1} chainWith {println it}
 
-    @ActiveMethod
-    def adder(int value) {
-        value + 1
-    }
-}
+queue << 1
+queue << 2
+queue << 3
+queue << 4
+queue << 5
+
+sleep 1000
+
