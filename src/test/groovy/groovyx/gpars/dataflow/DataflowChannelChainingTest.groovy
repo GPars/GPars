@@ -55,6 +55,21 @@ class DataflowChannelChainingTest extends GroovyTestCase {
         assert 11 == result.val
     }
 
+    public void testClosureArguments() {
+        final DataflowQueue queue = new DataflowQueue()
+        final DataflowVariable result = new DataflowVariable()
+
+        shouldFail(IllegalArgumentException) {
+            queue.chainWith {a, b ->}
+        }
+        shouldFail(IllegalArgumentException) {
+            queue.chainWith {a, b, c ->}
+        }
+        shouldFail(IllegalArgumentException) {
+            queue.chainWith {-> result << 1}
+        }
+    }
+
     public void testSyncQueue() {
         final SyncDataflowQueue queue = new SyncDataflowQueue()
         final result = queue.chainWith(group) {it * 2}.chainWith(group) {it + 1}.chainWith(group) {it}

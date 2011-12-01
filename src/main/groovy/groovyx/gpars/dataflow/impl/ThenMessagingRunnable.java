@@ -29,12 +29,14 @@ public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
     private final Closure closure;
 
     public ThenMessagingRunnable(final DataflowVariable<V> result, final Closure closure) {
+        if (closure.getMaximumNumberOfParameters() > 1)
+            throw new IllegalArgumentException("The supplied closure expects more than one argument.");
         this.result = result;
         this.closure = closure;
     }
 
     @Override
     protected void doRun(final T argument) {
-        result.leftShift((V) closure.call(argument));
+        result.leftShift(closure.getMaximumNumberOfParameters() == 1 ? (V) closure.call(argument) : (V) closure.call());
     }
 }

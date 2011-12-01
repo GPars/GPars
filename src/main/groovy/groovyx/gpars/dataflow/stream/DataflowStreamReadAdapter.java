@@ -131,7 +131,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
     public void whenBound(final Pool pool, final Closure closure) {
@@ -156,7 +156,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
      * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
@@ -172,7 +172,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
@@ -188,7 +188,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override

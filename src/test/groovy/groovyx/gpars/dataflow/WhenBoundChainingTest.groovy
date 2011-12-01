@@ -34,6 +34,67 @@ class WhenBoundChainingTest extends GroovyTestCase {
         assert 9 == result.val
     }
 
+    public void testClosureArguments() {
+        final DataflowVariable variable = new DataflowVariable()
+        final DataflowVariable result = new DataflowVariable()
+
+        shouldFail(IllegalArgumentException) {
+            variable.then {a, b ->}
+        }
+        shouldFail(IllegalArgumentException) {
+            variable.then {a, b, c ->}
+        }
+        variable.then {-> result << 1}
+        variable << 4
+        assert 1 == result.val
+    }
+
+    public void testWhenBoundClosureArguments() {
+        final DataflowVariable variable = new DataflowVariable()
+        final DataflowVariable result = new DataflowVariable()
+
+        shouldFail(IllegalArgumentException) {
+            variable.whenBound {a, b ->}
+        }
+        shouldFail(IllegalArgumentException) {
+            variable.whenBound {a, b, c ->}
+        }
+        variable.whenBound {-> result << 1}
+        variable << 4
+        assert 1 == result.val
+    }
+
+    public void testWhenBoundWithPoolClosureArguments() {
+        final DataflowVariable variable = new DataflowVariable()
+        final DataflowVariable result = new DataflowVariable()
+
+        shouldFail(IllegalArgumentException) {
+            variable.whenBound(Dataflow.DATA_FLOW_GROUP.threadPool) {a, b ->}
+        }
+        shouldFail(IllegalArgumentException) {
+            variable.whenBound(Dataflow.DATA_FLOW_GROUP.threadPool) {a, b, c ->}
+        }
+        variable.whenBound(Dataflow.DATA_FLOW_GROUP.threadPool) {-> result << 1}
+        variable << 4
+        assert 1 == result.val
+    }
+
+    public void testWhenBoundWithGroupClosureArguments() {
+        final DataflowVariable variable = new DataflowVariable()
+        final DataflowVariable result = new DataflowVariable()
+
+        shouldFail(IllegalArgumentException) {
+            variable.whenBound(Dataflow.DATA_FLOW_GROUP) {a, b ->}
+        }
+        shouldFail(IllegalArgumentException) {
+            variable.whenBound(Dataflow.DATA_FLOW_GROUP) {a, b, c ->}
+        }
+        variable.whenBound(Dataflow.DATA_FLOW_GROUP) {-> result << 1}
+        variable << 4
+        assert 1 == result.val
+    }
+
+
     public void testBasicChainingWithRightShift() {
         final DataflowVariable variable = new DataflowVariable()
         final DataflowVariable result = new DataflowVariable()

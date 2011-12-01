@@ -96,7 +96,7 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
-     * @param closure closure to execute when data available
+     * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
     public void whenBound(final Pool pool, final Closure closure) {
