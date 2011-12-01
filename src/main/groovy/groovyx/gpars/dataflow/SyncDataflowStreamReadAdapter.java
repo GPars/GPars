@@ -79,8 +79,8 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
     }
 
     @Override
-    public void rightShift(final Closure closure) {
-        whenBound(closure);
+    public <V> Promise<V> rightShift(final Closure closure) {
+        return then(closure);
     }
 
     @Override
@@ -90,8 +90,8 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
     }
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed by pooled actor after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery

@@ -92,17 +92,18 @@ public interface Promise<T> {
     T getVal(final long timeout, final TimeUnit units) throws InterruptedException;
 
     /**
-     * Schedule closure to be executed by pooled actor after data became available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
      * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    void rightShift(final Closure closure);
+    <V> Promise<V> rightShift(final Closure closure);
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param closure closure to execute when data available
@@ -110,8 +111,8 @@ public interface Promise<T> {
     void whenBound(final Closure closure);
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
@@ -120,8 +121,8 @@ public interface Promise<T> {
     void whenBound(final Pool pool, final Closure closure);
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
@@ -135,6 +136,38 @@ public interface Promise<T> {
      * @param stream stream where to send result
      */
     void whenBound(final MessageStream stream);
+
+    /**
+     * Schedule closure to be executed after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled
+     *
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    <V> Promise<V> then(final Closure closure);
+
+    /**
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    <V> Promise<V> then(final Pool pool, final Closure closure);
+
+    /**
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param group   The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    <V> Promise<V> then(final PGroup group, final Closure closure);
 
     /**
      * Check if value has been set already for this expression

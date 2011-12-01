@@ -26,6 +26,9 @@ import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.DataCallbackWithPool;
 import groovyx.gpars.dataflow.Dataflow;
 import groovyx.gpars.dataflow.DataflowReadChannel;
+import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
@@ -468,20 +471,20 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Schedule closure to be executed by pooled actor after data became available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed by pooled actor after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
      *
      * @param closure closure to execute when data available
      */
     @Override
-    public final void rightShift(final Closure closure) {
-        whenBound(closure);
+    public final <V> Promise<V> rightShift(final Closure closure) {
+        return then(closure);
     }
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed by pooled actor after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param closure closure to execute when data available
@@ -492,8 +495,8 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed by pooled actor after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
@@ -505,8 +508,8 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Schedule closure to be executed by pooled actor after data becomes available
-     * It is important to notice that even if data already available the execution of closure
+     * Schedule closure to be executed by pooled actor after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled.
      *
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
@@ -528,7 +531,54 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Send all pieces of data bound in the future to the provided stream when it becomes available     *
+     * Schedule closure to be executed after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled
+     *
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    @Override
+    public final <V> Promise<V> then(final Closure closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
+    }
+
+    /**
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    @Override
+    public <V> Promise<V> then(final Pool pool, final Closure closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(pool, new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
+    }
+
+    /**
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param group   The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closure closure to execute when data available
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    @Override
+    public <V> Promise<V> then(final PGroup group, final Closure closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(group, new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
+    }
+
+    /**
+     * Send all pieces of data bound in the future to the provided stream when it becomes available.     *
      *
      * @param closure closure to execute when data available
      */
@@ -538,7 +588,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     /**
-     * Send all pieces of data bound in the future to the provided stream when it becomes available
+     * Send all pieces of data bound in the future to the provided stream when it becomes available.
      *
      * @param stream stream where to send result
      */
@@ -757,4 +807,5 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
             expr.doBindRemote(hostId, message);
         }
     }
+
 }

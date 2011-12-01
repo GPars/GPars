@@ -39,7 +39,11 @@ def downloadPage(def url) {
     def page = new DataflowVariable()
     task {
         println "Started downloading from $url"
-        page << url.toURL().text
+        try {
+            page << url.toURL().text
+        } catch (all) {
+            page << 'Could not download the page'
+        }
         println "Done downloading from $url"
     }
     return page
