@@ -20,7 +20,6 @@ import groovy.swing.SwingBuilder
 import groovy.transform.Immutable
 import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.actor.StaticDispatchActor
 import groovyx.gpars.group.NonDaemonPGroup
 import java.awt.Color
 import java.awt.Font
@@ -246,7 +245,7 @@ final class SwingLifeGameWithActors extends DynamicDispatchActor {
     }
 }
 
-final class PrinterActor extends StaticDispatchActor {
+final class PrinterActor extends DynamicDispatchActor {
     private final List<List<JButton>> visualCells
 
     PrinterActor(final List<List<JButton>> visualCells) {
