@@ -27,7 +27,7 @@ import groovy.lang.Closure;
 
 public final class CopyChannelsClosure<V> extends Closure {
 
-    private static final Class[] PARAPETER_TYPES = {Object.class};
+    private static final Class[] PARAMETER_TYPES = {Object.class};
 
     public CopyChannelsClosure() {
         super(null, null);
@@ -41,7 +41,7 @@ public final class CopyChannelsClosure<V> extends Closure {
     @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
     @Override
     public Class[] getParameterTypes() {
-        return PARAPETER_TYPES;
+        return PARAMETER_TYPES;
     }
 
     @Override
