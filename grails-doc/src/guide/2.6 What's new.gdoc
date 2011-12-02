@@ -23,12 +23,12 @@ h3. Dataflow
 
 * Operator and selector speed-up
 * Kanban-style dataflow operator management has been added
+* Chaining of Promises using the new _then()_ method
+* Added a DSL for easy operator pipe-lining
 * Polished the way operators can be stopped
 * Added support for custom error handlers
 * Added synchronous dataflow variables and channels
 * Read channels can report their length
-* Chaining of Promises using the new _then()_ method
-* Easy operator pipe-lining
 
 h3. Agent
 
