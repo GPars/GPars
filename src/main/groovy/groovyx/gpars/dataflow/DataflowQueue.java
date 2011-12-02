@@ -21,6 +21,7 @@ import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
@@ -29,10 +30,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Arrays.asList;
 
 /**
  * Represents a thread-safe data flow stream. Values or DataflowVariables are added using the '<<' operator
@@ -45,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vaclav Pech
  *         Date: Jun 5, 2009
  */
-@SuppressWarnings({"ClassWithTooManyMethods"})
+@SuppressWarnings({"ClassWithTooManyMethods", "unchecked"})
 public class DataflowQueue<T> implements DataflowChannel<T> {
 
     /**
@@ -369,6 +373,51 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
         final DataflowQueue<V> result = new DataflowQueue<V>();
         group.operator(this, result, new ChainWithClosure<V>(closure));
         return result;
+    }
+
+    @Override
+    public <V> void into(final DataflowWriteChannel<V> target) {
+        into(Dataflow.DATA_FLOW_GROUP, target);
+    }
+
+    @Override
+    public <V> void into(final Pool pool, final DataflowWriteChannel<V> target) {
+        into(new DefaultPGroup(pool), target);
+    }
+
+    @Override
+    public <V> void into(final PGroup group, final DataflowWriteChannel<V> target) {
+        group.operator(this, target, new ChainWithClosure(new CopyChannelsClosure()));
+    }
+
+    @Override
+    public <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+        split(Dataflow.DATA_FLOW_GROUP, target1, target2);
+    }
+
+    @Override
+    public <V> void split(final Pool pool, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+        split(new DefaultPGroup(pool), target1, target2);
+    }
+
+    @Override
+    public <V> void split(final PGroup group, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+        split(group, asList(target1, target2));
+    }
+
+    @Override
+    public <V> void split(final List<DataflowWriteChannel<V>> targets) {
+        split(Dataflow.DATA_FLOW_GROUP, targets);
+    }
+
+    @Override
+    public <V> void split(final Pool pool, final List<DataflowWriteChannel<V>> targets) {
+        split(new DefaultPGroup(pool), targets);
+    }
+
+    @Override
+    public <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets) {
+        group.operator(asList(this), targets, new ChainWithClosure(new CopyChannelsClosure()));
     }
 
     /**

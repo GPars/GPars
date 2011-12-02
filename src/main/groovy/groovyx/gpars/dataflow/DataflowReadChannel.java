@@ -22,6 +22,7 @@ import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -177,7 +178,7 @@ public interface DataflowReadChannel<T> {
     /**
      * Creates and attaches a new operator processing values from the channel
      *
-     * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
+     * @param pool    The thread pool to use
      * @param closure The function to invoke on all incoming values as part of the new operator's body
      * @param <V>     The type of values returned from the supplied closure
      * @return A channel of the same type as this channel, which the new operator will output into.
@@ -187,12 +188,93 @@ public interface DataflowReadChannel<T> {
     /**
      * Creates and attaches a new operator processing values from the channel
      *
-     * @param group   The PGroup to use for task scheduling for asynchronous message delivery
+     * @param group   The PGroup to use
      * @param closure The function to invoke on all incoming values as part of the new operator's body
      * @param <V>     The type of values returned from the supplied closure
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
     <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param target The channel to copy data into
+     * @param <V>    The type of values passed between the channels
+     */
+    <V> void into(final DataflowWriteChannel<V> target);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param pool   The thread pool to use
+     * @param target The channel to copy data into
+     * @param <V>    The type of values passed between the channels
+     */
+    <V> void into(final Pool pool, final DataflowWriteChannel<V> target);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param group  The PGroup to use
+     * @param target The channel to copy data into
+     * @param <V>    The type of values passed between the channels
+     */
+    <V> void into(final PGroup group, final DataflowWriteChannel<V> target);
+
+    /**
+     * Splits the output of the current channel to be an input for the specified channels
+     *
+     * @param target1 The first channel to copy data into
+     * @param target2 The second channel to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2);
+
+    /**
+     * Splits the output of the current channel to be an input for the specified channels
+     *
+     * @param pool    The thread pool to use
+     * @param target1 The first channel to copy data into
+     * @param target2 The second channel to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    <V> void split(final Pool pool, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2);
+
+    /**
+     * Splits the output of the current channel to be an input for the specified channels
+     *
+     * @param group   The PGroup to use
+     * @param target1 The first channel to copy data into
+     * @param target2 The second channel to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    <V> void split(final PGroup group, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channels
+     *
+     * @param targets The channels to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    <V> void split(final List<DataflowWriteChannel<V>> targets);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channels
+     *
+     * @param pool    The thread pool to use
+     * @param targets The channels to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    <V> void split(final Pool pool, final List<DataflowWriteChannel<V>> targets);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channels
+     *
+     * @param group   The PGroup to use
+     * @param targets The channels to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets);
 
     /**
      * Check if value has been set already for this expression
