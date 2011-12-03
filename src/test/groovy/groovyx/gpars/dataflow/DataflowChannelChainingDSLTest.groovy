@@ -148,4 +148,15 @@ class DataflowChannelChainingDSLTest extends GroovyTestCase {
             assert 2 == it.val
         }
     }
+
+    public void testDelegatePropagation() {
+        final DataflowQueue queue = new DataflowQueue()
+        def result = queue.chainWith {
+            bindOutput 10
+            return 2
+        }
+        queue << 1
+        assert 10 == result.val
+        assert 2 == result.val
+    }
 }

@@ -44,6 +44,18 @@ public final class ChainWithClosure<V> extends Closure {
     }
 
     @Override
+    public void setDelegate(final Object delegate) {
+        super.setDelegate(delegate);
+        code.setDelegate(delegate);
+    }
+
+    @Override
+    public void setResolveStrategy(final int resolveStrategy) {
+        super.setResolveStrategy(resolveStrategy);
+        code.setResolveStrategy(resolveStrategy);
+    }
+
+    @Override
     public Object call(final Object arguments) {
         final V result = (V) code.call(arguments);
         ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
