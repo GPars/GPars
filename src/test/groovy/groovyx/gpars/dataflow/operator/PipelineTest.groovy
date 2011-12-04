@@ -38,7 +38,7 @@ public class PipelineTest extends GroovyTestCase {
     public void testPipeline() {
         final DataflowQueue queue = new DataflowQueue()
         final DataflowQueue result = new DataflowQueue()
-        final Pipeline pipeline = new Pipeline(queue)
+        final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
         pipeline | {it * 2} | {it + 1} | result
@@ -58,7 +58,7 @@ public class PipelineTest extends GroovyTestCase {
 
     public void testPipelineOutput() {
         final DataflowQueue queue = new DataflowQueue()
-        final Pipeline pipeline = new Pipeline(queue)
+        final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
         pipeline | {it * 2} | {it + 1}
@@ -77,7 +77,7 @@ public class PipelineTest extends GroovyTestCase {
         final DataflowQueue queue = new DataflowQueue()
         final DataflowQueue result1 = new DataflowQueue()
         final DataflowQueue result2 = new DataflowQueue()
-        final Pipeline pipeline = new Pipeline(queue)
+        final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
         pipeline | {it * 2} | {it + 1}
@@ -105,7 +105,7 @@ public class PipelineTest extends GroovyTestCase {
         final DataflowQueue queue = new DataflowQueue()
         final DataflowQueue result1 = new DataflowQueue()
         final DataflowQueue result2 = new DataflowQueue()
-        final Pipeline pipeline = new Pipeline(queue)
+        final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
         pipeline | {it * 2} | {it + 1}
@@ -130,4 +130,38 @@ public class PipelineTest extends GroovyTestCase {
         assert 5 == result2.val
         assert 7 == result2.val
     }
+
+    public void testMerge() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        new Pipeline(group, queue1).merge(queue2) {a, b -> a + b}.into queue3
+
+        queue1 << 1
+        queue1 << 2
+        queue2 << 3
+        queue2 << 4
+
+        assert 4 == queue3.val
+        assert 6 == queue3.val
+    }
+
+    public void testMergeMultiple() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        final DataflowQueue queue4 = new DataflowQueue()
+        new Pipeline(group, queue1).merge([queue2, queue3]) {a, b, c -> a + b + c}.into queue4
+
+        queue1 << 1
+        queue1 << 2
+        queue2 << 3
+        queue2 << 4
+        queue3 << 10
+        queue3 << 10
+
+        assert 14 == queue4.val
+        assert 16 == queue4.val
+    }
+
 }

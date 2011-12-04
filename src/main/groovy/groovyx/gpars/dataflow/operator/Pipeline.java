@@ -152,4 +152,31 @@ public final class Pipeline {
         output = output.tap(group, target);
         return this;
     }
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param other   The channel to merge with
+     * @param <V>     The type of values read from the supplied channel.
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> Pipeline merge(final DataflowReadChannel<V> other, final Closure closure) {
+        checkState();
+        output = output.merge(other, closure);
+        return this;
+    }
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    Pipeline merge(final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        checkState();
+        output = output.merge(others, closure);
+        return this;
+    }
 }

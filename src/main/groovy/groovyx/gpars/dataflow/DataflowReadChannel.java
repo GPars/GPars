@@ -323,6 +323,70 @@ public interface DataflowReadChannel<T> {
     <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target);
 
     /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param other   The channel to merge with
+     * @param <V>     The type of values passed between the channels
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param pool    The thread pool to use
+     * @param other   The channel to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param group   The PGroup to use
+     * @param other   The channel to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param pool    The thread pool to use
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param group   The PGroup to use
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure);
+
+    /**
      * Check if value has been set already for this expression
      *
      * @return true if bound already

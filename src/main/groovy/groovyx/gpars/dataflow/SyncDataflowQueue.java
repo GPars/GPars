@@ -22,6 +22,7 @@ import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.group.PGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -58,7 +59,6 @@ public final class SyncDataflowQueue<T> extends DataflowQueue<T> {
         return result;
     }
 
-    @SuppressWarnings({"ClassReferencesSubclass"})
     @Override
     public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
         final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
@@ -66,6 +66,15 @@ public final class SyncDataflowQueue<T> extends DataflowQueue<T> {
         return result;
     }
 
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
+        final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
+        inputs.add(this);
+        inputs.addAll(others);
+        group.operator(inputs, asList(result), new ChainWithClosure(closure));
+        return result;
+    }
 
     @Override
     public String toString() {

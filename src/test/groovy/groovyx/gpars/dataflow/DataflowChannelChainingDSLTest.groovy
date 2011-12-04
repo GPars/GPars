@@ -181,4 +181,119 @@ class DataflowChannelChainingDSLTest extends GroovyTestCase {
             assert 10 == it.val
         }
     }
+
+    public void testMerge() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        queue1.merge(group, queue2) {a, b -> a + b}.into queue3
+
+        queue1 << 1
+        queue1 << 2
+        queue2 << 3
+        queue2 << 4
+
+        assert 4 == queue3.val
+        assert 6 == queue3.val
+    }
+
+    public void testMergeClosureArguments() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        shouldFail(IllegalArgumentException) {
+            queue1.merge(group, queue2) {->}
+        }
+        shouldFail(IllegalArgumentException) {
+            queue1.merge(group, queue2) {it}
+        }
+        shouldFail(IllegalArgumentException) {
+            queue1.merge(group, queue2) {a, b, c ->}
+        }
+        shouldFail(IllegalArgumentException) {
+            queue1.merge(group, [queue2, queue3]) {a, b ->}
+        }
+    }
+
+    public void testSyncMerge() {
+        final SyncDataflowQueue queue1 = new SyncDataflowQueue()
+        final SyncDataflowQueue queue2 = new SyncDataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        final DataflowReadChannel pipeline = queue1.merge(group, queue2) {a, b -> a + b}
+        pipeline.into queue3
+
+        Thread.start {
+            queue1 << 1
+            queue1 << 2
+        }
+
+        Thread.start {
+            queue2 << 3
+            queue2 << 4
+        }
+
+        assert 4 == queue3.val
+        assert 6 == queue3.val
+        assert pipeline instanceof SyncDataflowQueue
+    }
+
+    public void testMergeBroadcast() {
+        final DataflowBroadcast broadcast1 = new DataflowBroadcast()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        broadcast1.createReadChannel().merge(group, queue2) {a, b -> a + b}.into queue3
+
+        broadcast1 << 1
+        broadcast1 << 2
+        queue2 << 3
+        queue2 << 4
+
+        assert 4 == queue3.val
+        assert 6 == queue3.val
+    }
+
+    public void testMergeSyncBroadcast() {
+        final SyncDataflowBroadcast broadcast1 = new SyncDataflowBroadcast()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        final DataflowReadChannel pipeline = broadcast1.createReadChannel().merge(group, queue2) {a, b -> a + b}
+        pipeline.into queue3
+
+        Thread.start {
+            broadcast1 << 1
+            broadcast1 << 2
+        }
+        queue2 << 3
+        queue2 << 4
+
+        assert 4 == queue3.val
+        assert 6 == queue3.val
+        assert pipeline instanceof SyncDataflowQueue
+    }
+
+    public void testMergeDFV() {
+        final DataflowVariable queue1 = new DataflowVariable()
+        final DataflowVariable queue2 = new DataflowVariable()
+        final DataflowVariable queue3 = new DataflowVariable()
+        queue1.merge(group, queue2) {a, b -> a + b}.into queue3
+
+        queue1 << 1
+        queue2 << 3
+
+        assert 4 == queue3.val
+    }
+
+    public void testMergeSyncDFV() {
+        final SyncDataflowVariable queue1 = new SyncDataflowVariable()
+        final SyncDataflowVariable queue2 = new SyncDataflowVariable()
+        final SyncDataflowVariable queue3 = new SyncDataflowVariable()
+        final DataflowReadChannel pipeline = queue1.merge(group, queue2) {a, b -> a + b}
+        pipeline.into queue3
+
+        queue1 << 1
+        queue2 << 3
+
+        assert 4 == queue3.val
+        assert pipeline instanceof SyncDataflowVariable
+    }
 }

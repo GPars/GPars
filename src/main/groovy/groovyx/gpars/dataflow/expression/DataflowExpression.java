@@ -42,6 +42,7 @@ import groovyx.gpars.serial.SerialMsg;
 import groovyx.gpars.serial.WithSerialId;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -691,6 +692,42 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure closure) {
+        return merge(asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure closure) {
+        return merge(pool, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure closure) {
+        return merge(group, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        return merge(Dataflow.DATA_FLOW_GROUP, others, closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        return merge(new DefaultPGroup(pool), others, closure);
+    }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
+        inputs.add(this);
+        inputs.addAll(others);
+        group.operator(inputs, asList(result), new ChainWithClosure(closure));
         return result;
     }
 

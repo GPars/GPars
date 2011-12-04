@@ -149,7 +149,7 @@ Merging allows you to join multiple channels into a single operator. The functio
 as many arguments as there are channels being merged - each will hold a value of the corresponding channel.
 
 {code}
-maleChannel.merge(femaleChannel) {m, f -> m.marry(f)}.chainWith {it.haveKids()}.into(mortgageCandidatesChannel)
+maleChannel.merge(femaleChannel) {m, f -> m.marry(f)}.into(mortgageCandidatesChannel)
 {code}
 
 h4. Filtering

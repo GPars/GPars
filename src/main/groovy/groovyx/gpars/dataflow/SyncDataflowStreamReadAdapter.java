@@ -26,6 +26,7 @@ import groovyx.gpars.dataflow.stream.StreamCore;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -140,11 +141,20 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
         return result;
     }
 
-    @SuppressWarnings({"ClassReferencesSubclass"})
     @Override
     public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
         final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
         group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
+        final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
+        inputs.add(this);
+        inputs.addAll(others);
+        group.operator(inputs, asList(result), new ChainWithClosure(closure));
         return result;
     }
 
