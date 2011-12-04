@@ -37,8 +37,6 @@ public final class Pipeline {
     private DataflowReadChannel output;
     private boolean complete = false;
 
-    //todo test and document the output property
-
     public Pipeline(final DataflowReadChannel output) {
         this(Dataflow.DATA_FLOW_GROUP, output);
     }
@@ -76,7 +74,7 @@ public final class Pipeline {
      *
      * @param closure The function to invoke on all incoming values as part of the new operator's body
      * @param <V>     The type of values returned from the supplied closure
-     * @return A channel of the same type as this channel, which the new operator will output into.
+     * @return This Pipeline instance
      */
     public <V> Pipeline chainWith(final Closure<V> closure) {
         checkState();
@@ -89,7 +87,7 @@ public final class Pipeline {
      *
      * @param closure The function to invoke on all incoming values as part of the new operator's body
      * @param <V>     The type of values returned from the supplied closure
-     * @return A channel of the same type as this channel, which the new operator will output into.
+     * @return This Pipeline instance
      */
     public <V> Pipeline or(final Closure<V> closure) {
         return chainWith(closure);
@@ -142,4 +140,16 @@ public final class Pipeline {
         complete = true;
     }
 
+    /**
+     * Taps into the pipeline at the current position, sending all data that pass through the pipeline also to the channel specified.
+     *
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return This Pipeline instance
+     */
+    public <V> Pipeline tap(final DataflowWriteChannel<V> target) {
+        checkState();
+        output = output.tap(group, target);
+        return this;
+    }
 }

@@ -159,4 +159,26 @@ class DataflowChannelChainingDSLTest extends GroovyTestCase {
         assert 10 == result.val
         assert 2 == result.val
     }
+
+    public void testTap() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        queue1.chainWith(group) {it * 2}.tap(group, queue2).into queue3
+
+
+        queue1 << 1
+        queue1 << 2
+        queue1 << 3
+        queue1 << 4
+        queue1 << 5
+
+        [queue2, queue3].each {
+            assert 2 == it.val
+            assert 4 == it.val
+            assert 6 == it.val
+            assert 8 == it.val
+            assert 10 == it.val
+        }
+    }
 }

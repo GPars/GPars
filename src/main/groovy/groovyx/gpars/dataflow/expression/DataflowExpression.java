@@ -619,7 +619,6 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         final DataflowVariable<V> result = new DataflowVariable<V>();
         group.operator(this, result, new ChainWithClosure<V>(closure));
         return result;
-
     }
 
     @Override
@@ -675,6 +674,24 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets) {
         group.operator(asList(this), targets, new ChainWithClosure(new CopyChannelsClosure()));
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target) {
+        return tap(Dataflow.DATA_FLOW_GROUP, target);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final Pool pool, final DataflowWriteChannel<V> target) {
+        return tap(new DefaultPGroup(pool), target);
+    }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
     }
 
     /**

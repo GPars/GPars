@@ -286,6 +286,24 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     @Override
+    public <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target) {
+        return tap(Dataflow.DATA_FLOW_GROUP, target);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final Pool pool, final DataflowWriteChannel<V> target) {
+        return tap(new DefaultPGroup(pool), target);
+    }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
+    @Override
     public boolean isBound() {
         return head.getFirstDFV().isBound();
     }

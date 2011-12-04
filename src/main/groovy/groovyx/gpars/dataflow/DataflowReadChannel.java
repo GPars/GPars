@@ -294,6 +294,35 @@ public interface DataflowReadChannel<T> {
     <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets);
 
     /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target);
+
+    /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param pool   The thread pool to use
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> tap(final Pool pool, final DataflowWriteChannel<V> target);
+
+    /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param group  The PGroup to use
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target);
+
+    /**
      * Check if value has been set already for this expression
      *
      * @return true if bound already

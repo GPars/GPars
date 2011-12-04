@@ -56,6 +56,23 @@ public class PipelineTest extends GroovyTestCase {
         assert 7 == result.val
     }
 
+    public void testPipelineOutput() {
+        final DataflowQueue queue = new DataflowQueue()
+        final Pipeline pipeline = new Pipeline(queue)
+
+        assert !pipeline.complete
+        pipeline | {it * 2} | {it + 1}
+        assert !pipeline.complete
+
+        queue << 1
+        queue << 2
+        queue << 3
+
+        assert 3 == pipeline.output.val
+        assert 5 == pipeline.output.val
+        assert 7 == pipeline.output.val
+    }
+
     public void testSplit() {
         final DataflowQueue queue = new DataflowQueue()
         final DataflowQueue result1 = new DataflowQueue()
@@ -66,6 +83,36 @@ public class PipelineTest extends GroovyTestCase {
         pipeline | {it * 2} | {it + 1}
         assert !pipeline.complete
         pipeline.split(result1, result2)
+        assert pipeline.complete
+
+        shouldFail(IllegalStateException) {
+            pipeline | new DataflowQueue()
+        }
+
+        queue << 1
+        queue << 2
+        queue << 3
+
+        assert 3 == result1.val
+        assert 5 == result1.val
+        assert 7 == result1.val
+        assert 3 == result2.val
+        assert 5 == result2.val
+        assert 7 == result2.val
+    }
+
+    public void testTap() {
+        final DataflowQueue queue = new DataflowQueue()
+        final DataflowQueue result1 = new DataflowQueue()
+        final DataflowQueue result2 = new DataflowQueue()
+        final Pipeline pipeline = new Pipeline(queue)
+
+        assert !pipeline.complete
+        pipeline | {it * 2} | {it + 1}
+        assert !pipeline.complete
+        pipeline.tap(result1)
+        assert !pipeline.complete
+        pipeline.into result2
         assert pipeline.complete
 
         shouldFail(IllegalStateException) {

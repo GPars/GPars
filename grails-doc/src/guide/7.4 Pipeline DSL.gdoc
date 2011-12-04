@@ -136,6 +136,29 @@ channel.split(group, otherChannel1, otherChannel2)
 channel.split(group, otherChannels)
 {code}
 
+h4. Tapping into the pipeline
+Like _split()_ the _tap()_ method (or the _+_ operator) allows you to fork the data flow into multiple channels. Tapping, however, is slightly more convenient
+in some scenarios, since it treats one of the two new forks as a successor of the pipeline.
+
+{code}
+queue.chainWith {it * 2}.tap(logChannel).chainWith{it + 1}.tap(logChannel).into(PrintChannel)
+{code}
+
+h4. Merging channels
+Merging allows you to join multiple channels into a single operator. The function passed as the second argument needs to accept
+as many arguments as there are channels being merged - each will hold a value of the corresponding channel.
+
+{code}
+maleChannel.merge(femaleChannel) {m, f -> m.marry(f)}.chainWith {it.haveKids()}.into(mortgageCandidatesChannel)
+{code}
+
+h4. Filtering
+
+{code}
+{code}
+
+h3. Collection processing with dataflow
+
 h3. The pipeline builder
 
 The _Pipeline_ class offers an intuitive builder for operator pipelines. The greatest benefit of using the _Pipeline_ class compared to chaining the channels directly is

@@ -18,9 +18,12 @@ package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.group.PGroup;
 
 import java.util.ArrayList;
+
+import static java.util.Arrays.asList;
 
 /**
  * Represents a thread-safe synchronous data flow stream. Values or DataflowVariables are added using the '<<' operator
@@ -54,6 +57,15 @@ public final class SyncDataflowQueue<T> extends DataflowQueue<T> {
         group.operator(this, result, new ChainWithClosure<V>(closure));
         return result;
     }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
+        final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
+        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
 
     @Override
     public String toString() {
