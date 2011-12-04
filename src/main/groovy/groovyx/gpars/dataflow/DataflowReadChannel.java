@@ -196,6 +196,15 @@ public interface DataflowReadChannel<T> {
     <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure);
 
     /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> or(final Closure<V> closure);
+
+    /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param target The channel to copy data into

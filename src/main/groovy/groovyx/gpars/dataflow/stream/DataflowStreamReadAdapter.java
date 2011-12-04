@@ -231,6 +231,11 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     @Override
+    public <V> DataflowReadChannel<V> or(final Closure<V> closure) {
+        return chainWith(closure);
+    }
+
+    @Override
     public <V> void into(final DataflowWriteChannel<V> target) {
         into(Dataflow.DATA_FLOW_GROUP, target);
     }
