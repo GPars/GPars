@@ -643,6 +643,11 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
+    public <V> void or(final DataflowWriteChannel<V> target) {
+        into(target);
+    }
+
+    @Override
     public <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
         split(Dataflow.DATA_FLOW_GROUP, target1, target2);
     }

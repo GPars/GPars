@@ -135,3 +135,42 @@ channel.split(pool, otherChannels)
 channel.split(group, otherChannel1, otherChannel2)
 channel.split(group, otherChannels)
 {code}
+
+h3. The pipeline builder
+
+The _Pipeline_ class offers an intuitive builder for operator pipelines. The greatest benefit of using the _Pipeline_ class compared to chaining the channels directly is
+the ease with which a custom thread pool/group can be applied to all the operators along the constructed chain.
+The available methods and overloaded operators are identical to the ones available on channels directly.
+
+{code}
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.operator.Pipeline
+import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.Pool
+
+final DataflowQueue queue = new DataflowQueue()
+final DataflowQueue result1 = new DataflowQueue()
+final DataflowQueue result2 = new DataflowQueue()
+final Pool pool = new DefaultPool(false, 2)
+
+final negate = {-it}
+
+final Pipeline pipeline = new Pipeline(pool, queue)
+
+pipeline | {it * 2} | {it + 1} | negate
+pipeline.split(result1, result2)
+
+queue << 1
+queue << 2
+queue << 3
+
+assert -3 == result1.val
+assert -5 == result1.val
+assert -7 == result1.val
+
+assert -3 == result2.val
+assert -5 == result2.val
+assert -7 == result2.val
+
+pool.shutdown()
+{code}

@@ -231,6 +231,14 @@ public interface DataflowReadChannel<T> {
     <V> void into(final PGroup group, final DataflowWriteChannel<V> target);
 
     /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param target The channel to copy data into
+     * @param <V>    The type of values passed between the channels
+     */
+    <V> void or(final DataflowWriteChannel<V> target);
+
+    /**
      * Splits the output of the current channel to be an input for the specified channels
      *
      * @param target1 The first channel to copy data into
