@@ -32,6 +32,7 @@ import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
 import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
+import groovyx.gpars.dataflow.operator.FilterClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
@@ -625,6 +626,21 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public <V> DataflowReadChannel<V> or(final Closure<V> closure) {
         return chainWith(closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> filter(final Closure<Boolean> closure) {
+        return chainWith(new FilterClosure(closure));
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> filter(final Pool pool, final Closure<Boolean> closure) {
+        return chainWith(pool, new FilterClosure(closure));
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> filter(final PGroup group, final Closure<Boolean> closure) {
+        return chainWith(group, new FilterClosure(closure));
     }
 
     @Override

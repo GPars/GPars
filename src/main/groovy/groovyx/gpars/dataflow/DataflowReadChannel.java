@@ -205,6 +205,36 @@ public interface DataflowReadChannel<T> {
     <V> DataflowReadChannel<V> or(final Closure<V> closure);
 
     /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> filter(final Closure<Boolean> closure);
+
+    /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param pool    The thread pool to use
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> filter(final Pool pool, final Closure<Boolean> closure);
+
+    /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param group   The PGroup to use
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> filter(final PGroup group, final Closure<Boolean> closure);
+
+
+    /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param target The channel to copy data into

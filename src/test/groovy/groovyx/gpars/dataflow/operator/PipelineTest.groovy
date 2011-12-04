@@ -163,5 +163,4 @@ public class PipelineTest extends GroovyTestCase {
         assert 14 == queue4.val
         assert 16 == queue4.val
     }
-
 }

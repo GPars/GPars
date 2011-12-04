@@ -88,6 +88,7 @@ queue << 5
 
 h4. Joining pipelines
 
+todo need to grab the pipeline input
 Two pipelines (or channels) can be connected using the _into()_ method:
 
 {code}
@@ -134,11 +135,12 @@ channel.split(pool, otherChannel1, otherChannel2)
 channel.split(pool, otherChannels)
 channel.split(group, otherChannel1, otherChannel2)
 channel.split(group, otherChannels)
+todo more methods exist
 {code}
 
 h4. Tapping into the pipeline
-Like _split()_ the _tap()_ method (or the _+_ operator) allows you to fork the data flow into multiple channels. Tapping, however, is slightly more convenient
-in some scenarios, since it treats one of the two new forks as a successor of the pipeline.
+Like _split()_ the _tap()_ method allows you to fork the data flow into multiple channels. Tapping, however, is slightly more convenient
+in some scenarios, since it treats one of the two new forks as the successor of the pipeline.
 
 {code}
 queue.chainWith {it * 2}.tap(logChannel).chainWith{it + 1}.tap(logChannel).into(PrintChannel)
@@ -154,7 +156,41 @@ maleChannel.merge(femaleChannel) {m, f -> m.marry(f)}.into(mortgageCandidatesCha
 
 h4. Filtering
 
+The _filter()_ method allows to filter data in the pipeline using boolean predicates.
+
 {code}
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+
+        final odd = {num -> num % 2 != 0 }
+
+        queue1.filter(group, odd) into queue2
+        (1..5).each {queue1 << it}
+        assert 1 == queue2.val
+        assert 3 == queue2.val
+        assert 5 == queue2.val
+{code}
+
+h4. Null values
+
+If a chained function returns a _null_ value, it is normally passed along the pipeline as a valid value. To indicate to the operator
+that no value should be passed further down the pipeline, a _NullObject.nullObject_ instance must be returned.
+
+{code}
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+
+        final odd = {num ->
+            if (num == 5) return null  //null values are normally passed on
+            if (num % 2 != 0) return num
+            else return NullObject.nullObject  //this value gets blocked
+        }
+
+        queue1.chainWith odd into queue2
+        (1..5).each {queue1 << it}
+        assert 1 == queue2.val
+        assert 3 == queue2.val
+        assert null == queue2.val
 {code}
 
 h3. Collection processing with dataflow

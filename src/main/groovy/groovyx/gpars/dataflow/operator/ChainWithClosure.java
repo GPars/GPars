@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow.operator;
 
 import groovy.lang.Closure;
+import org.codehaus.groovy.runtime.NullObject;
 
 /**
  * Used by the chainWith() method to wrap the supplied closure inside the operator's body.
@@ -58,21 +59,21 @@ public final class ChainWithClosure<V> extends Closure {
     @Override
     public Object call(final Object arguments) {
         final V result = (V) code.call(arguments);
-        ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
+        if (result != NullObject.getNullObject()) ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
         return result;
     }
 
     @Override
     public Object call(final Object... args) {
         final V result = (V) code.call(args);
-        ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
+        if (result != NullObject.getNullObject()) ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
         return result;
     }
 
     @Override
     public Object call() {
         final V result = (V) code.call();
-        ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
+        if (result != NullObject.getNullObject()) ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
         return result;
     }
 }

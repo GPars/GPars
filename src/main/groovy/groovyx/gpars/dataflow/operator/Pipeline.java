@@ -94,6 +94,18 @@ public final class Pipeline {
     }
 
     /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @return This Pipeline instance
+     */
+    public Pipeline filter(final Closure<Boolean> closure) {
+        checkState();
+        output = output.filter(group, closure);
+        return this;
+    }
+
+    /**
      * Makes the output of the pipeline to be an input for the specified channel
      *
      * @param target The channel to copy data into
@@ -157,13 +169,12 @@ public final class Pipeline {
      * Merges channels together as inputs for a single dataflow operator.
      *
      * @param other   The channel to merge with
-     * @param <V>     The type of values read from the supplied channel.
      * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> Pipeline merge(final DataflowReadChannel<V> other, final Closure closure) {
+    Pipeline merge(final DataflowReadChannel<Object> other, final Closure closure) {
         checkState();
-        output = output.merge(other, closure);
+        output = output.merge(group, other, closure);
         return this;
     }
 
@@ -176,7 +187,7 @@ public final class Pipeline {
      */
     Pipeline merge(final List<DataflowReadChannel<Object>> others, final Closure closure) {
         checkState();
-        output = output.merge(others, closure);
+        output = output.merge(group, others, closure);
         return this;
     }
 }

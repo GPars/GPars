@@ -296,4 +296,17 @@ class DataflowChannelChainingDSLTest extends GroovyTestCase {
         assert 4 == queue3.val
         assert pipeline instanceof SyncDataflowVariable
     }
+
+    public void testFilter() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+
+        final odd = {num -> num % 2 != 0 }
+
+        queue1.filter(group, odd) into queue2
+        (1..5).each {queue1 << it}
+        assert 1 == queue2.val
+        assert 3 == queue2.val
+        assert 5 == queue2.val
+    }
 }
