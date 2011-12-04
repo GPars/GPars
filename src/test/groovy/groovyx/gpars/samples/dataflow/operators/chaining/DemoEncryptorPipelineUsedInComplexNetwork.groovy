@@ -41,7 +41,7 @@ splitter(encrypted, [fork1, fork2])  //Split the data flow
 
 fork1.chainWith save  //Hook in the save operation
 
-//Hook in sneaky decryption
+//Hook in a sneaky decryption pipeline
 final DataflowReadChannel decrypted = fork2.chainWith {it[15..-4]} chainWith {it.reverse()} chainWith {it.toLowerCase()} chainWith {'Groovy leaks! Check out a decrypted secret message: ' + it}
 
 toEncrypt << "I need to keep this message secret!"

@@ -18,10 +18,9 @@ package groovyx.gpars.samples.actors
 
 import groovy.swing.SwingBuilder
 import groovy.transform.Immutable
+import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.actor.StaticDispatchActor
 import groovyx.gpars.group.NonDaemonPGroup
-import groovyx.gpars.samples.activeobject.Cell
 import java.awt.Color
 import java.awt.Font
 import java.awt.GridLayout
@@ -51,7 +50,7 @@ final class CellActor extends DynamicDispatchActor {
     private final int col
     private int numAliveNeighbors
     private int numEmptyNeighbors
-    final List<Cell> neighbors = []
+    final List<Actor> neighbors = []
     private PrinterActor printer
     private SwingLifeGameWithActors owner
 
@@ -192,7 +191,7 @@ final class SwingLifeGameWithActors extends DynamicDispatchActor {
 
         (0..<gridHeight).each {rowIndex ->
             (0..<gridWidth).each {columnIndex ->
-                final List<Cell> neighbors = []
+                final List<Actor> neighbors = []
                 [rowIndex - 1, rowIndex, rowIndex + 1].each {currentRowIndex ->
                     if (currentRowIndex in 0..<gridHeight) {
                         if (columnIndex > 0) neighbors << cellGrid[currentRowIndex][columnIndex - 1]
@@ -246,7 +245,7 @@ final class SwingLifeGameWithActors extends DynamicDispatchActor {
     }
 }
 
-final class PrinterActor extends StaticDispatchActor {
+final class PrinterActor extends DynamicDispatchActor {
     private final List<List<JButton>> visualCells
 
     PrinterActor(final List<List<JButton>> visualCells) {

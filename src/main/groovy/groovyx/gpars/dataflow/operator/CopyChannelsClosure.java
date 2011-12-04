@@ -25,54 +25,38 @@ import groovy.lang.Closure;
  * @author Vaclav Pech
  */
 
-public final class ChainWithClosure<V> extends Closure {
-    private final Closure code;
+public final class CopyChannelsClosure<V> extends Closure {
 
-    public ChainWithClosure(final Closure code) {
+    private static final Class[] PARAMETER_TYPES = {Object.class};
+
+    public CopyChannelsClosure() {
         super(null, null);
-        this.code = code;
     }
 
     @Override
     public int getMaximumNumberOfParameters() {
-        return code.getMaximumNumberOfParameters();
+        return 1;
     }
 
+    @SuppressWarnings({"ReturnOfCollectionOrArrayField"})
     @Override
     public Class[] getParameterTypes() {
-        return code.getParameterTypes();
-    }
-
-    @Override
-    public void setDelegate(final Object delegate) {
-        super.setDelegate(delegate);
-        code.setDelegate(delegate);
-    }
-
-    @Override
-    public void setResolveStrategy(final int resolveStrategy) {
-        super.setResolveStrategy(resolveStrategy);
-        code.setResolveStrategy(resolveStrategy);
+        return PARAMETER_TYPES;
     }
 
     @Override
     public Object call(final Object arguments) {
-        final V result = (V) code.call(arguments);
-        ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
-        return result;
+        return arguments;
     }
 
+    @SuppressWarnings({"OverloadedVarargsMethod"})
     @Override
     public Object call(final Object... args) {
-        final V result = (V) code.call(args);
-        ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
-        return result;
+        return args[0];
     }
 
     @Override
     public Object call() {
-        final V result = (V) code.call();
-        ((DataflowProcessor) getDelegate()).bindAllOutputsAtomically(result);
-        return result;
+        return null;
     }
 }

@@ -27,9 +27,11 @@ import groovyx.gpars.dataflow.DataCallbackWithPool;
 import groovyx.gpars.dataflow.Dataflow;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.remote.RemoteConnection;
@@ -52,12 +54,14 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 
+import static java.util.Arrays.asList;
+
 /**
  * The base class for all dataflow elements.
  *
  * @author Alex Tkachman, Vaclav Pech
  */
-@SuppressWarnings({"UnqualifiedStaticUsage", "CallToSimpleGetterFromWithinClass", "ConstantDeclaredInAbstractClass"})
+@SuppressWarnings({"UnqualifiedStaticUsage", "CallToSimpleGetterFromWithinClass", "ConstantDeclaredInAbstractClass", "unchecked"})
 public abstract class DataflowExpression<T> extends WithSerialId implements GroovyObject, DataflowReadChannel<T> {
 
     private static final String ATTACHMENT = "attachment";
@@ -616,6 +620,51 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         group.operator(this, result, new ChainWithClosure<V>(closure));
         return result;
 
+    }
+
+    @Override
+    public <V> void into(final DataflowWriteChannel<V> target) {
+        into(Dataflow.DATA_FLOW_GROUP, target);
+    }
+
+    @Override
+    public <V> void into(final Pool pool, final DataflowWriteChannel<V> target) {
+        into(new DefaultPGroup(pool), target);
+    }
+
+    @Override
+    public <V> void into(final PGroup group, final DataflowWriteChannel<V> target) {
+        group.operator(this, target, new ChainWithClosure(new CopyChannelsClosure()));
+    }
+
+    @Override
+    public <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+        split(Dataflow.DATA_FLOW_GROUP, target1, target2);
+    }
+
+    @Override
+    public <V> void split(final Pool pool, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+        split(new DefaultPGroup(pool), target1, target2);
+    }
+
+    @Override
+    public <V> void split(final PGroup group, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+        split(group, asList(target1, target2));
+    }
+
+    @Override
+    public <V> void split(final List<DataflowWriteChannel<V>> targets) {
+        split(Dataflow.DATA_FLOW_GROUP, targets);
+    }
+
+    @Override
+    public <V> void split(final Pool pool, final List<DataflowWriteChannel<V>> targets) {
+        split(new DefaultPGroup(pool), targets);
+    }
+
+    @Override
+    public <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets) {
+        group.operator(asList(this), targets, new ChainWithClosure(new CopyChannelsClosure()));
     }
 
     /**

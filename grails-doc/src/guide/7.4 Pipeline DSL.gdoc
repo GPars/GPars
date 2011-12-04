@@ -1,0 +1,119 @@
+h3. A DSL for building operators pipelines
+
+GPars offers handy shortcuts for the common and simple scenario of building a linear pipeline of operators,
+with work (data) traveling from one operator to the next in the chain.
+
+{code}
+def toUpperCase = {s -> s.toUpperCase()}
+
+final DataflowReadChannel encrypt = new DataflowQueue()
+final DataflowReadChannel encrypted = encrypt.chainWith toUpperCase chainWith {it.reverse()} chainWith {'###encrypted###' + it + '###'}
+
+encrypt << "I need to keep this message secret!"
+encrypt << "GPars can build linear operator pipelines really easily"
+
+println encrypted.val
+println encrypted.val
+{code}
+
+This saves you from directly creating, wiring and manipulating all the channels and operators that are to form the pipeline.
+
+Since each operator pipeline has an entry and an exit channel, pipelines can be wired into more complex operator networks.
+
+{code}
+def toUpperCase = {s -> s.toUpperCase()}
+def save = {text ->
+    //Just pretending to be saving the text to disk, database or whatever
+    println 'Saving ' + text
+}
+
+final DataflowReadChannel toEncrypt = new DataflowQueue()
+final DataflowReadChannel encrypted = toEncrypt.chainWith toUpperCase chainWith {it.reverse()} chainWith {'###encrypted###' + it + '###'}
+
+final DataflowQueue fork1 = new DataflowQueue()
+final DataflowQueue fork2 = new DataflowQueue()
+splitter(encrypted, [fork1, fork2])  //Split the data flow
+
+fork1.chainWith save  //Hook in the save operation
+
+//Hook in a sneaky decryption pipeline
+final DataflowReadChannel decrypted = fork2.chainWith {it[15..-4]} chainWith {it.reverse()} chainWith {it.toLowerCase()}
+      .chainWith {'Groovy leaks! Check out a decrypted secret message: ' + it}
+
+toEncrypt << "I need to keep this message secret!"
+toEncrypt << "GPars can build operator pipelines really easy"
+
+println decrypted.val
+println decrypted.val
+{code}
+
+{note}
+The type of the channel is preserved across the whole pipeline. E.g. if you start chaining off a synchronous channel,
+ all the channels in the pipeline will be synchronous. In that case, obviously, the whole chain blocks, including the writer who writes into the channel at head,
+ until someone reads data off the tail of the pipeline.
+ {code}
+final SyncDataflowQueue queue = new SyncDataflowQueue()
+final result = queue.chainWith {it * 2}.chainWith {it + 1} chainWith {it * 100}
+
+Thread.start {
+    5.times {
+        println result.val
+    }
+}
+
+queue << 1
+queue << 2
+queue << 3
+queue << 4
+queue << 5
+ {code}
+{note}
+
+h4. Joining pipelines
+
+Two pipelines (or channels) can be connected using the _into()_ method:
+
+{code}
+final DataflowReadChannel encrypt = new DataflowQueue()
+final DataflowWriteChannel messagesToSave = new DataflowQueue()
+encrypt.chainWith toUpperCase chainWith {it.reverse()} into messagesToSave
+
+task {
+    encrypt << "I need to keep this message secret!"
+    encrypt << "GPars can build operator pipelines really easy"
+}
+
+task {
+    2.times {
+        println "Saving " + messagesToSave.val
+    }
+}
+{code}
+
+The output of the _encryption_ pipeline is directly connected to the input of the _saving_ pipeline (a single channel in out case).
+
+h4. Forking the data flow
+
+When a need comes to copy the output of a pipeline/channel into more than one other pipeline/channel, the _split()_ method will help you:
+
+{code}
+final DataflowReadChannel encrypt = new DataflowQueue()
+final DataflowWriteChannel messagesToSave = new DataflowQueue()
+final DataflowWriteChannel messagesToLog = new DataflowQueue()
+
+encrypt.chainWith toUpperCase chainWith {it.reverse()}.split(messagesToSave, messagesToLog)
+{code}
+
+h4. Customizing the thread pools
+
+All of the Pipeline DSL methods allow for custom thread pools or _PGroups_ to be specified:
+{code}
+channel.then(pool) {it * 2}
+channel.then(group) {it * 2}
+channel.into(pool, otherChannel)
+channel.into(group, otherChannel)
+channel.split(pool, otherChannel1, otherChannel2)
+channel.split(pool, otherChannels)
+channel.split(group, otherChannel1, otherChannel2)
+channel.split(group, otherChannels)
+{code}
