@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.dataflow.operator.PoisonPill
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroup
 
@@ -53,6 +54,24 @@ class DataflowChannelChainingTest extends GroovyTestCase {
         assert 7 == result.val
         assert 9 == result.val
         assert 11 == result.val
+    }
+
+    public void testQueueWithOrOperator() {
+        final DataflowQueue queue = new DataflowQueue()
+        final result = queue | {it * 2} | {it + 1} | {it}
+
+        queue << 1
+        queue << 2
+        queue << 3
+        queue << 4
+        queue << 5
+
+        assert 3 == result.val
+        assert 5 == result.val
+        assert 7 == result.val
+        assert 9 == result.val
+        assert 11 == result.val
+        queue << PoisonPill.instance
     }
 
     public void testClosureArguments() {

@@ -22,6 +22,7 @@ import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
 import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
+import groovyx.gpars.dataflow.operator.FilterClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
@@ -376,6 +377,26 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     }
 
     @Override
+    public <V> DataflowReadChannel<V> or(final Closure<V> closure) {
+        return chainWith(closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> filter(final Closure<Boolean> closure) {
+        return chainWith(new FilterClosure(closure));
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> filter(final Pool pool, final Closure<Boolean> closure) {
+        return chainWith(pool, new FilterClosure(closure));
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> filter(final PGroup group, final Closure<Boolean> closure) {
+        return chainWith(group, new FilterClosure(closure));
+    }
+
+    @Override
     public <V> void into(final DataflowWriteChannel<V> target) {
         into(Dataflow.DATA_FLOW_GROUP, target);
     }
@@ -388,6 +409,11 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public <V> void into(final PGroup group, final DataflowWriteChannel<V> target) {
         group.operator(this, target, new ChainWithClosure(new CopyChannelsClosure()));
+    }
+
+    @Override
+    public <V> void or(final DataflowWriteChannel<V> target) {
+        into(target);
     }
 
     @Override
@@ -418,6 +444,58 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets) {
         group.operator(asList(this), targets, new ChainWithClosure(new CopyChannelsClosure()));
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target) {
+        return tap(Dataflow.DATA_FLOW_GROUP, target);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final Pool pool, final DataflowWriteChannel<V> target) {
+        return tap(new DefaultPGroup(pool), target);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure closure) {
+        return merge(asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure closure) {
+        return merge(pool, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure closure) {
+        return merge(group, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        return merge(Dataflow.DATA_FLOW_GROUP, others, closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        return merge(new DefaultPGroup(pool), others, closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
+        inputs.add(this);
+        inputs.addAll(others);
+        group.operator(inputs, asList(result), new ChainWithClosure(closure));
+        return result;
     }
 
     /**

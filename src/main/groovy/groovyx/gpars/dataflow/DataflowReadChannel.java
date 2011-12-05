@@ -196,6 +196,45 @@ public interface DataflowReadChannel<T> {
     <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure);
 
     /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> or(final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> filter(final Closure<Boolean> closure);
+
+    /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param pool    The thread pool to use
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> filter(final Pool pool, final Closure<Boolean> closure);
+
+    /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param group   The PGroup to use
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> filter(final PGroup group, final Closure<Boolean> closure);
+
+
+    /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param target The channel to copy data into
@@ -220,6 +259,14 @@ public interface DataflowReadChannel<T> {
      * @param <V>    The type of values passed between the channels
      */
     <V> void into(final PGroup group, final DataflowWriteChannel<V> target);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param target The channel to copy data into
+     * @param <V>    The type of values passed between the channels
+     */
+    <V> void or(final DataflowWriteChannel<V> target);
 
     /**
      * Splits the output of the current channel to be an input for the specified channels
@@ -275,6 +322,99 @@ public interface DataflowReadChannel<T> {
      * @param <V>     The type of values passed between the channels
      */
     <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets);
+
+    /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target);
+
+    /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param pool   The thread pool to use
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> tap(final Pool pool, final DataflowWriteChannel<V> target);
+
+    /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param group  The PGroup to use
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param other   The channel to merge with
+     * @param <V>     The type of values passed between the channels
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param pool    The thread pool to use
+     * @param other   The channel to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param group   The PGroup to use
+     * @param other   The channel to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param pool    The thread pool to use
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param group   The PGroup to use
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure);
 
     /**
      * Check if value has been set already for this expression

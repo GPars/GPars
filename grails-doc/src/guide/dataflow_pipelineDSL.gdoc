@@ -1,7 +1,25 @@
 h3. A DSL for building operators pipelines
 
-GPars offers handy shortcuts for the common and simple scenario of building a linear pipeline of operators,
-with work (data) traveling from one operator to the next in the chain.
+Building dataflow networks can be further simplified. GPars offers handy shortcuts for the common scenario of building (mostly linear) pipelines of operators.
+
+{code}
+def toUpperCase = {s -> s.toUpperCase()}
+
+final DataflowReadChannel encrypt = new DataflowQueue()
+final DataflowReadChannel encrypted = encrypt | toUpperCase | {it.reverse()} | {'###encrypted###' + it + '###'}
+
+encrypt << "I need to keep this message secret!"
+encrypt << "GPars can build linear operator pipelines really easily"
+
+println encrypted.val
+println encrypted.val
+{code}
+
+This saves you from directly creating, wiring and manipulating all the channels and operators that are to form the pipeline.
+The _pipe_ operator lets you hook an output of one function/operator/process to the input of another one. Just like chaining
+system processes on the command line.
+
+The _pipe_ operator is a handy shorthand for a more generic _chainWith()_ method:
 
 {code}
 def toUpperCase = {s -> s.toUpperCase()}
@@ -16,9 +34,10 @@ println encrypted.val
 println encrypted.val
 {code}
 
-This saves you from directly creating, wiring and manipulating all the channels and operators that are to form the pipeline.
+h4. Combining pipelines with straight operators
 
 Since each operator pipeline has an entry and an exit channel, pipelines can be wired into more complex operator networks.
+Only your imagination can limit your ability to mix pipelines with channels and operators in the same network definitions.
 
 {code}
 def toUpperCase = {s -> s.toUpperCase()}
@@ -94,7 +113,7 @@ The output of the _encryption_ pipeline is directly connected to the input of th
 
 h4. Forking the data flow
 
-When a need comes to copy the output of a pipeline/channel into more than one other pipeline/channel, the _split()_ method will help you:
+When a need comes to copy the output of a pipeline/channel into more than one following pipeline/channel, the _split()_ method will help you:
 
 {code}
 final DataflowReadChannel encrypt = new DataflowQueue()
@@ -104,16 +123,135 @@ final DataflowWriteChannel messagesToLog = new DataflowQueue()
 encrypt.chainWith toUpperCase chainWith {it.reverse()}.split(messagesToSave, messagesToLog)
 {code}
 
+h4. Tapping into the pipeline
+Like _split()_ the _tap()_ method allows you to fork the data flow into multiple channels. Tapping, however, is slightly more convenient
+in some scenarios, since it treats one of the two new forks as the successor of the pipeline.
+
+{code}
+queue.chainWith {it * 2}.tap(logChannel).chainWith{it + 1}.tap(logChannel).into(PrintChannel)
+{code}
+
+h4. Merging channels
+
+Merging allows you to join multiple read channels as inputs for a single dataflow operator. The function passed as the second argument needs to accept
+as many arguments as there are channels being merged - each will hold a value of the corresponding channel.
+
+{code}
+maleChannel.merge(femaleChannel) {m, f -> m.marry(f)}.into(mortgageCandidatesChannel)
+{code}
+
+h4. Filtering
+
+The _filter()_ method allows to filter data in the pipeline using boolean predicates.
+
+{code}
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+
+        final odd = {num -> num % 2 != 0 }
+
+        queue1.filter(odd) into queue2
+        (1..5).each {queue1 << it}
+        assert 1 == queue2.val
+        assert 3 == queue2.val
+        assert 5 == queue2.val
+{code}
+
+h4. Null values
+
+If a chained function returns a _null_ value, it is normally passed along the pipeline as a valid value. To indicate to the operator
+that no value should be passed further down the pipeline, a _NullObject.nullObject_ instance must be returned.
+
+{code}
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+
+        final odd = {num ->
+            if (num == 5) return null  //null values are normally passed on
+            if (num % 2 != 0) return num
+            else return NullObject.nullObject  //this value gets blocked
+        }
+
+        queue1.chainWith odd into queue2
+        (1..5).each {queue1 << it}
+        assert 1 == queue2.val
+        assert 3 == queue2.val
+        assert null == queue2.val
+{code}
+
 h4. Customizing the thread pools
 
 All of the Pipeline DSL methods allow for custom thread pools or _PGroups_ to be specified:
 {code}
-channel.then(pool) {it * 2}
-channel.then(group) {it * 2}
+channel | {it * 2}
+
+channel.chainWith(closure)
+channel.chainWith(pool) {it * 2}
+channel.chainWith(group) {it * 2}
+
+channel.into(otherChannel)
 channel.into(pool, otherChannel)
 channel.into(group, otherChannel)
+
+channel.split(otherChannel1, otherChannel2)
+channel.split(otherChannels)
 channel.split(pool, otherChannel1, otherChannel2)
 channel.split(pool, otherChannels)
 channel.split(group, otherChannel1, otherChannel2)
 channel.split(group, otherChannels)
+
+channel.tap(otherChannel)
+channel.tap(pool, otherChannel)
+channel.tap(group, otherChannel)
+
+channel.merge(otherChannel)
+channel.merge(otherChannels)
+channel.merge(pool, otherChannel)
+channel.merge(pool, otherChannels)
+channel.merge(group, otherChannel)
+channel.merge(group, otherChannels)
+
+channel.filter( otherChannel)
+channel.filter(pool, otherChannel)
+channel.filter(group, otherChannel)
+
+{code}
+
+h3. The pipeline builder
+
+The _Pipeline_ class offers an intuitive builder for operator pipelines. The greatest benefit of using the _Pipeline_ class compared to chaining the channels directly is
+the ease with which a custom thread pool/group can be applied to all the operators along the constructed chain.
+The available methods and overloaded operators are identical to the ones available on channels directly.
+
+{code}
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.operator.Pipeline
+import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.Pool
+
+final DataflowQueue queue = new DataflowQueue()
+final DataflowQueue result1 = new DataflowQueue()
+final DataflowQueue result2 = new DataflowQueue()
+final Pool pool = new DefaultPool(false, 2)
+
+final negate = {-it}
+
+final Pipeline pipeline = new Pipeline(pool, queue)
+
+pipeline | {it * 2} | {it + 1} | negate
+pipeline.split(result1, result2)
+
+queue << 1
+queue << 2
+queue << 3
+
+assert -3 == result1.val
+assert -5 == result1.val
+assert -7 == result1.val
+
+assert -3 == result2.val
+assert -5 == result2.val
+assert -7 == result2.val
+
+pool.shutdown()
 {code}

@@ -20,14 +20,18 @@ import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.dataflow.stream.DataflowStreamReadAdapter;
 import groovyx.gpars.dataflow.stream.StreamCore;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Arrays.asList;
 
 /**
  * Provides a special implementation of DataflowStreamReadAdapter, which cooperates with SyncDataflowBroadcast subscription and un-subscription mechanism.
@@ -134,6 +138,23 @@ final class SyncDataflowStreamReadAdapter<T> extends DataflowStreamReadAdapter<T
     public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
         final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
         group.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
+        final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
+        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
+        final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
+        inputs.add(this);
+        inputs.addAll(others);
+        group.operator(inputs, asList(result), new ChainWithClosure(closure));
         return result;
     }
 

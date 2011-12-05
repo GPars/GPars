@@ -21,9 +21,14 @@ import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.impl.ResizeableCountDownLatch;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.group.PGroup;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Arrays.asList;
 
 /**
  * A synchronous variant of DataflowVariable, which blocks the writer as well as the readers.
@@ -112,6 +117,23 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
     public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
         final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
         group.operator(this, result, new ChainWithClosure<V>(closure));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
+        final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
+        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
+        final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
+        inputs.add(this);
+        inputs.addAll(others);
+        group.operator(inputs, asList(result), new ChainWithClosure(closure));
         return result;
     }
 
