@@ -1,7 +1,6 @@
 h3. A DSL for building operators pipelines
 
-GPars offers handy shortcuts for the common and simple scenario of building a linear pipeline of operators,
-with work (data) traveling from one operator to the next in the chain.
+Building dataflow networks can be further simplified. GPars offers handy shortcuts for the common scenario of building (mostly linear) pipelines of operators.
 
 {code}
 def toUpperCase = {s -> s.toUpperCase()}
@@ -35,7 +34,10 @@ println encrypted.val
 println encrypted.val
 {code}
 
+h4. Combining pipelines with straight operators
+
 Since each operator pipeline has an entry and an exit channel, pipelines can be wired into more complex operator networks.
+Only your imagination can limit your ability to mix pipelines with channels and operators in the same network definitions.
 
 {code}
 def toUpperCase = {s -> s.toUpperCase()}
@@ -88,7 +90,6 @@ queue << 5
 
 h4. Joining pipelines
 
-todo need to grab the pipeline input
 Two pipelines (or channels) can be connected using the _into()_ method:
 
 {code}
@@ -112,7 +113,7 @@ The output of the _encryption_ pipeline is directly connected to the input of th
 
 h4. Forking the data flow
 
-When a need comes to copy the output of a pipeline/channel into more than one other pipeline/channel, the _split()_ method will help you:
+When a need comes to copy the output of a pipeline/channel into more than one following pipeline/channel, the _split()_ method will help you:
 
 {code}
 final DataflowReadChannel encrypt = new DataflowQueue()
@@ -120,22 +121,6 @@ final DataflowWriteChannel messagesToSave = new DataflowQueue()
 final DataflowWriteChannel messagesToLog = new DataflowQueue()
 
 encrypt.chainWith toUpperCase chainWith {it.reverse()}.split(messagesToSave, messagesToLog)
-{code}
-
-h4. Customizing the thread pools
-
-All of the Pipeline DSL methods allow for custom thread pools or _PGroups_ to be specified:
-{code}
-channel | {it * 2}
-channel.then(pool) {it * 2}
-channel.then(group) {it * 2}
-channel.into(pool, otherChannel)
-channel.into(group, otherChannel)
-channel.split(pool, otherChannel1, otherChannel2)
-channel.split(pool, otherChannels)
-channel.split(group, otherChannel1, otherChannel2)
-channel.split(group, otherChannels)
-todo more methods exist
 {code}
 
 h4. Tapping into the pipeline
@@ -147,7 +132,8 @@ queue.chainWith {it * 2}.tap(logChannel).chainWith{it + 1}.tap(logChannel).into(
 {code}
 
 h4. Merging channels
-Merging allows you to join multiple channels into a single operator. The function passed as the second argument needs to accept
+
+Merging allows you to join multiple read channels as inputs for a single dataflow operator. The function passed as the second argument needs to accept
 as many arguments as there are channels being merged - each will hold a value of the corresponding channel.
 
 {code}
@@ -164,7 +150,7 @@ The _filter()_ method allows to filter data in the pipeline using boolean predic
 
         final odd = {num -> num % 2 != 0 }
 
-        queue1.filter(group, odd) into queue2
+        queue1.filter(odd) into queue2
         (1..5).each {queue1 << it}
         assert 1 == queue2.val
         assert 3 == queue2.val
@@ -193,7 +179,43 @@ that no value should be passed further down the pipeline, a _NullObject.nullObje
         assert null == queue2.val
 {code}
 
-h3. Collection processing with dataflow
+h4. Customizing the thread pools
+
+All of the Pipeline DSL methods allow for custom thread pools or _PGroups_ to be specified:
+{code}
+channel | {it * 2}
+
+channel.chainWith(closure)
+channel.chainWith(pool) {it * 2}
+channel.chainWith(group) {it * 2}
+
+channel.into(otherChannel)
+channel.into(pool, otherChannel)
+channel.into(group, otherChannel)
+
+channel.split(otherChannel1, otherChannel2)
+channel.split(otherChannels)
+channel.split(pool, otherChannel1, otherChannel2)
+channel.split(pool, otherChannels)
+channel.split(group, otherChannel1, otherChannel2)
+channel.split(group, otherChannels)
+
+channel.tap(otherChannel)
+channel.tap(pool, otherChannel)
+channel.tap(group, otherChannel)
+
+channel.merge(otherChannel)
+channel.merge(otherChannels)
+channel.merge(pool, otherChannel)
+channel.merge(pool, otherChannels)
+channel.merge(group, otherChannel)
+channel.merge(group, otherChannels)
+
+channel.filter( otherChannel)
+channel.filter(pool, otherChannel)
+channel.filter(group, otherChannel)
+
+{code}
 
 h3. The pipeline builder
 
