@@ -415,15 +415,15 @@ Chaining can save quite some code when calling asynchronous services from within
 such as _Asynchronous Functions_ or _Active Methods_, return _Promises_ for their results. To obtain the actual results
 your handlers would either have to block to wait for the value to be bound, which would lock the current thread in an unproductive state,
 {code}
-variable.whenBound {
-    Promise promise = asyncFunction()
+variable.whenBound {value ->
+    Promise promise = asyncFunction(value)
     println promise.get()
 }
 {code}
 or, alternatively, it would register another (nested) _whenBound()_ handler, which would result in unnecessarily complex code.
 {code}
-variable.whenBound {
-    asyncFunction().whenBound {
+variable.whenBound {value ->
+    asyncFunction(value).whenBound {
         println it
     }
 }
