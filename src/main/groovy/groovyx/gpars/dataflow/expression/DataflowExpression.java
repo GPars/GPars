@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaProperty;
+import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.Actors;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
@@ -31,7 +32,6 @@ import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
-import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.dataflow.operator.FilterClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
@@ -619,7 +619,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
-        group.operator(this, result, new ChainWithClosure<V>(closure));
+        this.whenBound(new MessagingRunnable<V>() {
+            @Override
+            protected void doRun(final V argument) {
+                closure.setDelegate(this);
+                closure.setResolveStrategy(DELEGATE_FIRST);
+                result.leftShift(closure.call(argument));
+            }
+        });
         return result;
     }
 
@@ -655,7 +662,12 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     @Override
     public <V> void into(final PGroup group, final DataflowWriteChannel<V> target) {
-        group.operator(this, target, new ChainWithClosure(new CopyChannelsClosure()));
+        this.whenBound(new MessagingRunnable<V>() {
+            @Override
+            protected void doRun(final V argument) {
+                target.leftShift(argument);
+            }
+        });
     }
 
     @Override
@@ -690,7 +702,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     @Override
     public <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets) {
-        group.operator(asList(this), targets, new ChainWithClosure(new CopyChannelsClosure()));
+        this.whenBound(new MessagingRunnable<V>() {
+            @Override
+            protected void doRun(final V argument) {
+                for (final DataflowWriteChannel<V> target : targets) {
+                    target.leftShift(argument);
+                }
+            }
+        });
     }
 
     @Override
@@ -707,7 +726,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
-        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
+        this.whenBound(new MessagingRunnable<V>() {
+            @Override
+            protected void doRun(final V argument) {
+                result.leftShift(argument);
+                target.leftShift(argument);
+            }
+        });
+//        group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
         return result;
     }
 
