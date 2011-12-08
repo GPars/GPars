@@ -411,7 +411,7 @@ assert 9 == result.val
 {code}
 
 {note:Title=Motivation for chaining Promises}
-Chaining can save quite some code when calling asynchronous services from within _whenBound()_ handlers. Asynchronous services,
+Chaining can save quite some code when calling other asynchronous services from within _whenBound()_ handlers. Asynchronous services,
 such as _Asynchronous Functions_ or _Active Methods_, return _Promises_ for their results. To obtain the actual results
 your handlers would either have to block to wait for the value to be bound, which would lock the current thread in an unproductive state,
 {code}
@@ -427,6 +427,32 @@ variable.whenBound {value ->
         println it
     }
 }
+{code}
+For illustration compare the two following code snippets, one using _whenBound()_ and one using _then()_ chaining. They ate both equivalent in terms of functionality and behavior.
+
+{code}
+final DataflowVariable variable = new DataflowVariable()
+
+final doubler = {it * 2}
+final inc = {it + 1}
+
+//Using whenBound()
+variable.whenBound {value ->
+    task {
+        doubler(value)
+    }.whenBound {doubledValue ->
+        task {
+            inc(doubledValue)
+        }.whenBound {incrementedValue ->
+            println incrementedValue
+        }
+    }
+}
+
+//Using then() chaining
+variable.then doubler then inc then this.&println
+
+Thread.start {variable << 4}
 {code}
 Chaining Promises solves both of these issues elegantly:
 {code}
