@@ -619,14 +619,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
-        this.whenBound(new MessagingRunnable<V>() {
-            @Override
-            protected void doRun(final V argument) {
-                closure.setDelegate(this);
-                closure.setResolveStrategy(DELEGATE_FIRST);
-                result.leftShift(closure.call(argument));
-            }
-        });
+        whenBound(group, new ThenMessagingRunnable<T, V>(result, closure));
         return result;
     }
 
