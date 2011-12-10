@@ -76,7 +76,7 @@ public class GParsPoolUtil {
      */
     private static Future callParallel(Closure task) {
         final ForkJoinPool pool = GParsPool.retrieveCurrentPool()
-        if (!pool) throw new IllegalStateException("No ExecutorService available for the current thread.")
+        if (!pool) throw new IllegalStateException("No ForkJoinPool available for the current thread.")
         return pool.submit(new CallAsyncTask(task))
     }
 
@@ -125,7 +125,7 @@ public class GParsPoolUtil {
      * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
      */
     public static Closure async(Closure cl) {
-        return asyncFun(cl, false)
+        return {Object... args -> callAsync(cl, * args)}
     }
 
     /**
