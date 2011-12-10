@@ -295,4 +295,16 @@ public abstract class Dataflow {
     public static Select<?> select(final List<DataflowReadChannel> channels) {
         return Dataflow.DATA_FLOW_GROUP.select(channels);
     }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promises The promises to wait for
+     * @param code     A closure to execute with concrete values for each of the supplied promises
+     * @param <T>      The type of the final result
+     * @return A promise for the final result
+     */
+    public static <T> Promise<T> whenAllBound(final List<Promise<? extends Object>> promises, final Closure<T> code) {
+        return DATA_FLOW_GROUP.whenAllBound(promises, code);
+    }
 }

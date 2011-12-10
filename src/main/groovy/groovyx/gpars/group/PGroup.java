@@ -17,6 +17,7 @@
 package groovyx.gpars.group;
 
 import groovy.lang.Closure;
+import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.BlockingActor;
 import groovyx.gpars.actor.DefaultActor;
@@ -29,6 +30,7 @@ import groovyx.gpars.dataflow.Dataflow;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
+import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.Select;
 import groovyx.gpars.dataflow.operator.DataflowOperator;
 import groovyx.gpars.dataflow.operator.DataflowPrioritySelector;
@@ -37,6 +39,7 @@ import groovyx.gpars.dataflow.operator.DataflowProcessorAtomicBoundAllClosure;
 import groovyx.gpars.dataflow.operator.DataflowSelector;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -572,6 +575,44 @@ public abstract class PGroup {
     public Select select(final List<DataflowReadChannel> channels) {
         return new Select(this, channels);
     }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promises The promises to wait for
+     * @param code     A closure to execute with concrete values for each of the supplied promises
+     * @param <T>      The type of the final result
+     * @return A promise for the final result
+     */
+    public <T> Promise<T> whenAllBound(final List<Promise<? extends Object>> promises, final Closure<T> code) {
+        if (promises.size() != code.getMaximumNumberOfParameters())
+            throw new IllegalArgumentException("Cannot run whenAllBound(), since the number of promises does not match the number of arguments to the supplied closure.");
+        final DataflowVariable result = new DataflowVariable();
+        whenAllBound(promises, 0, new ArrayList<Object>(promises.size()), result, code);
+        return result;
+    }
+
+    /**
+     * Waits for the promise identified by the index to be bound and then passes on to the next promise in the list
+     *
+     * @param promises A list of all promises that need to be waited for
+     * @param index    The index of the current promise to wait for
+     * @param values   A list of values the so-far processed promises were bound tpo
+     * @param result   The promise for the final result of the calculation
+     * @param code     The calculation to execute on the values once they are all bound
+     * @param <T>      The type of the final result
+     */
+    private static <T> void whenAllBound(final List<Promise<? extends Object>> promises, final int index, final List<Object> values, final DataflowVariable<T> result, final Closure<T> code) {
+        if (index == promises.size()) result.leftShift(code.call(values.toArray()));
+        else promises.get(index).whenBound(new MessagingRunnable<Object>() {
+            @Override
+            protected void doRun(final Object argument) {
+                values.add(argument);
+                whenAllBound(promises, index + 1, values, result, code);
+            }
+        });
+    }
+
 
     /**
      * Shutdown the thread pool gracefully

@@ -342,7 +342,7 @@ a.whenBound {println "Just to confirm that the variable has been really set to $
 ...
 {code}
 
-Bind handlers can be registered on all dataflow channels (variables, queues or broadcasts) either using the >> operator or the _whenBound()_ method. They will be run once a value is bound to the variable.
+Bind handlers can be registered on all dataflow channels (variables, queues or broadcasts) either using the >> operator and the _then()_ or the _whenBound()_ methods. They will be run once a value is bound to the variable.
 
 Dataflow queues and broadcasts also support a _wheneverBound_ method to register a closure or a message handler to run each time a value is bound to them.
 
@@ -355,6 +355,28 @@ queue.wheneverBound {println "A value $it arrived to the queue"}
 Dataflow variables and broadcasts are one of several possible ways to implement _Parallel Speculations_ . For details, please check out _Parallel Speculations_ in the _Parallel Collections_ section
 of the User Guide.
 {note}
+
+h2. Bind handlers grouping
+
+When you need to wait for multiple DataflowVariables/Promises to be bound, you can benefit from calling the _whenAllBound()_ function,
+which is available on the _Dataflow_ class as well as on _PGroup_ instances.
+
+{code}
+    final group = new NonDaemonPGroup()
+
+    //Calling asynchronous services and receiving back promises for the reservations
+    Promise flightReservation = flightBookingService('PRG <-> BRU')
+    Promise hotelReservation = hotelBookingService('BRU:Feb 24 2009 - Feb 29 2009')
+    Promise taxiReservation = taxiBookingService('BRU:Feb 24 2009 10:31')
+
+    //when all reservations have been made we need to build an agenda for our trip
+    Promise agenda = group.whenAllBound([flightReservation, hotelReservation, taxiReservation]) {flight, hotel, taxi ->
+        "Agenda: $flight | $hotel | $taxi"
+    }
+
+    //since this is a demo, we will only print the agenda and block till it is ready
+    println agenda.val
+{code}
 
 h2. Bind handlers chaining
 

@@ -138,6 +138,38 @@ public class PGroupTest extends GroovyTestCase {
         nonDaemonGroup1.shutdown()
         nonDaemonGroup2.shutdown()
     }
+
+    void testWhenAllBound() {
+        final group = new NonDaemonPGroup(4)
+        final promises = (1..5).collect {new DataflowVariable()}
+        final result = group.whenAllBound(promises) {a, b, c, d, e -> a + b + c + d + e}
+        Thread.start {
+            promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
+        }
+        assert result.val == 15
+        group.shutdown()
+    }
+
+    void testWhenAllBoundArguments() {
+        final group = new NonDaemonPGroup(4)
+        final promises = (1..5).collect {new DataflowVariable()}
+        shouldFail(IllegalArgumentException) {
+            group.whenAllBound(promises) {-> 10}
+        }
+        shouldFail(IllegalArgumentException) {
+            group.whenAllBound(promises) {10}
+        }
+        shouldFail(IllegalArgumentException) {
+            group.whenAllBound(promises) {a -> 10}
+        }
+        shouldFail(IllegalArgumentException) {
+            group.whenAllBound(promises) {a, b, c, d -> 10}
+        }
+        shouldFail(IllegalArgumentException) {
+            group.whenAllBound(promises) {a, b, c, d, e, f -> 10}
+        }
+        group.shutdown()
+    }
 }
 
 class GroupTestActor extends BlockingActor {

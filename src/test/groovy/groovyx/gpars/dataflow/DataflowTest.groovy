@@ -22,96 +22,105 @@ import static groovyx.gpars.actor.Actors.blockingActor
 
 public class DataflowTest extends GroovyTestCase {
 
-  public void testSimpleAssignment() {
-    DataflowVariable<Integer> x = new DataflowVariable()
-    DataflowVariable<Integer> y = new DataflowVariable()
-    DataflowVariable<Integer> z = new DataflowVariable()
+    public void testSimpleAssignment() {
+        DataflowVariable<Integer> x = new DataflowVariable()
+        DataflowVariable<Integer> y = new DataflowVariable()
+        DataflowVariable<Integer> z = new DataflowVariable()
 
-    def result = 0
-    final def latch = new CountDownLatch(1)
+        def result = 0
+        final def latch = new CountDownLatch(1)
 
-    blockingActor {
-      z << x.val + y.val
-      result = z.val
-      latch.countDown()
+        blockingActor {
+            z << x.val + y.val
+            result = z.val
+            latch.countDown()
+        }
+
+        blockingActor {
+            x << 40
+        }
+        blockingActor {
+            y << 2
+        }
+
+        latch.await(90, TimeUnit.SECONDS)
+        assertEquals 42, result
     }
 
-    blockingActor {
-      x << 40
-    }
-    blockingActor {
-      y << 2
+    List<Integer> ints(int n, int max) {
+        if (n == max) return []
+        else return [n, * ints(n + 1, max)]
     }
 
-    latch.await(90, TimeUnit.SECONDS)
-    assertEquals 42, result
-  }
-
-  List<Integer> ints(int n, int max) {
-    if (n == max) return []
-    else return [n, * ints(n + 1, max)]
-  }
-
-  List<Integer> sum(int s, List<Integer> stream) {
-    switch (stream.size()) {
-      case 0: return [s]
-      default:
-        return [s, * sum(stream[0] + s, stream.size() > 1 ? stream[1..-1] : [])]
-    }
-  }
-
-  public void testListAssignment() {
-    def x = new DataflowVariable<List<Integer>>()
-    def y = new DataflowVariable<List<Integer>>()
-
-    blockingActor { x << ints(0, 10) }
-    blockingActor { y << sum(0, x.val) }
-
-    assertEquals([0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45], y.val)
-  }
-
-  void testRightShift() {
-    DataflowVariable<Integer> x = new DataflowVariable()
-    DataflowVariable<Integer> y = new DataflowVariable()
-    DataflowVariable<Integer> z = new DataflowVariable()
-
-    def result = new DataflowVariable()
-
-    z >> {res ->
-      result << res
+    List<Integer> sum(int s, List<Integer> stream) {
+        switch (stream.size()) {
+            case 0: return [s]
+            default:
+                return [s, * sum(stream[0] + s, stream.size() > 1 ? stream[1..-1] : [])]
+        }
     }
 
-    blockingActor {
-      z << x.val + y.val
+    public void testListAssignment() {
+        def x = new DataflowVariable<List<Integer>>()
+        def y = new DataflowVariable<List<Integer>>()
+
+        blockingActor { x << ints(0, 10) }
+        blockingActor { y << sum(0, x.val) }
+
+        assertEquals([0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45], y.val)
     }
 
-    blockingActor {x << 40}
-    blockingActor {y << 2}
+    void testRightShift() {
+        DataflowVariable<Integer> x = new DataflowVariable()
+        DataflowVariable<Integer> y = new DataflowVariable()
+        DataflowVariable<Integer> z = new DataflowVariable()
 
-    assertEquals 42, result.val
-  }
+        def result = new DataflowVariable()
 
-  void testMethodSyntax() {
-    def df = new Dataflows()
+        z >> {res ->
+            result << res
+        }
 
-    def result = new DataflowVariable()
+        blockingActor {
+            z << x.val + y.val
+        }
 
-    df.z {res ->
-      result << res
+        blockingActor {x << 40}
+        blockingActor {y << 2}
+
+        assertEquals 42, result.val
     }
 
-    blockingActor {
-      def v = df.x + df.y
-      df.z = v
+    void testMethodSyntax() {
+        def df = new Dataflows()
+
+        def result = new DataflowVariable()
+
+        df.z {res ->
+            result << res
+        }
+
+        blockingActor {
+            def v = df.x + df.y
+            df.z = v
+        }
+
+        blockingActor {
+            df.x = 40
+        }
+        blockingActor {
+            df.y = 2
+        }
+
+        assertEquals 42, result.val
     }
 
-    blockingActor {
-      df.x = 40
+    void testWhenAllBound() {
+        final promises = (1..5).collect {new DataflowVariable()}
+        final result = Dataflow.whenAllBound(promises) {a, b, c, d, e -> a + b + c + d + e}
+        Thread.start {
+            promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
+        }
+        assert result.val == 15
     }
-    blockingActor {
-      df.y = 2
-    }
-
-    assertEquals 42, result.val
-  }
 }
