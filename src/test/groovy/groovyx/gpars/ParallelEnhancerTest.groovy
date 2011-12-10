@@ -29,6 +29,10 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         def result = Collections.synchronizedSet(new HashSet())
         list.eachParallel {result << 2 * it}
         assertEquals(new HashSet([2, 4, 6, 8, 10]), result)
+        def squaresAndCubesOfOdds = list.collectManyParallel { Number number ->
+            number % 2 ? [number ** 2, number ** 3] : []
+        }
+        assert squaresAndCubesOfOdds == [1, 1, 9, 27, 25, 125]
     }
 
     public void testClassEnhancement() {
@@ -136,10 +140,15 @@ public class ParallelEnhancerTest extends GroovyTestCase {
         assertEquals 5, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(3)
         assertEquals 0, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel(6)
         assertEquals 0, ParallelEnhancer.enhanceInstance([]).countParallel(6)
+        assertEquals 2, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel{ it % 2 == 0 }
+        assertEquals 1, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel{ it < 3 }
+        assertEquals 6, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).countParallel{ it <= 3 }
         assertEquals 1, ParallelEnhancer.enhanceInstance('abc3').countParallel('a')
         assertEquals 3, ParallelEnhancer.enhanceInstance('abcaa3').countParallel('a')
         assertEquals 0, ParallelEnhancer.enhanceInstance('ebc3').countParallel('a')
         assertEquals 0, ParallelEnhancer.enhanceInstance(' '.trim()).countParallel('a')
+        assertEquals 3, ParallelEnhancer.enhanceInstance('elephant').countParallel{ it in 'aeiou'.toList() }
+
     }
 
     public void testSplit() {

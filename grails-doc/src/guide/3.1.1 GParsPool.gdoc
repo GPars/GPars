@@ -46,6 +46,7 @@ The following methods are currently supported on all objects in Groovy:
 * eachParallel()
 * eachWithIndexParallel()
 * collectParallel()
+* collectManyParallel()
 * findAllParallel()
 * findAnyParallel
 * findParallel()

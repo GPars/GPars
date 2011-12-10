@@ -36,6 +36,8 @@ final class TransparentParallel {
 
     public def final collect(Closure yield) { if (concurrencyActive) this.collectParallel(yield).makeConcurrent(); else (mixedIn[Object] as Object).collect(yield)}
 
+    public def final collectMany(Closure yield) { if (concurrencyActive) this.collectManyParallel(yield).makeConcurrent(); else (mixedIn[Object] as Object).collectMany(yield)}
+
     public def final find(Closure yield) { if (concurrencyActive) this.findParallel(yield); else (mixedIn[Object] as Object).find(yield)}
 
     public def final findAny(Closure yield) { if (concurrencyActive) this.findAnyParallel(yield); else (mixedIn[Object] as Object).find(yield)}

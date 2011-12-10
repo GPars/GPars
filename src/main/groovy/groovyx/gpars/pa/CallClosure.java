@@ -23,27 +23,27 @@ import groovy.lang.Closure;
  *
  * @author Vaclav Pech
  */
-public final class CallClosure extends Closure {
-    private final Closure target;
+public final class CallClosure<V> extends Closure<V> {
+    private final Closure<V> target;
     private static final long serialVersionUID = 209099114666842715L;
 
-    public CallClosure(final Closure target) {
+    public CallClosure(final Closure<V> target) {
         super(target.getOwner());
         this.target = target;
     }
 
     @Override
-    public Object call(final Object[] args) {
+    public V call(final Object[] args) {
         return target.call(args);
     }
 
     @Override
-    public Object call() {
+    public V call() {
         return target.call();
     }
 
     @Override
-    public Object call(final Object arguments) {
+    public V call(final Object arguments) {
         return target.call(arguments);
     }
 
