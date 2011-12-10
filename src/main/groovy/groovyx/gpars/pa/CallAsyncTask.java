@@ -24,15 +24,15 @@ import jsr166y.RecursiveTask;
  *
  * @author Vaclav Pech
  */
-public final class CallAsyncTask extends RecursiveTask<Object> {
-    private final Closure code;
+public final class CallAsyncTask<V> extends RecursiveTask<V> {
+    private final Closure<V> code;
 
-    public CallAsyncTask(final Closure code) {
+    public CallAsyncTask(final Closure<V> code) {
         this.code = code;
     }
 
     @Override
-    protected Object compute() {
+    protected V compute() {
         return code.call();
     }
 }

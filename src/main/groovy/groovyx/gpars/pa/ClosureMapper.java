@@ -24,15 +24,15 @@ import groovy.lang.Closure;
  *
  * @author Vaclav Pech
  */
-public final class ClosureMapper implements Ops.Op<Object, Object> {
-    private final Closure code;
+public final class ClosureMapper<V> implements Ops.Op<Object, V> {
+    private final Closure<V> code;
 
-    public ClosureMapper(final Closure code) {
+    public ClosureMapper(final Closure<V> code) {
         this.code = code;
     }
 
     @Override
-    public Object op(final Object o) {
+    public V op(final Object o) {
         return code.call(o);
     }
 }

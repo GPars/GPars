@@ -40,16 +40,16 @@ import java.util.concurrent.ConcurrentMap;
  */
 @SuppressWarnings({"UtilityClass", "AbstractClassWithoutAbstractMethods", "AbstractClassNeverImplemented", "StaticMethodOnlyUsedInOneClass"})
 public abstract class PAUtils {
-    public static Collection<Object> createCollection(final Iterable<Object> object) {
-        final Collection<Object> collection = new ArrayList<Object>();
-        for (final Object item : object) {
+    public static <T> Collection<T> createCollection(final Iterable<T> object) {
+        final Collection<T> collection = new ArrayList<T>();
+        for (final T item : object) {
             collection.add(item);
         }
         return collection;
     }
 
-    public static Collection<Object> createCollection(final Iterator<Object> iterator) {
-        final Collection<Object> collection = new ArrayList<Object>();
+    public static <T> Collection<T> createCollection(final Iterator<T> iterator) {
+        final Collection<T> collection = new ArrayList<T>();
         while (iterator.hasNext()) {
             collection.add(iterator.next());
         }
@@ -64,11 +64,11 @@ public abstract class PAUtils {
         return chars;
     }
 
-    public static Map.Entry<Object, Object>[] createArray(final Map<Object, Object> map) {
+    public static <K, V> Map.Entry<K, V>[] createArray(final Map<K, V> map) {
         @SuppressWarnings({"unchecked"})
-        final Map.Entry<Object, Object>[] result = new Map.Entry[map.size()];
+        final Map.Entry<K, V>[] result = new Map.Entry[map.size()];
         int i = 0;
-        for (final Map.Entry<Object, Object> entry : map.entrySet()) {
+        for (final Map.Entry<K, V> entry : map.entrySet()) {
             result[i] = entry;
             i++;
         }
@@ -83,19 +83,19 @@ public abstract class PAUtils {
      * @param cl The closure to use for parallel methods
      * @return The original or an unwrapping closure
      */
-    public static Closure buildClosureForMaps(final Closure cl) {
-        if (cl.getMaximumNumberOfParameters() == 2) return new Closure(cl.getOwner()) {
+    public static <T> Closure<T> buildClosureForMaps(final Closure<T> cl) {
+        if (cl.getMaximumNumberOfParameters() == 2) return new Closure<T>(cl.getOwner()) {
             private static final long serialVersionUID = -7502769124461342939L;
 
             @Override
-            public Object call(final Object arguments) {
+            public T call(final Object arguments) {
                 @SuppressWarnings({"unchecked"})
                 final Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) arguments;
-                return cl.call(new Object[]{entry.getKey(), entry.getValue()});
+                return cl.call(entry.getKey(), entry.getValue());
             }
 
             @Override
-            public Object call(final Object[] args) {
+            public T call(final Object[] args) {
                 return this.call(args[0]);
             }
         };
@@ -110,8 +110,8 @@ public abstract class PAUtils {
      * @param cl The closure to use for parallel methods
      * @return The original or an unwrapping closure
      */
-    public static Closure buildClosureForMapsWithIndex(final Closure cl) {
-        if (cl.getMaximumNumberOfParameters() == 3) return new Closure(cl.getOwner()) {
+    public static <T> Closure<T> buildClosureForMapsWithIndex(final Closure<T> cl) {
+        if (cl.getMaximumNumberOfParameters() == 3) return new Closure<T>(cl.getOwner()) {
             private static final long serialVersionUID = 4777456744250574403L;
 
             @SuppressWarnings({"rawtypes", "RawUseOfParameterizedType"})
@@ -126,11 +126,11 @@ public abstract class PAUtils {
             }
 
             @Override
-            public Object call(final Object[] args) {
+            public T call(final Object[] args) {
                 @SuppressWarnings({"unchecked"})
                 final Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) args[0];
                 final Integer index = (Integer) args[1];
-                return cl.call(new Object[]{entry.getKey(), entry.getValue(), index});
+                return cl.call(entry.getKey(), entry.getValue(), index);
             }
         };
 
@@ -158,11 +158,11 @@ public abstract class PAUtils {
      * @param handler The one or two argument closure to build a comparator on
      * @return A new Comparator to use
      */
-    public static Comparator<Object> createComparator(final Closure handler) {
+    public static Comparator<Object> createComparator(final Closure<Object> handler) {
         if (handler.getMaximumNumberOfParameters() == 2) return new Comparator<Object>() {
             @Override
             public int compare(final Object o1, final Object o2) {
-                return (Integer) handler.call(new Object[]{o1, o2});
+                return (Integer) handler.call(o1, o2);
             }
         };
         else return new Comparator<Object>() {
@@ -181,18 +181,19 @@ public abstract class PAUtils {
      * @param map The map of groups to contribute to
      * @return null
      */
-    public static Closure createGroupByClosure(final Closure cl, final ConcurrentMap<Object, List<Object>> map) {
-        return new Closure(cl.getOwner(), cl.getDelegate()) {
+    public static <K, T> Closure<Object> createGroupByClosure(final Closure<K> cl, final ConcurrentMap<K, List<T>> map) {
+        return new Closure<Object>(cl.getOwner(), cl.getDelegate()) {
             private static final long serialVersionUID = 5495474569312257163L;
 
             @Override
+            @SuppressWarnings({"unchecked"})
             public Object call(final Object arguments) {
-                final Object result = cl.call(arguments);
-                final List<Object> localList = new ArrayList<Object>();
-                localList.add(arguments);
-                final List<Object> myList = Collections.synchronizedList(localList);
-                final Collection<Object> list = map.putIfAbsent(result, myList);
-                if (list != null) list.add(arguments);
+                final K result = cl.call(arguments);
+                final List<T> localList = new ArrayList<T>();
+                localList.add((T) arguments);
+                final List<T> myList = Collections.synchronizedList(localList);
+                final Collection<T> list = map.putIfAbsent(result, myList);
+                if (list != null) list.add((T) arguments);
                 return null;
             }
         };
@@ -210,8 +211,8 @@ public abstract class PAUtils {
      * @param pooledThreadFlag Indicates, whether we now run in a pooled thread so we don't have to schedule the original function invocation, once all arguments have been bound
      */
     @SuppressWarnings({"unchecked"})
-    public static void evaluateArguments(final Pool pool, final Object[] args, final int current, final List<Object> soFarArgs,
-                                         final DataflowVariable<Object> result, final Closure original, final boolean pooledThreadFlag) {
+    public static <T> void evaluateArguments(final Pool pool, final Object[] args, final int current, final List<Object> soFarArgs,
+                                             final DataflowVariable<Object> result, final Closure<T> original, final boolean pooledThreadFlag) {
         if (current == args.length) {
             if (pooledThreadFlag) {
                 try {

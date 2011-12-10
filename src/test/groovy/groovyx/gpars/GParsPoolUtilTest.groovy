@@ -53,6 +53,15 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         }
     }
 
+    public void testCollectMany() {
+        groovyx.gpars.GParsPool.withPool(5) {
+            def squaresAndCubesOfOdds = [1, 2, 3, 4, 5].collectManyParallel { Number number ->
+                number % 2 ? [number ** 2, number ** 3] : []
+            }
+            assert squaresAndCubesOfOdds == [1, 1, 9, 27, 25, 125]
+        }
+    }
+
     public void testFindAll() {
         groovyx.gpars.GParsPool.withPool(5) {
             final List result = GParsPoolUtil.findAllParallel([1, 2, 3, 4, 5], {it > 2})
@@ -320,11 +329,15 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             assertEquals 1, [1, 2, 3, 4, 5].countParallel(3)
             assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(3)
             assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(6)
+            assertEquals 2, [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it % 2 == 0 }
+            assertEquals 1, [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it < 3 }
+            assertEquals 6, [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it <= 3 }
             assertEquals 0, [].countParallel(6)
             assertEquals 1, 'abc'.countParallel('a')
             assertEquals 3, 'abcaa'.countParallel('a')
             assertEquals 0, 'ebc'.countParallel('a')
             assertEquals 0, ''.countParallel('a')
+            assertEquals 3, 'elephant'.countParallel { it in 'aeiou'.toList() }
         }
     }
 

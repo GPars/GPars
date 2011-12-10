@@ -73,14 +73,14 @@ jar {
 repositories {
     mavenCentral()
     maven {
-      url 'http://repository.jboss.org/maven2'
-      url 'http://repository.codehaus.org'
-      url 'http://snapshots.repository.codehaus.org'
-      url 'http://download.java.net/maven/2'
-      //  Needed for using Spock snapshots.
-      url 'http://m2repo.spockframework.org/snapshots'
-      //  To get the latest Grails-Doc.
-      url 'http://repo.grails.org/grails/core'
+        url 'http://repository.jboss.org/maven2'
+        url 'http://repository.codehaus.org'
+        url 'http://snapshots.repository.codehaus.org'
+        url 'http://download.java.net/maven/2'
+        //  Needed for using Spock snapshots.
+        url 'http://m2repo.spockframework.org/snapshots'
+        //  To get the latest Grails-Doc.
+        url 'http://repo.grails.org/grails/core'
     }
 }
 
@@ -99,12 +99,12 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.4'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.5-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8-SNAPSHOT'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.5-groovy-1.8'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
-    compile 'org.multiverse:multiverse-beta:0.7-RC-1'
+    compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
     compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.1.5.GA'
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
