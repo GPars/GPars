@@ -33,6 +33,6 @@ public final class ClosurePredicate implements Ops.Predicate<Object> {
 
     @Override
     public boolean op(final Object o) {
-        return (Boolean) code.call(o);
+        return GParsPoolUtilHelper.convertToBoolean(code.call(o));
     }
 }

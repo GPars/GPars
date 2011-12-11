@@ -16,6 +16,8 @@
 
 package groovyx.gpars
 
+import groovyx.gpars.pa.PAWrapper
+
 /**
  * The Parallel interface holds methods that ParallelEnhancer adds to classes or instances when they get enhanced.
  *

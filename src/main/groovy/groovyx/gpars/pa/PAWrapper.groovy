@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008--2011  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,26 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.pa;
-
-import extra166y.Ops;
-import groovy.lang.Closure;
+package groovyx.gpars.pa
 
 /**
- * A PA reducer built around a closure
- *
- * @author Vaclav Pech
+ * The default ParallelArray wrapper class
  */
-public final class ClosureReducer<T> implements Ops.Reducer<T> {
-    private final Closure code;
-
-    public ClosureReducer(final Closure code) {
-        this.code = code;
-    }
-
-    @Override
-    public T op(final Object o, final Object o1) {
-        final Object[] args = {o, o1};
-        return (T) code.call(args);
-    }
+final class PAWrapper<T> extends AbstractPAWrapper {
+    def PAWrapper(final pa) { super(pa) }
 }
