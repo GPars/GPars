@@ -178,8 +178,8 @@ class GParsPoolUtilHelper {
         pa.apply({cl(it)} as Ops.Procedure)
     }
 
-    public static <T> ParallelArrayWithMapping eachWithIndex(ParallelArray<List<Object>> parray, Closure cl) {
-        return parray.withMapping({cl(it[0], it[1])} as Ops.Op)
+    public static <T> ParallelArrayWithMapping eachWithIndex(ParallelArray<List<Object>> parallelArray, Closure cl) {
+        return parallelArray.withMapping({cl(it[0], it[1])} as Ops.Op)
     }
 
     public static <T> Collection<T> findAllParallelPA(ParallelArray<T> pa, Closure cl) {

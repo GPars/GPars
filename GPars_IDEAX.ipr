@@ -4597,6 +4597,7 @@
           <option name="CHECK_ACTIONS" value="true" />
           <option name="IGNORE_NON_PUBLIC" value="true" />
         </inspection_tool>
+        <inspection_tool class="ComponentRegistrationProblems" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ConditionSignal" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ConditionalExpression" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreSimpleAssignmentsAndReturns" value="false" />
@@ -4722,6 +4723,7 @@
         <inspection_tool class="Deprecation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DeserializableClassInSecureContext" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DesignForExtension" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="DialogTitleCapitalization" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DirectConnectionManagement" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DisjointPackage" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DivideByZero" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5286,6 +5288,8 @@
         </inspection_tool>
         <inspection_tool class="InnerHTMLJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InspectionDescriptionNotFoundInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="InspectionMappingConsistency" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="InspectionUsingGrayColors" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InstanceGuardedByStatic" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="InstanceMethodNamingConvention" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_regex" value="[a-z][A-Za-z\d]*" />
@@ -5852,6 +5856,8 @@
         </inspection_tool>
         <inspection_tool class="PhingDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="PlatformDetectionJS" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="PlayCustomTagNameInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="PlayPropertyInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PluginXmlValidity" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="PointcutMethodStyleInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="PointlessArithmeticExpression" enabled="false" level="WARNING" enabled_by_default="false">
@@ -8089,8 +8095,11 @@
         <w>github</w>
         <w>gmemoize</w>
         <w>gortatowsky</w>
+        <w>goto</w>
+        <w>gradlew</w>
         <w>groeschke</w>
         <w>groovyx</w>
+        <w>grvy</w>
         <w>infoq</w>
         <w>instanceof</w>
         <w>intdiv</w>
@@ -8125,12 +8134,14 @@
         <w>noop</w>
         <w>novotný</w>
         <w>nproc</w>
+        <w>onepeople</w>
         <w>orany</w>
         <w>other's</w>
         <w>overriden</w>
         <w>parallelisation</w>
         <w>parallelization</w>
         <w>parameterized</w>
+        <w>peopleid</w>
         <w>pgroup</w>
         <w>pilsner</w>
         <w>protobuf</w>
@@ -8156,6 +8167,8 @@
         <w>username</w>
         <w>varargs</w>
         <w>veentjer</w>
+        <w>viewcvs</w>
+        <w>viewvc</w>
         <w>webdav</w>
         <w>wikipedia</w>
         <w>youre</w>

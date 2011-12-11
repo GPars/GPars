@@ -43,7 +43,7 @@ This feature is only available when using in the Fork/Join-based _GParsPool_ , n
 
 h3. Classical Example
 
-A classical example, inspired by http://github.com/thevery, counting occurencies of words in a string:
+A classical example, inspired by http://github.com/thevery, counting occurrences of words in a string:
 
 {code}
 import static groovyx.gpars.GParsPool.withPool
