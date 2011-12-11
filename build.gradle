@@ -277,19 +277,11 @@ task zipJavaDemo(type: Zip) {
 }
 
 task zipDist(type: Zip) {
-    //get the main jar
     from jar.outputs.files
-
-    // get the libs
-    from('lib') {
-        exclude('junit*', 'netty-3.1.5.GA-sources.jar', 'jcsp.jar', 'jcsp-demos-util.jar', 'spock-core*')
-    }
-
-    //get the license and notice files
+    from 'lib'
     from('src/main/resources/META-INF/') {
         include('LICENSE.txt', 'NOTICE.txt')
     }
-
     appendix = 'all'
 }
 
