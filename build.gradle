@@ -71,7 +71,7 @@ jar {
 }
 
 //  Should avoid using SNAPSHOT artefacts unless necessary to do so.  Spock currently has no 0.6 release but
-//  0.6 is needed with Groovy 1.8.x -- even thought there is a 0.5 artefact for Groovy 1.8.x, it has been
+//  0.6 is needed with Groovy 1.8.x -- even though there is a 0.5 artefact for Groovy 1.8.x, it has been
 //  labelled as insufficient to the task; see various emails on the spock mailing lists.
 
 repositories {
@@ -79,10 +79,7 @@ repositories {
     maven {
         url 'http://repository.jboss.org/maven2'
         url 'http://repository.codehaus.org'
-        //  Groovy 1.8.5-SNAPSHOT is in the Grails Core repository which we have to include in the path to
-        //  get the Grails Doc artefact.  Add this repository in the path to make sure we get the latest
-        //  version of Groovy 1.8.5-SNAPSHOT and not an old one.
-        url 'http://snapshots.repository.codehaus.org'
+        //url 'http://snapshots.repository.codehaus.org' // Only need if we use snapshot artefacts for things like Groovy.
         url 'http://download.java.net/maven/2'
         url 'http://m2repo.spockframework.org/snapshots'
         url 'http://repo.grails.org/grails/core' // Need this to get Grails Doc
