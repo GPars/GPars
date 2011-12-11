@@ -20,20 +20,19 @@ import extra166y.Ops;
 import groovy.lang.Closure;
 
 /**
- * A PA reducer built around a closure
+ * A PA predicate built around a closure
  *
  * @author Vaclav Pech
  */
-public final class ClosureReducer<T> implements Ops.Reducer<T> {
+public final class ClosureNegationPredicate implements Ops.Predicate<Object> {
     private final Closure code;
 
-    public ClosureReducer(final Closure code) {
+    public ClosureNegationPredicate(final Closure code) {
         this.code = code;
     }
 
     @Override
-    public T op(final Object o, final Object o1) {
-        final Object[] args = {o, o1};
-        return (T) code.call(args);
+    public boolean op(final Object o) {
+        return !GParsPoolUtilHelper.convertToBoolean(code.call(o));
     }
 }
