@@ -71,7 +71,7 @@ jar {
 }
 
 //  Should avoid using SNAPSHOT artefacts unless necessary to do so.  Spock currently has no 0.6 release but
-//  0.6 is needed with Groovy 1.8.x -- even thought there is a 0.5 aretfact for Groovy 1.8.x, it has been
+//  0.6 is needed with Groovy 1.8.x -- even thought there is a 0.5 artefact for Groovy 1.8.x, it has been
 //  labelled as insufficient to the task; see various emails on the spock mailing lists.
 
 repositories {
@@ -279,14 +279,14 @@ task zipJavaDemo(type: Zip) {
 task zipDist(type: Zip) {
     from jar.outputs.files
     from(runtimeClasspath) {
-      include('jsr166*', 'extra166*', 'netty*','multiverse*')
+        include('jsr166*', 'extra166*', 'netty*', 'multiverse*')
     }
     from('licenses') {
-      include '*'
-      into 'licenses'
+        include '*'
+        into 'licenses'
     }
     from('src/main/resources/META-INF/') {
-      include('LICENSE.txt', 'NOTICE.txt')
+        include('LICENSE.txt', 'NOTICE.txt')
     }
     appendix = 'all'
 }
