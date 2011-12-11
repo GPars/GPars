@@ -278,9 +278,16 @@ task zipJavaDemo(type: Zip) {
 
 task zipDist(type: Zip) {
     from jar.outputs.files
-    from(runtimeClasspath) { include('jsr166*', 'extra166*', 'netty*','multiverse*') }
-    from('lib') { include 'licenses/*' }
-    from('src/main/resources/META-INF/') { include('LICENSE.txt', 'NOTICE.txt') }
+    from(runtimeClasspath) {
+      include('jsr166*', 'extra166*', 'netty*','multiverse*')
+    }
+    from('licenses') {
+      include '*'
+      into 'licenses'
+    }
+    from('src/main/resources/META-INF/') {
+      include('LICENSE.txt', 'NOTICE.txt')
+    }
     appendix = 'all'
 }
 
