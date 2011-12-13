@@ -38,7 +38,7 @@ public final class Pipeline {
     private boolean complete = false;
 
     public Pipeline(final DataflowReadChannel output) {
-        this(Dataflow.DATA_FLOW_GROUP, output);
+        this(Dataflow.retrieveCurrentDFPGroup(), output);
     }
 
     public Pipeline(final Pool pool, final DataflowReadChannel output) {

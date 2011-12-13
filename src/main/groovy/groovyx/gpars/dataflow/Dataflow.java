@@ -305,6 +305,6 @@ public abstract class Dataflow {
      * @return A promise for the final result
      */
     public static <T> Promise<T> whenAllBound(final List<Promise<? extends Object>> promises, final Closure<T> code) {
-        return DATA_FLOW_GROUP.whenAllBound(promises, code);
+        return retrieveCurrentDFPGroup().whenAllBound(promises, code);
     }
 }

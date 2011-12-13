@@ -216,7 +216,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     @Override
     public final <V> DataflowReadChannel<V> chainWith(final Closure<V> closure) {
-        return chainWith(Dataflow.DATA_FLOW_GROUP, closure);
+        return chainWith(Dataflow.retrieveCurrentDFPGroup(), closure);
     }
 
     @Override
@@ -253,7 +253,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     @Override
     public <V> void into(final DataflowWriteChannel<V> target) {
-        into(Dataflow.DATA_FLOW_GROUP, target);
+        into(Dataflow.retrieveCurrentDFPGroup(), target);
     }
 
     @Override
@@ -273,7 +273,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     @Override
     public <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
-        split(Dataflow.DATA_FLOW_GROUP, target1, target2);
+        split(Dataflow.retrieveCurrentDFPGroup(), target1, target2);
     }
 
     @Override
@@ -288,7 +288,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     @Override
     public <V> void split(final List<DataflowWriteChannel<V>> targets) {
-        split(Dataflow.DATA_FLOW_GROUP, targets);
+        split(Dataflow.retrieveCurrentDFPGroup(), targets);
     }
 
     @Override
@@ -303,7 +303,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     @Override
     public <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target) {
-        return tap(Dataflow.DATA_FLOW_GROUP, target);
+        return tap(Dataflow.retrieveCurrentDFPGroup(), target);
     }
 
     @Override
@@ -335,7 +335,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
 
     @Override
     public <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure closure) {
-        return merge(Dataflow.DATA_FLOW_GROUP, others, closure);
+        return merge(Dataflow.retrieveCurrentDFPGroup(), others, closure);
     }
 
     @Override
