@@ -16,6 +16,7 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.group.NonDaemonPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import static groovyx.gpars.actor.Actors.blockingActor
@@ -122,5 +123,24 @@ public class DataflowTest extends GroovyTestCase {
             promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
         }
         assert result.val == 15
+    }
+
+    public void testNestedWhenAllBoundChaining() {
+        final DataflowVariable variable = new DataflowVariable()
+        final DataflowVariable result = new DataflowVariable()
+
+        def group = new NonDaemonPGroup()
+        Thread.start {
+            sleep 500
+            variable << 4
+        }
+        assert 8 == group.whenAllBound([variable]) {value ->
+            def a = new DataflowVariable()
+            Thread.start {
+                sleep 500
+                a << value * 2
+            }
+            return a
+        }.val
     }
 }
