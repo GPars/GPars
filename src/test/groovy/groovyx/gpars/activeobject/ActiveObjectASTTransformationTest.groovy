@@ -16,6 +16,7 @@
 
 package groovyx.gpars.activeobject
 
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.dataflow.Promise
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -572,6 +573,40 @@ new A()
         assert 10 == a.foo().get()
         assert a.foo().get() instanceof Integer
         assert a.foo() instanceof Promise
+    }
+
+    public void testGrabbingInternalActorsGroup() {
+        final GroovyShell shell = new GroovyShell()
+        def (group, a, b) = shell.evaluate("""
+import groovyx.gpars.activeobject.ActiveObject
+import groovyx.gpars.activeobject.ActiveMethod
+import groovyx.gpars.dataflow.DataflowVariable
+import groovyx.gpars.dataflow.Promise
+import groovyx.gpars.group.NonDaemonPGroup
+import groovyx.gpars.activeobject.ActiveObjectRegistry
+
+@ActiveObject
+class A {
+    @ActiveMethod(blocking = true)
+    def retrieveGroup() {
+        internalActiveObjectActor.parallelGroup
+    }
+}
+
+@ActiveObject("Custom")
+class B {
+    @ActiveMethod(blocking = true)
+    def retrieveGroup() {
+        internalActiveObjectActor.parallelGroup
+    }
+}
+
+final g = new NonDaemonPGroup()
+ActiveObjectRegistry.instance.register('Custom', g)
+[g, new A(), new B()]
+""")
+        assert Actors.defaultActorPGroup == a.retrieveGroup()
+        assert group == b.retrieveGroup()
     }
 
 }
