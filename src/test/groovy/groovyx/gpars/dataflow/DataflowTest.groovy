@@ -127,7 +127,6 @@ public class DataflowTest extends GroovyTestCase {
 
     public void testNestedWhenAllBoundChaining() {
         final DataflowVariable variable = new DataflowVariable()
-        final DataflowVariable result = new DataflowVariable()
 
         def group = new NonDaemonPGroup()
         Thread.start {
@@ -142,5 +141,6 @@ public class DataflowTest extends GroovyTestCase {
             }
             return a
         }.val
+        group.shutdown()
     }
 }
