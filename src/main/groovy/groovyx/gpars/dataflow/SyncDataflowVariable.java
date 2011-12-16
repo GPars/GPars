@@ -121,14 +121,14 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
     }
 
     @Override
-    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
-        final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
+    public DataflowReadChannel<T> tap(final PGroup group, final DataflowWriteChannel<T> target) {
+        final SyncDataflowVariable<T> result = new SyncDataflowVariable<T>();
         group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
         return result;
     }
 
     @Override
-    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
         final SyncDataflowVariable<V> result = new SyncDataflowVariable<V>();
         final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
         inputs.add(this);

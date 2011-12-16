@@ -28,8 +28,9 @@ import groovyx.gpars.scheduler.Pool
  */
 
 final DataflowQueue queue = new DataflowQueue()
-final DataflowQueue result1 = new DataflowQueue()
-final DataflowQueue result2 = new DataflowQueue()
+final DataflowQueue nonNegative = new DataflowQueue()
+final DataflowQueue negative = new DataflowQueue()
+final DataflowQueue converted = new DataflowQueue()
 final Pool pool = new DefaultPool(false, 2)
 
 final DataflowQueue logChannel = new DataflowQueue()
@@ -39,19 +40,16 @@ final negate = {-it}
 
 final Pipeline pipeline = new Pipeline(pool, queue)
 
-(pipeline | {it * 2} | {it + 1}).tap(logChannel) | negate
-pipeline.split(result1, result2)
+pipeline.binaryChoice(nonNegative, negative) {it >= 0}
+
+negative | negate | converted
 
 queue << 1
-queue << 2
+queue << -2
 queue << 3
 
-assert -3 == result1.val
-assert -5 == result1.val
-assert -7 == result1.val
-
-assert -3 == result2.val
-assert -5 == result2.val
-assert -7 == result2.val
+assert 1 == nonNegative.val
+assert 3 == nonNegative.val
+assert 2 == converted.val
 
 pool.shutdown()

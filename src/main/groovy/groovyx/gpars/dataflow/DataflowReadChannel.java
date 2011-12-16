@@ -82,7 +82,7 @@ public interface DataflowReadChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> rightShift(final Closure closure);
+    <V> Promise<V> rightShift(final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -128,7 +128,7 @@ public interface DataflowReadChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> then(final Closure closure);
+    <V> Promise<V> then(final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -139,7 +139,7 @@ public interface DataflowReadChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> then(final Pool pool, final Closure closure);
+    <V> Promise<V> then(final Pool pool, final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -150,7 +150,7 @@ public interface DataflowReadChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> then(final PGroup group, final Closure closure);
+    <V> Promise<V> then(final PGroup group, final Closure<V> closure);
 
     /**
      * Send all pieces of data bound in the future to the provided stream when it becomes available.     *
@@ -208,74 +208,66 @@ public interface DataflowReadChannel<T> {
      * Creates and attaches a new operator that will filter data using the provided closure
      *
      * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
-     * @param <V>     The type of values returned from the supplied closure
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> filter(final Closure<Boolean> closure);
+    DataflowReadChannel<T> filter(final Closure<Boolean> closure);
 
     /**
      * Creates and attaches a new operator that will filter data using the provided closure
      *
      * @param pool    The thread pool to use
      * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
-     * @param <V>     The type of values returned from the supplied closure
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> filter(final Pool pool, final Closure<Boolean> closure);
+    DataflowReadChannel<T> filter(final Pool pool, final Closure<Boolean> closure);
 
     /**
      * Creates and attaches a new operator that will filter data using the provided closure
      *
      * @param group   The PGroup to use
      * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
-     * @param <V>     The type of values returned from the supplied closure
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> filter(final PGroup group, final Closure<Boolean> closure);
+    DataflowReadChannel<T> filter(final PGroup group, final Closure<Boolean> closure);
 
 
     /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param target The channel to copy data into
-     * @param <V>    The type of values passed between the channels
      */
-    <V> void into(final DataflowWriteChannel<V> target);
+    void into(final DataflowWriteChannel<T> target);
 
     /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param pool   The thread pool to use
      * @param target The channel to copy data into
-     * @param <V>    The type of values passed between the channels
      */
-    <V> void into(final Pool pool, final DataflowWriteChannel<V> target);
+    void into(final Pool pool, final DataflowWriteChannel<T> target);
 
     /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param group  The PGroup to use
      * @param target The channel to copy data into
-     * @param <V>    The type of values passed between the channels
      */
-    <V> void into(final PGroup group, final DataflowWriteChannel<V> target);
+    void into(final PGroup group, final DataflowWriteChannel<T> target);
 
     /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param target The channel to copy data into
-     * @param <V>    The type of values passed between the channels
      */
-    <V> void or(final DataflowWriteChannel<V> target);
+    void or(final DataflowWriteChannel<T> target);
 
     /**
      * Splits the output of the current channel to be an input for the specified channels
      *
      * @param target1 The first channel to copy data into
      * @param target2 The second channel to copy data into
-     * @param <V>     The type of values passed between the channels
      */
-    <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2);
+    void split(final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2);
 
     /**
      * Splits the output of the current channel to be an input for the specified channels
@@ -283,9 +275,8 @@ public interface DataflowReadChannel<T> {
      * @param pool    The thread pool to use
      * @param target1 The first channel to copy data into
      * @param target2 The second channel to copy data into
-     * @param <V>     The type of values passed between the channels
      */
-    <V> void split(final Pool pool, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2);
+    void split(final Pool pool, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2);
 
     /**
      * Splits the output of the current channel to be an input for the specified channels
@@ -293,64 +284,57 @@ public interface DataflowReadChannel<T> {
      * @param group   The PGroup to use
      * @param target1 The first channel to copy data into
      * @param target2 The second channel to copy data into
-     * @param <V>     The type of values passed between the channels
      */
-    <V> void split(final PGroup group, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2);
+    void split(final PGroup group, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2);
 
     /**
      * Makes the output of the current channel to be an input for the specified channels
      *
      * @param targets The channels to copy data into
-     * @param <V>     The type of values passed between the channels
      */
-    <V> void split(final List<DataflowWriteChannel<V>> targets);
+    void split(final List<DataflowWriteChannel<T>> targets);
 
     /**
      * Makes the output of the current channel to be an input for the specified channels
      *
      * @param pool    The thread pool to use
      * @param targets The channels to copy data into
-     * @param <V>     The type of values passed between the channels
      */
-    <V> void split(final Pool pool, final List<DataflowWriteChannel<V>> targets);
+    void split(final Pool pool, final List<DataflowWriteChannel<T>> targets);
 
     /**
      * Makes the output of the current channel to be an input for the specified channels
      *
      * @param group   The PGroup to use
      * @param targets The channels to copy data into
-     * @param <V>     The type of values passed between the channels
      */
-    <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets);
+    void split(final PGroup group, final List<DataflowWriteChannel<T>> targets);
 
     /**
      * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
      *
      * @param target The channel to tap data into
-     * @param <V>    The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target);
+    DataflowReadChannel<T> tap(final DataflowWriteChannel<T> target);
 
     /**
      * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
      *
      * @param pool   The thread pool to use
      * @param target The channel to tap data into
-     * @param <V>    The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> tap(final Pool pool, final DataflowWriteChannel<V> target);
+    DataflowReadChannel<T> tap(final Pool pool, final DataflowWriteChannel<T> target);
 
     /**
      * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
      *
      * @param group  The PGroup to use
      * @param target The channel to tap data into
-     * @param <V>    The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target);
+    DataflowReadChannel<T> tap(final PGroup group, final DataflowWriteChannel<T> target);
 
     /**
      * Merges channels together as inputs for a single dataflow operator.
@@ -360,7 +344,7 @@ public interface DataflowReadChannel<T> {
      * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure closure);
+    <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure<V> closure);
 
     /**
      * Merges channels together as inputs for a single dataflow operator.
@@ -371,7 +355,7 @@ public interface DataflowReadChannel<T> {
      * @param <V>     The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure closure);
+    <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure<V> closure);
 
     /**
      * Merges channels together as inputs for a single dataflow operator.
@@ -382,7 +366,7 @@ public interface DataflowReadChannel<T> {
      * @param <V>     The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure closure);
+    <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure<V> closure);
 
     /**
      * Merges channels together as inputs for a single dataflow operator.
@@ -392,7 +376,7 @@ public interface DataflowReadChannel<T> {
      * @param <V>     The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure closure);
+    <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure<V> closure);
 
     /**
      * Merges channels together as inputs for a single dataflow operator.
@@ -403,7 +387,7 @@ public interface DataflowReadChannel<T> {
      * @param <V>     The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure closure);
+    <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure<V> closure);
 
     /**
      * Merges channels together as inputs for a single dataflow operator.
@@ -414,7 +398,89 @@ public interface DataflowReadChannel<T> {
      * @param <V>     The type of values passed between the channels
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
-    <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure);
+    <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure<V> closure);
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    void binaryChoice(final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code);
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param pool        The thread pool to use
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    void binaryChoice(final Pool pool, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code);
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param group       The PGroup to use
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    void binaryChoice(final PGroup group, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code);
+
+    /**
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
+     *
+     * @param outputs The channels to send data to of the closure returns true
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    void choice(final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param pool    The thread pool to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    void choice(final Pool pool, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param group   The PGroup to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    void choice(final PGroup group, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    void separate(final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code);
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param pool    The thread pool to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    void separate(final Pool pool, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code);
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param group   The PGroup to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    void separate(final PGroup group, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code);
+
 
     /**
      * Check if value has been set already for this expression

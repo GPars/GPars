@@ -99,7 +99,7 @@ public interface Promise<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> rightShift(final Closure closure);
+    <V> Promise<V> rightShift(final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -145,7 +145,7 @@ public interface Promise<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> then(final Closure closure);
+    <V> Promise<V> then(final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -156,7 +156,7 @@ public interface Promise<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> then(final Pool pool, final Closure closure);
+    <V> Promise<V> then(final Pool pool, final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -167,7 +167,7 @@ public interface Promise<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
-    <V> Promise<V> then(final PGroup group, final Closure closure);
+    <V> Promise<V> then(final PGroup group, final Closure<V> closure);
 
     /**
      * Check if value has been set already for this expression

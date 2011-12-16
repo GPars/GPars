@@ -190,4 +190,41 @@ public final class Pipeline {
         output = output.merge(group, others, closure);
         return this;
     }
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    public <T> void binaryChoice(final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        checkState();
+        output.binaryChoice(group, trueBranch, falseBranch, code);
+        complete = true;
+    }
+
+    /**
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
+     *
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    public <T> void choice(final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        checkState();
+        output.choice(group, outputs, code);
+        complete = true;
+    }
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    public void separate(final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+        checkState();
+        output.separate(group, outputs, code);
+        complete = true;
+    }
 }

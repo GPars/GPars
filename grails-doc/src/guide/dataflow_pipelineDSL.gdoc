@@ -140,6 +140,25 @@ as many arguments as there are channels being merged - each will hold a value of
 maleChannel.merge(femaleChannel) {m, f -> m.marry(f)}.into(mortgageCandidatesChannel)
 {code}
 
+h4. Separation
+
+_Separation_ is the opposite operation to _merge_. The supplied closure returns a list of values, each of which will be output into an output channel
+with the corresponding position index.
+
+{code}
+queue1.separate([queue2, queue3, queue4]) {a -> [a-1, a, a+1]}
+{code}
+
+h4. Choices
+
+The _binaryChoice()_ and _choice()_ methods allow you to send a value to one out of two (or many) output channels, as indicated by the return value from a closure.
+
+{code}
+queue1.binaryChoice(queue2, queue3) {a -> a > 0}
+queue1.choice([queue2, queue3, queue4]) {a -> a % 3}
+{code}
+
+
 h4. Filtering
 
 The _filter()_ method allows to filter data in the pipeline using boolean predicates.
@@ -215,6 +234,18 @@ channel.filter( otherChannel)
 channel.filter(pool, otherChannel)
 channel.filter(group, otherChannel)
 
+channel.binaryChoice( trueBranch, falseBranch)
+channel.binaryChoice(pool, trueBranch, falseBranch)
+channel.binaryChoice(group, trueBranch, falseBranch)
+
+channel.choice( branches)
+channel.choice(pool, branches)
+channel.choice(group, branches)
+
+channel.separate( outputs)
+channel.separate(pool, outputs)
+channel.separate(group, outputs)
+
 {code}
 
 h3. The pipeline builder
@@ -255,3 +286,4 @@ assert -7 == result2.val
 
 pool.shutdown()
 {code}
+

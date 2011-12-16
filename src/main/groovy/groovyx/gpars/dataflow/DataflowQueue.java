@@ -20,9 +20,12 @@ import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
+import groovyx.gpars.dataflow.operator.BinaryChoiceClosure;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
+import groovyx.gpars.dataflow.operator.ChoiceClosure;
 import groovyx.gpars.dataflow.operator.CopyChannelsClosure;
 import groovyx.gpars.dataflow.operator.FilterClosure;
+import groovyx.gpars.dataflow.operator.SeparationClosure;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
@@ -248,7 +251,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public final <V> Promise<V> rightShift(final Closure closure) {
+    public final <V> Promise<V> rightShift(final Closure<V> closure) {
         return then(closure);
     }
 
@@ -301,7 +304,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public final <V> Promise<V> then(final Closure closure) {
+    public final <V> Promise<V> then(final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(new ThenMessagingRunnable<T, V>(result, closure));
         return result;
@@ -317,7 +320,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public <V> Promise<V> then(final Pool pool, final Closure closure) {
+    public <V> Promise<V> then(final Pool pool, final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(pool, new ThenMessagingRunnable<T, V>(result, closure));
         return result;
@@ -333,7 +336,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public <V> Promise<V> then(final PGroup group, final Closure closure) {
+    public <V> Promise<V> then(final PGroup group, final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(group, new ThenMessagingRunnable<T, V>(result, closure));
         return result;
@@ -382,120 +385,165 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     }
 
     @Override
-    public <V> DataflowReadChannel<V> filter(final Closure<Boolean> closure) {
+    public DataflowReadChannel<T> filter(final Closure<Boolean> closure) {
         return chainWith(new FilterClosure(closure));
     }
 
     @Override
-    public <V> DataflowReadChannel<V> filter(final Pool pool, final Closure<Boolean> closure) {
+    public DataflowReadChannel<T> filter(final Pool pool, final Closure<Boolean> closure) {
         return chainWith(pool, new FilterClosure(closure));
     }
 
     @Override
-    public <V> DataflowReadChannel<V> filter(final PGroup group, final Closure<Boolean> closure) {
+    public DataflowReadChannel<T> filter(final PGroup group, final Closure<Boolean> closure) {
         return chainWith(group, new FilterClosure(closure));
     }
 
     @Override
-    public <V> void into(final DataflowWriteChannel<V> target) {
+    public void into(final DataflowWriteChannel<T> target) {
         into(Dataflow.retrieveCurrentDFPGroup(), target);
     }
 
     @Override
-    public <V> void into(final Pool pool, final DataflowWriteChannel<V> target) {
+    public void into(final Pool pool, final DataflowWriteChannel<T> target) {
         into(new DefaultPGroup(pool), target);
     }
 
     @Override
-    public <V> void into(final PGroup group, final DataflowWriteChannel<V> target) {
+    public void into(final PGroup group, final DataflowWriteChannel<T> target) {
         group.operator(this, target, new ChainWithClosure(new CopyChannelsClosure()));
     }
 
     @Override
-    public <V> void or(final DataflowWriteChannel<V> target) {
+    public void or(final DataflowWriteChannel<T> target) {
         into(target);
     }
 
     @Override
-    public <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+    public void split(final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2) {
         split(Dataflow.retrieveCurrentDFPGroup(), target1, target2);
     }
 
     @Override
-    public <V> void split(final Pool pool, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+    public void split(final Pool pool, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2) {
         split(new DefaultPGroup(pool), target1, target2);
     }
 
     @Override
-    public <V> void split(final PGroup group, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+    public void split(final PGroup group, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2) {
         split(group, asList(target1, target2));
     }
 
     @Override
-    public <V> void split(final List<DataflowWriteChannel<V>> targets) {
+    public void split(final List<DataflowWriteChannel<T>> targets) {
         split(Dataflow.retrieveCurrentDFPGroup(), targets);
     }
 
     @Override
-    public <V> void split(final Pool pool, final List<DataflowWriteChannel<V>> targets) {
+    public void split(final Pool pool, final List<DataflowWriteChannel<T>> targets) {
         split(new DefaultPGroup(pool), targets);
     }
 
     @Override
-    public <V> void split(final PGroup group, final List<DataflowWriteChannel<V>> targets) {
+    public void split(final PGroup group, final List<DataflowWriteChannel<T>> targets) {
         group.operator(asList(this), targets, new ChainWithClosure(new CopyChannelsClosure()));
     }
 
     @Override
-    public <V> DataflowReadChannel<V> tap(final DataflowWriteChannel<V> target) {
+    public DataflowReadChannel<T> tap(final DataflowWriteChannel<T> target) {
         return tap(Dataflow.retrieveCurrentDFPGroup(), target);
     }
 
     @Override
-    public <V> DataflowReadChannel<V> tap(final Pool pool, final DataflowWriteChannel<V> target) {
+    public DataflowReadChannel<T> tap(final Pool pool, final DataflowWriteChannel<T> target) {
         return tap(new DefaultPGroup(pool), target);
     }
 
     @Override
-    public <V> DataflowReadChannel<V> tap(final PGroup group, final DataflowWriteChannel<V> target) {
-        final DataflowQueue<V> result = new DataflowQueue<V>();
+    public DataflowReadChannel<T> tap(final PGroup group, final DataflowWriteChannel<T> target) {
+        final DataflowQueue<T> result = new DataflowQueue<T>();
         group.operator(asList(this), asList(result, target), new ChainWithClosure(new CopyChannelsClosure()));
         return result;
     }
 
     @Override
-    public <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure closure) {
+    public <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure<V> closure) {
         return merge(asList(other), closure);
     }
 
     @Override
-    public <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure closure) {
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final DataflowReadChannel<Object> other, final Closure<V> closure) {
         return merge(pool, asList(other), closure);
     }
 
     @Override
-    public <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure closure) {
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final DataflowReadChannel<Object> other, final Closure<V> closure) {
         return merge(group, asList(other), closure);
     }
 
     @Override
-    public <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure closure) {
+    public <V> DataflowReadChannel<V> merge(final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
         return merge(Dataflow.retrieveCurrentDFPGroup(), others, closure);
     }
 
     @Override
-    public <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
         return merge(new DefaultPGroup(pool), others, closure);
     }
 
     @Override
-    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
         final DataflowQueue<V> result = new DataflowQueue<V>();
-        final List<DataflowReadChannel> inputs = new ArrayList<DataflowReadChannel>();
+        final List<DataflowReadChannel<? extends Object>> inputs = new ArrayList<DataflowReadChannel<? extends Object>>();
         inputs.add(this);
         inputs.addAll(others);
         group.operator(inputs, asList(result), new ChainWithClosure(closure));
         return result;
+    }
+
+    @Override
+    public void binaryChoice(final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        binaryChoice(Dataflow.retrieveCurrentDFPGroup(), trueBranch, falseBranch, code);
+    }
+
+    @Override
+    public void binaryChoice(final Pool pool, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        binaryChoice(new DefaultPGroup(pool), trueBranch, falseBranch, code);
+    }
+
+    @Override
+    public void binaryChoice(final PGroup group, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        group.operator(asList(this), asList(trueBranch, falseBranch), new BinaryChoiceClosure(code));
+    }
+
+    @Override
+    public void choice(final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        choice(Dataflow.retrieveCurrentDFPGroup(), outputs, code);
+    }
+
+    @Override
+    public void choice(final Pool pool, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        choice(new DefaultPGroup(pool), outputs, code);
+    }
+
+    @Override
+    public void choice(final PGroup group, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        group.operator(asList(this), outputs, new ChoiceClosure(code));
+    }
+
+    @Override
+    public void separate(final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+        separate(Dataflow.retrieveCurrentDFPGroup(), outputs, code);
+    }
+
+    @Override
+    public void separate(final Pool pool, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+        separate(new DefaultPGroup(pool), outputs, code);
+    }
+
+    @Override
+    public void separate(final PGroup group, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+        group.operator(asList(this), outputs, new SeparationClosure(code));
     }
 
     /**

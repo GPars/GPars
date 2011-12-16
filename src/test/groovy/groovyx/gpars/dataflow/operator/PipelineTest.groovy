@@ -163,4 +163,75 @@ public class PipelineTest extends GroovyTestCase {
         assert 14 == queue4.val
         assert 16 == queue4.val
     }
+
+    public void testBinaryChoice() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        new Pipeline(group, queue1).binaryChoice(queue2, queue3) {a -> a >= 0}
+
+        queue1 << 1
+        queue1 << 2
+        queue1 << 3
+        queue1 << 4
+        queue1 << -10
+        queue1 << -20
+
+        assert 1 == queue2.val
+        assert 2 == queue2.val
+        assert 3 == queue2.val
+        assert 4 == queue2.val
+        assert -10 == queue3.val
+        assert -20 == queue3.val
+    }
+
+    public void testChoice() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        final DataflowQueue queue4 = new DataflowQueue()
+        new Pipeline(group, queue1).choice([queue2, queue3, queue4]) {a -> a % 3}
+
+        queue1 << 0
+        queue1 << 1
+        queue1 << 2
+        queue1 << 3
+        queue1 << 4
+        queue1 << 5
+
+        assert 0 == queue2.val
+        assert 3 == queue2.val
+        assert 1 == queue3.val
+        assert 4 == queue3.val
+        assert 2 == queue4.val
+        assert 5 == queue4.val
+        assert !queue2.isBound()
+        assert !queue3.isBound()
+        assert !queue4.isBound()
+    }
+
+    public void testSeparation() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+        final DataflowQueue queue4 = new DataflowQueue()
+        new Pipeline(group, queue1).separate([queue2, queue3, queue4]) {a -> [a - 1, a, a + 1]}
+
+        queue1 << 1
+        queue1 << 2
+        queue1 << 3
+
+        assert 0 == queue2.val
+        assert 1 == queue2.val
+        assert 2 == queue2.val
+        assert 1 == queue3.val
+        assert 2 == queue3.val
+        assert 3 == queue3.val
+        assert 2 == queue4.val
+        assert 3 == queue4.val
+        assert 4 == queue4.val
+        assert !queue2.isBound()
+        assert !queue3.isBound()
+        assert !queue4.isBound()
+    }
 }

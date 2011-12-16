@@ -26,9 +26,9 @@ import groovyx.gpars.dataflow.DataflowVariable;
 
 public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
     private final DataflowVariable<V> result;
-    private final Closure closure;
+    private final Closure<V> closure;
 
-    public ThenMessagingRunnable(final DataflowVariable<V> result, final Closure closure) {
+    public ThenMessagingRunnable(final DataflowVariable<V> result, final Closure<V> closure) {
         if (closure.getMaximumNumberOfParameters() > 1)
             throw new IllegalArgumentException("The supplied closure expects more than one argument.");
         this.result = result;
@@ -37,6 +37,6 @@ public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
 
     @Override
     protected void doRun(final T argument) {
-        result.leftShift(closure.getMaximumNumberOfParameters() == 1 ? (V) closure.call(argument) : (V) closure.call());
+        result.leftShift(closure.getMaximumNumberOfParameters() == 1 ? closure.call(argument) : closure.call());
     }
 }
