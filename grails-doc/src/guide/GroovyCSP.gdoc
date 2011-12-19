@@ -5,14 +5,14 @@ Jon Kerridge, the author of the CSP implementation in GPars, provides exhaustive
 [his website:|http://www.soc.napier.ac.uk/~cs10/#_Toc271192596]
 
 {note}
-The GroovyCSP implementation leverages JCSP, a Java-based CSP library, which is licensed under GPL. Unlike the liberal
-Apache 2 license, which GPars uses, GPL is more restrictive on use in commercial software. Please make sure your application conforms to the GPL
-rules before enabling use of JCSP in your code.
+The GroovyCSP implementation leverages JCSP, a Java-based CSP library, which is licensed under LGPL. There are some differences
+between the Apache 2 license, which GPars uses, and LGPL. Please make sure your application conforms to the LGPL
+rules before enabling the use of JCSP in your code.
 {note}
 
-If the GPL license is too restrictive for your use, you might consider checking out the Dataflow Concurrency chapter of this User Guide
+If the LGPL license is adequate for your use, you might consider checking out the Dataflow Concurrency chapter of this User Guide
 to learn about _tasks_ , _selectors_ and _operators_ , which may help you resolve concurrency issues in ways similar to the CSP approach.
-In fact the dataflow and CSP concepts stand very close to each other.
+In fact the dataflow and CSP concepts, as implemented in GPars, stand very close to each other.
 
 {note}
 By default, without actively adding an explicit dependency on JCSP in your build file or downloading and including the JCSP jar file in your project,
