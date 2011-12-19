@@ -391,6 +391,20 @@ which is available on the _Dataflow_ class as well as on _PGroup_ instances.
     println agenda.val
 {code}
 
+If you cannot specify up-front the number of parameters the _whenAllBound()_ handler takes, use a closure with one argument of type _List_:
+{code}
+Promise module1 = task {
+    compile(module1Sources)
+}
+Promise module2 = task {
+    compile(module2Sources)
+}
+//We don't know the number of modules that will be jarred together, so use a List
+final jarCompiledModules = {List modules -> ...}
+
+whenAllBound([module1, module2], jarCompiledModules)
+{code}
+
 h2. Bind handlers chaining
 
 All dataflow channels also support the _then()_ method to register a handler (a callback) that should be invoked when a value becomes available. Unlike _whenBound()_ the _then()_ method allows for chaining,
