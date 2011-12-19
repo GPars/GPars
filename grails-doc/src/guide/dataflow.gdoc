@@ -351,6 +351,19 @@ def queue = new DataflowQueue()
 queue.wheneverBound {println "A value $it arrived to the queue"}
 {code}
 
+Obviously nothing prevents you from having more of such handlers for a single promise: They will all trigger in parallel once the promise has a concrete value:
+
+{code}
+Promise bookingPromise = task {
+    final data = collectData()
+    return broker.makeBooking(data)
+}
+…
+bookingPromise.whenBound {booking -> printAgenda booking}
+bookingPromise.whenBound {booking -> sendMeAnEmailTo booking}
+bookingPromise.whenBound {booking -> updateTheCalendar booking}
+{code}
+
 {note}
 Dataflow variables and broadcasts are one of several possible ways to implement _Parallel Speculations_ . For details, please check out _Parallel Speculations_ in the _Parallel Collections_ section
 of the User Guide.
