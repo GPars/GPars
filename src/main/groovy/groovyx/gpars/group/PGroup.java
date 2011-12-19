@@ -585,8 +585,9 @@ public abstract class PGroup {
      * @return A promise for the final result
      */
     public <T> Promise<T> whenAllBound(final List<Promise<? extends Object>> promises, final Closure<T> code) {
-        if (promises.size() != code.getMaximumNumberOfParameters())
+        if (promises.size() != code.getMaximumNumberOfParameters() && !isListAccepting(code)) {
             throw new IllegalArgumentException("Cannot run whenAllBound(), since the number of promises does not match the number of arguments to the supplied closure.");
+        }
         final DataflowVariable result = new DataflowVariable();
         whenAllBound(promises, 0, new ArrayList<Object>(promises.size()), result, code);
         return result;
@@ -603,8 +604,13 @@ public abstract class PGroup {
      * @param <T>      The type of the final result
      */
     private static <T> void whenAllBound(final List<Promise<? extends Object>> promises, final int index, final List<Object> values, final DataflowVariable<T> result, final Closure<T> code) {
-        if (index == promises.size()) result.leftShift(code.call(values.toArray()));
-        else promises.get(index).whenBound(new MessagingRunnable<Object>() {
+        if (index == promises.size()) {
+            if (isListAccepting(code)) {
+                result.leftShift(code.call(values));
+            } else {
+                result.leftShift(code.call(values.toArray()));
+            }
+        } else promises.get(index).whenBound(new MessagingRunnable<Object>() {
             @Override
             protected void doRun(final Object argument) {
                 values.add(argument);
@@ -613,6 +619,9 @@ public abstract class PGroup {
         });
     }
 
+    private static <T> boolean isListAccepting(final Closure<T> code) {
+        return code.getMaximumNumberOfParameters() == 1 && List.class.isAssignableFrom(code.getParameterTypes()[0]);
+    }
 
     /**
      * Shutdown the thread pool gracefully

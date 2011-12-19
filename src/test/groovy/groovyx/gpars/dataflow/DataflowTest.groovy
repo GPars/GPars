@@ -143,4 +143,40 @@ public class DataflowTest extends GroovyTestCase {
         }.val
         group.shutdown()
     }
+
+    void testWhenAllBoundWithListArgument() {
+        final promises = (1..5).collect {new DataflowVariable()}
+        final result = Dataflow.whenAllBound(promises) {List values -> values.sum()}
+        Thread.start {
+            promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
+        }
+        assert result.val == 15
+    }
+
+    void testWhenAllBoundWithListArgumentAndOneValue() {
+        final promises = (1..1).collect {new DataflowVariable()}
+        final result = Dataflow.whenAllBound(promises) {List values -> values.sum()}
+        Thread.start {
+            promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
+        }
+        assert result.val == 1
+    }
+
+    void testWhenAllBoundWithListArgumentAndOneListValue() {
+        final promises = (1..1).collect {new DataflowVariable()}
+        final result = Dataflow.whenAllBound(promises) {value -> value.reverse()}
+        Thread.start {
+            promises.eachWithIndex {p, i -> sleep 100; p << [i + 1, 0]}
+        }
+        assert result.val == [0, 1]
+    }
+
+    void testWhenAllBoundWithListArgumentAndOneListValueWithSpecifiedType() {
+        final promises = (1..1).collect {new DataflowVariable()}
+        final result = Dataflow.whenAllBound(promises) {List value -> value.reverse()}
+        Thread.start {
+            promises.eachWithIndex {p, i -> sleep 100; p << [i + 1, 0]}
+        }
+        assert result.val == [[1, 0]]
+    }
 }
