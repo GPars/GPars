@@ -29,10 +29,6 @@ import groovyx.gpars.group.NonDaemonPGroup
 final group = new NonDaemonPGroup()
 final queue = new DataflowQueue()
 
-group.task {
-    (1..20).each {queue << it}
-}
-
 final t1 = group.task {
     (1..10).each {
         println 'First task: ' + queue.val
@@ -43,6 +39,10 @@ final t2 = group.task {
     (1..10).each {
         println 'Second task: ' + queue.val
     }
+}
+
+group.task {
+    (1..20).each {queue << it}
 }
 
 [t1, t2]*.join()

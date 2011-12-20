@@ -28,22 +28,23 @@ import groovyx.gpars.group.NonDaemonPGroup
 final group = new NonDaemonPGroup()
 final broadcast = new DataflowBroadcast()
 
+def subscription1 = broadcast.createReadChannel()
+final t1 = group.task {
+    (1..20).each {
+        println 'First task: ' + subscription1.val
+    }
+}
+
+def subscription2 = broadcast.createReadChannel()
+final t2 = group.task {
+    (1..20).each {
+        println 'Second task: ' + subscription2.val
+    }
+}
+
 group.task {
     (1..20).each {broadcast << it}
 }
 
-final t1 = group.task {
-    def subscription = broadcast.createReadChannel()
-    (1..20).each {
-        println 'First task: ' + subscription.val
-    }
-}
-
-final t2 = group.task {
-    def subscription = broadcast.createReadChannel()
-    (1..20).each {
-        println 'Second task: ' + subscription.val
-    }
-}
 [t1, t2]*.join()
 group.shutdown()
