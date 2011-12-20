@@ -16,34 +16,34 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowBroadcast
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
- * Demonstrates that multiple consumers reading off a shared DataflowQueues will load-balance the messages, so that each message
- * is read by exactly one consumer.
+ * Demonstrates that multiple consumers reading off a shared DataflowBroadcast will each receive all the messages.
  *
  * @author Vaclav Pech
  */
 
 final group = new NonDaemonPGroup()
-final queue = new DataflowQueue()
+final broadcast = new DataflowBroadcast()
 
 group.task {
-    (1..20).each {queue << it}
+    (1..20).each {broadcast << it}
 }
 
 final t1 = group.task {
-    (1..10).each {
-        println 'First task: ' + queue.val
+    def subscription = broadcast.createReadChannel()
+    (1..20).each {
+        println 'First task: ' + subscription.val
     }
 }
 
 final t2 = group.task {
-    (1..10).each {
-        println 'Second task: ' + queue.val
+    def subscription = broadcast.createReadChannel()
+    (1..20).each {
+        println 'Second task: ' + subscription.val
     }
 }
-
 [t1, t2]*.join()
 group.shutdown()
