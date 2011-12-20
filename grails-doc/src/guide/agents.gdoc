@@ -400,11 +400,11 @@ The property gets cleared once read.
     jugMembers.await()
 
     List errors = jugMembers.errors
-    assertEquals(2, errors.size())
+    assert 2 == errors.size()
     assert errors[0] instanceof IllegalStateException
-    assertEquals 'test1', errors[0].message
+    assert 'test1' == errors[0].message
     assert errors[1] instanceof IllegalArgumentException
-    assertEquals 'test2', errors[1].message
+    assert 'test2' == errors[1].message
 
     assert jugMembers.errors.empty
 {code}

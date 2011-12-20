@@ -25,7 +25,7 @@ public class ThreadPoolIteratorTest extends GroovyTestCase {
             list.iterator().eachParallel {
                 result << it
             }
-            assertEquals 9, result.size()
+            assert 9 == result.size()
         }
     }
 
@@ -34,7 +34,7 @@ public class ThreadPoolIteratorTest extends GroovyTestCase {
 
         GParsExecutorsPool.withPool {
             def result = list.iterator().collectParallel { 2 * it }
-            assertEquals 9, result.size()
+            assert 9 == result.size()
             assert result.any {it == 12}
         }
     }
@@ -45,8 +45,8 @@ public class ThreadPoolIteratorTest extends GroovyTestCase {
         GParsExecutorsPool.withPool {
             assert list.iterator().anyParallel { it == 6 }
             assert list.iterator().everyParallel { it < 10 }
-            assertEquals 8, list.iterator().findParallel { it == 8 }
-            assertEquals 3, (list.iterator().findAllParallel { it > 6 }).size()
+            assert 8 == list.iterator().findParallel { it == 8 }
+            assert 3 == (list.iterator().findAllParallel { it > 6 }).size()
         }
     }
 }

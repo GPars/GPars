@@ -77,9 +77,9 @@ public class DistributedDataflowTest extends GroovyTestCase {
             it.mainActor.join(5, TimeUnit.SECONDS)
             it.localHost.disconnect()
         }
-        assertEquals 'two', results.one.val
-        assertEquals 'one', results.two.val
-        assertEquals 'one', df['one']
-        assertEquals 'two', df['two']
+        assert 'two' == results.one.val
+        assert 'one' == results.two.val
+        assert 'one' == df['one']
+        assert 'two' == df['two']
     }
 }

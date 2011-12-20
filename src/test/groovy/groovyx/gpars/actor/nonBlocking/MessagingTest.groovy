@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,15 +56,15 @@ public class MessagingTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
 
         actor('message')
         barrier.await()
-        assertEquals 2, counter.intValue()
+        assert 2 == counter.intValue()
 
         actor('message')
         barrier.await()
-        assertEquals 3, counter.intValue()
+        assert 3 == counter.intValue()
     }
 
     public void testLeftShift() {
@@ -85,15 +85,15 @@ public class MessagingTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
 
         actor << 'message'
         barrier.await()
-        assertEquals 2, counter.intValue()
+        assert 2 == counter.intValue()
 
         actor << 'message'
         barrier.await()
-        assertEquals 3, counter.intValue()
+        assert 3 == counter.intValue()
     }
 
     public void testImplicitCallMethod() {
@@ -114,15 +114,15 @@ public class MessagingTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
 
         actor 'message'
         barrier.await()
-        assertEquals 2, counter.intValue()
+        assert 2 == counter.intValue()
 
         actor 'message'
         barrier.await()
-        assertEquals 3, counter.intValue()
+        assert 3 == counter.intValue()
     }
 
     public void testReactWithBufferedMessages() {
@@ -152,15 +152,15 @@ public class MessagingTest extends GroovyTestCase {
         actor.send('message')
         barrier.await()
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         barrier.await()
 
         barrier.await()
-        assertEquals 2, counter.intValue()
+        assert 2 == counter.intValue()
         barrier.await()
 
         barrier.await()
-        assertEquals 3, counter.intValue()
+        assert 3 == counter.intValue()
     }
 
     public void testReactWithDelayedMessages() {
@@ -177,6 +177,6 @@ public class MessagingTest extends GroovyTestCase {
         Thread.sleep(1000)
         actor.send('message')
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
     }
 }

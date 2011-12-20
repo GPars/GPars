@@ -28,21 +28,21 @@ public class ThreadPoolStringTest extends GroovyTestCase {
         def result = Collections.synchronizedSet(new HashSet())
         GParsExecutorsPool.withPool(5) {ExecutorService service ->
             'abc'.eachParallel {result.add(it.toUpperCase())}
-            assertEquals(new HashSet(['A', 'B', 'C']), result)
+            assert new HashSet(['A', 'B', 'C']) == result
         }
     }
 
     public void testCollectParallelWithString() {
         GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def result = 'abc'.collectParallel {it.toUpperCase()}
-            assertEquals(['A', 'B', 'C'], result)
+            assert ['A', 'B', 'C'] == result
         }
     }
 
     public void testFindAllParallelWithString() {
         GParsExecutorsPool.withPool(5) {ExecutorService service ->
             def result = 'aBC'.findAllParallel {it == it.toUpperCase()}
-            assertEquals(['B', 'C'], result)
+            assert ['B', 'C'] == result
         }
     }
 
@@ -56,7 +56,7 @@ public class ThreadPoolStringTest extends GroovyTestCase {
     public void testGrepParallelWithThreadPoolAndString() {
         GParsExecutorsPool.withPool(5) {
             def result = 'aBC'.grepParallel('B')
-            assertEquals(['B'], result)
+            assert ['B'] == result
         }
     }
 

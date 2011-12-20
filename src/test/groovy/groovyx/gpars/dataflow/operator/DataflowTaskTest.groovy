@@ -47,7 +47,7 @@ public class DataflowTaskTest extends GroovyTestCase {
 
         task {a << delegate}
 
-        assertEquals this, a.val
+        assert this == a.val
     }
 
     public void testJoin() {

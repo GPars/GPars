@@ -30,7 +30,7 @@ Executor service enhancements
 Asynchronous function processing
 {code}
 ThreadPool.withPool {
-    assertEquals([10, 20], AsyncInvokerUtil.doInParallel({calculateA()}, {calculateB()}))         //waits for results
-    assertEquals([10, 20], AsyncInvokerUtil.executeAsync({calculateA()}, {calculateB()})*.get())  //returns Futures instead and doesn't wait for results to be calculated
+    assert [10, 20] == AsyncInvokerUtil.doInParallel({calculateA()}, {calculateB()})         //waits for results
+    assert [10, 20] == AsyncInvokerUtil.executeAsync({calculateA()}, {calculateB()})*.get()  //returns Futures instead and doesn't wait for results to be calculated
 }
 {code}

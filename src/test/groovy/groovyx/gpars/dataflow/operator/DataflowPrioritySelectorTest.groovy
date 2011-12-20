@@ -225,7 +225,7 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         op1.actor.metaClass.onInterrupt = {}
         assert !flag.get()
         a << 'Message'
-        assertEquals 'a', b.val
+        assert 'a' == b.val
         assert flag.get()
         op1.terminate()
         op1.join()

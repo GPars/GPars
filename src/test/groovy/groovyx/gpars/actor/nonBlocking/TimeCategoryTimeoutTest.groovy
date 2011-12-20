@@ -80,7 +80,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 2, exceptions
+        assert 2 == exceptions
     }
 
     public void testMessageBeforeTimeout() {
@@ -148,7 +148,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
-        assertEquals(2, codeCounter.get())
+        assert 2 == codeCounter.get()
         assert timeoutFlag.get()
     }
 
@@ -177,7 +177,7 @@ public class TimeCategoryTimeoutTest extends GroovyTestCase {
 
         barrier.await()
         actor.join()
-        assertEquals(1, codeCounter.get())
+        assert 1 == codeCounter.get()
         assert !actor.isActive()
     }
 }

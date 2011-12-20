@@ -46,9 +46,9 @@ public class DataflowStreamAdapterTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 10, stream.val
+        assert 10 == stream.val
         thread << 'Proceed'
-        assertEquals 20, stream.val
+        assert 20 == stream.val
     }
 
     public void testStreamPoll() {
@@ -76,10 +76,10 @@ public class DataflowStreamAdapterTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 10, stream.poll()?.val
+        assert 10 == stream.poll()?.val
         assert stream.poll() == null
         thread << 'Proceed'
-        assertEquals 20, stream.val
+        assert 20 == stream.val
         assert stream.poll() == null
     }
 
@@ -123,7 +123,7 @@ public class DataflowStreamAdapterTest extends GroovyTestCase {
         latch.await()
         thread << 'Proceed'
         def value = stream.val
-        assertEquals 20, value
+        assert 20 == value
     }
 
     public void testIteration() {
@@ -135,10 +135,10 @@ public class DataflowStreamAdapterTest extends GroovyTestCase {
             (0..10).each {writeStream << it}
             writeStream << DataflowStream.eos()
         }.join()
-        stream.eachWithIndex {index, element -> assertEquals index, element }
+        stream.eachWithIndex {index, element -> assert index == element }
 
         (0..10).each {
-            assertEquals it, stream.val
+            assert it == stream.val
         }
     }
 
@@ -175,9 +175,9 @@ public class DataflowStreamAdapterTest extends GroovyTestCase {
         writeStream << 10
         writeStream << 20
         writeStream << 30
-        assertEquals 10, df.x1
-        assertEquals 20, df.x2
-        assertEquals 30, df.x3
+        assert 10 == df.x1
+        assert 20 == df.x2
+        assert 30 == df.x3
     }
 
     public void testWheneverBound() {

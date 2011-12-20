@@ -43,7 +43,7 @@ public class ReactorTest extends GroovyTestCase {
         processor.stop()
         processor.join()
 
-        assertEquals([0, 2, 4, 6, 8, 10], res)
+        assert [0, 2, 4, 6, 8, 10] == res
     }
 
     public void testWait() {
@@ -51,9 +51,9 @@ public class ReactorTest extends GroovyTestCase {
             2 * it
         }
 
-        assertEquals(20, processor.sendAndWait(10))
-        assertEquals(40, processor.sendAndWait(20))
-        assertEquals(60, processor.sendAndWait(30))
+        assert 20 == processor.sendAndWait(10)
+        assert 40 == processor.sendAndWait(20)
+        assert 60 == processor.sendAndWait(30)
 
         processor.stop()
         processor.join(10, TimeUnit.SECONDS)
@@ -82,9 +82,9 @@ public class ReactorTest extends GroovyTestCase {
         }
 
         [a1, a2, a3]*.join()
-        assertEquals 20, result1
-        assertEquals 40, result2
-        assertEquals 60, result3
+        assert 20 == result1
+        assert 40 == result2
+        assert 60 == result3
 
         processor.stop()
         processor.join()
@@ -112,7 +112,7 @@ public class ReactorTest extends GroovyTestCase {
         processor.stop()
         processor.join()
 
-        assertEquals([null], res)
+        assert [null] == res
     }
 
     public void testReplies() {

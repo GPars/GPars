@@ -216,20 +216,20 @@ class MakeTransparentMethodTest extends GroovyTestCase {
     public void testTransparentSum() {
         def items = [1, 2, 3, 4, 5]
         GParsPool.withPool(5) {
-            assertEquals 15, items.makeConcurrent().sum()
+            assert 15 == items.makeConcurrent().sum()
         }
     }
 
     public void testCount() {
         GParsPool.withPool(5) {
-            assertEquals 1, [1, 2, 3, 4, 5].makeConcurrent().count(3)
-            assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].makeConcurrent().count(3)
-            assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].makeConcurrent().count(6)
-            assertEquals 0, [].makeConcurrent().count(6)
-            assertEquals 1, 'abc1'.makeConcurrent().count('a')
-            assertEquals 3, 'abcaa1'.makeConcurrent().count('a')
-            assertEquals 0, 'ebc1'.makeConcurrent().count('a')
-            assertEquals 0, '  '.trim().makeConcurrent().count('a')
+            assert 1 == [1, 2, 3, 4, 5].makeConcurrent().count(3)
+            assert 5 == [3, 2, 3, 4, 5, 3, 3, 3].makeConcurrent().count(3)
+            assert 0 == [3, 2, 3, 4, 5, 3, 3, 3].makeConcurrent().count(6)
+            assert 0 == [].makeConcurrent().count(6)
+            assert 1 == 'abc1'.makeConcurrent().count('a')
+            assert 3 == 'abcaa1'.makeConcurrent().count('a')
+            assert 0 == 'ebc1'.makeConcurrent().count('a')
+            assert 0 == '  '.trim().makeConcurrent().count('a')
         }
     }
 
@@ -238,7 +238,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
             def result = [1, 2, 3, 4, 5].makeConcurrent().split {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
-            assertEquals 2, result.size()
+            assert 2 == result.size()
             assert [[], []] == [].makeConcurrent().split {it > 2}
             result = [3].makeConcurrent().split {it > 2}
             assert [[3], []] == result
@@ -252,7 +252,7 @@ class MakeTransparentMethodTest extends GroovyTestCase {
             def result = new String('abc').makeConcurrent().split {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
-            assertEquals 2, result.size()
+            assert 2 == result.size()
             result = ''.makeConcurrent().split {it == 'b'}
             assert [[], []] == result
             result = 'b'.makeConcurrent().split {it == 'b'}

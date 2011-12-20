@@ -40,7 +40,7 @@ public class DataflowExpressionTest extends GroovyTestCase {
         Dataflow.task { a << 5 }
         Dataflow.task { b << 20 }
 
-        assertEquals 141, d.val
+        assert 141 == d.val
     }
 
     public void testProperty() {
@@ -54,7 +54,7 @@ public class DataflowExpressionTest extends GroovyTestCase {
             b << [x: 1, y: 2, z: 3]
         }
 
-        assertEquals 11, (prod + 1).val
+        assert 11 == (prod + 1).val
     }
 
     public void testTransform() {
@@ -70,7 +70,7 @@ public class DataflowExpressionTest extends GroovyTestCase {
             b << 7
         }
 
-        assertEquals(13, (prod + 1).val)
+        assert 13 == (prod + 1).val
 
         shouldFail(IllegalArgumentException) {
             DataflowExpression.transform([a]) {x, y ->}
@@ -101,7 +101,7 @@ public class DataflowExpressionTest extends GroovyTestCase {
                 b << 7
             }
 
-            assertEquals(13, (prod + 1).val)
+            assert 13 == (prod + 1).val
         }
     }
 }

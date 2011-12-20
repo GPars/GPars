@@ -39,12 +39,12 @@ public class DataflowQueueTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 2, stream.length()
-        assertEquals 10, stream.val
-        assertEquals 1, stream.length()
+        assert 2 == stream.length()
+        assert 10 == stream.val
+        assert 1 == stream.length()
         thread << 'Proceed'
-        assertEquals 20, stream.val
-        assertEquals 0, stream.length()
+        assert 20 == stream.val
+        assert 0 == stream.length()
     }
 
     public void testStreamPoll() {
@@ -70,13 +70,13 @@ public class DataflowQueueTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 2, stream.length()
-        assertEquals 10, stream.poll()?.val
-        assertEquals 1, stream.length()
+        assert 2 == stream.length()
+        assert 10 == stream.poll()?.val
+        assert 1 == stream.length()
         assert stream.poll() == null
         thread << 'Proceed'
-        assertEquals 20, stream.val
-        assertEquals 0, stream.length()
+        assert 20 == stream.val
+        assert 0 == stream.length()
         assert stream.poll() == null
     }
 
@@ -95,12 +95,12 @@ public class DataflowQueueTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 2, stream.length()
+        assert 2 == stream.length()
         assertNull stream.val
-        assertEquals 1, stream.length()
+        assert 1 == stream.length()
         thread << 'Proceed'
         assertNull stream.val
-        assertEquals 0, stream.length()
+        assert 0 == stream.length()
     }
 
     public void testTake() {
@@ -117,11 +117,11 @@ public class DataflowQueueTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 1, stream.length()
+        assert 1 == stream.length()
         thread << 'Proceed'
         def value = stream.val
-        assertEquals 0, stream.length()
-        assertEquals 20, value
+        assert 0 == stream.length()
+        assert 20 == value
     }
 
     public void testIteration() {
@@ -138,15 +138,15 @@ public class DataflowQueueTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
         stream.eachWithIndex {element, index -> assert index == element }
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
 
         thread << 'Proceed'
         barrier.await()
-        assertEquals 12, stream.length()
+        assert 12 == stream.length()
         (0..10).each {
-            assertEquals it, stream.val
+            assert it == stream.val
         }
     }
 
@@ -160,34 +160,34 @@ public class DataflowQueueTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
         stream.each {assertNull it }
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
 
         for (i in (0..10)) { assertNull stream.val }
     }
 
     public void testToString() {
         final DataflowQueue<Integer> stream = new DataflowQueue<Integer>()
-        assertEquals 'DataflowQueue(queue=[])', stream.toString()
+        assert 'DataflowQueue(queue=[])' == stream.toString()
         stream << 10
-        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=10)])', stream.toString()
+        assert 'DataflowQueue(queue=[DataflowVariable(value=10)])' == stream.toString()
         stream << 20
-        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=10), DataflowVariable(value=20)])', stream.toString()
+        assert 'DataflowQueue(queue=[DataflowVariable(value=10), DataflowVariable(value=20)])' == stream.toString()
         stream.val
-        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=20)])', stream.toString()
+        assert 'DataflowQueue(queue=[DataflowVariable(value=20)])' == stream.toString()
         stream.val
-        assertEquals 'DataflowQueue(queue=[])', stream.toString()
+        assert 'DataflowQueue(queue=[])' == stream.toString()
         final DataflowVariable variable = new DataflowVariable()
         stream << variable
-        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=null)])', stream.toString()
+        assert 'DataflowQueue(queue=[DataflowVariable(value=null)])' == stream.toString()
         variable << '30'
         Thread.sleep 1000  //let the value propagate asynchronously into the variable stored in the stream
-        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=30)])', stream.toString()
-        assertEquals 'DataflowQueue(queue=[DataflowVariable(value=30)])', stream.toString()
+        assert 'DataflowQueue(queue=[DataflowVariable(value=30)])' == stream.toString()
+        assert 'DataflowQueue(queue=[DataflowVariable(value=30)])' == stream.toString()
         stream.val
-        assertEquals 'DataflowQueue(queue=[])', stream.toString()
-        assertEquals 'DataflowQueue(queue=[])', stream.toString()
+        assert 'DataflowQueue(queue=[])' == stream.toString()
+        assert 'DataflowQueue(queue=[])' == stream.toString()
     }
 
     public void testWhenBound() {
@@ -204,9 +204,9 @@ public class DataflowQueueTest extends GroovyTestCase {
         stream << 10
         stream << 20
         stream << 30
-        assertEquals 10, df.x1
-        assertEquals 20, df.x2
-        assertEquals 30, df.x3
+        assert 10 == df.x1
+        assert 20 == df.x2
+        assert 30 == df.x3
     }
 
     public void testWheneverBound() {

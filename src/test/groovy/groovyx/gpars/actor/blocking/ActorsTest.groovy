@@ -43,7 +43,7 @@ public class ActorsTest extends GroovyTestCase {
         }
 
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals 3, counter.intValue()
+        assert 3 == counter.intValue()
     }
 
     public void testActorStopAfterTimeout() {

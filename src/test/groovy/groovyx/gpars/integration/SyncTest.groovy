@@ -54,7 +54,7 @@ public class SyncTest extends GroovyTestCase {
         node1.mainActor.join(5, TimeUnit.SECONDS)
         node1.localHost.disconnect()
         node2.localHost.disconnect()
-        assertEquals "here is something", result.val
+        assert "here is something" == result.val
     }
 
     void testSendAndContinue() {
@@ -89,6 +89,6 @@ public class SyncTest extends GroovyTestCase {
         a1.join()
         a2.join()
 
-        assertEquals "so it goes", result.val
+        assert "so it goes" == result.val
     }
 }

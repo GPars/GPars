@@ -31,7 +31,7 @@ public class AgentListenerTest extends GroovyTestCase {
 
         counter {updateValue(it + 1)}
         counter.await()
-        assertEquals(1, counter.instantVal)
+        assert 1 == counter.instantVal
         assert flows.old1 == flows.old2
         assert flows.old1 == 0
         assert flows.new1 == flows.new2
@@ -41,63 +41,63 @@ public class AgentListenerTest extends GroovyTestCase {
     public void testValidators() {
         def counter = new Agent(0)
         counter {updateValue(it + 1)}
-        assertEquals(1, counter.val)
+        assert 1 == counter.val
 
         counter.addValidator {oldValue, newValue -> if (newValue < oldValue) throw new IllegalArgumentException('Decrease is not allowed!')}
         counter {updateValue(it + 1)}
-        assertEquals(2, counter.val)
+        assert 2 == counter.val
 
         counter {updateValue(it)}
-        assertEquals(2, counter.val)
+        assert 2 == counter.val
 
         counter {updateValue(it - 1)}
-        assertEquals(2, counter.val)
+        assert 2 == counter.val
 
         counter {updateValue(it + 3)}
-        assertEquals(5, counter.val)
+        assert 5 == counter.val
 
         counter.addValidator {oldValue, newValue -> if (newValue > oldValue + 1) throw new IllegalArgumentException('Jumps ahead are prohibited!')}
 
         counter {updateValue(it - 1)}
-        assertEquals(5, counter.val)
+        assert 5 == counter.val
 
         counter {updateValue(it + 3)}
-        assertEquals(5, counter.val)
+        assert 5 == counter.val
 
         counter {updateValue(it + 1)}
-        assertEquals(6, counter.val)
+        assert 6 == counter.val
     }
 
     public void testListenerThrowingException() {
         def counter = new Agent(0)
         counter {updateValue(it + 1)}
-        assertEquals(1, counter.val)
+        assert 1 == counter.val
 
         counter.addListener {oldValue, newValue -> if (newValue < oldValue) throw new IllegalArgumentException('Decrease is not allowed! But hey, I\'m just a listener!')}
         counter {updateValue(it + 1)}
-        assertEquals(2, counter.val)
+        assert 2 == counter.val
         assert !counter.hasErrors()
-        assertEquals 0, counter.errors.size()
+        assert 0 == counter.errors.size()
 
         counter {updateValue(it - 1)}
-        assertEquals(1, counter.val)
+        assert 1 == counter.val
         assert counter.hasErrors()
-        assertEquals 1, counter.errors.size()
+        assert 1 == counter.errors.size()
 
         counter {updateValue(it + 3)}
-        assertEquals(4, counter.val)
+        assert 4 == counter.val
         assert !counter.hasErrors()
 
         counter.addValidator {oldValue, newValue -> if (newValue > oldValue + 1) throw new IllegalArgumentException('Jumps ahead are prohibited!')}
 
         counter {updateValue(it - 1)}
-        assertEquals(3, counter.val)
+        assert 3 == counter.val
         assert counter.hasErrors()
-        assertEquals 1, counter.errors.size()
+        assert 1 == counter.errors.size()
 
         counter {updateValue(it + 3)}
-        assertEquals(3, counter.val)
+        assert 3 == counter.val
         assert counter.hasErrors()
-        assertEquals 1, counter.errors.size()
+        assert 1 == counter.errors.size()
     }
 }

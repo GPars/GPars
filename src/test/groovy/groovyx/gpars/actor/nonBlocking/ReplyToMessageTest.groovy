@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,8 +80,8 @@ public class ReplyToMessageTest extends GroovyTestCase {
         completedBarrier.await()
         bouncer.stop()
 
-        assertEquals([1, 2], replies1)
-        assertEquals([10, 20], replies2)
+        assert [1, 2] == replies1
+        assert [10, 20] == replies2
     }
 
     public void testMultipleActors() {
@@ -147,9 +147,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
         completedBarrier.await()
         incrementor.stop()
         decrementor.stop()
-        assertEquals 4, replies1.size()
+        assert 4 == replies1.size()
         assert replies1.containsAll([3, 5, 4, 8])
-        assertEquals 4, replies2.size()
+        assert 4 == replies2.size()
         assert replies2.containsAll([21, 59, 31, 39])
     }
 
@@ -285,8 +285,8 @@ public class ReplyToMessageTest extends GroovyTestCase {
         }
 
         completedBarrier.await()
-        assertEquals 1, replies1.size()
-        assertEquals 1, replies2.size()
+        assert 1 == replies1.size()
+        assert 1 == replies2.size()
 
         assert replies1.contains(3)
         assert replies2.contains(3)

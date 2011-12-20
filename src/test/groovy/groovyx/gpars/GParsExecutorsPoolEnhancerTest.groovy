@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ public class GParsExecutorsPoolEnhancerTest extends GroovyTestCase {
         GParsExecutorsPoolEnhancer.enhanceInstance list
         assert list.anyParallel {it > 4}
         assert list.everyParallel {it > 0}
-        assertEquals 1, list.findParallel {it < 2}
-        assertEquals([1, 2], list.findAllParallel {it < 3})
-        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
+        assert 1 == list.findParallel {it < 2}
+        assert [1, 2] == list.findAllParallel {it < 3}
+        assert [2, 4, 6, 8, 10] == list.collectParallel {2 * it}
         def result = Collections.synchronizedSet(new HashSet())
         list.eachParallel {result << 2 * it}
-        assertEquals(new HashSet([2, 4, 6, 8, 10]), result)
+        assert new HashSet([2, 4, 6, 8, 10]) == result
     }
 
     public void testClassEnhancement() {
@@ -35,13 +35,13 @@ public class GParsExecutorsPoolEnhancerTest extends GroovyTestCase {
         final List list = new LinkedList([1, 2, 3, 4, 5])
         assert list.anyParallel {it > 4}
         assert list.everyParallel {it > 0}
-        assertEquals 1, list.findParallel {it < 2}
-        assertEquals([1, 2], list.findAllParallel {it < 3})
-        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
+        assert 1 == list.findParallel {it < 2}
+        assert [1, 2] == list.findAllParallel {it < 3}
+        assert [2, 4, 6, 8, 10] == list.collectParallel {2 * it}
         def result = Collections.synchronizedSet(new HashSet())
         list.eachParallel {result << 2 * it}
-        assertEquals(5, result.size())
-        assertEquals(new HashSet([2, 4, 6, 8, 10]), result)
+        assert 5 == result.size()
+        assert new HashSet([2, 4, 6, 8, 10]) == result
     }
 
     public void testMapInstanceEnhancement() {
@@ -73,12 +73,12 @@ public class GParsExecutorsPoolEnhancerTest extends GroovyTestCase {
     public void testDualEnhancement() {
         GParsExecutorsPoolEnhancer.enhanceClass LinkedList
         final List list = new LinkedList([1, 2, 3, 4, 5])
-        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
+        assert [2, 4, 6, 8, 10] == list.collectParallel {2 * it}
 
         GParsExecutorsPoolEnhancer.enhanceInstance list
-        assertEquals([2, 4, 6, 8, 10], list.collectParallel {2 * it})
+        assert [2, 4, 6, 8, 10] == list.collectParallel {2 * it}
 
-        assertEquals([2, 4, 6, 8, 10], new LinkedList([1, 2, 3, 4, 5]).collectParallel {2 * it})
+        assert [2, 4, 6, 8, 10] == new LinkedList([1, 2, 3, 4, 5]).collectParallel {2 * it}
     }
 
     private String performExceptionCheck(List list) {

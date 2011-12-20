@@ -37,6 +37,6 @@ public class RepeatLoopTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 10, count
+        assert 10 == count
     }
 }

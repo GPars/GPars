@@ -37,7 +37,7 @@ public class AgentTest extends GroovyTestCase {
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
-        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+        assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
 
         final Thread t1 = Thread.start {
             jugMembers {it.add 'Joe'}  //add Joe
@@ -49,7 +49,7 @@ public class AgentTest extends GroovyTestCase {
         }
 
         [t1, t2]*.join()
-        assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
+        assert new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']) == new HashSet(jugMembers.val)
     }
 
     public void testCustomGroup() {
@@ -58,7 +58,7 @@ public class AgentTest extends GroovyTestCase {
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
-        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+        assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
 
         group.shutdown()
         shouldFail RejectedExecutionException, {
@@ -74,7 +74,7 @@ public class AgentTest extends GroovyTestCase {
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
-        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+        assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
 
         pool.shutdown()
         pool.awaitTermination(30, TimeUnit.SECONDS)
@@ -90,7 +90,7 @@ public class AgentTest extends GroovyTestCase {
 
         jugMembers {it.add 'James'}  //add James
         jugMembers.await()
-        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+        assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
     }
 
     public void testAgentFactory() {
@@ -99,7 +99,7 @@ public class AgentTest extends GroovyTestCase {
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
-        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+        assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
     }
 
     public void testFairAgentFactory() {
@@ -107,7 +107,7 @@ public class AgentTest extends GroovyTestCase {
 
         jugMembers.send {it.add 'James'}  //add James
         jugMembers.await()
-        assertEquals(new HashSet(['Me', 'James']), new HashSet(jugMembers.instantVal))
+        assert new HashSet(['Me', 'James']) == new HashSet(jugMembers.instantVal)
     }
 
     public void testListWithCloneCopyStrategy() {
@@ -125,7 +125,7 @@ public class AgentTest extends GroovyTestCase {
         }
 
         [t1, t2]*.join()
-        assertEquals(new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']), new HashSet(jugMembers.val))
+        assert new HashSet(['Me', 'James', 'Joe', 'Dave', 'Alice']) == new HashSet(jugMembers.val)
     }
 
     public void testCounter() {
@@ -170,7 +170,7 @@ public class AgentTest extends GroovyTestCase {
             result << it
         }
 
-        assertEquals 5, result.val
+        assert 5 == result.val
     }
 
     public void testExplicitReply() {
@@ -187,8 +187,8 @@ public class AgentTest extends GroovyTestCase {
             }
         }
 
-        assertEquals 'Explicit reply', result.val
-        assertEquals 10, result.val
+        assert 'Explicit reply' == result.val
+        assert 10 == result.val
     }
 
     public void testDirectMessage() {
@@ -198,13 +198,13 @@ public class AgentTest extends GroovyTestCase {
         assertNull counter.val
 
         counter << 10
-        assertEquals 10, counter.val
+        assert 10 == counter.val
 
         counter << 20
-        assertEquals 20, counter.val
+        assert 20 == counter.val
 
         counter << {updateValue(it + 10)}
-        assertEquals 30, counter.val
+        assert 30 == counter.val
 
     }
 
@@ -212,7 +212,7 @@ public class AgentTest extends GroovyTestCase {
         final Agent counter = new Agent<Long>()
 
         counter << 10
-        assertEquals 10, counter.val
+        assert 10 == counter.val
     }
 
     public void testNullInitialValue() {
@@ -233,7 +233,7 @@ public class AgentTest extends GroovyTestCase {
                 result << it
             }
         }
-        assertEquals 0, result.val
+        assert 0 == result.val
 
         result = new DataflowVariable()
         Actors.actor {
@@ -263,21 +263,21 @@ public class AgentTest extends GroovyTestCase {
     public void testInstantVal() {
         final Agent counter = new Agent<Long>(0L)
 
-        assertEquals 0, counter.instantVal
+        assert 0 == counter.instantVal
         counter << {
             updateValue it + 1
         }
         counter.await()
-        assertEquals 1, counter.instantVal
-        assertEquals 1, counter.val
+        assert 1 == counter.instantVal
+        assert 1 == counter.val
     }
 
     public void testIncompatibleMessageType() {
         final Agent counter = new Agent<Long>(0L)
         counter << 'test'
-        assertEquals 'test', counter.val
+        assert 'test' == counter.val
         counter << 1L
-        assertEquals 1L, counter.val
+        assert 1L == counter.val
     }
 
     public void testNullMessage() {
@@ -289,7 +289,7 @@ public class AgentTest extends GroovyTestCase {
         counter.valAsync {
             result << it
         }
-        assertEquals 'test', result.val
+        assert 'test' == result.val
     }
 
     public void testErrors() {
@@ -303,11 +303,11 @@ public class AgentTest extends GroovyTestCase {
 
         assert jugMembers.hasErrors()
         List errors = jugMembers.errors
-        assertEquals(2, errors.size())
+        assert 2 == errors.size()
         assert errors[0] instanceof IllegalStateException
-        assertEquals 'test1', errors[0].message
+        assert 'test1' == errors[0].message
         assert errors[1] instanceof IllegalArgumentException
-        assertEquals 'test2', errors[1].message
+        assert 'test2' == errors[1].message
 
         assert jugMembers.errors.empty
         assert !jugMembers.hasErrors()

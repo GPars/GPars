@@ -394,7 +394,7 @@ class SyncDataflowBroadcastTest extends GroovyTestCase {
         Thread.start {
             subscription1.getVal(10, TimeUnit.SECONDS)
         }
-        assertEquals 10, subscription2.getVal(10, TimeUnit.SECONDS)
+        assert 10 == subscription2.getVal(10, java.util.concurrent.TimeUnit.SECONDS)
     }
 
 }

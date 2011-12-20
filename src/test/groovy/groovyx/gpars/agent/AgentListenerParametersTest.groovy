@@ -84,7 +84,7 @@ public class AgentListenerParametersTest extends GroovyTestCase {
         registrations {updateValue(['Joe'])}
         assert registrations.val == []
         assert registrations.hasErrors()
-        assertEquals 1, registrations.errors.size()
+        assert 1 == registrations.errors.size()
 
         registrations {updateValue(['Dave'])}
         assert registrations.val == ['Dave']
@@ -93,12 +93,12 @@ public class AgentListenerParametersTest extends GroovyTestCase {
         registrations {updateValue(['Joe'])}
         assert registrations.val == ['Dave']
         assert registrations.hasErrors()
-        assertEquals 1, registrations.errors.size()
+        assert 1 == registrations.errors.size()
 
         registrations {updateValue(it << 'Joe')}
         assert registrations.val == ['Dave']
         assert registrations.hasErrors()
-        assertEquals 1, registrations.errors.size()
+        assert 1 == registrations.errors.size()
 
         registrations {r ->
             r << 'Alice'
@@ -108,7 +108,7 @@ public class AgentListenerParametersTest extends GroovyTestCase {
         }
         assert registrations.val == ['Dave']
         assert registrations.hasErrors()
-        assertEquals 1, registrations.errors.size()
+        assert 1 == registrations.errors.size()
 
         registrations {r ->
             r << 'Alice'

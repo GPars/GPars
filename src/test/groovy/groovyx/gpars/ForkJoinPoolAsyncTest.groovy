@@ -36,7 +36,7 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
             final Closure cl = {Number number -> result.add(number * 10); latch.countDown()}
             [1, 2, 3, 4, 5].each(cl.async())
             latch.await()
-            assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+            assert new HashSet([10, 20, 30, 40, 50]) == result
         }
     }
 
@@ -47,14 +47,14 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
             GParsPoolUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
             GParsPoolUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
             latch.await()
-            assertEquals 2, resultA
-            assertEquals 3, resultB
+            assert 2 == resultA
+            assert 3 == resultB
         }
     }
 
     public void testCallParallelWithResult() {
         GParsPool.withPool(5) {service ->
-            assertEquals 6, GParsPoolUtil.callAsync({it * 2}, 3).get()
+            assert 6 == groovyx.gpars.GParsPoolUtil.callAsync({it * 2}, 3).get()
         }
     }
 
@@ -65,14 +65,14 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
             GParsPoolUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
             GParsPoolUtil.async({int number -> resultB = number; latch.countDown()}).call(3);
             latch.await()
-            assertEquals 2, resultA
-            assertEquals 3, resultB
+            assert 2 == resultA
+            assert 3 == resultB
         }
     }
 
     public void testAsyncWithResult() {
         GParsPool.withPool(5) {service ->
-            assertEquals 6, GParsPoolUtil.async({it * 2}).call(3).get()
+            assert 6 == groovyx.gpars.GParsPoolUtil.async({it * 2}).call(3).get()
         }
     }
 
@@ -90,7 +90,7 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
         shouldFail(IllegalStateException.class) {
             GParsPoolUtil.callAsync({counter.set it}, 1)
         }
-        assertEquals 0, counter.get()
+        assert 0 == counter.get()
     }
 
     public void testLeftShift() {
@@ -105,32 +105,32 @@ public class ForkJoinPoolAsyncTest extends GroovyTestCase {
 
     public void testDoInParallel() {
         GParsPool.withPool {
-            assertEquals([10, 20], GParsPool.executeAsyncAndWait({10}, {20}))
+            assert [10, 20] == groovyx.gpars.GParsPool.executeAsyncAndWait({10}, {20})
         }
     }
 
     public void testExecuteInParallel() {
         GParsPool.withPool {
-            assertEquals([10, 20], GParsPool.executeAsync({10}, {20})*.get())
+            assert [10, 20] == groovyx.gpars.GParsPool.executeAsync({10}, {20})*.get()
         }
     }
 
     public void testDoInParallelList() {
         GParsPool.withPool {
-            assertEquals([10, 20], GParsPool.executeAsyncAndWait([{10}, {20}]))
+            assert [10, 20] == groovyx.gpars.GParsPool.executeAsyncAndWait([{10}, {20}])
         }
     }
 
     public void testExecuteAsyncList() {
         GParsPool.withPool {
-            assertEquals([10, 20], GParsPool.executeAsync([{10}, {20}])*.get())
+            assert [10, 20] == groovyx.gpars.GParsPool.executeAsync([{10}, {20}])*.get()
         }
     }
 
     public void testAsyncWithCollectionAndResult() {
         GParsPool.withPool(5) {service ->
             Collection<Future> result = [1, 2, 3, 4, 5].collect({it * 10}.async())
-            assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection) result*.get()))
+            assert new HashSet([10, 20, 30, 40, 50]) == new HashSet((Collection) result*.get())
         }
     }
 }

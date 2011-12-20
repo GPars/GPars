@@ -107,6 +107,6 @@ abstract public class MergeSortTest extends GroovyTestCase {
         sorter.send([1, 5, 2, 4, 3, 8, 6, 7, 3, 9, 5, 3])
 
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals([1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9], result)
+        assert [1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 8, 9] == result
     }
 }

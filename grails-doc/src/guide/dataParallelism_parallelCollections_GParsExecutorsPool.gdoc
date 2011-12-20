@@ -11,7 +11,7 @@ Examples of use:
 {code} //multiply numbers asynchronously
  GParsExecutorsPool.withPool {
      Collection<Future> result = [1, 2, 3, 4, 5].collectParallel{it * 10}
-     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
+     assert new HashSet([10, 20, 30, 40, 50]) == new HashSet((Collection)result*.get())
  }
 
  //multiply numbers asynchronously using an asynchronous closure
@@ -19,7 +19,7 @@ Examples of use:
      def closure={it * 10}
      def asyncClosure=closure.async()
      Collection<Future> result = [1, 2, 3, 4, 5].collect(asyncClosure)
-     assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result*.get()))
+     assert new HashSet([10, 20, 30, 40, 50]) == new HashSet((Collection)result*.get())
  }
 {code}
 The passed-in closure takes an instance of a ExecutorService as a parameter, which can be then used freely inside the closure.

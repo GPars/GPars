@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ public class ForkJoinPoolTest extends GroovyTestCase {
         GParsPool.withPool(5) {
             def result = Collections.synchronizedSet(new HashSet())
             [1, 2, 3, 4, 5].eachParallel {Number number -> result.add(number * 10)}
-            assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+            assert new HashSet([10, 20, 30, 40, 50]) == result
         }
     }
 
@@ -54,21 +54,21 @@ public class ForkJoinPoolTest extends GroovyTestCase {
     public void testCollectParallelWithThreadPool() {
         GParsPool.withPool(5) {
             def result = [1, 2, 3, 4, 5].collectParallel {Number number -> number * 10}
-            assertEquals([10, 20, 30, 40, 50], result)
+            assert [10, 20, 30, 40, 50] == result
         }
     }
 
     public void testCollectParallelWithThreadPoolOnRange() {
         GParsPool.withPool(5) {
             def result = (1..5).collectParallel {Number number -> number * 10}
-            assertEquals([10, 20, 30, 40, 50], result)
+            assert [10, 20, 30, 40, 50] == result
         }
     }
 
     public void testFindAllParallelWithThreadPool() {
         GParsPool.withPool(5) {
             def result = [1, 2, 3, 4, 5].findAllParallel {Number number -> number > 3}
-            assertEquals([4, 5], result)
+            assert [4, 5] == result
         }
     }
 
@@ -115,14 +115,14 @@ public class ForkJoinPoolTest extends GroovyTestCase {
 
     public void testQuicksort() {
         GParsPool.withPool {
-            assertEquals([0, 1, 2, 3], qsort([0, 3, 1, 2]))
+            assert [0, 1, 2, 3] == qsort([0, 3, 1, 2])
         }
     }
 
     public void testCategoryUsage() {
         GParsPool.withPool(5) {
-            assertEquals(new HashSet([2, 4, 6]), new HashSet((Collection) new HashSet([1, 2, 3]).collectParallel {it * 2}))
-            assertEquals(new HashSet([2, 3]), new HashSet((Collection) [1, 2, 3].findAllParallel {it > 1}))
+            assert new HashSet([2, 4, 6]) == new HashSet((Collection) new HashSet([1, 2, 3]).collectParallel {it * 2})
+            assert new HashSet([2, 3]) == new HashSet((Collection) [1, 2, 3].findAllParallel {it > 1})
         }
     }
 }

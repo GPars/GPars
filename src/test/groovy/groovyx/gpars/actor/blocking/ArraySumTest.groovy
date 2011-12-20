@@ -17,12 +17,12 @@
 package groovyx.gpars.actor.blocking
 
 import groovyx.gpars.actor.Actor
+import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import groovyx.gpars.actor.BlockingActor
 
 /**
  *
@@ -48,7 +48,7 @@ public class ArraySumTest extends GroovyTestCase {
         }
 
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals 15, result
+        assert 15 == result
         group.shutdown()
     }
 
@@ -57,7 +57,7 @@ public class ArraySumTest extends GroovyTestCase {
         final ArrayCalculator calculator = new ArrayCalculator([1, 2, 3, 4, 5], group).start()
 
         calculator.latch.await(90, TimeUnit.SECONDS)
-        assertEquals 15, calculator.result
+        assert 15 == calculator.result
         group.shutdown()
     }
 }

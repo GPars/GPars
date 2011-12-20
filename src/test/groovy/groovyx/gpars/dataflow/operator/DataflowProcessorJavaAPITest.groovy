@@ -52,7 +52,7 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         Dataflow.task { a << 10 }
         Dataflow.task { b << 20 }
 
-        assertEquals 30, c.val
+        assert 30 == c.val
 
         op.terminate()
     }
@@ -65,9 +65,9 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         def op = group.selector(inputs: [a, b], outputs: [c], new TestRunnable2())
 
         a << 10
-        assertEquals 20, c.val
+        assert 20 == c.val
         b << 20
-        assertEquals 40, c.val
+        assert 40 == c.val
 
         op.terminate()
     }
@@ -80,9 +80,9 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         def op = group.selector(inputs: [a, b], outputs: [c], new TestRunnable2WithIndex())
 
         a << 10
-        assertEquals([20, 0], c.val)
+        assert [20, 0] == c.val
         b << 20
-        assertEquals([40, 1], c.val)
+        assert [40, 1] == c.val
 
         op.terminate()
     }
@@ -95,9 +95,9 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         def op = group.prioritySelector(inputs: [a, b], outputs: [c], new TestRunnable2())
 
         a << 10
-        assertEquals 20, c.val
+        assert 20 == c.val
         b << 20
-        assertEquals 40, c.val
+        assert 40 == c.val
 
         op.terminate()
     }
@@ -110,9 +110,9 @@ public class DataflowProcessorJavaAPITest extends GroovyTestCase {
         def op = group.prioritySelector(inputs: [a, b], outputs: [c], new TestRunnable2WithIndex())
 
         a << 10
-        assertEquals([20, 0], c.val)
+        assert [20, 0] == c.val
         b << 20
-        assertEquals([40, 1], c.val)
+        assert [40, 1] == c.val
 
         op.terminate()
     }

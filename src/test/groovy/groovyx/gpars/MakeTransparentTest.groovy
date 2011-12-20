@@ -42,7 +42,7 @@ class MakeTransparentTest extends GroovyTestCase {
         GParsPool.withPool {
             assertNotNull([1].makeConcurrent())
             assertNotNull('abcde'.makeConcurrent())
-            assertEquals items, items.makeConcurrent()
+            assert items == items.makeConcurrent()
             assertNotNull(items.makeConcurrent())
             assert items.makeConcurrent() == items.makeConcurrent().makeConcurrent()
             final def p1 = items.makeConcurrent()
@@ -171,10 +171,10 @@ class MakeTransparentTest extends GroovyTestCase {
 
     public void testTransparentParallelInMethodCall() {
         def items = [1, 2, 3, 4, 5]
-        assertEquals 1, foo(items, 1).keys().size()
+        assert 1 == foo(items, 1).keys().size()
 
         GParsPool.withPool(5) {
-            assertEquals 1, foo(items, 1).keys().size()
+            assert 1 == foo(items, 1).keys().size()
             assert foo(items.makeConcurrent(), 5).keys().size() == 5
         }
     }

@@ -58,7 +58,7 @@ public class LifeCycleTest extends GroovyTestCase {
         barrier.await()
         assert actor.isActive()
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         actor.join()
         assertFalse actor.isActive()
     }
@@ -87,7 +87,7 @@ public class LifeCycleTest extends GroovyTestCase {
         barrier.await()
         assert actor.isActive()
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         barrier.await()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
@@ -110,7 +110,7 @@ public class LifeCycleTest extends GroovyTestCase {
         actor.send('message')
         actor.stop().join()
 
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
 
         shouldFail(IllegalStateException) {
             actor.send 'message'
@@ -134,7 +134,7 @@ public class LifeCycleTest extends GroovyTestCase {
         actor.send('message')
         actor.terminate().join()
 
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
 
         shouldFail(IllegalStateException) {
             actor.send 'message'
@@ -162,7 +162,7 @@ public class LifeCycleTest extends GroovyTestCase {
         actor.stop()
         actor.stop()
         latch.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         assertFalse actor.isActive()
     }
 
@@ -190,14 +190,14 @@ public class LifeCycleTest extends GroovyTestCase {
 
         barrier.await()
         assert actor.isActive()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         Thread.sleep 500
 
         actor.terminate().join()
 
         latch.await(90, TimeUnit.SECONDS)
         assertFalse actor.isActive()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         assertNotNull messagesReference.get()
     }
 
@@ -232,10 +232,10 @@ public class LifeCycleTest extends GroovyTestCase {
         actor.terminate().join()
 
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+        assert 2 == messagesReference.get().size()
     }
 
     public void testStartedByFactory() {
@@ -298,7 +298,7 @@ public class LifeCycleTest extends GroovyTestCase {
         assert onInterruptFlag.get()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+        assert 2 == messagesReference.get().size()
     }
 
     public void testOnException() {
@@ -331,7 +331,7 @@ public class LifeCycleTest extends GroovyTestCase {
         assert onExceptionFlag.get()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+        assert 2 == messagesReference.get().size()
     }
 
     public void testRestart() {
@@ -347,7 +347,7 @@ public class LifeCycleTest extends GroovyTestCase {
         barrier.await()
         assert actor.isActive()
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         actor.join()
         assertFalse actor.isActive()
 

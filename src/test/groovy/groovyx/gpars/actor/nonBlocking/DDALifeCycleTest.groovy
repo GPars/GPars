@@ -89,11 +89,11 @@ public class DDALifeCycleTest extends GroovyTestCase {
 
         actor << 1
         assert actor.isActive()
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
         actor.stop()
         barrier.await()
         actor.join()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         assertFalse actor.isActive()
         assert 1 == counter.get()
 
@@ -128,7 +128,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         actor << 2
         actor << 3
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         actor.join()
         assertFalse actor.isActive()
         assert [2, 3] == unprocessedMessages.collect {it.payLoad}
@@ -150,7 +150,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         assert actor.isActive()
         actor.terminate()
         actor.join()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         assertFalse actor.isActive()
 
         shouldFail(IllegalStateException) {
@@ -177,7 +177,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         actor.terminate()
         actor.join()
 
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
 
         shouldFail(IllegalStateException) {
             actor.send 'message'
@@ -207,7 +207,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         actor.stop()
         actor.stop()
         latch.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         assert actor.hasBeenStopped()
     }
 
@@ -230,13 +230,13 @@ public class DDALifeCycleTest extends GroovyTestCase {
         }
 
         assert actor.isActive()
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
 
         actor.stop().join()
 
         latch.await(90, TimeUnit.SECONDS)
         assertFalse actor.isActive()
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
         assertNotNull messagesReference.get()
     }
 
@@ -259,13 +259,13 @@ public class DDALifeCycleTest extends GroovyTestCase {
         }
 
         assert actor.isActive()
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
 
         actor.terminate().join()
 
         latch.await(90, TimeUnit.SECONDS)
         assertFalse actor.isActive()
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
         assertNotNull messagesReference.get()
     }
 
@@ -300,10 +300,10 @@ public class DDALifeCycleTest extends GroovyTestCase {
         actor.terminate().join()
 
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+        assert 2 == messagesReference.get().size()
     }
 
     public void testOnInterrupt() {
@@ -337,7 +337,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         assert onInterruptFlag.get()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+        assert 2 == messagesReference.get().size()
     }
 
     public void testExplicitInterruption() {
@@ -370,7 +370,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         assert onInterruptFlag.get()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+        assert 2 == messagesReference.get().size()
     }
 
     public void testOnException() {
@@ -403,7 +403,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         assert onExceptionFlag.get()
         assertFalse actor.isActive()
         assertNotNull messagesReference.get()
-        assertEquals 2, messagesReference.get().size()
+        assert 2 == messagesReference.get().size()
     }
 
     public void testRestart() {
@@ -423,7 +423,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         barrier.await()
         assert actor.isActive()
         barrier.await()
-        assertEquals 1, counter.intValue()
+        assert 1 == counter.intValue()
         actor.join()
         assertFalse actor.isActive()
 

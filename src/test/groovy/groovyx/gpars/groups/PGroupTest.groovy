@@ -35,7 +35,7 @@ public class PGroupTest extends GroovyTestCase {
             latch.countDown()
         }
 
-        assertEquals Actors.defaultActorPGroup, actor.parallelGroup
+        assert groovyx.gpars.actor.Actors.defaultActorPGroup == actor.parallelGroup
         latch.await()
         assert daemon.get()
     }
@@ -53,7 +53,7 @@ public class PGroupTest extends GroovyTestCase {
             latch1.countDown()
         }
 
-        assertEquals daemonGroup, actor1.parallelGroup
+        assert daemonGroup == actor1.parallelGroup
         latch1.await()
         assert daemon.get()
 
@@ -62,7 +62,7 @@ public class PGroupTest extends GroovyTestCase {
             latch2.countDown()
         }
 
-        assertEquals nonDaemonGroup, actor2.parallelGroup
+        assert nonDaemonGroup == actor2.parallelGroup
         latch2.await()
         assertFalse daemon.get()
 
@@ -79,14 +79,14 @@ public class PGroupTest extends GroovyTestCase {
         final InheritanceGroupTestActor actor1 = new InheritanceGroupTestActor(daemonGroup, daemon)
         actor1.start()
 
-        assertEquals daemonGroup, actor1.parallelGroup
+        assert daemonGroup == actor1.parallelGroup
         assert daemon.val
 
         daemon = new DataflowVariable()
         final InheritanceGroupTestActor actor2 = new InheritanceGroupTestActor(nonDaemonGroup, daemon)
         actor2.start()
 
-        assertEquals nonDaemonGroup, actor2.parallelGroup
+        assert nonDaemonGroup == actor2.parallelGroup
         assertFalse daemon.val
         daemonGroup.shutdown()
         nonDaemonGroup.shutdown()
@@ -97,9 +97,9 @@ public class PGroupTest extends GroovyTestCase {
         final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
 
-        assertEquals daemonGroup, actor.parallelGroup
+        assert daemonGroup == actor.parallelGroup
         actor.parallelGroup = nonDaemonGroup
-        assertEquals nonDaemonGroup, actor.parallelGroup
+        assert nonDaemonGroup == actor.parallelGroup
 
         daemonGroup.shutdown()
         nonDaemonGroup.shutdown()
@@ -110,7 +110,7 @@ public class PGroupTest extends GroovyTestCase {
         final PGroup nonDaemonGroup = new NonDaemonPGroup()
         final GroupTestActor actor = new GroupTestActor(daemonGroup)
         actor.start()
-        assertEquals daemonGroup, actor.parallelGroup
+        assert daemonGroup == actor.parallelGroup
         shouldFail(IllegalStateException) {
             actor.parallelGroup = nonDaemonGroup
         }

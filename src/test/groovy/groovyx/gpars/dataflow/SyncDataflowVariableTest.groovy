@@ -34,11 +34,11 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         }
         sleep 1000
         assert !reached.get()
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         t.join()
-        assertEquals 10, variable.val
-        assertEquals 10, variable.val
-        assertEquals 10, variable.val
+        assert 10 == variable.val
+        assert 10 == variable.val
+        assert 10 == variable.val
 
         assert reached.get()
     }
@@ -58,7 +58,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         sleep 1000
         assert !writerReached.get()
         assert readerReached.get() == 0
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         [t1, t2]*.join()
         assert writerReached.get()
         assert readerReached.get() == 10
@@ -67,15 +67,19 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
     public void testGet() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(1)
         Thread.start {variable << 10}
-        assertEquals 10, variable.get()
+        assert 10 == variable.get()
     }
 
     public void testMultiGet() {
         final SyncDataflowVariable variable = new SyncDataflowVariable(3)
+        final dataflows = new Dataflows()
         Thread.start {variable << 10}
-        Thread.start {assertEquals 10, variable.get()}
-        Thread.start {assertEquals 10, variable.get()}
-        Thread.start {assertEquals 10, variable.get(10, TimeUnit.SECONDS)}
+        Thread.start {dataflows.a = variable.get()}
+        Thread.start {dataflows.b = variable.get()}
+        Thread.start {dataflows.c = variable.get(10, java.util.concurrent.TimeUnit.SECONDS)}
+        assert 10 == dataflows.a
+        assert 10 == dataflows.b
+        assert 10 == dataflows.c
     }
 
     public void testTimeoutGet() {
@@ -84,7 +88,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
             variable.get(1, TimeUnit.SECONDS)
         }
         Thread.start {variable << 10}
-        assertEquals 10, variable.get(10, TimeUnit.SECONDS)
+        assert 10 == variable.get(10, java.util.concurrent.TimeUnit.SECONDS)
     }
 
     public void testTimeoutGetWithMultipleParties() {
@@ -101,7 +105,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         Thread.start {
             variable.get(10, TimeUnit.SECONDS)
         }
-        assertEquals 10, variable.get(10, TimeUnit.SECONDS)
+        assert 10 == variable.get(10, java.util.concurrent.TimeUnit.SECONDS)
     }
 
     public void testAsyncRead() {
@@ -125,8 +129,8 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
 
         Thread.start {variable << 10}
 
-        assertEquals 10, result1.val
-        assertEquals 10, result2.val
+        assert 10 == result1.val
+        assert 10 == result2.val
         group.shutdown()
     }
 
@@ -142,11 +146,11 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         }
         sleep 1000
         assert !reached.get()
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         t.join()
-        assertEquals 10, variable.val
-        assertEquals 10, variable.val
-        assertEquals 10, variable.val
+        assert 10 == variable.val
+        assert 10 == variable.val
+        assert 10 == variable.val
 
         assert reached.get()
     }
@@ -170,7 +174,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         sleep 1000
         assert !writerReached.get()
         assert readerReached.get() == 0
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         [t1, t2]*.join()
         assert writerReached.get()
         assert readerReached.get() == 10
@@ -190,11 +194,11 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
 
         sleep 1000
         assert !reached.get()
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         t.join()
-        assertEquals 10, variable.val
-        assertEquals 10, variable.val
-        assertEquals 10, variable.val
+        assert 10 == variable.val
+        assert 10 == variable.val
+        assert 10 == variable.val
 
         assert reached.get()
     }
@@ -218,7 +222,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         sleep 1000
         assert !writerReached.get()
         assert readerReached.get() == 0
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         [t1, t2]*.join()
         assert writerReached.get()
         assert readerReached.get() == 10
@@ -247,7 +251,7 @@ public class SyncDataflowVariableTest extends GroovyTestCase {
         sleep 1000
         assert variable.awaitingParties()
         assert variable.shouldThrowTimeout()
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         assert !variable.awaitingParties()
         t.join()
         assert !variable.awaitingParties()

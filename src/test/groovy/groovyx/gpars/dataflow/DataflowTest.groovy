@@ -45,7 +45,7 @@ public class DataflowTest extends GroovyTestCase {
         }
 
         latch.await(90, TimeUnit.SECONDS)
-        assertEquals 42, result
+        assert 42 == result
     }
 
     List<Integer> ints(int n, int max) {
@@ -68,7 +68,7 @@ public class DataflowTest extends GroovyTestCase {
         blockingActor { x << ints(0, 10) }
         blockingActor { y << sum(0, x.val) }
 
-        assertEquals([0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45], y.val)
+        assert [0, 0, 1, 3, 6, 10, 15, 21, 28, 36, 45] == y.val
     }
 
     void testRightShift() {
@@ -89,7 +89,7 @@ public class DataflowTest extends GroovyTestCase {
         blockingActor {x << 40}
         blockingActor {y << 2}
 
-        assertEquals 42, result.val
+        assert 42 == result.val
     }
 
     void testMethodSyntax() {
@@ -113,7 +113,7 @@ public class DataflowTest extends GroovyTestCase {
             df.y = 2
         }
 
-        assertEquals 42, result.val
+        assert 42 == result.val
     }
 
     void testWhenAllBound() {

@@ -200,7 +200,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
         op1.actor.metaClass.onInterrupt = {}
         assertFalse flag
         a << 'Message'
-        assertEquals 'a', b.val
+        assert 'a' == b.val
         assertTrue flag
         op1.terminate()
         op1.join()
@@ -406,7 +406,7 @@ public class DataflowSelectorTest extends GroovyTestCase {
         a << 3
         a << 4
 
-        assertEquals 1, b.val
+        assert 1 == b.val
         assertNull b.getVal(1, TimeUnit.SECONDS)
     }
 }

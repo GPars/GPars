@@ -33,7 +33,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         groovyx.gpars.GParsPool.withPool(5) {
             final AtomicInteger result = new AtomicInteger(0)
             GParsPoolUtil.eachParallel([1, 2, 3, 4, 5], {result.addAndGet(it)})
-            assertEquals 15, result
+            assert 15 == result
         }
     }
 
@@ -41,7 +41,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         groovyx.gpars.GParsPool.withPool(5) {
             final AtomicInteger result = new AtomicInteger(0)
             GParsPoolUtil.eachWithIndexParallel([1, 2, 3, 4, 5], {element, int index -> result.addAndGet(element * index)})
-            assertEquals 40, result
+            assert 40 == result
         }
     }
 
@@ -70,7 +70,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             assert (3 in result)
             assert (4 in result)
             assert (5 in result)
-            assertEquals 3, result.size()
+            assert 3 == result.size()
         }
     }
 
@@ -79,7 +79,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             def result = [1, 2, 3, 4, 5].splitParallel {it > 2}
             assert [3, 4, 5] as Set == result[0] as Set
             assert [1, 2] as Set == result[1] as Set
-            assertEquals 2, result.size()
+            assert 2 == result.size()
             assert [[], []] == [].splitParallel {it > 2}
             result = [3].splitParallel {it > 2}
             assert [[3], []] == result
@@ -93,7 +93,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             def result = 'abc'.splitParallel {it == 'b'}
             assert ['b'] as Set == result[0] as Set
             assert ['a', 'c'] as Set == result[1] as Set
-            assertEquals 2, result.size()
+            assert 2 == result.size()
             result = ''.splitParallel {it == 'b'}
             assert [[], []] == result
             result = 'b'.splitParallel {it == 'b'}
@@ -111,14 +111,14 @@ public class GParsPoolUtilTest extends GroovyTestCase {
             assert (3 in result)
             assert (4 in result)
             assert (5 in result)
-            assertEquals 3, result.size()
+            assert 3 == result.size()
         }
     }
 
     public void testEmptyFindAll() {
         groovyx.gpars.GParsPool.withPool(5) {
             final List<Integer> result = GParsPoolUtil.findAllParallel([1, 2, 3, 4, 5], {it > 6})
-            assertEquals 0, result.size()
+            assert 0 == result.size()
         }
     }
 
@@ -126,7 +126,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         groovyx.gpars.GParsPool.withPool(5) {
             final def result = GParsPoolUtil.findParallel([1, 2, 3, 4, 5], {it > 2})
             assert result in [3, 4, 5]
-            assertEquals 3, result
+            assert 3 == result
         }
     }
 
@@ -224,7 +224,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         shouldFail(IllegalStateException.class) {
             GParsPoolUtil.eachParallel([], {counter.incrementAndGet()})
         }
-        assertEquals 0, counter.get()
+        assert 0 == counter.get()
     }
 
     public void testNestedPools() {
@@ -289,72 +289,72 @@ public class GParsPoolUtilTest extends GroovyTestCase {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
-            assertEquals(['abc', 'xyz'], result)
+            assert ['abc', 'xyz'] == result
         }
     }
 
     public void testMin() {
         groovyx.gpars.GParsPool.withPool(5) {
-            assertEquals 1, [1, 2, 3, 4, 5].minParallel {a, b -> a - b}
-            assertEquals 5, [1, 2, 3, 4, 5].minParallel {a, b -> b - a}
-            assertEquals 1, [1, 2, 3, 4, 5].minParallel {it}
-            assertEquals 1, [1, 2, 3, 4, 5].minParallel {it * 2}
-            assertEquals 1, [1, 2, 3, 4, 5].minParallel {a -> a + 10}
-            assertEquals 1, [1, 2, 3, 4, 5].minParallel()
-            assertEquals 'a', 'abc'.minParallel()
+            assert 1 == [1, 2, 3, 4, 5].minParallel {a, b -> a - b}
+            assert 5 == [1, 2, 3, 4, 5].minParallel {a, b -> b - a}
+            assert 1 == [1, 2, 3, 4, 5].minParallel {it}
+            assert 1 == [1, 2, 3, 4, 5].minParallel {it * 2}
+            assert 1 == [1, 2, 3, 4, 5].minParallel {a -> a + 10}
+            assert 1 == [1, 2, 3, 4, 5].minParallel()
+            assert 'a' == 'abc'.minParallel()
         }
     }
 
     public void testMax() {
         groovyx.gpars.GParsPool.withPool(5) {
-            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {a, b -> a - b}
-            assertEquals 1, [1, 2, 3, 4, 5].maxParallel {a, b -> b - a}
-            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {it}
-            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {it * 2}
-            assertEquals 5, [1, 2, 3, 4, 5].maxParallel {a -> a + 10}
-            assertEquals 5, [1, 2, 3, 4, 5].maxParallel()
-            assertEquals 'c', 'abc'.maxParallel()
+            assert 5 == [1, 2, 3, 4, 5].maxParallel {a, b -> a - b}
+            assert 1 == [1, 2, 3, 4, 5].maxParallel {a, b -> b - a}
+            assert 5 == [1, 2, 3, 4, 5].maxParallel {it}
+            assert 5 == [1, 2, 3, 4, 5].maxParallel {it * 2}
+            assert 5 == [1, 2, 3, 4, 5].maxParallel {a -> a + 10}
+            assert 5 == [1, 2, 3, 4, 5].maxParallel()
+            assert 'c' == 'abc'.maxParallel()
         }
     }
 
     public void testSum() {
         groovyx.gpars.GParsPool.withPool(5) {
-            assertEquals 15, [1, 2, 3, 4, 5].sumParallel()
-            assertEquals 'abc', 'abc'.sumParallel()
+            assert 15 == [1, 2, 3, 4, 5].sumParallel()
+            assert 'abc' == 'abc'.sumParallel()
         }
     }
 
     public void testCount() {
         groovyx.gpars.GParsPool.withPool(5) {
-            assertEquals 1, [1, 2, 3, 4, 5].countParallel(3)
-            assertEquals 5, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(3)
-            assertEquals 0, [3, 2, 3, 4, 5, 3, 3, 3].countParallel(6)
-            assertEquals 2, [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it % 2 == 0 }
-            assertEquals 1, [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it < 3 }
-            assertEquals 6, [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it <= 3 }
-            assertEquals 0, [].countParallel(6)
-            assertEquals 1, 'abc'.countParallel('a')
-            assertEquals 3, 'abcaa'.countParallel('a')
-            assertEquals 0, 'ebc'.countParallel('a')
-            assertEquals 0, ''.countParallel('a')
-            assertEquals 3, 'elephant'.countParallel { it in 'aeiou'.toList() }
+            assert 1 == [1, 2, 3, 4, 5].countParallel(3)
+            assert 5 == [3, 2, 3, 4, 5, 3, 3, 3].countParallel(3)
+            assert 0 == [3, 2, 3, 4, 5, 3, 3, 3].countParallel(6)
+            assert 2 == [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it % 2 == 0 }
+            assert 1 == [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it < 3 }
+            assert 6 == [3, 2, 3, 4, 5, 3, 3, 3].countParallel { it <= 3 }
+            assert 0 == [].countParallel(6)
+            assert 1 == 'abc'.countParallel('a')
+            assert 3 == 'abcaa'.countParallel('a')
+            assert 0 == 'ebc'.countParallel('a')
+            assert 0 == ''.countParallel('a')
+            assert 3 == 'elephant'.countParallel { it in 'aeiou'.toList() }
         }
     }
 
     public void testReduce() {
         groovyx.gpars.GParsPool.withPool(5) {
-            assertEquals 15, [1, 2, 3, 4, 5].foldParallel() {a, b -> a + b}
-            assertEquals 'abc', 'abc'.foldParallel {a, b -> a + b}
-            assertEquals 55, [1, 2, 3, 4, 5].collectParallel {it ** 2}.foldParallel {a, b -> a + b}
+            assert 15 == [1, 2, 3, 4, 5].foldParallel() {a, b -> a + b}
+            assert 'abc' == 'abc'.foldParallel {a, b -> a + b}
+            assert 55 == [1, 2, 3, 4, 5].collectParallel {it ** 2}.foldParallel {a, b -> a + b}
         }
     }
 
     public void testSeededReduce() {
         groovyx.gpars.GParsPool.withPool(5) {
-            assertEquals 15, [1, 2, 3, 4, 5].foldParallel(0) {a, b -> a + b}
-            assertEquals 25, [1, 2, 3, 4, 5].foldParallel(10) {a, b -> a + b}
-            assertEquals 'abc', 'abc'.foldParallel('') {a, b -> a + b}
-            assertEquals 'abcd', 'abc'.foldParallel('d') {a, b -> a + b}
+            assert 15 == [1, 2, 3, 4, 5].foldParallel(0) {a, b -> a + b}
+            assert 25 == [1, 2, 3, 4, 5].foldParallel(10) {a, b -> a + b}
+            assert 'abc' == 'abc'.foldParallel('') {a, b -> a + b}
+            assert 'abcd' == 'abc'.foldParallel('d') {a, b -> a + b}
         }
     }
 
@@ -362,7 +362,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         final Map map = new ConcurrentHashMap()
 
         groovyx.gpars.GParsPool.withPool(5) {
-            assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].foldParallel {a, b ->
+            assert 55 == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].foldParallel {a, b ->
                 Thread.sleep 200
                 map[Thread.currentThread()] = ''
                 a + b
@@ -381,7 +381,7 @@ public class GParsPoolUtilTest extends GroovyTestCase {
         def x = [1, 2, 3]
         groovyx.gpars.GParsPool.withPool {
             methods.each {method, expected ->
-                assertEquals "Surprise when processing parallel version of $method", expected, x."${method}Parallel"({ it % 2 })
+                assert expected == x."${method}Parallel"({ it % 2 }): "Surprise when processing parallel version of $method"
             }
         }
     }

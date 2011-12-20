@@ -60,8 +60,8 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         Actors.blockingActor { b << 20 }
         Actors.blockingActor { c << 40 }
 
-        assertEquals 65, d.val
-        assertEquals 4000, e.val
+        assert 65 == d.val
+        assert 4000 == e.val
 
         op.terminate()
     }
@@ -82,8 +82,8 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         Actors.blockingActor { b << 20 }
         Actors.blockingActor { c << 40 }
 
-        assertEquals 65, d.val
-        assertEquals 4000, e.val
+        assert 65 == d.val
+        assert 4000 == e.val
 
         op.terminate()
     }
@@ -118,11 +118,11 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         Dataflow.task { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].each {c << it} }
 
         def results = (1..16).collect {d.val}
-        assertEquals 16, results.size()
+        assert 16 == results.size()
         assert results.containsAll([16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])
 
         def threads = (1..16).collect {e.val}
-        assertEquals 16, threads.size()
+        assert 16 == threads.size()
         assert threads.unique().size() in (parties..[poolSize, forks].max())
 
         op.terminate()

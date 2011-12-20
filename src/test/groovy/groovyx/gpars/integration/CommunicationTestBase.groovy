@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -100,9 +100,9 @@ public abstract class CommunicationTestBase extends GroovyTestCase {
 
         latch.await()
 
-        assertEquals([node2.id, node3.id] as SortedSet, res[node1.id].connected as SortedSet)
-        assertEquals([node1.id, node3.id] as SortedSet, res[node2.id].connected as SortedSet)
-        assertEquals([node1.id, node2.id] as SortedSet, res[node3.id].connected as SortedSet)
+        assert ([node2.id, node3.id] as SortedSet) == (res[node1.id].connected as SortedSet)
+        assert ([node1.id, node3.id] as SortedSet) == (res[node2.id].connected as SortedSet)
+        assert ([node1.id, node2.id] as SortedSet) == (res[node3.id].connected as SortedSet)
 
         latch = new CountDownLatch(nodes.size() * (nodes.size() - 1))
 
@@ -112,9 +112,9 @@ public abstract class CommunicationTestBase extends GroovyTestCase {
 
         latch.await()
 
-        assertEquals([node2.id, node3.id] as SortedSet, res[node1.id].disconnected as SortedSet)
-        assertEquals([node1.id, node3.id] as SortedSet, res[node2.id].disconnected as SortedSet)
-        assertEquals([node1.id, node2.id] as SortedSet, res[node3.id].disconnected as SortedSet)
+        assert ([node2.id, node3.id] as SortedSet) == (res[node1.id].disconnected as SortedSet)
+        assert ([node1.id, node3.id] as SortedSet) == (res[node2.id].disconnected as SortedSet)
+        assert ([node1.id, node2.id] as SortedSet) == (res[node3.id].disconnected as SortedSet)
 
         res.each {k, v -> println "$k : $v"}
     }

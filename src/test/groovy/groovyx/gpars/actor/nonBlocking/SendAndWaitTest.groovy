@@ -42,7 +42,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         def result = actor.sendAndWait(1)
 
         latch.await()
-        assertEquals 2, result
+        assert 2 == result
     }
 
     public void testMessagesToStoppedActor() {
@@ -64,7 +64,7 @@ public class SendAndWaitTest extends GroovyTestCase {
             actor.sendAndWait 2
         }
 
-        assertEquals 2, result
+        assert 2 == result
     }
 
     public void testFailedMessages() {
@@ -90,7 +90,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 2, result
+        assert 2 == result
     }
 
     public void testFailedMessagesOnException() {
@@ -120,7 +120,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 2, result
+        assert 2 == result
     }
 
     public void testTimeoutSuccessfulMessages() {
@@ -147,8 +147,8 @@ public class SendAndWaitTest extends GroovyTestCase {
         def result2 = actor.sendAndWait(3, 30, TimeUnit.SECONDS)
 
         latch.await()
-        assertEquals 2, result1
-        assertEquals 4, result2
+        assert 2 == result1
+        assert 4 == result2
     }
 
     public void testTimeoutMessages() {
@@ -212,7 +212,7 @@ public class SendAndWaitTest extends GroovyTestCase {
         }
 
         latch.await()
-        assertEquals 2, result
+        assert 2 == result
         group.shutdown()
     }
 }

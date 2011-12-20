@@ -25,21 +25,21 @@ public class ForkJoinPoolStringTest extends GroovyTestCase {
         GParsPool.withPool(5) {
             def result = Collections.synchronizedSet(new HashSet())
             'abc'.eachParallel {result.add(it.toUpperCase())}
-            assertEquals(new HashSet(['A', 'B', 'C']), result)
+            assert new HashSet(['A', 'B', 'C']) == result
         }
     }
 
     public void testCollectParallelWithThreadPoolAndString() {
         GParsPool.withPool(5) {
             def result = 'abc'.collectParallel {it.toUpperCase()}
-            assertEquals(['A', 'B', 'C'], result)
+            assert ['A', 'B', 'C'] == result
         }
     }
 
     public void testFindAllParallelWithThreadPoolAndString() {
         GParsPool.withPool(5) {
             def result = 'aBC'.findAllParallel {it == it.toUpperCase()}
-            assertEquals(['B', 'C'], result)
+            assert ['B', 'C'] == result
         }
     }
 
@@ -53,7 +53,7 @@ public class ForkJoinPoolStringTest extends GroovyTestCase {
     public void testGrepParallelWithThreadPoolAndString() {
         GParsPool.withPool(5) {
             def result = 'aBC'.grepParallel('B')
-            assertEquals(['B'], result)
+            assert ['B'] == result
         }
     }
 

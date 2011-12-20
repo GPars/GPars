@@ -168,7 +168,7 @@ public class TimeoutTest extends GroovyTestCase {
         barrier.await()
 
         barrier.await()
-        assertEquals(2, codeCounter.get())
+        assert 2 == codeCounter.get()
         assert timeoutFlag.get()
     }
 
@@ -192,7 +192,7 @@ public class TimeoutTest extends GroovyTestCase {
         barrier.await()
         barrier.await()
 
-        assertEquals(0, codeCounter.get())
+        assert 0 == codeCounter.get()
         assert exceptionFlag.get()
         actor.join()
         assert !actor.isActive()

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ public class LRUProtectionStorageTest extends GroovyTestCase {
         assert storage.size() == 1
         storage['key2'] = 2
         assert storage.size() == 1
-        assertEquals 2, storage['key2']
+        assert 2 == storage['key2']
         storage['key1'] = 1
         assert storage.size() == 1
         assertNull storage['key2']
-        assertEquals 1, storage['key1']
+        assert 1 == storage['key1']
 
     }
 
@@ -44,23 +44,23 @@ public class LRUProtectionStorageTest extends GroovyTestCase {
         storage['key2'] = 2
         storage['key3'] = 3
         assert storage.size() == 3
-        assertEquals 1, storage['key1']
-        assertEquals 2, storage['key2']
-        assertEquals 3, storage['key3']
+        assert 1 == storage['key1']
+        assert 2 == storage['key2']
+        assert 3 == storage['key3']
         storage['key4'] = 4
         assert storage.size() == 3
         assertNull storage['key1']
-        assertEquals 2, storage['key2']
-        assertEquals 3, storage['key3']
-        assertEquals 4, storage['key4']
+        assert 2 == storage['key2']
+        assert 3 == storage['key3']
+        assert 4 == storage['key4']
         storage['key4']
         storage['key2']
         storage['key5'] = 5
         assert storage.size() == 3
         assertNull storage['key3']
-        assertEquals 2, storage['key2']
-        assertEquals 4, storage['key4']
-        assertEquals 5, storage['key5']
+        assert 2 == storage['key2']
+        assert 4 == storage['key4']
+        assert 5 == storage['key5']
     }
 
     public void testTouch() {
@@ -71,9 +71,9 @@ public class LRUProtectionStorageTest extends GroovyTestCase {
         storage.touch('key1', 11)
         storage['key4'] = 4
         assert storage.size() == 3
-        assertEquals 11, storage['key1']
-        assertEquals 4, storage['key4']
-        assertEquals 3, storage['key3']
+        assert 11 == storage['key1']
+        assert 4 == storage['key4']
+        assert 3 == storage['key3']
         assertNull storage['key2']
     }
 }

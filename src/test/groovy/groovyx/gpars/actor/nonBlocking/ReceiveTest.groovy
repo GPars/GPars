@@ -42,9 +42,9 @@ public class ReceiveTest extends GroovyTestCase {
         actor << 'message1'
         actor << 'message2'
         actor << 'message3'
-        assertEquals 'message1', df.result1
-        assertEquals 'message2', df.result2
-        assertEquals 'message3', df.result3
+        assert 'message1' == df.result1
+        assert 'message2' == df.result2
+        assert 'message3' == df.result3
     }
 
     public void testNestedReceive() {
@@ -78,10 +78,10 @@ public class ReceiveTest extends GroovyTestCase {
         actor << 'message2'
         actor << 'message3'
         actor << 'message4'
-        assertEquals 'message1', df.result1
-        assertEquals 'message2', df.result2
-        assertEquals 'message3', df.result3
-        assertEquals 'message4', df.result4
+        assert 'message1' == df.result1
+        assert 'message2' == df.result2
+        assert 'message3' == df.result3
+        assert 'message4' == df.result4
         assert !df.contains('result5')
     }
 
@@ -110,9 +110,9 @@ public class ReceiveTest extends GroovyTestCase {
         }
         actor << msg
         barrier.await()
-        assertEquals 'message1', df.result1
-        assertEquals 'message2', df.result2
-        assertEquals 'Not delivered', df.deliveryError
+        assert 'message1' == df.result1
+        assert 'message2' == df.result2
+        assert 'Not delivered' == df.deliveryError
     }
 
 

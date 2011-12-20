@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,12 +60,12 @@ public class LoopTest extends GroovyTestCase {
         }
 
         Thread.sleep 1000
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
 
         1.upto(7) {
             actor.send 'message'
             barrier.await()
-            assertEquals it, counter.intValue()
+            assert it == counter.intValue()
         }
         actor.stop().join()
     }
@@ -96,7 +96,7 @@ public class LoopTest extends GroovyTestCase {
         actor.send 'message'
         actor.terminate()
         afterStopBarrier.await()
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
     }
 
     public void testSubsequentLoopStop() {
@@ -131,8 +131,8 @@ public class LoopTest extends GroovyTestCase {
         actor.terminate()
 
         afterBarrier.await()
-        assertEquals 1, counter.intValue()
-        assertEquals 1, messagesReference.get().size()
+        assert 1 == counter.intValue()
+        assert 1 == messagesReference.get().size()
     }
 
     public void testBeforeLoopStop() {
@@ -150,6 +150,6 @@ public class LoopTest extends GroovyTestCase {
         actor.send 'message'
         actor.terminate().join()
 
-        assertEquals 0, counter.intValue()
+        assert 0 == counter.intValue()
     }
 }

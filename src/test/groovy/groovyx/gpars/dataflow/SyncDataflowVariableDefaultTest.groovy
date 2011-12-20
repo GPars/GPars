@@ -27,22 +27,22 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
     public void testVariable() {
         final SyncDataflowVariable variable = new SyncDataflowVariable()
         variable << 10
-        assertEquals 10, variable.val
-        assertEquals 10, variable.val
+        assert 10 == variable.val
+        assert 10 == variable.val
 
         shouldFail(IllegalStateException) {
             variable << 20
         }
 
-        assertEquals 10, variable.val
+        assert 10 == variable.val
     }
 
     public void testGet() {
         final SyncDataflowVariable variable = new SyncDataflowVariable()
         variable << 10
-        assertEquals 10, variable.get()
-        assertEquals 10, variable.get()
-        assertEquals 10, variable.get(10, TimeUnit.SECONDS)
+        assert 10 == variable.get()
+        assert 10 == variable.get()
+        assert 10 == variable.get(10, java.util.concurrent.TimeUnit.SECONDS)
     }
 
     public void testTimeoutGet() {
@@ -51,8 +51,8 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
             variable.get(1, TimeUnit.SECONDS)
         }
         variable << 10
-        assertEquals 10, variable.get(10, TimeUnit.SECONDS)
-        assertEquals 10, variable.get()
+        assert 10 == variable.get(10, java.util.concurrent.TimeUnit.SECONDS)
+        assert 10 == variable.get()
     }
 
     public void testGetException() {
@@ -98,8 +98,8 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
             latch.countDown()
         }
         latch.await()
-        assertEquals 10, result[0]
-        assertEquals 10, result[1]
+        assert 10 == result[0]
+        assert 10 == result[1]
         group.shutdown()
     }
 
@@ -118,9 +118,9 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
             variable << 10
         }
 
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         latch.await()
-        assertEquals 10, result
+        assert 10 == result
         group.shutdown()
     }
 
@@ -142,18 +142,18 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 10, variable.val
+        assert 10 == variable.val
         latch.await()
-        assertEquals 10, result
+        assert 10 == result
         group.shutdown()
     }
 
     public void testToString() {
         final SyncDataflowVariable<Integer> variable = new SyncDataflowVariable<Integer>()
-        assertEquals 'SyncDataflowVariable(value=null)', variable.toString()
+        assert 'SyncDataflowVariable(value=null)' == variable.toString()
         variable << 10
-        assertEquals 'SyncDataflowVariable(value=10)', variable.toString()
-        assertEquals 'SyncDataflowVariable(value=10)', variable.toString()
+        assert 'SyncDataflowVariable(value=10)' == variable.toString()
+        assert 'SyncDataflowVariable(value=10)' == variable.toString()
     }
 
     public void testVariableBlockedBoundHandler() {
@@ -168,8 +168,8 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
             variable << 10
         }
 
-        assertEquals 10, variable.val
-        assertEquals 10, result.val
+        assert 10 == variable.val
+        assert 10 == result.val
         group.shutdown()
     }
 
@@ -182,7 +182,7 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
         variable >> {
             result << it
         }
-        assertEquals 10, result.val
+        assert 10 == result.val
     }
 
     public void testVariablePoll() {
@@ -199,9 +199,9 @@ public class SyncDataflowVariableDefaultTest extends GroovyTestCase {
             variable << 10
         }
 
-        assertEquals 10, variable.val
-        assertEquals 10, result.val
-        assertEquals 10, result.poll().val
+        assert 10 == variable.val
+        assert 10 == result.val
+        assert 10 == result.poll().val
         group.shutdown()
     }
 

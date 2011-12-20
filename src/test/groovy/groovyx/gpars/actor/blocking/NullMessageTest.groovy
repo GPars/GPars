@@ -70,6 +70,6 @@ public class NullMessageTest extends GroovyTestCase {
                 result << it
             }
         }
-        assertEquals 10, result.val
+        assert 10 == result.val
     }
 }

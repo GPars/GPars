@@ -149,7 +149,7 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
         }
         sleep 1000
 
-        assertEquals 2, subscription2.length()
+        assert 2 == subscription2.length()
         subscription2.val
 
         barrier.await()

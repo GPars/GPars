@@ -11,7 +11,7 @@ Examples of use:
  GParsPool.withPool {
      final AtomicInteger result = new AtomicInteger(0)
      [1, 2, 3, 4, 5].eachParallel {result.addAndGet(it)}
-     assertEquals 15, result
+     assert 15 == result
  }
 
  //multiply numbers asynchronously

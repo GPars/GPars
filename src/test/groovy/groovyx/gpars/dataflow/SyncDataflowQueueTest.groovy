@@ -35,8 +35,8 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         }
         sleep 1000
         assert !reached.get()
-        assertEquals 10, queue.val
-        assertEquals 20, queue.val
+        assert 10 == queue.val
+        assert 20 == queue.val
         t.join()
         assert queue.length() == 0
         assert reached.get()
@@ -78,7 +78,7 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         final SyncDataflowQueue queue = new SyncDataflowQueue()
         assert queue.getVal(1, TimeUnit.SECONDS) == null
         Thread.start {queue << 10}
-        assertEquals 10, queue.getVal(10, TimeUnit.SECONDS)
+        assert 10 == queue.getVal(10, java.util.concurrent.TimeUnit.SECONDS)
     }
 
     public void testAsyncRead() {
@@ -134,11 +134,11 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         }
 
         sleep 1000
-        assertEquals 10, stream.poll()?.val
+        assert 10 == stream.poll()?.val
         assert stream.poll() == null
         thread << 'Proceed'
-        assertEquals 20, stream.val
-        assertEquals 0, stream.length()
+        assert 20 == stream.val
+        assert 0 == stream.length()
         assert stream.poll() == null
         group.shutdown()
     }
@@ -158,7 +158,7 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         assertNull stream.val
         thread << 'Proceed'
         assertNull stream.val
-        assertEquals 0, stream.length()
+        assert 0 == stream.length()
         group.shutdown()
     }
 
@@ -177,9 +177,9 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
         stream.collect {it}.sort().eachWithIndex {element, index -> assert index == element }
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
 
         thread << 'Proceed'
         (0..11).each {
@@ -200,9 +200,9 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
         stream.each {assertNull it }
-        assertEquals 11, stream.length()
+        assert 11 == stream.length()
 
         for (i in (0..10)) { assertNull stream.val }
         group.shutdown()
@@ -210,29 +210,29 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
 
     public void testToString() {
         final SyncDataflowQueue<Integer> stream = new SyncDataflowQueue<Integer>()
-        assertEquals 'SyncDataflowQueue(queue=[])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[])' == stream.toString()
         Thread.start {stream << 10}
         sleep 1000
-        assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=10)])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=10)])' == stream.toString()
         Thread.start {stream << 20}
         sleep 1000
-        assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=10), SyncDataflowVariable(value=20)])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=10), SyncDataflowVariable(value=20)])' == stream.toString()
         stream.val
-        assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=20)])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=20)])' == stream.toString()
         stream.val
-        assertEquals 'SyncDataflowQueue(queue=[])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[])' == stream.toString()
 
         final SyncDataflowVariable variable = new SyncDataflowVariable()
         Thread.start {stream << variable}
         sleep 1000
-        assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=null)])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=null)])' == stream.toString()
         Thread.start {variable << '30'}
         Thread.sleep 3000  //let the value propagate asynchronously into the variable stored in the stream
-        assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=30)])', stream.toString()
-        assertEquals 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=30)])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=30)])' == stream.toString()
+        assert 'SyncDataflowQueue(queue=[SyncDataflowVariable(value=30)])' == stream.toString()
         stream.val
-        assertEquals 'SyncDataflowQueue(queue=[])', stream.toString()
-        assertEquals 'SyncDataflowQueue(queue=[])', stream.toString()
+        assert 'SyncDataflowQueue(queue=[])' == stream.toString()
+        assert 'SyncDataflowQueue(queue=[])' == stream.toString()
     }
 
     public void testWhenBound() {
@@ -251,9 +251,9 @@ public class SyncDataflowQueueTest extends GroovyTestCase {
         stream << 10
         stream << 20
         stream << 30
-        assertEquals 10, df.x1
-        assertEquals 20, df.x2
-        assertEquals 30, df.x3
+        assert 10 == df.x1
+        assert 20 == df.x2
+        assert 30 == df.x3
         group.shutdown()
     }
 

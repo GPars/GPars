@@ -26,8 +26,8 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {it * 2}
             Closure mem = buildMemoizeClosure(cl)
-            assertEquals 10, mem(5)
-            assertEquals 4, mem(2)
+            assert 10 == mem(5)
+            assert 4 == mem(2)
         }
     }
 
@@ -37,9 +37,9 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {2}
             Closure mem = cl.gmemoize()
-            assertEquals 2, mem(5)
-            assertEquals 2, mem(2)
-            assertEquals 2, mem(null)
+            assert 2 == mem(5)
+            assert 2 == mem(2)
+            assert 2 == mem(null)
         }
     }
 
@@ -51,10 +51,10 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
             assert counter == 0
             assertNull mem(5)
             assert counter == 1
-            assertEquals 2, mem(2)
+            assert 2 == mem(2)
             assert counter == 2
             assertNull mem(5)
-            assertEquals 2, mem(2)
+            assert 2 == mem(2)
             assert counter == 2
         }
     }
@@ -63,8 +63,8 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
         groovyx.gpars.GParsPool.withPool(5) {
             Closure cl = {-> 2}
             Closure mem = cl.gmemoize()
-            assertEquals 2, mem()
-            assertEquals 2, mem()
+            assert 2 == mem()
+            assert 2 == mem()
         }
     }
 
@@ -76,22 +76,22 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
                 it * 2
             }
             Closure mem = cl.gmemoize()
-            assertEquals 10, mem(5)
+            assert 10 == mem(5)
             assert flag
             flag = false
-            assertEquals 4, mem(2)
+            assert 4 == mem(2)
             assert flag
             flag = false
 
-            assertEquals 4, mem(2)
-            assertEquals 4, mem(2)
-            assertEquals 10, mem(5)
+            assert 4 == mem(2)
+            assert 4 == mem(2)
+            assert 10 == mem(5)
             assert !flag
 
-            assertEquals 6, mem(3)
+            assert 6 == mem(3)
             assert flag
             flag = false
-            assertEquals 6, mem(3)
+            assert 6 == mem(3)
             assert !flag
         }
     }
@@ -119,10 +119,10 @@ public abstract class AbstractMemoizeTest extends GroovyTestCase {
     }
 
     def checkParams(Closure mem, callFlag, args, desiredResult) {
-        assertEquals desiredResult, mem(* args)
+        assert desiredResult == mem(* args)
         assert !callFlag.empty
         callFlag.clear()
-        assertEquals desiredResult, mem(* args)
+        assert desiredResult == mem(* args)
         assert callFlag.empty
     }
 }

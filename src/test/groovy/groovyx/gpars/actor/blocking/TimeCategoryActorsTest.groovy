@@ -75,7 +75,7 @@ public class TimeCategoryActorsTest extends GroovyTestCase {
 
         actor.join()
         latch.await()
-        assertEquals 2, exceptions
+        assert 2 == exceptions
     }
 
     public void testReceiveWithHandler() {

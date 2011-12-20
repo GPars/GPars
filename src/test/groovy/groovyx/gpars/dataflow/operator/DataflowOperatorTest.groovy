@@ -59,8 +59,8 @@ public class DataflowOperatorTest extends GroovyTestCase {
         Dataflow.task { b << 20 }
         Dataflow.task { c << 40 }
 
-        assertEquals 65, d.val
-        assertEquals 4000, e.val
+        assert 65 == d.val
+        assert 4000 == e.val
 
         op.terminate()
     }
@@ -78,8 +78,8 @@ public class DataflowOperatorTest extends GroovyTestCase {
         a << 3
         a << 4
 
-        assertEquals 3, b.val
-        assertEquals 7, b.val
+        assert 3 == b.val
+        assert 7 == b.val
 
         op.terminate()
     }
@@ -96,7 +96,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         Dataflow.task { a << 5 }
         Dataflow.task { b << 20 }
 
-        assertEquals 30, c.val
+        assert 30 == c.val
 
         op.terminate()
     }
@@ -113,7 +113,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         group.task { a << 5 }
         group.task { b << 20 }
 
-        assertEquals 30, c.val
+        assert 30 == c.val
 
         op.terminate()
     }
@@ -135,11 +135,11 @@ public class DataflowOperatorTest extends GroovyTestCase {
         def op2 = group.operator(inputs: [b], outputs: [c]) {v ->
             bindOutput v + 1
         }
-        assertEquals 3, c.val
-        assertEquals 5, c.val
-        assertEquals 7, c.val
-        assertEquals 9, c.val
-        assertEquals 11, c.val
+        assert 3 == c.val
+        assert 5 == c.val
+        assert 7 == c.val
+        assert 9 == c.val
+        assert 11 == c.val
         [op1, op2]*.terminate()
     }
 
@@ -169,9 +169,9 @@ public class DataflowOperatorTest extends GroovyTestCase {
             bindOutput v1 + v2
         }
 
-        assertEquals 17, c.val
-        assertEquals 29, c.val
-        assertEquals 45, c.val
+        assert 17 == c.val
+        assert 29 == c.val
+        assert 45 == c.val
         [op1, op2, op3]*.terminate()
     }
 
@@ -203,7 +203,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         op1.actor.metaClass.onInterrupt = {}
         assert !flag.get()
         a << 'Message'
-        assertEquals 'a', b.val
+        assert 'a' == b.val
         assert flag.get()
         op1.terminate()
         op1.join()
@@ -483,7 +483,7 @@ public class DataflowOperatorTest extends GroovyTestCase {
         a << 3
         a << 4
 
-        assertEquals 1, b.val
+        assert 1 == b.val
         assertNull b.getVal(1, TimeUnit.SECONDS)
     }
 }

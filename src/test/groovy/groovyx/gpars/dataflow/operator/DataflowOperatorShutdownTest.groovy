@@ -46,8 +46,8 @@ public class DataflowOperatorShutdownTest extends GroovyTestCase {
         b << 20
         c << 30
 
-        assertEquals 60, d.val
-        assertEquals 6000, e.val
+        assert 60 == d.val
+        assert 6000 == e.val
         a << PoisonPill.instance
         assert d.val == PoisonPill.instance
         assert e.val == PoisonPill.instance
@@ -63,8 +63,8 @@ public class DataflowOperatorShutdownTest extends GroovyTestCase {
 
         a << 10
 
-        assertEquals 10, d.val
-        assertEquals 10, e.val
+        assert 10 == d.val
+        assert 10 == e.val
         a << PoisonPill.instance
         assert d.val == PoisonPill.instance
         assert e.val == PoisonPill.instance

@@ -54,14 +54,14 @@ public class DataflowOperatorGentlyStopTest extends GroovyTestCase {
         b << 20
         c << 40
 
-        assertEquals 65, d.val
+        assert 65 == d.val
         op.terminateAfterNextRun()
 
         a << 10
         b << 20
         c << 40
 
-        assertEquals 70, d.val
+        assert 70 == d.val
         op.join()
     }
 
@@ -80,7 +80,7 @@ public class DataflowOperatorGentlyStopTest extends GroovyTestCase {
         b << 20
         c << 40
 
-        assertEquals 70, d.val
+        assert 70 == d.val
         op.join()
     }
 

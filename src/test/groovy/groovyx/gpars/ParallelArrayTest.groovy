@@ -17,8 +17,6 @@
 package groovyx.gpars
 
 import extra166y.Ops
-import extra166y.Ops.Predicate
-import extra166y.Ops.Reducer
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -30,21 +28,21 @@ public class ParallelArrayTest extends GroovyTestCase {
 
     public void testReduce() {
         GParsPool.withPool(5) {
-            assertEquals 15, [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).reduce({a, b -> a + b} as Reducer, null)
-            assertEquals 'abc', 'abc'.parallelArray.withMapping({it} as Ops.Op).reduce({a, b -> a + b} as Reducer, null)
+            assert 15 == [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, null)
+            assert 'abc' == 'abc'.parallelArray.withMapping({it} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, null)
         }
     }
 
     @SuppressWarnings("GroovyMethodWithMoreThanThreeNegations")
     public void testFilterOperations() {
         GParsPool.withPool(5) {
-            assertEquals 'aa', 'abcde'.parallelArray.withFilter({it != 'e'} as Predicate).withMapping({it * 2} as Ops.Op).all().withFilter({it != 'cc'} as Predicate).min()
+            assert 'aa' == 'abcde'.parallelArray.withFilter({it != 'e'} as Ops.Predicate).withMapping({it * 2} as Ops.Op).all().withFilter({it != 'cc'} as Ops.Predicate).min()
         }
     }
 
     public void testNestedMap() {
         GParsPool.withPool(5) {
-            assertEquals 65, [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).withMapping({it + 10} as Ops.Op).reduce({a, b -> a + b} as Reducer, null)
+            assert 65 == [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).withMapping({it + 10} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, null)
         }
     }
 
@@ -52,21 +50,21 @@ public class ParallelArrayTest extends GroovyTestCase {
         final Map map = new ConcurrentHashMap()
 
         GParsPool.withPool(5) {
-            assertEquals 55, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].parallelArray.withMapping({it} as Ops.Op).reduce({a, b ->
+            assert 55 == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].parallelArray.withMapping({it} as Ops.Op).reduce({a, b ->
                 Thread.sleep 200
                 map[Thread.currentThread()] = ''
                 a + b
-            } as Reducer, null)
+            } as Ops.Reducer, null)
             assert map.keys().size() > 1
         }
     }
 
     public void testMinMax() {
         GParsPool.withPool(5) {
-            assertEquals 1, [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).min({a, b -> a - b} as Comparator)
-            assertEquals 5, [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).max({a, b -> a - b} as Comparator)
-            assertEquals 'a', 'abc'.parallelArray.withMapping({it} as Ops.Op).min()
-            assertEquals 'c', 'abc'.parallelArray.withMapping({it} as Ops.Op).max()
+            assert 1 == [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).min({a, b -> a - b} as Comparator)
+            assert 5 == [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).max({a, b -> a - b} as Comparator)
+            assert 'a' == 'abc'.parallelArray.withMapping({it} as Ops.Op).min()
+            assert 'c' == 'abc'.parallelArray.withMapping({it} as Ops.Op).max()
         }
     }
 
@@ -75,7 +73,7 @@ public class ParallelArrayTest extends GroovyTestCase {
             final List sortedNums = [1, 2, 3, 4, 5]
             final def pa = [1, 2, 3, 4, 5].parallelArray.withMapping({it} as Ops.Op).all()
             pa.sort({a, b -> a - b} as Comparator)
-            assertEquals(sortedNums, pa.all().asList())
+            assert sortedNums == pa.all().asList()
         }
     }
 

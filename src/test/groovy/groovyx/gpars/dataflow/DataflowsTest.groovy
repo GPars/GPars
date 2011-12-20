@@ -29,8 +29,8 @@ public class DataflowsTest extends GroovyTestCase {
         data.y = 'value'
         final def y = data.y
         assert y instanceof String
-        assertEquals 'value', y
-        assertEquals 'value', data.y
+        assert 'value' == y
+        assert 'value' == data.y
 
         shouldFail(IllegalStateException) {
             data.y = 20
@@ -44,7 +44,7 @@ public class DataflowsTest extends GroovyTestCase {
             data.x = 1
             data.x = 2
         }
-        assertEquals 1, data.x
+        assert 1 == data.x
     }
 
     public void testVariableFromThread() {
@@ -62,8 +62,8 @@ public class DataflowsTest extends GroovyTestCase {
             latch.countDown()
         }
         latch.await()
-        assertEquals 10, result[0]
-        assertEquals 10, result[1]
+        assert 10 == result[0]
+        assert 10 == result[1]
     }
 
     public void testBlockedRead() {
@@ -81,9 +81,9 @@ public class DataflowsTest extends GroovyTestCase {
             data.variable = 10
         }
 
-        assertEquals 10, data.variable
+        assert 10 == data.variable
         latch.await()
-        assertEquals 10, result
+        assert 10 == result
     }
 
     public void testNonBlockedRead() {
@@ -103,9 +103,9 @@ public class DataflowsTest extends GroovyTestCase {
         }
 
         barrier.await()
-        assertEquals 10, data.variable
+        assert 10 == data.variable
         latch.await()
-        assertEquals 10, result
+        assert 10 == result
     }
 
     public void testIndexes() {
@@ -121,7 +121,7 @@ public class DataflowsTest extends GroovyTestCase {
         Actors.blockingActor {
             data[0] = 7
         }
-        assertEquals 2, data[2]
+        assert 2 == data[2]
     }
 
     public void testValueRemoval() {
@@ -136,8 +136,8 @@ public class DataflowsTest extends GroovyTestCase {
 
         final def y = data.y
         assert y instanceof String
-        assertEquals 'value3', y
-        assertEquals 'value3', data.y
+        assert 'value3' == y
+        assert 'value3' == data.y
     }
 
     public void testUnblockingAfterValueRemoval() {
@@ -160,8 +160,8 @@ public class DataflowsTest extends GroovyTestCase {
 
         y = data.y  //retry
         assert y instanceof String
-        assertEquals 'value', y
-        assertEquals 'value', data.y
+        assert 'value' == y
+        assert 'value' == data.y
     }
 
     public void testWhenValueBound() {
@@ -174,10 +174,10 @@ public class DataflowsTest extends GroovyTestCase {
         data.y {result2 << it }
 
         assert result1.val instanceof String
-        assertEquals 'value', result1.val
+        assert 'value' == result1.val
         assert result2.val instanceof String
-        assertEquals 'value', result2.val
-        assertEquals 'value', data.y
+        assert 'value' == result2.val
+        assert 'value' == data.y
 
         shouldFail(IllegalStateException) {
             data.y = 20
@@ -199,10 +199,10 @@ public class DataflowsTest extends GroovyTestCase {
         data.x = 'value2'
         data.y = 'value1'
 
-        assertEquals 'value1', result1.val
-        assertEquals 'value2', result2.val
-        assertEquals 'value1', data.y
-        assertEquals 'value2', data.x
+        assert 'value1' == result1.val
+        assert 'value2' == result2.val
+        assert 'value1' == data.y
+        assert 'value2' == data.x
     }
 
     public void testContains() {
@@ -244,7 +244,7 @@ public class DataflowsTest extends GroovyTestCase {
         }
         assert 'x' in log
         assert 'y' in log
-        assertEquals 2, log.findAll { it in DataflowVariable }.size()
+        assert 2 == log.findAll { it in groovyx.gpars.dataflow.DataflowVariable }.size()
 
         def log2 = []
         for (entry in data) {
@@ -253,8 +253,8 @@ public class DataflowsTest extends GroovyTestCase {
         }
         assert log2 == log
 
-        assertEquals 'y', data.find { it.value.val == 1 }.key
-        assertEquals 2, data.findAll { it.key.size() == 1 }.size()
+        assert 'y' == data.find { it.value.val == 1 }.key
+        assert 2 == data.findAll { it.key.size() == 1 }.size()
         assert data.every { it.key.size() == 1 }
         assert data.any { it.key.size() == 1 }
     }

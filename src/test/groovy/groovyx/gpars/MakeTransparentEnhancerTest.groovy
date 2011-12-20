@@ -176,10 +176,10 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
 
     public void testTransparentParallelInMethodCall() {
         def items = [1, 2, 3, 4, 5]
-        assertEquals 1, foo(items).keys().size()
+        assert 1 == foo(items).keys().size()
 
         ParallelEnhancer.enhanceInstance(items)
-        assertEquals 1, foo(items).keys().size()
+        assert 1 == foo(items).keys().size()
         assert foo(items.makeConcurrent()).keys().size() > 1
     }
 
@@ -219,25 +219,25 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
     public void testTransparentSum() {
         def items = [1, 2, 3, 4, 5]
         ParallelEnhancer.enhanceInstance(items)
-        assertEquals 15, items.makeConcurrent().sum()
+        assert 15 == items.makeConcurrent().sum()
     }
 
     public void testTransparentCount() {
-        assertEquals 1, ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent().count(3)
-        assertEquals 5, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeConcurrent().count(3)
-        assertEquals 0, ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeConcurrent().count(6)
-        assertEquals 0, ParallelEnhancer.enhanceInstance([]).makeConcurrent().count(6)
-        assertEquals 1, ParallelEnhancer.enhanceInstance('abc2').makeConcurrent().count('a')
-        assertEquals 3, ParallelEnhancer.enhanceInstance('abcaa2').makeConcurrent().count('a')
-        assertEquals 0, ParallelEnhancer.enhanceInstance('ebc2').makeConcurrent().count('a')
-        assertEquals 0, ParallelEnhancer.enhanceInstance('     '.trim()).makeConcurrent().count('a')
+        assert 1 == groovyx.gpars.ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent().count(3)
+        assert 5 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeConcurrent().count(3)
+        assert 0 == groovyx.gpars.ParallelEnhancer.enhanceInstance([3, 2, 3, 4, 5, 3, 3, 3]).makeConcurrent().count(6)
+        assert 0 == groovyx.gpars.ParallelEnhancer.enhanceInstance([]).makeConcurrent().count(6)
+        assert 1 == groovyx.gpars.ParallelEnhancer.enhanceInstance('abc2').makeConcurrent().count('a')
+        assert 3 == groovyx.gpars.ParallelEnhancer.enhanceInstance('abcaa2').makeConcurrent().count('a')
+        assert 0 == groovyx.gpars.ParallelEnhancer.enhanceInstance('ebc2').makeConcurrent().count('a')
+        assert 0 == groovyx.gpars.ParallelEnhancer.enhanceInstance('     '.trim()).makeConcurrent().count('a')
     }
 
     public void testSplit() {
         def result = ParallelEnhancer.enhanceInstance([1, 2, 3, 4, 5]).makeConcurrent().split {it > 2}
         assert [3, 4, 5] as Set == result[0] as Set
         assert [1, 2] as Set == result[1] as Set
-        assertEquals 2, result.size()
+        assert 2 == result.size()
         assert [[], []] == ParallelEnhancer.enhanceInstance([]).makeConcurrent().split {it > 2}
         result = ParallelEnhancer.enhanceInstance([3]).makeConcurrent().split {it > 2}
         assert [[3], []] == result
@@ -249,7 +249,7 @@ class MakeTransparentEnhancerTest extends GroovyTestCase {
         def result = ParallelEnhancer.enhanceInstance(new String('abc')).makeConcurrent().split {it == 'b'}
         assert ['b'] as Set == result[0] as Set
         assert ['a', 'c'] as Set == result[1] as Set
-        assertEquals 2, result.size()
+        assert 2 == result.size()
         result = ParallelEnhancer.enhanceInstance('').makeConcurrent().split {it == 'b'}
         assert [[], []] == result
         result = ParallelEnhancer.enhanceInstance('b').makeConcurrent().split {it == 'b'}

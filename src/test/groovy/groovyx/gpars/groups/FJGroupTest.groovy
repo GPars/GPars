@@ -81,7 +81,7 @@ public class FJGroupTest extends GroovyTestCase {
 
         actor2 << 10
         latch.await()
-        assertEquals 25, result
+        assert 25 == result
         group1.shutdown()
         group2.shutdown()
     }

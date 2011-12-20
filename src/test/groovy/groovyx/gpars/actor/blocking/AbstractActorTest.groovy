@@ -141,8 +141,8 @@ public class AbstractActorTest extends GroovyTestCase {
         assert actor.deliveredMessages.contains('Message 1')
         assert actor.undeliveredMessages.get().contains('Message 2')
         assert actor.undeliveredMessages.get().contains('Message 3')
-        assertEquals 1, actor.deliveredMessages.size()
-        assertEquals 2, actor.undeliveredMessages.get().size()
+        assert 1 == actor.deliveredMessages.size()
+        assert 2 == actor.undeliveredMessages.get().size()
     }
 
     public void testSendAndPromise() {

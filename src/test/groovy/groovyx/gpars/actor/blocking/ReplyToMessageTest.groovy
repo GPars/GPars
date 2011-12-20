@@ -89,8 +89,8 @@ public class ReplyToMessageTest extends GroovyTestCase {
         completedBarrier.await()
         bouncer.terminate()
 
-        assertEquals([1, 2], replies1)
-        assertEquals([10, 20], replies2)
+        assert [1, 2] == replies1
+        assert [10, 20] == replies2
     }
 
     public void testMultipleActors() {
@@ -152,9 +152,9 @@ public class ReplyToMessageTest extends GroovyTestCase {
         completedBarrier.await()
         incrementor.terminate()
         decrementor.terminate()
-        assertEquals 4, replies1.size()
+        assert 4 == replies1.size()
         assert replies1.containsAll([3, 5, 4, 8])
-        assertEquals 4, replies2.size()
+        assert 4 == replies2.size()
         assert replies2.containsAll([21, 59, 31, 39])
     }
 

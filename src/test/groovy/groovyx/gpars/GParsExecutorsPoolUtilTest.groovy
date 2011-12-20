@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
             final Closure cl = {Number number -> result.add(number * 10); latch.countDown()}
             [1, 2, 3, 4, 5].each(cl.async())
             latch.await()
-            assertEquals(new HashSet([10, 20, 30, 40, 50]), result)
+            assert new HashSet([10, 20, 30, 40, 50]) == result
         }
     }
 
@@ -47,14 +47,14 @@ public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
             GParsExecutorsPoolUtil.callAsync({number -> resultA = number; latch.countDown()}, 2)
             GParsExecutorsPoolUtil.callAsync({number -> resultB = number; latch.countDown()}, 3)
             latch.await()
-            assertEquals 2, resultA
-            assertEquals 3, resultB
+            assert 2 == resultA
+            assert 3 == resultB
         }
     }
 
     public void testCallParallelWithResult() {
         GParsExecutorsPool.withPool(5) {ExecutorService service ->
-            assertEquals 6, GParsExecutorsPoolUtil.callAsync({it * 2}, 3).get()
+            assert 6 == groovyx.gpars.GParsExecutorsPoolUtil.callAsync({it * 2}, 3).get()
         }
     }
 
@@ -65,14 +65,14 @@ public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
             GParsExecutorsPoolUtil.async({int number -> resultA = number; latch.countDown()}).call(2);
             GParsExecutorsPoolUtil.async({int number -> resultB = number; latch.countDown()}).call(3);
             latch.await()
-            assertEquals 2, resultA
-            assertEquals 3, resultB
+            assert 2 == resultA
+            assert 3 == resultB
         }
     }
 
     public void testAsyncWithResult() {
         GParsExecutorsPool.withPool(5) {ExecutorService service ->
-            assertEquals 6, GParsExecutorsPoolUtil.async({it * 2}).call(3).get()
+            assert 6 == groovyx.gpars.GParsExecutorsPoolUtil.async({it * 2}).call(3).get()
         }
     }
 
@@ -96,7 +96,7 @@ public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
         shouldFail(IllegalStateException.class) {
             GParsExecutorsPoolUtil.callAsync({counter.set it}, 1)
         }
-        assertEquals 0, counter.get()
+        assert 0 == counter.get()
     }
 
     public void testLeftShift() {
@@ -116,7 +116,7 @@ public class GParsExecutorsPoolUtilTest extends GroovyTestCase {
                     word.anyParallel {it in ['a', 'y', '5']}
                 }
             }
-            assertEquals(['abc', 'xyz'], result)
+            assert ['abc', 'xyz'] == result
         }
     }
 
