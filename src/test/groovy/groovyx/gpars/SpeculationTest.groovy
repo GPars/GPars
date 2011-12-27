@@ -24,9 +24,9 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 public class SpeculationTest extends GroovyTestCase {
 
-    def neverReachedFlag = new AtomicBoolean(false)
+    final neverReachedFlag = new AtomicBoolean(false)
 
-    def alternatives = [
+    final alternatives = [
             {
                 Thread.sleep 30000
                 neverReachedFlag.set(true)
@@ -52,6 +52,31 @@ public class SpeculationTest extends GroovyTestCase {
                 Thread.sleep 25000
                 50
             }]
+    final failedAlternatives = [
+            {
+                Thread.sleep 300
+                throw new RuntimeException('test')
+            },
+
+            {
+                Thread.sleep 100
+                throw new RuntimeException('test')
+            },
+
+            {
+                Thread.sleep 10
+                throw new RuntimeException('test')
+            },
+
+            {
+                Thread.sleep 1000
+                throw new RuntimeException('test')
+            },
+
+            {
+                Thread.sleep 100
+                throw new RuntimeException('test')
+            }]
 
     public void testGParsPoolSpeculation() {
         GParsPool.withPool(5) {
@@ -69,6 +94,24 @@ public class SpeculationTest extends GroovyTestCase {
         }
         GParsExecutorsPool.withPool(10) {
             assert GParsExecutorsPool.speculate(alternatives) in [20, 40]
+        }
+        assert !neverReachedFlag.get()
+    }
+
+    public void testGParsPoolSpeculationWithAllBranchesFailed() {
+        GParsPool.withPool(5) {
+            shouldFail(IllegalStateException) {
+                GParsPool.speculate(failedAlternatives)
+            }
+        }
+        assert !neverReachedFlag.get()
+    }
+
+    public void testGParsExecutorsPoolSpeculationWithAllBranchesFailed() {
+        GParsExecutorsPool.withPool(5) {
+            shouldFail(IllegalStateException) {
+                GParsExecutorsPool.speculate(failedAlternatives)
+            }
         }
         assert !neverReachedFlag.get()
     }

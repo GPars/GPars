@@ -23,6 +23,7 @@ import groovyx.gpars.util.PoolUtils
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import jsr166y.ForkJoinPool
 import jsr166y.RecursiveTask
 
@@ -284,6 +285,7 @@ public class GParsPool {
     public static def speculate(Closure... alternatives) {
         def result = new DataflowVariable()
         def futures = new DataflowVariable()
+        final AtomicInteger failureCounter = new AtomicInteger(0)
         futures << GParsPool.executeAsync(alternatives.collect {
             original ->
             {->
@@ -292,10 +294,17 @@ public class GParsPool {
                     def localResult = original()
                     futures.val*.cancel(true)
                     result << localResult
-                } catch (Exception ignore) { }
+                } catch (Exception e) {
+                    int counter = failureCounter.incrementAndGet()
+                    if (counter == alternatives.size()) {
+                        result << new IllegalStateException('All speculations failed', e)
+                    }
+                }
             }
         })
-        return result.val
+        def r = result.val
+        if (r instanceof Exception) throw r
+        return r
     }
 
     private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {

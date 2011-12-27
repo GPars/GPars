@@ -24,6 +24,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Enables a ExecutorService-based DSL on closures, objects and collections.
@@ -264,6 +265,7 @@ class GParsExecutorsPool {
     public static def speculate(Closure... alternatives) {
         def result = new DataflowVariable()
         def futures = new DataflowVariable()
+        final AtomicInteger failureCounter = new AtomicInteger(0)
         futures << GParsExecutorsPool.executeAsync(alternatives.collect {
             original ->
             {->
@@ -272,9 +274,16 @@ class GParsExecutorsPool {
                     def localResult = original()
                     futures.val*.cancel(true)
                     result << localResult
-                } catch (Exception ignore) { }
+                } catch (Exception e) {
+                    int counter = failureCounter.incrementAndGet()
+                    if (counter == alternatives.size()) {
+                        result << new IllegalStateException('All speculations failed', e)
+                    }
+                }
             }
         })
-        return result.val
+        def r = result.val
+        if (r instanceof Exception) throw r
+        return r
     }
 }
