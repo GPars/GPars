@@ -21,10 +21,14 @@ import static groovyx.gpars.actor.Actors.actor
 
 def getYearEndClosing(String symbol, int year) {
     def url = "http://ichart.finance.yahoo.com/table.csv?s=$symbol&amp;a=11&amp;b=01&amp;c=$year&amp;d=11&amp;e=31&amp;f=$year&amp;g=m;ignore=.csv"
-    def data = url.toURL().text
-    def price = data.split("\n")[1].split(",")[4].toDouble()
-    Thread.sleep(1000); // slow down internet
-    [symbol, price]
+    try {
+        final data = url.toURL().text
+        final price = data.split("\n")[1].split(",")[4].toDouble()
+        Thread.sleep(1000); // slow down internet
+        return [symbol, price]
+    } catch (all) {
+        return [symbol, 0]
+    }
 }
 
 def symbols = ['AAPL', 'GOOG', 'IBM', 'MSFT']
