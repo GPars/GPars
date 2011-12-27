@@ -93,8 +93,8 @@ public class DataflowOperatorTest {
         // would wait for another input and hang
         //  stream4.getVal();
 
-        processor1.stop();
-        processor2.stop();
+        processor1.terminate();
+        processor2.terminate();
     }
 
     /**
