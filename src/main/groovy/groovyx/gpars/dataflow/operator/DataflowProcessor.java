@@ -145,7 +145,7 @@ public abstract class DataflowProcessor {
      * @param idx   The index of the channel to bind
      * @param value The value to bind
      */
-    final void bindOutput(final int idx, final Object value) {
+    public final void bindOutput(final int idx, final Object value) {
         ((DataflowWriteChannel<Object>) actor.outputs.get(idx)).bind(value);
     }
 
@@ -154,7 +154,7 @@ public abstract class DataflowProcessor {
      *
      * @param value The value to bind
      */
-    final void bindOutput(final Object value) {
+    public final void bindOutput(final Object value) {
         bindOutput(0, value);
     }
 
@@ -166,7 +166,7 @@ public abstract class DataflowProcessor {
      *
      * @param value The value to bind
      */
-    final void bindAllOutputs(final Object value) {
+    public final void bindAllOutputs(final Object value) {
         for (final Object output : actor.outputs) {
             ((DataflowWriteChannel<Object>) output).bind(value);
 
@@ -183,7 +183,7 @@ public abstract class DataflowProcessor {
      *
      * @param values Values to send to output channels of the same position index
      */
-    final void bindAllOutputValues(final Object... values) {
+    public final void bindAllOutputValues(final Object... values) {
         final List<DataflowWriteChannel> outputs = getOutputs();
         for (int i = 0; i < outputs.size(); i++) {
             outputs.get(i).bind(values[i]);
@@ -196,8 +196,7 @@ public abstract class DataflowProcessor {
      *
      * @param value The value to bind
      */
-    @SuppressWarnings("GroovySynchronizedMethod")
-    final synchronized void bindAllOutputsAtomically(final Object value) {
+    public final synchronized void bindAllOutputsAtomically(final Object value) {
         for (final DataflowWriteChannel writeChannel : getOutputs()) {
             writeChannel.bind(value);
         }
@@ -210,8 +209,7 @@ public abstract class DataflowProcessor {
      *
      * @param values Values to send to output channels of the same position index
      */
-    @SuppressWarnings("GroovySynchronizedMethod")
-    final synchronized void bindAllOutputValuesAtomically(final Object... values) {
+    public final synchronized void bindAllOutputValuesAtomically(final Object... values) {
         final List<DataflowWriteChannel> outputs = getOutputs();
         for (int i = 0; i < outputs.size(); i++) {
             outputs.get(i).bind(values[i]);
