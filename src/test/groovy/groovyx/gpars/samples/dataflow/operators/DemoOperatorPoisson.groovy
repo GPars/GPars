@@ -21,7 +21,7 @@ import groovyx.gpars.dataflow.operator.PoisonPill
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
- * Dataflow operators and selectors can be stopped in two ways - calling the stop() method on all operators that need to be stopped
+ * Dataflow operators and selectors can be stopped in two ways - calling the terminate() method on all operators that need to be stopped
  * or by sending a poisson message. This demo shows the second approach.
  *
  * After receiving a poisson an operator stops. It only makes sure the poisson is first sent to all its output channels, so that the poisson can spread
