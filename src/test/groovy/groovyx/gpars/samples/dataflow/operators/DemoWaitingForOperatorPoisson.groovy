@@ -17,12 +17,13 @@
 package groovyx.gpars.samples.dataflow.operators
 
 import groovyx.gpars.dataflow.DataflowQueue
-import groovyx.gpars.dataflow.operator.PoisonPill
+import groovyx.gpars.dataflow.operator.CountingPoisonPill
 import groovyx.gpars.group.NonDaemonPGroup
 
 /**
  * Dataflow operators and selectors can be stopped in two ways - calling the terminate() method on all operators that need to be stopped
  * or by sending a poisson message. This demo shows the second approach.
+ * By using a CountingPoisonPill other threads can be waiting for a specified number of operators in the network to be terminated.
  *
  * After receiving a poisson an operator stops. It only makes sure the poisson is first sent to all its output channels, so that the poisson can spread
  * to the connected operators.
@@ -45,12 +46,15 @@ def op2 = group.selector(inputs: [d], outputs: [f, out]) { }
 
 def op3 = group.prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-a << PoisonPill.instance  //Send the poisson
+//Send the poisson indicating the number of opeators than need to be terminated
+final pill = new CountingPoisonPill(3)
+a << pill
 
-assert out.val == PoisonPill.instance  //The poisson will fall out from the output channels
-op1.join()
-op2.join()
-op3.join()
+//Wait for all operators to terminate
+pill.join()
+//All operators should be terminated by now
+
+assert out.val == pill  //The poisson will fall out from the output channels
 
 println "All operators have stopped."
 group.shutdown()

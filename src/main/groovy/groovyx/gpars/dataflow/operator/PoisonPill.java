@@ -31,6 +31,9 @@ public class PoisonPill {
         return ourInstance;
     }
 
-    private PoisonPill() {
+    PoisonPill() {
+    }
+
+    void countDown() {
     }
 }

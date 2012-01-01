@@ -86,6 +86,7 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
         if (data instanceof PoisonPill) {
             owningProcessor.bindAllOutputsAtomically(data);
             owningProcessor.terminate();
+            ((PoisonPill) data).countDown();
             return true;
         }
         return false;
