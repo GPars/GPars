@@ -311,6 +311,32 @@ When sending a poison pill down the operator network you may need to be notified
 have been stopped. The _CountingPoisonPill_ class serves exactly this purpose:
 
 {code}
+operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
+selector(inputs: [d], outputs: [f, out]) { }
+prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+//Send the poisson indicating the number of operators than need to be terminated before we can continue
+final pill = new CountingPoisonPill(3)
+a << pill
+
+//Wait for all operators to terminate
+pill.join()
+//At least 3 operators should be terminated by now
+{code}
+
+The _termination_ property of the _CountingPoisonPill_ class is a regular _Promise<Boolean>_ and so has a lot of handy properties.
+{code}
+//Send the poisson indicating the number of operators than need to be terminated before we can continue
+final pill = new CountingPoisonPill(3)
+pill.termination.whenBound {println "Reporting asynchronously that the network has been stopped"}
+a << pill
+
+if (pill.termination.bound) println "Wow, that was quick. We are done already!"
+else println "Things are being slow today. The network is still running."
+
+//Wait for all operators to terminate
+assert pill.termination.get()
+//At least 3 operators should be terminated by now
 {code}
 
 h4. Termination tips and tricks
