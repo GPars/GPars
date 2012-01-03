@@ -16,7 +16,9 @@
 
 package groovyx.gpars.dataflow.operator;
 
-import java.util.concurrent.CountDownLatch;
+import groovyx.gpars.dataflow.DataflowVariable;
+import groovyx.gpars.dataflow.Promise;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Vaclav Pech
  */
 public final class CountingPoisonPill extends PoisonPill {
-    private final CountDownLatch latch = new CountDownLatch(1);
+    private final DataflowVariable<Boolean> termination = new DataflowVariable<Boolean>();
     private final AtomicInteger counter;
 
     /**
@@ -44,7 +46,7 @@ public final class CountingPoisonPill extends PoisonPill {
      * @throws InterruptedException If the current thread gets interrupted during the blocking
      */
     public void join() throws InterruptedException {
-        latch.await();
+        termination.join();
     }
 
     /**
@@ -55,12 +57,16 @@ public final class CountingPoisonPill extends PoisonPill {
      * @throws InterruptedException If the current thread gets interrupted during the blocking
      */
     public void join(final long timeout, final TimeUnit unit) throws InterruptedException {
-        latch.await(timeout, unit);
+        termination.join(timeout, unit);
+    }
+
+    public Promise<Boolean> getTermination() {
+        return termination;
     }
 
     @Override
     void countDown() {
         final int currentValue = counter.decrementAndGet();
-        if (currentValue == 0) latch.countDown();
+        if (currentValue == 0) termination.bind(true);
     }
 }

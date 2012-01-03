@@ -137,4 +137,30 @@ public class DataflowOperatorCountingShutdownTest extends GroovyTestCase {
         op2.join()
         op3.join()
     }
+
+    public void testTerminationProperty() {
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+        final DataflowQueue e = new DataflowQueue()
+
+        def op = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z ->
+            bindOutput 0, x + y + z
+            bindOutput 1, x * y * z
+        }
+
+        a << 10
+        b << 20
+        c << 30
+
+        assert 60 == d.val
+        assert 6000 == e.val
+        final pill = new CountingPoisonPill(1)
+        assert !pill.termination.bound
+        a << pill
+        pill.join()
+        assert pill.termination.bound
+        op.join()
+    }
 }
