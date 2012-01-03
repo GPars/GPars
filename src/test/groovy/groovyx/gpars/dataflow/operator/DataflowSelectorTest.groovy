@@ -182,7 +182,6 @@ public class DataflowSelectorTest extends GroovyTestCase {
         sleep 500
         a << 'Never delivered'
         op1.terminate()
-        barrier.await()
         op1.join()
         assert counter == 1
     }
