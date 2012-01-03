@@ -285,6 +285,8 @@ op3.join()
 {code}
 
 After receiving a poisson an operator terminates. It only makes sure the poisson is first sent to all its output channels, so that the poisson can spread to the connected operators.
+Also, although operators typically wait for all inputs to have a value, in case of _PoisonPills_, the operator will terminate
+immediately as soon as a _PoisonPill_ appears on any of its inputs.
 
 {note}
 Given the potential variety of operator networks and their asynchronous nature, a good termination strategy is that
@@ -302,6 +304,59 @@ This is exactly what the terminateAfterNextRun() method does. It will schedule t
 of messages gets handled.
 This may be particularly handy when you use a group of operators/selectors to load-balance messages coming from a channel.
 Once the work-load decreases, the terminateAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
+
+h4. Poison with counting
+
+When sending a poison pill down the operator network you may need to be notified when all the operators or a specified number of them
+have been stopped. The _CountingPoisonPill_ class serves exactly this purpose:
+
+{code}
+{code}
+
+h4. Termination tips and tricks
+
+Notice that GPars _tasks_ return a _DataflowVariable_, which gets bound to a value as soon as the task finishes.
+The 'terminator' operator below leverages the fact that _DataflowVariables_ are implementations of the _DataflowReadChannel_
+interface and thus can be consumed by operators. As soon as both tasks finish, the operator will send a _PoisonPill_
+down the q channel to stop the consumer as soon as it processes all data.
+
+{code}
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.group.NonDaemonPGroup
+
+
+def group = new NonDaemonPGroup()
+
+final DataflowQueue q = new DataflowQueue()
+
+// final destination
+def customs = group.operator(inputs: [q], outputs: []) { value ->
+    println "Customs received $value"
+}
+
+// big producer
+def green = group.task {
+    (1..100).each {
+        q << 'green channel ' + it
+        sleep 10
+    }
+}
+
+// little producer
+def red = group.task {
+    (1..10).each {
+        q << 'red channel ' + it
+        sleep 15
+    }
+}
+
+def terminator = group.operator(inputs: [green, red], outputs: []) { t1, t2 ->
+    q << PoisonPill.instance
+}
+
+customs.join()
+group.shutdown()
+{code}
 
 h2. Selectors
 
