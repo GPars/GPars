@@ -344,7 +344,7 @@ h4. Termination tips and tricks
 Notice that GPars _tasks_ return a _DataflowVariable_, which gets bound to a value as soon as the task finishes.
 The 'terminator' operator below leverages the fact that _DataflowVariables_ are implementations of the _DataflowReadChannel_
 interface and thus can be consumed by operators. As soon as both tasks finish, the operator will send a _PoisonPill_
-down the q channel to stop the consumer as soon as it processes all data.
+down the _q_ channel to stop the consumer as soon as it processes all data.
 
 {code}
 import groovyx.gpars.dataflow.DataflowQueue
