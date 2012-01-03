@@ -200,14 +200,15 @@ public class DataflowPrioritySelectorTest extends GroovyTestCase {
         def op1 = group.prioritySelector(inputs: [a, b], outputs: [c]) {x ->
             barrier1.await()
             counter++
-            barrier2.await()
+            try {
+                barrier2.await()
+            } catch (InterruptedException ignore) { }
 
         }
         a << 'Delivered'
         barrier1.await()
         a << 'Never delivered'
         op1.terminate()
-        barrier2.await()
         op1.join()
         assert counter == 1
     }

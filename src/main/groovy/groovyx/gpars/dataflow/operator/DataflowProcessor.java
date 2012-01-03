@@ -119,7 +119,7 @@ public abstract class DataflowProcessor {
      * Stops the processor immediately, potentially loosing unhandled messages
      */
     public final void terminate() {
-        actor.stop();
+        actor.terminate();
     }
 
     /**

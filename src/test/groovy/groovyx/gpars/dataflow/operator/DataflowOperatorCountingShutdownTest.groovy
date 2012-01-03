@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
+import java.util.concurrent.TimeUnit
 import static groovyx.gpars.dataflow.Dataflow.operator
 import static groovyx.gpars.dataflow.Dataflow.prioritySelector
 import static groovyx.gpars.dataflow.Dataflow.selector
@@ -161,6 +162,52 @@ public class DataflowOperatorCountingShutdownTest extends GroovyTestCase {
         a << pill
         pill.join()
         assert pill.termination.bound
+        op.join()
+    }
+
+    public void testTerminationWithRepetition() {
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+
+        def op = operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+            bindOutput 0, x + y + z
+        }
+
+        a << 10
+        b << 20
+        c << 30
+
+        assert 60 == d.val
+        final pill = new CountingPoisonPill(2)
+        a << pill
+        c << pill
+        pill.join(1, TimeUnit.SECONDS)
+        assert !pill.termination.bound
+        op.join()
+    }
+
+    public void testTerminationWithRepetitionOnSelector() {
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+
+        def op = selector(inputs: [a, b, c], outputs: [d]) {x ->
+            bindOutput 0, x
+        }
+
+        a << 10
+        b << 20
+        c << 30
+
+        assert (1..3).collect {d.val} as Set == [10, 20, 30] as Set
+        final pill = new CountingPoisonPill(2)
+        a << pill
+        c << pill
+        pill.join(1, TimeUnit.SECONDS)
+        assert !pill.termination.bound
         op.join()
     }
 }
