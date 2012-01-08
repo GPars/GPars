@@ -77,9 +77,7 @@ jar {
 repositories {
     mavenCentral()
     maven {
-        url 'http://repository.jboss.org/maven2'
         url 'http://repository.codehaus.org'
-        //url 'http://snapshots.repository.codehaus.org' // Only need if we use snapshot artefacts for things like Groovy.
         url 'http://download.java.net/maven/2'
         url 'http://m2repo.spockframework.org/snapshots'
         url 'http://repo.grails.org/grails/core' // Need this to get Grails Doc
@@ -107,11 +105,11 @@ dependencies {
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
-    compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.1.5.GA'
+    compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.7.Final'
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs 'org.codehaus.groovy:groovy-all:1.8.4'
+    docs 'org.codehaus.groovy:groovy-all:1.8.5'
     docs 'org.yaml:snakeyaml:1.9'
     docs 'commons-lang:commons-lang:2.6'
     //
