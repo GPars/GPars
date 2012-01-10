@@ -192,7 +192,7 @@ public abstract class AbstractLoopingActor extends Actor {
     }
 
     @Override
-    public final Actor terminate() {
+    public final synchronized Actor terminate() {
         if (isActive()) {
             stop();
 
@@ -206,7 +206,9 @@ public abstract class AbstractLoopingActor extends Actor {
             //noinspection CallToThreadYield
             Thread.yield();
             if (!isActorThread() && currentThread != null) {
-                currentThread.interrupt();
+                try {
+                    currentThread.interrupt();
+                } catch (Exception ignore) {/*If the currentThread field gets set to null in the meantime, we do not need to do anything*/ }
             } else send(TERMINATE_MESSAGE);
         }
         return this;
