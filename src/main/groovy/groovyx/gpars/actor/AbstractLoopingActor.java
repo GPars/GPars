@@ -192,25 +192,23 @@ public abstract class AbstractLoopingActor extends Actor {
     }
 
     @Override
-    public final synchronized Actor terminate() {
-        if (isActive()) {
+    public final Actor terminate() {
+        synchronized (this) {
+            if (!isActive()) return this;
             stop();
-
             terminatingFlag = true;
-
-            if (isActorThread()) {
-                terminatedFlag = true;
-                handleTermination();
-                getJoinLatch().bindUnique(null);
-            }
-            //noinspection CallToThreadYield
-            Thread.yield();
-            if (!isActorThread() && currentThread != null) {
-                try {
-                    currentThread.interrupt();
-                } catch (Exception ignore) {/*If the currentThread field gets set to null in the meantime, we do not need to do anything*/ }
-            } else send(TERMINATE_MESSAGE);
         }
+
+        if (isActorThread()) {
+            terminatedFlag = true;
+            handleTermination();
+            getJoinLatch().bindUnique(null);
+        }
+        //noinspection CallToThreadYield
+        Thread.yield();
+        if (!isActorThread() && currentThread != null) {
+            currentThread.interrupt();
+        } else send(TERMINATE_MESSAGE);
         return this;
     }
 
