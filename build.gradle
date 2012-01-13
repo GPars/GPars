@@ -287,7 +287,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-6'
+    gradleVersion = '1.0-milestone-7'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
