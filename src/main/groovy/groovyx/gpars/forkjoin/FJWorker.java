@@ -37,6 +37,7 @@ final class FJWorker<T> extends AbstractForkJoinWorker<T> {
         this.args = size > 1 ? (T[]) Arrays.copyOfRange(args, 0, size - 1) : (T[]) EMPTY_OBJECTS;
         this.code = (Closure) ((Closure) args[size - 1]).clone();
         this.code.setDelegate(this);
+        this.code.setResolveStrategy(Closure.DELEGATE_FIRST);
     }
 
     @SuppressWarnings({"MethodOverloadsMethodOfSuperclass", "OverloadedVarargsMethod"})
