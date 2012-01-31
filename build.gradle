@@ -137,7 +137,7 @@ gradle.taskGraph.whenReady {taskGraph ->
     }
 }
 
-task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist']) << {
+task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
     println 'We release now'
 }
 
