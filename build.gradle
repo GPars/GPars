@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008–2011  The original author or authors
+// Copyright © 2008–2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.5'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
     testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8-SNAPSHOT'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
@@ -109,7 +109,7 @@ dependencies {
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs 'org.codehaus.groovy:groovy-all:1.8.5'
+    docs 'org.codehaus.groovy:groovy-all:1.8.6'
     docs 'org.yaml:snakeyaml:1.9'
     docs 'commons-lang:commons-lang:2.6'
     //
@@ -137,7 +137,7 @@ gradle.taskGraph.whenReady {taskGraph ->
     }
 }
 
-task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist']) << {
+task release(dependsOn: ['build', 'zipSamples', 'zipJavaDemo', 'zipDist', 'zipGuide']) << {
     println 'We release now'
 }
 
@@ -207,7 +207,7 @@ uploadArchives {
 }
 
 def titleForDocumentation = archivesBaseName + ' ' + version
-def copyrightString = 'Copyright &#169; 2008&#8211;2011  V&#225;clav Pech.  All Rights Reserved.'
+def copyrightString = 'Copyright &#169; 2008&#8211;2012  V&#225;clav Pech.  All Rights Reserved.'
 def packageTitle = group
 
 javadoc {
@@ -287,7 +287,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-7'
+    gradleVersion = '1.0-milestone-8a'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
