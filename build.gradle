@@ -70,16 +70,11 @@ jar {
     }
 }
 
-//  Should avoid using SNAPSHOT artefacts unless necessary to do so.  Spock currently has no 0.6 release but
-//  0.6 is needed with Groovy 1.8.x -- even though there is a 0.5 artefact for Groovy 1.8.x, it has been
-//  labelled as insufficient to the task; see various emails on the spock mailing lists.
-
 repositories {
     mavenCentral()
     maven {
         url 'http://repository.codehaus.org'
         url 'http://download.java.net/maven/2'
-        url 'http://m2repo.spockframework.org/snapshots'
         url 'http://repo.grails.org/grails/core' // Need this to get Grails Doc
     }
 }
@@ -101,7 +96,7 @@ configurations {
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8-SNAPSHOT'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
