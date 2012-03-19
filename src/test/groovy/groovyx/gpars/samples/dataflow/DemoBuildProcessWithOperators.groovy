@@ -28,25 +28,25 @@ import static groovyx.gpars.dataflow.Dataflow.operator
  */
 
 //Mock-up definitions of build steps
-def createABuildStep = {name -> {param -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
-def createASlowArgBuildStep = {name -> {param -> println "Starting $name"; sleep 9000; println "Finished $name"; true}}
-def createAThreeArgBuildStep = {name -> {a, b, c -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
-def checkout = createASlowArgBuildStep 'Checkout Sources'
-def compileSources = createABuildStep 'Compile Sources'
-def generateAPIDoc = createABuildStep 'Generate API Doc'
-def generateUserDocumentation = createABuildStep 'Generate User Documentation'
-def packageProject = createAThreeArgBuildStep 'Package Sources'
-def deploy = createABuildStep 'Deploy'
+final createABuildStep = {name -> {param -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
+final createASlowArgBuildStep = {name -> {param -> println "Starting $name"; sleep 9000; println "Finished $name"; true}}
+final createAThreeArgBuildStep = {name -> {a, b, c -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
+final checkout = createASlowArgBuildStep 'Checkout Sources'
+final compileSources = createABuildStep 'Compile Sources'
+final generateAPIDoc = createABuildStep 'Generate API Doc'
+final generateUserDocumentation = createABuildStep 'Generate User Documentation'
+final packageProject = createAThreeArgBuildStep 'Package Sources'
+final deploy = createABuildStep 'Deploy'
 
 /* We need channels to wire active elements together */
 
-def urls = new DataflowQueue()
-def checkedOutProjects = new DataflowBroadcast()
-def compiledProjects = new DataflowQueue()
-def apiDocs = new DataflowQueue()
-def userDocs = new DataflowQueue()
-def packages = new DataflowQueue()
-def done = new DataflowQueue()
+final urls = new DataflowQueue()
+final checkedOutProjects = new DataflowBroadcast()
+final compiledProjects = new DataflowQueue()
+final apiDocs = new DataflowQueue()
+final userDocs = new DataflowQueue()
+final packages = new DataflowQueue()
+final done = new DataflowQueue()
 
 /* Here's the composition of individual build steps into a process */
 
@@ -70,7 +70,7 @@ operator([compiledProjects, apiDocs, userDocs], [packages]) {classes, api, guide
     bindOutput packageProject(classes, api, guide)
 }
 
-def deployer = operator(packages, done) {packagedProject ->
+final deployer = operator(packages, done) {packagedProject ->
     if (deploy(packagedProject) == 'success') bindOutput true
     else bindOutput false
 }

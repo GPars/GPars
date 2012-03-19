@@ -26,36 +26,36 @@ import static groovyx.gpars.dataflow.Dataflow.whenAllBound
  */
 
 //Mock-up definitions of build steps
-def createABuildStep = {name -> {param -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
-def createATwoArgBuildStep = {name -> {a, b -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
-def createAThreeArgBuildStep = {name -> {a, b, c -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
-def checkout = createABuildStep 'Checkout Sources'
-def fetchSourceLibs = createABuildStep 'Fetch Source Libs'
-def fetchTestLibs = createABuildStep 'Fetch Test Libs'
-def compileSources = createABuildStep 'Compile Sources'
-def compileUnitTests = createATwoArgBuildStep 'Compile Unit Tests'
-def runUnitTests = createABuildStep('Run Unit Tests') >> {[unitTestSuccessful: true]}
-def generateAPIDoc = createABuildStep 'Generate API Doc'
-def generateUserDocumentation = createABuildStep 'Generate User Documentation'
-def packageSources = createABuildStep 'Package Sources'
-def deploy = createABuildStep 'Deploy'
-def uploadDocumentation = createAThreeArgBuildStep 'Upload Documentation'
+final createABuildStep = {name -> {param -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
+final createATwoArgBuildStep = {name -> {a, b -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
+final createAThreeArgBuildStep = {name -> {a, b, c -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
+final checkout = createABuildStep 'Checkout Sources'
+final fetchSourceLibs = createABuildStep 'Fetch Source Libs'
+final fetchTestLibs = createABuildStep 'Fetch Test Libs'
+final compileSources = createABuildStep 'Compile Sources'
+final compileUnitTests = createATwoArgBuildStep 'Compile Unit Tests'
+final runUnitTests = createABuildStep('Run Unit Tests') >> {[unitTestSuccessful: true]}
+final generateAPIDoc = createABuildStep 'Generate API Doc'
+final generateUserDocumentation = createABuildStep 'Generate User Documentation'
+final packageSources = createABuildStep 'Package Sources'
+final deploy = createABuildStep 'Deploy'
+final uploadDocumentation = createAThreeArgBuildStep 'Upload Documentation'
 
 /* Here's the composition of individual build steps into a process */
 
-def checkoutDone = task {checkout('git@github.com:vaclav/GPars.git')}
-def sourceCompiled = checkoutDone.then fetchSourceLibs then compileSources
-def testLibsReady = checkoutDone.then fetchTestLibs
-def unitTestsResult = whenAllBound([sourceCompiled, testLibsReady], compileUnitTests).then runUnitTests
-def deployed = unitTestsResult.then {buildContext ->
+final checkoutDone = task {checkout('git@github.com:vaclav/GPars.git')}
+final sourceCompiled = checkoutDone.then fetchSourceLibs then compileSources
+final testLibsReady = checkoutDone.then fetchTestLibs
+final unitTestsResult = whenAllBound([sourceCompiled, testLibsReady], compileUnitTests).then runUnitTests
+final deployed = unitTestsResult.then {buildContext ->
     if (buildContext.unitTestSuccessful) {
         deploy(packageSources(buildContext))
     } else return buildContext
 }
-def apiDocGenerated = checkoutDone.then generateAPIDoc
-def userDocGenerated = checkoutDone.then generateUserDocumentation
+final apiDocGenerated = checkoutDone.then generateAPIDoc
+final userDocGenerated = checkoutDone.then generateUserDocumentation
 
-def docsUploaded = whenAllBound([apiDocGenerated, userDocGenerated, unitTestsResult], uploadDocumentation)
+final docsUploaded = whenAllBound([apiDocGenerated, userDocGenerated, unitTestsResult], uploadDocumentation)
 
 /* Now we're setup and can wait for the build to finish */
 

@@ -26,14 +26,14 @@ import static groovyx.gpars.GParsPool.withPool
  */
 
 //Mock-up definitions of build steps
-def createABuildStep = {name -> {param -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
-def createAThreeArgBuildStep = {name -> {a, b, c -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
-def checkout = createABuildStep 'Checkout Sources'
-def compileSources = createABuildStep 'Compile Sources'
-def generateAPIDoc = createABuildStep 'Generate API Doc'
-def generateUserDocumentation = createABuildStep 'Generate User Documentation'
-def packageProject = createAThreeArgBuildStep 'Package Sources'
-def deploy = createABuildStep 'Deploy'
+final createABuildStep = {name -> {param -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
+final createAThreeArgBuildStep = {name -> {a, b, c -> println "Starting $name"; sleep 3000; println "Finished $name"; true}}
+final checkout = createABuildStep 'Checkout Sources'
+final compileSources = createABuildStep 'Compile Sources'
+final generateAPIDoc = createABuildStep 'Generate API Doc'
+final generateUserDocumentation = createABuildStep 'Generate User Documentation'
+final packageProject = createAThreeArgBuildStep 'Package Sources'
+final deploy = createABuildStep 'Deploy'
 
 /* First, we need a thread pool */
 
@@ -41,12 +41,12 @@ withPool {
 
     /* Second, we need asynchronous variants of all the individual build steps */
 
-    def aCheckout = checkout.asyncFun()
-    def aCompileSources = compileSources.asyncFun()
-    def aGenerateAPIDoc = generateAPIDoc.asyncFun()
-    def aGenerateUserDocumentation = generateUserDocumentation.asyncFun()
-    def aPackageProject = packageProject.asyncFun()
-    def aDeploy = deploy.asyncFun()
+    final aCheckout = checkout.asyncFun()
+    final aCompileSources = compileSources.asyncFun()
+    final aGenerateAPIDoc = generateAPIDoc.asyncFun()
+    final aGenerateUserDocumentation = generateUserDocumentation.asyncFun()
+    final aPackageProject = packageProject.asyncFun()
+    final aDeploy = deploy.asyncFun()
 
     /* Third, here's the composition of asynchronous build steps to form a process */
 
