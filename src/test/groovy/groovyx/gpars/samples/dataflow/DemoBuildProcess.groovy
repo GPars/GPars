@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.dataflow.thenChaining
+package groovyx.gpars.samples.dataflow
 
 import static groovyx.gpars.dataflow.Dataflow.task
 import static groovyx.gpars.dataflow.Dataflow.whenAllBound
