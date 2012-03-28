@@ -124,7 +124,7 @@ class TestRunnable1 extends DataflowMessagingRunnable {
         super(2);
     }
 
-    protected void doRun(Object[] arguments) {
+    protected void doRun(Object... arguments) {
         getOwningProcessor().bindOutput(arguments[0] + arguments[1])
     }
 }
@@ -135,7 +135,7 @@ class TestRunnable2 extends DataflowMessagingRunnable {
         super(1);
     }
 
-    protected void doRun(Object[] arguments) {
+    protected void doRun(Object... arguments) {
         getOwningProcessor().bindOutput(2 * arguments[0])
     }
 }
@@ -146,7 +146,7 @@ class TestRunnable2WithIndex extends DataflowMessagingRunnable {
         super(2);
     }
 
-    protected void doRun(Object[] arguments) {
+    protected void doRun(Object... arguments) {
         getOwningProcessor().bindOutput([2 * arguments[0], arguments[1]])
     }
 }
