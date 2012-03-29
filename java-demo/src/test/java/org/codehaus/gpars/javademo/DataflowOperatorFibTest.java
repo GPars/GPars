@@ -51,10 +51,10 @@ public class DataflowOperatorFibTest {
             long counter = 0L;
 
             @Override
-            protected void doRun(final Object[] objects) {
+            protected void doRun(final Object... arguments) {
                 DataflowProcessor owner = getOwningProcessor();
-                BigInteger a = (BigInteger) objects[0];
-                BigInteger b = (BigInteger) objects[1];
+                BigInteger a = (BigInteger) arguments[0];
+                BigInteger b = (BigInteger) arguments[1];
                 counter++;
                 final BigInteger sum = a.add(b);
                 owner.bindOutput(1, sum);

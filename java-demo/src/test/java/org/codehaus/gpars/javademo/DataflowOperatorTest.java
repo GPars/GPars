@@ -48,9 +48,9 @@ public class DataflowOperatorTest {
         final List<DataflowQueue> calculationOutputList = asList(stream2);
         final DataflowProcessor processor1 = Dataflow.operator(calculationInputList, calculationOutputList, new DataflowMessagingRunnable(1) {
             @Override
-            protected void doRun(final Object[] objects) {
+            protected void doRun(final Object... arguments) {
                 // Passing calculated value to output stream
-                getOwningProcessor().bindOutput(2 * (Integer) objects[0]);
+                getOwningProcessor().bindOutput(2 * (Integer) arguments[0]);
             }
         });
 
@@ -65,8 +65,8 @@ public class DataflowOperatorTest {
         // processor2 reads value from stream2 and stream 2 and writes sum to stream 4
         final DataflowProcessor processor2 = Dataflow.operator(asList(stream2, stream3), asList(stream4), new DataflowMessagingRunnable(2) {
             @Override
-            protected void doRun(final Object[] objects) {
-                getOwningProcessor().bindOutput((Integer) objects[0] + (Integer) objects[1]);
+            protected void doRun(final Object... arguments) {
+                getOwningProcessor().bindOutput((Integer) arguments[0] + (Integer) arguments[1]);
             }
         });
 
