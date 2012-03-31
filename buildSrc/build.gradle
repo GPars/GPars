@@ -13,8 +13,8 @@ repositories {
 dependencies {
 	groovy localGroovy()
     compile gradleApi()
-    compile(grailsDocs) { transitive = false }
-    compile(xhtmlRenderer) { transitive = false }
-    compile(lowagieItext) { transitive = false }
-    compile(radeox) { transitive = false }
+    compile(ext.grailsDocs) { transitive = false }
+    compile(ext.xhtmlRenderer) { transitive = false }
+    compile(ext.lowagieItext) { transitive = false }
+    compile(ext.radeox) { transitive = false }
 }
