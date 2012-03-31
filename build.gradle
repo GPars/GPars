@@ -25,7 +25,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
 
-//apply plugin: 'code-quality'
+apply plugin: 'codenarc'
 
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -34,7 +34,6 @@ defaultTasks 'test'
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '1.0-SNAPSHOT'
-bundleVersion = version
 
 sourceCompatibility = 5
 targetCompatibility = 5
@@ -108,10 +107,10 @@ dependencies {
     docs 'org.yaml:snakeyaml:1.9'
     docs 'commons-lang:commons-lang:2.6'
     //
-    docs grailsDocs
-    docs radeox
-    docs lowagieItext
-    docs xhtmlRenderer
+    docs ext.grailsDocs
+    docs ext.radeox
+    docs ext.lowagieItext
+    docs ext.xhtmlRenderer
     docs 'commons-logging:commons-logging:1.1.1'
     deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.0"
     cover 'net.sourceforge.cobertura:cobertura:1.9.4.1'
@@ -151,11 +150,8 @@ task integrationTest(type: Test, dependsOn: 'test') {
 }
 
 // codenarc configuration
-codeNarcConfigFileName = "./config/codenarc/codenarc.groovy"
-task checkstyleMain(overwrite: true) << {}
-task checkstyleTest(overwrite: true) << {}
-// don't fail build on CodeNarc tasks
 tasks.withType(CodeNarc).all { codeNarcTask ->
+    codeNarcTask.configFile = file('./config/codenarc/codenarc.groovy')
     codeNarcTask.ignoreFailures = true
 }
 
@@ -165,7 +161,7 @@ if (!project.hasProperty('codehausUsername')) codehausUsername = ''
 if (!project.hasProperty('codehausPassword')) codehausPassword = ''
 
 uploadArchives {
-    project.deployer = repositories.mavenDeployer {
+    project.ext.deployer = repositories.mavenDeployer {
         uniqueVersion = false
         configuration = configurations.deployerJars
         repository(url: 'https://dav.codehaus.org/repository/gpars/') {
@@ -282,7 +278,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-8a'
+    gradleVersion = '1.0-milestone-9'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
@@ -351,7 +347,7 @@ idea {
         excludeDirs += file('java-demo') // A separate module of a pure-java gpars usage
     }
     project {
-        javaVersion = '1.6'
+        ext.javaVersion = '1.6'
         ipr {
             withXml { provider ->
                 def node = provider.asNode()
