@@ -43,7 +43,7 @@ class PdfGuide extends DefaultTask {
                     home: project.file('grails-doc').absolutePath,
                     tool: 'pdf/gpars'
             )
-        } catch (x) {
+        } catch (ignore) {
             // it's very likely that the stream is closed before
             // the renderer 'finishes' but it actually does
             // ignore for now

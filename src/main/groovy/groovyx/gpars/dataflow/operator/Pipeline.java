@@ -222,7 +222,7 @@ public final class Pipeline {
      * @param outputs The channels to send data to.
      * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
      */
-    public void separate(final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+    public void separate(final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         checkState();
         output.separate(group, outputs, code);
         complete = true;

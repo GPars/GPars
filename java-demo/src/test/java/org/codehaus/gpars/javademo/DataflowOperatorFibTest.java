@@ -52,9 +52,9 @@ public class DataflowOperatorFibTest {
 
             @Override
             protected void doRun(final Object... arguments) {
-                DataflowProcessor owner = getOwningProcessor();
-                BigInteger a = (BigInteger) arguments[0];
-                BigInteger b = (BigInteger) arguments[1];
+                final DataflowProcessor owner = getOwningProcessor();
+                final BigInteger a = (BigInteger) arguments[0];
+                final BigInteger b = (BigInteger) arguments[1];
                 counter++;
                 final BigInteger sum = a.add(b);
                 owner.bindOutput(1, sum);

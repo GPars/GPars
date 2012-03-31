@@ -69,7 +69,7 @@ public final class SyncDataflowQueue<T> extends DataflowQueue<T> {
     @Override
     public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
         final SyncDataflowQueue<V> result = new SyncDataflowQueue<V>();
-        final List<DataflowReadChannel<? extends Object>> inputs = new ArrayList<DataflowReadChannel<? extends Object>>();
+        final List<DataflowReadChannel<?>> inputs = new ArrayList<DataflowReadChannel<?>>();
         inputs.add(this);
         inputs.addAll(others);
         group.operator(inputs, asList(result), new ChainWithClosure(closure));

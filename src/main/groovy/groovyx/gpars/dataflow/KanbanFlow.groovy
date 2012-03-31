@@ -30,7 +30,6 @@ import groovyx.gpars.scheduler.ResizeablePool
  * resizeable pool of daemon threads, starting with the GPars default pool size. This can be overridden
  * by setting the <tt>pooledGroup</tt> property to a custom PGroup.
  * @see KanbanLink
- * @see groovyx.gpars.dataflow.KanbanFlowTest
  * @author Dierk Koenig
  */
 class KanbanFlow {

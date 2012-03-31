@@ -494,7 +494,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
         final DataflowQueue<V> result = new DataflowQueue<V>();
-        final List<DataflowReadChannel<? extends Object>> inputs = new ArrayList<DataflowReadChannel<? extends Object>>();
+        final List<DataflowReadChannel<?>> inputs = new ArrayList<DataflowReadChannel<?>>();
         inputs.add(this);
         inputs.addAll(others);
         group.operator(inputs, asList(result), new ChainWithClosure(closure));
@@ -532,17 +532,17 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     }
 
     @Override
-    public void separate(final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+    public void separate(final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         separate(Dataflow.retrieveCurrentDFPGroup(), outputs, code);
     }
 
     @Override
-    public void separate(final Pool pool, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+    public void separate(final Pool pool, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         separate(new DefaultPGroup(pool), outputs, code);
     }
 
     @Override
-    public void separate(final PGroup group, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+    public void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         group.operator(asList(this), outputs, new SeparationClosure(code));
     }
 

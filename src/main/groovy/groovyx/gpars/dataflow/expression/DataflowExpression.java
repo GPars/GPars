@@ -799,17 +799,17 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
-    public void separate(final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+    public void separate(final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         separate(Dataflow.retrieveCurrentDFPGroup(), outputs, code);
     }
 
     @Override
-    public void separate(final Pool pool, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+    public void separate(final Pool pool, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         separate(new DefaultPGroup(pool), outputs, code);
     }
 
     @Override
-    public void separate(final PGroup group, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code) {
+    public void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         group.operator(asList(this), outputs, new SeparationClosure(code));
     }
 

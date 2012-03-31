@@ -136,7 +136,7 @@ private final class LFExceptionTestActor extends BlockingActor {
     def void run() {
         try {
             super.run()
-        } catch (LFErrorTestException e) {
+        } catch (LFErrorTestException ignore) {
             flag3 = true
             latch.countDown()
         }
