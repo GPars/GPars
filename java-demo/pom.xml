@@ -61,8 +61,8 @@
 <!--Optional dependencies-->
         <!--<dependency>-->
             <!--<groupId>org.multiverse</groupId>-->
-            <!--<artifactId>multiverse-core</artifactId>-->
-            <!--<version>0.7.0</version>-->
+            <!--<artifactId>multiverse-beta</artifactId>-->
+            <!--<version>0.7-RC-1</version>-->
         <!--</dependency>-->
 
         <!--<dependency>-->
