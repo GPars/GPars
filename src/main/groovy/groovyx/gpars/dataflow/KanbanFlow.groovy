@@ -16,9 +16,9 @@
 
 package groovyx.gpars.dataflow
 
+import groovyx.gpars.GParsConfig
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
-import groovyx.gpars.scheduler.ResizeablePool
 
 /**
  * A KanbanFlow is a network of dataflow connections made up from {@link KanbanLink}s.
@@ -40,7 +40,7 @@ class KanbanFlow {
     boolean cycleAllowed = false
 
     /** If adapted, this must be set before calling start()   */
-    PGroup pooledGroup = new DefaultPGroup(new ResizeablePool( /*isDaemon*/ true)) // default pool size
+    PGroup pooledGroup = new DefaultPGroup(GParsConfig.retrieveDefaultPool()) // default pool size
 
     /**
      * First part of the sequence <code>link producer to consumer</code>.
@@ -69,7 +69,7 @@ class KanbanFlow {
     }
 
     /** Stop all {@link KanbanLink}s of this flow. **/
-    void stop()  { links*.stop() } // note dk: needs investigation, maybe do it in reverse
+    void stop() { links*.stop() } // note dk: needs investigation, maybe do it in reverse
 
     /** Helper method that inverses the sequence of Closure parameters.  **/
     static Closure inverse(Closure body) {

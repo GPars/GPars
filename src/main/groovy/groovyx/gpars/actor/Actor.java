@@ -19,6 +19,7 @@ import groovy.lang.Closure;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaMethod;
 import groovy.time.BaseDuration;
+import groovyx.gpars.GParsConfig;
 import groovyx.gpars.MessagingRunnable;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
@@ -85,7 +86,7 @@ public abstract class Actor extends MessageStream {
     /**
      * Timer holding timeouts for react methods
      */
-    protected static final Timer timer = new Timer("GPars Actor Timer", true);
+    protected static final Timer timer = GParsConfig.retrieveTimerFactory().createTimer("GPars Actor Timer", true);
 
     protected Actor() {
         this(new DataflowVariable<Object>());

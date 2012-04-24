@@ -67,7 +67,7 @@ public class GParsPoolUtil {
     /**
      * Allows timeouts for async operations
      */
-    private static final Timer timer = new Timer("GParsTimeoutTimer", true);
+    private static final Timer timer = GParsConfig.retrieveTimerFactory().createTimer("GParsTimeoutTimer", true);
 
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = (ForkJoinPool) GParsPool.retrieveCurrentPool();
