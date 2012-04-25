@@ -30,6 +30,7 @@ import groovyx.gpars.pa.ClosureReducer;
 import groovyx.gpars.pa.GParsPoolUtilHelper;
 import groovyx.gpars.pa.PAWrapper;
 import groovyx.gpars.pa.SumClosure;
+import groovyx.gpars.util.GeneralTimer;
 import groovyx.gpars.util.PAUtils;
 import jsr166y.ForkJoinPool;
 import jsr166y.RecursiveTask;
@@ -39,7 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -67,7 +67,7 @@ public class GParsPoolUtil {
     /**
      * Allows timeouts for async operations
      */
-    private static final Timer timer = GParsConfig.retrieveTimerFactory().createTimer("GParsTimeoutTimer", true);
+    private static final GeneralTimer timer = GParsConfig.retrieveDefaultTimer("GParsTimeoutTimer", true);
 
     private static ForkJoinPool retrievePool() {
         final ForkJoinPool pool = (ForkJoinPool) GParsPool.retrieveCurrentPool();

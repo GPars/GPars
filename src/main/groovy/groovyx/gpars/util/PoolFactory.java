@@ -16,11 +16,19 @@
 
 package groovyx.gpars.util;
 
+import groovyx.gpars.scheduler.Pool;
+
 /**
- * Allows customized timers to be created in managed environments such as GAE
+ * Used to create thread pools in hosted environment
  *
  * @author Vaclav Pech
  */
-public interface TimerFactory {
-    GeneralTimer createTimer(final String name, final boolean daemon);
+public interface PoolFactory {
+    Pool createPool();
+
+    Pool createPool(boolean daemon);
+
+    Pool createPool(int numberOfThreads);
+
+    Pool createPool(boolean daemon, int numberOfThreads);
 }

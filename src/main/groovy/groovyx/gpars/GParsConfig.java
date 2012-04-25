@@ -18,9 +18,12 @@ package groovyx.gpars;
 
 import groovyx.gpars.scheduler.Pool;
 import groovyx.gpars.scheduler.ResizeablePool;
+import groovyx.gpars.util.GeneralTimer;
+import groovyx.gpars.util.PoolFactory;
 import groovyx.gpars.util.TimerFactory;
 
 import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Enables to specify custom thread pools and timers to run GPars in hosted environments, such as GAE
@@ -28,16 +31,26 @@ import java.util.Timer;
  * @author Vaclav Pech
  */
 public final class GParsConfig {
-    private static volatile Pool defaultPool;
+    private static volatile PoolFactory poolFactory;
     private static volatile TimerFactory timerFactory;
 
-    public static void setDefaultPool(final Pool pool) {
+    public static void setPoolFactory(final PoolFactory pool) {
         if (pool == null) throw new IllegalArgumentException("The default pool must not be null");
-        defaultPool = pool;
+        poolFactory = pool;
     }
 
+    public static PoolFactory getPoolFactory() {
+        return poolFactory;
+    }
+
+    /**
+     * If a pool factory has been set, it will be used to create a new thread pool.
+     * Otherwise a new instance of ResizeablePool will be returned.
+     *
+     * @return A thread pool instance to use for default parallel groups (actors, dataflow)
+     */
     public static Pool retrieveDefaultPool() {
-        if (defaultPool != null) return defaultPool;
+        if (poolFactory != null) return poolFactory.createPool();
         return new ResizeablePool(true, 1);
     }
 
@@ -46,12 +59,18 @@ public final class GParsConfig {
         GParsConfig.timerFactory = timerFactory;
     }
 
-    public static TimerFactory retrieveTimerFactory() {
-        if (timerFactory != null) return timerFactory;
-        return new TimerFactory() {
+    public static TimerFactory getTimerFactory() {
+        return timerFactory;
+    }
+
+    public static GeneralTimer retrieveDefaultTimer(final String name, final boolean daemon) {
+        if (timerFactory != null) return timerFactory.createTimer(name, daemon);
+        return new GeneralTimer() {
+            private final Timer timer = new Timer(name, daemon);
+
             @Override
-            public Timer createTimer(final String name, final boolean daemon) {
-                return new Timer(name, daemon);
+            public void schedule(final TimerTask task, final long timeout) {
+                timer.schedule(task, timeout);
             }
         };
     }

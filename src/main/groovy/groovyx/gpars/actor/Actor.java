@@ -36,13 +36,13 @@ import groovyx.gpars.serial.SerialContext;
 import groovyx.gpars.serial.SerialHandle;
 import groovyx.gpars.serial.SerialMsg;
 import groovyx.gpars.serial.WithSerialId;
+import groovyx.gpars.util.GeneralTimer;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,7 +86,7 @@ public abstract class Actor extends MessageStream {
     /**
      * Timer holding timeouts for react methods
      */
-    protected static final Timer timer = GParsConfig.retrieveTimerFactory().createTimer("GPars Actor Timer", true);
+    protected static final GeneralTimer timer = GParsConfig.retrieveDefaultTimer("GPars Actor Timer", true);
 
     protected Actor() {
         this(new DataflowVariable<Object>());

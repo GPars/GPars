@@ -17,33 +17,102 @@
 package groovyx.gpars.util
 
 import groovyx.gpars.GParsConfig
-import groovyx.gpars.GParsExecutorsPoolUtil
-import groovyx.gpars.GParsPoolUtil
-import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.Actors
-import groovyx.gpars.dataflow.Dataflow
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.NonDaemonPGroup
+import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.scheduler.ResizeablePool
 import spock.lang.Specification
 
 class GParsConfigTest extends Specification {
-    def "default pool should be used"() {
+    def "without initialization the config values are empty"() {
+        expect:
+        GParsConfig.poolFactory == null
+        GParsConfig.retrieveDefaultPool() != null
+        GParsConfig.timerFactory == null
+    }
+
+    def "default pool should be used for default parallel groups"() {
         given:
         final myPool = new ResizeablePool(true)
 
+        def factory = new PoolFactory() {
+            @Override
+            Pool createPool() {
+                return myPool
+            }
+
+            @Override
+            Pool createPool(final boolean daemon) {
+                return myPool
+            }
+
+            @Override
+            Pool createPool(final int numberOfThreads) {
+                return myPool
+            }
+
+            @Override
+            Pool createPool(final boolean daemon, final int numberOfThreads) {
+                return myPool
+            }
+        }
         when:
-        GParsConfig.defaultPool = myPool
+        GParsConfig.poolFactory = factory
 
         then:
-        Actors.defaultActorPGroup.threadPool.is(myPool)
-        Dataflow.DATA_FLOW_GROUP.threadPool.is(myPool)
+        GParsConfig.retrieveDefaultPool().is(myPool)
+        GParsConfig.poolFactory.is(factory)
     }
 
-    def "default timer factory should be used"() {
+    def "default pool should be used in parallel groups"() {
         given:
-        final myTimer = new Timer()
+        final myPool = new ResizeablePool(true)
+
+        def factory = new PoolFactory() {
+            @Override
+            Pool createPool() {
+                return myPool
+            }
+
+            @Override
+            Pool createPool(final boolean daemon) {
+                return myPool
+            }
+
+            @Override
+            Pool createPool(final int numberOfThreads) {
+                return myPool
+            }
+
+            @Override
+            Pool createPool(final boolean daemon, final int numberOfThreads) {
+                return myPool
+            }
+        }
+        when:
+        GParsConfig.poolFactory = factory
+        def group1 = new DefaultPGroup()
+        def group2 = new DefaultPGroup(10)
+        def group3 = new NonDaemonPGroup()
+        def group4 = new NonDaemonPGroup(10)
+
+        then:
+        group1.threadPool.is(myPool)
+        group2.threadPool.is(myPool)
+        group3.threadPool.is(myPool)
+        group4.threadPool.is(myPool)
+    }
+
+    def "default timer factory should be retrieved"() {
+        given:
+        final myTimer = new GeneralTimer() {
+            @Override
+            void schedule(final TimerTask task, final long timeout) { }
+        }
+
         final myTimerFactory = new TimerFactory() {
             @Override
-            Timer createTimer(final String name, final boolean daemon) {
+            GeneralTimer createTimer(final String name, final boolean daemon) {
                 return myTimer
             }
         }
@@ -52,9 +121,6 @@ class GParsConfigTest extends Specification {
         GParsConfig.timerFactory = myTimerFactory
 
         then:
-        Actor.timer.is(myTimer)
-        GParsExecutorsPoolUtil.timer.is(myTimer)
-        GParsPoolUtil.timer.is(myTimer)
+        GParsConfig.retrieveDefaultTimer("", true).is(myTimer)
     }
-
 }

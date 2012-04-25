@@ -19,6 +19,7 @@ package groovyx.gpars
 import groovy.time.Duration
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.util.GeneralTimer
 import groovyx.gpars.util.PAUtils
 
 import java.util.concurrent.Callable
@@ -49,7 +50,7 @@ public class GParsExecutorsPoolUtil {
     /**
      * Allows timeouts for async operations
      */
-    private static final Timer timer = GParsConfig.retrieveTimerFactory().createTimer('GParsExecutorsTimeoutTimer', true)
+    private static final GeneralTimer timer = GParsConfig.retrieveDefaultTimer('GParsExecutorsTimeoutTimer', true)
 
     /**
      * schedules the supplied closure for processing in the underlying thread pool.

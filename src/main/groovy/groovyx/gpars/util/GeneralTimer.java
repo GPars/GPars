@@ -16,11 +16,11 @@
 
 package groovyx.gpars.util;
 
+import java.util.TimerTask;
+
 /**
- * Allows customized timers to be created in managed environments such as GAE
- *
- * @author Vaclav Pech
+ * Represents timers, either java.util.Timer or timers provided by the hosting environment, such as GAE
  */
-public interface TimerFactory {
-    GeneralTimer createTimer(final String name, final boolean daemon);
+public interface GeneralTimer {
+    void schedule(TimerTask task, long timeout);
 }
