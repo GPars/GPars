@@ -14,12 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.actorComparison
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.StaticDispatchActor
+import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -32,7 +33,7 @@ final def concurrencyLevel = 8
     final def channels = new Actor[10000]
 
     for (int i = 0; i < 10000; i++) {
-        final def channel = new StaticHandlerWithArray(channels, i, cdl)
+        final def channel = new HandlerWithArray(channels, i, cdl)
         channel.parallelGroup = group
         channels[i] = channel
         channel.silentStart()
@@ -52,20 +53,20 @@ final def concurrencyLevel = 8
     println(t2 - t1)
 }
 
-final class StaticHandlerWithArray extends StaticDispatchActor<Object> {
+final class HandlerWithArray extends DynamicDispatchActor {
 
     final def channels
     private final def index
     private final def cdl
 
-    def StaticHandlerWithArray(final def channels, final def index, final def cdl) {
+    def HandlerWithArray(final def channels, final def index, final def cdl) {
         this.channels = channels
         this.index = index
         this.cdl = cdl
 //        makeFair()
     }
 
-    void onMessage(final Object msg) {
+    def onMessage(final def msg) {
         if (index < channels.length - 1) channels[index + 1].send(msg)
         cdl.countDown()
     }
