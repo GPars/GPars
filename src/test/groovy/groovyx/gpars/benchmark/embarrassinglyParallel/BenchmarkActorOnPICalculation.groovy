@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark.obsolete
+package groovyx.gpars.benchmark.embarrassinglyParallel
 
+import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 
 def execute(int actorCount) {
@@ -23,11 +24,13 @@ def execute(int actorCount) {
     final double delta = 1.0d / n
     final long sliceSize = n / actorCount
     final long startTimeNanos = System.nanoTime()
-    final List computors = []
+    final List computors = [].asSynchronized()
     final group = new DefaultPGroup(actorCount) // Interesting (!) behaviour with the +1 missing.
+    def startAccumulator = new DataflowVariable<Boolean>()
     final accumulator = group.actor {
         double sum = 0.0d
         int counter = 0
+        startAccumulator.val
         loop {
             if (counter < computors.size()) {
                 counter++
@@ -58,6 +61,7 @@ def execute(int actorCount) {
         )
 
     }
+    startAccumulator.bind(true)
     accumulator.join()
 }
 
@@ -65,7 +69,7 @@ execute(1)
 println()
 execute(2)
 println()
-execute(3)
+execute(4)
 println()
 execute(8)
 println()

@@ -14,34 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples.benchmarks
+package groovyx.gpars.benchmark.actorComparison
 
-import groovyx.gpars.dataflow.DataflowQueue
-import static groovyx.gpars.dataflow.Dataflow.operator
+import groovyx.gpars.agent.Agent
 
-final DataflowQueue a = new DataflowQueue()
-final DataflowQueue b = new DataflowQueue()
-final DataflowQueue c = new DataflowQueue()
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-def operator = operator([inputs: [a, b], outputs: [c]]) {x, y ->
-    bindOutput(x + y)
+/**
+ * @author Vaclav Pech
+ * Date: 13.4.2010
+ */
+
+final ExecutorService pool = Executors.newFixedThreadPool(10)
+
+final long t1 = System.currentTimeMillis()
+final Agent agent = new Agent<Long>(0L)
+300.times {
+    1000.times {
+        pool.submit {agent << {updateValue(it + 1)}}
+    }
+    agent.await()
 }
-final int iterations = 1000000
-
-def t1 = System.currentTimeMillis()
-iterations.times {
-    a << it
-    b << it
-}
-
-iterations.times {
-    c.val
-}
-
-def t2 = System.currentTimeMillis()
-
-//operator.stop()
-
-println t2 - t1
-
-System.exit(0)
+final long t2 = System.currentTimeMillis()
+println "Result: ${agent.val}"
+println "Time: ${t2 - t1}"
+pool.shutdown()

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import groovyx.gpars.actor.DynamicDispatchActor
 /**
  * @author Jiri Mares, Vaclav Pech
  */
-abstract class StatefulDynamicDispatchActor extends DynamicDispatchActor {
+abstract class PipelineDynamicDispatchActor extends DynamicDispatchActor {
     Actor follower
 
     abstract String handleMessage(String message)
@@ -37,26 +37,31 @@ abstract class StatefulDynamicDispatchActor extends DynamicDispatchActor {
     }
 
 }
-final class DownloadStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
+final class DownloadPipelineDynamicDispatchActor extends groovyx.gpars.benchmark.akka.PipelineDynamicDispatchActor {
     String handleMessage(String message) {
         message.replaceFirst('Requested ', 'Downloaded ')
     }
 }
 
-final class IndexStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
+final class IndexPipelineDynamicDispatchActor extends groovyx.gpars.benchmark.akka.PipelineDynamicDispatchActor {
     String handleMessage(String message) {
         message.replaceFirst('Downloaded ', 'Indexed ')
     }
 }
 
-final class WriteStatefulDynamicDispatchActor extends StatefulDynamicDispatchActor {
+final class WritePipelineDynamicDispatchActor extends groovyx.gpars.benchmark.akka.PipelineDynamicDispatchActor {
     String handleMessage(String message) {
         message.replaceFirst('Indexed ', 'Wrote ')
     }
 }
 
 new PipelineBenchmark(
-        writer: new WriteStatefulDynamicDispatchActor(),
-        indexer: new IndexStatefulDynamicDispatchActor(),
-        downloader: new DownloadStatefulDynamicDispatchActor()
+        writer: new WritePipelineDynamicDispatchActor(),
+        indexer: new IndexPipelineDynamicDispatchActor(),
+        downloader: new DownloadPipelineDynamicDispatchActor()
+).warmup()
+println new PipelineBenchmark(
+        writer: new WritePipelineDynamicDispatchActor(),
+        indexer: new IndexPipelineDynamicDispatchActor(),
+        downloader: new DownloadPipelineDynamicDispatchActor()
 ).run()

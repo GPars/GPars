@@ -14,35 +14,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.actorComparison
 
-import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.actor.Actors
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
 
-final def concurrencyLevel = 8
+def t1 = System.nanoTime()
+
+final def concurrencyLevel = 10
+final def numOfActors = 100
+final def iterations = 1000
 group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
-final DataflowQueue queue = new DataflowQueue()
-
-(1..2000000).each {
-    queue << it
+def createReactor(final code) {
+    group.reactor code
+//    group.fairReactor code
 }
-queue << -1
 
-final def t1 = System.currentTimeMillis()
+def reactors = (1..numOfActors).collect {
+    createReactor { it }
+}
 
-long sum = 0
-def op = group.selector([queue], []) {
-    if (it == -1) {
-        println sum
-        terminate()
-    } else {
-        sum += it
+def controller = Actors.reactor {
+    def sum = 0L
+
+    iterations.times {
+        for (reactor in reactors) {
+            sum += reactor.sendAndWait(1)
+        }
     }
+
+    terminate()
+    println "Done $sum"
 }
 
-op.join()
+controller 'Start'
+controller.join()
 group.shutdown()
-final def t2 = System.currentTimeMillis()
-println(t2 - t1)
+
+def t2 = System.nanoTime()
+println((t2 - t1) / 1000000)

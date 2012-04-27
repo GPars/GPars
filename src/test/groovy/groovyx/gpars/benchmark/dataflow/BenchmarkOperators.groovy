@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,44 +14,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.dataflow
 
-import groovyx.gpars.actor.Actors
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
 
-def t1 = System.nanoTime()
-
-final def concurrencyLevel = 10
-final def numOfActors = 100
-final def iterations = 1000
+final def concurrencyLevel = 8
 group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
-def createReactor(final code) {
-    group.reactor code
-//    group.fairReactor code
+final DataflowQueue queue = new DataflowQueue()
+(1..2000000).each {
+    queue << it
 }
+queue << -1
 
-def reactors = (1..numOfActors).collect {
-    createReactor { it }
-}
+final def t1 = System.currentTimeMillis()
 
-def controller = Actors.reactor {
-    def sum = 0L
-
-    iterations.times {
-        for (reactor in reactors) {
-            sum += reactor.sendAndWait(1)
-        }
+long sum = 0
+def op = group.operator([queue], []) {
+    if (it == -1) {
+        println sum
+        terminate()
+    } else {
+        sum += it
     }
-
-    terminate()
-    println "Done $sum"
 }
 
-controller 'Start'
-controller.join()
+op.join()
 group.shutdown()
-
-def t2 = System.nanoTime()
-println((t2 - t1) / 1000000)
+final def t2 = System.currentTimeMillis()
+println(t2 - t1)

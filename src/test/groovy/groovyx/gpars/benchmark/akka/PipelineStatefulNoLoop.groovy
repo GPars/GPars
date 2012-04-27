@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ package groovyx.gpars.benchmark.akka
  * @author Jiri Mares, Vaclav Pech
  */
 abstract class PipelineHandler {
-    abstract String handleMessage(String message)
-
-    ;
+    abstract String handleMessage(String message);
 
     void handle(actor, follower) {
         actor.react {message ->
@@ -56,21 +54,30 @@ class WriteHandler extends PipelineHandler {
     }
 }
 
-def benchmark = new PipelineBenchmark()
-def pgroup = benchmark.create()
+perform()  //warmup
+println perform()
 
-benchmark.downloader = pgroup.actor {
-    new DownloadHandler().handle(delegate,
-            benchmark.indexer = pgroup.actor {
-                new IndexHandler().handle(delegate,
-                        benchmark.writer = pgroup.actor {
-                            new WriteHandler().handle(delegate,
-                                    null)
-                        })
-            })
+private long perform() {
+    def benchmark = new PipelineBenchmark()
+    def pgroup = benchmark.create()
+
+    benchmark.downloader = pgroup.actor {
+        new DownloadHandler().handle(delegate,
+                benchmark.indexer = pgroup.actor {
+                    new IndexHandler().handle(delegate,
+                            benchmark.writer = pgroup.actor {
+                                new WriteHandler().handle(delegate,
+                                        null)
+                            })
+                })
+    }
+
+    benchmark.prepare(pgroup, false)
+    final result = benchmark.benchmark()
+    benchmark.shutdown(pgroup)
+    result
 }
 
-benchmark.prepare(pgroup, false)
-benchmark.benchmark()
-benchmark.shutdown(pgroup)
+
+
 
