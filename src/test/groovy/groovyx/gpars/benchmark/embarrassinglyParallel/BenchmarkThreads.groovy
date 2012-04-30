@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark.obsolete
+package groovyx.gpars.benchmark.embarrassinglyParallel
 
 import java.util.concurrent.ArrayBlockingQueue
 
@@ -59,7 +59,7 @@ execute(1)
 println()
 execute(2)
 println()
-execute(3)
+execute(4)
 println()
 execute(8)
 println()

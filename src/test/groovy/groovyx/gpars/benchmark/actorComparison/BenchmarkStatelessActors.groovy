@@ -14,34 +14,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.actorComparison
 
-import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
+
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 final def concurrencyLevel = 8
 group = new DefaultPGroup(new FJPool(concurrencyLevel))
 
-final DataflowQueue queue = new DataflowQueue()
-(1..2000000).each {
-    queue << it
-}
-queue << -1
-
 final def t1 = System.currentTimeMillis()
+final def cdl = new CountDownLatch(10000 * 500)
+def last = null
 
-long sum = 0
-def op = group.operator([queue], []) {
-    if (it == -1) {
-        println sum
-        terminate()
-    } else {
-        sum += it
-    }
+for (int i = 0; i < 10000; i++) {
+    final def channel = new Handler(last, cdl)
+    channel.parallelGroup = group
+    last = channel
+    channel.silentStart()
 }
 
-op.join()
+for (int i = 0; i < 500; i++) {
+    last.send("Hi")
+}
+
+cdl.await(1000, TimeUnit.SECONDS)
+
 group.shutdown()
 final def t2 = System.currentTimeMillis()
 println(t2 - t1)
+
+final class Handler extends DynamicDispatchActor {
+
+    private final def soFarLast
+    private final def cdl
+
+    def Handler(final def soFarLast, final def cdl) {
+        this.soFarLast = soFarLast
+        this.cdl = cdl
+//        makeFair()
+    }
+
+    def onMessage(final def msg) {
+        soFarLast?.send(msg)
+        cdl.countDown()
+    }
+}

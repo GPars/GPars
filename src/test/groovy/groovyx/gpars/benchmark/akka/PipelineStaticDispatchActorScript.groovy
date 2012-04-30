@@ -17,58 +17,49 @@
 package groovyx.gpars.benchmark.akka
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.actor.DefaultActor
+import groovyx.gpars.actor.StaticDispatchActor
 
 /**
- * @author Jiri Mares, Vaclav Pech
+ * @author Vaclav Pech
  */
-abstract class StatefulActor extends DefaultActor {
+abstract class PipelineStaticDispatchActor extends StaticDispatchActor {
     Actor follower
 
-    abstract String handleMessage(String message);
+    abstract String handleMessage(String message)
 
-    void act() {
-        loop {
-            react { message ->
-                switch (message) {
-                    case String:
-                        follower?.send(handleMessage(message))
-                        break
-                    case StopMessage.instance:
-                        follower?.send(message)
-                        terminate()
-                }
-            }
-        }
+    void onMessage(Object message) {
+        if (message.is(StopMessage.instance)) {
+            follower?.send(message)
+            terminate()
+        } else follower?.send(handleMessage(message))
     }
 }
 
-final class DownloadStatefulActor extends StatefulActor {
+final class DownloadPipelineStaticDispatchActor extends groovyx.gpars.benchmark.akka.PipelineStaticDispatchActor {
     String handleMessage(String message) {
         message.replaceFirst('Requested ', 'Downloaded ')
     }
 }
 
-final class IndexStatefulActor extends StatefulActor {
+final class IndexPipelineStaticDispatchActor extends groovyx.gpars.benchmark.akka.PipelineStaticDispatchActor {
     String handleMessage(String message) {
         message.replaceFirst('Downloaded ', 'Indexed ')
     }
 }
 
-final class WriteStatefulActor extends StatefulActor {
+final class WritePipelineStaticDispatchActor extends groovyx.gpars.benchmark.akka.PipelineStaticDispatchActor {
     String handleMessage(String message) {
         message.replaceFirst('Indexed ', 'Wrote ')
     }
 }
 
 new PipelineBenchmark(
-        writer: new WriteStatefulActor(),
-        indexer: new IndexStatefulActor(),
-        downloader: new DownloadStatefulActor()
+        writer: new WritePipelineStaticDispatchActor(),
+        indexer: new IndexPipelineStaticDispatchActor(),
+        downloader: new DownloadPipelineStaticDispatchActor()
 ).warmup()
 println new PipelineBenchmark(
-        writer: new WriteStatefulActor(),
-        indexer: new IndexStatefulActor(),
-        downloader: new DownloadStatefulActor()
+        writer: new WritePipelineStaticDispatchActor(),
+        indexer: new IndexPipelineStaticDispatchActor(),
+        downloader: new DownloadPipelineStaticDispatchActor()
 ).run()
-

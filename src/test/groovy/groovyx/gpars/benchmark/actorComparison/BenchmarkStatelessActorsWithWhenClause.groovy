@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,36 +14,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.actorComparison
 
 import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.FJPool
+import groovyx.gpars.scheduler.DefaultPool
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+final def concurrencyLevel = 20
+group = new DefaultPGroup(new DefaultPool(false, concurrencyLevel))
+
 final def t1 = System.currentTimeMillis()
-
-final def concurrencyLevel = 8
-group = new DefaultPGroup(new FJPool(concurrencyLevel))
-
 final def cdl = new CountDownLatch(10000 * 500)
 def last = null
 
-for (int i = 0; i < 10000; i++) {
-    final def soFarLast = last
-    def channel = group.actor {
-        loop {
-            react {
-                soFarLast?.send(it)
-                cdl.countDown()
-            }
+int i = 0
+while (i < 10000) {
+    def soFarLast = last
+    def channel = group.messageHandler {
+        when {def msg ->
+            soFarLast?.send(msg)
+            cdl.countDown()
         }
     }
     last = channel
+    i += 1
 }
 
-for (int i = 0; i < 500; i++) {
+i = 0
+while (i < 500) {
     last.send("Hi")
+    i += 1
 }
 
 cdl.await(1000, TimeUnit.SECONDS)

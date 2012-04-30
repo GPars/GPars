@@ -14,11 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark
+package groovyx.gpars.benchmark.actorComparison
 
 import groovyx.gpars.agent.Agent
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
