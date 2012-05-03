@@ -62,6 +62,11 @@ class GParsConfigTest extends Specification {
         then:
         GParsConfig.retrieveDefaultPool().is(myPool)
         GParsConfig.poolFactory.is(factory)
+
+        cleanup:
+        GParsConfig.poolFactoryFlag = false
+        GParsConfig.poolFactory = null
+        GParsConfig.poolFactoryFlag = false
     }
 
     def "default pool should be used in parallel groups"() {
@@ -103,7 +108,9 @@ class GParsConfigTest extends Specification {
         group4.threadPool.is(myPool)
 
         cleanup:
+        GParsConfig.poolFactoryFlag = false
         GParsConfig.poolFactory = null
+        GParsConfig.poolFactoryFlag = false
     }
 
     def "default timer factory should be retrieved"() {
@@ -127,6 +134,8 @@ class GParsConfigTest extends Specification {
         GParsConfig.retrieveDefaultTimer("", true).is(myTimer)
 
         cleanup:
+        GParsConfig.timerFactoryFlag = false
         GParsConfig.timerFactory = null
+        GParsConfig.timerFactoryFlag = false
     }
 }
