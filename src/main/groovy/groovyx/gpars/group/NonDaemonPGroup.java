@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-11  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package groovyx.gpars.group;
 
+import groovyx.gpars.GParsConfig;
 import groovyx.gpars.scheduler.DefaultPool;
 
 /**
@@ -35,7 +36,7 @@ public final class NonDaemonPGroup extends PGroup {
      * Creates a group for actors, agents, tasks and operators. The actors will share a common non-daemon thread pool.
      */
     public NonDaemonPGroup() {
-        super(new DefaultPool(false));
+        super(GParsConfig.getPoolFactory() == null ? new DefaultPool(false) : GParsConfig.getPoolFactory().createPool(false));
     }
 
     /**
@@ -44,6 +45,6 @@ public final class NonDaemonPGroup extends PGroup {
      * @param poolSize The initial size of the underlying thread pool
      */
     public NonDaemonPGroup(final int poolSize) {
-        super(new DefaultPool(false, poolSize));
+        super(GParsConfig.getPoolFactory() == null ? new DefaultPool(false, poolSize) : GParsConfig.getPoolFactory().createPool(false, poolSize));
     }
 }

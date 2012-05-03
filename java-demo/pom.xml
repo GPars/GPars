@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.8.4</version>
+            <version>1.8.6</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jsr166-mirror</groupId>
@@ -57,6 +57,31 @@
             <artifactId>extra166y</artifactId>
             <version>1.7.0</version>
         </dependency>
+
+<!--Optional dependencies-->
+        <!--<dependency>-->
+            <!--<groupId>org.multiverse</groupId>-->
+            <!--<artifactId>multiverse-beta</artifactId>-->
+            <!--<version>0.7-RC-1</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>org.jboss.netty</groupId>-->
+            <!--<artifactId>netty</artifactId>-->
+            <!--<version>3.2.7.Final</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>org.spockframework</groupId>-->
+            <!--<artifactId>spock-core</artifactId>-->
+            <!--<version>0.6-groovy-1.8</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>org.codehaus.jcsp</groupId>-->
+            <!--<artifactId>jcsp</artifactId>-->
+            <!--<version>1.1-rc5</version>-->
+        <!--</dependency>-->
 
     </dependencies>
     <build>

@@ -24,30 +24,28 @@
 package groovyx.gpars.samples.collections
 
 import extra166y.Ops
-import extra166y.Ops.Predicate
-import extra166y.Ops.Reducer
 
 groovyx.gpars.GParsPool.withPool {
-    assert 15 == [1, 2, 3, 4, 5].parallelArray.reduce({a, b -> a + b} as Reducer, 0)                                        //summarize
-    assert 55 == [1, 2, 3, 4, 5].parallelArray.withMapping({it ** 2} as Ops.Op).reduce({a, b -> a + b} as Reducer, 0)       //summarize squares
-    assert 20 == [1, 2, 3, 4, 5].parallelArray.withFilter({it % 2 == 0} as Predicate)                                       //summarize squares of even numbers
-            .withMapping({it ** 2} as Ops.Op).reduce({a, b -> a + b} as Reducer, 0)
+    assert 15 == [1, 2, 3, 4, 5].parallelArray.reduce({a, b -> a + b} as Ops.Reducer, 0)                                        //summarize
+    assert 55 == [1, 2, 3, 4, 5].parallelArray.withMapping({it ** 2} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, 0)       //summarize squares
+    assert 20 == [1, 2, 3, 4, 5].parallelArray.withFilter({it % 2 == 0} as Ops.Predicate)                                       //summarize squares of even numbers
+            .withMapping({it ** 2} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, 0)
 
     assert 20 == (1..5).parallelArray                                                                                       //summarize squares of even numbers using sum
-            .withFilter({it % 2 == 0} as Predicate).withMapping({it ** 2} as Ops.Op).reduce({a, b -> a + b} as Reducer, 0)
+            .withFilter({it % 2 == 0} as Ops.Predicate).withMapping({it ** 2} as Ops.Op).reduce({a, b -> a + b} as Ops.Reducer, 0)
 
     def n = 10
-    println((1..n).parallelArray.reduce({a, b -> a * b} as Reducer, 0))
+    println((1..n).parallelArray.reduce({a, b -> a * b} as Ops.Reducer, 0))
 
     final def bitSizes = [4, 6, 8, 1, 4, 2, 4, 5, 7, 6, 7, 3, 2, 4, 5, 6, 7, 2, 1, 2]
     assert 256 == bitSizes.parallelArray.withMapping({2 ** it} as Ops.Op).max()                                             //find max value range
 
 
-    assert 'abc' == 'abc'.parallelArray.reduce({a, b -> a + b} as Reducer, "")                                              //concatenate
+    assert 'abc' == 'abc'.parallelArray.reduce({a, b -> a + b} as Ops.Reducer, "")                                              //concatenate
     assert 'aa:bb:cc:dd:ee' == 'abcde'.parallelArray                                                                        //concatenate duplicated characters with separator
-            .withMapping({it * 2} as Ops.Op).reduce({a, b -> "$a:$b"} as Reducer, "")
+            .withMapping({it * 2} as Ops.Op).reduce({a, b -> "$a:$b"} as Ops.Reducer, "")
     //filter out some elements
-    assert 'aa-bb-dd' == 'abcde'.parallelArray.withFilter({it != 'e'} as Predicate).withMapping({it * 2} as Ops.Op).all().withFilter({it != 'cc'} as Predicate).all().reduce({a, b -> "$a-$b"} as Reducer, null)
+    assert 'aa-bb-dd' == 'abcde'.parallelArray.withFilter({it != 'e'} as Ops.Predicate).withMapping({it * 2} as Ops.Op).all().withFilter({it != 'cc'} as Ops.Predicate).all().reduce({a, b -> "$a-$b"} as Ops.Reducer, null)
 }
 
 

@@ -166,7 +166,7 @@ public class DDALifeCycleTest extends GroovyTestCase {
         final Actor actor = group.messageHandler {
             when {message ->
                 barrier.await()
-                Thread.sleep 30000
+                Thread.sleep 90000
                 counter.set 10
                 10
             }

@@ -19,7 +19,9 @@ package groovyx.gpars
 import groovy.time.Duration
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.util.GeneralTimer
 import groovyx.gpars.util.PAUtils
+
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -28,6 +30,7 @@ import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
 import static groovyx.gpars.util.PAUtils.buildClosureForMaps
 import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
@@ -47,7 +50,7 @@ public class GParsExecutorsPoolUtil {
     /**
      * Allows timeouts for async operations
      */
-    private static final Timer timer = new Timer('GParsExecutorsTimeoutTimer', true)
+    private static final GeneralTimer timer = GParsConfig.retrieveDefaultTimer('GParsExecutorsTimeoutTimer', true)
 
     /**
      * schedules the supplied closure for processing in the underlying thread pool.

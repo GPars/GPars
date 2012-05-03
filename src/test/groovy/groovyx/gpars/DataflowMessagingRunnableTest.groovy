@@ -27,17 +27,17 @@ class DataflowMessagingRunnableTest extends GroovyTestCase {
         }
         runnable.call(5)
         assert df[5] == 5
-        runnable.call([6] as Object[])
+        runnable.call(6)
         assert df[6] == 6
-        runnable.call([100, 200] as Object[])
+        runnable.call(100, 200)
         assert df[100] == 300
 
-        runnable.call([200, 20, 30, 40, 50] as Object[])
+        runnable.call(200, 20, 30, 40, 50)
         assert df[200] == 250
 
-        runnable.call([1, 2, 3] as Object[])
+        runnable.call(1, 2, 3)
         assert df[1] == 6
-        runnable.call([10, 20, 30] as Object[])
+        runnable.call(10, 20, 30)
         assert df[10] == 60
     }
 
@@ -61,7 +61,7 @@ class MyTestDataflowMessagingRunnable extends DataflowMessagingRunnable {
         this.df = df
     }
 
-    protected void doRun(Object[] arguments) {
+    protected void doRun(Object... arguments) {
         df[arguments[0]] = arguments[0] + (arguments.size() > 1 ? arguments[1] : 0) + (arguments.size() > 2 ? arguments[2] : 0)
     }
 }

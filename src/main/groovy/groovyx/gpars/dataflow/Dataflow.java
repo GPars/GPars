@@ -17,10 +17,10 @@
 package groovyx.gpars.dataflow;
 
 import groovy.lang.Closure;
+import groovyx.gpars.GParsConfig;
 import groovyx.gpars.dataflow.operator.DataflowProcessor;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
-import groovyx.gpars.scheduler.ResizeablePool;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ public abstract class Dataflow {
     /**
      * The parallel group used by all Dataflow Concurrency actors by default.
      */
-    public static final PGroup DATA_FLOW_GROUP = new DefaultPGroup(new ResizeablePool(true, 1));
+    public static final PGroup DATA_FLOW_GROUP = new DefaultPGroup(GParsConfig.retrieveDefaultPool());
 
     /**
      * Maps threads/tasks to parallel groups they belong to
@@ -304,7 +304,7 @@ public abstract class Dataflow {
      * @param <T>      The type of the final result
      * @return A promise for the final result
      */
-    public static <T> Promise<T> whenAllBound(final List<Promise<? extends Object>> promises, final Closure<T> code) {
+    public static <T> Promise<T> whenAllBound(final List<Promise<?>> promises, final Closure<T> code) {
         return retrieveCurrentDFPGroup().whenAllBound(promises, code);
     }
 }

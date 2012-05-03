@@ -75,14 +75,8 @@ public abstract class DataflowMessagingRunnable extends Closure {
     }
 
     @Override
-    public final Object call(final Object[] args) {
+    public final Object call(final Object... args) {
         doRun(args);
-        return null;
-    }
-
-    @Override
-    public final Object call(final Object arguments) {
-        doRun(new Object[]{arguments});
         return null;
     }
 
@@ -91,5 +85,5 @@ public abstract class DataflowMessagingRunnable extends Closure {
      *
      * @param arguments The parameters passed from the caller to the closure
      */
-    protected abstract void doRun(final Object[] arguments);
+    protected abstract void doRun(final Object... arguments);
 }

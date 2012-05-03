@@ -2,7 +2,7 @@
 
 #  This script is here only for the Codehaus Bamboo build.
 
-buildTask="build"
+buildTask="build zipSamples zipJavaDemo zipDist zipGuide"
 
 if [ $# -gt 0 ]
 then

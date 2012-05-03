@@ -240,9 +240,6 @@
       </facet-type>
     </autodetection-disabled>
   </component>
-  <component name="GradleSettings">
-    <option name="GRADLE_HOME" value="$USER_HOME$/Library/gradle-1.0-milestone-6" />
-  </component>
   <component name="GradleUISettings">
     <setting name="root" />
   </component>
@@ -453,6 +450,8 @@
           <option name="ignoreCollectionLoops" value="false" />
         </inspection_tool>
         <inspection_tool class="FunctionWithInconsistentReturnsJS" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="GroovyAccessToStaticFieldLockedOnInstance" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="GroovyAccessibility" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyAssignabilityCheck" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyConstantConditional" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyConstantIfStatement" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -478,6 +477,7 @@
         <inspection_tool class="GroovyUnnecessaryReturn" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyUnreachableStatement" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyUnusedAssignment" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="GroovyUnusedCatchParameter" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyVariableNotAssigned" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GspInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GspPropertiesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -1207,6 +1207,7 @@
             <value />
           </option>
           <option name="ignoreClassWithParameterization" value="false" />
+          <option name="ignoreThrowables" value="true" />
         </inspection_tool>
         <inspection_tool class="EmptyInitializer" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="EmptyStatementBodyJS" enabled="false" level="WARNING" enabled_by_default="false">
@@ -1238,6 +1239,7 @@
         <inspection_tool class="ExceptionCaughtLocallyJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExceptionFromCatchWhichDoesntWrap" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreGetMessage" value="false" />
+          <option name="ignoreCantWrap" value="false" />
         </inspection_tool>
         <inspection_tool class="ExceptionNameDoesntEndWithException" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExtendsConcreteCollection" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1276,7 +1278,6 @@
           <option name="ignoreCollectionLoops" value="false" />
         </inspection_tool>
         <inspection_tool class="FunctionWithInconsistentReturnsJS" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="GroovyAccessToStaticFieldLockedOnInstance" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyAnnotationNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[A-Z][A-Za-z\d]*" />
           <option name="m_minLength" value="8" />
@@ -1292,19 +1293,16 @@
         <inspection_tool class="GroovyBusyWait" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeConditionalCall" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeElvis" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyConditionalWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyContinue" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyContinueOrBreakFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyDoubleCheckedLocking" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreOnVolatileVariables" value="false" />
         </inspection_tool>
-        <inspection_tool class="GroovyDuplicateSwitchBranch" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyCatchBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptySyncBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyTryBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyGetterCallCanBePropertyAccess" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyIfStatementWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyIfStatementWithTooManyBranches" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="3" />
         </inspection_tool>
@@ -1346,16 +1344,12 @@
         <inspection_tool class="GroovyReturnFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySetterCallCanBePropertyAccess" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySwitchStatementWithNoDefault" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovySynchronizationOnNonFinalField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySynchronizationOnThis" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovySynchronizationOnVariableInitializedWithLiteral" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySystemRunFinalizersOnExit" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyThreadStopSuspendResume" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyThrowFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyUnconditionalWait" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyUnsynchronizedMethodOverridesSynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyUnusedCatchParameter" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWaitCallNotInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWaitWhileNotSynchronized" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWhileLoopSpinsOnField" enabled="true" level="WARNING" enabled_by_default="true">
@@ -1542,7 +1536,8 @@
         <inspection_tool class="LoopWithImplicitTerminationCondition" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LossyEncoding" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_ignoreInHashCode" value="true" />
+          <option name="ignoreInHashCode" value="true" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="MapReplaceableByEnumMap" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1862,7 +1857,6 @@
         </inspection_tool>
         <inspection_tool class="StringBufferField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringBufferMustHaveInitialCapacity" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="StringBufferReplaceableByString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringBufferToStringInConcatenation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringCompareTo" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringConcatenationInLoops" enabled="true" level="WARNING" enabled_by_default="true">
@@ -1940,6 +1934,7 @@
         <inspection_tool class="TodoComment" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="TooBroadCatch" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="onlyWarnOnRootExceptions" value="false" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="TooBroadScope" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_allowConstructorAsInitializer" value="false" />
@@ -2328,6 +2323,7 @@
             <value />
           </option>
           <option name="ignoreClassWithParameterization" value="false" />
+          <option name="ignoreThrowables" value="true" />
         </inspection_tool>
         <inspection_tool class="EmptyFinallyBlockJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="EmptyInitializer" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2356,6 +2352,7 @@
         <inspection_tool class="ErrorRethrown" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExceptionFromCatchWhichDoesntWrap" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreGetMessage" value="false" />
+          <option name="ignoreCantWrap" value="false" />
         </inspection_tool>
         <inspection_tool class="ExceptionNameDoesntEndWithException" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExtendsConcreteCollection" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2401,7 +2398,6 @@
         </inspection_tool>
         <inspection_tool class="FunctionWithMultipleLoopsJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="FunctionWithMultipleReturnPointsJS" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyAccessToStaticFieldLockedOnInstance" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyAnnotationNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[A-Z][A-Za-z\d]*" />
           <option name="m_minLength" value="8" />
@@ -2417,13 +2413,11 @@
         <inspection_tool class="GroovyBusyWait" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeConditionalCall" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeElvis" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyConditionalWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyContinue" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyContinueOrBreakFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyDoubleCheckedLocking" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreOnVolatileVariables" value="false" />
         </inspection_tool>
-        <inspection_tool class="GroovyDuplicateSwitchBranch" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyCatchBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptySyncBlock" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2434,7 +2428,6 @@
           <option name="m_maxLength" value="64" />
         </inspection_tool>
         <inspection_tool class="GroovyGetterCallCanBePropertyAccess" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyIfStatementWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyIfStatementWithTooManyBranches" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="3" />
         </inspection_tool>
@@ -2477,16 +2470,12 @@
         <inspection_tool class="GroovyReturnFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySetterCallCanBePropertyAccess" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySwitchStatementWithNoDefault" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovySynchronizationOnNonFinalField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySynchronizationOnThis" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovySynchronizationOnVariableInitializedWithLiteral" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySystemRunFinalizersOnExit" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyThreadStopSuspendResume" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyThrowFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyUnconditionalWait" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyUnsynchronizedMethodOverridesSynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyUnusedCatchParameter" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWaitCallNotInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWaitWhileNotSynchronized" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWhileLoopSpinsOnField" enabled="true" level="WARNING" enabled_by_default="true">
@@ -2652,7 +2641,8 @@
         <inspection_tool class="LoopWithImplicitTerminationCondition" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LossyEncoding" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_ignoreInHashCode" value="true" />
+          <option name="ignoreInHashCode" value="true" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="MagicNumberJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -2970,7 +2960,6 @@
         </inspection_tool>
         <inspection_tool class="StringBufferField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringBufferMustHaveInitialCapacity" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="StringBufferReplaceableByString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringBufferToStringInConcatenation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringCompareTo" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringConcatenationInLoops" enabled="true" level="WARNING" enabled_by_default="true">
@@ -3050,6 +3039,7 @@
         <inspection_tool class="TimeToString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="TooBroadCatch" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="onlyWarnOnRootExceptions" value="false" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="TooBroadScope" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_allowConstructorAsInitializer" value="false" />
@@ -3419,6 +3409,7 @@
             <value />
           </option>
           <option name="ignoreClassWithParameterization" value="false" />
+          <option name="ignoreThrowables" value="true" />
         </inspection_tool>
         <inspection_tool class="EmptyInitializer" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="EmptyStatementBodyJS" enabled="false" level="WARNING" enabled_by_default="false">
@@ -3450,6 +3441,7 @@
         <inspection_tool class="ExceptionCaughtLocallyJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExceptionFromCatchWhichDoesntWrap" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreGetMessage" value="false" />
+          <option name="ignoreCantWrap" value="false" />
         </inspection_tool>
         <inspection_tool class="ExceptionNameDoesntEndWithException" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ExtendsConcreteCollection" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -3488,7 +3480,6 @@
           <option name="ignoreCollectionLoops" value="false" />
         </inspection_tool>
         <inspection_tool class="FunctionWithInconsistentReturnsJS" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="GroovyAccessToStaticFieldLockedOnInstance" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyAnnotationNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[A-Z][A-Za-z\d]*" />
           <option name="m_minLength" value="8" />
@@ -3504,19 +3495,16 @@
         <inspection_tool class="GroovyBusyWait" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeConditionalCall" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeElvis" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyConditionalWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyContinue" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyContinueOrBreakFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyDoubleCheckedLocking" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreOnVolatileVariables" value="false" />
         </inspection_tool>
-        <inspection_tool class="GroovyDuplicateSwitchBranch" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyCatchBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptySyncBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyEmptyTryBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyGetterCallCanBePropertyAccess" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyIfStatementWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyIfStatementWithTooManyBranches" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_limit" value="3" />
         </inspection_tool>
@@ -3559,16 +3547,12 @@
         <inspection_tool class="GroovyReturnFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySetterCallCanBePropertyAccess" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySwitchStatementWithNoDefault" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovySynchronizationOnNonFinalField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySynchronizationOnThis" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovySynchronizationOnVariableInitializedWithLiteral" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovySystemRunFinalizersOnExit" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyThreadStopSuspendResume" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyThrowFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyUnconditionalWait" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyUnsynchronizedMethodOverridesSynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyUnusedCatchParameter" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWaitCallNotInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWaitWhileNotSynchronized" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyWhileLoopSpinsOnField" enabled="true" level="WARNING" enabled_by_default="true">
@@ -3767,7 +3751,8 @@
         <inspection_tool class="LoopWithImplicitTerminationCondition" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="LossyEncoding" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_ignoreInHashCode" value="true" />
+          <option name="ignoreInHashCode" value="true" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="MapReplaceableByEnumMap" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -4083,7 +4068,6 @@
         </inspection_tool>
         <inspection_tool class="StringBufferField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringBufferMustHaveInitialCapacity" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="StringBufferReplaceableByString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringBufferToStringInConcatenation" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringCompareTo" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="StringConcatenationInLoops" enabled="true" level="WARNING" enabled_by_default="true">
@@ -4161,6 +4145,7 @@
         <inspection_tool class="TodoComment" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="TooBroadCatch" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="onlyWarnOnRootExceptions" value="false" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="TooBroadScope" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_allowConstructorAsInitializer" value="false" />
@@ -4314,6 +4299,7 @@
         <inspection_tool class="AmbiguousFieldAccess" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AmbiguousMethodCall" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AndroidDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="AndroidNonConstantResIdsInSwitch" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="Annotation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AnnotationClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="AnnotationNamingConvention" enabled="false" level="WARNING" enabled_by_default="false">
@@ -4419,6 +4405,7 @@
         </inspection_tool>
         <inspection_tool class="BooleanMethodReturnsNull" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="BooleanVariableAlwaysNegated" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="BoundFieldAssignment" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="BoxingBoxedValue" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="BreakStatement" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="BreakStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -4501,6 +4488,7 @@
         <inspection_tool class="CheckValidXmlInScriptTagBody" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="CheckXmlFileWithXercesValidator" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="CheckedExceptionClass" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="ClashingGetters" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ClassComplexity" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_limit" value="80" />
         </inspection_tool>
@@ -4698,6 +4686,7 @@
         <inspection_tool class="CyclicClassDependency" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CyclicPackageDependency" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CyclomaticComplexity" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="ignoreEqualsMethod" value="false" />
           <option name="m_limit" value="10" />
         </inspection_tool>
         <inspection_tool class="CyclomaticComplexityJS" enabled="false" level="WARNING" enabled_by_default="false">
@@ -4746,6 +4735,7 @@
         <inspection_tool class="DuplicateConditionJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicateImport" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicateMapKey" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="DuplicateMnemonic" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicateNumberLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="DuplicatePropertyInspection" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="CURRENT_FILE" value="true" />
@@ -4801,6 +4791,7 @@
             <value />
           </option>
           <option name="ignoreClassWithParameterization" value="false" />
+          <option name="ignoreThrowables" value="true" />
         </inspection_tool>
         <inspection_tool class="EmptyDirectory" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EmptyElseBlock" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -4856,6 +4847,7 @@
         <inspection_tool class="ExceptionExtendsError" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExceptionFromCatchWhichDoesntWrap" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreGetMessage" value="false" />
+          <option name="ignoreCantWrap" value="false" />
         </inspection_tool>
         <inspection_tool class="ExceptionNameDoesntEndWithException" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExpectedExceptionNeverThrown" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5136,6 +5128,7 @@
         <inspection_tool class="GroovyUntypedAccess" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyUnusedAssignment" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyUnusedCatchParameter" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="GroovyUnusedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyVariableNotAssigned" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyWaitCallNotInLoop" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GroovyWaitWhileNotSynchronized" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5351,13 +5344,17 @@
         <inspection_tool class="JNDIResource" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="insideTryAllowed" value="false" />
         </inspection_tool>
+        <inspection_tool class="JSBitwiseOperatorUsage" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSCheckFunctionSignatures" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
         <inspection_tool class="JSDeprecatedSymbols" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JSDuplicatedDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSFieldCanBeLocal" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSFieldCanBeLocalInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSHint" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSImplicitlyInternalDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSLastCommaInArrayLiteral" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSLastCommaInObjectLiteral" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="JSLint" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSLintValidation" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSLowercasedConstructorCall" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSMethodCanBeStatic" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5399,6 +5396,7 @@
         <inspection_tool class="JSUnusedAssignment" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSUnusedLocalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="JSValidateJSDoc" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JSValidateJSON" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSValidateTypes" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JUnit4AnnotatedMethodInJUnit3TestCase" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5480,6 +5478,7 @@
         <inspection_tool class="JpaQueryApiInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JsfJamExtendsClassInconsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JsfManagedBeansInconsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="JspAbsolutePathInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JspDirectiveInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JspPropertiesInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="KeySetIterationMayUseEntrySet" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5544,8 +5543,10 @@
         <inspection_tool class="LossyEncoding" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MVCPathVariableInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MagicCharacter" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="MagicConstant" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MagicNumber" enabled="false" level="WARNING" enabled_by_default="false">
-          <option name="m_ignoreInHashCode" value="true" />
+          <option name="ignoreInHashCode" value="true" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="MagicNumberJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MalformedFormatString" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5616,6 +5617,7 @@
         <inspection_tool class="MisorderedStaticImports" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MissingAspectjAutoproxyInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MissingDeprecatedAnnotation" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="MissingMnemonic" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MissingNewInThrowStatement" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MissingOverrideAnnotation" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreObjectMethods" value="true" />
@@ -5687,8 +5689,12 @@
           <option name="m_limit" value="5" />
         </inspection_tool>
         <inspection_tool class="NewExceptionWithoutArguments" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="NewInstanceOfSingleton" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NewStringBufferWithCharArgument" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="NoButtonGroup" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NoExplicitFinalizeCalls" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="NoLabelFor" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="NoScrollPane" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NonAtomicOperationOnVolatileField" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NonBlockStatementBodyJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NonBooleanMethodNameMayNotStartWithQuestion" enabled="false" level="WARNING" enabled_by_default="false">
@@ -5768,6 +5774,7 @@
         <inspection_tool class="OctalIntegerJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OctalLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OnDemandImport" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="OneButtonGroup" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OneWayWebMethod" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="OrredNotEqualExpression" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="OverloadedMethodsWithSameNumberOfParameters" enabled="false" level="WARNING" enabled_by_default="false">
@@ -6301,6 +6308,7 @@
         <inspection_tool class="TodoComment" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="TooBroadCatch" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="onlyWarnOnRootExceptions" value="false" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="TooBroadScope" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_allowConstructorAsInitializer" value="false" />
@@ -6308,6 +6316,7 @@
         </inspection_tool>
         <inspection_tool class="TooBroadThrows" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="onlyWarnOnRootExceptions" value="false" />
+          <option name="ignoreInTestCode" value="false" />
         </inspection_tool>
         <inspection_tool class="TrailingSpacesInProperty" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="TransientFieldInNonSerializableClass" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7823,7 +7832,7 @@
         <inspection_tool class="gwtRawAsyncCallback" enabled="false" level="WARNING" enabled_by_default="false" />
       </profile>
     </profiles>
-    <option name="PROJECT_PROFILE" value="GPars default" />
+    <option name="PROJECT_PROFILE" value="CodeStyle" />
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
   </component>
@@ -8002,6 +8011,7 @@
     <option name="PER_PROJECT_SETTINGS">
       <value>
         <option name="USE_SAME_INDENTS" value="true" />
+        <option name="IGNORE_SAME_INDENTS_FOR_LANGUAGES" value="true" />
         <option name="LINE_SEPARATOR" value="&#10;" />
         <option name="GENERATE_FINAL_LOCALS" value="true" />
         <option name="GENERATE_FINAL_PARAMETERS" value="true" />
@@ -8014,9 +8024,6 @@
           <option name="INDENT_SIZE" value="2" />
           <option name="TAB_SIZE" value="2" />
         </ADDITIONAL_INDENT_OPTIONS>
-        <ADDITIONAL_INDENT_OPTIONS fileType="gsp">
-          <option name="INDENT_SIZE" value="2" />
-        </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="haml">
           <option name="INDENT_SIZE" value="2" />
         </ADDITIONAL_INDENT_OPTIONS>
@@ -8024,14 +8031,21 @@
           <option name="INDENT_SIZE" value="2" />
           <option name="TAB_SIZE" value="2" />
         </ADDITIONAL_INDENT_OPTIONS>
-        <ADDITIONAL_INDENT_OPTIONS fileType="yml">
-          <option name="INDENT_SIZE" value="2" />
-        </ADDITIONAL_INDENT_OPTIONS>
         <codeStyleSettings language="CoffeeScript">
           <indentOptions>
             <option name="INDENT_SIZE" value="4" />
             <option name="CONTINUATION_INDENT_SIZE" value="8" />
             <option name="TAB_SIZE" value="4" />
+          </indentOptions>
+        </codeStyleSettings>
+        <codeStyleSettings language="GSP">
+          <indentOptions>
+            <option name="INDENT_SIZE" value="2" />
+          </indentOptions>
+        </codeStyleSettings>
+        <codeStyleSettings language="Gherkin">
+          <indentOptions>
+            <option name="INDENT_SIZE" value="4" />
           </indentOptions>
         </codeStyleSettings>
         <codeStyleSettings language="JavaScript">
@@ -8346,11 +8360,24 @@
     <dictionary name="vaclavpech">
       <words>
         <w>almiray</w>
+        <w>bordercolor</w>
+        <w>borderopacity</w>
         <w>bytecodes</w>
+        <w>clearfix</w>
+        <w>codegen</w>
+        <w>colset</w>
+        <w>defs</w>
         <w>diamond&quot;</w>
+        <w>docname</w>
+        <w>doctype</w>
         <w>gant</w>
+        <w>gridtolerance</w>
         <w>groovydoc</w>
+        <w>guidetolerance</w>
+        <w>icns</w>
+        <w>inkscape</w>
         <w>itext</w>
+        <w>jbosscache</w>
         <w>jetensky</w>
         <w>kanban</w>
         <w>kanbanflow</w>
@@ -8359,12 +8386,25 @@
         <w>lowagie</w>
         <w>matula</w>
         <w>mittie</w>
+        <w>monospace</w>
+        <w>namedview</w>
         <w>nextc</w>
         <w>noitide</w>
         <w>novotny</w>
+        <w>objecttolerance</w>
+        <w>pagecolor</w>
+        <w>pageopacity</w>
+        <w>pageshadow</w>
         <w>peng</w>
+        <w>persp</w>
+        <w>showgrid</w>
+        <w>sodipodi</w>
         <w>subdirectory</w>
         <w>thon</w>
+        <w>xdpi</w>
+        <w>xlink</w>
+        <w>xmlns</w>
+        <w>ydpi</w>
       </words>
     </dictionary>
     <dictionary name="dierkkonig" />
@@ -8447,26 +8487,28 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/gpars/gpars/1.0-SNAPSHOT/gpars-1.0-SNAPSHOT-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.groovy:groovy-all:1.8.4">
+    <library name="Maven: org.codehaus.groovy:groovy-all:1.8.6">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.6/groovy-all-1.8.6.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.6/groovy-all-1.8.6-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.6/groovy-all-1.8.6-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.codehaus.groovy:groovy-all:1.8.4">
+    <library name="Maven: org.codehaus.jcsp:jcsp:1.1-rc5">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jcsp/jcsp/1.1-rc5/jcsp-1.1-rc5.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jcsp/jcsp-1.1-rc5-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jcsp/jcsp/1.1-rc5/jcsp-1.1-rc5-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/groovy/groovy-all/1.8.4/groovy-all-1.8.4-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jcsp/jcsp-1.1-rc5-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jcsp/jcsp/1.1-rc5/jcsp-1.1-rc5-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.codehaus.jsr166-mirror:extra166y:1.7.0">
@@ -8489,6 +8531,50 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jsr166-mirror/jsr166y/1.7.0/jsr166y-1.7.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.jboss.netty:netty:3.2.7.Final">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/jboss/netty/netty/3.2.7.Final/netty-3.2.7.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/jboss/netty/netty/3.2.7.Final/netty-3.2.7.Final-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/jboss/netty/netty/3.2.7.Final/netty-3.2.7.Final-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.multiverse:multiverse-beta:0.7-RC-1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-beta/0.7-RC-1/multiverse-beta-0.7-RC-1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-beta/0.7-RC-1/multiverse-beta-0.7-RC-1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-beta/0.7-RC-1/multiverse-beta-0.7-RC-1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.multiverse:multiverse-core:0.7.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-core/0.7.0/multiverse-core-0.7.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-core/0.7.0/multiverse-core-0.7.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-core/0.7.0/multiverse-core-0.7.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.spockframework:spock-core:0.6-groovy-1.8">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/spockframework/spock-core/0.6-groovy-1.8/spock-core-0.6-groovy-1.8.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/spockframework/spock-core/0.6-groovy-1.8/spock-core-0.6-groovy-1.8-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/spockframework/spock-core/0.6-groovy-1.8/spock-core-0.6-groovy-1.8-sources.jar!/" />
       </SOURCES>
     </library>
   </component>

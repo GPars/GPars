@@ -49,7 +49,7 @@ public class LocalNode {
 
     private final UUID id = UUID.randomUUID();
 
-    private LocalHost localHost;
+    private final LocalHost localHost;
 
     public LocalNode() {
         this(null, null);

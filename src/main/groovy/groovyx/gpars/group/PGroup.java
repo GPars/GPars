@@ -584,7 +584,7 @@ public abstract class PGroup {
      * @param <T>      The type of the final result
      * @return A promise for the final result
      */
-    public <T> Promise<T> whenAllBound(final List<Promise<? extends Object>> promises, final Closure<T> code) {
+    public <T> Promise<T> whenAllBound(final List<Promise<?>> promises, final Closure<T> code) {
         if (promises.size() != code.getMaximumNumberOfParameters() && !isListAccepting(code)) {
             throw new IllegalArgumentException("Cannot run whenAllBound(), since the number of promises does not match the number of arguments to the supplied closure.");
         }
@@ -603,7 +603,7 @@ public abstract class PGroup {
      * @param code     The calculation to execute on the values once they are all bound
      * @param <T>      The type of the final result
      */
-    private static <T> void whenAllBound(final List<Promise<? extends Object>> promises, final int index, final List<Object> values, final DataflowVariable<T> result, final Closure<T> code) {
+    private static <T> void whenAllBound(final List<Promise<?>> promises, final int index, final List<Object> values, final DataflowVariable<T> result, final Closure<T> code) {
         if (index == promises.size()) {
             if (isListAccepting(code)) {
                 result.leftShift(code.call(values));

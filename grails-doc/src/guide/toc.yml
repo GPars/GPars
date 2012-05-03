@@ -50,5 +50,6 @@ STM :
 tips :
   title : Tips
   tips_performance : Performance
+  tips_hostedEnvironment : Integration into hosted environment
 conclusion :
   title : Conclusion

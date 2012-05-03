@@ -201,7 +201,7 @@ public class DataflowOperatorDemo {
         final DataflowQueue stream4 = new DataflowQueue();
 
         final DataflowProcessor op1 = Dataflow.selector(Arrays.asList(stream1), Arrays.asList(stream2), new DataflowMessagingRunnable(1) {
-            @Override protected void doRun(final Object[] objects) {
+            @Override protected void doRun(final Object... objects) {
                 getOwningProcessor().bindOutput(2*(Integer)objects[0]);
             }
         });
@@ -209,7 +209,7 @@ public class DataflowOperatorDemo {
         final List secondOperatorInput = Arrays.asList(stream2, stream3);
 
         final DataflowProcessor op2 = Dataflow.operator(secondOperatorInput, Arrays.asList(stream4), new DataflowMessagingRunnable(2) {
-            @Override protected void doRun(final Object[] objects) {
+            @Override protected void doRun(final Object... objects) {
                 getOwningProcessor().bindOutput((Integer) objects[0] + (Integer) objects[1]);
             }
         });

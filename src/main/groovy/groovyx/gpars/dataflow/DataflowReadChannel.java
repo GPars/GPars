@@ -461,7 +461,7 @@ public interface DataflowReadChannel<T> {
      * @param outputs The channels to send data to.
      * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
      */
-    void separate(final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code);
+    void separate(final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
 
     /**
      * Allows the closure to output different values to different output channels.
@@ -470,7 +470,7 @@ public interface DataflowReadChannel<T> {
      * @param outputs The channels to send data to.
      * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
      */
-    void separate(final Pool pool, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code);
+    void separate(final Pool pool, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
 
     /**
      * Allows the closure to output different values to different output channels.
@@ -479,7 +479,7 @@ public interface DataflowReadChannel<T> {
      * @param outputs The channels to send data to.
      * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
      */
-    void separate(final PGroup group, final List<DataflowWriteChannel<? extends Object>> outputs, final Closure<List<Object>> code);
+    void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
 
 
     /**

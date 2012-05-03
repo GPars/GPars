@@ -30,13 +30,14 @@ final DataflowQueue ch1 = new DataflowQueue()
 final DataflowQueue ch2 = new DataflowQueue()
 final DataflowQueue ch3 = new DataflowQueue()
 
+ch1 << 1
+ch2 << 0
+ch2 << 0
+
 final op = operator([ch1, ch2], [ch3, ch1, ch2]) {a, b ->
     bindAllOutputs a + b
 }
 
-ch1 << 1
-ch2 << 0
-ch2 << 0
 
 30.times {
     println ch3.val

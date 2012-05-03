@@ -207,7 +207,11 @@ public abstract class AbstractLoopingActor extends Actor {
         //noinspection CallToThreadYield
         Thread.yield();
         if (!isActorThread() && currentThread != null) {
-            currentThread.interrupt();
+            try {
+                currentThread.interrupt();  //NPE may occur non-deterministically, since we're running concurrently with the actor's thread
+            } catch (Exception e) {
+                send(TERMINATE_MESSAGE);
+            }
         } else send(TERMINATE_MESSAGE);
         return this;
     }
