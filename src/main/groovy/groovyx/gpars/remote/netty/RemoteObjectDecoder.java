@@ -20,11 +20,11 @@ import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.remote.RemoteHost;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipelineCoverage;
 import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 
-@ChannelPipelineCoverage("one")
+@ChannelHandler.Sharable
 public class RemoteObjectDecoder extends ObjectDecoder {
     private final RemoteConnection connection;
 
