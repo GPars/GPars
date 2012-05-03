@@ -37,7 +37,8 @@ public final class GParsConfig {
     private static volatile boolean timerFactoryFlag = false;
 
     public static void setPoolFactory(final PoolFactory pool) {
-        if (poolFactoryFlag) throw new IllegalArgumentException("The pool factory cannot be altered at this stage");
+        if (poolFactoryFlag)
+            throw new IllegalArgumentException("The pool factory cannot be altered at this stage. It has already been set before.");
         poolFactoryFlag = true;
         poolFactory = pool;
     }
@@ -58,7 +59,8 @@ public final class GParsConfig {
     }
 
     public static void setTimerFactory(final TimerFactory timerFactory) {
-        if (timerFactoryFlag) throw new IllegalArgumentException("The timer factory cannot be altered at this stage");
+        if (timerFactoryFlag)
+            throw new IllegalArgumentException("The timer factory cannot be altered at this stage. It has already been set before.");
         timerFactoryFlag = true;
         GParsConfig.timerFactory = timerFactory;
     }
