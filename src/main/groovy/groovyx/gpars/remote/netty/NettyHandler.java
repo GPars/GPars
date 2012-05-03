@@ -20,7 +20,7 @@ import groovyx.gpars.remote.RemoteConnection;
 import groovyx.gpars.serial.SerialMsg;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipelineCoverage;
+import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
@@ -29,7 +29,7 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 /**
  * @author Alex Tkachman
  */
-@ChannelPipelineCoverage("one")
+@ChannelHandler.Sharable
 public class NettyHandler extends SimpleChannelHandler {
 
     private Channel channel;
