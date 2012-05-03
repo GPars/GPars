@@ -63,6 +63,12 @@ public final class GParsConfig {
         return timerFactory;
     }
 
+    /**
+     * If a timer factory has been set, it will be used to create a timer.
+     * Otherwise a new instance of java.util.Timer will be created, wrapped inside a GeneralTimer instance and returned.
+     *
+     * @return A timer instance to use to handle timeouts (actors, GParsPool, GParsExecutorsPool)
+     */
     public static GeneralTimer retrieveDefaultTimer(final String name, final boolean daemon) {
         if (timerFactory != null) return timerFactory.createTimer(name, daemon);
         return new GeneralTimer() {

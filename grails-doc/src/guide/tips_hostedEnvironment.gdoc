@@ -1,0 +1,34 @@
+Hosted environments, such as Google App Engine, impose additional restrictions on threading. For GPars to integrate with
+these environments better, the default thread factory and timer factory can be customized.
+The _GPars_Config_ class provides static initialization methods allowing third parties to register their own implementations of
+the _PoolFactory_ and _TimerFactory_ interfaces, which will then be used to create default pools and timers for Actors, Dataflow
+and PGroups.
+
+{code}
+public final class GParsConfig {
+    private static volatile PoolFactory poolFactory;
+    private static volatile TimerFactory timerFactory;
+
+    public static void setPoolFactory(final PoolFactory pool)
+
+    public static PoolFactory getPoolFactory()
+
+    public static Pool retrieveDefaultPool()
+
+    public static void setTimerFactory(final TimerFactory timerFactory)
+
+    public static TimerFactory getTimerFactory()
+
+    public static GeneralTimer retrieveDefaultTimer(final String name, final boolean daemon)
+}
+{code}
+
+The custom factories should be registered immediately after the application startup in order for Actors and Dataflow
+to be able to use them for their default groups.
+
+h3. Compatibility
+
+Some further compatibility problems may occur when running GPars in a hosted environment. The most noticeable one is probably
+ the lack of ForkJoinThreadPool (aka jsr-166y) support in GAE. Functionality such as Fork/Join and GParsPool may thus not be available on some
+ services as a result. However, GParsExecutorsPool, Dataflow, Actors, Agents and Stm should work normally
+ even when using managed non-Java SE thread pools.
