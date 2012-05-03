@@ -101,6 +101,9 @@ class GParsConfigTest extends Specification {
         group2.threadPool.is(myPool)
         group3.threadPool.is(myPool)
         group4.threadPool.is(myPool)
+
+        cleanup:
+        GParsConfig.poolFactory = null
     }
 
     def "default timer factory should be retrieved"() {
@@ -122,5 +125,8 @@ class GParsConfigTest extends Specification {
 
         then:
         GParsConfig.retrieveDefaultTimer("", true).is(myTimer)
+
+        cleanup:
+        GParsConfig.timerFactory = null
     }
 }

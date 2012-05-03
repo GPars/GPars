@@ -33,9 +33,12 @@ import java.util.TimerTask;
 public final class GParsConfig {
     private static volatile PoolFactory poolFactory;
     private static volatile TimerFactory timerFactory;
+    private static volatile boolean poolFactoryFlag = false;
+    private static volatile boolean timerFactoryFlag = false;
 
     public static void setPoolFactory(final PoolFactory pool) {
-        if (pool == null) throw new IllegalArgumentException("The default pool must not be null");
+        if (poolFactoryFlag) throw new IllegalArgumentException("The pool factory cannot be altered at this stage");
+        poolFactoryFlag = true;
         poolFactory = pool;
     }
 
@@ -55,7 +58,8 @@ public final class GParsConfig {
     }
 
     public static void setTimerFactory(final TimerFactory timerFactory) {
-        if (timerFactory == null) throw new IllegalArgumentException("The TimerFactory must not be null");
+        if (timerFactoryFlag) throw new IllegalArgumentException("The timer factory cannot be altered at this stage");
+        timerFactoryFlag = true;
         GParsConfig.timerFactory = timerFactory;
     }
 
