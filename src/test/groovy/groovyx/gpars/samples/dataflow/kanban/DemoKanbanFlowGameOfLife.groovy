@@ -30,17 +30,19 @@ import static groovyx.gpars.dataflow.ProcessingNode.node
  * @author Dierk Koenig
  */
 
-def painter = node { boardOut, boardIn  ->
+List<List<Integer>> makeBoard() { (0..9).collect { [0] * 10 } }
+
+def display = node { boardOut, boardIn  ->
     def board = boardIn.take()
-    boardOut << board
+    boardOut << board                   // downstream can proceed concurrently
     board.each { println it.join(' ') }
     println()
 }
 
 def nextBoard = node { boardIn, boardOut ->
     def board = boardIn.take()
-    def out   = board.collect {it.clone()}
-    for (row in 1..8) {
+    def out   = makeBoard()
+    for (row in 1..8) { // we could use eachParallel here but that is a different story
         for (col in 1..8) {
             out[row][col] = nextCellValue(board, row, col)
         }
@@ -49,25 +51,28 @@ def nextBoard = node { boardIn, boardOut ->
 }
 
 int nextCellValue(board, row, col) {
-    def aliveNeighbors = board[row - 1][col - 1] + board[row - 1][col] + board[row - 1][col + 1] +
-                         board[row]    [col - 1] +                       board[row]    [col + 1] +
-                         board[row + 1][col - 1] + board[row + 1][col] + board[row + 1][col + 1]
-    def cell = board[row][col]
-    if (cell  && !(aliveNeighbors in [2, 3])) { return 0 }
-    if (!cell &&   aliveNeighbors == 3)       { return 1 }
-    return cell
+    def aliveNeighbors =
+        board[row - 1][col - 1] + board[row - 1][col] + board[row - 1][col + 1] +
+        board[row + 0][col - 1] +                       board[row + 0][col + 1] +
+        board[row + 1][col - 1] + board[row + 1][col] + board[row + 1][col + 1]
+    switch(aliveNeighbors){
+        case 0..1 : return 0
+        case 2    : return board[row][col]
+        case 3    : return 1
+        case 4..8 : return 0
+    }
 }
 
 new KanbanFlow().with {
     cycleAllowed = true
-    def down = link painter   to nextBoard
-    def loop = link nextBoard to painter
+    def down = link display   to nextBoard
+    def loop = link nextBoard to display
 
-    def startBoard = (0..9).collect { [0] * 10 }
+    def startBoard = makeBoard()
     [[1,2],[2,3],[3,1],[3,2],[3,3]].each { startBoard[it[0]][it[1]] = 1 } // glider
     loop.downstream << new KanbanTray(link: loop, product: startBoard)
 
     start()
-    sleep 500
+    sleep 100
     stop()
 }
