@@ -47,6 +47,8 @@ dataflow :
   dataflow_classicExamples : Classic Examples
 STM :
   title : STM
+GAE :
+  title : Google App Engine Integration
 tips :
   title : Tips
   tips_performance : Performance

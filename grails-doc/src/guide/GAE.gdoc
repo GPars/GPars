@@ -1,0 +1,9 @@
+GPars can be run on the "Google App Engine (GAE)":https://developers.google.com/appengine/ .
+It can be made part of Groovy and Java GAE applications as well as a plugged into Gaelyk.
+The small "GPars App Engine integration library":https://github.com/musketyr/gpars-appengine
+provides all the necessary infrastructure to hook GAE services into GPars.
+Although you'll be running on GAE threads and leveraging GAE timer services, the high-level abstractions remain the same.
+With a few restrictions you can still use GPars actors, dataflow, agents, parallel collections and other handy concepts.
+
+Please refer to the "GPars App Engine library":https://github.com/musketyr/gpars-appengine documentation for details
+on how to proceed with GPars on GAE.
