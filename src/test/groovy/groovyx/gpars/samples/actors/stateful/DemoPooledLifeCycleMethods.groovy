@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
  * @author Vaclav Pech
  */
 
-private class ExceptionFlag {
+/*private*/ class ExceptionFlag {
     static final boolean THROW_EXCEPTION = true  //change the flag to test either exception or timeout
 }
 

@@ -47,7 +47,7 @@ public class DataflowTaskTest extends GroovyTestCase {
     }
 }
 
-private class TestRunnable implements Runnable {
+/*private*/ class TestRunnable implements Runnable {
 
     def df
 
@@ -60,7 +60,7 @@ private class TestRunnable implements Runnable {
     }
 }
 
-private class TestCallable implements Callable {
+/*private*/ class TestCallable implements Callable {
 
     def df
 
