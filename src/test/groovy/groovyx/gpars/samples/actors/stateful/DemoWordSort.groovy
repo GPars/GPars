@@ -24,10 +24,10 @@ import java.util.concurrent.CountDownLatch
 final def group = new DefaultPGroup(23)
 
 //Messages
-private final class FileToSort {
+/*private*/ final class FileToSort {
     String fileName
 }
-private final class SortResult {
+/*private*/ final class SortResult {
     String fileName;
     List<String> words
 }

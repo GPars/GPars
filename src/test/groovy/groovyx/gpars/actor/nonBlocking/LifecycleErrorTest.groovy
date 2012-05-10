@@ -120,7 +120,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
     }
 }
 
-private final class LFExceptionTestActor extends BlockingActor {
+/*private*/ final class LFExceptionTestActor extends BlockingActor {
     volatile boolean flag1 = false
     volatile boolean flag2 = false
     volatile boolean flag3 = false
@@ -167,7 +167,7 @@ private final class LFExceptionTestActor extends BlockingActor {
     }
 }
 
-private final class LFErrorTestException extends RuntimeException {
+/*private*/ final class LFErrorTestException extends RuntimeException {
 
     def LFErrorTestException(message) {
         super(message);
