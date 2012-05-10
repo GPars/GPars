@@ -75,6 +75,7 @@ repositories {
         url 'http://repository.codehaus.org'
         url 'http://download.java.net/maven/2'
         url 'http://repo.grails.org/grails/core' // Need this to get Grails Doc
+        url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
     }
 }
 
