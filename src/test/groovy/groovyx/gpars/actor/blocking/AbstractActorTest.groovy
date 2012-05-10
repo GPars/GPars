@@ -73,13 +73,16 @@ public class AbstractActorTest extends GroovyTestCase {
         final AtomicBoolean flag = new AtomicBoolean(false)
         final CountDownLatch latch = new CountDownLatch(1)
 
-        def actor = [act: {->
-            Thread.sleep(100)
-        },
-                afterStart: {->
-                    flag.set(true)
-                    latch.countDown()
-                }] as BlockingActor
+        def actor = new BlockingActor() {
+            @Override
+            protected void act() {
+                Thread.sleep(100)
+            }
+            public void afterStart() {
+                flag.set(true)
+                latch.countDown()
+            }
+        }
 
         actor.start()
         latch.await(90, TimeUnit.SECONDS)
@@ -95,6 +98,8 @@ public class AbstractActorTest extends GroovyTestCase {
         final AtomicReference result = new AtomicReference()
 
         Actor actor = Actors.blockingActor {
+            delegate.metaClass.onTimeout = {-> timeoutFlag.set(true)}
+
             receive(1, TimeUnit.SECONDS) {
                 receiveFlag.set(true)
                 result.set it
@@ -102,8 +107,6 @@ public class AbstractActorTest extends GroovyTestCase {
             flag.set(true)
             latch.countDown()
         }
-
-        actor.metaClass.onTimeout = {-> timeoutFlag.set(true)}
 
         latch.await(90, TimeUnit.SECONDS)
         assert flag.get()
