@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008–2010,2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import groovyx.gpars.actor.Actors
 import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.TimeUnit
 
+import groovy.transform.PackageScope
+
 /**
  * Two actors are created to show possible ways to handle all lifecycle events of event-driven actors.
  * @author Vaclav Pech
  */
 
-/*private*/ class ExceptionFlag {
+@PackageScope final class ExceptionFlag {
     static final boolean THROW_EXCEPTION = true  //change the flag to test either exception or timeout
 }
 

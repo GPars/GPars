@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008–2010,2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,15 +20,17 @@ import groovyx.gpars.actor.Actor
 import groovyx.gpars.actor.DefaultActor
 import java.util.concurrent.CountDownLatch
 
+import groovy.transform.PackageScope
+
 /**
  * @author Jan Novotný
  */
 
 //Messages
-/*private*/ final class FileToSort {
+@PackageScope final class FileToSort {
     String fileName
 }
-/*private*/ final class SortResult {
+@PackageScope final class SortResult {
     String fileName;
     List<String> words
 }
