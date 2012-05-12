@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008–2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import groovyx.gpars.actor.BlockingActor
 import groovyx.gpars.group.DefaultPGroup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+
+import groovy.transform.PackageScope
 
 public class LifecycleErrorTest extends GroovyTestCase {
 
@@ -120,7 +122,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
     }
 }
 
-/*private*/ final class LFExceptionTestActor extends BlockingActor {
+@PackageScope final class LFExceptionTestActor extends BlockingActor {
     volatile boolean flag1 = false
     volatile boolean flag2 = false
     volatile boolean flag3 = false
@@ -167,7 +169,7 @@ public class LifecycleErrorTest extends GroovyTestCase {
     }
 }
 
-/*private*/ final class LFErrorTestException extends RuntimeException {
+@PackageScope final class LFErrorTestException extends RuntimeException {
 
     def LFErrorTestException(message) {
         super(message);
