@@ -314,7 +314,7 @@ private final class FileToSort { String fileName }
 private final class SortResult { String fileName; List<String> words }
 
 //Worker actor
-final class WordSortActor extends DefaultActor {
+class WordSortActor extends DefaultActor {
 
     private List<String> sortedWords(String fileName) {
         parseFile(fileName).sort {it.toLowerCase()}
