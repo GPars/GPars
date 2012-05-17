@@ -151,6 +151,8 @@ abstract class AbstractPAWrapper<T> {
      * to be combined into a single element under their common key.
      * E.g. [[a, b], [c, d], [a, e], [c, f]] will be combined into [a : b+e, c : d+f], while the '+' operation on the values needs to be provided by the user as the accumulation closure.
      *
+     * The keys will be mutually compared using their equals and hashCode methods.
+     *
      * The 'accumulation function' argument needs to specify a function to use for combining (accumulating) the values belonging to the same key.
      * An 'initial accumulator value' needs to be provided as well. Since the 'combine' method processes items in parallel, the 'initial accumulator value' will be reused multiple times.
      * Thus the provided value must allow for reuse. It should be either a cloneable or immutable value or a closure returning a fresh initial accumulator each time requested.
