@@ -19,6 +19,10 @@ package groovyx.gpars.samples.collections
 import static groovyx.gpars.GParsPool.*;
 import groovy.transform.TupleConstructor
 
+/**
+ * @author Mario Garcia
+ */
+
 @TupleConstructor
 class Car{
     String model
