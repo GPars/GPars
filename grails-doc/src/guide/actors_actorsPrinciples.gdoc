@@ -353,6 +353,20 @@ def actor2 = myGroup.actor {
 }
 {code}
 
+The _parallelGroup_ property of an actor points to the group it belongs to. It by default points to the default actor group,
+which is _Actors.defaultActorPGroup_ , and can only be changed before the actor is started.
+
+{code}
+class MyActor extends StaticDispatchActor<Integer> {
+    private static PGroup group = new DefaultPGroup(100)
+
+    MyActor(...) {
+        this.parallelGroup = group
+        ...
+    }
+}
+{code}
+
 The actors belonging to the same group share the *underlying thread pool* of that group. The pool by default contains *n + 1 threads*, where *n* stands for the number of *CPUs* detected by the JVM. The *pool size* can be set *explicitly* either by setting the _gpars.poolsize_ system property or individually for each actor group by specifying the appropriate constructor parameter.
 
 {code}
@@ -429,6 +443,14 @@ helperActors.shutdown()
 {code}
 
 Do not forget to shutdown custom pooled actor groups, once you no longer need them and their actors, to preserve system resources.
+
+h3. The default actor group
+
+Actors that didn't have their parallelGroup property changed or that were created through any of the factory methods on the _Actors_ class
+share a common group _Actors.defaultActorPGroup_ . This group uses a *resizeable thread pool* with an upper limit of *1000 threads* .
+This gives you the comfort of having the pool automatically adjust to the demand of the actors. On the other hand,
+with a growing number of actors the pool may become too big an inefficient.
+It is advisable to group your actors into your own PGroups with fixed size thread pools for all but trivial applications.
 
 h3. Common trap: App terminates while actors do not receive messages
 
