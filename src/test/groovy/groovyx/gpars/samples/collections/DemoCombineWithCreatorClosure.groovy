@@ -36,7 +36,7 @@ class BrandedCar {
 
 def cars = [new BrandedCar('F550', 'a', 2342.223), new BrandedCar('F550', 'b', 234.234), new BrandedCar('Da', 'c', 2222.2)]
 
-final createAccumulator = {new BrandedCar("", "", 0.0)}
+final createAccumulator = {new BrandedCar('', '', 0.0)}
 
 withPool {
     def modelResult =
