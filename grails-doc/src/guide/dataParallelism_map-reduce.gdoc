@@ -83,6 +83,7 @@ h3. Combine
 The _combine_ operation expects on its input a list of tuples (two-element lists) considered to be key-value pairs (such as [ [key1, value1], [key2, value2], [key1, value3], [key3, value4] ... ] )
 with potentially repeating keys. When invoked, _combine_ merges the values for identical keys using the provided accumulator function and produces a map mapping the original (unique) keys to their accumulated values.
 E.g. [[a, b], [c, d], [a, e], [c, f]] will be combined into [a : b+e, c : d+f], while the '+' operation on the values needs to be provided by the user as the accumulation closure.
+
 The _accumulation function_ argument needs to specify a function to use for combining (accumulating) the values belonging to the same key.
 An _initial accumulator value_ needs to be provided as well. Since the _combine_ method processes items in parallel, the _initial accumulator value_ will be reused multiple times.
 Thus the provided value must allow for reuse. It should be either a *cloneable* or *immutable* value or a *closure* returning a fresh initial accumulator each time requested.
@@ -98,3 +99,83 @@ accumulator = {ShoppingCart cart, Item value -> cart.addItem(value)} initialValu
 The return type is a map.
 E.g. [['he', 1], ['she', 2], ['he', 2], ['me', 1], ['she, 5], ['he', 1] with the initial value provided a 0 will be combined into
 ['he' : 4, 'she' : 7, 'he', : 2, 'me' : 1]
+
+{note}
+The keys will be mutually compared using their equals and hashCode methods. Consider using _\@Canonical_ or _\@EqualsAndHashCode_
+to annotate classes that you use as keys. Just like with all hash maps in Groovy, be sure you're using a String not a GString as a key!
+{note}
+
+For more involved scenarios when you _combine()_ complex objects, a good strategy here is to have a class that can be used as a key for the common use cases
+and apply different keys for uncommon cases.
+
+
+{code}
+import groovy.transform.ToString
+import groovy.transform.TupleConstructor
+
+import static groovyx.gpars.GParsPool.withPool
+
+@TupleConstructor @ToString
+class PricedCar implements Cloneable {
+    String model
+    String color
+    Double price
+
+    boolean equals(final o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        final PricedCar pricedCar = (PricedCar) o
+
+        if (color != pricedCar.color) return false
+        if (model != pricedCar.model) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = (model != null ? model.hashCode() : 0)
+        result = 31 * result + (color != null ? color.hashCode() : 0)
+        return result
+    }
+
+    @Override
+    protected Object clone() {
+        return super.clone()
+    }
+}
+
+def cars = [new PricedCar('F550', 'blue', 2342.223),
+        new PricedCar('F550', 'red', 234.234),
+        new PricedCar('Da', 'white', 2222.2),
+        new PricedCar('Da', 'white', 1111.1)]
+
+withPool {
+    //Combine by model
+    def result =
+        cars.parallel.map {
+            [it.model, it]
+        }.combine(new PricedCar('', 'N/A', 0.0)) {sum, value ->
+            sum.model = value.model
+            sum.price += value.price
+            sum
+        }.values()
+
+    println result
+
+
+    //Combine by model and color (the PricedCar's equals and hashCode))
+    result =
+        cars.parallel.map {
+            [it, it]
+        }.combine(new PricedCar('', 'N/A', 0.0)) {sum, value ->
+            sum.model = value.model
+            sum.color = value.color
+            sum.price += value.price
+            sum
+        }.values()
+
+    println result
+}
+{code}
