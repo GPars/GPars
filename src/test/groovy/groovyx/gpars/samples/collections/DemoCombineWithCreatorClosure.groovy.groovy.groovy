@@ -24,47 +24,44 @@ import groovy.transform.TupleConstructor
  */
 
 @TupleConstructor
-class PricedCar implements Cloneable {
+class BrandedCar {
     String model
+    String brand
     Double price
 
     String toString() {
         "PricedCar $model"
     }
-
-    boolean equals(final o) {
-        if (this.is(o)) return true
-        if (getClass() != o.class) return false
-
-        final PricedCar car = (PricedCar) o
-
-        if (model != car.model) return false
-
-        return true
-    }
-
-    int hashCode() {
-        return (model != null ? model.hashCode() : 0)
-    }
-
-    @Override
-    protected Object clone() {
-        return super.clone()
-    }
 }
 
-def cars = [new PricedCar("F550", 2342.223), new PricedCar("F550", 234.234), new PricedCar("Da", 2222.2)]
+def cars = [new BrandedCar("F550", "a", 2342.223), new BrandedCar("F550", "b", 234.234), new BrandedCar("Da", "c", 2222.2)]
+
+final createAccumulator = {new BrandedCar("", "", 0.0)}
 
 withPool {
-    def result =
+    def modelResult =
         cars.parallel.map {
-            [it.name, it]
-        }.combine(new PricedCar("", 0.0)) {sum, value ->
+            [it.model, it]
+        }.combine(createAccumulator) {sum, value ->
             sum.model = value.model
+            sum.brand = "Mixed values"
             sum.price += value.price
             sum
         }
                 .values()
 
-    println result
+    println modelResult
+
+    def brandedResult =
+        cars.parallel.map {
+            [it.model + it.brand, it]
+        }.combine(createAccumulator) {sum, value ->
+            sum.model = value.model
+            sum.brand = value.brand
+            sum.price += value.price
+            sum
+        }
+                .values()
+
+    println brandedResult
 }
