@@ -16,14 +16,14 @@
 
 package groovyx.gpars.samples.collections
 
-import static groovyx.gpars.GParsPool.*;
-import groovy.transform.TupleConstructor
+import groovy.transform.Canonical
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * @author Mario Garcia, Vaclav Pech
  */
 
-@TupleConstructor
+@Canonical
 class PricedCar implements Cloneable {
     String model
     Double price
@@ -32,33 +32,18 @@ class PricedCar implements Cloneable {
         "PricedCar $model"
     }
 
-    boolean equals(final o) {
-        if (this.is(o)) return true
-        if (getClass() != o.class) return false
-
-        final PricedCar car = (PricedCar) o
-
-        if (model != car.model) return false
-
-        return true
-    }
-
-    int hashCode() {
-        return (model != null ? model.hashCode() : 0)
-    }
-
     @Override
     protected Object clone() {
         return super.clone()
     }
 }
 
-def cars = [new PricedCar("F550", 2342.223), new PricedCar("F550", 234.234), new PricedCar("Da", 2222.2)]
+def cars = [new PricedCar('F550', 2342.223), new PricedCar('F550', 234.234), new PricedCar('Da', 2222.2)]
 
 withPool {
     def result =
         cars.parallel.map {
-            [it.name, it]
+            [it.model, it]
         }.combine(new PricedCar("", 0.0)) {sum, value ->
             sum.model = value.model
             sum.price += value.price

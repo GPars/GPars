@@ -24,11 +24,11 @@ import groovy.transform.TupleConstructor
  */
 
 @TupleConstructor
-class Car{
+class Car {
     String model
     Double price
 
-    String toString(){
+    String toString() {
         "Car $model"
     }
 
@@ -48,13 +48,13 @@ class Car{
     }
 }
 
-def cars = [new Car("F550",2342.223),new Car("F550",234.234),new Car("Da",2222.2)]
+def cars = [new Car('F550', 2342.223), new Car('F550', 234.234), new Car('Da', 2222.2)]
 
-withPool{
+withPool {
     def result =
-        cars.parallel.map{
-            [it,it.price]
-        }.combine(0){sum,value->
+        cars.parallel.map {
+            [it, it.price]
+        }.combine(0) {sum, value ->
             sum + value
         }
 
