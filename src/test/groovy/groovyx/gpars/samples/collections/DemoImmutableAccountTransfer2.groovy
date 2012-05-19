@@ -1,6 +1,6 @@
-// GPars (formerly GParallelizer)
+// GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-10  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.samples
+package groovyx.gpars.samples.collections
 
 import static groovyx.gpars.GParsPool.withPool
 import groovy.transform.Immutable
@@ -40,7 +40,7 @@ import groovy.transform.Immutable
         new ImmutableAccount2(balance + add)
     }
 
-    /** @return list of new "this" and new target account  */
+    /** @return list of new "this" and new target account   */
     List<ImmutableAccount2> transferTo(ImmutableAccount2 target, int amount) {
         [credit(-amount), target.credit(amount)]
     }
@@ -48,11 +48,12 @@ import groovy.transform.Immutable
 
 class ReferenceSafe {
     private List references
+
     synchronized List getValues() { references }
     /** @param update a closure that gets called with the spread of saved refs
-     * and that's return value becomes the new reference list */
+     * and that's return value becomes the new reference list  */
     synchronized void setValues(Closure update) {
-        references = update(*references).asImmutable()
+        references = update(* references).asImmutable()
     }
 }
 
@@ -61,7 +62,7 @@ accounts.values = { [new ImmutableAccount2(0), new ImmutableAccount2(0)] }
 
 withPool(50) {
     (1..1000).eachParallel {
-        accounts.values = { a,b -> a.transferTo b, 1 }
+        accounts.values = { a, b -> a.transferTo b, 1 }
     }
 }
 assert [-1000, 1000] == accounts.values.balance
