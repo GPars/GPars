@@ -33,7 +33,7 @@ apply plugin: 'idea'
 defaultTasks 'test'
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
-version = '1.0-beta-2'
+version = '1.0-SNAPSHOT'
 
 sourceCompatibility = 5
 targetCompatibility = 5
