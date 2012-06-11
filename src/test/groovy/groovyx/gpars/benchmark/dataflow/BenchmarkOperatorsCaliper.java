@@ -26,12 +26,8 @@ public class BenchmarkOperatorsCaliper extends SimpleBenchmark {
         script = new BenchmarkOperators();
     }
     public void timeOperator(int reps) {
-        ;
-
         for (int i = 0; i < reps; i++) {
-
                 script.run();
-
         }
 
     }
