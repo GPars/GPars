@@ -46,6 +46,13 @@ apply {
     from 'gradle/docsDependencies.gradle'
 }
 
+task copyDSLDefinitions(type: Copy) {
+    into "$buildDir/classes/main"
+    from(sourceSets.main.allSource) {
+        include('**/*.gdsl')
+    }
+}
+
 jar {
     manifest {
         name = 'gpars'
@@ -68,6 +75,8 @@ jar {
         instruction '-removeheaders', 'Bnd-LastModified'
     }
 }
+
+jar.dependsOn copyDSLDefinitions
 
 repositories {
     mavenCentral()
