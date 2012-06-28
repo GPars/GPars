@@ -30,26 +30,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Created with IntelliJ IDEA.
- * User: don
- * Date: 6/27/12
- * Time: 5:11 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
-    final int repeatNum = 200 * 2;
-    final int maxClients = 4;
+    final int repeatNum = 200 * 2; // Value used by Akka
+    final int maxClients = 4;      // Value used by Akka
     int repeatsPerClient;
     PGroup group;
     CountDownLatch cdl;
-    final Random random = new Random(0);
     List<Actor> clients;
     long total_duration;
     int total_count;
 
-    @Param({"2", "4", "8"}) int numberOfClients;
+    @Param({"1", "2", "4"}) int numberOfClients;
     private void setup(){
 
         total_duration=0;
@@ -58,6 +52,7 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         cdl = new CountDownLatch(numberOfClients);
         repeatsPerClient = repeatNum/numberOfClients;
         clients = new ArrayList<Actor>();
+
         for(int i=0; i < numberOfClients; i++){
             Actor destination = new Destination(group).start();
             Actor w4 = new WayPoint(destination, group).start();
@@ -76,9 +71,10 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
             try {
                 client.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
         }
+        group.shutdown();
     }
     public synchronized void add_duration(long duration){
         total_duration += duration;
@@ -92,9 +88,9 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         }
 
         try {
-            cdl.await(); //differ
+            cdl.await(20000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
         teardown();
@@ -176,6 +172,7 @@ class Client extends DynamicDispatchActor{
         this.parallelGroup = group;
         this.benchmark = benchmark;
     }
+
     void shortDelay(int micros, long n) {
         if (micros > 0) {
             int sampling = 1000 / micros;
@@ -183,7 +180,7 @@ class Client extends DynamicDispatchActor{
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 }
             }
         }
@@ -195,7 +192,7 @@ class Client extends DynamicDispatchActor{
         benchmark.add_duration(duration);
         received++;
         if (sent < repeat){
-            shortDelay(250, received);
+            shortDelay(250, received);  // value used by Akka
             next.send( new Msg(System.nanoTime(), this));
             sent++;
         } else if (received >= repeat){
@@ -205,11 +202,11 @@ class Client extends DynamicDispatchActor{
     }
 
     public void onMessage(Run msg){
-        int initialDelay = new Random(0).nextInt(20);
+        int initialDelay = new Random(0).nextInt(20);   // Value used by Akka
         try {
             Thread.sleep(initialDelay);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         next.send( new Msg(System.nanoTime(), this));
         sent++;

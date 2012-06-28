@@ -16,31 +16,56 @@
 
 package groovyx.gpars.benchmark;
 
+import com.google.caliper.Benchmark;
 import com.google.caliper.Runner;
+import com.google.caliper.runner.CaliperMain;
+import com.google.caliper.runner.InvalidBenchmarkException;
+import com.google.caliper.util.InvalidCommandException;
 import com.google.common.collect.ObjectArrays;
+import groovyx.gpars.benchmark.akka.BenchmarkLatencyDynamicDispatchActorCaliper;
+import groovyx.gpars.benchmark.akka.BenchmarkLatencyStaticDispatchActorCaliper;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.collect.ObjectArrays.concat;
 
 public class BenchmarkRunner {
 
     public static void main(String [] args){
-        File directory = new File("src/test/groovy/groovyx/gpars/benchmark/dataflow");
-        File []  files = directory.listFiles(new Filter());
-        for(int i=0;i<files.length;i++){
-            String className=files[i].getName();
-            className=className.substring(0,className.lastIndexOf('.'));
-            className="groovyx.gpars.benchmark.dataflow."+className;
-            new Runner().run(ObjectArrays.concat(args, className));
-        }
+        String [] latency_arg = {"-i", "latency"};
+        String [] throughput_arg = {"-i", "throughput"};
+        PrintWriter writer = new PrintWriter(System.out);
+        List<Class> benchmarks = new ArrayList<Class>();
 
+        benchmarks.add(BenchmarkLatencyDynamicDispatchActorCaliper.class);
+        benchmarks.add(BenchmarkLatencyStaticDispatchActorCaliper.class);
+
+        for(Class benchmark: benchmarks){
+            try {
+                if(benchmark.getName().equals("BenchmarkThroughputStaticDispatchActorCaliper")){
+                    CaliperMain.exitlessMain(concat(throughput_arg, benchmark.getName()), writer);
+                }
+                else CaliperMain.exitlessMain(concat(latency_arg, benchmark.getName()), writer);
+            } catch (InvalidCommandException e) {
+                e.display(writer);
+
+            } catch (InvalidBenchmarkException e) {
+                e.display(writer);
+
+            } catch (Throwable t) {
+                t.printStackTrace(writer);
+                writer.println();
+                writer.println("An unexpected exception has been thrown by the caliper runner.");
+                writer.println("Please see https://sites.google.com/site/caliperusers/issues");
+            }
+
+            writer.flush();
+        }
     }
 
-    static class Filter implements FileFilter
-    {
-        public boolean accept(File file)
-        {
-            return file.getName().toLowerCase().indexOf("caliper")>=0;
-        }
-    }
+
 }
