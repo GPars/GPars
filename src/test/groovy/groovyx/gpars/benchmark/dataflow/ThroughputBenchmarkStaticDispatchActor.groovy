@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark.dataflow
+package groovyx.gpars.benchmark
+//-Dbenchmark=true -Dbenchmark.repeatFactor=500
 
 import com.google.caliper.Param
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
+import com.google.caliper.api.Benchmark
+import com.google.caliper.runner.CaliperMain
 import groovyx.gpars.actor.StaticDispatchActor
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.FJPool
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import com.google.caliper.api.VmParam
 
-class ThroughputBenchmarkStaticDispatchActor extends SimpleBenchmark{
-    @VmParam(["-Xdebug"])String placeHolder;
-    @VmParam(["-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"])String placeHolder2;
+class ThroughputBenchmarkStaticDispatchActor extends Benchmark {
+
+
     @Param(["1", "2", "4", "6", "8",
     "10", "12", "14", "16", "18",
     "20", "22", "24", "26", "28",
@@ -41,20 +41,23 @@ class ThroughputBenchmarkStaticDispatchActor extends SimpleBenchmark{
     DefaultPGroup group
     long repeatsPerClient
 
-
-    @Override protected void setUp() throws Exception {
-        int repeatFactor = 2
-        long repeat = 30000L * repeatFactor
-        int maxClients = 4;
-        group = new DefaultPGroup(new FJPool(maxClients))
-        repeatsPerClient = repeat / numberOfClients
-    }
-
-    public void timeThroughput(int reps) {
+    public long timeThroughput(int reps) {
+        long totalTime =0;
         for (int i = 0; i < reps; i++) {
+            //start set up
+
+            int repeatFactor = 2
+            long repeat = 30000L * repeatFactor
+            int maxClients = 4;
+            group = new DefaultPGroup(new FJPool(maxClients))
+            repeatsPerClient = repeat / numberOfClients
             CountDownLatch latch = new CountDownLatch(numberOfClients)
             ArrayList<DestinationActor> destinations = new ArrayList<DestinationActor>()
-            ArrayList<ClientActor>clients = new ArrayList<ClientActor>()
+            ArrayList<ClientActor> clients = new ArrayList<ClientActor>()
+
+            //end setup
+            long startTime = System.nanoTime();
+            //start timing
 
             (1..numberOfClients).each {
                 destinations.add(new DestinationActor(group).start())
@@ -67,6 +70,9 @@ class ThroughputBenchmarkStaticDispatchActor extends SimpleBenchmark{
                 it.send(RUN)
             }
             latch.await(maxRunDurationMillis, TimeUnit.MILLISECONDS)
+
+            //stopTiming
+            totalTime += System.nanoTime()- startTime;
             clients.each {
                 it.terminate()
             }
@@ -74,10 +80,11 @@ class ThroughputBenchmarkStaticDispatchActor extends SimpleBenchmark{
                 it.terminate();
             }
         }
+        return totalTime;
     }
 
     static void main(String[] args) {
-        new Runner().main(ThroughputBenchmarkStaticDispatchActor.class, args);
+        CaliperMain.main(ThroughputBenchmark_Instrument.class, args);
     }
 
 }
@@ -99,21 +106,21 @@ class ClientActor extends StaticDispatchActor<Integer> {
     }
 
     void onMessage(Integer msg) {
-        if (msg.equals(ThroughputBenchmarkStaticDispatchActor.MESSAGE)) {
+        if (msg.equals(ThroughputBenchmark_Instrument.MESSAGE)) {
             received += 1
             if (sent < repeatsPerClient) {
                 actor.send(msg)
                 sent += 1
             } else if (received >= repeatsPerClient) {
                 latch.countDown()
-                sent=0;
-                received=0;
+                sent = 0;
+                received = 0;
 
             }
         }
-        if (msg.equals(ThroughputBenchmarkStaticDispatchActor.RUN)) {
+        if (msg.equals(ThroughputBenchmark_Instrument.RUN)) {
             (1..Math.min(repeatsPerClient, 1000L)).each {
-                actor.send(ThroughputBenchmarkStaticDispatchActor.MESSAGE)
+                actor.send(ThroughputBenchmark_Instrument.MESSAGE)
                 sent += 1
             }
         }
@@ -128,7 +135,7 @@ class DestinationActor extends StaticDispatchActor<Integer> {
 
     @Override
     void onMessage(Integer m) {
-        getSender().send(ThroughputBenchmarkStaticDispatchActor.MESSAGE)
+        getSender().send(ThroughputBenchmark_Instrument.MESSAGE)
     }
 }
 
