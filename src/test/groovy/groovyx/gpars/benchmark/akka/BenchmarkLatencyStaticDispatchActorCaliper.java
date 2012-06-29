@@ -17,8 +17,6 @@
 package groovyx.gpars.benchmark.akka;
 
 import com.google.caliper.Param;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 import com.google.caliper.api.Benchmark;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.Actor;
@@ -82,7 +80,7 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends Benchmark {
         total_duration += duration;
         total_count++;
     }
-    public long latencyPropagationDelay(int dummy){
+    public long latencyStaticPropagationDelay(int dummy){
         setup();
         for(Actor client: clients){
             client.start();

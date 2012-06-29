@@ -27,13 +27,6 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created with IntelliJ IDEA.
- * User: don
- * Date: 6/28/12
- * Time: 3:14 PM
- * To change this template use File | Settings | File Templates.
- */
 public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
     @Param({"1", "2", "4", "6", "8",
@@ -48,7 +41,7 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
     long repeatsPerClient;
 
 
-    public long timeThroughput(int reps) {
+    public long timeStaticThroughput(int reps) {
         long totalTime =0;
         for (int i = 0; i < reps; i++) {
             int repeatFactor = 2;

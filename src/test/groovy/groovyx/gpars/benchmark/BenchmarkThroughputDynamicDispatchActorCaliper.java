@@ -27,7 +27,7 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
     public static final Message message = new Message();
     final int maxRunDurationMillis = 20000;
 
-    public long timeThroughput(int reps) {
+    public long timeDynamicThroughput(int reps) {
         long totalTime=0;
         for (int rep = 0; rep< reps; rep++) {
             CountDownLatch latch = new CountDownLatch(numberOfClients);

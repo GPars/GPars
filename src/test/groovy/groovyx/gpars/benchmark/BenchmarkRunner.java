@@ -16,17 +16,13 @@
 
 package groovyx.gpars.benchmark;
 
-import com.google.caliper.Benchmark;
-import com.google.caliper.Runner;
 import com.google.caliper.runner.CaliperMain;
 import com.google.caliper.runner.InvalidBenchmarkException;
 import com.google.caliper.util.InvalidCommandException;
-import com.google.common.collect.ObjectArrays;
 import groovyx.gpars.benchmark.akka.BenchmarkLatencyDynamicDispatchActorCaliper;
 import groovyx.gpars.benchmark.akka.BenchmarkLatencyStaticDispatchActorCaliper;
+import groovyx.gpars.benchmark.akka.BenchmarkThroughputStaticDispatchActorCaliper;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,20 +32,22 @@ import static com.google.common.collect.ObjectArrays.concat;
 public class BenchmarkRunner {
 
     public static void main(String [] args){
-        String [] latency_arg = {"-i", "latency"};
-        String [] throughput_arg = {"-i", "throughput"};
+        String [] latencyArg = {"-i", "latency"};
+        String [] throughputArg = {"-i", "throughput"};
         PrintWriter writer = new PrintWriter(System.out);
         List<Class> benchmarks = new ArrayList<Class>();
 
         benchmarks.add(BenchmarkLatencyDynamicDispatchActorCaliper.class);
         benchmarks.add(BenchmarkLatencyStaticDispatchActorCaliper.class);
+        benchmarks.add(BenchmarkThroughputDynamicDispatchActorCaliper.class);
+        benchmarks.add(BenchmarkThroughputStaticDispatchActorCaliper.class);
 
         for(Class benchmark: benchmarks){
             try {
-                if(benchmark.getName().equals("BenchmarkThroughputStaticDispatchActorCaliper")){
-                    CaliperMain.exitlessMain(concat(throughput_arg, benchmark.getName()), writer);
+                if(benchmark.getName().matches(".*Throughput.*")){
+                    CaliperMain.exitlessMain(concat(throughputArg, benchmark.getName()), writer);
                 }
-                else CaliperMain.exitlessMain(concat(latency_arg, benchmark.getName()), writer);
+                else CaliperMain.exitlessMain(concat(latencyArg, benchmark.getName()), writer);
             } catch (InvalidCommandException e) {
                 e.display(writer);
 

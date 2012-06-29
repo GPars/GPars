@@ -21,7 +21,6 @@ import com.google.caliper.api.Benchmark;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.DynamicDispatchActor;
-import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.FJPool;
@@ -80,7 +79,7 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         total_duration += duration;
         total_count++;
     }
-    public long latencyPropagationDelay(int dummy){
+    public long latencyDynamicPropagationDelay(int dummy){
         setup();
         for(Actor client: clients){
             client.start();
