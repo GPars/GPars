@@ -26,7 +26,6 @@ import groovyx.gpars.scheduler.FJPool;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
@@ -79,7 +78,7 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
                 client.send(RUN);
             }
             try {
-                latch.await(maxRunDurationMillis, TimeUnit.MILLISECONDS);
+                latch.await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
