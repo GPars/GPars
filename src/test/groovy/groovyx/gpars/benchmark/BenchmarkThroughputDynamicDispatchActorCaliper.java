@@ -2,8 +2,8 @@ package groovyx.gpars.benchmark;
 
 import com.google.caliper.Param;
 import com.google.caliper.api.Benchmark;
+import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
-import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.scheduler.FJPool;
@@ -19,33 +19,47 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
             "30", "32", "34", "36", "38",
             "40", "42", "44", "46", "48"}
     ) int numberOfClients;
-    int repeatFactor = 2;
-    long repeat = 30000L * repeatFactor;
-    int maxClients = 4;
-    DefaultPGroup group = new DefaultPGroup(new FJPool(maxClients));
-    Run run = new Run();
-    public static final Message message = new Message();
-    final int maxRunDurationMillis = 20000;
+    @VmParam({"-server"}) String server;
+    @VmParam({"-Xms512M"}) String xms;
+    @VmParam({"-Xmx1024M"}) String xmx;
+    @VmParam({"-XX:+UseParallelGC"}) String gc;
 
-    public long timeDynamicThroughput(int reps) {
+    int maxClients = 4;
+    public static final Run RUN =new Run();
+    public static final Message MESSAGE = new Message();
+    final int maxRunDurationMillis = 20000;
+    DefaultPGroup group;
+    long repeatsPerClient;
+    int repeatFactor = 500;
+    int repeat = 30000 * repeatFactor;
+
+    public int totalMessages(){
+        return repeat;
+    }
+
+    public long timeDynamicDispatchActorThroughput(int reps) {
         long totalTime=0;
+        group = new DefaultPGroup(new FJPool(maxClients));
+        repeatsPerClient = repeat / numberOfClients;
+
         for (int rep = 0; rep< reps; rep++) {
+
             CountDownLatch latch = new CountDownLatch(numberOfClients);
-            long repeatsPerClient = repeat / numberOfClients;
-            ArrayList<Actor> clients = new ArrayList<Actor>();     //put lists inside method
-            ArrayList<Actor> destinations = new ArrayList<Actor>();
+            ArrayList<Client> clients = new ArrayList<Client>();
+            ArrayList<Destination> destinations = new ArrayList<Destination>();
+
             for (int i = 0; i < numberOfClients; i++) {
-                destinations.add(new Destination(group).start());
+                destinations.add((Destination)new Destination(group).start());
             }
 
-            for (Actor destination : destinations) {
-                clients.add(new Client(destination, latch, repeatsPerClient, group).start());
+            for (Destination destination : destinations) {
+                clients.add((Client)new Client(destination, latch, repeatsPerClient, group).start());
             }
 
             long startTime = System.nanoTime();
-            Run run = new Run();
-            for (Actor client : clients) {
-                client.send(run);
+
+            for (Client client : clients) {
+                client.send(RUN);
             }
             try {
                 latch.await(maxRunDurationMillis, TimeUnit.MILLISECONDS);
@@ -53,10 +67,10 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
                 e.printStackTrace();
             }
             totalTime+=System.nanoTime()-startTime;
-            for (Actor client : clients) {
+            for (Client client : clients) {
                 client.terminate();
             }
-            for (Actor destination : destinations) {
+            for (Destination destination : destinations) {
                 destination.terminate();
             }
         }
@@ -78,11 +92,11 @@ class Client extends DynamicDispatchActor {
 
     long sent = 0L;
     long received = 0L;
-    Actor actor;
+    Destination actor;
     long repeatsPerClient;
     CountDownLatch latch;
 
-    public Client(Actor actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public Client(Destination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -102,7 +116,7 @@ class Client extends DynamicDispatchActor {
         }
         if (msg instanceof Run) {
             for (int i = 0; i < Math.min(repeatsPerClient, 1000L); i++) {
-                actor.send(BenchmarkThroughputDynamicDispatchActorCaliper.message);
+                actor.send(BenchmarkThroughputDynamicDispatchActorCaliper.MESSAGE);
                 sent += 1;
             }
         }

@@ -18,6 +18,7 @@ package groovyx.gpars.benchmark.akka;
 
 import com.google.caliper.Param;
 import com.google.caliper.api.Benchmark;
+import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.DynamicDispatchActor;
@@ -29,11 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 
 public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
-    final int repeatNum = 200 * 2; // Value used by Akka
+    final int repeatNum = 200 * 500; // Value used by Akka
     final int maxClients = 4;      // Value used by Akka
     int repeatsPerClient;
     PGroup group;
@@ -42,6 +42,10 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
     long total_duration;
     int total_count;
 
+    @VmParam({"-server"}) String server;
+    @VmParam({"-Xms512M"}) String xms;
+    @VmParam({"-Xmx1024M"}) String xmx;
+    @VmParam({"-XX:+UseParallelGC"}) String gc;
     @Param({"1", "2", "4"}) int numberOfClients;
     private void setup(){
 
@@ -75,11 +79,17 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         }
         group.shutdown();
     }
+
     public synchronized void add_duration(long duration){
         total_duration += duration;
         total_count++;
     }
-    public long latencyDynamicPropagationDelay(int dummy){
+
+    public int totalMessages(){
+        return repeatNum;
+    }
+
+    public long latencyDynamicDispatchActorLatency(int dummy){
         setup();
         for(Actor client: clients){
             client.start();
@@ -87,7 +97,9 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         }
 
         try {
-            cdl.await(20000, TimeUnit.MILLISECONDS);
+           cdl.await();
+
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

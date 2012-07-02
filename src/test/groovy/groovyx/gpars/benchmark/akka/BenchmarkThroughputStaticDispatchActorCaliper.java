@@ -18,6 +18,7 @@ package groovyx.gpars.benchmark.akka;
 
 import com.google.caliper.Param;
 import com.google.caliper.api.Benchmark;
+import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
@@ -29,38 +30,51 @@ import java.util.concurrent.TimeUnit;
 
 public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
-    @Param({"1", "2", "4", "6", "8",
+   @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
             "20", "22", "24", "26", "28",
             "30", "32", "34", "36", "38",
-            "40", "42", "44", "46", "48"}) int numberOfClients;
+            "40", "42", "44", "46", "48"}
+   ) int numberOfClients;
+    @VmParam({"-server"}) String server;
+    @VmParam({"-Xms512M"}) String xms;
+    @VmParam({"-Xmx1024M"}) String xmx;
+    @VmParam({"-XX:+UseParallelGC"}) String gc;//vm settings
+
+    int maxClients = 4;
     public static final int RUN = 1;
     public static final int MESSAGE = 2;
     final int maxRunDurationMillis = 20000;
     DefaultPGroup group;
     long repeatsPerClient;
+    int repeatFactor=500;
+    int repeat=30000*repeatFactor; //total number of messages that needs to be sent
 
+    public int totalMessages(){
+        return repeat;
+    }
 
-    public long timeStaticThroughput(int reps) {
+    public long timeStaticDispatchActorThroughput(int reps) {
         long totalTime =0;
+        group = new DefaultPGroup(new FJPool(maxClients));
+        repeatsPerClient = repeat / numberOfClients;//MESSAGE quota for each pair of actors
+
         for (int i = 0; i < reps; i++) {
-            int repeatFactor = 2;
-            long repeat = 30000L * repeatFactor;
-            int maxClients = 4;
-            group = new DefaultPGroup(new FJPool(maxClients));
-            repeatsPerClient = repeat / numberOfClients;
+
             CountDownLatch latch = new CountDownLatch(numberOfClients);
             ArrayList<DestinationActor> destinations = new ArrayList<DestinationActor>();
             ArrayList<ClientActor> clients = new ArrayList<ClientActor>();
 
-            long startTime = System.nanoTime();
             for(int j=0; j < numberOfClients; j++){
                 destinations.add((DestinationActor)new DestinationActor(group).start());
 
             }
-            for(DestinationActor actor: destinations){
-                clients.add((ClientActor)new ClientActor(actor, latch, repeatsPerClient, group).start());
+            for(DestinationActor destination: destinations){
+                clients.add((ClientActor)new ClientActor(destination, latch, repeatsPerClient, group).start());
             }
+
+            long startTime = System.nanoTime();//start timing
+
             for(ClientActor client: clients) {
                 client.send(RUN);
             }
@@ -69,7 +83,8 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            totalTime += System.nanoTime()- startTime;
+
+            totalTime += System.nanoTime()- startTime;//stop timing
 
             for(ClientActor client: clients){
                 client.terminate();
@@ -81,8 +96,10 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
         return totalTime;
     }
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         CaliperMain.main(BenchmarkThroughputStaticDispatchActorCaliper.class, args);
+
+
     }
 
 }
