@@ -22,6 +22,8 @@ package groovyx.gpars.benchmark;
 import com.google.caliper.runner.CaliperMain;
 import com.google.caliper.runner.InvalidBenchmarkException;
 import com.google.caliper.util.InvalidCommandException;
+import groovyx.gpars.benchmark.akka.BenchmarkLatencyDynamicDispatchActorCaliper;
+import groovyx.gpars.benchmark.akka.BenchmarkLatencyStaticDispatchActorCaliper;
 import groovyx.gpars.benchmark.akka.BenchmarkThroughputStaticDispatchActorCaliper;
 
 import java.io.PrintWriter;
@@ -38,8 +40,8 @@ public class BenchmarkRunner {
         PrintWriter writer = new PrintWriter(System.out);
         List<Class> benchmarks = new ArrayList<Class>();
 
-        //benchmarks.add(BenchmarkLatencyDynamicDispatchActorCaliper.class);
-        //benchmarks.add(BenchmarkLatencyStaticDispatchActorCaliper.class);
+        benchmarks.add(BenchmarkLatencyDynamicDispatchActorCaliper.class);
+        benchmarks.add(BenchmarkLatencyStaticDispatchActorCaliper.class);
         benchmarks.add(BenchmarkThroughputDynamicDispatchActorCaliper.class);
         benchmarks.add(BenchmarkThroughputStaticDispatchActorCaliper.class);
 
