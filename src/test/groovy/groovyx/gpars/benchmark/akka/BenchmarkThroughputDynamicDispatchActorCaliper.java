@@ -1,4 +1,4 @@
-package groovyx.gpars.benchmark;
+package groovyx.gpars.benchmark.akka;
 
 import com.google.caliper.Param;
 import com.google.caliper.api.Benchmark;
@@ -30,7 +30,7 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
 
     int maxClients = 4;
     public static final Run RUN = new Run();
-    public static final Message MESSAGE = new Message();
+    public static final ThroughputMessage MESSAGE = new ThroughputMessage();
     final int maxRunDurationMillis = 20000;
     DefaultPGroup group;
     long repeatsPerClient;
@@ -88,7 +88,7 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
 
 }
 
-class Message {
+class ThroughputMessage {
 }
 
 class Run {
@@ -109,7 +109,7 @@ class Client extends DynamicDispatchActor {
         this.latch = latch;
     }
 
-    void onMessage(final Message msg) {
+    void onMessage(final ThroughputMessage msg) {
         received += 1;
         if (sent < repeatsPerClient) {
             actor.send(msg);
@@ -133,7 +133,7 @@ class Destination extends DynamicDispatchActor {
         this.parallelGroup = group;
     }
 
-    void onMessage(final Message msg) {
+    void onMessage(final ThroughputMessage msg) {
         getSender().send(msg);
     }
 

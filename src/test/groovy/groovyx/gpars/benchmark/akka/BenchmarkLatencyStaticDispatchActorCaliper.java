@@ -138,6 +138,7 @@ class StaticWayPoint extends StaticDispatchActor<Message> {
     StaticWayPoint(final Actor next, PGroup group){
         this.next = next;
         this.parallelGroup = group;
+       // this.makeFair();
     }
 
     @Override
@@ -155,6 +156,7 @@ class StaticWayPoint extends StaticDispatchActor<Message> {
 
 class StaticDestination extends StaticDispatchActor<Message>{
     StaticDestination(PGroup group){
+        //this.makeFair();
         this.parallelGroup = group;
     }
     @Override
@@ -183,6 +185,7 @@ class StaticClient extends StaticDispatchActor<Message>{
         this.repeat = repeat;
         this.parallelGroup = group;
         this.benchmark = benchmark;
+        //this.makeFair();
     }
 
     void shortDelay(int micros, long n) {

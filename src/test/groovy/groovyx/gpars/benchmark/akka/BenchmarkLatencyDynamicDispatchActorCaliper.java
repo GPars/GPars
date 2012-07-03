@@ -57,12 +57,12 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         clients = new ArrayList<Actor>();
 
         for(int i=0; i < numberOfClients; i++){
-            Actor destination = new Destination(group).start();
+            Actor destination = new LatencyDestination(group).start();
             Actor w4 = new WayPoint(destination, group).start();
             Actor w3 = new WayPoint(w4, group).start();
             Actor w2 = new WayPoint(w3, group).start();
             Actor w1 = new WayPoint(w2, group).start();
-            clients.add(new Client(w1, cdl, repeatsPerClient, group, this));
+            clients.add(new LatencyClient(w1, cdl, repeatsPerClient, group, this));
         }
     }
 
@@ -93,7 +93,7 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         setup();
         for(Actor client: clients){
             client.start();
-            client.send(new Run());
+            client.send(new LatencyRun());
         }
 
         try {
@@ -128,7 +128,7 @@ class Msg{
     }
 }
 
-class Run{}
+class LatencyRun{}
 class Poison{}
 
 class WayPoint extends DynamicDispatchActor {
@@ -137,6 +137,7 @@ class WayPoint extends DynamicDispatchActor {
     WayPoint(final Actor next, PGroup group){
         this.next = next;
         this.parallelGroup = group;
+        //this.makeFair();
     }
 
     public void onMessage(Msg msg){
@@ -151,10 +152,11 @@ class WayPoint extends DynamicDispatchActor {
 
 }
 
-class Destination extends DynamicDispatchActor{
+class LatencyDestination extends DynamicDispatchActor{
 
-    Destination(PGroup group){
+    LatencyDestination(PGroup group){
         this.parallelGroup = group;
+        //this.makeFair();
     }
 
     public void onMessage(Msg msg){
@@ -168,7 +170,7 @@ class Destination extends DynamicDispatchActor{
 
 }
 
-class Client extends DynamicDispatchActor{
+class LatencyClient extends DynamicDispatchActor{
     long sent = 0L;
     long received = 0L;
     final Actor next;
@@ -176,12 +178,13 @@ class Client extends DynamicDispatchActor{
     final int repeat;
     final BenchmarkLatencyDynamicDispatchActorCaliper benchmark;
 
-    Client(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyDynamicDispatchActorCaliper benchmark){
+    LatencyClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyDynamicDispatchActorCaliper benchmark){
         this.next = next;
         this.latch = latch;
         this.repeat = repeat;
         this.parallelGroup = group;
         this.benchmark = benchmark;
+        //this.makeFair();
     }
 
     void shortDelay(int micros, long n) {
@@ -212,7 +215,7 @@ class Client extends DynamicDispatchActor{
 
     }
 
-    public void onMessage(Run msg){
+    public void onMessage(LatencyRun msg){
         int initialDelay = new Random(0).nextInt(20);   // Value used by Akka
         try {
             Thread.sleep(initialDelay);
