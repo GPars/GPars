@@ -21,7 +21,6 @@ import com.google.caliper.api.Benchmark;
 import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.StaticDispatchActor;
-import groovyx.gpars.benchmark.BenchmarkThroughputDynamicDispatchActorCaliper;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.scheduler.FJPool;
 
@@ -29,26 +28,20 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created with IntelliJ IDEA.
- * User: don
- * Date: 7/3/12
- * Time: 11:01 AM
- * To change this template use File | Settings | File Templates.
- */
 public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark {
-       @Param({"1", "2", "4", "6", "8",
+    @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
             "20", "22", "24", "26", "28",
             "30", "32", "34", "36", "38",
             "40", "42", "44", "46", "48"}
-   ) int numberOfClients;
+    )
+    int numberOfClients;
 
 
     @VmParam({"-server"}) String server;
     @VmParam({"-Xms512M"}) String xms;
     @VmParam({"-Xmx1024M"}) String xmx;
-    @VmParam({"-XX:+UseParallelGC"}) String gc;//vm settings
+    @VmParam({"-XX:+UseParallelGC"}) String gc;
 
     int maxClients = 4;
     public static final int RUN = 1;
@@ -56,15 +49,15 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
     final int maxRunDurationMillis = 20000;
     DefaultPGroup group;
     long repeatsPerClient;
-    int repeatFactor=500;
-    int repeat=30000*repeatFactor; //total number of messages that needs to be sent
+    int repeatFactor = 500;
+    int repeat = 30000 * repeatFactor; //total number of messages that needs to be sent
 
-    public int totalMessages(){
+    public int totalMessages() {
         return repeat;
     }
 
     public long timeComputationStaticDispatchActorThroughput(int reps) {
-        long totalTime =0;
+        long totalTime = 0;
         group = new DefaultPGroup(new FJPool(maxClients));
         repeatsPerClient = repeat / numberOfClients;//MESSAGE quota for each pair of actors
 
@@ -74,17 +67,17 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
             ArrayList<ComputationDestinationActor> destinations = new ArrayList<ComputationDestinationActor>();
             ArrayList<ComputationClientActor> clients = new ArrayList<ComputationClientActor>();
 
-            for(int j=0; j < numberOfClients; j++){
-                destinations.add((ComputationDestinationActor)new ComputationDestinationActor(group).start());
+            for (int j = 0; j < numberOfClients; j++) {
+                destinations.add((ComputationDestinationActor) new ComputationDestinationActor(group).start());
 
             }
-            for(ComputationDestinationActor destination: destinations){
-                clients.add((ComputationClientActor)new ComputationClientActor(destination, latch, repeatsPerClient, group).start());
+            for (ComputationDestinationActor destination : destinations) {
+                clients.add((ComputationClientActor) new ComputationClientActor(destination, latch, repeatsPerClient, group).start());
             }
 
             long startTime = System.nanoTime();//start timing
 
-            for(ComputationClientActor client: clients) {
+            for (ComputationClientActor client : clients) {
                 client.send(RUN);
             }
             try {
@@ -93,12 +86,12 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
                 e.printStackTrace();
             }
 
-            totalTime += System.nanoTime()- startTime;//stop timing
+            totalTime += System.nanoTime() - startTime;//stop timing
 
-            for(ComputationClientActor client: clients){
+            for (ComputationClientActor client : clients) {
                 client.terminate();
             }
-            for(ComputationDestinationActor destination: destinations) {
+            for (ComputationDestinationActor destination : destinations) {
                 destination.terminate();
             }
         }
@@ -125,7 +118,7 @@ class ComputationClientActor extends StaticDispatchActor<Integer> {
     private long currentPosition = 0L;
     int nrOfElements = 1000;
 
-    void calculatePi(){
+    void calculatePi() {
         _pi += calculateDecimals(currentPosition);
         currentPosition += nrOfElements;
     }
@@ -160,7 +153,7 @@ class ComputationClientActor extends StaticDispatchActor<Integer> {
             }
         }
         if (msg.equals(BenchmarkThroughputStaticDispatchActorCaliper.RUN)) {
-            for(int i=0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
+            for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
                 actor.send(BenchmarkThroughputComputationStaticActorCaliper.MESSAGE);
                 sent += 1;
             }
@@ -175,7 +168,7 @@ class ComputationDestinationActor extends StaticDispatchActor<Integer> {
     private long currentPosition = 0L;
     int nrOfElements = 1000;
 
-    void calculatePi(){
+    void calculatePi() {
         _pi += calculateDecimals(currentPosition);
         currentPosition += nrOfElements;
     }

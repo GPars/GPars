@@ -42,21 +42,22 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
     long total_duration;
     int total_count;
 
+    @Param({"1", "2", "4"}) int numberOfClients;
+
     @VmParam({"-server"}) String server;
     @VmParam({"-Xms512M"}) String xms;
     @VmParam({"-Xmx1024M"}) String xmx;
     @VmParam({"-XX:+UseParallelGC"}) String gc;
-    @Param({"1", "2", "4"}) int numberOfClients;
-    private void setup(){
 
-        total_duration=0;
-        total_count =0;
+    private void setup() {
+        total_duration = 0;
+        total_count = 0;
         group = new DefaultPGroup(new FJPool(maxClients));
         cdl = new CountDownLatch(numberOfClients);
-        repeatsPerClient = repeatNum/numberOfClients;
+        repeatsPerClient = repeatNum / numberOfClients;
         clients = new ArrayList<Actor>();
 
-        for(int i=0; i < numberOfClients; i++){
+        for (int i = 0; i < numberOfClients; i++) {
             Actor destination = new LatencyDestination(group).start();
             Actor w4 = new WayPoint(destination, group).start();
             Actor w3 = new WayPoint(w4, group).start();
@@ -66,11 +67,11 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         }
     }
 
-    private void teardown(){
-        for(Actor client: clients){
+    private void teardown() {
+        for (Actor client : clients) {
             client.send(new Poison());
         }
-        for(Actor client: clients){
+        for (Actor client : clients) {
             try {
                 client.join();
             } catch (InterruptedException e) {
@@ -80,24 +81,24 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         group.shutdown();
     }
 
-    public synchronized void add_duration(long duration){
+    public synchronized void add_duration(long duration) {
         total_duration += duration;
         total_count++;
     }
 
-    public int totalMessages(){
+    public int totalMessages() {
         return repeatNum;
     }
 
-    public long latencyDynamicDispatchActorLatency(int dummy){
+    public long latencyDynamicDispatchActorLatency(int dummy) {
         setup();
-        for(Actor client: clients){
+        for (Actor client : clients) {
             client.start();
             client.send(new LatencyRun());
         }
 
         try {
-           cdl.await();
+            cdl.await();
 
 
         } catch (InterruptedException e) {
@@ -109,68 +110,72 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         return total_duration;
     }
 
-    public static void main(String [] args){
+    public static void main(String[] args) {
         CaliperMain.main(BenchmarkLatencyDynamicDispatchActorCaliper.class, args);
     }
 }
 
-class Msg{
+class Msg {
     final long sendTime;
     final Actor sender;
 
-    Msg(final long sendTime, final Actor sender){
+    Msg(final long sendTime, final Actor sender) {
         this.sendTime = sendTime;
         this.sender = sender;
     }
 
-    public Actor sender(){
+    public Actor sender() {
         return sender;
     }
 }
 
-class LatencyRun{}
-class Poison{}
+class LatencyRun {
+}
+
+class Poison {
+}
 
 class WayPoint extends DynamicDispatchActor {
     final Actor next;
 
-    WayPoint(final Actor next, PGroup group){
+    WayPoint(final Actor next, PGroup group) {
         this.next = next;
         this.parallelGroup = group;
         //this.makeFair();
     }
 
-    public void onMessage(Msg msg){
+    public void onMessage(Msg msg) {
         next.send(msg);
 
     }
 
-    public void onMessage(Poison msg){
+    public void onMessage(Poison msg) {
         next.send(msg);
         terminate();
     }
 
 }
 
-class LatencyDestination extends DynamicDispatchActor{
+class LatencyDestination extends DynamicDispatchActor {
 
-    LatencyDestination(PGroup group){
+    LatencyDestination(PGroup group) {
         this.parallelGroup = group;
         //this.makeFair();
     }
 
-    public void onMessage(Msg msg){
-        msg.sender().send( msg );
+    public void onMessage(Msg msg) {
+        msg.sender().send(msg);
 
 
     }
-    public void onMessage(Poison msg){
+
+    public void onMessage(Poison msg) {
         terminate();
     }
 
 }
 
-class LatencyClient extends DynamicDispatchActor{
+class LatencyClient extends DynamicDispatchActor {
     long sent = 0L;
     long received = 0L;
     final Actor next;
@@ -178,7 +183,7 @@ class LatencyClient extends DynamicDispatchActor{
     final int repeat;
     final BenchmarkLatencyDynamicDispatchActorCaliper benchmark;
 
-    LatencyClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyDynamicDispatchActorCaliper benchmark){
+    LatencyClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyDynamicDispatchActorCaliper benchmark) {
         this.next = next;
         this.latch = latch;
         this.repeat = repeat;
@@ -200,33 +205,33 @@ class LatencyClient extends DynamicDispatchActor{
         }
     }
 
-    public void onMessage(Msg msg){
+    public void onMessage(Msg msg) {
 
         long duration = System.nanoTime() - msg.sendTime;
         benchmark.add_duration(duration);
         received++;
-        if (sent < repeat){
+        if (sent < repeat) {
             shortDelay(250, received);  // value used by Akka
-            next.send( new Msg(System.nanoTime(), this));
+            next.send(new Msg(System.nanoTime(), this));
             sent++;
-        } else if (received >= repeat){
+        } else if (received >= repeat) {
             latch.countDown();
         }
 
     }
 
-    public void onMessage(LatencyRun msg){
+    public void onMessage(LatencyRun msg) {
         int initialDelay = new Random(0).nextInt(20);   // Value used by Akka
         try {
             Thread.sleep(initialDelay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        next.send( new Msg(System.nanoTime(), this));
+        next.send(new Msg(System.nanoTime(), this));
         sent++;
     }
 
-    public void onMessage(Poison msg){
+    public void onMessage(Poison msg) {
         next.send(msg);
         terminate();
     }

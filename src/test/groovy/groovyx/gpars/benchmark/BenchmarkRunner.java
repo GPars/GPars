@@ -15,7 +15,6 @@
 // limitations under the License.
 
 
-
 //change b=
 package groovyx.gpars.benchmark;
 
@@ -35,9 +34,9 @@ import static com.google.common.collect.ObjectArrays.concat;
 
 public class BenchmarkRunner {
 
-    public static void main(String [] args){
-        String [] latencyArg = {"-i", "latency"};
-        String [] throughputArg = {"-i", "throughput"};
+    public static void main(String[] args) {
+        String[] latencyArg = {"-i", "latency"};
+        String[] throughputArg = {"-i", "throughput"};
         PrintWriter writer = new PrintWriter(System.out);
         List<Class> benchmarks = new ArrayList<Class>();
 
@@ -46,12 +45,11 @@ public class BenchmarkRunner {
         benchmarks.add(BenchmarkThroughputDynamicDispatchActorCaliper.class);
         benchmarks.add(BenchmarkThroughputStaticDispatchActorCaliper.class);
 
-        for(Class benchmark: benchmarks){
+        for (Class benchmark : benchmarks) {
             try {
-                if(benchmark.getName().matches(".*Throughput.*")){
+                if (benchmark.getName().matches(".*Throughput.*")) {
                     CaliperMain.exitlessMain(concat(throughputArg, benchmark.getName()), writer);
-                }
-                else CaliperMain.exitlessMain(concat(latencyArg, benchmark.getName()), writer);
+                } else CaliperMain.exitlessMain(concat(latencyArg, benchmark.getName()), writer);
             } catch (InvalidCommandException e) {
                 e.display(writer);
 

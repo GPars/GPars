@@ -29,16 +29,18 @@ import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
-   @Param({"1", "2", "4", "6", "8",
+    @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
             "20", "22", "24", "26", "28",
             "30", "32", "34", "36", "38",
             "40", "42", "44", "46", "48"}
-   ) int numberOfClients;
+    )
+    int numberOfClients;
+
     @VmParam({"-server"}) String server;
     @VmParam({"-Xms512M"}) String xms;
     @VmParam({"-Xmx1024M"}) String xmx;
-    @VmParam({"-XX:+UseParallelGC"}) String gc;//vm settings
+    @VmParam({"-XX:+UseParallelGC"}) String gc;
 
     int maxClients = 4;
     public static final int RUN = 1;
@@ -46,15 +48,15 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
     final int maxRunDurationMillis = 20000;
     DefaultPGroup group;
     long repeatsPerClient;
-    int repeatFactor=500;
-    int repeat=30000*repeatFactor; //total number of messages that needs to be sent
+    int repeatFactor = 500;
+    int repeat = 30000 * repeatFactor; //total number of messages that needs to be sent
 
-    public int totalMessages(){
+    public int totalMessages() {
         return repeat;
     }
 
     public long timeStaticDispatchActorThroughput(int reps) {
-        long totalTime =0;
+        long totalTime = 0;
         group = new DefaultPGroup(new FJPool(maxClients));
         repeatsPerClient = repeat / numberOfClients;//MESSAGE quota for each pair of actors
 
@@ -64,17 +66,17 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
             ArrayList<DestinationActor> destinations = new ArrayList<DestinationActor>();
             ArrayList<ClientActor> clients = new ArrayList<ClientActor>();
 
-            for(int j=0; j < numberOfClients; j++){
-                destinations.add((DestinationActor)new DestinationActor(group).start());
+            for (int j = 0; j < numberOfClients; j++) {
+                destinations.add((DestinationActor) new DestinationActor(group).start());
 
             }
-            for(DestinationActor destination: destinations){
-                clients.add((ClientActor)new ClientActor(destination, latch, repeatsPerClient, group).start());
+            for (DestinationActor destination : destinations) {
+                clients.add((ClientActor) new ClientActor(destination, latch, repeatsPerClient, group).start());
             }
 
             long startTime = System.nanoTime();//start timing
 
-            for(ClientActor client: clients) {
+            for (ClientActor client : clients) {
                 client.send(RUN);
             }
             try {
@@ -83,12 +85,12 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
                 e.printStackTrace();
             }
 
-            totalTime += System.nanoTime()- startTime;//stop timing
+            totalTime += System.nanoTime() - startTime;//stop timing
 
-            for(ClientActor client: clients){
+            for (ClientActor client : clients) {
                 client.terminate();
             }
-            for(DestinationActor destination: destinations) {
+            for (DestinationActor destination : destinations) {
                 destination.terminate();
             }
         }
@@ -97,8 +99,6 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
     public static void main(String[] args) {
         CaliperMain.main(BenchmarkThroughputStaticDispatchActorCaliper.class, args);
-
-
     }
 
 }
@@ -134,12 +134,11 @@ class ClientActor extends StaticDispatchActor<Integer> {
             }
         }
         if (msg.equals(BenchmarkThroughputStaticDispatchActorCaliper.RUN)) {
-            for(int i=0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
+            for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
                 actor.send(BenchmarkThroughputStaticDispatchActorCaliper.MESSAGE);
                 sent += 1;
             }
         }
-
     }
 }
 
