@@ -29,8 +29,8 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
     String gc;
 
     int maxClients = 4;
-    public static final Run RUN = new Run();
-    public static final ThroughputMessage MESSAGE = new ThroughputMessage();
+    public static final ThroughputDynamicRun RUN = new ThroughputDynamicRun();
+    public static final ThroughputDynamicMessage MESSAGE = new ThroughputDynamicMessage();
     final int maxRunDurationMillis = 20000;
     DefaultPGroup group;
     long repeatsPerClient;
@@ -49,20 +49,20 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
         for (int rep = 0; rep < reps; rep++) {
 
             CountDownLatch latch = new CountDownLatch(numberOfClients);
-            ArrayList<Client> clients = new ArrayList<Client>();
-            ArrayList<Destination> destinations = new ArrayList<Destination>();
+            ArrayList<ThroughputDynamicClient> clients = new ArrayList<ThroughputDynamicClient>();
+            ArrayList<ThroughputDynamicDestination> destinations = new ArrayList<ThroughputDynamicDestination>();
 
             for (int i = 0; i < numberOfClients; i++) {
-                destinations.add((Destination) new Destination(group).start());
+                destinations.add((ThroughputDynamicDestination) new ThroughputDynamicDestination(group).start());
             }
 
-            for (Destination destination : destinations) {
-                clients.add((Client) new Client(destination, latch, repeatsPerClient, group).start());
+            for (ThroughputDynamicDestination destination : destinations) {
+                clients.add((ThroughputDynamicClient) new ThroughputDynamicClient(destination, latch, repeatsPerClient, group).start());
             }
 
             long startTime = System.nanoTime();
 
-            for (Client client : clients) {
+            for (ThroughputDynamicClient client : clients) {
                 client.send(RUN);
             }
             try {
@@ -71,10 +71,10 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
                 e.printStackTrace();
             }
             totalTime += System.nanoTime() - startTime;
-            for (Client client : clients) {
+            for (ThroughputDynamicClient client : clients) {
                 client.terminate();
             }
-            for (Destination destination : destinations) {
+            for (ThroughputDynamicDestination destination : destinations) {
                 destination.terminate();
             }
         }
@@ -88,28 +88,28 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
 
 }
 
-class ThroughputMessage {
+class ThroughputDynamicMessage {
 }
 
-class Run {
+class ThroughputDynamicRun {
 }
 
-class Client extends DynamicDispatchActor {
+class ThroughputDynamicClient extends DynamicDispatchActor {
 
     long sent = 0L;
     long received = 0L;
-    Destination actor;
+    ThroughputDynamicDestination actor;
     long repeatsPerClient;
     CountDownLatch latch;
 
-    public Client(Destination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ThroughputDynamicClient(ThroughputDynamicDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
         this.latch = latch;
     }
 
-    void onMessage(final ThroughputMessage msg) {
+    void onMessage(final ThroughputDynamicMessage msg) {
         received += 1;
         if (sent < repeatsPerClient) {
             actor.send(msg);
@@ -120,7 +120,7 @@ class Client extends DynamicDispatchActor {
         }
     }
 
-    void onMessage(final Run msg) {
+    void onMessage(final ThroughputDynamicRun msg) {
         for (int i = 0; i < Math.min(repeatsPerClient, 1000L); i++) {
             actor.send(BenchmarkThroughputDynamicDispatchActorCaliper.MESSAGE);
             sent += 1;
@@ -128,12 +128,12 @@ class Client extends DynamicDispatchActor {
     }
 }
 
-class Destination extends DynamicDispatchActor {
-    public Destination(DefaultPGroup group) {
+class ThroughputDynamicDestination extends DynamicDispatchActor {
+    public ThroughputDynamicDestination(DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
-    void onMessage(final ThroughputMessage msg) {
+    void onMessage(final ThroughputDynamicMessage msg) {
         getSender().send(msg);
     }
 

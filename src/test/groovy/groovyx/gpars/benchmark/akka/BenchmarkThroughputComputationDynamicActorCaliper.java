@@ -20,14 +20,14 @@ import com.google.caliper.Param;
 import com.google.caliper.api.Benchmark;
 import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
-import groovyx.gpars.actor.StaticDispatchActor;
+import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.scheduler.FJPool;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
-public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark {
+public class BenchmarkThroughputComputationDynamicActorCaliper extends Benchmark {
     @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
             "20", "22", "24", "26", "28",
@@ -43,8 +43,8 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
     @VmParam({"-XX:+UseParallelGC"}) String gc;
 
     int maxClients = 4;
-    public static final int RUN = 1;
-    public static final int MESSAGE = 2;
+    public static final ComputationDynamicRun RUN = new ComputationDynamicRun();
+    public static final ComputationDynamicMessage MESSAGE = new ComputationDynamicMessage();
     final int maxRunDurationMillis = 20000;
     DefaultPGroup group;
     long repeatsPerClient;
@@ -55,7 +55,7 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
         return repeat;
     }
 
-    public long timeComputationStaticDispatchActorThroughput(int reps) {
+    public long timeComputationDynamicDispatchActorThroughput(int reps) {
         long totalTime = 0;
         group = new DefaultPGroup(new FJPool(maxClients));
         repeatsPerClient = repeat / numberOfClients;//MESSAGE quota for each pair of actors
@@ -63,20 +63,20 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
         for (int i = 0; i < reps; i++) {
 
             CountDownLatch latch = new CountDownLatch(numberOfClients);
-            ArrayList<ComputationStaticDestinationActor> destinations = new ArrayList<ComputationStaticDestinationActor>();
-            ArrayList<ComputationStaticClientActor> clients = new ArrayList<ComputationStaticClientActor>();
+            ArrayList<ComputationDynamicDestinationActor> destinations = new ArrayList<ComputationDynamicDestinationActor>();
+            ArrayList<ComputationDynamicClientActor> clients = new ArrayList<ComputationDynamicClientActor>();
 
             for (int j = 0; j < numberOfClients; j++) {
-                destinations.add((ComputationStaticDestinationActor) new ComputationStaticDestinationActor(group).start());
+                destinations.add((ComputationDynamicDestinationActor) new ComputationDynamicDestinationActor(group).start());
 
             }
-            for (ComputationStaticDestinationActor destination : destinations) {
-                clients.add((ComputationStaticClientActor) new ComputationStaticClientActor(destination, latch, repeatsPerClient, group).start());
+            for (ComputationDynamicDestinationActor destination : destinations) {
+                clients.add((ComputationDynamicClientActor) new ComputationDynamicClientActor(destination, latch, repeatsPerClient, group).start());
             }
 
             long startTime = System.nanoTime();//start timing
 
-            for (ComputationStaticClientActor client : clients) {
+            for (ComputationDynamicClientActor client : clients) {
                 client.send(RUN);
             }
             try {
@@ -87,10 +87,10 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
 
             totalTime += System.nanoTime() - startTime;//stop timing
 
-            for (ComputationStaticClientActor client : clients) {
+            for (ComputationDynamicClientActor client : clients) {
                 client.terminate();
             }
-            for (ComputationStaticDestinationActor destination : destinations) {
+            for (ComputationDynamicDestinationActor destination : destinations) {
                 destination.terminate();
             }
         }
@@ -98,18 +98,20 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends Benchmark 
     }
 
     public static void main(String[] args) {
-        CaliperMain.main(BenchmarkThroughputComputationStaticActorCaliper.class, args);
+        CaliperMain.main(BenchmarkThroughputComputationDynamicActorCaliper.class, args);
 
 
     }
 
 }
+class ComputationDynamicMessage{}
+class ComputationDynamicRun{}
 
-class ComputationStaticClientActor extends StaticDispatchActor<Integer> {
+class ComputationDynamicClientActor extends DynamicDispatchActor {
 
     long sent = 0L;
     long received = 0L;
-    ComputationStaticDestinationActor actor;
+    ComputationDynamicDestinationActor actor;
     long repeatsPerClient;
     CountDownLatch latch;
     private double _pi = 0.0;
@@ -129,39 +131,35 @@ class ComputationStaticClientActor extends StaticDispatchActor<Integer> {
         return acc;
     }
 
-    public ComputationStaticClientActor(ComputationStaticDestinationActor actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ComputationDynamicClientActor(ComputationDynamicDestinationActor actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
         this.latch = latch;
     }
-
-    @Override
-    public void onMessage(Integer msg) {
-        if (msg.equals(BenchmarkThroughputComputationStaticActorCaliper.MESSAGE)) {
-            received += 1;
-            calculatePi();
-            if (sent < repeatsPerClient) {
-                actor.send(msg);
-                sent += 1;
-            } else if (received >= repeatsPerClient) {
-                latch.countDown();
-                sent = 0;
-                received = 0;
-
-            }
+    public void onMessage(ComputationDynamicMessage msg){
+        received += 1;
+        calculatePi();
+        if (sent < repeatsPerClient) {
+            actor.send(msg);
+            sent += 1;
+        } else if (received >= repeatsPerClient) {
+            latch.countDown();
+            sent = 0;
+            received = 0;
         }
-        if (msg.equals(BenchmarkThroughputStaticDispatchActorCaliper.RUN)) {
-            for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
-                actor.send(BenchmarkThroughputComputationStaticActorCaliper.MESSAGE);
-                sent += 1;
-            }
-        }
-
     }
+    public void onMessage(ComputationDynamicRun msg){
+        for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
+            actor.send(BenchmarkThroughputComputationDynamicActorCaliper.MESSAGE);
+            sent += 1;
+        }
+    }
+
+
 }
 
-class ComputationStaticDestinationActor extends StaticDispatchActor<Integer> {
+class ComputationDynamicDestinationActor extends DynamicDispatchActor {
     private double _pi = 0.0;
     double pi = _pi;
     private long currentPosition = 0L;
@@ -179,12 +177,11 @@ class ComputationStaticDestinationActor extends StaticDispatchActor<Integer> {
         return acc;
     }
 
-    public ComputationStaticDestinationActor(DefaultPGroup group) {
+    public ComputationDynamicDestinationActor(DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
-    @Override
-    public void onMessage(Integer m) {
+    public void onMessage(ComputationDynamicMessage m) {
         calculatePi();
         getSender().send(m);
     }

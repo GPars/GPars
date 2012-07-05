@@ -61,18 +61,18 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends Benchmark {
         clients = new ArrayList<Actor>();
 
         for(int i=0; i < numberOfClients; i++){
-            Actor destination = new StaticDestination(group).start();
-            Actor w4 = new StaticWayPoint(destination, group).start();
-            Actor w3 = new StaticWayPoint(w4, group).start();
-            Actor w2 = new StaticWayPoint(w3, group).start();
-            Actor w1 = new StaticWayPoint(w2, group).start();
-            clients.add(new StaticClient(w1, cdl, repeatsPerClient, group, this));
+            Actor destination = new LatencyStaticDestination(group).start();
+            Actor w4 = new LatencyStaticWayPoint(destination, group).start();
+            Actor w3 = new LatencyStaticWayPoint(w4, group).start();
+            Actor w2 = new LatencyStaticWayPoint(w3, group).start();
+            Actor w1 = new LatencyStaticWayPoint(w2, group).start();
+            clients.add(new LatencyStaticClient(w1, cdl, repeatsPerClient, group, this));
         }
     }
 
     private void teardown(){
         for(Actor client: clients){
-            client.send(new Message(0, null, "POISON"));
+            client.send(new LatencyStaticMessage(0, null, "POISON"));
         }
         for(Actor client: clients){
             try {
@@ -97,7 +97,7 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends Benchmark {
         setup();
         for(Actor client: clients){
             client.start();
-            client.send(new Message(0,null,"RUN"));
+            client.send(new LatencyStaticMessage(0,null,"RUN"));
         }
 
         try {
@@ -116,12 +116,12 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends Benchmark {
     }
 }
 
-class Message{
+class LatencyStaticMessage {
     final long sendTime;
     final Actor sender;
     String msg;
 
-    Message(final long sendTime, final Actor sender, String msg){
+    LatencyStaticMessage(final long sendTime, final Actor sender, String msg){
         this.sendTime = sendTime;
         this.sender = sender;
         this.msg = msg;
@@ -132,17 +132,17 @@ class Message{
     }
 }
 
-class StaticWayPoint extends StaticDispatchActor<Message> {
+class LatencyStaticWayPoint extends StaticDispatchActor<LatencyStaticMessage> {
     final Actor next;
 
-    StaticWayPoint(final Actor next, PGroup group){
+    LatencyStaticWayPoint(final Actor next, PGroup group){
         this.next = next;
         this.parallelGroup = group;
        // this.makeFair();
     }
 
     @Override
-    public void onMessage(Message msg){
+    public void onMessage(LatencyStaticMessage msg){
         if(msg.msg.equals("MESSAGE")){
             next.send(msg);
         }
@@ -154,13 +154,13 @@ class StaticWayPoint extends StaticDispatchActor<Message> {
 
 }
 
-class StaticDestination extends StaticDispatchActor<Message>{
-    StaticDestination(PGroup group){
+class LatencyStaticDestination extends StaticDispatchActor<LatencyStaticMessage>{
+    LatencyStaticDestination(PGroup group){
         //this.makeFair();
         this.parallelGroup = group;
     }
     @Override
-    public void onMessage(Message msg){
+    public void onMessage(LatencyStaticMessage msg){
         if(msg.msg.equals("MESSAGE")){
             msg.sender().send( msg );
         }
@@ -171,7 +171,7 @@ class StaticDestination extends StaticDispatchActor<Message>{
 
 }
 
-class StaticClient extends StaticDispatchActor<Message>{
+class LatencyStaticClient extends StaticDispatchActor<LatencyStaticMessage>{
     long sent = 0L;
     long received = 0L;
     final Actor next;
@@ -179,7 +179,7 @@ class StaticClient extends StaticDispatchActor<Message>{
     final int repeat;
     final BenchmarkLatencyStaticDispatchActorCaliper benchmark;
 
-    StaticClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyStaticDispatchActorCaliper benchmark){
+    LatencyStaticClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyStaticDispatchActorCaliper benchmark){
         this.next = next;
         this.latch = latch;
         this.repeat = repeat;
@@ -202,14 +202,14 @@ class StaticClient extends StaticDispatchActor<Message>{
     }
 
     @Override
-    public void onMessage(Message msg){
+    public void onMessage(LatencyStaticMessage msg){
         if(msg.msg.equals("MESSAGE")){
             long duration = System.nanoTime() - msg.sendTime;
             benchmark.add_duration(duration);
             received++;
             if (sent < repeat){
                 shortDelay(250, received);  // Value used by Akka
-                next.send( new Message(System.nanoTime(), this, "MESSAGE"));
+                next.send( new LatencyStaticMessage(System.nanoTime(), this, "MESSAGE"));
                 sent++;
             } else if (received >= repeat){
                 latch.countDown();
@@ -223,7 +223,7 @@ class StaticClient extends StaticDispatchActor<Message>{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            next.send( new Message(System.nanoTime(), this, "MESSAGE"));
+            next.send( new LatencyStaticMessage(System.nanoTime(), this, "MESSAGE"));
             sent++;
         }
 

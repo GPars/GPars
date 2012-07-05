@@ -58,18 +58,18 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         clients = new ArrayList<Actor>();
 
         for (int i = 0; i < numberOfClients; i++) {
-            Actor destination = new LatencyDestination(group).start();
-            Actor w4 = new WayPoint(destination, group).start();
-            Actor w3 = new WayPoint(w4, group).start();
-            Actor w2 = new WayPoint(w3, group).start();
-            Actor w1 = new WayPoint(w2, group).start();
-            clients.add(new LatencyClient(w1, cdl, repeatsPerClient, group, this));
+            Actor destination = new LatencyDynamicDestination(group).start();
+            Actor w4 = new LatencyDynamicWayPoint(destination, group).start();
+            Actor w3 = new LatencyDynamicWayPoint(w4, group).start();
+            Actor w2 = new LatencyDynamicWayPoint(w3, group).start();
+            Actor w1 = new LatencyDynamicWayPoint(w2, group).start();
+            clients.add(new LatencyDynamicClient(w1, cdl, repeatsPerClient, group, this));
         }
     }
 
     private void teardown() {
         for (Actor client : clients) {
-            client.send(new Poison());
+            client.send(new LatencyDynamicPoison());
         }
         for (Actor client : clients) {
             try {
@@ -94,7 +94,7 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
         setup();
         for (Actor client : clients) {
             client.start();
-            client.send(new LatencyRun());
+            client.send(new LatencyDynamicRun());
         }
 
         try {
@@ -115,11 +115,11 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends Benchmark {
     }
 }
 
-class Msg {
+class LatencyDynamicMessage {
     final long sendTime;
     final Actor sender;
 
-    Msg(final long sendTime, final Actor sender) {
+    LatencyDynamicMessage(final long sendTime, final Actor sender) {
         this.sendTime = sendTime;
         this.sender = sender;
     }
@@ -129,53 +129,53 @@ class Msg {
     }
 }
 
-class LatencyRun {
+class LatencyDynamicRun {
 }
 
-class Poison {
+class LatencyDynamicPoison {
 }
 
-class WayPoint extends DynamicDispatchActor {
+class LatencyDynamicWayPoint extends DynamicDispatchActor {
     final Actor next;
 
-    WayPoint(final Actor next, PGroup group) {
+    LatencyDynamicWayPoint(final Actor next, PGroup group) {
         this.next = next;
         this.parallelGroup = group;
         //this.makeFair();
     }
 
-    public void onMessage(Msg msg) {
+    public void onMessage(LatencyDynamicMessage msg) {
         next.send(msg);
 
     }
 
-    public void onMessage(Poison msg) {
+    public void onMessage(LatencyDynamicPoison msg) {
         next.send(msg);
         terminate();
     }
 
 }
 
-class LatencyDestination extends DynamicDispatchActor {
+class LatencyDynamicDestination extends DynamicDispatchActor {
 
-    LatencyDestination(PGroup group) {
+    LatencyDynamicDestination(PGroup group) {
         this.parallelGroup = group;
         //this.makeFair();
     }
 
-    public void onMessage(Msg msg) {
+    public void onMessage(LatencyDynamicMessage msg) {
         msg.sender().send(msg);
 
 
     }
 
-    public void onMessage(Poison msg) {
+    public void onMessage(LatencyDynamicPoison msg) {
         terminate();
     }
 
 }
 
-class LatencyClient extends DynamicDispatchActor {
+class LatencyDynamicClient extends DynamicDispatchActor {
     long sent = 0L;
     long received = 0L;
     final Actor next;
@@ -183,7 +183,7 @@ class LatencyClient extends DynamicDispatchActor {
     final int repeat;
     final BenchmarkLatencyDynamicDispatchActorCaliper benchmark;
 
-    LatencyClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyDynamicDispatchActorCaliper benchmark) {
+    LatencyDynamicClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyDynamicDispatchActorCaliper benchmark) {
         this.next = next;
         this.latch = latch;
         this.repeat = repeat;
@@ -205,14 +205,14 @@ class LatencyClient extends DynamicDispatchActor {
         }
     }
 
-    public void onMessage(Msg msg) {
+    public void onMessage(LatencyDynamicMessage msg) {
 
         long duration = System.nanoTime() - msg.sendTime;
         benchmark.add_duration(duration);
         received++;
         if (sent < repeat) {
             shortDelay(250, received);  // value used by Akka
-            next.send(new Msg(System.nanoTime(), this));
+            next.send(new LatencyDynamicMessage(System.nanoTime(), this));
             sent++;
         } else if (received >= repeat) {
             latch.countDown();
@@ -220,18 +220,18 @@ class LatencyClient extends DynamicDispatchActor {
 
     }
 
-    public void onMessage(LatencyRun msg) {
+    public void onMessage(LatencyDynamicRun msg) {
         int initialDelay = new Random(0).nextInt(20);   // Value used by Akka
         try {
             Thread.sleep(initialDelay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        next.send(new Msg(System.nanoTime(), this));
+        next.send(new LatencyDynamicMessage(System.nanoTime(), this));
         sent++;
     }
 
-    public void onMessage(Poison msg) {
+    public void onMessage(LatencyDynamicPoison msg) {
         next.send(msg);
         terminate();
     }

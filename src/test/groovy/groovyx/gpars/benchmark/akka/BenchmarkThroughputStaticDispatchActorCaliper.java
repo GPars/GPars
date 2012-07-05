@@ -63,20 +63,20 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
         for (int i = 0; i < reps; i++) {
 
             CountDownLatch latch = new CountDownLatch(numberOfClients);
-            ArrayList<DestinationActor> destinations = new ArrayList<DestinationActor>();
-            ArrayList<ClientActor> clients = new ArrayList<ClientActor>();
+            ArrayList<ThroughputStaticDestinationActor> destinations = new ArrayList<ThroughputStaticDestinationActor>();
+            ArrayList<ThroughputStaticClientActor> clients = new ArrayList<ThroughputStaticClientActor>();
 
             for (int j = 0; j < numberOfClients; j++) {
-                destinations.add((DestinationActor) new DestinationActor(group).start());
+                destinations.add((ThroughputStaticDestinationActor) new ThroughputStaticDestinationActor(group).start());
 
             }
-            for (DestinationActor destination : destinations) {
-                clients.add((ClientActor) new ClientActor(destination, latch, repeatsPerClient, group).start());
+            for (ThroughputStaticDestinationActor destination : destinations) {
+                clients.add((ThroughputStaticClientActor) new ThroughputStaticClientActor(destination, latch, repeatsPerClient, group).start());
             }
 
             long startTime = System.nanoTime();//start timing
 
-            for (ClientActor client : clients) {
+            for (ThroughputStaticClientActor client : clients) {
                 client.send(RUN);
             }
             try {
@@ -87,10 +87,10 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
             totalTime += System.nanoTime() - startTime;//stop timing
 
-            for (ClientActor client : clients) {
+            for (ThroughputStaticClientActor client : clients) {
                 client.terminate();
             }
-            for (DestinationActor destination : destinations) {
+            for (ThroughputStaticDestinationActor destination : destinations) {
                 destination.terminate();
             }
         }
@@ -103,16 +103,16 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
 }
 
-class ClientActor extends StaticDispatchActor<Integer> {
+class ThroughputStaticClientActor extends StaticDispatchActor<Integer> {
 
     long sent = 0L;
     long received = 0L;
-    DestinationActor actor;
+    ThroughputStaticDestinationActor actor;
     long repeatsPerClient;
     CountDownLatch latch;
 
 
-    public ClientActor(DestinationActor actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ThroughputStaticClientActor(ThroughputStaticDestinationActor actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -142,8 +142,8 @@ class ClientActor extends StaticDispatchActor<Integer> {
     }
 }
 
-class DestinationActor extends StaticDispatchActor<Integer> {
-    public DestinationActor(DefaultPGroup group) {
+class ThroughputStaticDestinationActor extends StaticDispatchActor<Integer> {
+    public ThroughputStaticDestinationActor(DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
