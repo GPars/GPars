@@ -16,44 +16,40 @@
 
 package groovyx.gpars.samples.dataflow
 
-import groovyx.gpars.AsyncFun
+import groovyx.gpars.GParsPoolUtil
 
 import static groovyx.gpars.GParsPool.withPool
 
 /**
- * Demonstrates the way to use @AsyncFun to build composable asynchronous functions.
- * The @AsyncFun annotation allows the user to create an asynchronous variant of a function.
+ * Demonstrates the way to use asyncFun() to build composable asynchronous functions.
+ * The asyncFun() function allows the user to create an asynchronous variant of a function.
  * Such asynchronous functions accept asynchronous, potentially uncompleted, calculations as parameters (represented by DataflowVariables),
  * perform their own calculation asynchronously using the wrapping thread pool
  * and without blocking the caller they return a DataflowVariable representing a handle to the result of the ongoing asynchronous calculation.
  *
+ * Notice the pool may not exist when the asynchronous functions are being created. The functions can pick up a thread pool
+ * each time they are invoked.
+ *
  * @author Vaclav Pech
  */
 
-class DownloadingSearch {
-    @AsyncFun Closure download = {String url ->
-        url.toURL().text
-    }
-
-    @AsyncFun Closure scanFor = {String word, String text ->
-        text.findAll(word).size()
-    }
-
-    @AsyncFun Closure lower = {s -> s.toLowerCase()}
-
-    void scan() {
-        def result = scanFor('groovy', lower(download('http://www.infoq.com')))  //synchronous processing
-        println 'Allowed to do something else now'
-        println result.get()
-    }
+Closure sPlus = {Integer a, Integer b ->
+    a + b
 }
 
-withPool {
-    new DownloadingSearch().scan()
+Closure sMultiply = {Integer a, Integer b ->
+    sleep 2000
+    a * b
 }
 
-//This time we create a pool for the scan() method call only
-final search = new DownloadingSearch()
+println "Synchronous result: " + sMultiply(sPlus(10, 30), 100)
+
+Closure aPlus = GParsPoolUtil.asyncFun(sPlus)
+Closure aMultiply = GParsPoolUtil.asyncFun(sMultiply)
+
 withPool {
-    search.scan()
+    def result = aMultiply(aPlus(10, 30), 100)
+
+    println "Time to do something else while the calculation is running"
+    println "Asynchronous result: " + result.get()
 }

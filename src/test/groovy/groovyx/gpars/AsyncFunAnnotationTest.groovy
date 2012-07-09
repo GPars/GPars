@@ -38,6 +38,22 @@ class AsyncFunAnnotationTest extends Specification {
         wasCalled
     }
 
+    def "test basic annotation usage with delayed pool assignment"() {
+
+        when:
+        boolean wasCalled = false
+        def tester = new TestSum()
+
+        groovyx.gpars.GParsPool.withPool(5) {
+            assert tester.sum(1, 2).val == 3
+            assert tester.sum(10, 15) instanceof Promise
+            wasCalled = true
+        }
+
+        then:
+        wasCalled
+    }
+
     def "test annotation on already annotated field value"() {
 
         when:

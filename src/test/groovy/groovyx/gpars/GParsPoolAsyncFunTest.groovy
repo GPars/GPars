@@ -18,6 +18,7 @@ package groovyx.gpars
 
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.Promise
+import groovyx.gpars.scheduler.FJPool
 import jsr166y.RecursiveAction
 
 /**
@@ -153,5 +154,41 @@ public class GParsPoolAsyncFunTest extends GroovyTestCase {
                 assert aMultiply(aPlus(5, -6), 100).get()
             }
         }
+    }
+
+    public void testExplicitPool() {
+        final pool = new FJPool()
+
+        Closure sPlus = {Integer a, Integer b ->
+            a + b
+        }
+
+        Closure sMultiply = {Integer a, Integer b ->
+            a * b
+        }
+
+        Closure aPlus = GParsPoolUtil.asyncFun(sPlus, pool)
+        Closure aMultiply = GParsPoolUtil.asyncFun(sMultiply, pool, true)
+
+        assert sMultiply(sPlus(10, 30), 100) == aMultiply(aPlus(10, 30), 100)
+
+    }
+
+    public void testDelayedPool() {
+        Closure sPlus = {Integer a, Integer b ->
+            a + b
+        }
+
+        Closure sMultiply = {Integer a, Integer b ->
+            a * b
+        }
+
+        Closure aPlus = GParsPoolUtil.asyncFun(sPlus)
+        Closure aMultiply = GParsPoolUtil.asyncFun(sMultiply, true)
+
+        groovyx.gpars.GParsPool.withPool(5) {
+            assert sMultiply(sPlus(10, 30), 100) == aMultiply(aPlus(10, 30), 100)
+        }
+
     }
 }

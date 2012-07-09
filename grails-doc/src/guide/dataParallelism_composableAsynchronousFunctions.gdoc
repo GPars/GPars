@@ -269,4 +269,50 @@ The _AsyncFun_ also allows the user to specify, whether the resulting function s
 def sum = {a, b -> a + b }
 {code}
 
+h4. Explicit and delayed pool assignment
+
+When using the _GPars(Executors)PoolUtil.asyncFun()_ function directly to create an asynchronous function you have two additional options
+to assign a thread pool to the function.
+
+# The thread pool to use by the function can be specified explicitly as an additional argument at creation time
+# The implicit thread pool can be obtained from the surrounding scope at invocation rather at creation time
+
+When specifying the thread pool explicitly, the call doesn't need to be wrapped in an _withPool()_ block:
+{code}
+Closure sPlus = {Integer a, Integer b ->
+    a + b
+}
+
+Closure sMultiply = {Integer a, Integer b ->
+    sleep 2000
+    a * b
+}
+
+println "Synchronous result: " + sMultiply(sPlus(10, 30), 100)
+
+final pool = new FJPool()
+
+Closure aPlus = GParsPoolUtil.asyncFun(sPlus, pool)
+Closure aMultiply = GParsPoolUtil.asyncFun(sMultiply, pool)
+
+def result = aMultiply(aPlus(10, 30), 100)
+
+println "Time to do something else while the calculation is running"
+println "Asynchronous result: " + result.get()
+{code}
+
+With delayed pool assignment only the function invocation must be surrounded with a _withPool()_ block:
+
+{code}
+Closure aPlus = GParsPoolUtil.asyncFun(sPlus)
+Closure aMultiply = GParsPoolUtil.asyncFun(sMultiply)
+
+withPool {
+    def result = aMultiply(aPlus(10, 30), 100)
+
+    println "Time to do something else while the calculation is running"
+    println "Asynchronous result: " + result.get()
+}
+{code}
+
 On our side this is a very interesting domain to explore, so any comments, questions or suggestions on combining asynchronous functions or hints about its limits are welcome.

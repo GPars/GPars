@@ -30,6 +30,7 @@ import groovyx.gpars.pa.ClosureReducer;
 import groovyx.gpars.pa.GParsPoolUtilHelper;
 import groovyx.gpars.pa.PAWrapper;
 import groovyx.gpars.pa.SumClosure;
+import groovyx.gpars.scheduler.FJPool;
 import groovyx.gpars.util.GeneralTimer;
 import groovyx.gpars.util.PAUtils;
 import jsr166y.ForkJoinPool;
@@ -156,6 +157,20 @@ public class GParsPoolUtil {
      */
     public static Closure asyncFun(final Closure original, final boolean blocking) {
         return GParsPoolUtilHelper.asyncFun(original, blocking);
+    }
+
+    /**
+     * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataflowVariable for the potential return value
+     */
+    public static Closure asyncFun(final Closure original, final FJPool pool) {
+        return asyncFun(original, pool, false);
+    }
+
+    /**
+     * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataflowVariable for the potential return value
+     */
+    public static Closure asyncFun(final Closure original, final FJPool pool, final boolean blocking) {
+        return GParsPoolUtilHelper.asyncFun(original, blocking, pool);
     }
 
     /**

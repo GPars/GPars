@@ -19,6 +19,7 @@ package groovyx.gpars
 import groovy.time.Duration
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.util.GeneralTimer
 import groovyx.gpars.util.PAUtils
 
@@ -118,12 +119,27 @@ public class GParsExecutorsPoolUtil {
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataflowVariable for the potential return value
      */
     public static Closure asyncFun(final Closure original, final boolean blocking = false) {
-        final def pool = new DefaultPool(GParsExecutorsPool.retrieveCurrentPool())
+        asyncFun(original, null, blocking)
+    }
+
+    /**
+     * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataflowVariable for the potential return value
+     */
+    public static Closure asyncFun(final Closure original, final Pool pool, final boolean blocking = false) {
+        final def localPool = pool ?: retrieveLocalPool();
         return {final Object[] args ->
             final DataflowVariable result = new DataflowVariable()
-            PAUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            PAUtils.evaluateArguments(localPool ?: retrieveLocalPool(), args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
+    }
+
+    private static Pool retrieveLocalPool() {
+        final retrievedPool = GParsExecutorsPool.retrieveCurrentPool()
+        if (retrievedPool != null) {
+            return new DefaultPool(retrievedPool);
+        }
+        return null
     }
 
     /**

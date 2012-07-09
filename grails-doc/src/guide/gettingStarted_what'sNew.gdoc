@@ -10,6 +10,7 @@ See "the Breaking Changes listing":http://gpars.codehaus.org/Breaking+Changes fo
 
 h3. Asynchronous functions
 
+* Allowed for delayed and explicit thread pool assignment strategies for asynchronous functions
 * Performance tuning to the asynchronous closure invocation mechanism
 
 h3. Parallel collections

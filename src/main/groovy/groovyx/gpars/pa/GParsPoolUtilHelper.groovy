@@ -19,6 +19,7 @@ package groovyx.gpars.pa
 import extra166y.Ops
 import extra166y.ParallelArray
 import extra166y.ParallelArrayWithMapping
+import groovyx.gpars.GParsPool
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.TransparentParallel
 import groovyx.gpars.dataflow.DataflowVariable
@@ -27,10 +28,12 @@ import groovyx.gpars.memoize.NullProtectionStorage
 import groovyx.gpars.memoize.NullValue
 import groovyx.gpars.scheduler.FJPool
 import groovyx.gpars.util.PAUtils
+import jsr166y.ForkJoinPool
+
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.SoftReference
 import java.util.concurrent.Future
-import jsr166y.ForkJoinPool
+
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
 
 /**
@@ -54,13 +57,22 @@ class GParsPoolUtilHelper {
         return GParsPoolUtil.callParallel({-> cl(* args)});
     }
 
-    public static Closure asyncFun(final Closure original, final boolean blocking) {
-        final FJPool pool = new FJPool(GParsPoolUtil.retrievePool());
+    public static Closure asyncFun(final Closure original, final boolean blocking, final FJPool pool = null) {
+        final FJPool localPool = pool ?: retrieveFJPool();
+
         return {final Object[] args ->
             final DataflowVariable result = new DataflowVariable()
-            PAUtils.evaluateArguments(pool, args.clone(), 0, [], result, original, false)
+            PAUtils.evaluateArguments(localPool ?: retrieveFJPool(), args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
+    }
+
+    private static FJPool retrieveFJPool() {
+        final retrievedPool = GParsPool.retrieveCurrentPool()
+        if (retrievedPool != null) {
+            return new FJPool(retrievedPool);
+        }
+        return null
     }
 
     public static <T> Closure<T> buildMemoizeFunction(Map cache, Closure<T> cl) {
