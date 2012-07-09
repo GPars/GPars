@@ -33,7 +33,7 @@ def fib(DataflowChannel out) {
 }
 
 final SyncDataflowQueue ch = new SyncDataflowQueue()
-group.task new Print('Fibonnaci numbers', ch)
+group.task new Print('Fibonacci numbers', ch)
 fib(ch)
 
 sleep 10000
