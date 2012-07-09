@@ -20,7 +20,7 @@ import groovyx.gpars.dataflow.DataflowChannel
 import groovyx.gpars.dataflow.SyncDataflowQueue
 import groovyx.gpars.group.DefaultPGroup
 
-group = new DefaultPGroup()
+group = new DefaultPGroup(6)
 
 def numbers(DataflowChannel out) {
     group.task {
