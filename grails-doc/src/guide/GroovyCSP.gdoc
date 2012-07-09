@@ -38,8 +38,8 @@ Determinism combined with indirect addressing result in a great level of composa
 small CSP processes into bigger ones just by connecting their input and output channels and then wrapping them by another,
 bigger containing process.
 
-The CSP model introduces non-determinism using _Alternatives_ . A process can attempt to read a value from multiple channels
-at the same time through a construct called _Alternative_ or _Select_ . The first value that becomes available in any of the channels
+The CSP model introduces non-determinism using _Alternatives_. A process can attempt to read a value from multiple channels
+at the same time through a construct called _Alternative_ or _Select_. The first value that becomes available in any of the channels
 involved in the _Select_ will be read and consumed by the process. Since the order of messages received through a _Select_
 depends on unpredictable conditions during program run-time, the value that will get read is non-deterministic.
 
@@ -47,10 +47,9 @@ h2. CSP with GPars dataflow
 
 GPars provides all the necessary building blocks to create CSP processes.
 
-||CSP concept||GPars equivalent||
-|Process|Task - Closure/Runnable/Callable|
-|Channel|SyncDataflowQueue/SyncDataflowBroadcast|
-|Alternative|Select/PrioritySelect|
+* *CSP Processes* can be modelled through GPars tasks using a _Closure_, a _Runnable_ or a _Callable_ to hold the actual implementation of the process
+* *CSP Channels* should be modelled with _SyncDataflowQueue_ and _SyncDataflowBroadcast_ classes
+* *CSP Alternative* is provided through the _Select_ class with its _select_ and _ prioritySelect_ methods
 
 h3. Processes
 
