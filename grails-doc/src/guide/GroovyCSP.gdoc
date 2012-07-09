@@ -10,7 +10,7 @@ between the Apache 2 license, which GPars uses, and LGPL. Please make sure your 
 rules before enabling the use of JCSP in your code.
 {note}
 
-If the LGPL license is adequate for your use, you might consider checking out the Dataflow Concurrency chapter of this User Guide
+If the LGPL license is not adequate for your use, you might consider checking out the Dataflow Concurrency chapter of this User Guide
 to learn about _tasks_ , _selectors_ and _operators_ , which may help you resolve concurrency issues in ways similar to the CSP approach.
 In fact the dataflow and CSP concepts, as implemented in GPars, stand very close to each other.
 
@@ -19,3 +19,36 @@ By default, without actively adding an explicit dependency on JCSP in your build
 the standard commercial-software-friendly Apache 2 License terms apply to your project. GPars directly only depends on software licensed under licenses
 compatible with the Apache 2 License.
 {note}
+
+h2. The CSP model principles
+
+In essence, the CSP model builds on independent concurrent processes, which mutually communicate through channels using synchronous
+(i.e. rendezvous) message passing. Unlike actors or dataflow operators, which revolve around the event-processing pattern,
+CSP processes place focus the their activities (aka sequences of steps) and use communication to stay mutually in sync along the way.
+
+Since the addressing is indirect through channels, the processes do not need to know about one another. They typically
+consist of a set of input and output channels and a body. Once a CSP process is started, it obtains a thread from a thread pool
+and starts processing its body, pausing only when reading from a channel or writing into a channel. Some implementations (e.g. GoLang)
+can also detach the thread from the CSP process when blocked on a channel.
+
+CSP programs are deterministic. The same data on the program's input will always generate the same output, irrespective of
+the actual thread-scheduling scheme used. This helps a lot when debugging CSP programs as well as analyzing deadlocks.
+
+Determinism combined with indirect addressing result in a great level of composability of CSP processes. You can combine
+small CSP processes into bigger ones just by connecting their input and output channels and then wrapping them by another,
+bigger containing process.
+
+The CSP model introduces non-determinism using _Alternatives_ . A process can attempt to read a value from multiple channels
+at the same time through a construct called _Alternative_ or _Select_ . The first value that becomes available in any of the channels
+involved in the _Select_ will be read and consumed by the process. Since the order of messages received through a _Select_
+depends on unpredictable conditions during program run-time, the value that will get read is non-deterministic.
+
+h2. CSP with GPars dataflow
+
+GPars provides all the necessary building blocks to create CSP processes.
+
+||CSP concept||GPars equivalent||
+|Process|Task - Closure/Runnable/Callable|
+|Channel|SyncDataflowQueue/SyncDataflowBroadcast|
+|Alternative|Select/PrioritySelect|
+
