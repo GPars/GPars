@@ -31,7 +31,6 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 
 defaultTasks 'test'
-defaultTasks 'runBenchmarks'
 
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
@@ -127,9 +126,26 @@ dependencies {
     cover 'net.sourceforge.cobertura:cobertura:1.9.4.1'
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
 }
-task runBenchmarks(dependsOn: 'classes', type: JavaExec){
-    main= 'groovyx.gpars.benchmark.BenchmarkRunner'
+task runLatencyDynamic(dependsOn: 'classes', type: JavaExec){
+    def gcArg = "-XX:+UseParallelGC"
+    if (System.getProperty('os.name').equals("Windows")){
+	gcArg = "\"-XX:+UseParallelGC\""
+    }
+
+    main= 'groovyx.gpars.benchmark.akka.BenchmarkLatencyDynamicDispatchActorCaliper'
     classpath= sourceSets.test.runtimeClasspath
+    args = ['-i', 'latency', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+}
+
+task runThroughputStatic(dependsOn: 'classes', type: JavaExec){
+    def gcArg = "-XX:+UseParallelGC"
+    if (System.getProperty('os.name').equals("Windows")){
+	gcArg = "\"-XX:+UseParallelGC\""
+    }
+
+    main= 'groovyx.gpars.benchmark.akka.BenchmarkThroughputStaticDispatchActorCaliper'
+    classpath= sourceSets.test.runtimeClasspath
+    args = ['-i', 'throughput', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
 }
 
 //  To get the details of the "unchecked" issues.

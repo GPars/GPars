@@ -1,17 +1,15 @@
 package groovyx.gpars.benchmark.akka;
 
 import com.google.caliper.Param;
-import com.google.caliper.api.Benchmark;
 import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
-import groovyx.gpars.scheduler.FJPool;
 
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 
-public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
+public class BenchmarkThroughputDynamicDispatchActorCaliper extends BenchmarkCaliper {
     @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
             "20", "22", "24", "26", "28",
@@ -28,57 +26,23 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
     @VmParam({"-XX:+UseParallelGC"})
     String gc;
 
-    int maxClients = 4;
-    public static final ThroughputDynamicRun RUN = new ThroughputDynamicRun();
-    public static final ThroughputDynamicMessage MESSAGE = new ThroughputDynamicMessage();
-    final int maxRunDurationMillis = 20000;
-    DefaultPGroup group;
-    long repeatsPerClient;
-    int repeatFactor = 500;
-    int repeat = 30000 * repeatFactor;
+
+    BenchmarkThroughputDynamicDispatchActorCaliper(){
+        super(30000, DYNAMIC_RUN, ThroughputDynamicClient.class, ThroughputDynamicDestination.class);
+    }
 
     public int totalMessages() {
         return repeat;
     }
 
     public long timeDynamicDispatchActorThroughput(int reps) {
-        long totalTime = 0;
-        group = new DefaultPGroup(new FJPool(maxClients));
-        repeatsPerClient = repeat / numberOfClients;
-
-        for (int rep = 0; rep < reps; rep++) {
-
-            CountDownLatch latch = new CountDownLatch(numberOfClients);
-            ArrayList<ThroughputDynamicClient> clients = new ArrayList<ThroughputDynamicClient>();
-            ArrayList<ThroughputDynamicDestination> destinations = new ArrayList<ThroughputDynamicDestination>();
-
-            for (int i = 0; i < numberOfClients; i++) {
-                destinations.add((ThroughputDynamicDestination) new ThroughputDynamicDestination(group).start());
-            }
-
-            for (ThroughputDynamicDestination destination : destinations) {
-                clients.add((ThroughputDynamicClient) new ThroughputDynamicClient(destination, latch, repeatsPerClient, group).start());
-            }
-
-            long startTime = System.nanoTime();
-
-            for (ThroughputDynamicClient client : clients) {
-                client.send(RUN);
-            }
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            totalTime += System.nanoTime() - startTime;
-            for (ThroughputDynamicClient client : clients) {
-                client.terminate();
-            }
-            for (ThroughputDynamicDestination destination : destinations) {
-                destination.terminate();
-            }
+        long time=0;
+        try {
+            time = super.timeThroughput(reps, numberOfClients);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return totalTime;
+        return time;
     }
 
     public static void main(String[] args) {
@@ -88,11 +52,6 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends Benchmark {
 
 }
 
-class ThroughputDynamicMessage {
-}
-
-class ThroughputDynamicRun {
-}
 
 class ThroughputDynamicClient extends DynamicDispatchActor {
 
@@ -109,31 +68,31 @@ class ThroughputDynamicClient extends DynamicDispatchActor {
         this.latch = latch;
     }
 
-    void onMessage(final ThroughputDynamicMessage msg) {
+    void onMessage(final DynamicMessage msg) {
         received += 1;
         if (sent < repeatsPerClient) {
             actor.send(msg);
             sent += 1;
         } else if (received >= repeatsPerClient) {
             latch.countDown();
-
         }
     }
 
-    void onMessage(final ThroughputDynamicRun msg) {
+    void onMessage(final DynamicRun msg) {
         for (int i = 0; i < Math.min(repeatsPerClient, 1000L); i++) {
-            actor.send(BenchmarkThroughputDynamicDispatchActorCaliper.MESSAGE);
+            actor.send(BenchmarkCaliper.DYNAMIC_MESSAGE);
             sent += 1;
         }
     }
 }
 
 class ThroughputDynamicDestination extends DynamicDispatchActor {
+
     public ThroughputDynamicDestination(DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
-    void onMessage(final ThroughputDynamicMessage msg) {
+    void onMessage(final DynamicMessage msg) {
         getSender().send(msg);
     }
 

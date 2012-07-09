@@ -26,89 +26,36 @@ import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.FJPool;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 
-public class BenchmarkLatencyStaticDispatchActorCaliper extends Benchmark {
+public class BenchmarkLatencyStaticDispatchActorCaliper extends BenchmarkCaliper {
     @Param({"1", "2", "4"}) int numberOfClients;
     @VmParam({"-server"}) String server;
     @VmParam({"-Xms512M"}) String xms;
     @VmParam({"-Xmx1024M"}) String xmx;
     @VmParam({"-XX:+UseParallelGC"}) String gc;
 
-    int repeatNum = 200*500;  //Value used by Akka
-    final int maxClients = 4;       //Value used by Akka
-    int repeatsPerClient;
-    PGroup group;
-    CountDownLatch cdl;
-    List<Actor> clients;
-    long total_duration;
-    int total_count;
-
-
-
-
-    private void setup(){
-
-        total_duration=0;
-        total_count =0;
-        group = new DefaultPGroup(new FJPool(maxClients));
-        cdl = new CountDownLatch(numberOfClients);
-        repeatsPerClient = repeatNum/numberOfClients;
-        clients = new ArrayList<Actor>();
-
-        for(int i=0; i < numberOfClients; i++){
-            Actor destination = new LatencyStaticDestination(group).start();
-            Actor w4 = new LatencyStaticWayPoint(destination, group).start();
-            Actor w3 = new LatencyStaticWayPoint(w4, group).start();
-            Actor w2 = new LatencyStaticWayPoint(w3, group).start();
-            Actor w1 = new LatencyStaticWayPoint(w2, group).start();
-            clients.add(new LatencyStaticClient(w1, cdl, repeatsPerClient, group, this));
-        }
-    }
-
-    private void teardown(){
-        for(Actor client: clients){
-            client.send(new LatencyStaticMessage(0, null, "POISON"));
-        }
-        for(Actor client: clients){
-            try {
-                client.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        group.shutdown();
-    }
-
-    public synchronized void add_duration(long duration){
-        total_duration += duration;
-        total_count++;
+    BenchmarkLatencyStaticDispatchActorCaliper(){
+        super(200, new LatencyMessage(0, null, STATIC_RUN), new LatencyMessage(0, null, STATIC_POISON),LatencyStaticClient.class, LatencyStaticDestination.class, LatencyStaticWayPoint.class);
     }
 
     public int totalMessages(){
-        return repeatNum;
+        return repeat;
     }
 
     public long latencyStaticDispatchActorLatency(int dummy){
-        setup();
-        for(Actor client: clients){
-            client.start();
-            client.send(new LatencyStaticMessage(0,null,"RUN"));
-        }
-
+        long time = 0;
         try {
-            cdl.await(); //differ
-        } catch (InterruptedException e) {
+            time = timeLatency(numberOfClients);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        teardown();
-
-        return total_duration;
+        return time;
     }
 
     public static void main(String [] args){
@@ -116,37 +63,21 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends Benchmark {
     }
 }
 
-class LatencyStaticMessage {
-    final long sendTime;
-    final Actor sender;
-    String msg;
-
-    LatencyStaticMessage(final long sendTime, final Actor sender, String msg){
-        this.sendTime = sendTime;
-        this.sender = sender;
-        this.msg = msg;
-    }
-
-    public Actor sender(){
-        return sender;
-    }
-}
-
-class LatencyStaticWayPoint extends StaticDispatchActor<LatencyStaticMessage> {
+class LatencyStaticWayPoint extends StaticDispatchActor<LatencyMessage> {
     final Actor next;
 
-    LatencyStaticWayPoint(final Actor next, PGroup group){
+    public LatencyStaticWayPoint(final Actor next, DefaultPGroup group){
         this.next = next;
         this.parallelGroup = group;
        // this.makeFair();
     }
 
     @Override
-    public void onMessage(LatencyStaticMessage msg){
-        if(msg.msg.equals("MESSAGE")){
+    public void onMessage(LatencyMessage msg){
+        if(msg.msg == BenchmarkCaliper.STATIC_MESSAGE){
             next.send(msg);
         }
-        else if(msg.msg.equals("POISON")){
+        else if(msg.msg == BenchmarkCaliper.STATIC_POISON){
             next.send(msg);
             this.terminate();
         }
@@ -154,32 +85,34 @@ class LatencyStaticWayPoint extends StaticDispatchActor<LatencyStaticMessage> {
 
 }
 
-class LatencyStaticDestination extends StaticDispatchActor<LatencyStaticMessage>{
-    LatencyStaticDestination(PGroup group){
+class LatencyStaticDestination extends StaticDispatchActor<LatencyMessage>{
+
+    public LatencyStaticDestination(DefaultPGroup group){
         //this.makeFair();
         this.parallelGroup = group;
     }
+
     @Override
-    public void onMessage(LatencyStaticMessage msg){
-        if(msg.msg.equals("MESSAGE")){
-            msg.sender().send( msg );
+    public void onMessage(LatencyMessage msg){
+        if(msg.msg == BenchmarkCaliper.STATIC_MESSAGE){
+            msg.sender().send(msg);
         }
-        else if(msg.msg.equals("POISON")){
+        else if(msg.msg == BenchmarkCaliper.STATIC_POISON){
             this.terminate();
         }
     }
 
 }
 
-class LatencyStaticClient extends StaticDispatchActor<LatencyStaticMessage>{
+class LatencyStaticClient extends StaticDispatchActor<LatencyMessage>{
     long sent = 0L;
     long received = 0L;
     final Actor next;
     CountDownLatch latch;
-    final int repeat;
-    final BenchmarkLatencyStaticDispatchActorCaliper benchmark;
+    final long repeat;
+    final BenchmarkCaliper benchmark;
 
-    LatencyStaticClient(final Actor next, CountDownLatch latch, final int repeat, PGroup group, BenchmarkLatencyStaticDispatchActorCaliper benchmark){
+    public LatencyStaticClient(final Actor next, CountDownLatch latch, final long repeat, DefaultPGroup group, BenchmarkCaliper benchmark){
         this.next = next;
         this.latch = latch;
         this.repeat = repeat;
@@ -202,32 +135,30 @@ class LatencyStaticClient extends StaticDispatchActor<LatencyStaticMessage>{
     }
 
     @Override
-    public void onMessage(LatencyStaticMessage msg){
-        if(msg.msg.equals("MESSAGE")){
+    public void onMessage(LatencyMessage msg){
+        if(msg.msg == BenchmarkCaliper.STATIC_MESSAGE){
             long duration = System.nanoTime() - msg.sendTime;
-            benchmark.add_duration(duration);
+            benchmark.addDuration(duration);
             received++;
             if (sent < repeat){
                 shortDelay(250, received);  // Value used by Akka
-                next.send( new LatencyStaticMessage(System.nanoTime(), this, "MESSAGE"));
+                next.send( new LatencyMessage(System.nanoTime(), this, BenchmarkCaliper.STATIC_MESSAGE));
                 sent++;
             } else if (received >= repeat){
                 latch.countDown();
             }
         }
-
-        else if(msg.msg.equals("RUN")){
+        else if(msg.msg == BenchmarkCaliper.STATIC_RUN){
             int initialDelay = new Random(0).nextInt(20);    //Value used by Akka
             try {
                 Thread.sleep(initialDelay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            next.send( new LatencyStaticMessage(System.nanoTime(), this, "MESSAGE"));
+            next.send( new LatencyMessage(System.nanoTime(), this, BenchmarkCaliper.STATIC_MESSAGE));
             sent++;
         }
-
-        else if(msg.msg.equals("POISON")){
+        else if(msg.msg == BenchmarkCaliper.STATIC_POISON){
             next.send(msg);
             terminate();
         }

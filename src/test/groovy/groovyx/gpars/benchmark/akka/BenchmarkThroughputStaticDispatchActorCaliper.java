@@ -24,10 +24,11 @@ import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
 import groovyx.gpars.scheduler.FJPool;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
-public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
+public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCaliper {
 
     @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
@@ -42,59 +43,23 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
     @VmParam({"-Xmx1024M"}) String xmx;
     @VmParam({"-XX:+UseParallelGC"}) String gc;
 
-    int maxClients = 4;
-    public static final int RUN = 1;
-    public static final int MESSAGE = 2;
-    final int maxRunDurationMillis = 20000;
-    DefaultPGroup group;
-    long repeatsPerClient;
-    int repeatFactor = 500;
-    int repeat = 30000 * repeatFactor; //total number of messages that needs to be sent
 
-    public int totalMessages() {
+    BenchmarkThroughputStaticDispatchActorCaliper(){
+       super(30000,BenchmarkCaliper.STATIC_RUN, ThroughputStaticClient.class,ThroughputStaticDestination.class);
+    }
+
+    public int totalMessages(){
         return repeat;
     }
 
     public long timeStaticDispatchActorThroughput(int reps) {
-        long totalTime = 0;
-        group = new DefaultPGroup(new FJPool(maxClients));
-        repeatsPerClient = repeat / numberOfClients;//MESSAGE quota for each pair of actors
-
-        for (int i = 0; i < reps; i++) {
-
-            CountDownLatch latch = new CountDownLatch(numberOfClients);
-            ArrayList<ThroughputStaticDestinationActor> destinations = new ArrayList<ThroughputStaticDestinationActor>();
-            ArrayList<ThroughputStaticClientActor> clients = new ArrayList<ThroughputStaticClientActor>();
-
-            for (int j = 0; j < numberOfClients; j++) {
-                destinations.add((ThroughputStaticDestinationActor) new ThroughputStaticDestinationActor(group).start());
-
-            }
-            for (ThroughputStaticDestinationActor destination : destinations) {
-                clients.add((ThroughputStaticClientActor) new ThroughputStaticClientActor(destination, latch, repeatsPerClient, group).start());
-            }
-
-            long startTime = System.nanoTime();//start timing
-
-            for (ThroughputStaticClientActor client : clients) {
-                client.send(RUN);
-            }
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            totalTime += System.nanoTime() - startTime;//stop timing
-
-            for (ThroughputStaticClientActor client : clients) {
-                client.terminate();
-            }
-            for (ThroughputStaticDestinationActor destination : destinations) {
-                destination.terminate();
-            }
+        long time =0;
+        try {
+          time = super.timeThroughput(reps, numberOfClients);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return totalTime;
+        return time;
     }
 
     public static void main(String[] args) {
@@ -103,16 +68,16 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends Benchmark {
 
 }
 
-class ThroughputStaticClientActor extends StaticDispatchActor<Integer> {
+class ThroughputStaticClient extends StaticDispatchActor<Integer> {
 
     long sent = 0L;
     long received = 0L;
-    ThroughputStaticDestinationActor actor;
+    ThroughputStaticDestination actor;
     long repeatsPerClient;
     CountDownLatch latch;
 
 
-    public ThroughputStaticClientActor(ThroughputStaticDestinationActor actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ThroughputStaticClient(ThroughputStaticDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -121,7 +86,7 @@ class ThroughputStaticClientActor extends StaticDispatchActor<Integer> {
 
     @Override
     public void onMessage(Integer msg) {
-        if (msg.equals(BenchmarkThroughputStaticDispatchActorCaliper.MESSAGE)) {
+        if (msg.equals(BenchmarkCaliper.STATIC_MESSAGE)) {
             received += 1;
             if (sent < repeatsPerClient) {
                 actor.send(msg);
@@ -133,22 +98,22 @@ class ThroughputStaticClientActor extends StaticDispatchActor<Integer> {
 
             }
         }
-        if (msg.equals(BenchmarkThroughputStaticDispatchActorCaliper.RUN)) {
+        if (msg.equals(BenchmarkCaliper.STATIC_RUN)) {
             for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
-                actor.send(BenchmarkThroughputStaticDispatchActorCaliper.MESSAGE);
+                actor.send(BenchmarkCaliper.STATIC_MESSAGE);
                 sent += 1;
             }
         }
     }
 }
 
-class ThroughputStaticDestinationActor extends StaticDispatchActor<Integer> {
-    public ThroughputStaticDestinationActor(DefaultPGroup group) {
+class ThroughputStaticDestination extends StaticDispatchActor<Integer> {
+    public ThroughputStaticDestination(DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
     @Override
-    public void onMessage(Integer m) {
-        getSender().send(BenchmarkThroughputStaticDispatchActorCaliper.MESSAGE);
+    public void onMessage(Integer msg) {
+        getSender().send(msg);
     }
 }
