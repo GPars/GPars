@@ -62,7 +62,7 @@ class GParsPoolUtilHelper {
 
         return {final Object[] args ->
             final DataflowVariable result = new DataflowVariable()
-            PAUtils.evaluateArguments(localPool ?: retrieveFJPool(), args.clone(), 0, [], result, original, false)
+            PAUtils.evaluateArguments(localPool ?: new FJPool(GParsPoolUtil.retrievePool()), args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
     }

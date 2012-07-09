@@ -129,7 +129,7 @@ public class GParsExecutorsPoolUtil {
         final def localPool = pool ?: retrieveLocalPool();
         return {final Object[] args ->
             final DataflowVariable result = new DataflowVariable()
-            PAUtils.evaluateArguments(localPool ?: retrieveLocalPool(), args.clone(), 0, [], result, original, false)
+            PAUtils.evaluateArguments(localPool ?: new DefaultPool(GParsExecutorsPool.retrieveCurrentPool()), args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
     }
