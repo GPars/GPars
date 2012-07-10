@@ -41,7 +41,6 @@ targetCompatibility = 5
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
-def gcArg = "-XX:+UseParallelGC"
 
 apply {
     from 'gradle/docs.gradle'
@@ -128,6 +127,11 @@ dependencies {
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
 }
 
+def gcArg = "-XX:+UseParallelGC"
+if (System.getProperty('os.name').matches(".*Windows.*")){
+    gcArg = '"""-XX:+UseParallelGC"""'
+}
+
 task runLatencyStatic(dependsOn: 'classes', type: JavaExec){
     main= 'groovyx.gpars.benchmark.akka.BenchmarkLatencyStaticDispatchActorCaliper'
     classpath= sourceSets.test.runtimeClasspath
@@ -173,9 +177,6 @@ task runBenchmarks(){
     benchmarks.add("ComputationStatic")
     benchmarks.add("ComputationDynamic")
 
-    if (System.getProperty('os.name').matches(".*Windows.*")){
-        gcArg = "\"\"-XX:+UseParallelGC\"\""
-    }
 
     benchmarks.each{
         tasks["run${it}"].execute()
