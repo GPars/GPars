@@ -34,14 +34,11 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends BenchmarkC
             "40", "42", "44", "46", "48"}
     )
     int numberOfClients;
-    @VmParam({"-server"})
-    String server;
-    @VmParam({"-Xms512M"})
-    String xms;
-    @VmParam({"-Xmx1024M"})
-    String xmx;
-    @VmParam({"-XX:+UseParallelGC"})
-    String gc;
+
+    @VmParam String server;
+    @VmParam String xms;
+    @VmParam String xmx;
+    @VmParam String gc;
 
     BenchmarkThroughputComputationStaticActorCaliper(){
         super(500, BenchmarkCaliper.STATIC_RUN, ComputationStaticClient.class, ComputationStaticDestination.class);
@@ -55,15 +52,7 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends BenchmarkC
         long time=0;
         try {
             time = super.timeThroughput(reps, numberOfClients);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return time;
