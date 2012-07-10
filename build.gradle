@@ -41,6 +41,7 @@ targetCompatibility = 5
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
+def gcArg = "-XX:+UseParallelGC"
 
 apply {
     from 'gradle/docs.gradle'
@@ -126,26 +127,60 @@ dependencies {
     cover 'net.sourceforge.cobertura:cobertura:1.9.4.1'
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
 }
-task runLatencyDynamic(dependsOn: 'classes', type: JavaExec){
-    def gcArg = "-XX:+UseParallelGC"
-    if (System.getProperty('os.name').equals("Windows")){
-	gcArg = "\"-XX:+UseParallelGC\""
-    }
 
+task runLatencyStatic(dependsOn: 'classes', type: JavaExec){
+    main= 'groovyx.gpars.benchmark.akka.BenchmarkLatencyStaticDispatchActorCaliper'
+    classpath= sourceSets.test.runtimeClasspath
+    args = ['-i', 'latency', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+}
+
+task runLatencyDynamic(dependsOn: 'classes', type: JavaExec){
     main= 'groovyx.gpars.benchmark.akka.BenchmarkLatencyDynamicDispatchActorCaliper'
     classpath= sourceSets.test.runtimeClasspath
     args = ['-i', 'latency', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
 }
 
 task runThroughputStatic(dependsOn: 'classes', type: JavaExec){
-    def gcArg = "-XX:+UseParallelGC"
-    if (System.getProperty('os.name').equals("Windows")){
-	gcArg = "\"-XX:+UseParallelGC\""
-    }
-
     main= 'groovyx.gpars.benchmark.akka.BenchmarkThroughputStaticDispatchActorCaliper'
     classpath= sourceSets.test.runtimeClasspath
     args = ['-i', 'throughput', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+}
+
+task runThroughputDynamic(dependsOn: 'classes', type: JavaExec){
+    main= 'groovyx.gpars.benchmark.akka.BenchmarkThroughputDynamicDispatchActorCaliper'
+    classpath= sourceSets.test.runtimeClasspath
+    args = ['-i', 'throughput', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+}
+
+task runComputationStatic(dependsOn: 'classes', type: JavaExec){
+    main= 'groovyx.gpars.benchmark.akka.BenchmarkThroughputComputationStaticActorCaliper'
+    classpath= sourceSets.test.runtimeClasspath
+    args = ['-i', 'throughput', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+}
+
+task runComputationDynamic(dependsOn: 'classes', type: JavaExec){
+    main= 'groovyx.gpars.benchmark.akka.BenchmarkThroughputComputationDynamicActorCaliper'
+    classpath= sourceSets.test.runtimeClasspath
+    args = ['-i', 'throughput', "-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
+}
+
+task runBenchmarks(){
+    List<String> benchmarks = new ArrayList<String>()
+    benchmarks.add("LatencyStatic")
+    benchmarks.add("LatencyDynamic")
+    benchmarks.add("ThroughputStatic")
+    benchmarks.add("ThroughputDynamic")
+    benchmarks.add("ComputationStatic")
+    benchmarks.add("ComputationDynamic")
+
+    if (System.getProperty('os.name').matches(".*Windows.*")){
+        gcArg = "\"\"-XX:+UseParallelGC\"\""
+    }
+
+    benchmarks.each{
+        tasks["run${it}"].execute()
+    }
+
 }
 
 //  To get the details of the "unchecked" issues.
