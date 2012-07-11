@@ -46,7 +46,7 @@ public class ThroughputMeasurementWorker implements Worker {
             this.options = options;
             this.log = log;
             this.startTick = System.nanoTime(); // TODO: Ticker?
-            this.totalMessages = (Integer) benchmark.getClass().getDeclaredMethod("totalMessages", null).invoke(benchmark);
+            this.totalMessages = (Integer) benchmark.getClass().getSuperclass().getDeclaredMethod("totalMessages").invoke(benchmark);
             timeMethod.setAccessible(true);
         }
 
