@@ -23,8 +23,6 @@ import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
 
-
-import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
@@ -33,17 +31,13 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends BenchmarkCalipe
 
     @Param({"1", "2", "4"}) int numberOfClients;
 
-    @VmParam({"-server"}) String server;
-    @VmParam({"-Xms512M"}) String xms;
-    @VmParam({"-Xmx1024M"}) String xmx;
-    @VmParam({"-XX:+UseParallelGC"}) String gc;
+    @VmParam String server;
+    @VmParam String xms;
+    @VmParam String xmx;
+    @VmParam String gc;
 
     BenchmarkLatencyDynamicDispatchActorCaliper(){
         super(200, DYNAMIC_RUN, DYNAMIC_POISON, LatencyDynamicClient.class, LatencyDynamicDestination.class, LatencyDynamicWayPoint.class);
-    }
-
-    public int totalMessages() {
-        return repeat;
     }
 
     public long latencyDynamicDispatchActorLatency(int dummy) {

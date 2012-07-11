@@ -22,7 +22,6 @@ import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.DynamicDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkThroughputComputationDynamicActorCaliper extends BenchmarkCaliper {
@@ -33,22 +32,14 @@ public class BenchmarkThroughputComputationDynamicActorCaliper extends Benchmark
             "40", "42", "44", "46", "48"}
     )
     int numberOfClients;
-    @VmParam({"-server"})
-    String server;
-    @VmParam({"-Xms512M"})
-    String xms;
-    @VmParam({"-Xmx1024M"})
-    String xmx;
-    @VmParam({"-XX:+UseParallelGC"})
-    String gc;
+    @VmParam String server;
+    @VmParam String xms;
+    @VmParam String xmx;
+    @VmParam String gc;
 
 
     BenchmarkThroughputComputationDynamicActorCaliper(){
         super(500, DYNAMIC_RUN, ComputationDynamicClient.class, ComputationDynamicDestination.class);
-    }
-
-    public int totalMessages() {
-        return repeat;
     }
 
     public long timeDynamicDispatchActorThroughput(int reps) {

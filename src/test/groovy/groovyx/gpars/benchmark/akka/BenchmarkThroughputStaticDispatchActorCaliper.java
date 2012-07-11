@@ -17,15 +17,11 @@
 package groovyx.gpars.benchmark.akka;
 
 import com.google.caliper.Param;
-import com.google.caliper.api.Benchmark;
 import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
-import groovyx.gpars.scheduler.FJPool;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCaliper {
@@ -38,18 +34,14 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCali
     )
     int numberOfClients;
 
-    @VmParam({"-server"}) String server;
-    @VmParam({"-Xms512M"}) String xms;
-    @VmParam({"-Xmx1024M"}) String xmx;
-    @VmParam({"-XX:+UseParallelGC"}) String gc;
+    @VmParam String server;
+    @VmParam String xms;
+    @VmParam String xmx;
+    @VmParam String gc;
 
 
     BenchmarkThroughputStaticDispatchActorCaliper(){
        super(30000,BenchmarkCaliper.STATIC_RUN, ThroughputStaticClient.class,ThroughputStaticDestination.class);
-    }
-
-    public int totalMessages(){
-        return repeat;
     }
 
     public long timeStaticDispatchActorThroughput(int reps) {

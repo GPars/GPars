@@ -22,7 +22,6 @@ import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkThroughputComputationStaticActorCaliper extends BenchmarkCaliper {
@@ -42,10 +41,6 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends BenchmarkC
 
     BenchmarkThroughputComputationStaticActorCaliper(){
         super(500, BenchmarkCaliper.STATIC_RUN, ComputationStaticClient.class, ComputationStaticDestination.class);
-    }
-
-    public int totalMessages() {
-        return repeat;
     }
 
     public long timeComputationStaticDispatchActorThroughput(int reps) {

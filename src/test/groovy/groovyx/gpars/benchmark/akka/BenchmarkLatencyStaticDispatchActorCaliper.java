@@ -17,35 +17,25 @@
 package groovyx.gpars.benchmark.akka;
 
 import com.google.caliper.Param;
-import com.google.caliper.api.Benchmark;
 import com.google.caliper.api.VmParam;
 import com.google.caliper.runner.CaliperMain;
 import groovyx.gpars.actor.Actor;
 import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.group.DefaultPGroup;
-import groovyx.gpars.group.PGroup;
-import groovyx.gpars.scheduler.FJPool;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 
 public class BenchmarkLatencyStaticDispatchActorCaliper extends BenchmarkCaliper {
     @Param({"1", "2", "4"}) int numberOfClients;
-    @VmParam({"-server"}) String server;
-    @VmParam({"-Xms512M"}) String xms;
-    @VmParam({"-Xmx1024M"}) String xmx;
-    @VmParam({"-XX:+UseParallelGC"}) String gc;
+    @VmParam String server;
+    @VmParam String xms;
+    @VmParam String xmx;
+    @VmParam String gc;
 
     BenchmarkLatencyStaticDispatchActorCaliper(){
         super(200, new LatencyMessage(0, null, STATIC_RUN), new LatencyMessage(0, null, STATIC_POISON),LatencyStaticClient.class, LatencyStaticDestination.class, LatencyStaticWayPoint.class);
-    }
-
-    public int totalMessages(){
-        return repeat;
     }
 
     public long latencyStaticDispatchActorLatency(int dummy){
