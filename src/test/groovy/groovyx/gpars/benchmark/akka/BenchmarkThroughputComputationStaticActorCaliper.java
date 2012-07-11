@@ -116,7 +116,7 @@ class ComputationStaticClient extends StaticDispatchActor<Integer> {
 }
 
 class ComputationStaticDestination extends StaticDispatchActor<Integer> {
-    private double _pi = 0.0;
+    private double pi = 0.0;
     private long currentPosition = 0L;
     int nrOfElements = 1000;
 
@@ -131,7 +131,7 @@ class ComputationStaticDestination extends StaticDispatchActor<Integer> {
     }
 
     void calculatePi() {
-        _pi += calculateDecimals(currentPosition);
+        pi += calculateDecimals(currentPosition);
         currentPosition += nrOfElements;
     }
 

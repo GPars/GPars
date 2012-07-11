@@ -127,12 +127,12 @@ dependencies {
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
 }
 
-
-
 task runBenchmarks(type: JavaExec) {
     def gcArg = "-XX:+UseParallelGC"
+
+    // On Windows, calling the JVM with extended params requires multiple levels of quoting
     if (System.getProperty('os.name').matches(".*Windows.*")) {
-       gcArg = '"""-XX:+UseParallelGC"""'
+        gcArg = '"""-XX:+UseParallelGC"""'
     }
     description = 'Runs benchmarks measuring the throughput and latency of actors in GPars'
     main = 'groovyx.gpars.benchmark.BenchmarkRunner'
