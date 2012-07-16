@@ -7,6 +7,9 @@ import com.google.caliper.model.Scenario
 import com.google.caliper.model.VM
 import groovy.xml.MarkupBuilder
 
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
 class HTMLBuilder {
     private List<Environment> environments
     private List<VM> vms
@@ -27,7 +30,10 @@ class HTMLBuilder {
     }
 
     public void createHTML(String url) {
-        FileWriter writer = new FileWriter('Test.html')
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        Date date = new Date();
+        System.out.println();
+        FileWriter writer = new FileWriter(label+''+dateFormat.format(date)+'.html')
         def builder = new MarkupBuilder(writer)
         builder.html {
             title '' + label + ' ' + timeStamp
@@ -77,5 +83,9 @@ class HTMLBuilder {
                 img(src: url, border: 0)
             }
         }
+    }
+
+    public static void main(String[] args) {
+
     }
 }
