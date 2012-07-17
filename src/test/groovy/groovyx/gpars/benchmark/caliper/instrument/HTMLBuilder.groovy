@@ -2,72 +2,144 @@ package groovyx.gpars.benchmark.caliper.instrument
 
 import com.google.caliper.model.Environment
 import com.google.caliper.model.Instrument
-import com.google.caliper.model.Measurement
 import com.google.caliper.model.Result
 import com.google.caliper.model.Run
 import com.google.caliper.model.Scenario
 import com.google.caliper.model.VM
 import groovy.xml.MarkupBuilder
+
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import groovyx.gpars.benchmark.caliper.JsonFileParser
+import groovyx.gpars.benchmark.caliper.GoogleChartBuilder
+import groovyx.gpars.benchmark.caliper.ChartBuilder
+import com.google.common.collect.ImmutableSortedSet
+import java.awt.Color
 
 class HTMLBuilder {
-    private List<Environment> environments
-    private List<VM> vms
-    private List<Instrument> instruments
-    private List<Scenario> scenarios
-    private List<Result> results
-    private String label;
-    private long timeStamp;
+    private Run run
+    private List<ChartBuilder.Axis> sortedAxes
+    private Map<ChartBuilder.ScenarioName, ChartBuilder.ProcessedResult> processedResults
+    private ImmutableSortedSet<ChartBuilder.ScenarioName> sortedScenarioNames;
+    private double minValue;
+    private double maxValue;
 
     public HTMLBuilder(Run run) {
-        this.environments = run.environments;
-        this.vms = run.vms;
-        this.instruments = run.instruments;
-        this.scenarios = run.scenarios;
-        this.results = run.results;
-        this.label = run.label;
-        this.timeStamp = run.timestamp;
+        this.run = run
     }
 
-    public void createHTML(String url) {
+    public void buildLineGraphURL(ArrayList<String> xValues, ArrayList<Integer> yValues, List<ArrayList<String>> historyXValues,List<ArrayList<Integer>> historyYValues,
+                            ArrayList<String> historyNames, ArrayList<Integer> rangeList, String xLabel, String yLabel, int globalMax) {
+
+
+        def chart = new GoogleChartBuilder()
+        String result = chart.lineXY{
+            size(w:750, h:400)
+            title{
+                row(run.label)
+            }
+            data(encoding:'text', numLines:(historyXValues.size()+1)*2) {
+                set(xValues.toList())
+                set(yValues.toList())
+                for(int i=0; i < historyXValues.size(); i++){
+                    set(historyXValues[i].toList())
+                    set(historyYValues[i].toList())
+                }
+            }
+            colors{
+                Random rand = new Random();
+
+                for(int i=0; i < historyXValues.size()+1; i++){
+                    String colorHex = "";
+                    for(int j=0; j < 3; j++){
+                        char c = 48+(rand.nextInt(9))
+                        colorHex = colorHex << c <<c
+                    }
+                    color(colorHex)
+                }
+            }
+            //lineStyle(line1:[1,6,3])
+            legend{
+                label("Current")
+                historyNames.each{
+                    label(it)
+                }
+            }
+            axis( bottom:[],left:[], left2:[yLabel], bottom2:[xLabel])
+            range([0:[xValues.get(0).toInteger(),xValues.get(xValues.size()-1).toInteger()], 1:[1,globalMax]])
+
+
+            dataRange(rangeList.toList())
+
+        }
+
+        buildHTML(result)
+    }
+
+    public void buildBarGraphURL(ArrayList<String> xValues, ArrayList<Integer> yValues, List<ArrayList<String>> historyXValues,List<ArrayList<Integer>> historyYValues,
+                                  ArrayList<String> historyNames, ArrayList<Integer> rangeList, String xLabel, String yLabel, int globalMax) {
+
+
+        def chart = new GoogleChartBuilder()
+        String result = chart.bar(['vertical', 'grouped']){
+            size(w:750, h:400)
+            barSize(width:4, space:1)
+            title{
+                row(run.label)
+            }
+            data(encoding:'text', numLines:(historyXValues.size()+1)*2) {
+//                set(xValues.toList())
+                set(yValues.toList())
+                for(int i=0; i < historyXValues.size(); i++){
+                    set(historyYValues[i].toList())
+                }
+            }
+            colors{
+                color('FF9966')
+                color('6699FF')
+                color('99FF66')
+                color('66CC00')
+            }
+            //lineStyle(line1:[1,6,3])
+            legend{
+                label("Current")
+                historyNames.each{
+                    label(it)
+                }
+            }
+            axis( bottom:xValues.toList(),left:[])
+            range([0:[xValues.get(0).toInteger(),xValues.get(xValues.size()-1).toInteger()], 1:[1,globalMax]])
+
+
+            dataRange(rangeList.toList())
+            labelOption('b')
+        }
+
+        buildHTML(result)
+    }
+
+    private void buildHTML(String url) {
+        File dir = new File("caliper-charts");
+        dir.mkdir();
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm");
         Date date = new Date();
-        FileWriter writer = new FileWriter(label + '' + dateFormat.format(date) + '.html')
+        FileWriter writer = new FileWriter(dir.getName()+"/"+run.label + '' + dateFormat.format(date) + '.html')
         def builder = new MarkupBuilder(writer)
         builder.html {
-            head {
-                title label + " " + dateFormat.format(date)
-            }
+            title '' + run.label + ' ' + run.timestamp
             body {
                 table(border: 1) {
                     tr {
-                        th(style: "font-size: 0.75em","Number of Actors")
-                        th(style: "font-size: 0.75em","Measurements")
+                        th("Environments")
                     }
-                    for (int i = 0; i < scenarios.size(); i++) {
+                    for (int i = 0; i < run.environments.size(); i++) {
+                        Environment e=run.environments.get(i)
+                        SortedMap<String, String> properties=e.@properties
                         tr {
-                            Measurement m = results.get(i).measurements.get(0);
-                            td(style: "font-size: 0.75em", scenarios.get(i).userParameters.get("numberOfClients"));
-                            td(style: "font-size: 0.75em", ((long) m.@value / m.weight) + " " + m.unit);
-                        }
-                    }
-                    tr{
-                        img(src: url, border: 0)
-                    }
-                }
-                table(border: 1) {
-                    tr {
-                        th(style: "font-size: 0.75em",  "Environments")
-                    }
-                    for (int i = 0; i < environments.size(); i++) {
-                        Environment e = environments.get(i)
-                        SortedMap<String, String> properties = e.@properties
-                        tr {
-                            td(style: "font-size: 0.75em","CPU: " + properties.get("host.cpu.names"))
-                            td(style: "font-size: 0.75em","Number of Cores: " + properties.get("host.cpus"))
-                            td(style: "font-size: 0.75em","Memory: " + properties.get("host.memory.physical"))
-                            td(style: "font-size: 0.75em","OS: " + properties.get("os.name") + " " + properties.get("os.version"))
+                            td("CPU: "+properties.get("host.cpu.names"))
+                            td("Number of Cores: "+properties.get("host.cpus"))
+                            td("Memory: "+properties.get("host.memory.physical"))
+                            td("OS: "+properties.get("os.name")+" "+properties.get("os.version"))
                         }
                     }
                 }
@@ -75,25 +147,37 @@ class HTMLBuilder {
                     tr {
                         th("VMs")
                     }
-                    for (int i = 0; i < vms.size(); i++) {
+                    for (int i = 0; i < run.vms.size(); i++) {
                         tr {
-                            td(style: "font-size: 0.75em",vms.get(i).vmName)
+                            td(run.vms.get(i).vmName)
                         }
                     }
                 }
                 table(border: 1) {
                     tr {
-                        th(style: "font-size: 0.75em","Instruments")
+                        th("Instruments")
                     }
-                    for (int i = 0; i < instruments.size(); i++) {
-                        Instrument instrument = instruments.get(i);
+                    for (int i = 0; i < run.instruments.size(); i++) {
+                        Instrument instrument=run.instruments.get(i);
                         tr {
-                            String s = instrument.className
-                            td(style: "font-size: 0.75em",s.substring(s.lastIndexOf('.') + 1, s.length()))
+                            String s=instrument.className
+                            td(s.substring(s.lastIndexOf('.')+1,s.length()))
                         }
                     }
                 }
-
+                table(border: 1) {
+                    tr {
+                        th("Number of Actors")
+                        th("Measurements")
+                    }
+                    for (int i = 0; i < run.scenarios.size(); i++) {
+                        tr {
+                            td(run.scenarios.get(i).userParameters.get("numberOfClients"));
+                            td((long)run.results.get(i).measurements.get(0).@value/run.results.get(i).measurements.get(0).weight);
+                        }
+                    }
+                }
+                img(src: url, border: 0)
 
             }
         }

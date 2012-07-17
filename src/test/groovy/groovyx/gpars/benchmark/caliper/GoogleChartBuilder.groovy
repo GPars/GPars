@@ -114,7 +114,7 @@ class GoogleChartBuilder extends BuilderSupport {
     def data = {args ->
         encodingKey = args.encoding[FIRST_CHAR].toLowerCase()
 	    encodingTranslator = translators[encodingKey]
-		'chd=' << encodingKey << COLON
+		'chd=' << encodingKey << args.numLines << COLON
 	}
 
 
@@ -197,7 +197,10 @@ class GoogleChartBuilder extends BuilderSupport {
         map.endLine ? output << map.endLine << ',' : output << '0,'
         output << '0|'
     }
-
+    def labelOption = { arg->
+        def p = ''<<''
+        p << "chdlp=" << arg
+    }
     def solidClosure = { map ->
         def output = "s" << ''
         map.color ? output << ',' << map.color : output
@@ -302,7 +305,7 @@ class GoogleChartBuilder extends BuilderSupport {
                          'style':axis_style, 'lineStyle':line_style, 'grid':grid, 'markers':'chm=',
                          'shape':shape, 'rangeMarker':rangeMarker, 'fill':fill, 'backgrounds': 'chf=' ,
                         'background':background , 'area':area ,'solid':solid, 'gradient':gradient,
-                        'stripes':stripes, 'stripe':stripe, colors:'chco=', 'color':color, 'barSize':barSize, 'dataRange':data_range]
+                        'stripes':stripes, 'stripe':stripe, colors:'chco=', 'color':color, 'barSize':barSize, 'dataRange':data_range, 'labelOption':labelOption]
                       
     def closureDictionary = chartTypes + required + optional
 	

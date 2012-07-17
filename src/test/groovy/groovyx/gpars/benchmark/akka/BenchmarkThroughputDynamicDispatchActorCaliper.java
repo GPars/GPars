@@ -26,7 +26,7 @@ public class BenchmarkThroughputDynamicDispatchActorCaliper extends BenchmarkCal
         super(30000, DYNAMIC_RUN, ThroughputDynamicClient.class, ThroughputDynamicDestination.class);
     }
 
-    public long timeDynamicDispatchActorThroughput(int reps) {
+    public long timeThroughputDynamicDispatchActor(int reps) {
         long time=0;
         try {
             time = super.timeThroughput(reps, numberOfClients);

@@ -38,7 +38,7 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends BenchmarkCaliper
         super(200, new LatencyMessage(0, null, STATIC_RUN), new LatencyMessage(0, null, STATIC_POISON),LatencyStaticClient.class, LatencyStaticDestination.class, LatencyStaticWayPoint.class);
     }
 
-    public long latencyStaticDispatchActorLatency(int dummy){
+    public long latencyLatencyStaticDispatchActor(int dummy){
         long time = 0;
         try {
             time = timeLatency(numberOfClients);

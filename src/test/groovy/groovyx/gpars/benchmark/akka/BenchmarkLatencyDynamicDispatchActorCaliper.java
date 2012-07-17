@@ -40,7 +40,7 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends BenchmarkCalipe
         super(200, DYNAMIC_RUN, DYNAMIC_POISON, LatencyDynamicClient.class, LatencyDynamicDestination.class, LatencyDynamicWayPoint.class);
     }
 
-    public long latencyDynamicDispatchActorLatency(int dummy) {
+    public long latencyLatencyDynamicDispatchActor(int dummy) {
         long time = 0;
         try {
             time = timeLatency(numberOfClients);

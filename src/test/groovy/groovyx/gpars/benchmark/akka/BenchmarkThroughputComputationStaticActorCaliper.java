@@ -43,7 +43,7 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends BenchmarkC
         super(500, BenchmarkCaliper.STATIC_RUN, ComputationStaticClient.class, ComputationStaticDestination.class);
     }
 
-    public long timeComputationStaticDispatchActorThroughput(int reps) {
+    public long timeThroughputComputationStaticActor(int reps) {
         long time=0;
         try {
             time = super.timeThroughput(reps, numberOfClients);

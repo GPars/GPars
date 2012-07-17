@@ -44,7 +44,7 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCali
        super(30000,BenchmarkCaliper.STATIC_RUN, ThroughputStaticClient.class,ThroughputStaticDestination.class);
     }
 
-    public long timeStaticDispatchActorThroughput(int reps) {
+    public long timeThroughputStaticDispatchActor(int reps) {
         long time =0;
         try {
           time = super.timeThroughput(reps, numberOfClients);

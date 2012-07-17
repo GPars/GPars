@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.caliper.runner;
+package groovyx.gpars.benchmark.caliper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -25,6 +25,7 @@ import com.google.caliper.model.Result;
 import com.google.caliper.model.Run;
 import com.google.caliper.model.Scenario;
 import com.google.caliper.model.VM;
+import com.google.caliper.runner.ResultProcessor;
 import com.google.caliper.util.LinearTranslation;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
@@ -39,16 +40,18 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Doubles;
+import groovyx.gpars.benchmark.caliper.instrument.HTMLBuilder;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry
-import groovyx.gpars.benchmark.caliper.GoogleChartBuilder
-import groovyx.gpars.benchmark.caliper.instrument.HTMLBuilder;
+import java.util.Map.Entry;
 
-final class GoogleChartMaker implements ResultProcessor {
+final class ChartBuilder implements ResultProcessor {
 
     private static final int maxParamWidth = 30;
 
@@ -58,8 +61,8 @@ final class GoogleChartMaker implements ResultProcessor {
     // least non-overlapping-use, which is only sorta necessary. Seems like handleResults should
     // create a one-per-call state object containing these fields and pass that around instead of
     // having these as member vars.
+
     private Run run;
-    // (scenario.localName, axisName) -> value
     private Table<ScenarioName, AxisName, AxisValue> scenarioLocalVars;
     private Map<ScenarioName, ProcessedResult> processedResults;
     private List<Axis> sortedAxes;
@@ -96,8 +99,6 @@ final class GoogleChartMaker implements ResultProcessor {
     }
 
     private void displayResults(Instrument instrument) {
-        System.out.printf("Results for %s:%n", instrument.className);
-
         processedResults = Maps.newHashMap();
         for (Result result : run.results) {
             ScenarioName scenarioLocalName = new ScenarioName(result.scenarioLocalName);
@@ -168,11 +169,107 @@ final class GoogleChartMaker implements ResultProcessor {
 
         this.sortedAxes = new VarianceOrdering().reverse().sortedCopy(axes);
         this.sortedScenarioNames =
-            ImmutableSortedSet.copyOf(new ByAxisOrdering(), processedResults.keySet());
+                ImmutableSortedSet.copyOf(new ByAxisOrdering(), processedResults.keySet());
         this.maxValue = maxOfMedians;
         this.minValue = minOfMedians;
 
-        makeURL();
+        buildChart();
+    }
+
+    private void buildChart(){
+        /* X axis label is User Parameter,
+           A parameter is singleton if it has only one value
+           Assumption here is there is only one user parameter(numberOfClients)
+           and there are multiple scenarios */
+        String xLabel = null;
+
+        for (Axis axis : sortedAxes) {
+            if (!axis.isSingleton()) {
+                xLabel = axis.name.toString();
+                break;
+            }
+        }
+
+        if(xLabel.equals(null)){
+            System.out.println( "Need more than 1 scenario to build chart");
+            return;
+        }
+
+        /* Y axis label is the unit of measurements
+           It is ns for latency, and messages per second for throughput */
+        ChartBuilder.ProcessedResult firstResult = processedResults.values().iterator().next();
+        String yLabel = firstResult.responseUnit;
+
+        ArrayList<Integer> yValues = new ArrayList<Integer>();
+        ArrayList<String> xValues = new ArrayList<String>();
+        for (ChartBuilder.ScenarioName scenarioLocalName : sortedScenarioNames) {
+            ChartBuilder.ProcessedResult result = processedResults.get(scenarioLocalName);
+            yValues.add((int)result.median);
+            for (ChartBuilder.Axis axis : sortedAxes) {
+                if (!axis.isSingleton()) {
+                    xValues.add(axis.get(scenarioLocalName).toString());
+                }
+            }
+        }
+
+        /* Looking for the previous measurements of this benchmark
+           that has the same number of scenarios by
+           parsing Json files saved in caliper-results folder.
+           Do not change the name of the file nor the name of the benchmark method */
+        File dir = new File("caliper-results");
+        List<ArrayList<Integer>> historyYValues = new ArrayList<ArrayList<Integer>>();
+        List<ArrayList<String>> historyXValues = new ArrayList<ArrayList<String>>();
+        ArrayList<String> historyNames = new ArrayList<String>();
+        int counter =0;
+        for(File file : dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(final File dir, final String name) {
+                if(name.matches(".*"+run.label+".*"+"\\.json")){
+                    return true;
+                }
+                return false;
+            }
+        })){
+            JsonFileParser parser = new JsonFileParser(file);
+            ArrayList<Integer> yVal = parser.getMeasurements();
+            if(yVal.size() == yValues.size()){
+                historyYValues.add(parser.getMeasurements());
+                historyXValues.add(parser.getScenarios());
+                String [] tempList = file.getName().split("\\.");
+                historyNames.add(tempList[tempList.length -2]);
+                if(++counter >= 3) break;
+            }
+
+        }
+
+        /* Calculating the range of the cart and the range of each data set.
+         */
+        List<Integer> maxList = new ArrayList<Integer>();
+        for(ArrayList<Integer> medians: historyYValues){
+            int max = -1;
+            for(int val: medians){
+                max = Math.max(max, val);
+            }
+            maxList.add(max);
+        }
+
+        ArrayList<Integer> rangeList = new ArrayList<Integer>();
+        rangeList.add(new Integer(xValues.get(0)));
+        rangeList.add(new Integer(xValues.get(xValues.size()-1)));
+        rangeList.add(1);
+        rangeList.add((int)maxValue);
+
+        int globalMax = (int)maxValue;
+        for(int val: maxList){
+            globalMax = Math.max(globalMax, val);
+//            rangeList.add(new Integer(xValues.get(0)));
+//            rangeList.add(new Integer(xValues.get(xValues.size()-1)));
+            rangeList.add(1);
+            rangeList.add(val);
+        }
+
+        HTMLBuilder htmlBuilder = new HTMLBuilder(run);
+        htmlBuilder.buildBarGraphURL(xValues,yValues,historyXValues,historyYValues,historyNames,rangeList,xLabel,yLabel,globalMax);
     }
 
     private ProcessedResult combineResults(ProcessedResult r1, Result r2) {
@@ -251,70 +348,6 @@ final class GoogleChartMaker implements ResultProcessor {
         }
     }
 
-    /**
-     * Prints a table of values.
-     */
-    private void makeURL() {
-        // header
-        String xLabel;
-
-        for (Axis axis : sortedAxes) {
-            if (!axis.isSingleton()) {
-                xLabel = axis.name
-                break;
-            }
-        }
-        println xLabel
-
-        ProcessedResult firstResult = processedResults.values().iterator().next();
-        String yLabel = "${firstResult.responseUnit}";
-        println yLabel
-
-        ArrayList<Integer> yValues = new ArrayList<Integer>()
-        ArrayList<String> xValues = new ArrayList<String>()
-        for (ScenarioName scenarioLocalName : sortedScenarioNames) {
-            ProcessedResult result = processedResults.get(scenarioLocalName)
-            yValues << result.median
-            for (Axis axis : sortedAxes) {
-                if (!axis.isSingleton()) {
-                      xValues << truncate(axis.get(scenarioLocalName).toString(), axis.maxLength)
-                }
-            }
-        }
-
-        def chart = new GoogleChartBuilder()
-        String result = chart.lineXY{
-            size(w:700, h:400)
-            title{
-                row(run.label)
-            }
-            data(encoding:'text'){
-                set(xValues.toList())
-                set(yValues.toList())
-            }
-            colors{
-                color('66CC00')
-                color('3399ff')
-            }
-            //lineStyle(line1:[1,6,3])
-            legend{
-                label("Testing")
-            }
-            axis( bottom:[],left:[], left2:[yLabel], bottom2:[xLabel])
-            range([1:[1,maxValue], 0:[xValues.get(0).toInteger(),xValues.get(xValues.size()-1).toInteger()]]) // Only works if there more than 2 sets of data
-            dataRange([xValues.get(0).toInteger(),xValues.get(xValues.size()-1).toInteger(),1,maxValue])
-
-        }
-
-        HTMLBuilder builder = new HTMLBuilder(run)
-        builder.createHTML(result)
-
-    }
-
-
-
-
-
     @SuppressWarnings("NumericCastThatLosesPrecision")
     private static int floor(double d) {
         return (int) Math.floor(d);
@@ -371,10 +404,10 @@ final class GoogleChartMaker implements ResultProcessor {
             double[] sortedValues = values.clone();
             Arrays.sort(sortedValues);
             if (sortedValues.length % 2 == 1) {
-                return sortedValues.getAt((int) sortedValues.length / 2)
+                return sortedValues[(int) sortedValues.length / 2];
             } else {
-                double high = sortedValues.getAt((int) sortedValues.length / 2)
-                double low = sortedValues.getAt(((int) sortedValues.length / 2) - 1)
+                double high = sortedValues[(int) sortedValues.length / 2];
+                double low = sortedValues[((int) sortedValues.length / 2) - 1];
                 return (low + high) / 2;
             }
         }
@@ -463,11 +496,11 @@ final class GoogleChartMaker implements ResultProcessor {
     }
 
     private static final Function<VM, String> VM_LOCAL_NAME_FUNCTION =
-        new Function<VM, String>() {
-            @Override public String apply(VM vm) {
-                return vm.localName;
-            }
-        };
+            new Function<VM, String>() {
+                @Override public String apply(VM vm) {
+                    return vm.localName;
+                }
+            };
 
 
 }

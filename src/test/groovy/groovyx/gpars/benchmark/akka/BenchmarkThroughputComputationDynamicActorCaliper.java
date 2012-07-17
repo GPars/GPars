@@ -42,7 +42,7 @@ public class BenchmarkThroughputComputationDynamicActorCaliper extends Benchmark
         super(500, DYNAMIC_RUN, ComputationDynamicClient.class, ComputationDynamicDestination.class);
     }
 
-    public long timeDynamicDispatchActorThroughput(int reps) {
+    public long timeThroughputComputationDynamicActor(int reps) {
         long time=0;
         try {
             time = super.timeThroughput(reps, numberOfClients);
