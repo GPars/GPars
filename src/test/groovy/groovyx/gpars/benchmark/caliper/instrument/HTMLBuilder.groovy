@@ -3,6 +3,7 @@ package groovyx.gpars.benchmark.caliper.instrument
 import com.google.caliper.model.Environment
 import com.google.caliper.model.Instrument
 import com.google.caliper.model.Result
+import com.google.caliper.model.Run
 import com.google.caliper.model.Scenario
 import com.google.caliper.model.VM
 import groovy.xml.MarkupBuilder
@@ -19,7 +20,7 @@ class HTMLBuilder {
     private String label;
     private long timeStamp;
 
-    public HTMLBuilder() {
+    public HTMLBuilder(Run run) {
         this.environments = run.environments;
         this.vms = run.vms;
         this.instruments = run.instruments;
@@ -30,10 +31,10 @@ class HTMLBuilder {
     }
 
     public void createHTML(String url) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm");
         Date date = new Date();
         System.out.println();
-        FileWriter writer = new FileWriter(label+''+dateFormat.format(date)+'.html')
+        FileWriter writer = new FileWriter(label + '' + dateFormat.format(date) + '.html')
         def builder = new MarkupBuilder(writer)
         builder.html {
             title '' + label + ' ' + timeStamp
@@ -43,8 +44,13 @@ class HTMLBuilder {
                         th("Environments")
                     }
                     for (int i = 0; i < environments.size(); i++) {
+                        Environment e=environments.get(i)
+                        SortedMap<String, String> properties=e.@properties
                         tr {
-                            td(environments.get(i).toString())
+                            td("CPU: "+properties.get("host.cpu.names"))
+                            td("Number of Cores: "+properties.get("host.cpus"))
+                            td("Memory: "+properties.get("host.memory.physical"))
+                            td("OS: "+properties.get("os.name")+" "+properties.get("os.version"))
                         }
                     }
                 }
@@ -54,7 +60,7 @@ class HTMLBuilder {
                     }
                     for (int i = 0; i < vms.size(); i++) {
                         tr {
-                            td(vms.get(i).toString())
+                            td(vms.get(i).vmName)
                         }
                     }
                 }
@@ -63,8 +69,10 @@ class HTMLBuilder {
                         th("Instruments")
                     }
                     for (int i = 0; i < instruments.size(); i++) {
+                        Instrument instrument=instruments.get(i);
                         tr {
-                            td(instruments.get(i).toString())
+                            String s=instrument.className
+                            td(s.substring(s.lastIndexOf('.')+1,s.length()))
                         }
                     }
                 }
@@ -75,17 +83,14 @@ class HTMLBuilder {
                     }
                     for (int i = 0; i < scenarios.size(); i++) {
                         tr {
-                            scenarios.get(i).toString();
-                            results.get(i).toString();
+                            td(scenarios.get(i).userParameters.get("numberOfClients"));
+                            td((long)results.get(i).measurements.get(0).@value/results.get(i).measurements.get(0).weight);
                         }
                     }
                 }
                 img(src: url, border: 0)
+
             }
         }
-    }
-
-    public static void main(String[] args) {
-
     }
 }
