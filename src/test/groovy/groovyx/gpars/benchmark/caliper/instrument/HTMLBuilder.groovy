@@ -2,12 +2,12 @@ package groovyx.gpars.benchmark.caliper.instrument
 
 import com.google.caliper.model.Environment
 import com.google.caliper.model.Instrument
+import com.google.caliper.model.Measurement
 import com.google.caliper.model.Result
 import com.google.caliper.model.Run
 import com.google.caliper.model.Scenario
 import com.google.caliper.model.VM
 import groovy.xml.MarkupBuilder
-
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -33,24 +33,41 @@ class HTMLBuilder {
     public void createHTML(String url) {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm");
         Date date = new Date();
-        System.out.println();
         FileWriter writer = new FileWriter(label + '' + dateFormat.format(date) + '.html')
         def builder = new MarkupBuilder(writer)
         builder.html {
-            title '' + label + ' ' + timeStamp
+            head {
+                title label + " " + dateFormat.format(date)
+            }
             body {
                 table(border: 1) {
                     tr {
-                        th("Environments")
+                        th(style: "font-size: 0.75em","Number of Actors")
+                        th(style: "font-size: 0.75em","Measurements")
+                    }
+                    for (int i = 0; i < scenarios.size(); i++) {
+                        tr {
+                            Measurement m = results.get(i).measurements.get(0);
+                            td(style: "font-size: 0.75em", scenarios.get(i).userParameters.get("numberOfClients"));
+                            td(style: "font-size: 0.75em", ((long) m.@value / m.weight) + " " + m.unit);
+                        }
+                    }
+                    tr{
+                        img(src: url, border: 0)
+                    }
+                }
+                table(border: 1) {
+                    tr {
+                        th(style: "font-size: 0.75em",  "Environments")
                     }
                     for (int i = 0; i < environments.size(); i++) {
-                        Environment e=environments.get(i)
-                        SortedMap<String, String> properties=e.@properties
+                        Environment e = environments.get(i)
+                        SortedMap<String, String> properties = e.@properties
                         tr {
-                            td("CPU: "+properties.get("host.cpu.names"))
-                            td("Number of Cores: "+properties.get("host.cpus"))
-                            td("Memory: "+properties.get("host.memory.physical"))
-                            td("OS: "+properties.get("os.name")+" "+properties.get("os.version"))
+                            td(style: "font-size: 0.75em","CPU: " + properties.get("host.cpu.names"))
+                            td(style: "font-size: 0.75em","Number of Cores: " + properties.get("host.cpus"))
+                            td(style: "font-size: 0.75em","Memory: " + properties.get("host.memory.physical"))
+                            td(style: "font-size: 0.75em","OS: " + properties.get("os.name") + " " + properties.get("os.version"))
                         }
                     }
                 }
@@ -60,35 +77,23 @@ class HTMLBuilder {
                     }
                     for (int i = 0; i < vms.size(); i++) {
                         tr {
-                            td(vms.get(i).vmName)
+                            td(style: "font-size: 0.75em",vms.get(i).vmName)
                         }
                     }
                 }
                 table(border: 1) {
                     tr {
-                        th("Instruments")
+                        th(style: "font-size: 0.75em","Instruments")
                     }
                     for (int i = 0; i < instruments.size(); i++) {
-                        Instrument instrument=instruments.get(i);
+                        Instrument instrument = instruments.get(i);
                         tr {
-                            String s=instrument.className
-                            td(s.substring(s.lastIndexOf('.')+1,s.length()))
+                            String s = instrument.className
+                            td(style: "font-size: 0.75em",s.substring(s.lastIndexOf('.') + 1, s.length()))
                         }
                     }
                 }
-                table(border: 1) {
-                    tr {
-                        th("Number of Actors")
-                        th("Measurements")
-                    }
-                    for (int i = 0; i < scenarios.size(); i++) {
-                        tr {
-                            td(scenarios.get(i).userParameters.get("numberOfClients"));
-                            td((long)results.get(i).measurements.get(0).@value/results.get(i).measurements.get(0).weight);
-                        }
-                    }
-                }
-                img(src: url, border: 0)
+
 
             }
         }
