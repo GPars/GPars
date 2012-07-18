@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark.caliper;
+package groovyx.gpars.benchmark.caliper.chart;
 
 import com.google.caliper.model.Run;
 import com.google.gson.Gson;

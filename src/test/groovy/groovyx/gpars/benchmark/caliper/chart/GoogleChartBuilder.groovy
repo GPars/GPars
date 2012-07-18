@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark.caliper
+package groovyx.gpars.benchmark.caliper.chart
 
 class GoogleChartBuilder extends BuilderSupport {
 	def result = 'http://chart.apis.google.com/chart?' << ''

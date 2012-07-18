@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package groovyx.gpars.benchmark.caliper;
+package groovyx.gpars.benchmark.caliper.chart;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -26,13 +26,10 @@ import com.google.caliper.model.Run;
 import com.google.caliper.model.Scenario;
 import com.google.caliper.model.VM;
 import com.google.caliper.runner.ResultProcessor;
-import com.google.caliper.util.LinearTranslation;
 import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Lists;

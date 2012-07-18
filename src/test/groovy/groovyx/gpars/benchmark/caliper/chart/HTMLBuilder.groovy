@@ -1,20 +1,18 @@
-package groovyx.gpars.benchmark.caliper.instrument
+package groovyx.gpars.benchmark.caliper.chart
 
 import com.google.caliper.model.Environment
 import com.google.caliper.model.Instrument
-import com.google.caliper.model.Result
+
 import com.google.caliper.model.Run
-import com.google.caliper.model.Scenario
-import com.google.caliper.model.VM
+
 import groovy.xml.MarkupBuilder
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import groovyx.gpars.benchmark.caliper.JsonFileParser
-import groovyx.gpars.benchmark.caliper.GoogleChartBuilder
+
+import groovyx.gpars.benchmark.caliper.chart.GoogleChartBuilder
 import groovyx.gpars.benchmark.caliper.ChartBuilder
 import com.google.common.collect.ImmutableSortedSet
-import java.awt.Color
 
 class HTMLBuilder {
     private Run run
