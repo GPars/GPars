@@ -220,25 +220,27 @@ final class ChartBuilder implements ResultProcessor {
         ArrayList<String> historyNames = new ArrayList<String>();
         int counter =0;
 
-        for(File file : dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(final File dir, final String name) {
-                if(name.matches(".*"+run.label+".*"+"\\.json")){
-                    return true;
+        if(dir.isDirectory()){
+            for(File file : dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(final File dir, final String name) {
+                    if(name.matches(".*"+run.label+".*"+"\\.json")){
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        })){
-            JsonFileParser parser = new JsonFileParser(file);
-            ArrayList<Long> yVal = parser.getMeasurements();
-            if(yVal.size() == yValues.size()){
-                historyYValues.add(parser.getMeasurements());
-                historyXValues.add(parser.getScenarios());
-                String [] tempList = file.getName().split("\\.");
-                historyNames.add(tempList[tempList.length -2]);
-                if(++counter >= 3) break;
-            }
+            })){
+                JsonFileParser parser = new JsonFileParser(file);
+                ArrayList<Long> yVal = parser.getMeasurements();
+                if(yVal.size() == yValues.size()){
+                    historyYValues.add(parser.getMeasurements());
+                    historyXValues.add(parser.getScenarios());
+                    String [] tempList = file.getName().split("\\.");
+                    historyNames.add(tempList[tempList.length -2]);
+                    if(++counter >= 3) break;
+                }
 
+            }
         }
 
         /* Calculating the range of the cart and the range of each data set.
