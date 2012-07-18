@@ -128,7 +128,7 @@ class HTMLBuilder {
                         tr {
                             Measurement m = run.results.get(i).measurements.get(0);
                             td(style: "font-size: 0.75em", run.scenarios.get(i).userParameters.get("numberOfClients"));
-                            td(style: "font-size: 0.75em", ((long) m.@value / m.weight) + " " + m.unit);
+                            td(style: "font-size: 0.75em", ((long) m.@value / m.weight));
                         }
                     }
                     tr {
@@ -142,10 +142,16 @@ class HTMLBuilder {
                     for (int i = 0; i < run.environments.size(); i++) {
                         Environment e = run.environments.get(i)
                         SortedMap<String, String> properties = e.@properties
-                        tr {
+                        tr{
                             td(style: "font-size: 0.75em", "CPU: " + properties.get("host.cpu.names"))
+                        }
+                        tr{
                             td(style: "font-size: 0.75em", "Number of Cores: " + properties.get("host.cpus"))
+                        }
+                        tr{
                             td(style: "font-size: 0.75em", "Memory: " + properties.get("host.memory.physical"))
+                        }
+                        tr{
                             td(style: "font-size: 0.75em", "OS: " + properties.get("os.name") + " " + properties.get("os.version"))
                         }
                     }
