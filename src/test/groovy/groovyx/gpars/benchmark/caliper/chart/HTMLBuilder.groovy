@@ -154,7 +154,7 @@ class HTMLBuilder {
 
                     for (int i = 0; i < run.vms.size(); i++) {
                         tr {
-                            td(style: "font-size: 0.75em", "VM :"+run.vms.get(i).vmName)
+                            td(style: "font-size: 0.75em", "VM: "+run.vms.get(i).vmName)
                         }
                     }
                 }
@@ -163,7 +163,7 @@ class HTMLBuilder {
                         Instrument instrument = run.instruments.get(i);
                         tr {
                             String s = instrument.className
-                            td(style: "font-size: 0.75em", "Instrument :"+s.substring(s.lastIndexOf('.') + 1, s.length()))
+                            td(style: "font-size: 0.75em", "Instrument: "+s.substring(s.lastIndexOf('.') + 1, s.length()))
                         }
                     }
                 }
