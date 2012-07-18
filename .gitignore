@@ -1,0 +1,17 @@
+bin
+build
+out
+.gradle
+gradle-app.setting
+cobertura.ser
+buildSrc/.gradle
+buildSrc/build
+*.iws
+GPars.ipr
+GPars.iml
+.classpath
+.project
+.settings
+*~
+/caliper-charts/
+/caliper-results/
