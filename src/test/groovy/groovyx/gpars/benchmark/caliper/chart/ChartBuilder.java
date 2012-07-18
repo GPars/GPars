@@ -37,9 +37,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Doubles;
-import groovyx.gpars.benchmark.caliper.instrument.HTMLBuilder;
+import groovyx.gpars.benchmark.caliper.chart.HTMLBuilder;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -197,11 +198,11 @@ final class ChartBuilder implements ResultProcessor {
         ChartBuilder.ProcessedResult firstResult = processedResults.values().iterator().next();
         String yLabel = firstResult.responseUnit;
 
-        ArrayList<Integer> yValues = new ArrayList<Integer>();
+        ArrayList<Long> yValues = new ArrayList<Long>();
         ArrayList<String> xValues = new ArrayList<String>();
         for (ChartBuilder.ScenarioName scenarioLocalName : sortedScenarioNames) {
             ChartBuilder.ProcessedResult result = processedResults.get(scenarioLocalName);
-            yValues.add((int)result.median);
+            yValues.add((long)result.median);
             for (ChartBuilder.Axis axis : sortedAxes) {
                 if (!axis.isSingleton()) {
                     xValues.add(axis.get(scenarioLocalName).toString());
@@ -214,10 +215,11 @@ final class ChartBuilder implements ResultProcessor {
            parsing Json files saved in caliper-results folder.
            Do not change the name of the file nor the name of the benchmark method */
         File dir = new File("caliper-results");
-        List<ArrayList<Integer>> historyYValues = new ArrayList<ArrayList<Integer>>();
+        List<ArrayList<Long>> historyYValues = new ArrayList<ArrayList<Long>>();
         List<ArrayList<String>> historyXValues = new ArrayList<ArrayList<String>>();
         ArrayList<String> historyNames = new ArrayList<String>();
         int counter =0;
+
         for(File file : dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(final File dir, final String name) {
@@ -228,7 +230,7 @@ final class ChartBuilder implements ResultProcessor {
             }
         })){
             JsonFileParser parser = new JsonFileParser(file);
-            ArrayList<Integer> yVal = parser.getMeasurements();
+            ArrayList<Long> yVal = parser.getMeasurements();
             if(yVal.size() == yValues.size()){
                 historyYValues.add(parser.getMeasurements());
                 historyXValues.add(parser.getScenarios());
@@ -241,32 +243,32 @@ final class ChartBuilder implements ResultProcessor {
 
         /* Calculating the range of the cart and the range of each data set.
          */
-        List<Integer> maxList = new ArrayList<Integer>();
-        for(ArrayList<Integer> medians: historyYValues){
-            int max = -1;
-            for(int val: medians){
+        List<Long> maxList = new ArrayList<Long>();
+        for(ArrayList<Long> medians: historyYValues){
+            long max = -1;
+            for(long val: medians){
                 max = Math.max(max, val);
             }
             maxList.add(max);
         }
 
-        ArrayList<Integer> rangeList = new ArrayList<Integer>();
-        rangeList.add(new Integer(xValues.get(0)));
-        rangeList.add(new Integer(xValues.get(xValues.size()-1)));
-        rangeList.add(1);
-        rangeList.add((int)maxValue);
+        ArrayList<Long> rangeList = new ArrayList<Long>();
+//        rangeList.add(new Long(xValues.get(0)));
+//        rangeList.add(new Long(xValues.get(xValues.size()-1)));
+        rangeList.add(1L);
+        rangeList.add((long)maxValue);
 
-        int globalMax = (int)maxValue;
-        for(int val: maxList){
+        long globalMax = (long)maxValue;
+        for(long val: maxList){
             globalMax = Math.max(globalMax, val);
 //            rangeList.add(new Integer(xValues.get(0)));
 //            rangeList.add(new Integer(xValues.get(xValues.size()-1)));
-            rangeList.add(1);
+            rangeList.add(1L);
             rangeList.add(val);
         }
 
         HTMLBuilder htmlBuilder = new HTMLBuilder(run);
-        htmlBuilder.buildBarGraphURL(xValues,yValues,historyXValues,historyYValues,historyNames,rangeList,xLabel,yLabel,globalMax);
+        htmlBuilder.buildBarGraphURL(xValues,yValues,historyXValues,historyYValues,historyNames,rangeList,xLabel,yLabel, globalMax);
     }
 
     private ProcessedResult combineResults(ProcessedResult r1, Result r2) {

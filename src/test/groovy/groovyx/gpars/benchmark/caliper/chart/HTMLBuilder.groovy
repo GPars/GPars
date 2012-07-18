@@ -12,19 +12,13 @@ import java.text.SimpleDateFormat
 
 class HTMLBuilder {
     private Run run
-    private List<ChartBuilder.Axis> sortedAxes
-    private Map<ChartBuilder.ScenarioName, ChartBuilder.ProcessedResult> processedResults
-    private ImmutableSortedSet<ChartBuilder.ScenarioName> sortedScenarioNames;
-    private double minValue;
-    private double maxValue;
 
     public HTMLBuilder(Run run) {
         this.run = run
     }
 
-    public void buildLineGraphURL(ArrayList<String> xValues, ArrayList<Integer> yValues, List<ArrayList<String>> historyXValues, List<ArrayList<Integer>> historyYValues,
-                                  ArrayList<String> historyNames, ArrayList<Integer> rangeList, String xLabel, String yLabel, int globalMax) {
-
+    public void buildLineGraphURL(ArrayList<String> xValues, ArrayList<Long> yValues, List<ArrayList<String>> historyXValues, List<ArrayList<Long>> historyYValues,
+                                  ArrayList<String> historyNames, ArrayList<Long> rangeList, String xLabel, String yLabel, long globalMax) {
 
         def chart = new GoogleChartBuilder()
         String result = chart.lineXY {
@@ -61,28 +55,33 @@ class HTMLBuilder {
             }
             axis(bottom: [], left: [], left2: [yLabel], bottom2: [xLabel])
             range([0: [xValues.get(0).toInteger(), xValues.get(xValues.size() - 1).toInteger()], 1: [1, globalMax]])
-
-
             dataRange(rangeList.toList())
-
         }
-
         buildHTML(result)
     }
 
-    public void buildBarGraphURL(ArrayList<String> xValues, ArrayList<Integer> yValues, List<ArrayList<String>> historyXValues, List<ArrayList<Integer>> historyYValues,
-                                 ArrayList<String> historyNames, ArrayList<Integer> rangeList, String xLabel, String yLabel, int globalMax) {
-
+    public void buildBarGraphURL(ArrayList<String> xValues, ArrayList<Long> yValues, List<ArrayList<String>> historyXValues, List<ArrayList<Long>> historyYValues,
+                                 ArrayList<String> historyNames, ArrayList<Long> rangeList, String xLabel, String yLabel, long globalMax) {
 
         def chart = new GoogleChartBuilder()
+        int numberOfLines = yValues.size()*(historyYValues.size()+1)
+        int margin = 500/numberOfLines
+        int width = 0, space = 0
+        if(margin > 30){
+            width = 30
+            space =  margin - width
+        }
+        else{
+            space = 1
+            width = margin - space
+        }
         String result = chart.bar(['vertical', 'grouped']) {
             size(w: 750, h: 400)
-            barSize(width: 4, space: 1)
+            barSize(width: width, space: space)
             title {
                 row(run.label)
             }
             data(encoding: 'text', numLines: (historyXValues.size() + 1) * 2) {
-//                set(xValues.toList())
                 set(yValues.toList())
                 for (int i = 0; i < historyXValues.size(); i++) {
                     set(historyYValues[i].toList())
@@ -94,7 +93,6 @@ class HTMLBuilder {
                 color('99FF66')
                 color('66CC00')
             }
-            //lineStyle(line1:[1,6,3])
             legend {
                 label("Current")
                 historyNames.each {
@@ -103,12 +101,9 @@ class HTMLBuilder {
             }
             axis(bottom: xValues.toList(), left: [])
             range([0: [xValues.get(0).toInteger(), xValues.get(xValues.size() - 1).toInteger()], 1: [1, globalMax]])
-
-
             dataRange(rangeList.toList())
             labelOption('b')
         }
-
         buildHTML(result)
     }
 

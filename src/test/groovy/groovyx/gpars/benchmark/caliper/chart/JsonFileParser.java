@@ -64,7 +64,6 @@ public class JsonFileParser {
             }
         }
 
-
        JsonParser parser = new JsonParser();
         try{
             jsonObject = (JsonObject)parser.parse(result);
@@ -73,18 +72,18 @@ public class JsonFileParser {
         }
     }
 
-    public ArrayList<Integer> getMeasurements(){
+    public ArrayList<Long> getMeasurements(){
         JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-        ArrayList<Integer> medianList = new ArrayList<Integer>();
+        ArrayList<Long> medianList = new ArrayList<Long>();
         if(jsonArray == null) return medianList;
 
         for(int scenario=0; scenario < jsonArray.size(); scenario++){
             JsonArray measurementArray = jsonArray.get(scenario).getAsJsonObject().getAsJsonArray("measurements");
-            ArrayList<Integer> trials = new ArrayList<Integer>();
+            ArrayList<Long> trials = new ArrayList<Long>();
 
             for(int trial=0; trial < measurementArray.size(); trial++){
                 JsonObject measurement = measurementArray.get(trial).getAsJsonObject();
-                trials.add(measurement.get("value").getAsInt() / measurement.get("weight").getAsInt());
+                trials.add(measurement.get("value").getAsLong() / measurement.get("weight").getAsLong());
             }
             medianList.add(trials.get(trials.size() / 2));
         }
