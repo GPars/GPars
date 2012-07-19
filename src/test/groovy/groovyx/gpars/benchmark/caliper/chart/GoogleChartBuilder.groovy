@@ -154,7 +154,7 @@ class GoogleChartBuilder extends BuilderSupport {
 
     def data_range = {
         def s = ''<<''
-        s << "chds=" << listToString(it)
+        s << "chds=" << it
     }
     def removeLastPipe(stringWithPipe){
         def result

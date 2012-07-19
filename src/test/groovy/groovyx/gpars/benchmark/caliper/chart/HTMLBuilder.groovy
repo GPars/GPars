@@ -18,7 +18,7 @@ class HTMLBuilder {
     }
 
     public void buildLineGraphURL(ArrayList<String> xValues, ArrayList<Long> yValues, List<ArrayList<String>> historyXValues, List<ArrayList<Long>> historyYValues,
-                                  ArrayList<String> historyNames, ArrayList<Long> rangeList, String xLabel, String yLabel, long globalMax) {
+                                  ArrayList<String> historyNames, String xLabel, String yLabel, long globalMax) {
 
         def chart = new GoogleChartBuilder()
         String result = chart.lineXY {
@@ -55,13 +55,13 @@ class HTMLBuilder {
             }
             axis(bottom: [], left: [], left2: [yLabel], bottom2: [xLabel])
             range([0: [xValues.get(0).toInteger(), xValues.get(xValues.size() - 1).toInteger()], 1: [1, globalMax]])
-            dataRange(rangeList.toList())
+            dataRange('a')
         }
         buildHTML(result)
     }
 
     public void buildBarGraphURL(ArrayList<String> xValues, ArrayList<Long> yValues, List<ArrayList<String>> historyXValues, List<ArrayList<Long>> historyYValues,
-                                 ArrayList<String> historyNames, ArrayList<Long> rangeList, String xLabel, String yLabel, long globalMax) {
+                                 ArrayList<String> historyNames, String xLabel, String yLabel, long globalMax) {
 
         def chart = new GoogleChartBuilder()
         int numberOfLines = yValues.size() * (historyYValues.size() + 1)
@@ -101,7 +101,7 @@ class HTMLBuilder {
             }
             axis(bottom: xValues.toList(), left: [])
             range([0: [xValues.get(0).toInteger(), xValues.get(xValues.size() - 1).toInteger()], 1: [1, globalMax]])
-            dataRange(rangeList.toList())
+            dataRange('a')
             labelOption('b')
         }
         buildHTML(result)

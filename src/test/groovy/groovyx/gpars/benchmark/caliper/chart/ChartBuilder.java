@@ -42,12 +42,18 @@ import groovyx.gpars.benchmark.caliper.chart.HTMLBuilder;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 final class ChartBuilder implements ResultProcessor {
 
@@ -220,6 +226,24 @@ final class ChartBuilder implements ResultProcessor {
         ArrayList<String> historyNames = new ArrayList<String>();
         int counter =0;
 
+        /* Pick history files that are most recently creaetd */
+        Queue<File> fileQueue = new PriorityQueue<File>(10, new Comparator<File>() {
+            @Override
+            public int compare(final File o1, final File o2) {
+                String [] tempList1 = o1.getName().split("\\.");
+                String [] tempList2 = o2.getName().split("\\.");
+                Date date1=null, date2=null;
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ssZ");
+                try {
+                    date1 = simpleDateFormat.parse(tempList1[tempList1.length - 2]);
+                    date2 = simpleDateFormat.parse(tempList2[tempList2.length - 2]);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return date2.compareTo(date1);
+            }
+        });
+
         if(dir.isDirectory()){
             for(File file : dir.listFiles(new FilenameFilter() {
                 @Override
@@ -233,14 +257,19 @@ final class ChartBuilder implements ResultProcessor {
                 JsonFileParser parser = new JsonFileParser(file);
                 ArrayList<Long> yVal = parser.getMeasurements();
                 if(yVal.size() == yValues.size()){
-                    historyYValues.add(parser.getMeasurements());
-                    historyXValues.add(parser.getScenarios());
-                    String [] tempList = file.getName().split("\\.");
-                    historyNames.add(tempList[tempList.length -2]);
-                    if(++counter >= 3) break;
+                    fileQueue.add(file);
                 }
-
             }
+        }
+
+        for(int i=0; i < 3; i++){
+            if(fileQueue.isEmpty()) break;
+            File file = fileQueue.poll();
+            JsonFileParser parser = new JsonFileParser(file);
+            historyYValues.add(parser.getMeasurements());
+            historyXValues.add(parser.getScenarios());
+            String [] tempList = file.getName().split("\\.");
+            historyNames.add(tempList[tempList.length -2]);
         }
 
         /* Calculating the range of the cart and the range of each data set.
@@ -254,23 +283,13 @@ final class ChartBuilder implements ResultProcessor {
             maxList.add(max);
         }
 
-        ArrayList<Long> rangeList = new ArrayList<Long>();
-//        rangeList.add(new Long(xValues.get(0)));
-//        rangeList.add(new Long(xValues.get(xValues.size()-1)));
-        rangeList.add(1L);
-        rangeList.add((long)maxValue);
-
         long globalMax = (long)maxValue;
         for(long val: maxList){
             globalMax = Math.max(globalMax, val);
-//            rangeList.add(new Integer(xValues.get(0)));
-//            rangeList.add(new Integer(xValues.get(xValues.size()-1)));
-            rangeList.add(1L);
-            rangeList.add(val);
         }
 
         HTMLBuilder htmlBuilder = new HTMLBuilder(run);
-        htmlBuilder.buildBarGraphURL(xValues,yValues,historyXValues,historyYValues,historyNames,rangeList,xLabel,yLabel, globalMax);
+        htmlBuilder.buildBarGraphURL(xValues,yValues,historyXValues,historyYValues,historyNames,xLabel,yLabel, globalMax);
     }
 
     private ProcessedResult combineResults(ProcessedResult r1, Result r2) {
