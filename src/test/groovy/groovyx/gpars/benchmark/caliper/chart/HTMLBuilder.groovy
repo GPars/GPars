@@ -64,14 +64,14 @@ class HTMLBuilder {
                                  ArrayList<String> historyNames, ArrayList<Long> rangeList, String xLabel, String yLabel, long globalMax) {
 
         def chart = new GoogleChartBuilder()
-        int numberOfLines = yValues.size()*(historyYValues.size()+1)
-        int margin = 500/numberOfLines
+        int numberOfLines = yValues.size() * (historyYValues.size() + 1)
+        int margin = 500 / numberOfLines
         int width = 0, space = 0
-        if(margin > 30){
+        if (margin > 30) {
             width = 30
-            space =  1
+            space = 1
         }
-        else{
+        else {
             space = 1
             width = margin - space
         }
@@ -110,9 +110,9 @@ class HTMLBuilder {
     void buildHTML(String url) {
         File dir = new File("caliper-charts");
         dir.mkdir();
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
         Date date = new Date();
-        FileWriter writer = new FileWriter(dir.name+"/"+run.label + '' + dateFormat.format(date) + '.html')
+        FileWriter writer = new FileWriter(dir.name + File.separator + run.label + '' + dateFormat.format(date) + '.html')
         def builder = new MarkupBuilder(writer)
         builder.html {
             head {
@@ -135,32 +135,31 @@ class HTMLBuilder {
                         img(src: url, border: 0)
                     }
                 }
-                table{
+                table {
                     tr {
                         th(style: "font-size: 0.75em", "Environment")
                     }
                     for (int i = 0; i < run.environments.size(); i++) {
                         Environment e = run.environments.get(i)
                         SortedMap<String, String> properties = e.@properties
-                        tr{
+                        tr {
                             td(style: "font-size: 0.75em", "CPU: " + properties.get("host.cpu.names"))
                         }
-                        tr{
+                        tr {
                             td(style: "font-size: 0.75em", "Number of Cores: " + properties.get("host.cpus"))
                         }
-                        tr{
+                        tr {
                             td(style: "font-size: 0.75em", "Memory: " + properties.get("host.memory.physical"))
                         }
-                        tr{
+                        tr {
                             td(style: "font-size: 0.75em", "OS: " + properties.get("os.name") + " " + properties.get("os.version"))
                         }
                     }
                 }
                 table {
-
                     for (int i = 0; i < run.vms.size(); i++) {
                         tr {
-                            td(style: "font-size: 0.75em", "VM: "+run.vms.get(i).vmName)
+                            td(style: "font-size: 0.75em", "VM: " + run.vms.get(i).vmName)
                         }
                     }
                 }
@@ -169,11 +168,13 @@ class HTMLBuilder {
                         Instrument instrument = run.instruments.get(i);
                         tr {
                             String s = instrument.className
-                            td(style: "font-size: 0.75em", "Instrument: "+s.substring(s.lastIndexOf('.') + 1, s.length()))
+                            td(style: "font-size: 0.75em", "Instrument: " + s.substring(s.lastIndexOf('.') + 1, s.length()))
                         }
                     }
                 }
             }
         }
+        writer.flush()
+        writer.close()
     }
 }
