@@ -383,7 +383,7 @@ public class GParsExecutorsPoolUtil {
      */
     public static boolean everyParallel(Object collection, Closure cl) {
         final AtomicBoolean flag = new AtomicBoolean(true)
-        eachParallel(collection, {value -> if (!cl(value)) flag.set(false)})
+        eachParallel(collection, {value -> if (flag.get() && !cl(value)) flag.set(false)})
         return flag.get()
     }
 

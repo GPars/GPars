@@ -107,7 +107,7 @@ public class ThreadPoolExceptionTest extends GroovyTestCase {
     public void testAllWithException() {
         shouldFail(AsyncException.class) {
             GParsExecutorsPool.withPool(5) {ExecutorService service ->
-                'abc'.everyParallel {if (it == 'b') throw new RuntimeException('test')}
+                'abc'.everyParallel {if (it == 'b') throw new RuntimeException('test') else return true}
             }
         }
     }
@@ -115,7 +115,7 @@ public class ThreadPoolExceptionTest extends GroovyTestCase {
     public void testAnyWithException() {
         shouldFail(AsyncException.class) {
             GParsExecutorsPool.withPool(5) {ExecutorService service ->
-                'abc'.anyParallel {if (it == 'b') throw new RuntimeException('test')}
+                'abc'.anyParallel {if (it == 'b') throw new RuntimeException('test') else return false}
             }
         }
     }
