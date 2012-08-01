@@ -15,7 +15,7 @@
 // limitations under the License.
 
 
-package groovyx.gpars.benchmark;
+package groovyx.gpars.benchmark.caliper;
 
 import com.google.caliper.runner.CaliperMain;
 import com.google.caliper.runner.InvalidBenchmarkException;

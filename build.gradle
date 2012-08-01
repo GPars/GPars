@@ -135,7 +135,7 @@ task runBenchmarks(type: JavaExec) {
         gcArg = '"""-XX:+UseParallelGC"""'
     }
     description = 'Runs benchmarks measuring the throughput and latency of actors in GPars'
-    main = 'groovyx.gpars.benchmark.BenchmarkRunner'
+    main = 'groovyx.gpars.benchmark.caliper.BenchmarkRunner'
     classpath = sourceSets.test.runtimeClasspath
     args = ["-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
 }
