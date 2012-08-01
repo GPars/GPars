@@ -13,8 +13,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// Based on a benchmark in the Akka source code
 
-package groovyx.gpars.benchmark.akka;
+package groovyx.gpars.benchmark.caliper.akka;
 
 import com.google.caliper.Param;
 import com.google.caliper.api.VmParam;
@@ -24,7 +26,7 @@ import groovyx.gpars.group.DefaultPGroup;
 
 import java.util.concurrent.CountDownLatch;
 
-public class BenchmarkThroughputComputationDynamicActorCaliper extends BenchmarkCaliper {
+public class BenchmarkThroughputDynamicDispatchActorCaliper extends BenchmarkCaliper {
     @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
             "20", "22", "24", "26", "28",
@@ -38,11 +40,11 @@ public class BenchmarkThroughputComputationDynamicActorCaliper extends Benchmark
     @VmParam String gc;
 
 
-    BenchmarkThroughputComputationDynamicActorCaliper(){
-        super(500, DYNAMIC_RUN, ComputationDynamicClient.class, ComputationDynamicDestination.class);
+    BenchmarkThroughputDynamicDispatchActorCaliper(){
+        super(30000, DYNAMIC_RUN, ThroughputDynamicClient.class, ThroughputDynamicDestination.class);
     }
 
-    public long timeThroughputComputationDynamicActor(int reps) {
+    public long timeThroughputDynamicDispatchActor(int reps) {
         long time=0;
         try {
             time = super.timeThroughput(reps, numberOfClients);
@@ -53,25 +55,22 @@ public class BenchmarkThroughputComputationDynamicActorCaliper extends Benchmark
     }
 
     public static void main(String[] args) {
-        CaliperMain.main(BenchmarkThroughputComputationDynamicActorCaliper.class, args);
+        CaliperMain.main(BenchmarkThroughputDynamicDispatchActorCaliper.class, args);
     }
 
 
 }
 
 
-class ComputationDynamicClient extends DynamicDispatchActor {
-    private double _pi = 0.0;
-    private long currentPosition = 0L;
-    int nrOfElements = 1000;
+class ThroughputDynamicClient extends DynamicDispatchActor {
 
     long sent = 0L;
     long received = 0L;
-    ComputationDynamicDestination actor;
+    ThroughputDynamicDestination actor;
     long repeatsPerClient;
     CountDownLatch latch;
 
-    public ComputationDynamicClient(ComputationDynamicDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ThroughputDynamicClient(ThroughputDynamicDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -80,7 +79,6 @@ class ComputationDynamicClient extends DynamicDispatchActor {
 
     void onMessage(final DynamicMessage msg) {
         received += 1;
-        calculatePi();
         if (sent < repeatsPerClient) {
             actor.send(msg);
             sent += 1;
@@ -95,45 +93,16 @@ class ComputationDynamicClient extends DynamicDispatchActor {
             sent += 1;
         }
     }
-
-    void calculatePi() {
-        _pi += calculateDecimals(currentPosition);
-        currentPosition += nrOfElements;
-    }
-
-    private double calculateDecimals(long start) {
-        double acc = 0.0;
-        for (long i = start; i < start + nrOfElements; i++)
-            acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
-        return acc;
-    }
 }
 
-class ComputationDynamicDestination extends DynamicDispatchActor {
+class ThroughputDynamicDestination extends DynamicDispatchActor {
 
-    private double _pi = 0.0;
-    private long currentPosition = 0L;
-    int nrOfElements = 1000;
-
-    public ComputationDynamicDestination(DefaultPGroup group) {
+    public ThroughputDynamicDestination(DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
     void onMessage(final DynamicMessage msg) {
-        calculatePi();
         getSender().send(msg);
-    }
-
-    void calculatePi() {
-        _pi += calculateDecimals(currentPosition);
-        currentPosition += nrOfElements;
-    }
-
-    private double calculateDecimals(long start) {
-        double acc = 0.0;
-        for (long i = start; i < start + nrOfElements; i++)
-            acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
-        return acc;
     }
 
 }

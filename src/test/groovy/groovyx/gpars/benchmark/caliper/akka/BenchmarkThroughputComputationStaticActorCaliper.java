@@ -13,8 +13,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// Based on a benchmark in the Akka source code
 
-package groovyx.gpars.benchmark.akka;
+package groovyx.gpars.benchmark.caliper.akka;
 
 import com.google.caliper.Param;
 import com.google.caliper.api.VmParam;
@@ -24,7 +26,7 @@ import groovyx.gpars.group.DefaultPGroup;
 
 import java.util.concurrent.CountDownLatch;
 
-public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCaliper {
+public class BenchmarkThroughputComputationStaticActorCaliper extends BenchmarkCaliper {
 
     @Param({"1", "2", "4", "6", "8",
             "10", "12", "14", "16", "18",
@@ -39,15 +41,14 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCali
     @VmParam String xmx;
     @VmParam String gc;
 
-
-    BenchmarkThroughputStaticDispatchActorCaliper(){
-       super(30000,BenchmarkCaliper.STATIC_RUN, ThroughputStaticClient.class,ThroughputStaticDestination.class);
+    BenchmarkThroughputComputationStaticActorCaliper(){
+        super(500, STATIC_RUN, ComputationStaticClient.class, ComputationStaticDestination.class);
     }
 
-    public long timeThroughputStaticDispatchActor(int reps) {
-        long time =0;
+    public long timeThroughputComputationStaticActor(int reps) {
+        long time=0;
         try {
-          time = super.timeThroughput(reps, numberOfClients);
+            time = super.timeThroughput(reps, numberOfClients);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,21 +56,25 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCali
     }
 
     public static void main(String[] args) {
-        CaliperMain.main(BenchmarkThroughputStaticDispatchActorCaliper.class, args);
+        CaliperMain.main(BenchmarkThroughputComputationStaticActorCaliper.class, args);
     }
 
 }
 
-class ThroughputStaticClient extends StaticDispatchActor<Integer> {
+class ComputationStaticClient extends StaticDispatchActor<Integer> {
 
     long sent = 0L;
     long received = 0L;
-    ThroughputStaticDestination actor;
+    ComputationStaticDestination actor;
     long repeatsPerClient;
     CountDownLatch latch;
 
+    private double _pi = 0.0;
+    private long currentPosition = 0L;
+    int nrOfElements = 1000;
 
-    public ThroughputStaticClient(ThroughputStaticDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+
+    public ComputationStaticClient(ComputationStaticDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -80,6 +85,7 @@ class ThroughputStaticClient extends StaticDispatchActor<Integer> {
     public void onMessage(Integer msg) {
         if (msg.equals(BenchmarkCaliper.STATIC_MESSAGE)) {
             received += 1;
+            calculatePi();
             if (sent < repeatsPerClient) {
                 actor.send(msg);
                 sent += 1;
@@ -87,9 +93,9 @@ class ThroughputStaticClient extends StaticDispatchActor<Integer> {
                 latch.countDown();
                 sent = 0;
                 received = 0;
-
             }
         }
+
         if (msg.equals(BenchmarkCaliper.STATIC_RUN)) {
             for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
                 actor.send(BenchmarkCaliper.STATIC_MESSAGE);
@@ -97,15 +103,44 @@ class ThroughputStaticClient extends StaticDispatchActor<Integer> {
             }
         }
     }
+
+    void calculatePi() {
+        _pi += calculateDecimals(currentPosition);
+        currentPosition += nrOfElements;
+    }
+
+    private double calculateDecimals(long start) {
+        double acc = 0.0;
+        for (long i = start; i < start + nrOfElements; i++)
+            acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
+        return acc;
+    }
 }
 
-class ThroughputStaticDestination extends StaticDispatchActor<Integer> {
-    public ThroughputStaticDestination(DefaultPGroup group) {
+class ComputationStaticDestination extends StaticDispatchActor<Integer> {
+    private double pi = 0.0;
+    private long currentPosition = 0L;
+    int nrOfElements = 1000;
+
+    public ComputationStaticDestination(DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
     @Override
     public void onMessage(Integer msg) {
+        calculatePi();
         getSender().send(msg);
+    }
+
+    void calculatePi() {
+        pi += calculateDecimals(currentPosition);
+        currentPosition += nrOfElements;
+    }
+
+    private double calculateDecimals(long start) {
+        double acc = 0.0;
+        for (long i = start; i < start + nrOfElements; i++)
+            acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
+        return acc;
     }
 }

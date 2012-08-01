@@ -20,12 +20,12 @@ package groovyx.gpars.benchmark;
 import com.google.caliper.runner.CaliperMain;
 import com.google.caliper.runner.InvalidBenchmarkException;
 import com.google.caliper.util.InvalidCommandException;
-import groovyx.gpars.benchmark.akka.BenchmarkLatencyDynamicDispatchActorCaliper;
-import groovyx.gpars.benchmark.akka.BenchmarkLatencyStaticDispatchActorCaliper;
-import groovyx.gpars.benchmark.akka.BenchmarkThroughputComputationDynamicActorCaliper;
-import groovyx.gpars.benchmark.akka.BenchmarkThroughputComputationStaticActorCaliper;
-import groovyx.gpars.benchmark.akka.BenchmarkThroughputDynamicDispatchActorCaliper;
-import groovyx.gpars.benchmark.akka.BenchmarkThroughputStaticDispatchActorCaliper;
+import groovyx.gpars.benchmark.caliper.akka.BenchmarkLatencyDynamicDispatchActorCaliper;
+import groovyx.gpars.benchmark.caliper.akka.BenchmarkLatencyStaticDispatchActorCaliper;
+import groovyx.gpars.benchmark.caliper.akka.BenchmarkThroughputComputationDynamicActorCaliper;
+import groovyx.gpars.benchmark.caliper.akka.BenchmarkThroughputComputationStaticActorCaliper;
+import groovyx.gpars.benchmark.caliper.akka.BenchmarkThroughputDynamicDispatchActorCaliper;
+import groovyx.gpars.benchmark.caliper.akka.BenchmarkThroughputStaticDispatchActorCaliper;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

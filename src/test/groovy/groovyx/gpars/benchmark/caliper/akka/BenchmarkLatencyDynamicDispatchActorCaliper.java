@@ -13,8 +13,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-package groovyx.gpars.benchmark.akka;
+//
+// Based on a benchmark in the Akka source code
+package groovyx.gpars.benchmark.caliper.akka;
 
 import com.google.caliper.Param;
 import com.google.caliper.api.VmParam;

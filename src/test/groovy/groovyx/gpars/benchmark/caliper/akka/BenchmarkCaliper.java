@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package groovyx.gpars.benchmark.akka;
+package groovyx.gpars.benchmark.caliper.akka;
 
 import com.google.caliper.api.Benchmark;
 import groovyx.gpars.actor.Actor;

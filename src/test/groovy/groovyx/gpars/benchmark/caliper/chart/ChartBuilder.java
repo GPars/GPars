@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by Hyuk Don Kwon
+ * Modified to support graphing using Google Chart
  */
 
 package groovyx.gpars.benchmark.caliper.chart;
