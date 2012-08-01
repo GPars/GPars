@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
@@ -358,8 +359,9 @@ public class GParsExecutorsPoolUtil {
      */
     public static def findAnyParallel(Object collection, Closure cl) {
         final AtomicReference result = new AtomicReference(null)
-        collectParallel(collection, {if ((result.get() == null) && cl(it)) {result.set(it); return it} else return null})
-        return result.get()
+        return processAnyResult(collection.collect {value -> {-> cl(value) ? value : null}})
+//        collectParallel(collection, {if ((result.get() == null) && cl(it)) {result.set(it); return it} else return null})
+//        return result.get()
     }
 
     /**
@@ -409,9 +411,10 @@ public class GParsExecutorsPoolUtil {
      *     assert [1, 2, 3, 4, 5].anyParallel{Number number -> number > 2}*     assert ![1, 2, 3, 4, 5].anyParallel{Number number -> number > 6}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static boolean anyParallel(Object collection, Closure cl) {
-        final AtomicBoolean flag = new AtomicBoolean(false)
-        eachParallel(collection, {if ((!flag.get()) && cl(it)) flag.set(true)})
-        return flag.get()
+        return processAnyResult(collection.collect {value -> {-> cl(value)}})
+//        final AtomicBoolean flag = new AtomicBoolean(false)
+//        eachParallel(collection, {if ((!flag.get()) && cl(it)) flag.set(true)})
+//        return flag.get()
     }
 
     /**
@@ -457,6 +460,39 @@ public class GParsExecutorsPoolUtil {
         }
 
         if (exceptions.empty) return result
+        else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", new ArrayList(exceptions))
+    }
+
+    /**
+     * Used for methods such as findAnyParallel() or anyParallel(), which may stop some alternatives once the result is known
+     *
+     * @param alternatives The alternative closures to run
+     * @return The result (any) found
+     */
+    public static def processAnyResult(List<Closure> alternatives) {
+        final Collection<Throwable> exceptions = new ArrayList<Throwable>().asSynchronized()
+        def result = new DataflowVariable()
+        def futures = new DataflowVariable()
+        final AtomicInteger totalCounter = new AtomicInteger(alternatives.size())
+        futures << GParsExecutorsPool.executeAsync(alternatives.collect {
+            original ->
+            {->
+                try {
+                    def localResult = original()
+                    if (localResult) {
+                        futures.val*.cancel(true)
+                        result.bindSafely(localResult)
+                    }
+                } catch (InterruptedException ignore) {
+                } catch (Throwable e) {
+                    exceptions.add(e)
+                } finally {
+                    if (totalCounter.decrementAndGet() == 0 && !result.isBound()) result << null  //No more results may appear
+                }
+            }
+        })
+        final r = result.val
+        if (exceptions.empty) return r
         else throw new AsyncException("Some asynchronous operations failed. ${exceptions}", new ArrayList(exceptions))
     }
 }
