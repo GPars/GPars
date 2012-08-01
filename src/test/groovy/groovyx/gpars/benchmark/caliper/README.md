@@ -4,15 +4,14 @@ A set of benchmarks for the GPars concurrency framework using Google Caliper
 
 # Instructions
 
-1. Clone the *Benchmarks* branch from the repository
 1. cd into the GPars project directory
-1. run the 'runBenchmarks' task using Gradle
+1. run the *runBenchmarks* task using Gradle
 1. The benchmarks should take about 40-50 minutes to run
 
 # Results
 
 1. The results are printed to the console and are stored locally as charts in HTML files and as raw data in JSON files
-1. The HTML files are stored at "projectDirectory/caliper-charts" and the JSON files are at "projectDirectory/caliper-results"
+1. The HTML files are stored at *projectDirectory/caliper-charts* and the JSON files are at *projectDirectory/caliper-results*
 1. The charts are generated using Google's chart-builder service so an internet connection is required
 1. The charts will compare the current benchmark run to the last three benchmark runs
 
