@@ -16,8 +16,6 @@
 
 package groovyx.gpars.benchmark.caliper.chart;
 
-import com.google.caliper.model.Run;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -25,28 +23,18 @@ import com.google.gson.JsonParser;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 
-/**
- * Created with IntelliJ IDEA.
- * User: don
- * Date: 7/16/12
- * Time: 1:36 PM
- * To change this template use File | Settings | File Templates.
- */
 public class JsonFileParser {
 
     JsonObject jsonObject;
 
-    public JsonFileParser(File file){
+    public JsonFileParser(File file) {
         parseFile(file);
     }
 
-    private void parseFile(File file){
+    private void parseFile(File file) {
         byte[] buffer = new byte[(int) file.length()];
         DataInputStream in = null;
         String result = null;
@@ -56,7 +44,7 @@ public class JsonFileParser {
             result = new String(buffer);
         } catch (Exception e) {
             e.printStackTrace();
-        }finally{
+        } finally {
             try {
                 in.close();
             } catch (IOException e) {
@@ -64,24 +52,24 @@ public class JsonFileParser {
             }
         }
 
-       JsonParser parser = new JsonParser();
-        try{
-            jsonObject = (JsonObject)parser.parse(result);
-        }catch(ClassCastException e){
+        JsonParser parser = new JsonParser();
+        try {
+            jsonObject = (JsonObject) parser.parse(result);
+        } catch (ClassCastException e) {
             jsonObject = new JsonObject();
         }
     }
 
-    public ArrayList<Long> getMeasurements(){
+    public ArrayList<Long> getMeasurements() {
         JsonArray jsonArray = jsonObject.getAsJsonArray("results");
         ArrayList<Long> medianList = new ArrayList<Long>();
-        if(jsonArray == null) return medianList;
+        if (jsonArray == null) return medianList;
 
-        for(int scenario=0; scenario < jsonArray.size(); scenario++){
+        for (int scenario = 0; scenario < jsonArray.size(); scenario++) {
             JsonArray measurementArray = jsonArray.get(scenario).getAsJsonObject().getAsJsonArray("measurements");
             ArrayList<Long> trials = new ArrayList<Long>();
 
-            for(int trial=0; trial < measurementArray.size(); trial++){
+            for (int trial = 0; trial < measurementArray.size(); trial++) {
                 JsonObject measurement = measurementArray.get(trial).getAsJsonObject();
                 trials.add(measurement.get("value").getAsLong() / measurement.get("weight").getAsLong());
             }
@@ -91,11 +79,11 @@ public class JsonFileParser {
     }
 
 
-    public ArrayList<String> getScenarios(){
+    public ArrayList<String> getScenarios() {
         JsonArray jsonArray = jsonObject.getAsJsonArray("scenarios");
         ArrayList<String> result = new ArrayList<String>();
-        if(jsonArray == null) return result;
-        for(int scenario=0; scenario < jsonArray.size(); scenario++){
+        if (jsonArray == null) return result;
+        for (int scenario = 0; scenario < jsonArray.size(); scenario++) {
             result.add(jsonArray.get(scenario).getAsJsonObject().get("userParameters").getAsJsonObject().get("numberOfClients").getAsString());
         }
         return result;

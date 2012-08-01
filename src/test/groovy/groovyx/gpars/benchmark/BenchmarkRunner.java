@@ -35,11 +35,11 @@ import static com.google.common.collect.ObjectArrays.concat;
 
 public class BenchmarkRunner {
 
-    public static void main(String[] args) {
-        String[] latencyArg = {"-i", "latency"};
-        String[] throughputArg = {"-i", "throughput"};
-        PrintWriter writer = new PrintWriter(System.out);
-        List<Class> benchmarks = new ArrayList<Class>();
+    public static void main(final String[] args) {
+        final String[] latencyArg = {"-i", "latency"};
+        final String[] throughputArg = {"-i", "throughput"};
+        final PrintWriter writer = new PrintWriter(System.out);
+        final List<Class> benchmarks = new ArrayList<Class>();
 
         benchmarks.add(BenchmarkLatencyDynamicDispatchActorCaliper.class);
         benchmarks.add(BenchmarkLatencyStaticDispatchActorCaliper.class);
@@ -48,11 +48,12 @@ public class BenchmarkRunner {
         benchmarks.add(BenchmarkThroughputComputationDynamicActorCaliper.class);
         benchmarks.add(BenchmarkThroughputComputationStaticActorCaliper.class);
 
-        for (Class benchmark : benchmarks) {
+        for (final Class benchmark : benchmarks) {
             try {
                 if (benchmark.getName().matches(".*Throughput.*")) {
                     CaliperMain.exitlessMain(concat(concat(throughputArg, args, String.class), benchmark.getName()), writer);
-                } else CaliperMain.exitlessMain(concat(concat(latencyArg, args, String.class), benchmark.getName()), writer);
+                } else
+                    CaliperMain.exitlessMain(concat(concat(latencyArg, args, String.class), benchmark.getName()), writer);
             } catch (InvalidCommandException e) {
                 e.display(writer);
 
@@ -69,6 +70,4 @@ public class BenchmarkRunner {
             writer.flush();
         }
     }
-
-
 }

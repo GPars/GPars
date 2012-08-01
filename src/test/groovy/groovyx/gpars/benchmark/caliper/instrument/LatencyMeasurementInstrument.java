@@ -22,21 +22,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
 
 public class LatencyMeasurementInstrument extends Instrument {
-    @Override public ShortDuration estimateRuntimePerTrial() {
+    @Override
+    public ShortDuration estimateRuntimePerTrial() {
         return ShortDuration.valueOf(options.get("maxTotalRuntime"));
     }
 
-    @Override public boolean isBenchmarkMethod(Method method) {
+    @Override
+    public boolean isBenchmarkMethod(Method method) {
         return method.getName().startsWith("latency") && Util.isPublic(method);
     }
 
-    @Override public BenchmarkMethod createBenchmarkMethod(BenchmarkClass benchmarkClass,
-                                                           Method method) throws InvalidBenchmarkException {
-
+    @Override
+    public BenchmarkMethod createBenchmarkMethod(BenchmarkClass benchmarkClass, Method method) throws InvalidBenchmarkException {
         checkArgument(isBenchmarkMethod(method));
-
-
-        // Static technically doesn't hurt anything, but it's just the completely wrong idea
         if (Util.isStatic(method)) {
             throw new InvalidBenchmarkException(
                     "LatencyMeasure methods must not be static: " + method.getName());
@@ -48,12 +46,12 @@ public class LatencyMeasurementInstrument extends Instrument {
     }
 
 
-
-    @Override public void dryRun(Benchmark benchmark, BenchmarkMethod benchmarkMethod)
+    @Override
+    public void dryRun(Benchmark benchmark, BenchmarkMethod benchmarkMethod)
             throws UserCodeException {
         Method m = benchmarkMethod.method();
         try {
-            m.invoke(benchmark,1);
+            m.invoke(benchmark, 1);
         } catch (IllegalAccessException impossible) {
             throw new AssertionError(impossible);
         } catch (InvocationTargetException e) {
@@ -63,7 +61,8 @@ public class LatencyMeasurementInstrument extends Instrument {
         }
     }
 
-    @Override public Map<String, String> workerOptions() {
+    @Override
+    public Map<String, String> workerOptions() {
         return new ImmutableMap.Builder<String, String>()
                 .put("warmupNanos", toNanosString("warmup"))
                 .put("timingIntervalNanos", toNanosString("timingInterval"))
@@ -74,7 +73,8 @@ public class LatencyMeasurementInstrument extends Instrument {
                 .build();
     }
 
-    @Override public Class<? extends Worker> workerClass() {
+    @Override
+    public Class<? extends Worker> workerClass() {
         return LatencyMeasurementWorker.class;
     }
 
@@ -82,15 +82,18 @@ public class LatencyMeasurementInstrument extends Instrument {
         return String.valueOf(ShortDuration.valueOf(options.get(optionName)).to(TimeUnit.NANOSECONDS));
     }
 
-    @Override public boolean equals(Object object) {
-        return object instanceof LatencyMeasurementInstrument; // currently this class is stateless.
+    @Override
+    public boolean equals(Object object) {
+        return object instanceof LatencyMeasurementInstrument;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return 0x5FE89C3A;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "latency";
     }
 }

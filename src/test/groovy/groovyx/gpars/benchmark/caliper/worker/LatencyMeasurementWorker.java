@@ -20,11 +20,6 @@ public class LatencyMeasurementWorker implements Worker {
         Options options = new Options(optionMap);
         Trial trial = new Trial(benchmark, methodName, options, log);
         trial.warmUp();
-
-        // TODO: make the minimum configurable, default to maybe 1000?
-        /* if (targetReps < 100) {
-       throw new Exception("Too few reps"); // TODO: better exception
-   }     */
         return trial.run(benchmarkReps);
     }
 
@@ -35,7 +30,7 @@ public class LatencyMeasurementWorker implements Worker {
         final WorkerEventLog log;
         final long startTick;
         final int repeatFactor;
-        final int warmupReps = 1;
+        static final int warmupReps = 1;
 
         Trial(Benchmark benchmark, String methodName, Options options, WorkerEventLog log)
                 throws Exception {
@@ -45,7 +40,7 @@ public class LatencyMeasurementWorker implements Worker {
             this.latencyMethod = benchmark.getClass().getDeclaredMethod("latency" + methodName, int.class);
             this.options = options;
             this.log = log;
-            this.startTick = System.nanoTime(); // TODO: Ticker?
+            this.startTick = System.nanoTime();
             this.repeatFactor = (Integer) benchmark.getClass().getSuperclass().getDeclaredMethod("totalMessages").invoke(benchmark);
 
 
@@ -59,28 +54,12 @@ public class LatencyMeasurementWorker implements Worker {
         }
 
         Collection<Measurement> run(int targetReps) throws Exception {
-            // Use a variety of rep counts for measurements, so that things like concavity and
-            // y-intercept might be observed later. Just cycle through them in order (why not?).
-            int[] repCounts = {
-                    //  (int) (targetReps * 0.7),
-                    //  (int) (targetReps * 0.9),
-                    (int) (targetReps * 1.1),
-                    (int) (targetReps * 1.3)
-            };
-
-            long timeToStop = startTick + options.maxTotalRuntimeNanos - options.timingIntervalNanos;
-
             Queue<Measurement> measurements = new LinkedList<Measurement>();
-
             LastNValues recentValues = new LastNValues(options.reportedIntervals);
-            int i = 0;
 
             log.notifyMeasurementPhaseStarting();
-
-            //while (System.nanoTime() < timeToStop) {
-            for(int trials=0;trials<1;trials++){
-                //int reps = repCounts[i++ % repCounts.length];
-                int reps=5;
+            for (int trials = 0; trials < 1; trials++) {
+                int reps = 5;
                 if (options.gcBeforeEach) {
                     Util.forceGc();
                 }
@@ -115,7 +94,6 @@ public class LatencyMeasurementWorker implements Worker {
         }
 
         private static int adjustRepCount(int previousReps, long previousNanos, long targetNanos) {
-            // TODO: friendly error on overflow?
             // Note the * could overflow 2^63, but only if you're being kinda insane...
             return (int) (previousReps * targetNanos / previousNanos);
         }
@@ -134,12 +112,12 @@ public class LatencyMeasurementWorker implements Worker {
     }
 
     private static class Options {
-        long warmupNanos;
-        long timingIntervalNanos;
-        int reportedIntervals;
-        double shortCircuitTolerance;
-        long maxTotalRuntimeNanos;
-        boolean gcBeforeEach;
+        final long warmupNanos;
+        final long timingIntervalNanos;
+        final int reportedIntervals;
+        final double shortCircuitTolerance;
+        final long maxTotalRuntimeNanos;
+        final boolean gcBeforeEach;
 
         Options(Map<String, String> optionMap) {
             this.warmupNanos = Long.parseLong(optionMap.get("warmupNanos"));
@@ -150,7 +128,7 @@ public class LatencyMeasurementWorker implements Worker {
             this.gcBeforeEach = Boolean.parseBoolean(optionMap.get("gcBeforeEach"));
 
             if (warmupNanos + reportedIntervals * timingIntervalNanos > maxTotalRuntimeNanos) {
-                throw new RuntimeException("maxTotalRuntime is too low"); // TODO
+                throw new RuntimeException("maxTotalRuntime is too low");
             }
         }
     }

@@ -16,9 +16,6 @@
 
 package groovyx.gpars.benchmark.caliper.chart;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.caliper.model.Instrument;
 import com.google.caliper.model.Measurement;
 import com.google.caliper.model.Result;
@@ -31,16 +28,14 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Doubles;
-import groovyx.gpars.benchmark.caliper.chart.HTMLBuilder;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,29 +50,22 @@ import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 final class ChartBuilder implements ResultProcessor {
 
     private static final int maxParamWidth = 30;
-
-
-
-    // TODO(schmoe): these feel dirty - they assume a ConsoleResultProcessor is single-use, or at
-    // least non-overlapping-use, which is only sorta necessary. Seems like handleResults should
-    // create a one-per-call state object containing these fields and pass that around instead of
-    // having these as member vars.
-
     private Run run;
     private Table<ScenarioName, AxisName, AxisValue> scenarioLocalVars;
     private Map<ScenarioName, ProcessedResult> processedResults;
     private List<Axis> sortedAxes;
     private ImmutableSortedSet<ScenarioName> sortedScenarioNames;
-
     private double minValue;
     private double maxValue;
 
-
-
-    @Override public void handleResults(Run run) {
+    @Override
+    public void handleResults(Run run) {
         this.run = run;
         Map<String, VM> vms = Maps.uniqueIndex(run.vms, VM_LOCAL_NAME_FUNCTION);
         this.scenarioLocalVars = HashBasedTable.create();
@@ -180,7 +168,7 @@ final class ChartBuilder implements ResultProcessor {
         buildChart();
     }
 
-    private void buildChart(){
+    private void buildChart() {
         /* X axis label is User Parameter,
            A parameter is singleton if it has only one value
            Assumption here is there is only one user parameter(numberOfClients)
@@ -194,8 +182,8 @@ final class ChartBuilder implements ResultProcessor {
             }
         }
 
-        if(xLabel.equals(null)){
-            System.out.println( "Need more than 1 scenario to build chart");
+        if (xLabel.equals(null)) {
+            System.out.println("Need more than 1 scenario to build chart");
             return;
         }
 
@@ -208,7 +196,7 @@ final class ChartBuilder implements ResultProcessor {
         ArrayList<String> xValues = new ArrayList<String>();
         for (ChartBuilder.ScenarioName scenarioLocalName : sortedScenarioNames) {
             ChartBuilder.ProcessedResult result = processedResults.get(scenarioLocalName);
-            yValues.add((long)result.median);
+            yValues.add((long) result.median);
             for (ChartBuilder.Axis axis : sortedAxes) {
                 if (!axis.isSingleton()) {
                     xValues.add(axis.get(scenarioLocalName).toString());
@@ -224,15 +212,14 @@ final class ChartBuilder implements ResultProcessor {
         List<ArrayList<Long>> historyYValues = new ArrayList<ArrayList<Long>>();
         List<ArrayList<String>> historyXValues = new ArrayList<ArrayList<String>>();
         ArrayList<String> historyNames = new ArrayList<String>();
-        int counter =0;
 
-        /* Pick history files that are most recently creaetd */
+        /* Pick history files that are most recently created */
         Queue<File> fileQueue = new PriorityQueue<File>(10, new Comparator<File>() {
             @Override
             public int compare(final File o1, final File o2) {
-                String [] tempList1 = o1.getName().split("\\.");
-                String [] tempList2 = o2.getName().split("\\.");
-                Date date1=null, date2=null;
+                String[] tempList1 = o1.getName().split("\\.");
+                String[] tempList2 = o2.getName().split("\\.");
+                Date date1 = null, date2 = null;
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ssZ");
                 try {
                     date1 = simpleDateFormat.parse(tempList1[tempList1.length - 2]);
@@ -244,55 +231,55 @@ final class ChartBuilder implements ResultProcessor {
             }
         });
 
-        if(dir.isDirectory()){
-            for(File file : dir.listFiles(new FilenameFilter() {
+        if (dir.isDirectory()) {
+            for (File file : dir.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(final File dir, final String name) {
-                    if(name.matches(".*"+run.label+".*"+"\\.json")){
+                    if (name.matches(".*" + run.label + ".*" + "\\.json")) {
                         return true;
                     }
                     return false;
                 }
-            })){
+            })) {
                 JsonFileParser parser = new JsonFileParser(file);
                 ArrayList<Long> yVal = parser.getMeasurements();
-                if(yVal.size() == yValues.size()){
+                if (yVal.size() == yValues.size()) {
                     fileQueue.add(file);
                 }
             }
         }
 
-        for(int i=0; i < 3; i++){
-            if(fileQueue.isEmpty()) break;
+        for (int i = 0; i < 3; i++) {
+            if (fileQueue.isEmpty()) break;
             File file = fileQueue.poll();
             JsonFileParser parser = new JsonFileParser(file);
             historyYValues.add(parser.getMeasurements());
             historyXValues.add(parser.getScenarios());
-            String [] tempList = file.getName().split("\\.");
-            historyNames.add(tempList[tempList.length -2]);
+            String[] tempList = file.getName().split("\\.");
+            historyNames.add(tempList[tempList.length - 2]);
         }
 
         /* Calculating the range of the cart and the range of each data set.
          */
         List<Long> maxList = new ArrayList<Long>();
-        for(ArrayList<Long> medians: historyYValues){
+        for (ArrayList<Long> medians : historyYValues) {
             long max = -1;
-            for(long val: medians){
+            for (long val : medians) {
                 max = Math.max(max, val);
             }
             maxList.add(max);
         }
 
-        long globalMax = (long)maxValue;
-        for(long val: maxList){
+        long globalMax = (long) maxValue;
+        for (long val : maxList) {
             globalMax = Math.max(globalMax, val);
         }
 
         HTMLBuilder htmlBuilder = new HTMLBuilder(run);
-        htmlBuilder.buildBarGraphURL(xValues,yValues,historyXValues,historyYValues,historyNames,xLabel,yLabel, globalMax);
+        htmlBuilder.buildBarGraphURL(xValues, yValues, historyXValues, historyYValues, historyNames, xLabel, yLabel, globalMax);
     }
 
-    private ProcessedResult combineResults(ProcessedResult r1, Result r2) {
+    private static ProcessedResult combineResults(ProcessedResult r1, Result r2) {
         checkArgument(r1.modelResult.instrumentLocalName.equals(r2.instrumentLocalName));
         checkArgument(r1.modelResult.scenarioLocalName.equals(r2.scenarioLocalName));
         r2.measurements = ImmutableList.<Measurement>builder()
@@ -346,6 +333,7 @@ final class ChartBuilder implements ResultProcessor {
      * in an appropriate grouping of output values.
      */
     private static class VarianceOrdering extends Ordering<Axis> {
+        @Override
         public int compare(Axis a, Axis b) {
             return Double.compare(a.variance, b.variance);
         }
@@ -355,6 +343,7 @@ final class ChartBuilder implements ResultProcessor {
      * Orders scenarios by the axes.
      */
     private class ByAxisOrdering extends Ordering<ScenarioName> {
+        @Override
         public int compare(ScenarioName scenarioALocalName, ScenarioName scenarioBLocalName) {
             for (Axis axis : sortedAxes) {
                 int aValue = axis.index(scenarioALocalName);
@@ -382,7 +371,7 @@ final class ChartBuilder implements ResultProcessor {
         if (s.length() <= maxLength) {
             return s;
         } else {
-            return s.substring(0, maxLength - 1) + "+";
+            return s.substring(0, maxLength - 1) + '+';
         }
     }
 
@@ -419,7 +408,6 @@ final class ChartBuilder implements ResultProcessor {
             return values;
         }
 
-        // TODO(schmoe): consider copying com.google.math.Sample into caliper.util
         private static double computeMedian(double[] values) {
             double[] sortedValues = values.clone();
             Arrays.sort(sortedValues);
@@ -441,8 +429,6 @@ final class ChartBuilder implements ResultProcessor {
         }
     }
 
-    // TODO(fry): eventually migrate to a Java data model b/5895975
-
     private static class ScenarioName {
         private final String name;
 
@@ -450,15 +436,18 @@ final class ChartBuilder implements ResultProcessor {
             this.name = checkNotNull(name);
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return name;
         }
 
-        @Override public int hashCode() {
+        @Override
+        public int hashCode() {
             return name.hashCode();
         }
 
-        @Override public boolean equals(Object other) {
+        @Override
+        public boolean equals(Object other) {
             if (other instanceof ScenarioName) {
                 ScenarioName that = (ScenarioName) other;
                 return this.name.equals(that.name);
@@ -474,15 +463,18 @@ final class ChartBuilder implements ResultProcessor {
             this.name = checkNotNull(name);
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return name;
         }
 
-        @Override public int hashCode() {
+        @Override
+        public int hashCode() {
             return name.hashCode();
         }
 
-        @Override public boolean equals(Object other) {
+        @Override
+        public boolean equals(Object other) {
             if (other instanceof AxisName) {
                 AxisName that = (AxisName) other;
                 return this.name.equals(that.name);
@@ -498,15 +490,18 @@ final class ChartBuilder implements ResultProcessor {
             this.value = checkNotNull(value);
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return value;
         }
 
-        @Override public int hashCode() {
+        @Override
+        public int hashCode() {
             return value.hashCode();
         }
 
-        @Override public boolean equals(Object other) {
+        @Override
+        public boolean equals(Object other) {
             if (other instanceof AxisValue) {
                 AxisValue that = (AxisValue) other;
                 return this.value.equals(that.value);
@@ -517,12 +512,11 @@ final class ChartBuilder implements ResultProcessor {
 
     private static final Function<VM, String> VM_LOCAL_NAME_FUNCTION =
             new Function<VM, String>() {
-                @Override public String apply(VM vm) {
+                @Override
+                public String apply(VM vm) {
                     return vm.localName;
                 }
             };
-
-
 }
 
 

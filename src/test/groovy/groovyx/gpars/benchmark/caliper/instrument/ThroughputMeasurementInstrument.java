@@ -31,9 +31,7 @@ public class ThroughputMeasurementInstrument extends Instrument {
     }
 
     @Override
-    public BenchmarkMethod createBenchmarkMethod(BenchmarkClass benchmarkClass,
-                                                 Method method) throws InvalidBenchmarkException {
-
+    public BenchmarkMethod createBenchmarkMethod(BenchmarkClass benchmarkClass, Method method) throws InvalidBenchmarkException {
         return Instrument.createBenchmarkMethodFromTimeMethod(benchmarkClass, method);
     }
 
@@ -75,7 +73,7 @@ public class ThroughputMeasurementInstrument extends Instrument {
 
     @Override
     public boolean equals(Object object) {
-        return object instanceof ThroughputMeasurementInstrument; // currently this class is stateless.
+        return object instanceof ThroughputMeasurementInstrument;
     }
 
     @Override
