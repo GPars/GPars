@@ -4,7 +4,7 @@ A set of benchmarks for the GPars concurrency framework using Google Caliper
 
 # Instructions
 
-1. Clone the *Benchmarks branch from the repository
+1. Clone the *Benchmarks* branch from the repository
 1. cd into the GPars project directory
 1. run the 'runBenchmarks' task using Gradle
 1. The benchmarks should take about 40-50 minutes to run
