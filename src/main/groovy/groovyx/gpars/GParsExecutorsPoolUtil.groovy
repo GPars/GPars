@@ -25,7 +25,6 @@ import groovyx.gpars.util.PAUtils
 
 import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.Semaphore
@@ -359,7 +358,8 @@ public class GParsExecutorsPoolUtil {
      */
     public static def findAnyParallel(Object collection, Closure cl) {
         final AtomicReference result = new AtomicReference(null)
-        collectParallel(collection, {if ((result.get() == null) && cl(it)) {result.set(it); return it} else return null}).find {it != null}
+        collectParallel(collection, {if ((result.get() == null) && cl(it)) {result.set(it); return it} else return null})
+        return result.get()
     }
 
     /**
@@ -445,7 +445,7 @@ public class GParsExecutorsPoolUtil {
     }
 
     static List<Object> processResult(List<Future<Object>> futures) {
-        final Collection<Throwable> exceptions = new ConcurrentLinkedQueue<Throwable>()
+        final Collection<Throwable> exceptions = new ArrayList<Throwable>()
 
         final List<Object> result = futures.collect {
             try {
