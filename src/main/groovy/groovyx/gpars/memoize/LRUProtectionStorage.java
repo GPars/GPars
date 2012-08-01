@@ -34,6 +34,7 @@ public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
     private final int maxSize;
 
     public LRUProtectionStorage(final int maxSize) {
+        super(maxSize, 0.75f, true);
         this.maxSize = maxSize;
     }
 
@@ -50,15 +51,9 @@ public final class LRUProtectionStorage extends LinkedHashMap<Object, Object> {
      */
     @SuppressWarnings({"SynchronizedMethod"})
     public synchronized void touch(final Object key, final Object value) {
+        if (value == get(key)) return;
         remove(key);
         put(key, value);
-    }
-
-    @Override
-    public Object get(final Object key) {
-        final Object value = remove(key);
-        if (value != null) put(key, value);
-        return value;
     }
 
     /**
