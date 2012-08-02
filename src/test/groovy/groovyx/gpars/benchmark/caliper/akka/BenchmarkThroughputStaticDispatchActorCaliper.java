@@ -36,27 +36,31 @@ public class BenchmarkThroughputStaticDispatchActorCaliper extends BenchmarkCali
     )
     int numberOfClients;
 
-    @VmParam String server;
-    @VmParam String xms;
-    @VmParam String xmx;
-    @VmParam String gc;
+    @VmParam
+    String server;
+    @VmParam
+    String xms;
+    @VmParam
+    String xmx;
+    @VmParam
+    String gc;
 
 
-    BenchmarkThroughputStaticDispatchActorCaliper(){
-       super(30000, STATIC_RUN, ThroughputStaticClient.class,ThroughputStaticDestination.class);
+    BenchmarkThroughputStaticDispatchActorCaliper() {
+        super(30000, STATIC_RUN, ThroughputStaticClient.class, ThroughputStaticDestination.class);
     }
 
-    public long timeThroughputStaticDispatchActor(int reps) {
-        long time =0;
+    public long timeThroughputStaticDispatchActor(final int reps) {
+        long time = 0L;
         try {
-          time = super.timeThroughput(reps, numberOfClients);
+            time = timeThroughput(reps, numberOfClients);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return time;
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         CaliperMain.main(BenchmarkThroughputStaticDispatchActorCaliper.class, args);
     }
 
@@ -71,7 +75,7 @@ class ThroughputStaticClient extends StaticDispatchActor<Integer> {
     CountDownLatch latch;
 
 
-    public ThroughputStaticClient(ThroughputStaticDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ThroughputStaticClient(final ThroughputStaticDestination actor, final CountDownLatch latch, final long repeatsPerClient, final DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -79,35 +83,35 @@ class ThroughputStaticClient extends StaticDispatchActor<Integer> {
     }
 
     @Override
-    public void onMessage(Integer msg) {
+    public void onMessage(final Integer msg) {
         if (msg.equals(BenchmarkCaliper.STATIC_MESSAGE)) {
-            received += 1;
+            received += 1L;
             if (sent < repeatsPerClient) {
                 actor.send(msg);
-                sent += 1;
+                sent += 1L;
             } else if (received >= repeatsPerClient) {
                 latch.countDown();
-                sent = 0;
-                received = 0;
+                sent = 0L;
+                received = 0L;
 
             }
         }
         if (msg.equals(BenchmarkCaliper.STATIC_RUN)) {
-            for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
+            for (int i = 0; (long) i < Math.min(repeatsPerClient, 1000L); i++) {
                 actor.send(BenchmarkCaliper.STATIC_MESSAGE);
-                sent += 1;
+                sent += 1L;
             }
         }
     }
 }
 
 class ThroughputStaticDestination extends StaticDispatchActor<Integer> {
-    public ThroughputStaticDestination(DefaultPGroup group) {
+    public ThroughputStaticDestination(final DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
     @Override
-    public void onMessage(Integer msg) {
+    public void onMessage(final Integer msg) {
         getSender().send(msg);
     }
 }

@@ -44,34 +44,34 @@ public class LatencyMeasurementInstrument extends Instrument {
     }
 
     @Override
-    public boolean isBenchmarkMethod(Method method) {
+    public boolean isBenchmarkMethod(final Method method) {
         return method.getName().startsWith("latency") && Util.isPublic(method);
     }
 
     @Override
-    public BenchmarkMethod createBenchmarkMethod(BenchmarkClass benchmarkClass, Method method) throws InvalidBenchmarkException {
+    public BenchmarkMethod createBenchmarkMethod(final BenchmarkClass benchmarkClass, final Method method) throws InvalidBenchmarkException {
         checkArgument(isBenchmarkMethod(method));
         if (Util.isStatic(method)) {
             throw new InvalidBenchmarkException(
                     "LatencyMeasure methods must not be static: " + method.getName());
         }
 
-        String methodName = method.getName();
-        String shortName = methodName.substring("latency".length());
+        final String methodName = method.getName();
+        final String shortName = methodName.substring("latency".length());
         return new BenchmarkMethod(benchmarkClass, method, shortName);
     }
 
 
     @Override
-    public void dryRun(Benchmark benchmark, BenchmarkMethod benchmarkMethod)
+    public void dryRun(final Benchmark benchmark, final BenchmarkMethod benchmarkMethod)
             throws UserCodeException {
-        Method m = benchmarkMethod.method();
+        final Method m = benchmarkMethod.method();
         try {
             m.invoke(benchmark, 1);
         } catch (IllegalAccessException impossible) {
             throw new AssertionError(impossible);
         } catch (InvocationTargetException e) {
-            Throwable userException = e.getCause();
+            final Throwable userException = e.getCause();
             propagateIfInstanceOf(userException, SkipThisScenarioException.class);
             throw new UserCodeException(userException);
         }
@@ -94,12 +94,12 @@ public class LatencyMeasurementInstrument extends Instrument {
         return LatencyMeasurementWorker.class;
     }
 
-    private String toNanosString(String optionName) {
+    private String toNanosString(final String optionName) {
         return String.valueOf(ShortDuration.valueOf(options.get(optionName)).to(TimeUnit.NANOSECONDS));
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         return object instanceof LatencyMeasurementInstrument;
     }
 

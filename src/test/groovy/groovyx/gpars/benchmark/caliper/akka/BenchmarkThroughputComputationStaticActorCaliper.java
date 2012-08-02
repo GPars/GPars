@@ -36,26 +36,30 @@ public class BenchmarkThroughputComputationStaticActorCaliper extends BenchmarkC
     )
     int numberOfClients;
 
-    @VmParam String server;
-    @VmParam String xms;
-    @VmParam String xmx;
-    @VmParam String gc;
+    @VmParam
+    String server;
+    @VmParam
+    String xms;
+    @VmParam
+    String xmx;
+    @VmParam
+    String gc;
 
-    BenchmarkThroughputComputationStaticActorCaliper(){
+    BenchmarkThroughputComputationStaticActorCaliper() {
         super(500, STATIC_RUN, ComputationStaticClient.class, ComputationStaticDestination.class);
     }
 
-    public long timeThroughputComputationStaticActor(int reps) {
-        long time=0;
+    public long timeThroughputComputationStaticActor(final int reps) {
+        long time = 0;
         try {
-            time = super.timeThroughput(reps, numberOfClients);
+            time = timeThroughput(reps, numberOfClients);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return time;
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         CaliperMain.main(BenchmarkThroughputComputationStaticActorCaliper.class, args);
     }
 
@@ -74,7 +78,7 @@ class ComputationStaticClient extends StaticDispatchActor<Integer> {
     int nrOfElements = 1000;
 
 
-    public ComputationStaticClient(ComputationStaticDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ComputationStaticClient(final ComputationStaticDestination actor, final CountDownLatch latch, final long repeatsPerClient, final DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -82,7 +86,7 @@ class ComputationStaticClient extends StaticDispatchActor<Integer> {
     }
 
     @Override
-    public void onMessage(Integer msg) {
+    public void onMessage(final Integer msg) {
         if (msg.equals(BenchmarkCaliper.STATIC_MESSAGE)) {
             received += 1;
             calculatePi();
@@ -97,21 +101,21 @@ class ComputationStaticClient extends StaticDispatchActor<Integer> {
         }
 
         if (msg.equals(BenchmarkCaliper.STATIC_RUN)) {
-            for (int i = 0; i < (Math.min(repeatsPerClient, 1000L)); i++) {
+            for (int i = 0; (long) i < Math.min(repeatsPerClient, 1000L); i++) {
                 actor.send(BenchmarkCaliper.STATIC_MESSAGE);
-                sent += 1;
+                sent += 1L;
             }
         }
     }
 
     void calculatePi() {
         _pi += calculateDecimals(currentPosition);
-        currentPosition += nrOfElements;
+        currentPosition += (long) nrOfElements;
     }
 
-    private double calculateDecimals(long start) {
+    private double calculateDecimals(final long start) {
         double acc = 0.0;
-        for (long i = start; i < start + nrOfElements; i++)
+        for (long i = start; i < start + (long) nrOfElements; i++)
             acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
         return acc;
     }
@@ -122,24 +126,24 @@ class ComputationStaticDestination extends StaticDispatchActor<Integer> {
     private long currentPosition = 0L;
     int nrOfElements = 1000;
 
-    public ComputationStaticDestination(DefaultPGroup group) {
+    public ComputationStaticDestination(final DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
     @Override
-    public void onMessage(Integer msg) {
+    public void onMessage(final Integer msg) {
         calculatePi();
         getSender().send(msg);
     }
 
     void calculatePi() {
         pi += calculateDecimals(currentPosition);
-        currentPosition += nrOfElements;
+        currentPosition += (long) nrOfElements;
     }
 
-    private double calculateDecimals(long start) {
+    private double calculateDecimals(final long start) {
         double acc = 0.0;
-        for (long i = start; i < start + nrOfElements; i++)
+        for (long i = start; i < start + (long) nrOfElements; i++)
             acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
         return acc;
     }

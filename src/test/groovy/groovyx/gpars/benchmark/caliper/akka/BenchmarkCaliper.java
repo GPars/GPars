@@ -23,6 +23,7 @@ import groovyx.gpars.scheduler.FJPool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
 public abstract class BenchmarkCaliper extends Benchmark {
@@ -40,20 +41,20 @@ public abstract class BenchmarkCaliper extends Benchmark {
     int totalPerRep;
     int repeat;
     int repeatsPerClient;
-    long totalDuration;
+    private long totalDuration;
     DefaultPGroup group;
     Class<? extends Actor> clientType, destinationType, waypointType;
-    ArrayList<Actor> destinations;
-    ArrayList<Actor> clients;
+    Collection<Actor> destinations;
+    Collection<Actor> clients;
     CountDownLatch latch;
 
-    BenchmarkCaliper(){
+    BenchmarkCaliper() {
         // shouldn't be called
         RUN = null;
         POISON = null;
     }
 
-    BenchmarkCaliper(int totalPerRep, Object run, Class clientType, Class destinationType){
+    BenchmarkCaliper(int totalPerRep, Object run, Class clientType, Class destinationType) {
         this.totalPerRep = totalPerRep;
         this.repeat = totalPerRep * repeatFactor;
         this.RUN = run;
@@ -62,7 +63,7 @@ public abstract class BenchmarkCaliper extends Benchmark {
         this.destinationType = destinationType;
     }
 
-    BenchmarkCaliper(int totalPerRep, Object run, Object poison, Class clientType, Class destinationType, Class waypointType){
+    BenchmarkCaliper(final int totalPerRep, final Object run, final Object poison, final Class clientType, final Class destinationType, final Class waypointType) {
         this.totalPerRep = totalPerRep;
         this.repeat = totalPerRep * repeatFactor;
         this.RUN = run;
@@ -72,15 +73,15 @@ public abstract class BenchmarkCaliper extends Benchmark {
         this.waypointType = waypointType;
     }
 
-    public int totalMessages(){
+    public int totalMessages() {
         return repeat;
     }
 
-    public long timeThroughput(int reps, int numberOfClients) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, InterruptedException {
-        long totalTime = 0;
+    public long timeThroughput(final int reps, final int numberOfClients) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, InterruptedException {
         group = new DefaultPGroup(new FJPool(maxClients));
         repeatsPerClient = repeat / numberOfClients;//MESSAGE quota for each pair of actors
 
+        long totalTime = 0L;
         for (int i = 0; i < reps; i++) {
 
             latch = new CountDownLatch(numberOfClients);
@@ -91,13 +92,13 @@ public abstract class BenchmarkCaliper extends Benchmark {
                 destinations.add(destinationType.getConstructor(new Class<?>[]{DefaultPGroup.class}).newInstance(group).start());
 
             }
-            for (Actor destination : destinations) {
-                clients.add(clientType.getConstructor(new Class<?>[]{destinationType, CountDownLatch.class, long.class, DefaultPGroup.class}).newInstance(destination,latch,repeatsPerClient, group).start());
+            for (final Actor destination : destinations) {
+                clients.add(clientType.getConstructor(new Class<?>[]{destinationType, CountDownLatch.class, long.class, DefaultPGroup.class}).newInstance(destination, latch, repeatsPerClient, group).start());
             }
 
-            long startTime = System.nanoTime();//start timing
+            final long startTime = System.nanoTime();//start timing
 
-            for (Actor client : clients) {
+            for (final Actor client : clients) {
                 client.send(RUN);
             }
 
@@ -106,10 +107,10 @@ public abstract class BenchmarkCaliper extends Benchmark {
 
             totalTime += System.nanoTime() - startTime;//stop timing
 
-            for (Actor client : clients) {
+            for (final Actor client : clients) {
                 client.terminate();
             }
-            for (Actor destination : destinations) {
+            for (final Actor destination : destinations) {
                 destination.terminate();
             }
         }
@@ -117,66 +118,75 @@ public abstract class BenchmarkCaliper extends Benchmark {
 
     }
 
-    public long timeLatency(int numberOfClients) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
+    public long timeLatency(final int numberOfClients) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
         setupLatencyBenchmark(numberOfClients);
 
-        for (Actor client : clients) {
+        for (final Actor client : clients) {
             client.start();
             client.send(RUN);
         }
 
         latch.await();
         teardownLatencyBenchmark();
-        return totalDuration;
+        synchronized (this) {
+            return totalDuration;
+        }
     }
 
-    private void setupLatencyBenchmark(int numberOfClients) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+    private void setupLatencyBenchmark(final int numberOfClients) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
 
-        totalDuration = 0;
+        totalDuration = 0L;
         group = new DefaultPGroup(new FJPool(maxClients));
         latch = new CountDownLatch(numberOfClients);
         repeatsPerClient = repeat / numberOfClients;
         clients = new ArrayList<Actor>();
 
         for (int i = 0; i < numberOfClients; i++) {
-            Actor destination = destinationType.getConstructor(new Class<?>[]{DefaultPGroup.class}).newInstance(group).start();
-            Actor w4 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(destination, group).start();
-            Actor w3 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(w4, group).start();
-            Actor w2 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(w3, group).start();
-            Actor w1 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(w2, group).start();
-            clients.add(clientType.getConstructor(new Class<?>[]{Actor.class, CountDownLatch.class, long.class, DefaultPGroup.class, BenchmarkCaliper.class}).newInstance(w1,latch,repeatsPerClient, group, this));
+            final Actor destination = destinationType.getConstructor(new Class<?>[]{DefaultPGroup.class}).newInstance(group).start();
+            final Actor w4 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(destination, group).start();
+            final Actor w3 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(w4, group).start();
+            final Actor w2 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(w3, group).start();
+            final Actor w1 = waypointType.getConstructor(new Class<?>[]{Actor.class, DefaultPGroup.class}).newInstance(w2, group).start();
+            clients.add(clientType.getConstructor(new Class<?>[]{Actor.class, CountDownLatch.class, long.class, DefaultPGroup.class, BenchmarkCaliper.class}).newInstance(w1, latch, repeatsPerClient, group, this));
         }
     }
 
     private void teardownLatencyBenchmark() throws InterruptedException {
-        for (Actor client : clients) {
+        for (final Actor client : clients) {
             client.send(POISON);
         }
 
-        for (Actor client : clients) {
+        for (final Actor client : clients) {
             client.join();
         }
         group.shutdown();
     }
 
-    public synchronized void addDuration(long duration){
+    public synchronized void addDuration(final long duration) {
         totalDuration += duration;
     }
 }
 
-class DynamicRun{}
-class DynamicMessage{}
-class Poison{}
-class LatencyMessage{
+class DynamicRun {
+}
+
+class DynamicMessage {
+}
+
+class Poison {
+}
+
+class LatencyMessage {
     final long sendTime;
     final Actor sender;
     int msg;
 
-    LatencyMessage(final long sendTime, final Actor sender, int msg){
+    LatencyMessage(final long sendTime, final Actor sender, final int msg) {
         this.sendTime = sendTime;
         this.sender = sender;
         this.msg = msg;
     }
+
     LatencyMessage(final long sendTime, final Actor sender) {
         this.sendTime = sendTime;
         this.sender = sender;

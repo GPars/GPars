@@ -42,25 +42,25 @@ public class ThroughputMeasurementInstrument extends Instrument {
     }
 
     @Override
-    public boolean isBenchmarkMethod(Method method) {
+    public boolean isBenchmarkMethod(final Method method) {
         return Instrument.isTimeMethod(method);
     }
 
     @Override
-    public BenchmarkMethod createBenchmarkMethod(BenchmarkClass benchmarkClass, Method method) throws InvalidBenchmarkException {
+    public BenchmarkMethod createBenchmarkMethod(final BenchmarkClass benchmarkClass, final Method method) throws InvalidBenchmarkException {
         return Instrument.createBenchmarkMethodFromTimeMethod(benchmarkClass, method);
     }
 
     @Override
-    public void dryRun(Benchmark benchmark, BenchmarkMethod benchmarkMethod)
+    public void dryRun(final Benchmark benchmark, final BenchmarkMethod benchmarkMethod)
             throws UserCodeException {
-        Method m = benchmarkMethod.method();
+        final Method method = benchmarkMethod.method();
         try {
-            m.invoke(benchmark, 1);
+            method.invoke(benchmark, 1);
         } catch (IllegalAccessException impossible) {
             throw new AssertionError(impossible);
         } catch (InvocationTargetException e) {
-            Throwable userException = e.getCause();
+            final Throwable userException = e.getCause();
             propagateIfInstanceOf(userException, SkipThisScenarioException.class);
             throw new UserCodeException(userException);
         }
@@ -83,12 +83,12 @@ public class ThroughputMeasurementInstrument extends Instrument {
         return ThroughputMeasurementWorker.class;
     }
 
-    private String toNanosString(String optionName) {
+    private String toNanosString(final String optionName) {
         return String.valueOf(ShortDuration.valueOf(options.get(optionName)).to(TimeUnit.NANOSECONDS));
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         return object instanceof ThroughputMeasurementInstrument;
     }
 

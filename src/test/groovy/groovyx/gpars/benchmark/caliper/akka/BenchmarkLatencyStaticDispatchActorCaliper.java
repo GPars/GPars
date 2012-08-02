@@ -30,17 +30,22 @@ import java.util.concurrent.CountDownLatch;
 
 
 public class BenchmarkLatencyStaticDispatchActorCaliper extends BenchmarkCaliper {
-    @Param({"1", "2", "4"}) int numberOfClients;
-    @VmParam String server;
-    @VmParam String xms;
-    @VmParam String xmx;
-    @VmParam String gc;
+    @Param({"1", "2", "4"})
+    int numberOfClients;
+    @VmParam
+    String server;
+    @VmParam
+    String xms;
+    @VmParam
+    String xmx;
+    @VmParam
+    String gc;
 
-    BenchmarkLatencyStaticDispatchActorCaliper(){
-        super(200, new LatencyMessage(0, null, STATIC_RUN), new LatencyMessage(0, null, STATIC_POISON),LatencyStaticClient.class, LatencyStaticDestination.class, LatencyStaticWayPoint.class);
+    BenchmarkLatencyStaticDispatchActorCaliper() {
+        super(200, new LatencyMessage(0L, null, STATIC_RUN), new LatencyMessage(0L, null, STATIC_POISON), LatencyStaticClient.class, LatencyStaticDestination.class, LatencyStaticWayPoint.class);
     }
 
-    public long latencyLatencyStaticDispatchActor(int dummy){
+    public long latencyLatencyStaticDispatchActor(final int dummy) {
         long time = 0;
         try {
             time = timeLatency(numberOfClients);
@@ -50,7 +55,7 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends BenchmarkCaliper
         return time;
     }
 
-    public static void main(String [] args){
+    public static void main(final String[] args) {
         CaliperMain.main(BenchmarkLatencyStaticDispatchActorCaliper.class, args);
     }
 }
@@ -58,18 +63,17 @@ public class BenchmarkLatencyStaticDispatchActorCaliper extends BenchmarkCaliper
 class LatencyStaticWayPoint extends StaticDispatchActor<LatencyMessage> {
     final Actor next;
 
-    public LatencyStaticWayPoint(final Actor next, DefaultPGroup group){
+    public LatencyStaticWayPoint(final Actor next, final DefaultPGroup group) {
         this.next = next;
         this.parallelGroup = group;
-       // this.makeFair();
+        // this.makeFair();
     }
 
     @Override
-    public void onMessage(LatencyMessage msg){
-        if(msg.msg == BenchmarkCaliper.STATIC_MESSAGE){
+    public void onMessage(final LatencyMessage msg) {
+        if (msg.msg == BenchmarkCaliper.STATIC_MESSAGE) {
             next.send(msg);
-        }
-        else if(msg.msg == BenchmarkCaliper.STATIC_POISON){
+        } else if (msg.msg == BenchmarkCaliper.STATIC_POISON) {
             next.send(msg);
             this.terminate();
         }
@@ -77,26 +81,25 @@ class LatencyStaticWayPoint extends StaticDispatchActor<LatencyMessage> {
 
 }
 
-class LatencyStaticDestination extends StaticDispatchActor<LatencyMessage>{
+class LatencyStaticDestination extends StaticDispatchActor<LatencyMessage> {
 
-    public LatencyStaticDestination(DefaultPGroup group){
+    public LatencyStaticDestination(final DefaultPGroup group) {
         //this.makeFair();
         this.parallelGroup = group;
     }
 
     @Override
-    public void onMessage(LatencyMessage msg){
-        if(msg.msg == BenchmarkCaliper.STATIC_MESSAGE){
+    public void onMessage(final LatencyMessage msg) {
+        if (msg.msg == BenchmarkCaliper.STATIC_MESSAGE) {
             msg.sender().send(msg);
-        }
-        else if(msg.msg == BenchmarkCaliper.STATIC_POISON){
+        } else if (msg.msg == BenchmarkCaliper.STATIC_POISON) {
             this.terminate();
         }
     }
 
 }
 
-class LatencyStaticClient extends StaticDispatchActor<LatencyMessage>{
+class LatencyStaticClient extends StaticDispatchActor<LatencyMessage> {
     long sent = 0L;
     long received = 0L;
     final Actor next;
@@ -104,7 +107,7 @@ class LatencyStaticClient extends StaticDispatchActor<LatencyMessage>{
     final long repeat;
     final BenchmarkCaliper benchmark;
 
-    public LatencyStaticClient(final Actor next, CountDownLatch latch, final long repeat, DefaultPGroup group, BenchmarkCaliper benchmark){
+    public LatencyStaticClient(final Actor next, final CountDownLatch latch, final long repeat, final DefaultPGroup group, final BenchmarkCaliper benchmark) {
         this.next = next;
         this.latch = latch;
         this.repeat = repeat;
@@ -113,12 +116,12 @@ class LatencyStaticClient extends StaticDispatchActor<LatencyMessage>{
         //this.makeFair();
     }
 
-    void shortDelay(int micros, long n) {
+    static void shortDelay(final int micros, final long n) {
         if (micros > 0) {
-            int sampling = 1000 / micros;
-            if ((n % sampling) == 0) {
+            final int sampling = 1000 / micros;
+            if (n % (long) sampling == 0L) {
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(1L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -127,30 +130,28 @@ class LatencyStaticClient extends StaticDispatchActor<LatencyMessage>{
     }
 
     @Override
-    public void onMessage(LatencyMessage msg){
-        if(msg.msg == BenchmarkCaliper.STATIC_MESSAGE){
-            long duration = System.nanoTime() - msg.sendTime;
+    public void onMessage(final LatencyMessage msg) {
+        if (msg.msg == BenchmarkCaliper.STATIC_MESSAGE) {
+            final long duration = System.nanoTime() - msg.sendTime;
             benchmark.addDuration(duration);
             received++;
-            if (sent < repeat){
+            if (sent < repeat) {
                 shortDelay(250, received);  // Value used by Akka
-                next.send( new LatencyMessage(System.nanoTime(), this, BenchmarkCaliper.STATIC_MESSAGE));
+                next.send(new LatencyMessage(System.nanoTime(), this, BenchmarkCaliper.STATIC_MESSAGE));
                 sent++;
-            } else if (received >= repeat){
+            } else if (received >= repeat) {
                 latch.countDown();
             }
-        }
-        else if(msg.msg == BenchmarkCaliper.STATIC_RUN){
-            int initialDelay = new Random(0).nextInt(20);    //Value used by Akka
+        } else if (msg.msg == BenchmarkCaliper.STATIC_RUN) {
+            final int initialDelay = new Random(0).nextInt(20);    //Value used by Akka
             try {
-                Thread.sleep(initialDelay);
+                Thread.sleep((long) initialDelay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            next.send( new LatencyMessage(System.nanoTime(), this, BenchmarkCaliper.STATIC_MESSAGE));
+            next.send(new LatencyMessage(System.nanoTime(), this, BenchmarkCaliper.STATIC_MESSAGE));
             sent++;
-        }
-        else if(msg.msg == BenchmarkCaliper.STATIC_POISON){
+        } else if (msg.msg == BenchmarkCaliper.STATIC_POISON) {
             next.send(msg);
             terminate();
         }

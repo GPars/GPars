@@ -34,18 +34,22 @@ public class BenchmarkThroughputComputationDynamicActorCaliper extends Benchmark
             "40", "42", "44", "46", "48"}
     )
     int numberOfClients;
-    @VmParam String server;
-    @VmParam String xms;
-    @VmParam String xmx;
-    @VmParam String gc;
+    @VmParam
+    String server;
+    @VmParam
+    String xms;
+    @VmParam
+    String xmx;
+    @VmParam
+    String gc;
 
 
-    BenchmarkThroughputComputationDynamicActorCaliper(){
+    BenchmarkThroughputComputationDynamicActorCaliper() {
         super(500, DYNAMIC_RUN, ComputationDynamicClient.class, ComputationDynamicDestination.class);
     }
 
-    public long timeThroughputComputationDynamicActor(int reps) {
-        long time=0;
+    public long timeThroughputComputationDynamicActor(final int reps) {
+        long time = 0;
         try {
             time = super.timeThroughput(reps, numberOfClients);
         } catch (Exception e) {
@@ -54,7 +58,7 @@ public class BenchmarkThroughputComputationDynamicActorCaliper extends Benchmark
         return time;
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         CaliperMain.main(BenchmarkThroughputComputationDynamicActorCaliper.class, args);
     }
 
@@ -73,7 +77,7 @@ class ComputationDynamicClient extends DynamicDispatchActor {
     long repeatsPerClient;
     CountDownLatch latch;
 
-    public ComputationDynamicClient(ComputationDynamicDestination actor, CountDownLatch latch, long repeatsPerClient, DefaultPGroup group) {
+    public ComputationDynamicClient(final ComputationDynamicDestination actor, final CountDownLatch latch, final long repeatsPerClient, final DefaultPGroup group) {
         this.parallelGroup = group;
         this.actor = actor;
         this.repeatsPerClient = repeatsPerClient;
@@ -92,20 +96,20 @@ class ComputationDynamicClient extends DynamicDispatchActor {
     }
 
     void onMessage(final DynamicRun msg) {
-        for (int i = 0; i < Math.min(repeatsPerClient, 1000L); i++) {
+        for (int i = 0; (long) i < Math.min(repeatsPerClient, 1000L); i++) {
             actor.send(BenchmarkCaliper.DYNAMIC_MESSAGE);
-            sent += 1;
+            sent += 1L;
         }
     }
 
     void calculatePi() {
         _pi += calculateDecimals(currentPosition);
-        currentPosition += nrOfElements;
+        currentPosition += (long) nrOfElements;
     }
 
-    private double calculateDecimals(long start) {
+    private double calculateDecimals(final long start) {
         double acc = 0.0;
-        for (long i = start; i < start + nrOfElements; i++)
+        for (long i = start; i < start + (long) nrOfElements; i++)
             acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
         return acc;
     }
@@ -117,7 +121,7 @@ class ComputationDynamicDestination extends DynamicDispatchActor {
     private long currentPosition = 0L;
     int nrOfElements = 1000;
 
-    public ComputationDynamicDestination(DefaultPGroup group) {
+    public ComputationDynamicDestination(final DefaultPGroup group) {
         this.parallelGroup = group;
     }
 
@@ -128,12 +132,12 @@ class ComputationDynamicDestination extends DynamicDispatchActor {
 
     void calculatePi() {
         _pi += calculateDecimals(currentPosition);
-        currentPosition += nrOfElements;
+        currentPosition += (long) nrOfElements;
     }
 
-    private double calculateDecimals(long start) {
+    private double calculateDecimals(final long start) {
         double acc = 0.0;
-        for (long i = start; i < start + nrOfElements; i++)
+        for (long i = start; i < start + (long) nrOfElements; i++)
             acc += 4.0 * (1 - (i % 2) * 2) / (2 * i + 1);
         return acc;
     }

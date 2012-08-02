@@ -70,7 +70,7 @@ class HTMLBuilder {
                 }
             }
             axis(bottom: [], left: [], left2: [yLabel], bottom2: [xLabel])
-            range([0: [xValues.get(0).toInteger(), xValues.get(xValues.size() - 1).toInteger()], 1: [1, globalMax]])
+            range([0: [xValues[0].toInteger(), xValues[xValues.size() - 1].toInteger()], 1: [1, globalMax]])
             dataRange('a')
         }
         buildHTML(result)
@@ -116,7 +116,7 @@ class HTMLBuilder {
                 }
             }
             axis(bottom: xValues.toList(), left: [])
-            range([0: [xValues.get(0).toInteger(), xValues.get(xValues.size() - 1).toInteger()], 1: [1, globalMax]])
+            range([0: [xValues[0].toInteger(), xValues[xValues.size() - 1].toInteger()], 1: [1, globalMax]])
             dataRange('a')
             labelOption('b')
         }
@@ -142,8 +142,8 @@ class HTMLBuilder {
                     }
                     for (int i = 0; i < run.scenarios.size(); i++) {
                         tr {
-                            Measurement m = run.results.get(i).measurements.get(0);
-                            td(style: "font-size: 0.75em", run.scenarios.get(i).userParameters.get("numberOfClients"));
+                            Measurement m = run.results[i].measurements[0];
+                            td(style: "font-size: 0.75em", run.scenarios[i].userParameters["numberOfClients"]);
                             td(style: "font-size: 0.75em", ((long) m.@value / m.weight));
                         }
                     }
@@ -156,32 +156,32 @@ class HTMLBuilder {
                         th(style: "font-size: 0.75em", "Environment")
                     }
                     for (int i = 0; i < run.environments.size(); i++) {
-                        Environment e = run.environments.get(i)
+                        Environment e = run.environments[i]
                         SortedMap<String, String> properties = e.@properties
                         tr {
-                            td(style: "font-size: 0.75em", "CPU: " + properties.get("host.cpu.names"))
+                            td(style: "font-size: 0.75em", "CPU: " + properties["host.cpu.names"])
                         }
                         tr {
-                            td(style: "font-size: 0.75em", "Number of Cores: " + properties.get("host.cpus"))
+                            td(style: "font-size: 0.75em", "Number of Cores: " + properties["host.cpus"])
                         }
                         tr {
-                            td(style: "font-size: 0.75em", "Memory: " + properties.get("host.memory.physical"))
+                            td(style: "font-size: 0.75em", "Memory: " + properties["host.memory.physical"])
                         }
                         tr {
-                            td(style: "font-size: 0.75em", "OS: " + properties.get("os.name") + " " + properties.get("os.version"))
+                            td(style: "font-size: 0.75em", "OS: " + properties["os.name"] + " " + properties["os.version"])
                         }
                     }
                 }
                 table {
                     for (int i = 0; i < run.vms.size(); i++) {
                         tr {
-                            td(style: "font-size: 0.75em", "VM: " + run.vms.get(i).vmName)
+                            td(style: "font-size: 0.75em", "VM: " + run.vms[i].vmName)
                         }
                     }
                 }
                 table {
                     for (int i = 0; i < run.instruments.size(); i++) {
-                        Instrument instrument = run.instruments.get(i);
+                        Instrument instrument = run.instruments[i];
                         tr {
                             String s = instrument.className
                             td(style: "font-size: 0.75em", "Instrument: " + s.substring(s.lastIndexOf('.') + 1, s.length()))

@@ -29,45 +29,49 @@ import groovyx.gpars.benchmark.caliper.akka.BenchmarkThroughputStaticDispatchAct
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import static com.google.common.collect.ObjectArrays.concat;
 
-public class BenchmarkRunner {
+public final class BenchmarkRunner {
 
     public static void main(final String[] args) {
         final String[] latencyArg = {"-i", "latency"};
         final String[] throughputArg = {"-i", "throughput"};
         final PrintWriter writer = new PrintWriter(System.out);
-        final List<Class> benchmarks = new ArrayList<Class>();
+        try {
+            final Collection<Class> benchmarks = new ArrayList<Class>();
 
-        benchmarks.add(BenchmarkLatencyDynamicDispatchActorCaliper.class);
-        benchmarks.add(BenchmarkLatencyStaticDispatchActorCaliper.class);
-        benchmarks.add(BenchmarkThroughputDynamicDispatchActorCaliper.class);
-        benchmarks.add(BenchmarkThroughputStaticDispatchActorCaliper.class);
-        benchmarks.add(BenchmarkThroughputComputationDynamicActorCaliper.class);
-        benchmarks.add(BenchmarkThroughputComputationStaticActorCaliper.class);
+            benchmarks.add(BenchmarkLatencyDynamicDispatchActorCaliper.class);
+            benchmarks.add(BenchmarkLatencyStaticDispatchActorCaliper.class);
+            benchmarks.add(BenchmarkThroughputDynamicDispatchActorCaliper.class);
+            benchmarks.add(BenchmarkThroughputStaticDispatchActorCaliper.class);
+            benchmarks.add(BenchmarkThroughputComputationDynamicActorCaliper.class);
+            benchmarks.add(BenchmarkThroughputComputationStaticActorCaliper.class);
 
-        for (final Class benchmark : benchmarks) {
-            try {
-                if (benchmark.getName().matches(".*Throughput.*")) {
-                    CaliperMain.exitlessMain(concat(concat(throughputArg, args, String.class), benchmark.getName()), writer);
-                } else
-                    CaliperMain.exitlessMain(concat(concat(latencyArg, args, String.class), benchmark.getName()), writer);
-            } catch (InvalidCommandException e) {
-                e.display(writer);
+            for (final Class benchmark : benchmarks) {
+                try {
+                    if (benchmark.getName().matches(".*Throughput.*")) {
+                        CaliperMain.exitlessMain(concat(concat(throughputArg, args, String.class), benchmark.getName()), writer);
+                    } else
+                        CaliperMain.exitlessMain(concat(concat(latencyArg, args, String.class), benchmark.getName()), writer);
+                } catch (InvalidCommandException e) {
+                    e.display(writer);
 
-            } catch (InvalidBenchmarkException e) {
-                e.display(writer);
+                } catch (InvalidBenchmarkException e) {
+                    e.display(writer);
 
-            } catch (Throwable t) {
-                t.printStackTrace(writer);
-                writer.println();
-                writer.println("An unexpected exception has been thrown by the caliper runner.");
-                writer.println("Please see https://sites.google.com/site/caliperusers/issues");
+                } catch (Throwable t) {
+                    t.printStackTrace(writer);
+                    writer.println();
+                    writer.println("An unexpected exception has been thrown by the caliper runner.");
+                    writer.println("Please see https://sites.google.com/site/caliperusers/issues");
+                }
+
+                writer.flush();
             }
-
-            writer.flush();
+        } finally {
+            writer.close();
         }
     }
 }

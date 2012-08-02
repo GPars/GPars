@@ -30,18 +30,23 @@ import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkLatencyDynamicDispatchActorCaliper extends BenchmarkCaliper {
 
-    @Param({"1", "2", "4"}) int numberOfClients;
+    @Param({"1", "2", "4"})
+    int numberOfClients;
 
-    @VmParam String server;
-    @VmParam String xms;
-    @VmParam String xmx;
-    @VmParam String gc;
+    @VmParam
+    String server;
+    @VmParam
+    String xms;
+    @VmParam
+    String xmx;
+    @VmParam
+    String gc;
 
-    BenchmarkLatencyDynamicDispatchActorCaliper(){
+    BenchmarkLatencyDynamicDispatchActorCaliper() {
         super(200, DYNAMIC_RUN, DYNAMIC_POISON, LatencyDynamicClient.class, LatencyDynamicDestination.class, LatencyDynamicWayPoint.class);
     }
 
-    public long latencyLatencyDynamicDispatchActor(int dummy) {
+    public long latencyLatencyDynamicDispatchActor(final int dummy) {
         long time = 0;
         try {
             time = timeLatency(numberOfClients);
@@ -51,28 +56,26 @@ public class BenchmarkLatencyDynamicDispatchActorCaliper extends BenchmarkCalipe
         return time;
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         CaliperMain.main(BenchmarkLatencyDynamicDispatchActorCaliper.class, args);
     }
 }
 
 
-
-
 class LatencyDynamicWayPoint extends DynamicDispatchActor {
     final Actor next;
 
-    public LatencyDynamicWayPoint(final Actor next, DefaultPGroup group) {
+    public LatencyDynamicWayPoint(final Actor next, final DefaultPGroup group) {
         this.next = next;
         this.parallelGroup = group;
         //this.makeFair();
     }
 
-    public void onMessage(LatencyMessage msg) {
+    public void onMessage(final LatencyMessage msg) {
         next.send(msg);
     }
 
-    public void onMessage(Poison msg) {
+    public void onMessage(final Poison msg) {
         next.send(msg);
         terminate();
     }
@@ -81,16 +84,16 @@ class LatencyDynamicWayPoint extends DynamicDispatchActor {
 
 class LatencyDynamicDestination extends DynamicDispatchActor {
 
-    public LatencyDynamicDestination(DefaultPGroup group) {
+    public LatencyDynamicDestination(final DefaultPGroup group) {
         this.parallelGroup = group;
         //this.makeFair();
     }
 
-    public void onMessage(LatencyMessage msg) {
+    public void onMessage(final LatencyMessage msg) {
         msg.sender().send(msg);
     }
 
-    public void onMessage(Poison msg) {
+    public void onMessage(final Poison msg) {
         terminate();
     }
 
@@ -104,7 +107,7 @@ class LatencyDynamicClient extends DynamicDispatchActor {
     final long repeat;
     final BenchmarkCaliper benchmark;
 
-    public LatencyDynamicClient(final Actor next, CountDownLatch latch, final long repeat, DefaultPGroup group, BenchmarkCaliper benchmark) {
+    public LatencyDynamicClient(final Actor next, final CountDownLatch latch, final long repeat, final DefaultPGroup group, final BenchmarkCaliper benchmark) {
         this.next = next;
         this.latch = latch;
         this.repeat = repeat;
@@ -113,12 +116,12 @@ class LatencyDynamicClient extends DynamicDispatchActor {
         //this.makeFair();
     }
 
-    void shortDelay(int micros, long n) {
+    void shortDelay(final int micros, final long n) {
         if (micros > 0) {
-            int sampling = 1000 / micros;
-            if ((n % sampling) == 0) {
+            final int sampling = 1000 / micros;
+            if (n % sampling == 0) {
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(1L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -126,9 +129,9 @@ class LatencyDynamicClient extends DynamicDispatchActor {
         }
     }
 
-    public void onMessage(LatencyMessage msg) {
+    public void onMessage(final LatencyMessage msg) {
 
-        long duration = System.nanoTime() - msg.sendTime;
+        final long duration = System.nanoTime() - msg.sendTime;
         benchmark.addDuration(duration);
         received++;
         if (sent < repeat) {
@@ -141,10 +144,10 @@ class LatencyDynamicClient extends DynamicDispatchActor {
 
     }
 
-    public void onMessage(DynamicRun msg) {
-        int initialDelay = new Random(0).nextInt(20);   // Value used by Akka
+    public void onMessage(final DynamicRun msg) {
+        final int initialDelay = new Random(0).nextInt(20);   // Value used by Akka
         try {
-            Thread.sleep(initialDelay);
+            Thread.sleep((long) initialDelay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -152,7 +155,7 @@ class LatencyDynamicClient extends DynamicDispatchActor {
         sent++;
     }
 
-    public void onMessage(Poison msg) {
+    public void onMessage(final Poison msg) {
         next.send(msg);
         terminate();
     }

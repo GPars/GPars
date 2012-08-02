@@ -314,7 +314,7 @@ class GoogleChartBuilder extends BuilderSupport {
     def createNode(name) {
         def output = closureDictionary[name]
         if (closureDictionary[name] instanceof Closure) {
-            output = closureDictionary[name]()
+            output = closureDictionary[name].call()
         }
         return check(output)
     }

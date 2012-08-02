@@ -31,11 +31,11 @@ import java.util.Queue;
 
 public class LatencyMeasurementWorker implements Worker {
     @Override
-    public Collection<Measurement> measure(Benchmark benchmark, String methodName, Map<String, String> optionMap, WorkerEventLog log) throws Exception {
-        final int benchmarkReps = 100;
-        Options options = new Options(optionMap);
-        Trial trial = new Trial(benchmark, methodName, options, log);
+    public Collection<Measurement> measure(final Benchmark benchmark, final String methodName, final Map<String, String> optionMap, final WorkerEventLog log) throws Exception {
+        final Options options = new Options(optionMap);
+        final Trial trial = new Trial(benchmark, methodName, options, log);
         trial.warmUp();
+        final int benchmarkReps = 100;
         return trial.run(benchmarkReps);
     }
 
@@ -48,7 +48,7 @@ public class LatencyMeasurementWorker implements Worker {
         final int repeatFactor;
         static final int warmupReps = 1;
 
-        Trial(Benchmark benchmark, String methodName, Options options, WorkerEventLog log)
+        Trial(final Benchmark benchmark, final String methodName, final Options options, final WorkerEventLog log)
                 throws Exception {
             this.benchmark = benchmark;
 
@@ -69,29 +69,29 @@ public class LatencyMeasurementWorker implements Worker {
 
         }
 
-        Collection<Measurement> run(int targetReps) throws Exception {
-            Queue<Measurement> measurements = new LinkedList<Measurement>();
-            LastNValues recentValues = new LastNValues(options.reportedIntervals);
+        Collection<Measurement> run(final int targetReps) throws Exception {
+            final Queue<Measurement> measurements = new LinkedList<Measurement>();
+            final LastNValues recentValues = new LastNValues(options.reportedIntervals);
 
             log.notifyMeasurementPhaseStarting();
             for (int trials = 0; trials < 1; trials++) {
-                int reps = 5;
                 if (options.gcBeforeEach) {
                     Util.forceGc();
                 }
 
                 log.notifyMeasurementStarting();
-                long nanos = invokeLatencyMethod(reps);
+                final int reps = 5;
+                final long nanos = invokeLatencyMethod(reps);
 
-                Measurement m = new Measurement();
-                m.value = nanos;
-                m.weight = reps * repeatFactor;
-                m.unit = "ns";
-                m.description = "propagation latency";
-                double nanosPerRep = m.value / m.weight;
+                final Measurement measure = new Measurement();
+                measure.value = (double) nanos;
+                measure.weight = (double) (reps * repeatFactor);
+                measure.unit = "ns";
+                measure.description = "propagation latency";
+                final double nanosPerRep = measure.value / measure.weight;
                 log.notifyMeasurementEnding(nanosPerRep);
 
-                measurements.add(m);
+                measurements.add(measure);
                 if (measurements.size() > options.reportedIntervals) {
                     measurements.remove();
                 }
@@ -105,21 +105,21 @@ public class LatencyMeasurementWorker implements Worker {
             return measurements;
         }
 
-        private boolean shouldShortCircuit(LastNValues lastN) {
+        private boolean shouldShortCircuit(final LastNValues lastN) {
             return lastN.isFull() && lastN.normalizedStddev() < options.shortCircuitTolerance;
         }
 
-        private static int adjustRepCount(int previousReps, long previousNanos, long targetNanos) {
+        private static int adjustRepCount(final int previousReps, final long previousNanos, final long targetNanos) {
             // Note the * could overflow 2^63, but only if you're being kinda insane...
-            return (int) (previousReps * targetNanos / previousNanos);
+            return (int) ((long) previousReps * targetNanos / previousNanos);
         }
 
-        private long invokeLatencyMethod(int reps) throws Exception {
+        private long invokeLatencyMethod(final int reps) throws Exception {
 
-            long total = 0;
+            long total = 0L;
 
             for (int i = 0; i < reps; i++) {
-                total += ((Long) latencyMethod.invoke(benchmark, i));
+                total += (Long) latencyMethod.invoke(benchmark, i);
 
             }
             return total;
@@ -135,7 +135,7 @@ public class LatencyMeasurementWorker implements Worker {
         final long maxTotalRuntimeNanos;
         final boolean gcBeforeEach;
 
-        Options(Map<String, String> optionMap) {
+        Options(final Map<String, String> optionMap) {
             this.warmupNanos = Long.parseLong(optionMap.get("warmupNanos"));
             this.timingIntervalNanos = Long.parseLong(optionMap.get("timingIntervalNanos"));
             this.reportedIntervals = Integer.parseInt(optionMap.get("reportedIntervals"));

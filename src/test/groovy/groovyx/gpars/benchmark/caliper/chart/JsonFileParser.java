@@ -30,12 +30,12 @@ public class JsonFileParser {
 
     JsonObject jsonObject;
 
-    public JsonFileParser(File file) {
+    public JsonFileParser(final File file) {
         parseFile(file);
     }
 
-    private void parseFile(File file) {
-        byte[] buffer = new byte[(int) file.length()];
+    private void parseFile(final File file) {
+        final byte[] buffer = new byte[(int) file.length()];
         DataInputStream in = null;
         String result = null;
         try {
@@ -52,25 +52,25 @@ public class JsonFileParser {
             }
         }
 
-        JsonParser parser = new JsonParser();
+        final JsonParser parser = new JsonParser();
         try {
             jsonObject = (JsonObject) parser.parse(result);
-        } catch (ClassCastException e) {
+        } catch (ClassCastException ignore) {
             jsonObject = new JsonObject();
         }
     }
 
     public ArrayList<Long> getMeasurements() {
-        JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-        ArrayList<Long> medianList = new ArrayList<Long>();
+        final JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+        final ArrayList<Long> medianList = new ArrayList<Long>();
         if (jsonArray == null) return medianList;
 
         for (int scenario = 0; scenario < jsonArray.size(); scenario++) {
-            JsonArray measurementArray = jsonArray.get(scenario).getAsJsonObject().getAsJsonArray("measurements");
-            ArrayList<Long> trials = new ArrayList<Long>();
+            final JsonArray measurementArray = jsonArray.get(scenario).getAsJsonObject().getAsJsonArray("measurements");
+            final ArrayList<Long> trials = new ArrayList<Long>();
 
             for (int trial = 0; trial < measurementArray.size(); trial++) {
-                JsonObject measurement = measurementArray.get(trial).getAsJsonObject();
+                final JsonObject measurement = measurementArray.get(trial).getAsJsonObject();
                 trials.add(measurement.get("value").getAsLong() / measurement.get("weight").getAsLong());
             }
             medianList.add(trials.get(trials.size() / 2));
@@ -80,8 +80,8 @@ public class JsonFileParser {
 
 
     public ArrayList<String> getScenarios() {
-        JsonArray jsonArray = jsonObject.getAsJsonArray("scenarios");
-        ArrayList<String> result = new ArrayList<String>();
+        final JsonArray jsonArray = jsonObject.getAsJsonArray("scenarios");
+        final ArrayList<String> result = new ArrayList<String>();
         if (jsonArray == null) return result;
         for (int scenario = 0; scenario < jsonArray.size(); scenario++) {
             result.add(jsonArray.get(scenario).getAsJsonObject().get("userParameters").getAsJsonObject().get("numberOfClients").getAsString());
