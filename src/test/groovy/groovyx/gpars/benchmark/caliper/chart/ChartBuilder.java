@@ -64,8 +64,6 @@ final class ChartBuilder implements ResultProcessor {
     private Map<ScenarioName, ProcessedResult> processedResults;
     private List<Axis> sortedAxes;
     private ImmutableSortedSet<ScenarioName> sortedScenarioNames;
-    //todo remove?
-    double minValue;
     private double maxValue;
 
     @Override
@@ -167,7 +165,6 @@ final class ChartBuilder implements ResultProcessor {
         this.sortedScenarioNames =
                 ImmutableSortedSet.copyOf(new ByAxisOrdering(), processedResults.keySet());
         this.maxValue = maxOfMedians;
-        this.minValue = minOfMedians;
 
         buildChart();
     }
@@ -250,6 +247,9 @@ final class ChartBuilder implements ResultProcessor {
             }
         }
 
+        /* Picks three latest histories.
+           Overflows Google Chart if try to plot more than 3 histories.(Total of 4)
+         */
         for (int i = 0; i < 3; i++) {
             if (fileQueue.isEmpty()) break;
             final File file = fileQueue.poll();
