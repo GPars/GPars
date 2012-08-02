@@ -16,6 +16,8 @@
 
 package groovyx.gpars.dataflow
 
+import groovy.transform.PackageScope
+
 import java.util.concurrent.Callable
 
 public class DataflowTaskTest extends GroovyTestCase {
