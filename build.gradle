@@ -102,25 +102,24 @@ configurations {
 
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'
-    testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
     compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.7.Final'
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
+    testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8'
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
-    docs 'org.codehaus.groovy:groovy-all:1.8.6'
+    docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'
     docs 'org.yaml:snakeyaml:1.9'
     docs 'commons-lang:commons-lang:2.6'
-    //
     docs ext.grailsDocs
     docs ext.radeox
     docs ext.lowagieItext
     docs ext.xhtmlRenderer
     docs 'commons-logging:commons-logging:1.1.1'
-    deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.0"
+    deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.2"
     cover 'net.sourceforge.cobertura:cobertura:1.9.4.1'
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
 }
