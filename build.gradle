@@ -21,9 +21,14 @@
 //  Author: Rene Groeschke
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
+final signingPropertiesAreSet = {
+  project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile') 
+}
+
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
+if (signingPropertiesAreSet()) { apply plugin : 'signing' }
 
 apply plugin: 'codenarc'
 
@@ -84,6 +89,7 @@ repositories {
         url 'http://download.java.net/maven/2'
         url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
     }
+    if (project.hasProperty('gpars_useMavenLocal') && gpars_useMavenLocal) { mavenLocal() }
 }
 
 configurations {
@@ -162,12 +168,21 @@ tasks.withType(CodeNarc).all { codeNarcTask ->
     codeNarcTask.ignoreFailures = true
 }
 
+if ( signingPropertiesAreSet ( ) ) {
+  signing {
+    sign configurations.archives
+  }
+}
+
 //build.dependsOn integrationTest
 
-if (!project.hasProperty('codehausUsername')) codehausUsername = ''
-if (!project.hasProperty('codehausPassword')) codehausPassword = ''
-
 uploadArchives {
+    if ( ! ( project.hasProperty ( 'codehausUsername') && project.hasProperty ( 'codehausPassword' ) ) ) {
+        throw new RuntimeException ( 'Must define both codehausUsername and codehausPassword to upload archives.')
+    }
+    if ( ! signingPropertiesAreSet ( ) ) {
+        throw new RuntimeException ( 'Must define signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.' )
+    }
     project.ext.deployer = repositories.mavenDeployer {
         uniqueVersion = false
         configuration = configurations.deployerJars
