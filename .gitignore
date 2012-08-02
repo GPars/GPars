@@ -13,3 +13,5 @@ GPars.iml
 .project
 .settings
 *~
+/caliper-charts/
+/caliper-results/

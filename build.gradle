@@ -31,6 +31,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 
 defaultTasks 'test'
+
 archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '1.0-SNAPSHOT'
@@ -104,6 +105,7 @@ dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
     testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8'
+    testCompile fileTree(dir: 'lib', include: '*.jar')
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
@@ -123,6 +125,19 @@ dependencies {
     deployerJars "org.apache.maven.wagon:wagon-http-lightweight:2.0"
     cover 'net.sourceforge.cobertura:cobertura:1.9.4.1'
     testRuntime 'net.sourceforge.cobertura:cobertura:1.9.4.1'
+}
+
+task runBenchmarks(type: JavaExec) {
+    def gcArg = "-XX:+UseParallelGC"
+
+    // On Windows, calling the JVM with extended params requires multiple levels of quoting
+    if (System.getProperty('os.name').matches(".*Windows.*")) {
+        gcArg = '"""-XX:+UseParallelGC"""'
+    }
+    description = 'Runs benchmarks measuring the throughput and latency of actors in GPars'
+    main = 'groovyx.gpars.benchmark.caliper.BenchmarkRunner'
+    classpath = sourceSets.test.runtimeClasspath
+    args = ["-Jgc=${gcArg}", '-Jxms=-Xms512M', '-Jxmx=-Xmx1024M', '-Jserver=-server']
 }
 
 //  To get the details of the "unchecked" issues.
