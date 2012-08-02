@@ -176,48 +176,51 @@ if ( signingPropertiesAreSet ( ) ) {
 
 //build.dependsOn integrationTest
 
-uploadArchives {
-    if ( ! ( project.hasProperty ( 'codehausUsername') && project.hasProperty ( 'codehausPassword' ) ) ) {
-        throw new RuntimeException ( 'Must define both codehausUsername and codehausPassword to upload archives.')
-    }
-    if ( ! signingPropertiesAreSet ( ) ) {
-        throw new RuntimeException ( 'Must define signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.' )
-    }
-    project.ext.deployer = repositories.mavenDeployer {
-        uniqueVersion = false
-        configuration = configurations.deployerJars
-        repository(url: 'https://dav.codehaus.org/repository/gpars/') {
-            authentication(userName: codehausUsername, password: codehausPassword)
+gradle.taskGraph.whenReady { taskGraph -> 
+    if (taskGraph.hasTask(uploadArchives)) {
+        if (!(project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword'))) {
+            throw new RuntimeException('Must define both codehausUsername and codehausPassword to upload archives.')
         }
-        snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
-            authentication(userName: codehausUsername, password: codehausPassword)
+        if (!signingPropertiesAreSet()) {
+            throw new RuntimeException('Must define signing.keyId, signing.password, and signing.secretKeyRingFile to upload signed archives.')
         }
-        pom.project {
-            name 'GPars'
-            description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
-            url 'http://gpars.codehaus.org'
-            inceptionYear '2009'
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
+        project.ext.deployer = uploadArchives.repositories.mavenDeployer {
+            uniqueVersion = false
+            configuration = configurations.deployerJars
+            repository(url: 'https://dav.codehaus.org/repository/gpars/') {
+                authentication(userName: codehausUsername, password: codehausPassword)
+            }
+            snapshotRepository(url: 'https://dav.codehaus.org/snapshots.repository/gpars/') {
+                authentication(userName: codehausUsername, password: codehausPassword)
+            }
+            pom.project {
+                name 'GPars'
+                description 'The Groovy and Java high-level concurrency library offering actors, dataflow, CSP, agents, parallel collections, fork/join and more'
+                url 'http://gpars.codehaus.org'
+                inceptionYear '2009'
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
                 }
             }
-        }
-        // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
-        pom.whenConfigured {pom ->
-            // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
-            pom.dependencies.each {dependency ->
-                if (dependency.artifactId in ['netty', 'jcsp', 'multiverse-beta']) {
-                    dependency.optional = true
+            // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
+            pom.whenConfigured {pom ->
+                // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
+                pom.dependencies.each {dependency ->
+                    if (dependency.artifactId in ['netty', 'jcsp', 'multiverse-beta']) {
+                        dependency.optional = true
+                    }
                 }
+                // Remove test dependencies from all poms
+                pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == 'test' })
             }
-            // Remove test dependencies from all poms
-            pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == 'test' })
         }
     }
 }
+
 
 def titleForDocumentation = archivesBaseName + ' ' + version
 def copyrightString = 'Copyright &#169; 2008&#8211;2012  V&#225;clav Pech.  All Rights Reserved.'
