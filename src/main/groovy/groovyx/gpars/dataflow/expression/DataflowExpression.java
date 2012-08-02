@@ -56,7 +56,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 
 import static java.util.Arrays.asList;
@@ -88,12 +87,12 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     /**
      * Holds the current state of the variable
      */
-    protected final AtomicInteger state=new AtomicInteger();
+    protected final AtomicInteger state = new AtomicInteger();
 
     /**
      * Points to the head of the chain of requests waiting for a value to be bound
      */
-    private final AtomicReference<WaitingThread> waiting=new AtomicReference<WaitingThread>();
+    private final AtomicReference<WaitingThread> waiting = new AtomicReference<WaitingThread>();
 
     /**
      * Possible states
@@ -486,7 +485,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public final void whenBound(final Closure closure) {
+    public final <V> void whenBound(final Closure<V> closure) {
         getValAsync(new DataCallback(closure, Dataflow.retrieveCurrentDFPGroup()));
     }
 
@@ -499,7 +498,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public void whenBound(final Pool pool, final Closure closure) {
+    public <V> void whenBound(final Pool pool, final Closure<V> closure) {
         getValAsync(new DataCallbackWithPool(pool, closure));
     }
 
@@ -512,7 +511,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public final void whenBound(final PGroup group, final Closure closure) {
+    public final <V> void whenBound(final PGroup group, final Closure<V> closure) {
         getValAsync(new DataCallback(closure, group));
     }
 
@@ -579,7 +578,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public final void wheneverBound(final Closure closure) {
+    public final <V> void wheneverBound(final Closure<V> closure) {
         whenBound(closure);
     }
 

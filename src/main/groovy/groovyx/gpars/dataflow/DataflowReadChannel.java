@@ -78,6 +78,8 @@ public interface DataflowReadChannel<T> {
      * Schedule closure to be executed after data became available.
      * It is important to notice that even if the expression is already bound the execution of closure
      * will not happen immediately but will be scheduled
+     * <p/>
+     * rightShift() redefines the >> operator so you can write df >> {println it} instead of df.whenBound{println it}
      *
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
@@ -91,7 +93,7 @@ public interface DataflowReadChannel<T> {
      *
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
-    void whenBound(final Closure closure);
+    <V> void whenBound(final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -101,7 +103,7 @@ public interface DataflowReadChannel<T> {
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
-    void whenBound(final Pool pool, final Closure closure);
+    <V> void whenBound(final Pool pool, final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -111,7 +113,7 @@ public interface DataflowReadChannel<T> {
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
-    void whenBound(final PGroup group, final Closure closure);
+    <V> void whenBound(final PGroup group, final Closure<V> closure);
 
     /**
      * Send the bound data to provided stream when it becomes available
@@ -157,7 +159,7 @@ public interface DataflowReadChannel<T> {
      *
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
-    void wheneverBound(final Closure closure);
+    <V> void wheneverBound(final Closure<V> closure);
 
     /**
      * Send all pieces of data bound in the future to the provided stream when it becomes available.
