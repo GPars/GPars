@@ -105,7 +105,7 @@ public class ResizeableCountDownLatchTest extends GroovyTestCase {
         final ResizeableCountDownLatch latch = new ResizeableCountDownLatch(3)
         assert latch.count == 3
         latch.countDown()
-        assert !latch.attemptToCountDownAndAwait(500)
+        assert !latch.attemptToCountDownAndAwait(500000)
         assert latch.count == 3
         assert !latch.await(10, TimeUnit.MILLISECONDS)
     }
@@ -118,7 +118,7 @@ public class ResizeableCountDownLatchTest extends GroovyTestCase {
         latch.countDown()
         latch.countDown()
         latch.countDown()
-        assert latch.attemptToCountDownAndAwait(500)
+        assert latch.attemptToCountDownAndAwait(500000)
         assert latch.count == 0
         assert latch.await(10, TimeUnit.MILLISECONDS)
     }
@@ -151,7 +151,7 @@ public class ResizeableCountDownLatchTest extends GroovyTestCase {
             latch.await()
         }
         latch.countDown()
-        assert latch.attemptToCountDownAndAwait(5000)
+        assert latch.attemptToCountDownAndAwait(5000000)
         latch.increaseCount()
         assert latch.count == 1
         assert !latch.await(0, TimeUnit.MILLISECONDS)

@@ -129,7 +129,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     @Override
-    public void whenBound(final Closure closure) {
+    public <V> void whenBound(final Closure<V> closure) {
         asyncHead.getFirstDFV().whenBound(closure);
         moveAsyncHead();
     }
@@ -143,13 +143,13 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public void whenBound(final Pool pool, final Closure closure) {
+    public <V> void whenBound(final Pool pool, final Closure<V> closure) {
         asyncHead.getFirstDFV().whenBound(pool, closure);
         moveAsyncHead();
     }
 
     @Override
-    public void whenBound(final PGroup group, final Closure closure) {
+    public <V> void whenBound(final PGroup group, final Closure<V> closure) {
         asyncHead.getFirstDFV().whenBound(group, closure);
         moveAsyncHead();
     }
@@ -208,7 +208,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     @Override
-    public void wheneverBound(final Closure closure) {
+    public <V> void wheneverBound(final Closure<V> closure) {
         head.wheneverBound(closure);
     }
 

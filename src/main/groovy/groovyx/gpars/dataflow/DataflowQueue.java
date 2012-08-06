@@ -263,7 +263,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public final void whenBound(final Closure closure) {
+    public final <V> void whenBound(final Closure<V> closure) {
         getValAsync(new DataCallback(closure, Dataflow.retrieveCurrentDFPGroup()));
     }
 
@@ -276,12 +276,12 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public final void whenBound(final Pool pool, final Closure closure) {
+    public final <V> void whenBound(final Pool pool, final Closure<V> closure) {
         getValAsync(new DataCallbackWithPool(pool, closure));
     }
 
     @Override
-    public void whenBound(final PGroup group, final Closure closure) {
+    public <V> void whenBound(final PGroup group, final Closure<V> closure) {
         getValAsync(new DataCallback(closure, group));
     }
 
@@ -348,7 +348,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
     @Override
-    public final void wheneverBound(final Closure closure) {
+    public final <V> void wheneverBound(final Closure<V> closure) {
         wheneverBoundListeners.add(new DataCallback(closure, Dataflow.retrieveCurrentDFPGroup()));
     }
 

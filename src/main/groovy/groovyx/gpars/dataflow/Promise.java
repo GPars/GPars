@@ -108,7 +108,7 @@ public interface Promise<T> {
      *
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
-    void whenBound(final Closure closure);
+    <V> void whenBound(final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -118,7 +118,7 @@ public interface Promise<T> {
      * @param pool    The thread pool to use for task scheduling for asynchronous message delivery
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
-    void whenBound(final Pool pool, final Closure closure);
+    <V> void whenBound(final Pool pool, final Closure<V> closure);
 
     /**
      * Schedule closure to be executed after data becomes available.
@@ -128,7 +128,7 @@ public interface Promise<T> {
      * @param group   The PGroup to use for task scheduling for asynchronous message delivery
      * @param closure closure to execute when data becomes available. The closure should take at most one argument.
      */
-    void whenBound(final PGroup group, final Closure closure);
+    <V> void whenBound(final PGroup group, final Closure<V> closure);
 
     /**
      * Send the bound data to provided stream when it becomes available

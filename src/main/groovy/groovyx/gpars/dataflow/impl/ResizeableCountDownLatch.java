@@ -171,12 +171,12 @@ public final class ResizeableCountDownLatch {
      * Attempts to atomically count down the latch and await release with a timeout.
      * If the timeout expires, the count is increased and the latch is re-tested before reporting failed timeout.
      *
-     * @param timeout The time in milliseconds to await
+     * @param timeout The time in nanoseconds to await
      * @return True, if successful, false, is the timeout elapses without the latch being released
      * @throws InterruptedException If the thread gets interrupted while waiting for the release
      */
     public boolean attemptToCountDownAndAwait(final long timeout) throws InterruptedException {
-        if (await(timeout, TimeUnit.MILLISECONDS)) return true;
+        if (await(timeout, TimeUnit.NANOSECONDS)) return true;
         increaseCount();
         if (getCount() <= 1L) {
             countDown();

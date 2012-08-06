@@ -85,17 +85,17 @@ public final class SyncDataflowVariable<T> extends DataflowVariable<T> {
      */
     @Override
     public T getVal(final long timeout, final TimeUnit units) throws InterruptedException {
-        final long start = System.currentTimeMillis();
-        final long duration = units.toMillis(timeout);
+        final long start = System.nanoTime();
+        final long duration = units.toNanos(timeout);
 
         final T result = super.getVal(timeout, units);
         if (result == null) {
             if (!this.isBound()) return null;
-            if (readerIsReady(duration - (System.currentTimeMillis() - start))) return getVal();
+            if (readerIsReady(duration - (System.nanoTime() - start))) return getVal();
             else return null;
         }
 
-        if (readerIsReady(duration - (System.currentTimeMillis() - start))) return result;
+        if (readerIsReady(duration - (System.nanoTime() - start))) return result;
         else return null;
     }
 
