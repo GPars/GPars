@@ -16,7 +16,7 @@
 
 package groovyx.gpars.pa
 
-import extra166y.ParallelArrayWithMapping
+import groovyx.gpars.extra166y.ParallelArrayWithMapping
 
 /**
  * The ParallelArray wrapper used after the map() operation

@@ -20,8 +20,8 @@ import groovy.time.TimeCategory
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.ParallelEnhancer
 import jsr166y.ForkJoinPool
-import extra166y.Ops.Reducer
-import extra166y.ParallelArray
+import groovyx.gpars.extra166y.Ops.Reducer
+import groovyx.gpars.extra166y.ParallelArray
 import static groovyx.gpars.GParsPool.withExistingPool
 import static groovyx.gpars.GParsPool.withPool
 

@@ -16,7 +16,7 @@
 
 package groovyx.gpars
 
-import extra166y.Ops
+import groovyx.gpars.extra166y.Ops
 import java.util.concurrent.ConcurrentHashMap
 
 /**

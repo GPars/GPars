@@ -110,7 +110,6 @@ configurations {
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
-    compile 'org.codehaus.jsr166-mirror:extra166y:1.7.0'
     compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
     testCompile fileTree(dir: 'lib', include: '*.jar')
     compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.7.Final'
@@ -305,7 +304,7 @@ task zipJavaDemo(type: Zip) {
 task zipDist(type: Zip) {
     from jar.outputs.files
     from(runtimeClasspath) {
-        include('jsr166*', 'extra166*', 'netty*', 'multiverse*')
+        include('jsr166*', 'netty*', 'multiverse*')
     }
     from('licenses') {
         include '*'

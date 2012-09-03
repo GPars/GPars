@@ -23,7 +23,7 @@
 
 package groovyx.gpars.samples.collections
 
-import extra166y.Ops
+import groovyx.gpars.extra166y.Ops
 
 groovyx.gpars.GParsPool.withPool {
     assert 15 == [1, 2, 3, 4, 5].parallelArray.reduce({a, b -> a + b} as Ops.Reducer, 0)                                        //summarize

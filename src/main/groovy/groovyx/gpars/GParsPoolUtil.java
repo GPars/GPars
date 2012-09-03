@@ -16,10 +16,10 @@
 
 package groovyx.gpars;
 
-import extra166y.Ops;
-import extra166y.ParallelArray;
+import groovyx.gpars.extra166y.Ops;
 import groovy.lang.Closure;
 import groovy.time.Duration;
+import groovyx.gpars.extra166y.ParallelArray;
 import groovyx.gpars.memoize.LRUProtectionStorage;
 import groovyx.gpars.pa.CallAsyncTask;
 import groovyx.gpars.pa.CallClosure;

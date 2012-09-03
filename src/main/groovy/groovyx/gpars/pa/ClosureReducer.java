@@ -16,7 +16,7 @@
 
 package groovyx.gpars.pa;
 
-import extra166y.Ops;
+import groovyx.gpars.extra166y.Ops;
 import groovy.lang.Closure;
 
 /**

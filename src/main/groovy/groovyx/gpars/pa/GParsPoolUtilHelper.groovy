@@ -16,9 +16,9 @@
 
 package groovyx.gpars.pa
 
-import extra166y.Ops
-import extra166y.ParallelArray
-import extra166y.ParallelArrayWithMapping
+import groovyx.gpars.extra166y.Ops
+import groovyx.gpars.extra166y.ParallelArray
+import groovyx.gpars.extra166y.ParallelArrayWithMapping
 import groovyx.gpars.GParsPool
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.TransparentParallel

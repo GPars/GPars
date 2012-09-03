@@ -3,7 +3,7 @@ property on any collection or object will return a _jsr166y.forkjoin.ParallelArr
 which then can be manipulated through the jsr166y API. Please refer to the jsr166y documentation for the API details.
 
 {code}
-import extra166y.Ops
+import groovyx.gpars.extra166y.Ops
 
 groovyx.gpars.GParsPool.withPool {
     assert 15 == [1, 2, 3, 4, 5].parallelArray.reduce({a, b -> a + b} as Ops.Reducer, 0)                                        //summarize
