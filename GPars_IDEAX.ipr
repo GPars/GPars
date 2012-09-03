@@ -170,7 +170,15 @@
       <profile default="true" name="Default" enabled="false">
         <processorPath useClasspath="true" />
       </profile>
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <processorPath useClasspath="true" />
+        <module name="gpars-java-demo" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="gpars-java-demo" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
   <component name="CopyrightManager" default="GPars">
     <copyright>
@@ -216,6 +224,7 @@
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java-demo" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/dataflow/operator/DataflowOperator.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/pa/GParsPoolUtilHelper.groovy" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/groovy/groovyx/gpars/remote/RemoteConnection.java" charset="UTF-8" />
@@ -8761,7 +8770,6 @@
     <version value="1.0" />
   </component>
   <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_STRING" value="-target 1.6" />
     <option name="MAXIMUM_HEAP_SIZE" value="256" />
   </component>
   <component name="JavadocGenerationManager">
@@ -9340,7 +9348,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
@@ -9474,17 +9482,6 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-beta/0.7-RC-1/multiverse-beta-0.7-RC-1-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.multiverse:multiverse-core:0.7.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-core/0.7.0/multiverse-core-0.7.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-core/0.7.0/multiverse-core-0.7.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/multiverse/multiverse-core/0.7.0/multiverse-core-0.7.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.spockframework:spock-core:0.6-groovy-1.8">
