@@ -5,7 +5,8 @@
  */
 
 package groovyx.gpars.extra166y;
-import java.util.*;
+
+import java.util.Comparator;
 
 /**
  * Interfaces and utilities declaring per-element operations used

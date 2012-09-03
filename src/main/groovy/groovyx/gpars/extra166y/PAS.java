@@ -5,11 +5,41 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
+
+import jsr166y.ForkJoinPool;
+import jsr166y.ForkJoinTask;
+import jsr166y.RecursiveAction;
+
 import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.atomic.AtomicLongArray;
+
+import static groovyx.gpars.extra166y.Ops.BinaryDoubleOp;
+import static groovyx.gpars.extra166y.Ops.BinaryLongOp;
+import static groovyx.gpars.extra166y.Ops.BinaryOp;
+import static groovyx.gpars.extra166y.Ops.DoubleComparator;
+import static groovyx.gpars.extra166y.Ops.DoubleGenerator;
+import static groovyx.gpars.extra166y.Ops.DoubleOp;
+import static groovyx.gpars.extra166y.Ops.DoubleProcedure;
+import static groovyx.gpars.extra166y.Ops.DoubleReducer;
+import static groovyx.gpars.extra166y.Ops.Generator;
+import static groovyx.gpars.extra166y.Ops.IntAndDoubleToDouble;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToLong;
+import static groovyx.gpars.extra166y.Ops.IntAndObjectToObject;
+import static groovyx.gpars.extra166y.Ops.IntToDouble;
+import static groovyx.gpars.extra166y.Ops.IntToLong;
+import static groovyx.gpars.extra166y.Ops.IntToObject;
+import static groovyx.gpars.extra166y.Ops.LongComparator;
+import static groovyx.gpars.extra166y.Ops.LongGenerator;
+import static groovyx.gpars.extra166y.Ops.LongOp;
+import static groovyx.gpars.extra166y.Ops.LongProcedure;
+import static groovyx.gpars.extra166y.Ops.LongReducer;
+import static groovyx.gpars.extra166y.Ops.Op;
+import static groovyx.gpars.extra166y.Ops.Procedure;
+import static groovyx.gpars.extra166y.Ops.Reducer;
 
 /**
  * Shared internal execution support for ParallelArray and

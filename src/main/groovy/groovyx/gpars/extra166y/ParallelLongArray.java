@@ -5,9 +5,41 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
-import java.util.*;
+
+import jsr166y.ForkJoinPool;
+
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.RandomAccess;
+
+import static groovyx.gpars.extra166y.Ops.BinaryLongOp;
+import static groovyx.gpars.extra166y.Ops.BinaryLongPredicate;
+import static groovyx.gpars.extra166y.Ops.IntAndLongPredicate;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToDouble;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToLong;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToObject;
+import static groovyx.gpars.extra166y.Ops.IntToLong;
+import static groovyx.gpars.extra166y.Ops.LongAndDoubleToDouble;
+import static groovyx.gpars.extra166y.Ops.LongAndDoubleToLong;
+import static groovyx.gpars.extra166y.Ops.LongAndDoubleToObject;
+import static groovyx.gpars.extra166y.Ops.LongAndLongToDouble;
+import static groovyx.gpars.extra166y.Ops.LongAndLongToObject;
+import static groovyx.gpars.extra166y.Ops.LongAndObjectToDouble;
+import static groovyx.gpars.extra166y.Ops.LongAndObjectToLong;
+import static groovyx.gpars.extra166y.Ops.LongAndObjectToObject;
+import static groovyx.gpars.extra166y.Ops.LongComparator;
+import static groovyx.gpars.extra166y.Ops.LongGenerator;
+import static groovyx.gpars.extra166y.Ops.LongOp;
+import static groovyx.gpars.extra166y.Ops.LongPredicate;
+import static groovyx.gpars.extra166y.Ops.LongProcedure;
+import static groovyx.gpars.extra166y.Ops.LongReducer;
+import static groovyx.gpars.extra166y.Ops.LongToDouble;
+import static groovyx.gpars.extra166y.Ops.LongToObject;
 
 /**
  * An array of longs supporting parallel operations.  This class

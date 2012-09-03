@@ -5,9 +5,28 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
-import java.util.*;
+
+import jsr166y.ForkJoinPool;
+
+import java.util.Comparator;
+
+import static groovyx.gpars.extra166y.Ops.BinaryOp;
+import static groovyx.gpars.extra166y.Ops.IntAndObjectToDouble;
+import static groovyx.gpars.extra166y.Ops.IntAndObjectToLong;
+import static groovyx.gpars.extra166y.Ops.IntAndObjectToObject;
+import static groovyx.gpars.extra166y.Ops.ObjectAndDoubleToDouble;
+import static groovyx.gpars.extra166y.Ops.ObjectAndDoubleToLong;
+import static groovyx.gpars.extra166y.Ops.ObjectAndDoubleToObject;
+import static groovyx.gpars.extra166y.Ops.ObjectAndLongToDouble;
+import static groovyx.gpars.extra166y.Ops.ObjectAndLongToLong;
+import static groovyx.gpars.extra166y.Ops.ObjectAndLongToObject;
+import static groovyx.gpars.extra166y.Ops.ObjectAndObjectToDouble;
+import static groovyx.gpars.extra166y.Ops.ObjectAndObjectToLong;
+import static groovyx.gpars.extra166y.Ops.ObjectToDouble;
+import static groovyx.gpars.extra166y.Ops.ObjectToLong;
+import static groovyx.gpars.extra166y.Ops.Op;
+import static groovyx.gpars.extra166y.Ops.Procedure;
+import static groovyx.gpars.extra166y.Ops.Reducer;
 
 /**
  * A prefix view of ParallelDoubleArray that causes operations to apply

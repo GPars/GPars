@@ -5,8 +5,17 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
+
+import jsr166y.ForkJoinPool;
+
+import static groovyx.gpars.extra166y.Ops.BinaryDoubleOp;
+import static groovyx.gpars.extra166y.Ops.BinaryDoublePredicate;
+import static groovyx.gpars.extra166y.Ops.DoubleGenerator;
+import static groovyx.gpars.extra166y.Ops.DoubleOp;
+import static groovyx.gpars.extra166y.Ops.DoublePredicate;
+import static groovyx.gpars.extra166y.Ops.IntAndDoublePredicate;
+import static groovyx.gpars.extra166y.Ops.IntAndDoubleToDouble;
+import static groovyx.gpars.extra166y.Ops.IntToDouble;
 
 /**
  * A prefix view of ParallelDoubleArray that causes operations to apply

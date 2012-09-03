@@ -5,8 +5,27 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
+
+import jsr166y.ForkJoinPool;
+
+import static groovyx.gpars.extra166y.Ops.BinaryLongOp;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToDouble;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToLong;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToObject;
+import static groovyx.gpars.extra166y.Ops.LongAndDoubleToDouble;
+import static groovyx.gpars.extra166y.Ops.LongAndDoubleToLong;
+import static groovyx.gpars.extra166y.Ops.LongAndDoubleToObject;
+import static groovyx.gpars.extra166y.Ops.LongAndLongToDouble;
+import static groovyx.gpars.extra166y.Ops.LongAndLongToObject;
+import static groovyx.gpars.extra166y.Ops.LongAndObjectToDouble;
+import static groovyx.gpars.extra166y.Ops.LongAndObjectToLong;
+import static groovyx.gpars.extra166y.Ops.LongAndObjectToObject;
+import static groovyx.gpars.extra166y.Ops.LongComparator;
+import static groovyx.gpars.extra166y.Ops.LongOp;
+import static groovyx.gpars.extra166y.Ops.LongProcedure;
+import static groovyx.gpars.extra166y.Ops.LongReducer;
+import static groovyx.gpars.extra166y.Ops.LongToDouble;
+import static groovyx.gpars.extra166y.Ops.LongToObject;
 
 /**
  * A prefix view of ParallelArray that causes operations to apply

@@ -5,8 +5,11 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
+
+import jsr166y.ForkJoinPool;
+
+import static groovyx.gpars.extra166y.Ops.LongComparator;
+import static groovyx.gpars.extra166y.Ops.LongReducer;
 
 /**
  * A prefix view of ParallelLongArray that causes operations to apply

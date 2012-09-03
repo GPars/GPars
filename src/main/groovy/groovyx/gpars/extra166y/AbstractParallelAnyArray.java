@@ -5,15 +5,16 @@
  */
 
 package groovyx.gpars.extra166y;
+
 import jsr166y.ForkJoinPool;
 
-import static groovyx.gpars.extra166y.Ops.*;
-
+import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.lang.reflect.Array;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static groovyx.gpars.extra166y.Ops.*;
 
 /**
  * Abstract class serving as the basis of parallel

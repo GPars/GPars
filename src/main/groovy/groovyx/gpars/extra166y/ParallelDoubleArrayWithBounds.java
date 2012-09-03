@@ -5,8 +5,11 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
+
+import jsr166y.ForkJoinPool;
+
+import static groovyx.gpars.extra166y.Ops.DoubleComparator;
+import static groovyx.gpars.extra166y.Ops.DoubleReducer;
 
 /**
  * A prefix view of ParallelDoubleArray that causes operations to apply

@@ -5,9 +5,36 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
-import java.util.*;
+
+import jsr166y.ThreadLocalRandom;
+
+import java.util.Comparator;
+
+import static groovyx.gpars.extra166y.Ops.BinaryDoublePredicate;
+import static groovyx.gpars.extra166y.Ops.BinaryIntPredicate;
+import static groovyx.gpars.extra166y.Ops.BinaryLongPredicate;
+import static groovyx.gpars.extra166y.Ops.BinaryPredicate;
+import static groovyx.gpars.extra166y.Ops.DoubleComparator;
+import static groovyx.gpars.extra166y.Ops.DoubleGenerator;
+import static groovyx.gpars.extra166y.Ops.DoubleOp;
+import static groovyx.gpars.extra166y.Ops.DoublePredicate;
+import static groovyx.gpars.extra166y.Ops.DoubleReducer;
+import static groovyx.gpars.extra166y.Ops.DoubleToLong;
+import static groovyx.gpars.extra166y.Ops.DoubleToObject;
+import static groovyx.gpars.extra166y.Ops.IntGenerator;
+import static groovyx.gpars.extra166y.Ops.IntReducer;
+import static groovyx.gpars.extra166y.Ops.LongComparator;
+import static groovyx.gpars.extra166y.Ops.LongGenerator;
+import static groovyx.gpars.extra166y.Ops.LongOp;
+import static groovyx.gpars.extra166y.Ops.LongPredicate;
+import static groovyx.gpars.extra166y.Ops.LongReducer;
+import static groovyx.gpars.extra166y.Ops.LongToDouble;
+import static groovyx.gpars.extra166y.Ops.LongToObject;
+import static groovyx.gpars.extra166y.Ops.ObjectToDouble;
+import static groovyx.gpars.extra166y.Ops.ObjectToLong;
+import static groovyx.gpars.extra166y.Ops.Op;
+import static groovyx.gpars.extra166y.Ops.Predicate;
+import static groovyx.gpars.extra166y.Ops.Reducer;
 
 /**
  * A collection of static factory methods providing commonly useful

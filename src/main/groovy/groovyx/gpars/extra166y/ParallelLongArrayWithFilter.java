@@ -5,8 +5,17 @@
  */
 
 package groovyx.gpars.extra166y;
-import jsr166y.*;
-import static groovyx.gpars.extra166y.Ops.*;
+
+import jsr166y.ForkJoinPool;
+
+import static groovyx.gpars.extra166y.Ops.BinaryLongOp;
+import static groovyx.gpars.extra166y.Ops.BinaryLongPredicate;
+import static groovyx.gpars.extra166y.Ops.IntAndLongPredicate;
+import static groovyx.gpars.extra166y.Ops.IntAndLongToLong;
+import static groovyx.gpars.extra166y.Ops.IntToLong;
+import static groovyx.gpars.extra166y.Ops.LongGenerator;
+import static groovyx.gpars.extra166y.Ops.LongOp;
+import static groovyx.gpars.extra166y.Ops.LongPredicate;
 
 
 /**
