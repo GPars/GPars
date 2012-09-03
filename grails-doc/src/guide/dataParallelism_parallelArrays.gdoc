@@ -1,5 +1,5 @@
 As an alternative, the efficient tree-based data structures defines in JSR-166y can be used directly. The _parallelArray_
-property on any collection or object will return a _jsr166y.forkjoin.ParallelArray_ instance holding the elements of the original collection,
+property on any collection or object will return a _ParallelArray_ instance holding the elements of the original collection,
 which then can be manipulated through the jsr166y API. Please refer to the jsr166y documentation for the API details.
 
 {code}

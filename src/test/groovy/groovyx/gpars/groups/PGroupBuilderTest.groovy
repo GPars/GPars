@@ -22,7 +22,7 @@ import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.Pool
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import jsr166y.ForkJoinPool
+import java.util.concurrent.ForkJoinPool
 
 class PGroupBuilderTest extends GroovyTestCase {
     public void testCreationFromPool() {

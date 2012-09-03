@@ -6,7 +6,7 @@
 
 package groovyx.gpars.extra166y;
 
-import jsr166y.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ import static groovyx.gpars.extra166y.Ops.LongToObject;
  * Here is a complete (although naive) prime filter program:
  * <pre>
  * import java.math.BigInteger;
- * import jsr166y.*;
+ * import java.util.concurrent.*;
  * import static groovyx.gpars.extra166y.Ops.*;
  * import static groovyx.gpars.extra166y.ParallelLongArray.*;
  *

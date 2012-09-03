@@ -17,7 +17,7 @@
 package groovyx.gpars.scheduler;
 
 import groovyx.gpars.util.PoolUtils;
-import jsr166y.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool;
 
 import java.util.concurrent.TimeUnit;
 

@@ -6,7 +6,7 @@
 
 package groovyx.gpars.extra166y;
 
-import jsr166y.ThreadLocalRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 import java.util.Comparator;
 

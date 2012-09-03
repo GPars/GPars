@@ -17,7 +17,7 @@
 package groovyx.gpars
 
 import java.lang.Thread.UncaughtExceptionHandler
-import jsr166y.ForkJoinPool
+import java.util.concurrent.ForkJoinPool
 import static groovyx.gpars.GParsPool.withExistingPool
 import static groovyx.gpars.GParsPool.withPool
 

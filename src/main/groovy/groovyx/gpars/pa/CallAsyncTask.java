@@ -17,7 +17,7 @@
 package groovyx.gpars.pa;
 
 import groovy.lang.Closure;
-import jsr166y.RecursiveTask;
+import java.util.concurrent.RecursiveTask;
 
 /**
  * A helper class to wrap closures for callAsync on GParsPool

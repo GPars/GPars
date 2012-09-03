@@ -16,7 +16,7 @@
 
 package groovyx.gpars.forkjoin;
 
-import jsr166y.RecursiveTask;
+import java.util.concurrent.RecursiveTask;
 
 import java.util.ArrayList;
 import java.util.Arrays;

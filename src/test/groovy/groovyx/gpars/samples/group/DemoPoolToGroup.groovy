@@ -21,7 +21,7 @@ import groovyx.gpars.GParsPool
 import groovyx.gpars.group.PGroup
 import groovyx.gpars.group.PGroupBuilder
 import java.util.concurrent.ExecutorService
-import jsr166y.ForkJoinPool
+import java.util.concurrent.ForkJoinPool
 
 /**
  * Demonstrates how to use existing thread pool to build an instance of PGroup and then retrieve the pool back from the group.

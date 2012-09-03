@@ -52,7 +52,7 @@ In order to allow cancellation, the asynchronously running code must keep checki
 
 h3. Executor Service enhancements
 
-The ExecutorService and jsr166y.forkjoin.ForkJoinPool class is enhanced with the << (leftShift) operator to submit tasks to the pool and return
+The ExecutorService and ForkJoinPool class is enhanced with the << (leftShift) operator to submit tasks to the pool and return
 a _Future_ for the result.
 
 Example:

@@ -16,9 +16,9 @@
 
 package groovyx.gpars;
 
-import groovyx.gpars.extra166y.Ops;
 import groovy.lang.Closure;
 import groovy.time.Duration;
+import groovyx.gpars.extra166y.Ops;
 import groovyx.gpars.extra166y.ParallelArray;
 import groovyx.gpars.memoize.LRUProtectionStorage;
 import groovyx.gpars.pa.CallAsyncTask;
@@ -33,8 +33,6 @@ import groovyx.gpars.pa.SumClosure;
 import groovyx.gpars.scheduler.FJPool;
 import groovyx.gpars.util.GeneralTimer;
 import groovyx.gpars.util.PAUtils;
-import jsr166y.ForkJoinPool;
-import jsr166y.RecursiveTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+import java.util.concurrent.RecursiveTask;
 
 import static groovyx.gpars.util.PAGroovyUtils.createCollection;
 import static groovyx.gpars.util.PAUtils.buildClosureForMaps;

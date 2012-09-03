@@ -6,7 +6,7 @@
 
 package groovyx.gpars.extra166y;
 
-import jsr166y.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
