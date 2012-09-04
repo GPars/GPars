@@ -48,10 +48,16 @@ public abstract class DataflowProcessor {
     public static final String INPUTS = "inputs";
     public static final String OUTPUTS = "outputs";
     public static final String MAX_FORKS = "maxForks";
+    public static final String STATE_OBJECT = "stateObject";
     /**
      * The internal actor performing on behalf of the processor
      */
     protected DataflowProcessorActor actor;
+
+    /**
+     * May hold custom state provided at construction time and read within the body
+     */
+    protected final Object stateObject;
 
     private List<Closure> errorHandlers;
 
@@ -66,10 +72,12 @@ public abstract class DataflowProcessor {
         //noinspection ThisEscapedInObjectConstruction
         code.setDelegate(this);
 
+        stateObject = extractState(channels);
         if (channels == null) return;
         final Collection inputs = (Collection) channels.get(INPUTS);
-        if (inputs == null || inputs.isEmpty())
+        if (inputs == null || inputs.isEmpty()) {
             throw new IllegalArgumentException("The processor body must take some inputs. The provided list of input channels is empty.");
+        }
     }
 
     static boolean shouldBeMultiThreaded(final Map<String, Object> channels) {
@@ -86,6 +94,11 @@ public abstract class DataflowProcessor {
         final List<DataflowWriteChannel> outputs = (List<DataflowWriteChannel>) channels.get(OUTPUTS);
         if (outputs != null) return Collections.unmodifiableList(outputs);
         return null;
+    }
+
+    static Object extractState(final Map<String, Object> channels) {
+        if (channels==null) return null;
+        return channels.get(STATE_OBJECT);
     }
 
     protected static void checkMaxForks(final Map channels) {
@@ -244,6 +257,14 @@ public abstract class DataflowProcessor {
     public final DataflowWriteChannel getOutput() {
         if (actor.outputs.isEmpty()) return null;
         return (DataflowWriteChannel) actor.outputs.get(0);
+    }
+
+    /**
+     * Retrieves the custom state object
+     * @return The state object associated with the operator
+     */
+    public final Object getStateObject() {
+        return stateObject;
     }
 
     /**

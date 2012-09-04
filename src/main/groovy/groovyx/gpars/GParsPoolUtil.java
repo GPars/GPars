@@ -39,6 +39,7 @@ import jsr166y.RecursiveTask;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
@@ -1025,7 +1026,7 @@ public class GParsPoolUtil {
      * GParsPool.withPool {*     assert ([1, 2, 3, 4, 5].groupByParallel {Number number -> number % 2}).size() == 2
      * }* </pre>
      */
-    public static <K> Map<K, Object> groupByParallel(final Object collection, final Closure<K> cl) {
+    public static <K> Map<K, List<Object>> groupByParallel(final Object collection, final Closure<K> cl) {
         return groupByParallelPA(GParsPoolUtilHelper.createPA(collection, retrievePool()), cl);
     }
 
@@ -1051,7 +1052,7 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T minParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min(createComparator(cl));
+        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).min((Comparator<T>)createComparator(cl));
     }
 
     /**
@@ -1109,7 +1110,7 @@ public class GParsPoolUtil {
      */
     @SuppressWarnings("GroovyAssignabilityCheck")
     public static <T> T maxParallel(final Collection<T> collection, final Closure cl) {
-        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max(createComparator(cl));
+        return GParsPoolUtilHelper.createPAFromCollection(collection, retrievePool()).max((Comparator<T>)createComparator(cl));
     }
 
     /**
