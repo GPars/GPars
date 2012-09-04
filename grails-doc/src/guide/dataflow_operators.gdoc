@@ -122,7 +122,7 @@ otherwise your applications will not exit.
 
 h3. Constructing operators
 
-The construction properties of an operator, such as _inputs_, _outputs_ or _maxForks_ cannot be modified once the operator has been build.
+The construction properties of an operator, such as _inputs_, _outputs_, _stateObject_ or _maxForks_ cannot be modified once the operator has been build.
 You may find the _groovyx.gpars.dataflow.ProcessingNode_ class helpful when gradually collecting channels and values into lists
 before you finally build an operator.
 
@@ -158,6 +158,27 @@ bValues << 2
 
 assert [11, 22] == (1..2).collect {
     results.val
+}
+{code}
+
+h3. State in operators
+
+Although operators can frequently do without keeping state between subsequent invocations, GPars allows operators to maintain state,
+if desired by the developer. One obvious way is to leverage the Groovy closure capabilities to close-over their context:
+
+{code}
+int counter = 0
+operator(inputs: [a], outputs: [b]) {value ->
+    counter += 1
+}
+{code}
+
+Another way, which allows you to avoid declaring the state object outside of the operator definition, is to pass the state object
+into the operator as a _stateObject_ parameter at construction time:
+
+{code}
+operator(inputs: [a], outputs: [b], stateObject: [counter: 0]) {value ->
+    stateObject.counter += 1
 }
 {code}
 
