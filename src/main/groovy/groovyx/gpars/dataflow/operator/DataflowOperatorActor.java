@@ -79,7 +79,8 @@ class DataflowOperatorActor extends DataflowProcessorActor {
 
         if (isControlMessage(result)) {
             result = fireMessageArrived(result, (Integer) attachment, true);
-            if (checkPoison(result)) return;
+            checkPoison(result);
+            if (isControlMessage(result)) return;
         }
 
         final Object verifiedValue = fireMessageArrived(result, (Integer) attachment, false);

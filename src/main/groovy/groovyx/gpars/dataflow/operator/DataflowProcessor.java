@@ -21,7 +21,6 @@ import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.group.PGroup;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -62,9 +61,7 @@ public abstract class DataflowProcessor {
      */
     protected final Object stateObject;
 
-    private final CopyOnWriteArrayList<DataflowEventListener> listeners = new CopyOnWriteArrayList<DataflowEventListener>();
-
-    private List<Closure> errorHandlers;
+    private final Collection<DataflowEventListener> listeners = new CopyOnWriteArrayList<DataflowEventListener>();
 
     /**
      * Creates a processor
@@ -292,16 +289,6 @@ public abstract class DataflowProcessor {
         if (fireOnException(e)) {
             terminate();
         }
-
-        //todo remove
-        if (errorHandlers == null || errorHandlers.isEmpty()) {
-            System.err.println("The dataflow processor experienced an exception and is about to terminate. " + e);
-        } else {
-            for (final Closure errorHandler : errorHandlers) {
-                errorHandler.call(e);
-            }
-        }
-        terminate();
     }
 
     public final void addDataflowEventListener(final DataflowEventListener listener) {
@@ -374,18 +361,5 @@ public abstract class DataflowProcessor {
         for (final DataflowEventListener listener : listeners) {
             listener.afterRun(this, messages);
         }
-    }
-
-    /**
-     * Registers a new error handler closure that will be invoked once the operator detects an error
-     *
-     * @param handler A one-argument closure, expecting an exception (a Throwable instance) as a parameter
-     */
-    public final synchronized void addErrorHandler(final Closure handler) {
-        if (handler == null) throw new IllegalArgumentException("Error handler must not be null.");
-        if (errorHandlers == null) errorHandlers = new ArrayList<Closure>();
-        handler.setDelegate(this);
-        handler.setResolveStrategy(Closure.DELEGATE_FIRST);
-        errorHandlers.add(handler);
     }
 }

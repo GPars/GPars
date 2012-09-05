@@ -85,7 +85,7 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
     }
 
     static boolean isControlMessage(final Object message) {
-        return message instanceof PoisonPill;
+        return message instanceof ControlMessage;
     }
 
     /**

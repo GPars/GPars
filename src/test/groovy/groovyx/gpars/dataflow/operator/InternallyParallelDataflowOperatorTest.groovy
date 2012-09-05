@@ -22,6 +22,7 @@ import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
+
 import java.util.concurrent.CyclicBarrier
 
 /**
@@ -179,12 +180,16 @@ public class InternallyParallelDataflowOperatorTest extends GroovyTestCase {
         final DataflowQueue stream = new DataflowQueue()
         final DataflowVariable a = new DataflowVariable()
 
-        def op = group.operator(inputs: [stream], outputs: [], maxFork: 3) {
-            throw new RuntimeException('test')
+        final listener = new DataflowEventAdapter() {
+            @Override
+            boolean onException(final DataflowProcessor processor, final Throwable e) {
+                a << e
+                true
+            }
         }
-        op.addErrorHandler {Throwable e ->
-            a << e
-            terminate()
+
+        def op = group.operator(inputs: [stream], outputs: [], maxFork: 3, listeners: [listener]) {
+            throw new RuntimeException('test')
         }
         stream << 'value'
         assert a.val instanceof RuntimeException

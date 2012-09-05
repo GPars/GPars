@@ -86,31 +86,31 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         a << 10
         b << 20
         assert 30 == c.val
-        assert listener1.events[0].startsWith("afterStart")
-        assert listener2.events[0].startsWith("afterStart")
-        assert 1 == listener1.countEventsThatStartWith("afterStart")
-        assert 1 == listener2.countEventsThatStartWith("afterStart")
-        assert 0 == listener1.countEventsThatStartWith("afterStop")
-        assert 0 == listener2.countEventsThatStartWith("afterStop")
+        assert listener1.events[0].startsWith('afterStart')
+        assert listener2.events[0].startsWith('afterStart')
+        assert 1 == listener1.countEventsThatStartWith('afterStart')
+        assert 1 == listener2.countEventsThatStartWith('afterStart')
+        assert 0 == listener1.countEventsThatStartWith('afterStop')
+        assert 0 == listener2.countEventsThatStartWith('afterStop')
 
         a << 1
         b << 2
         assert 3 == c.val
-        assert listener1.events[0].startsWith("afterStart")
-        assert listener2.events[0].startsWith("afterStart")
-        assert 1 == listener1.countEventsThatStartWith("afterStart")
-        assert 1 == listener2.countEventsThatStartWith("afterStart")
-        assert 0 == listener1.countEventsThatStartWith("afterStop")
-        assert 0 == listener2.countEventsThatStartWith("afterStop")
+        assert listener1.events[0].startsWith('afterStart')
+        assert listener2.events[0].startsWith('afterStart')
+        assert 1 == listener1.countEventsThatStartWith('afterStart')
+        assert 1 == listener2.countEventsThatStartWith('afterStart')
+        assert 0 == listener1.countEventsThatStartWith('afterStop')
+        assert 0 == listener2.countEventsThatStartWith('afterStop')
 
         op.terminate()
         op.join()
-        assert listener1.events.last().startsWith("afterStop")
-        assert listener2.events.last().startsWith("afterStop")
-        assert 1 == listener1.countEventsThatStartWith("afterStart")
-        assert 1 == listener2.countEventsThatStartWith("afterStart")
-        assert 1 == listener1.countEventsThatStartWith("afterStop")
-        assert 1 == listener2.countEventsThatStartWith("afterStop")
+        assert listener1.events.last().startsWith('afterStop')
+        assert listener2.events.last().startsWith('afterStop')
+        assert 1 == listener1.countEventsThatStartWith('afterStart')
+        assert 1 == listener2.countEventsThatStartWith('afterStart')
+        assert 1 == listener1.countEventsThatStartWith('afterStop')
+        assert 1 == listener2.countEventsThatStartWith('afterStop')
     }
 
     public void testOperatorMessages() {
@@ -124,14 +124,14 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         a << 10
         b << 20
         assert 30 == c.val
-        assert 2 == listener1.countEventsThatStartWith("messageArrived")
-        assert 2 == listener2.countEventsThatStartWith("messageArrived")
-        assert 1 == listener1.countEventsThatStartWith("beforeRun")
-        assert 1 == listener2.countEventsThatStartWith("beforeRun")
-        assert 1 == listener1.countEventsThatStartWith("messageSentOut")
-        assert 1 == listener2.countEventsThatStartWith("messageSentOut")
-        assert 1 == listener1.countEventsThatStartWith("afterRun")
-        assert 1 == listener2.countEventsThatStartWith("afterRun")
+        assert 2 == listener1.countEventsThatStartWith('messageArrived')
+        assert 2 == listener2.countEventsThatStartWith('messageArrived')
+        assert 1 == listener1.countEventsThatStartWith('beforeRun')
+        assert 1 == listener2.countEventsThatStartWith('beforeRun')
+        assert 1 == listener1.countEventsThatStartWith('messageSentOut')
+        assert 1 == listener2.countEventsThatStartWith('messageSentOut')
+        assert 1 == listener1.countEventsThatStartWith('afterRun')
+        assert 1 == listener2.countEventsThatStartWith('afterRun')
 
         final arrived1 = listener1.retrieveEvents {it.startsWith 'messageArrived'}
         assert 'messageArrived 10' == arrived1.first()
@@ -162,14 +162,14 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         assert 10 == c.val
         b << 20
         assert 20 == c.val
-        assert 2 == listener1.countEventsThatStartWith("messageArrived")
-        assert 2 == listener2.countEventsThatStartWith("messageArrived")
-        assert 2 == listener1.countEventsThatStartWith("beforeRun")
-        assert 2 == listener2.countEventsThatStartWith("beforeRun")
-        assert 2 == listener1.countEventsThatStartWith("messageSentOut")
-        assert 2 == listener2.countEventsThatStartWith("messageSentOut")
-        assert 2 == listener1.countEventsThatStartWith("afterRun")
-        assert 2 == listener2.countEventsThatStartWith("afterRun")
+        assert 2 == listener1.countEventsThatStartWith('messageArrived')
+        assert 2 == listener2.countEventsThatStartWith('messageArrived')
+        assert 2 == listener1.countEventsThatStartWith('beforeRun')
+        assert 2 == listener2.countEventsThatStartWith('beforeRun')
+        assert 2 == listener1.countEventsThatStartWith('messageSentOut')
+        assert 2 == listener2.countEventsThatStartWith('messageSentOut')
+        assert 2 == listener1.countEventsThatStartWith('afterRun')
+        assert 2 == listener2.countEventsThatStartWith('afterRun')
 
         final arrived1 = listener1.retrieveEvents {it.startsWith 'messageArrived'}
         assert 'messageArrived 10' == arrived1.first()
@@ -190,16 +190,16 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
 
         a << PoisonPill.instance
         assert PoisonPill.instance == c.val
-        assert 1 == listener1.countEventsThatStartWith("controlMessageArrived")
-        assert 1 == listener2.countEventsThatStartWith("controlMessageArrived")
-        assert 0 == listener1.countEventsThatStartWith("messageArrived")
-        assert 0 == listener2.countEventsThatStartWith("messageArrived")
-        assert 0 == listener1.countEventsThatStartWith("beforeRun")
-        assert 0 == listener2.countEventsThatStartWith("beforeRun")
-        assert 1 == listener1.countEventsThatStartWith("messageSentOut")
-        assert 1 == listener2.countEventsThatStartWith("messageSentOut")
-        assert 0 == listener1.countEventsThatStartWith("afterRun")
-        assert 0 == listener2.countEventsThatStartWith("afterRun")
+        assert 1 == listener1.countEventsThatStartWith('controlMessageArrived')
+        assert 1 == listener2.countEventsThatStartWith('controlMessageArrived')
+        assert 0 == listener1.countEventsThatStartWith('messageArrived')
+        assert 0 == listener2.countEventsThatStartWith('messageArrived')
+        assert 0 == listener1.countEventsThatStartWith('beforeRun')
+        assert 0 == listener2.countEventsThatStartWith('beforeRun')
+        assert 1 == listener1.countEventsThatStartWith('messageSentOut')
+        assert 1 == listener2.countEventsThatStartWith('messageSentOut')
+        assert 0 == listener1.countEventsThatStartWith('afterRun')
+        assert 0 == listener2.countEventsThatStartWith('afterRun')
 
         op.terminate()
     }
@@ -214,16 +214,16 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
 
         a << PoisonPill.instance
         assert PoisonPill.instance == c.val
-        assert 1 == listener1.countEventsThatStartWith("controlMessageArrived")
-        assert 1 == listener2.countEventsThatStartWith("controlMessageArrived")
-        assert 0 == listener1.countEventsThatStartWith("messageArrived")
-        assert 0 == listener2.countEventsThatStartWith("messageArrived")
-        assert 0 == listener1.countEventsThatStartWith("beforeRun")
-        assert 0 == listener2.countEventsThatStartWith("beforeRun")
-        assert 1 == listener1.countEventsThatStartWith("messageSentOut")
-        assert 1 == listener2.countEventsThatStartWith("messageSentOut")
-        assert 0 == listener1.countEventsThatStartWith("afterRun")
-        assert 0 == listener2.countEventsThatStartWith("afterRun")
+        assert 1 == listener1.countEventsThatStartWith('controlMessageArrived')
+        assert 1 == listener2.countEventsThatStartWith('controlMessageArrived')
+        assert 0 == listener1.countEventsThatStartWith('messageArrived')
+        assert 0 == listener2.countEventsThatStartWith('messageArrived')
+        assert 0 == listener1.countEventsThatStartWith('beforeRun')
+        assert 0 == listener2.countEventsThatStartWith('beforeRun')
+        assert 1 == listener1.countEventsThatStartWith('messageSentOut')
+        assert 1 == listener2.countEventsThatStartWith('messageSentOut')
+        assert 0 == listener1.countEventsThatStartWith('afterRun')
+        assert 0 == listener2.countEventsThatStartWith('afterRun')
 
         op.terminate()
     }
@@ -241,52 +241,52 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
 
         @Override
         void afterStart(final DataflowProcessor processor) {
-            events << "afterStart"
+            events << 'afterStart'
         }
 
         @Override
         void afterStop(final DataflowProcessor processor) {
-            events << "afterStop"
+            events << 'afterStop'
         }
 
         @Override
         boolean onException(final DataflowProcessor processor, final Throwable e) {
-            events << "onException"
+            events << 'onException'
             false
         }
 
         @Override
         Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
-            events << "messageArrived $message"
+            events << 'messageArrived ' + String.valueOf(message)
             message
         }
 
         @Override
         Object controlMessageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
-            events << "controlMessageArrived $message"
+            events << 'controlMessageArrived ' + String.valueOf(message)
             return message
         }
 
         @Override
         Object messageSentOut(final DataflowProcessor processor, final DataflowWriteChannel<Object> channel, final int index, final Object message) {
-            events << "messageSentOut $message"
+            events << 'messageSentOut ' + String.valueOf(message)
             return message
         }
 
         @Override
         List<Object> beforeRun(final DataflowProcessor processor, final List<Object> messages) {
-            events << "beforeRun"
+            events << 'beforeRun'
             return messages
         }
 
         @Override
         void afterRun(final DataflowProcessor processor, final List<Object> messages) {
-            events << "afterRun"
+            events << 'afterRun'
         }
 
         @Override
         void customEvent(final DataflowProcessor processor, final Object data) {
-            events << "customEvent:" + data
+            events << 'customEvent:' + data
         }
     }
 }

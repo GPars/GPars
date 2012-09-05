@@ -79,10 +79,68 @@ public class DataflowProcessorEventExceptionTest extends GroovyTestCase {
 
         a << 1
         b << 2
-        assert 3 == c.val
+
+        a << 100
+        b << 200
+        assert 300 == c.val
 
         op.terminate()
     }
+
+    public void testErrorTerminatingListener() {
+        final d = new DataflowQueue<Throwable>()
+        final listener1 = new DataflowEventAdapter() {
+            @Override
+            boolean onException(final DataflowProcessor processor, final Throwable e) {
+                d << e
+//                processor.bindAllOutputs(e)
+                return true
+            }
+        }
+        def op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener1]) {x, y ->
+            if (x == 1) throw new IllegalArgumentException('test')
+            bindOutput x + y
+        }
+
+        a << 10
+        b << 20
+        assert 30 == c.val
+
+        a << 1
+        b << 2
+        sleep 500
+        assert !c.bound
+        op.join()
+
+        assert d.val instanceof IllegalArgumentException
+    }
+
+    public void testErrorTerminatingListenerWithBind() {
+        final listener1 = new DataflowEventAdapter() {
+            @Override
+            boolean onException(final DataflowProcessor processor, final Throwable e) {
+                processor.bindAllOutputs(e)
+                return true
+            }
+        }
+        def op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener1]) {x, y ->
+            if (x == 1) throw new IllegalArgumentException('test')
+            bindOutput x + y
+        }
+
+        a << 10
+        b << 20
+        assert 30 == c.val
+
+        a << 1
+        b << 2
+        assert c.val instanceof IllegalArgumentException
+        op.join()
+    }
+
+    //todo fix
+    //todo rewriting values
+    //todo control exceptions
 
     class ExceptionTestListener extends DataflowEventAdapter {
         volatile CopyOnWriteArrayList<String> events = []

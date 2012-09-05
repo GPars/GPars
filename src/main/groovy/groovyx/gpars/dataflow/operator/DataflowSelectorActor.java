@@ -59,7 +59,8 @@ class DataflowSelectorActor extends DataflowProcessorActor {
 
         if (isControlMessage(value)) {
             value = fireMessageArrived(value, index, true);
-            if (checkPoison(value)) return;
+            checkPoison(value);
+            if (isControlMessage(value)) return;
         }
 
         final Object verifiedValue = fireMessageArrived(value, index, false);
