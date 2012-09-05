@@ -74,12 +74,12 @@ class DataflowOperatorActor extends DataflowProcessorActor {
             return;
         }
         final Map msg = (Map) message;
-        final Object result = msg.get("result");
+        Object result = msg.get("result");
         final Object attachment = msg.get("attachment");
 
         if (isControlMessage(result)) {
-            final Object controlMessage = fireMessageArrived(result, (Integer) attachment, true);
-            if (checkPoison(controlMessage)) return;
+            result = fireMessageArrived(result, (Integer) attachment, true);
+            if (checkPoison(result)) return;
         }
 
         final Object verifiedValue = fireMessageArrived(result, (Integer) attachment, false);

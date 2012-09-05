@@ -228,68 +228,65 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         op.terminate()
     }
 
-    //todo value rewrite
-    //todo exceptions - empty listeners
-}
+    class TestListener implements DataflowEventListener {
+        volatile CopyOnWriteArrayList<String> events = []
 
-class TestListener implements DataflowEventListener {
-    volatile CopyOnWriteArrayList<String> events = []
+        List<String> retrieveEvents(Closure filter) {
+            events.findAll filter
+        }
 
-    List<String> retrieveEvents(Closure filter) {
-        events.findAll filter
-    }
+        int countEventsThatStartWith(String filter) {
+            retrieveEvents {it.startsWith(filter)}.size()
+        }
 
-    int countEventsThatStartWith(String filter) {
-        retrieveEvents {it.startsWith(filter)}.size()
-    }
+        @Override
+        void afterStart(final DataflowProcessor processor) {
+            events << "afterStart"
+        }
 
-    @Override
-    void afterStart(final DataflowProcessor processor) {
-        events << "afterStart"
-    }
+        @Override
+        void afterStop(final DataflowProcessor processor) {
+            events << "afterStop"
+        }
 
-    @Override
-    void afterStop(final DataflowProcessor processor) {
-        events << "afterStop"
-    }
+        @Override
+        boolean onException(final DataflowProcessor processor, final Throwable e) {
+            events << "onException"
+            false
+        }
 
-    @Override
-    boolean onException(final DataflowProcessor processor, final Throwable e) {
-        events << "onException"
-        false
-    }
+        @Override
+        Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
+            events << "messageArrived $message"
+            message
+        }
 
-    @Override
-    Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
-        events << "messageArrived $message"
-        message
-    }
+        @Override
+        Object controlMessageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
+            events << "controlMessageArrived $message"
+            return message
+        }
 
-    @Override
-    Object controlMessageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
-        events << "controlMessageArrived $message"
-        return message
-    }
+        @Override
+        Object messageSentOut(final DataflowProcessor processor, final DataflowWriteChannel<Object> channel, final int index, final Object message) {
+            events << "messageSentOut $message"
+            return message
+        }
 
-    @Override
-    Object messageSentOut(final DataflowProcessor processor, final DataflowWriteChannel<Object> channel, final int index, final Object message) {
-        events << "messageSentOut $message"
-        return message
-    }
+        @Override
+        List<Object> beforeRun(final DataflowProcessor processor, final List<Object> messages) {
+            events << "beforeRun"
+            return messages
+        }
 
-    @Override
-    List<Object> beforeRun(final DataflowProcessor processor, final List<Object> messages) {
-        events << "beforeRun"
-        return messages
-    }
+        @Override
+        void afterRun(final DataflowProcessor processor, final List<Object> messages) {
+            events << "afterRun"
+        }
 
-    @Override
-    void afterRun(final DataflowProcessor processor, final List<Object> messages) {
-        events << "afterRun"
-    }
-
-    @Override
-    void customEvent(final DataflowProcessor processor, final Object data) {
-        events << "customEvent:" + data
+        @Override
+        void customEvent(final DataflowProcessor processor, final Object data) {
+            events << "customEvent:" + data
+        }
     }
 }

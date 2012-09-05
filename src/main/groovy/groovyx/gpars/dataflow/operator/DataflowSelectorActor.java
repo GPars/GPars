@@ -55,11 +55,11 @@ class DataflowSelectorActor extends DataflowProcessorActor {
         }
         final SelectResult msg = (SelectResult) message;
         final int index = msg.getIndex();
-        final Object value = msg.getValue();
+        Object value = msg.getValue();
 
         if (isControlMessage(value)) {
-            final Object controlMessage = fireMessageArrived(value, index, true);
-            if (checkPoison(controlMessage)) return;
+            value = fireMessageArrived(value, index, true);
+            if (checkPoison(value)) return;
         }
 
         final Object verifiedValue = fireMessageArrived(value, index, false);
