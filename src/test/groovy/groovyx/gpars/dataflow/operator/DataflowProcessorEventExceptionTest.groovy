@@ -17,6 +17,8 @@
 package groovyx.gpars.dataflow.operator
 
 import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowReadChannel
+import groovyx.gpars.dataflow.DataflowWriteChannel
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 
@@ -138,9 +140,69 @@ public class DataflowProcessorEventExceptionTest extends GroovyTestCase {
         op.join()
     }
 
-    //todo fix
-    //todo rewriting values
-    //todo control exceptions
+    public void testExceptionInMessageArrivedOutsideOperatorBody() {
+        final exceptions = new DataflowQueue<Object>()
+
+        final listener1 = new DataflowEventAdapter() {
+            @Override
+            Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
+                if (message == 1) throw new IllegalArgumentException('test')
+                message
+            }
+
+            @Override
+            boolean onException(final DataflowProcessor processor, final Throwable e) {
+                exceptions << e
+                return false
+            }
+        }
+        def op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener1]) {x, y ->
+            bindOutput x + y
+        }
+
+        a << 10
+        b << 20
+        assert 30 == c.val
+
+        a << 1
+        assert exceptions.val instanceof IllegalArgumentException
+        op.join()
+    }
+
+    public void testExceptionInMessageSentOutOutsideOperatorBody() {
+        final exceptions = new DataflowQueue<Object>()
+
+        final listener1 = new DataflowEventAdapter() {
+            @Override
+            Object messageSentOut(final DataflowProcessor processor, final DataflowWriteChannel<Object> channel, final int index, final Object message) {
+                if (message == 1) throw new IllegalStateException('test')
+                message
+            }
+
+            @Override
+            boolean onException(final DataflowProcessor processor, final Throwable e) {
+                exceptions << e
+                return false
+            }
+        }
+        def op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener1]) {x, y ->
+            bindOutput x + y
+        }
+
+        a << 10
+        b << 20
+        assert 30 == c.val
+
+        a << 0
+        b << 1
+        assert exceptions.val instanceof IllegalStateException
+
+        a << 100
+        b << 200
+        assert 300 == c.val
+        op.terminate()
+    }
+
 
     class ExceptionTestListener extends DataflowEventAdapter {
         volatile CopyOnWriteArrayList<String> events = []

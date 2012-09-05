@@ -58,6 +58,11 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
         owningProcessor.fireAfterStop();
     }
 
+    final void onException(final Throwable e) {
+        reportException(e);
+        terminate();
+    }
+
     /**
      * Sends the message, ignoring exceptions caused by the actor not being active anymore
      *
@@ -95,14 +100,12 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
      * @param data The poisson to re-send
      * @return True, if poisson has been received
      */
-    final boolean checkPoison(final Object data) {
+    final void checkPoison(final Object data) {
         if (data instanceof PoisonPill) {
             owningProcessor.bindAllOutputsAtomically(data);
             owningProcessor.terminate();
             ((PoisonPill) data).countDown();
-            return true;
         }
-        return false;
     }
 
     final void reportException(final Throwable e) {
