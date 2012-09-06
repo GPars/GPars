@@ -283,7 +283,7 @@ public abstract class DataflowProcessor {
     @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
     final synchronized void reportError(final Throwable e) {
         if (listeners.isEmpty()) {
-            System.err.println("The dataflow processor experienced an exception and is about to terminate. " + e);
+            System.err.println("The dataflow processor experienced an unhandled exception and is about to terminate. " + e);
             terminate();
         }
         if (fireOnException(e)) {
