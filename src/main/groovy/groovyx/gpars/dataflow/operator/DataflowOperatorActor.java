@@ -45,8 +45,10 @@ class DataflowOperatorActor extends DataflowProcessorActor {
         super(owningOperator, group, outputs, inputs, code);
     }
 
+    @Override
     @SuppressWarnings({"UnusedDeclaration"})
     final void afterStart() {
+        super.afterStart();
         queryInputs(true);
     }
 
@@ -72,10 +74,18 @@ class DataflowOperatorActor extends DataflowProcessorActor {
             return;
         }
         final Map msg = (Map) message;
-        final Object result = msg.get("result");
+        Object result = msg.get("result");
         final Object attachment = msg.get("attachment");
-        if (checkPoison(result)) return;
-        values.put(attachment, result);
+
+        if (isControlMessage(result)) {
+            result = fireMessageArrived(result, (Integer) attachment, true);
+            checkPoison(result);
+            if (isControlMessage(result)) return;
+        }
+
+        final Object verifiedValue = fireMessageArrived(result, (Integer) attachment, false);
+
+        values.put(attachment, verifiedValue);
         if (values.size() > inputs.size())
             throw new IllegalStateException("The DataflowOperatorActor is in an inconsistent state. values.size()=" + values.size() + ", inputs.size()=" + inputs.size());
         if (values.size() == inputs.size()) {
@@ -91,7 +101,10 @@ class DataflowOperatorActor extends DataflowProcessorActor {
             for (final Map.Entry entry : arrivedMessages) {
                 arrivedValues.add(entry.getValue());
             }
-            startTask(arrivedValues);
+
+            final List<Object> verifiedValues = owningProcessor.fireBeforeRun(arrivedValues);
+
+            startTask(verifiedValues);
             values = new HashMap(values.size());
             if (stoppingGently) {
                 stop();
@@ -101,11 +114,13 @@ class DataflowOperatorActor extends DataflowProcessorActor {
     }
 
     @SuppressWarnings({"CatchGenericClass"})
-    void startTask(final List results) {
+    void startTask(final List<Object> results) {
         try {
             code.call(results.toArray(new Object[results.size()]));
         } catch (Throwable e) {
             reportException(e);
+        } finally {
+            owningProcessor.fireAfterRun(results);
         }
     }
 }

@@ -21,11 +21,11 @@ import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.group.PGroup;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Dataflow selectors and operators (processors) form the basic units in dataflow networks. They are typically combined into oriented graphs that transform data.
@@ -49,6 +49,8 @@ public abstract class DataflowProcessor {
     public static final String OUTPUTS = "outputs";
     public static final String MAX_FORKS = "maxForks";
     public static final String STATE_OBJECT = "stateObject";
+    private static final String LISTENERS = "listeners";
+
     /**
      * The internal actor performing on behalf of the processor
      */
@@ -59,7 +61,7 @@ public abstract class DataflowProcessor {
      */
     protected final Object stateObject;
 
-    private List<Closure> errorHandlers;
+    private final Collection<DataflowEventListener> listeners = new CopyOnWriteArrayList<DataflowEventListener>();
 
     /**
      * Creates a processor
@@ -73,6 +75,7 @@ public abstract class DataflowProcessor {
         code.setDelegate(this);
 
         stateObject = extractState(channels);
+        listeners.addAll(extractListeners(channels));
         if (channels == null) return;
         final Collection inputs = (Collection) channels.get(INPUTS);
         if (inputs == null || inputs.isEmpty()) {
@@ -96,9 +99,15 @@ public abstract class DataflowProcessor {
         return null;
     }
 
-    static Object extractState(final Map<String, Object> channels) {
-        if (channels==null) return null;
+    private static Object extractState(final Map<String, Object> channels) {
+        if (channels == null) return null;
         return channels.get(STATE_OBJECT);
+    }
+
+    private static Collection<DataflowEventListener> extractListeners(final Map<String, Object> channels) {
+        if (channels == null) return null;
+        final Collection<DataflowEventListener> listeners = (Collection<DataflowEventListener>) channels.get(LISTENERS);
+        return listeners != null ? listeners : Collections.<DataflowEventListener>emptyList();
     }
 
     protected static void checkMaxForks(final Map channels) {
@@ -159,7 +168,8 @@ public abstract class DataflowProcessor {
      * @param value The value to bind
      */
     public final void bindOutput(final int idx, final Object value) {
-        ((DataflowWriteChannel<Object>) actor.outputs.get(idx)).bind(value);
+        final DataflowWriteChannel<Object> channel = (DataflowWriteChannel<Object>) actor.outputs.get(idx);
+        channel.bind(fireMessageSentOut(channel, idx, value));
     }
 
     /**
@@ -180,9 +190,10 @@ public abstract class DataflowProcessor {
      * @param value The value to bind
      */
     public final void bindAllOutputs(final Object value) {
-        for (final Object output : actor.outputs) {
-            ((DataflowWriteChannel<Object>) output).bind(value);
-
+        final List<DataflowWriteChannel> outputs = getOutputs();
+        for (int i = 0; i < outputs.size(); i++) {
+            final DataflowWriteChannel<Object> channel = (DataflowWriteChannel<Object>) outputs.get(i);
+            channel.bind(fireMessageSentOut(channel, i, value));
         }
     }
 
@@ -199,7 +210,8 @@ public abstract class DataflowProcessor {
     public final void bindAllOutputValues(final Object... values) {
         final List<DataflowWriteChannel> outputs = getOutputs();
         for (int i = 0; i < outputs.size(); i++) {
-            outputs.get(i).bind(values[i]);
+            final DataflowWriteChannel channel = outputs.get(i);
+            channel.bind(fireMessageSentOut(channel, i, values[i]));
         }
     }
 
@@ -210,9 +222,7 @@ public abstract class DataflowProcessor {
      * @param value The value to bind
      */
     public final synchronized void bindAllOutputsAtomically(final Object value) {
-        for (final DataflowWriteChannel writeChannel : getOutputs()) {
-            writeChannel.bind(value);
-        }
+        bindAllOutputs(value);
     }
 
     /**
@@ -223,10 +233,7 @@ public abstract class DataflowProcessor {
      * @param values Values to send to output channels of the same position index
      */
     public final synchronized void bindAllOutputValuesAtomically(final Object... values) {
-        final List<DataflowWriteChannel> outputs = getOutputs();
-        for (int i = 0; i < outputs.size(); i++) {
-            outputs.get(i).bind(values[i]);
-        }
+        bindAllOutputValues(values);
     }
 
     /**
@@ -261,6 +268,7 @@ public abstract class DataflowProcessor {
 
     /**
      * Retrieves the custom state object
+     *
      * @return The state object associated with the operator
      */
     public final Object getStateObject() {
@@ -274,26 +282,86 @@ public abstract class DataflowProcessor {
      */
     @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
     final synchronized void reportError(final Throwable e) {
-        if (errorHandlers == null || errorHandlers.isEmpty()) {
-            System.err.println("The dataflow processor experienced an exception and is about to terminate. " + e);
-        } else {
-            for (final Closure errorHandler : errorHandlers) {
-                errorHandler.call(e);
-            }
+        if (listeners.isEmpty()) {
+            System.err.println("The dataflow processor experienced an unhandled exception and is about to terminate. " + e);
+            terminate();
         }
-        terminate();
+        if (fireOnException(e)) {
+            terminate();
+        }
     }
 
-    /**
-     * Registers a new error handler closure that will be invoked once the operator detects an error
-     *
-     * @param handler A one-argument closure, expecting an exception (a Throwable instance) as a parameter
-     */
-    public final synchronized void addErrorHandler(final Closure handler) {
-        if (handler == null) throw new IllegalArgumentException("Error handler must not be null.");
-        if (errorHandlers == null) errorHandlers = new ArrayList<Closure>();
-        handler.setDelegate(this);
-        handler.setResolveStrategy(Closure.DELEGATE_FIRST);
-        errorHandlers.add(handler);
+    public final void addDataflowEventListener(final DataflowEventListener listener) {
+        listeners.add(listener);
+    }
+
+    public final void removeDataflowEventListener(final DataflowEventListener listener) {
+        listeners.remove(listener);
+    }
+
+    protected final void fireAfterStart() {
+        for (final DataflowEventListener listener : listeners) {
+            listener.afterStart(this);
+        }
+    }
+
+    protected final void fireAfterStop() {
+        for (final DataflowEventListener listener : listeners) {
+            listener.afterStop(this);
+        }
+    }
+
+    protected final boolean fireOnException(final Throwable e) {
+        boolean terminate = false;
+        for (final DataflowEventListener listener : listeners) {
+            terminate = terminate || listener.onException(this, e);
+        }
+        return terminate;
+    }
+
+    public final Object fireCustomEvent(final Object data) {
+        Object result = data;
+        for (final DataflowEventListener listener : listeners) {
+            result = listener.customEvent(this, result);
+        }
+        return result;
+    }
+
+    protected final Object fireMessageArrived(final DataflowReadChannel channel, final int index, final Object message) {
+        Object result = message;
+        for (final DataflowEventListener listener : listeners) {
+            result = listener.messageArrived(this, channel, index, result);
+        }
+        return result;
+    }
+
+    protected final Object fireControlMessageArrived(final DataflowReadChannel channel, final int index, final Object message) {
+        Object result = message;
+        for (final DataflowEventListener listener : listeners) {
+            result = listener.controlMessageArrived(this, channel, index, result);
+        }
+        return result;
+    }
+
+    protected final Object fireMessageSentOut(final DataflowWriteChannel channel, final int index, final Object message) {
+        Object result = message;
+        for (final DataflowEventListener listener : listeners) {
+            result = listener.messageSentOut(this, channel, index, result);
+        }
+        return result;
+    }
+
+    protected final List<Object> fireBeforeRun(final List<Object> messages) {
+        List<Object> result = messages;
+        for (final DataflowEventListener listener : listeners) {
+            result = listener.beforeRun(this, result);
+        }
+        return result;
+    }
+
+    protected final void fireAfterRun(final List<Object> messages) {
+        for (final DataflowEventListener listener : listeners) {
+            listener.afterRun(this, messages);
+        }
     }
 }

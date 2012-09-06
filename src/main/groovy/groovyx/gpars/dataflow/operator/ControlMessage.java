@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,22 +17,10 @@
 package groovyx.gpars.dataflow.operator;
 
 /**
- * Represents the poisson for dataflow operators.
- * After receiving the poisson a dataflow operator will send the poisson to all its output channels and terminate.
+ * A marker interface indicating control dataflow messages, which in general do not get propagated to the operator's body
  *
  * @author Vaclav Pech
- *         Date: Oct 6, 2010
  */
-public class PoisonPill implements ControlMessage {
-    private static final PoisonPill ourInstance = new PoisonPill();
-
-    public static PoisonPill getInstance() {
-        return ourInstance;
-    }
-
-    PoisonPill() {
-    }
-
-    void countDown() {
-    }
+@SuppressWarnings("MarkerInterface")
+public interface ControlMessage {
 }
