@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -55,6 +56,7 @@ final class ForkingDataflowSelectorActor extends DataflowSelectorActor {
                 try {
                     ForkingDataflowSelectorActor.super.startTask(index, result);
                 } finally {
+                    owningProcessor.fireAfterRun(Arrays.asList(result));
                     semaphore.release();
                 }
             }

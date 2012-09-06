@@ -20,6 +20,7 @@ import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
+
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
@@ -310,12 +311,16 @@ public class DataflowSelectorTest extends GroovyTestCase {
         final DataflowQueue stream = new DataflowQueue()
         final DataflowVariable a = new DataflowVariable()
 
-        def op = group.selector(inputs: [stream], outputs: []) {
-            throw new RuntimeException('test')
+        final listener = new DataflowEventAdapter() {
+            @Override
+            boolean onException(final DataflowProcessor processor, final Throwable e) {
+                a << e
+                true
+            }
         }
-        op.addErrorHandler {Throwable e ->
-            a << e
-            terminate()
+
+        def op = group.selector(inputs: [stream], outputs: [], listeners: [listener]) {
+            throw new RuntimeException('test')
         }
         stream << 'value'
         assert a.val instanceof RuntimeException

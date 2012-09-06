@@ -37,6 +37,8 @@ public final class CountingPoisonPill extends PoisonPill {
      * @param count The number of operators that need to be stopped before the join() method returns.
      */
     public CountingPoisonPill(final int count) {
+        if (count < 0)
+            throw new IllegalArgumentException("A counting poison pill can only start with a positive number");
         this.counter = new AtomicInteger(count);
     }
 

@@ -56,16 +56,26 @@ operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 }
 {code}
 
-The standard error handling will print out an error message to standard error output and terminate the operator in case an uncaught
-exception is thrown from withing the operator's body. To alter the behavior, you can register you custom error handlers using the _addErrorHandler()_ method
-on the operator:
+{note}
+The standard error handling will print out an error message to the standard error output and terminate the operator in case an uncaught
+exception is thrown from withing the operator's body. To alter the behavior, you can register your own event listener:
 
 {code}
-    op.addErrorHandler {Throwable e ->
-        //handle the exception
-        terminate()  //You can also terminate the operator
+def listener = new DataflowEventAdapter() {
+    @Override
+    boolean onException(final DataflowProcessor processor, final Throwable e) {
+        logChannel << e
+        return false   //Indicate whether to terminate the operator or not
     }
+}
+
+op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener]) {x, y ->
+    ...
+}
+See the _Operator lifecycle_ section for more details.
 {code}
+
+{note}
 
 h4. Types of operators
 
@@ -268,6 +278,124 @@ operator(inputs:[inputChannel], outputs:[a, b], maxForks:5) {msg ->
  Using the _bindAllOutputs_ or the _bindAllOutputValues_ methods will not guarantee atomicity of writes across al the output channels when using internal parallelism.
  If preserving the order of messages in multiple output channels is not an issue, _bindAllOutputs_ as well as _bindAllOutputValues_ will provide better performance over the atomic variants.
 {note}
+
+h4. Operator lifecycle
+
+Dataflow operators and selectors fire several events during their lifecycle, which allows the interested parties to obtain
+notifications and potential alter operator's behavior. The _DataflowEventListener_ interface offers a couple of callback methods:
+{code}
+public interface DataflowEventListener {
+    /**
+     * Invoked immediately after the operator starts by a pooled thread before the first message is obtained
+     *
+     * @param processor The reporting dataflow operator/selector
+     */
+    void afterStart(DataflowProcessor processor);
+
+    /**
+     * Invoked immediately after the operator terminates
+     *
+     * @param processor The reporting dataflow operator/selector
+     */
+    void afterStop(DataflowProcessor processor);
+
+    /**
+     * Invoked if an exception occurs.
+     * If any of the listeners returns true, the operator will terminate.
+     * Exceptions outside of the operator's body or listeners' messageSentOut() handlers will terminate the operator irrespective of the listeners' votes.
+     *
+     * @param processor The reporting dataflow operator/selector
+     * @param e         The thrown exception
+     * @return True, if the operator should terminate in response to the exception, false otherwise.
+     */
+    boolean onException(DataflowProcessor processor, Throwable e);
+
+    /**
+     * Invoked when a message becomes available in an input channel.
+     *
+     * @param processor The reporting dataflow operator/selector
+     * @param channel   The input channel holding the message
+     * @param index     The index of the input channel within the operator
+     * @param message   The incoming message
+     * @return The original message or a message that should be used instead
+     */
+    Object messageArrived(DataflowProcessor processor, DataflowReadChannel<Object> channel, int index, Object message);
+
+    /**
+     * Invoked when a control message (instances of ControlMessage) becomes available in an input channel.
+     *
+     * @param processor The reporting dataflow operator/selector
+     * @param channel   The input channel holding the message
+     * @param index     The index of the input channel within the operator
+     * @param message   The incoming message
+     * @return The original message or a message that should be used instead
+     */
+    Object controlMessageArrived(DataflowProcessor processor, DataflowReadChannel<Object> channel, int index, Object message);
+
+    /**
+     * Invoked when a message is being bound to an output channel.
+     *
+     * @param processor The reporting dataflow operator/selector
+     * @param channel   The output channel to send the message to
+     * @param index     The index of the output channel within the operator
+     * @param message   The message to send
+     * @return The original message or a message that should be used instead
+     */
+    Object messageSentOut(DataflowProcessor processor, DataflowWriteChannel<Object> channel, int index, Object message);
+
+    /**
+     * Invoked when all messages required to trigger the operator become available in the input channels.
+     *
+     * @param processor The reporting dataflow operator/selector
+     * @param messages  The incoming messages
+     * @return The original list of messages or a modified/new list of messages that should be used instead
+     */
+    List<Object> beforeRun(DataflowProcessor processor, List<Object> messages);
+
+    /**
+     * Invoked when the operator completes a single run
+     *
+     * @param processor The reporting dataflow operator/selector
+     * @param messages  The incoming messages that have been processed
+     */
+    void afterRun(DataflowProcessor processor, List<Object> messages);
+
+    /**
+     * Invoked when the fireCustomEvent() method is triggered manually on a dataflow operator/selector
+     *
+     * @param processor The reporting dataflow operator/selector
+     * @param data      The custom piece of data provided as part of the event
+     * @return A value to return from the fireCustomEvent() method to the caller (event initiator)
+     */
+    Object customEvent(DataflowProcessor processor, Object data);
+}
+{code}
+
+A default implementation is provided through the _DataflowEventAdapter_ class.
+
+Listeners provide a way to handle exceptions, when they occur inside operators. A listener may typically log such exceptions,
+notify a supervising entity, generate an alternative output or perform any steps required to recover from the situation.
+If there's no listener registered or if any of the listeners returns _true_ the operator will terminate, preserving the contract of _afterStop()_ .
+Exceptions that occur outside the actual operator's body, i.e. at the parameter preparation phase before the body is triggered
+or at the clean-up and channel subscription phase, after the body finishes, always lead to operator termination.
+
+The _fireCustomEvent()_ method available on operators and selectors may be used to communicate back and forth between operator's body
+and the interested listeners:
+{code}
+final listener = new DataflowEventAdapter() {
+    @Override
+    Object customEvent(DataflowProcessor processor, Object data) {
+        println "Log: Getting quite high on the scale $data"
+        return 100  //The value to use instead
+    }
+}
+
+op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener]) {x, y ->
+    final sum = x + y
+    if (sum > 100) bindOutput(fireCustomEvent(sum))  //Reporting that the sum is too high, binding the lowered value that comes back
+    else bindOutput sum
+}
+{code}
 
 h4. Terminating operators
 
