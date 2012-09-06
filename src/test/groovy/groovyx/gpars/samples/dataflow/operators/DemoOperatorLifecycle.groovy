@@ -83,7 +83,7 @@ final listener = new DataflowEventListener() {
     }
 
     @Override
-    void customEvent(final DataflowProcessor processor, final Object data) {
+    Object customEvent(DataflowProcessor processor, Object data) {
         println 'customEvent'
     }
 }

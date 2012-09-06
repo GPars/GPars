@@ -50,27 +50,27 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         final listener1 = new TestListener()
         final listener2 = new TestListener()
         def op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener1, listener2]) {x, y ->
-            fireCustomEvent(x)
-            bindOutput x + y
+            final xa = fireCustomEvent(x)
+            bindOutput xa + y
         }
         assert 0 == listener1.countEventsThatStartWith('customEvent')
         assert 0 == listener2.countEventsThatStartWith('customEvent')
         a << 10
         b << 20
-        assert 30 == c.val
+        assert 60 == c.val
         assert 1 == listener1.countEventsThatStartWith('customEvent')
         assert 1 == listener2.countEventsThatStartWith('customEvent')
         assert "customEvent:10" == listener1.retrieveEvents {it.startsWith 'customEvent'}[0]
-        assert "customEvent:10" == listener2.retrieveEvents {it.startsWith 'customEvent'}[0]
+        assert "customEvent:20" == listener2.retrieveEvents {it.startsWith 'customEvent'}[0]
         a << 1
         b << 2
-        assert 3 == c.val
+        assert 6 == c.val
         assert 2 == listener1.countEventsThatStartWith('customEvent')
         assert 2 == listener2.countEventsThatStartWith('customEvent')
         assert "customEvent:10" == listener1.retrieveEvents {it.startsWith 'customEvent'}[0]
         assert "customEvent:1" == listener1.retrieveEvents {it.startsWith 'customEvent'}[1]
-        assert "customEvent:10" == listener2.retrieveEvents {it.startsWith 'customEvent'}[0]
-        assert "customEvent:1" == listener2.retrieveEvents {it.startsWith 'customEvent'}[1]
+        assert "customEvent:20" == listener2.retrieveEvents {it.startsWith 'customEvent'}[0]
+        assert "customEvent:2" == listener2.retrieveEvents {it.startsWith 'customEvent'}[1]
 
         op.terminate()
     }
@@ -285,8 +285,9 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         }
 
         @Override
-        void customEvent(final DataflowProcessor processor, final Object data) {
+        Object customEvent(DataflowProcessor processor, Object data) {
             events << 'customEvent:' + data
+            data * 2
         }
     }
 }

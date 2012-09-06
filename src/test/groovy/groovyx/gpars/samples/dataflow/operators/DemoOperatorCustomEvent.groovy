@@ -18,10 +18,13 @@ package groovyx.gpars.samples.dataflow.operators
 
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.operator.DataflowEventAdapter
+import groovyx.gpars.dataflow.operator.DataflowProcessor
 import groovyx.gpars.group.DefaultPGroup
 
 /**
- * Shows how to monitor operator's exceptions and react to them in listeners
+ * Shows how to use custom events to trigger custom event handlers.
+ * In our example the operator reports through a custom event whenever the sum becomes too high. The listeners have
+ * a chance to lower the result value that gets output from the operator.
  *
  * @author Vaclav Pech
  */
@@ -31,32 +34,28 @@ final DataflowQueue a = new DataflowQueue()
 final DataflowQueue b = new DataflowQueue()
 final DataflowQueue c = new DataflowQueue()
 
-//When no listeners are registered, terminate upon exception
-def op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener]) {x, y ->
-    if (x < 0) throw new IllegalArgumentException("I do not like negative xs")
-    bindOutput x + y
-}
-
-a << 1
-b << 10
-op.join()
-
-//When the listener
-//The listener to monitor the operator's lifecycle
+//The listener to monitor the operator
 final listener = new DataflowEventAdapter() {
+    @Override
+    Object customEvent(DataflowProcessor processor, Object data) {
+        println "Log: Getting quite high on the scale $data"
+        return 100  //The value to use instead
+    }
 }
 
 op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener]) {x, y ->
-    bindOutput x + y
+    final sum = x + y
+    if (sum > 100) bindOutput(fireCustomEvent(sum))  //Reporting that the sum is too high, binding the lowered value that comes back
+    else bindOutput sum
 }
 
 a << 10
 b << 20
 assert 30 == c.val
-a << 1
+
+a << 101
 b << 2
-assert 3 == c.val
+assert 100 == c.val
 
 op.terminate()
 group.shutdown()
-assert """Processing 10 and 20;Processing 1 and 2;""" == listener.data.toString()

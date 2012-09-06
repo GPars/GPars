@@ -319,10 +319,12 @@ public abstract class DataflowProcessor {
         return terminate;
     }
 
-    public final void fireCustomEvent(final Object data) {
+    public final Object fireCustomEvent(final Object data) {
+        Object result = data;
         for (final DataflowEventListener listener : listeners) {
-            listener.customEvent(this, data);
+            result = listener.customEvent(this, result);
         }
+        return result;
     }
 
     protected final Object fireMessageArrived(final DataflowReadChannel channel, final int index, final Object message) {

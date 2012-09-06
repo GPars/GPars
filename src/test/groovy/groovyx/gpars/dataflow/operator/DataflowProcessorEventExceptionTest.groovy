@@ -232,8 +232,9 @@ public class DataflowProcessorEventExceptionTest extends GroovyTestCase {
         }
 
         @Override
-        void customEvent(final DataflowProcessor processor, final Object data) {
+        Object customEvent(DataflowProcessor processor, Object data) {
             events << "customEvent:" + data
+            data
         }
     }
 }
