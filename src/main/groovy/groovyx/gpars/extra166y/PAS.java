@@ -1,8 +1,8 @@
-/*
- * Written by Doug Lea with assistance from members of JCP JSR-166
- * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/publicdomain/zero/1.0/
- */
+// extra-166y ParallelArray library
+//
+// Written by Doug Lea with assistance from members of JCP JSR-166
+// Expert Group and released to the public domain, as explained at
+// http://creativecommons.org/publicdomain/zero/1.0
 
 package groovyx.gpars.extra166y;
 
@@ -46,11 +46,16 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  * specializations.
  */
 class PAS {
-    private PAS() {} // all-static, non-instantiable
+    private PAS() {
+    } // all-static, non-instantiable
 
-    /** Global default executor */
+    /**
+     * Global default executor
+     */
     private static volatile ForkJoinPool defaultExecutor;
-    /** Lock for on-demand initialization of defaultExecutor */
+    /**
+     * Lock for on-demand initialization of defaultExecutor
+     */
     private static final Object poolLock = new Object();
 
     static ForkJoinPool defaultExecutor() {
@@ -76,12 +81,12 @@ class PAS {
      * where tasks aren't stolen.  This generates and joins tasks with
      * a bit less overhead than pure recursive style -- there are only
      * as many tasks as leaves (no strictly internal nodes).
-     *
+     * <p/>
      * Split control relies on pap.getThreshold(), which is
      * expected to err on the side of generating too many tasks. To
      * counterbalance, if a task pops off its own smallest subtask, it
      * directly runs its leaf action rather than possibly resplitting.
-     *
+     * <p/>
      * There are, with a few exceptions, three flavors of each FJBase
      * subclass, prefixed FJO (object reference), FJD (double) and FJL
      * (long).
@@ -91,6 +96,7 @@ class PAS {
         final int lo;
         final int hi;
         final FJBase next; // the next task that creator should join
+
         FJBase(AbstractParallelAnyArray pap, int lo, int hi, FJBase next) {
             this.pap = pap;
             this.lo = lo;
@@ -117,17 +123,27 @@ class PAS {
             } while (h - l > g);
             atLeaf(l, h);
             do {
-                if (r.tryUnfork()) r.atLeaf(r.lo, r.hi); else r.join();
+                if (r.tryUnfork()) r.atLeaf(r.lo, r.hi);
+                else r.join();
                 onReduce(r);
                 r = r.next;
             } while (r != null);
         }
 
-        /** Leaf computation */
+        /**
+         * Leaf computation
+         */
         abstract void atLeaf(int l, int h);
-        /** Operation performed after joining right subtask -- default noop */
-        void onReduce(FJBase right) {}
-        /** Factory method to create new subtask, normally of current type */
+
+        /**
+         * Operation performed after joining right subtask -- default noop
+         */
+        void onReduce(FJBase right) {
+        }
+
+        /**
+         * Factory method to create new subtask, normally of current type
+         */
         abstract FJBase newSubtask(int l, int h, FJBase r);
     }
 
@@ -135,14 +151,17 @@ class PAS {
 
     static final class FJOApply extends FJBase {
         final Procedure procedure;
+
         FJOApply(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                  Procedure procedure) {
             super(pap, lo, hi, next);
             this.procedure = procedure;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOApply(pap, l, h, r, procedure);
         }
+
         void atLeaf(int l, int h) {
             pap.leafApply(l, h, procedure);
         }
@@ -150,14 +169,17 @@ class PAS {
 
     static final class FJDApply extends FJBase {
         final DoubleProcedure procedure;
+
         FJDApply(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                  DoubleProcedure procedure) {
             super(pap, lo, hi, next);
             this.procedure = procedure;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDApply(pap, l, h, r, procedure);
         }
+
         void atLeaf(int l, int h) {
             pap.leafApply(l, h, procedure);
         }
@@ -165,14 +187,17 @@ class PAS {
 
     static final class FJLApply extends FJBase {
         final LongProcedure procedure;
+
         FJLApply(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                  LongProcedure procedure) {
             super(pap, lo, hi, next);
             this.procedure = procedure;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLApply(pap, l, h, r, procedure);
         }
+
         void atLeaf(int l, int h) {
             pap.leafApply(l, h, procedure);
         }
@@ -183,60 +208,72 @@ class PAS {
     static final class FJOReduce extends FJBase {
         final Reducer reducer;
         Object result;
+
         FJOReduce(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                   Reducer reducer, Object base) {
             super(pap, lo, hi, next);
             this.reducer = reducer;
             this.result = base;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOReduce(pap, l, h, r, reducer, result);
         }
+
         void atLeaf(int l, int h) {
             result = pap.leafReduce(l, h, reducer, result);
         }
+
         void onReduce(FJBase right) {
-            result = reducer.op(result, ((FJOReduce)right).result);
+            result = reducer.op(result, ((FJOReduce) right).result);
         }
     }
 
     static final class FJDReduce extends FJBase {
         final DoubleReducer reducer;
         double result;
+
         FJDReduce(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                   DoubleReducer reducer, double base) {
             super(pap, lo, hi, next);
             this.reducer = reducer;
             this.result = base;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDReduce(pap, l, h, r, reducer, result);
         }
+
         void atLeaf(int l, int h) {
             result = pap.leafReduce(l, h, reducer, result);
         }
+
         void onReduce(FJBase right) {
-            result = reducer.op(result, ((FJDReduce)right).result);
+            result = reducer.op(result, ((FJDReduce) right).result);
         }
     }
 
     static final class FJLReduce extends FJBase {
         final LongReducer reducer;
         long result;
+
         FJLReduce(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                   LongReducer reducer, long base) {
             super(pap, lo, hi, next);
             this.reducer = reducer;
             this.result = base;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLReduce(pap, l, h, r, reducer, result);
         }
+
         void atLeaf(int l, int h) {
             result = pap.leafReduce(l, h, reducer, result);
         }
+
         void onReduce(FJBase right) {
-            result = reducer.op(result, ((FJLReduce)right).result);
+            result = reducer.op(result, ((FJLReduce) right).result);
         }
     }
 
@@ -245,15 +282,18 @@ class PAS {
     static final class FJOMap extends FJBase {
         final Object[] dest;
         final int offset;
+
         FJOMap(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                Object[] dest, int offset) {
             super(pap, lo, hi, next);
             this.dest = dest;
             this.offset = offset;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOMap(pap, l, h, r, dest, offset);
         }
+
         void atLeaf(int l, int h) {
             pap.leafTransfer(l, h, dest, l + offset);
         }
@@ -262,15 +302,18 @@ class PAS {
     static final class FJDMap extends FJBase {
         final double[] dest;
         final int offset;
+
         FJDMap(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                double[] dest, int offset) {
             super(pap, lo, hi, next);
             this.dest = dest;
             this.offset = offset;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDMap(pap, l, h, r, dest, offset);
         }
+
         void atLeaf(int l, int h) {
             pap.leafTransfer(l, h, dest, l + offset);
         }
@@ -279,15 +322,18 @@ class PAS {
     static final class FJLMap extends FJBase {
         final long[] dest;
         final int offset;
+
         FJLMap(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                long[] dest, int offset) {
             super(pap, lo, hi, next);
             this.dest = dest;
             this.offset = offset;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLMap(pap, l, h, r, dest, offset);
         }
+
         void atLeaf(int l, int h) {
             pap.leafTransfer(l, h, dest, l + offset);
         }
@@ -297,14 +343,17 @@ class PAS {
 
     static final class FJOTransform extends FJBase {
         final Op op;
+
         FJOTransform(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                      Op op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOTransform(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafTransform(l, h, op);
         }
@@ -312,14 +361,17 @@ class PAS {
 
     static final class FJDTransform extends FJBase {
         final DoubleOp op;
+
         FJDTransform(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                      DoubleOp op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDTransform(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafTransform(l, h, op);
         }
@@ -327,14 +379,17 @@ class PAS {
 
     static final class FJLTransform extends FJBase {
         final LongOp op;
+
         FJLTransform(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                      LongOp op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLTransform(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafTransform(l, h, op);
         }
@@ -344,14 +399,17 @@ class PAS {
 
     static final class FJOIndexMap extends FJBase {
         final IntToObject op;
+
         FJOIndexMap(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                     IntToObject op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOIndexMap(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafIndexMap(l, h, op);
         }
@@ -359,14 +417,17 @@ class PAS {
 
     static final class FJDIndexMap extends FJBase {
         final IntToDouble op;
+
         FJDIndexMap(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                     IntToDouble op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDIndexMap(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafIndexMap(l, h, op);
         }
@@ -374,14 +435,17 @@ class PAS {
 
     static final class FJLIndexMap extends FJBase {
         final IntToLong op;
+
         FJLIndexMap(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                     IntToLong op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLIndexMap(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafIndexMap(l, h, op);
         }
@@ -391,14 +455,17 @@ class PAS {
 
     static final class FJOBinaryIndexMap extends FJBase {
         final IntAndObjectToObject op;
+
         FJOBinaryIndexMap(AbstractParallelAnyArray pap, int lo, int hi,
                           FJBase next, IntAndObjectToObject op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOBinaryIndexMap(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafBinaryIndexMap(l, h, op);
         }
@@ -406,14 +473,17 @@ class PAS {
 
     static final class FJDBinaryIndexMap extends FJBase {
         final IntAndDoubleToDouble op;
+
         FJDBinaryIndexMap(AbstractParallelAnyArray pap, int lo, int hi,
                           FJBase next, IntAndDoubleToDouble op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDBinaryIndexMap(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafBinaryIndexMap(l, h, op);
         }
@@ -421,14 +491,17 @@ class PAS {
 
     static final class FJLBinaryIndexMap extends FJBase {
         final IntAndLongToLong op;
+
         FJLBinaryIndexMap(AbstractParallelAnyArray pap, int lo, int hi,
                           FJBase next, IntAndLongToLong op) {
             super(pap, lo, hi, next);
             this.op = op;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLBinaryIndexMap(pap, l, h, r, op);
         }
+
         void atLeaf(int l, int h) {
             pap.leafBinaryIndexMap(l, h, op);
         }
@@ -439,14 +512,17 @@ class PAS {
 
     static final class FJOGenerate extends FJBase {
         final Generator generator;
+
         FJOGenerate(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                     Generator generator) {
             super(pap, lo, hi, next);
             this.generator = generator;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOGenerate(pap, l, h, r, generator);
         }
+
         void atLeaf(int l, int h) {
             pap.leafGenerate(l, h, generator);
         }
@@ -454,14 +530,17 @@ class PAS {
 
     static final class FJDGenerate extends FJBase {
         final DoubleGenerator generator;
+
         FJDGenerate(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                     DoubleGenerator generator) {
             super(pap, lo, hi, next);
             this.generator = generator;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDGenerate(pap, l, h, r, generator);
         }
+
         void atLeaf(int l, int h) {
             pap.leafGenerate(l, h, generator);
         }
@@ -469,14 +548,17 @@ class PAS {
 
     static final class FJLGenerate extends FJBase {
         final LongGenerator generator;
+
         FJLGenerate(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                     LongGenerator generator) {
             super(pap, lo, hi, next);
             this.generator = generator;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLGenerate(pap, l, h, r, generator);
         }
+
         void atLeaf(int l, int h) {
             pap.leafGenerate(l, h, generator);
         }
@@ -486,14 +568,17 @@ class PAS {
 
     static final class FJOFill extends FJBase {
         final Object value;
+
         FJOFill(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                 Object value) {
             super(pap, lo, hi, next);
             this.value = value;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOFill(pap, l, h, r, value);
         }
+
         void atLeaf(int l, int h) {
             pap.leafFill(l, h, value);
         }
@@ -501,14 +586,17 @@ class PAS {
 
     static final class FJDFill extends FJBase {
         final double value;
+
         FJDFill(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                 double value) {
             super(pap, lo, hi, next);
             this.value = value;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDFill(pap, l, h, r, value);
         }
+
         void atLeaf(int l, int h) {
             pap.leafFill(l, h, value);
         }
@@ -516,14 +604,17 @@ class PAS {
 
     static final class FJLFill extends FJBase {
         final long value;
+
         FJLFill(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                 long value) {
             super(pap, lo, hi, next);
             this.value = value;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLFill(pap, l, h, r, value);
         }
+
         void atLeaf(int l, int h) {
             pap.leafFill(l, h, value);
         }
@@ -535,6 +626,7 @@ class PAS {
         final Object[] other;
         final int otherOffset;
         final BinaryOp combiner;
+
         FJOCombineInPlace(AbstractParallelAnyArray pap, int lo, int hi,
                           FJBase next, Object[] other, int otherOffset,
                           BinaryOp combiner) {
@@ -543,10 +635,12 @@ class PAS {
             this.otherOffset = otherOffset;
             this.combiner = combiner;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOCombineInPlace
-                (pap, l, h, r, other, otherOffset, combiner);
+                    (pap, l, h, r, other, otherOffset, combiner);
         }
+
         void atLeaf(int l, int h) {
             pap.leafCombineInPlace(l, h, other, otherOffset, combiner);
         }
@@ -556,6 +650,7 @@ class PAS {
         final double[] other;
         final int otherOffset;
         final BinaryDoubleOp combiner;
+
         FJDCombineInPlace(AbstractParallelAnyArray pap, int lo, int hi,
                           FJBase next, double[] other, int otherOffset,
                           BinaryDoubleOp combiner) {
@@ -564,10 +659,12 @@ class PAS {
             this.otherOffset = otherOffset;
             this.combiner = combiner;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDCombineInPlace
-                (pap, l, h, r, other, otherOffset, combiner);
+                    (pap, l, h, r, other, otherOffset, combiner);
         }
+
         void atLeaf(int l, int h) {
             pap.leafCombineInPlace(l, h, other, otherOffset, combiner);
         }
@@ -577,6 +674,7 @@ class PAS {
         final long[] other;
         final int otherOffset;
         final BinaryLongOp combiner;
+
         FJLCombineInPlace(AbstractParallelAnyArray pap, int lo, int hi,
                           FJBase next, long[] other, int otherOffset,
                           BinaryLongOp combiner) {
@@ -585,10 +683,12 @@ class PAS {
             this.otherOffset = otherOffset;
             this.combiner = combiner;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLCombineInPlace
-                (pap, l, h, r, other, otherOffset, combiner);
+                    (pap, l, h, r, other, otherOffset, combiner);
         }
+
         void atLeaf(int l, int h) {
             pap.leafCombineInPlace(l, h, other, otherOffset, combiner);
         }
@@ -598,6 +698,7 @@ class PAS {
         final ParallelArrayWithMapping other;
         final int otherOffset;
         final BinaryOp combiner;
+
         FJOPACombineInPlace(AbstractParallelAnyArray pap, int lo, int hi,
                             FJBase next,
                             ParallelArrayWithMapping other, int otherOffset,
@@ -607,10 +708,12 @@ class PAS {
             this.otherOffset = otherOffset;
             this.combiner = combiner;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOPACombineInPlace
-                (pap, l, h, r, other, otherOffset, combiner);
+                    (pap, l, h, r, other, otherOffset, combiner);
         }
+
         void atLeaf(int l, int h) {
             pap.leafCombineInPlace(l, h, other, otherOffset, combiner);
         }
@@ -620,6 +723,7 @@ class PAS {
         final ParallelDoubleArrayWithDoubleMapping other;
         final int otherOffset;
         final BinaryDoubleOp combiner;
+
         FJDPACombineInPlace(AbstractParallelAnyArray pap, int lo, int hi,
                             FJBase next,
                             ParallelDoubleArrayWithDoubleMapping other,
@@ -629,10 +733,12 @@ class PAS {
             this.otherOffset = otherOffset;
             this.combiner = combiner;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDPACombineInPlace
-                (pap, l, h, r, other, otherOffset, combiner);
+                    (pap, l, h, r, other, otherOffset, combiner);
         }
+
         void atLeaf(int l, int h) {
             pap.leafCombineInPlace(l, h, other, otherOffset, combiner);
         }
@@ -642,6 +748,7 @@ class PAS {
         final ParallelLongArrayWithLongMapping other;
         final int otherOffset;
         final BinaryLongOp combiner;
+
         FJLPACombineInPlace(AbstractParallelAnyArray pap, int lo, int hi,
                             FJBase next,
                             ParallelLongArrayWithLongMapping other,
@@ -651,10 +758,12 @@ class PAS {
             this.otherOffset = otherOffset;
             this.combiner = combiner;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLPACombineInPlace
-                (pap, l, h, r, other, otherOffset, combiner);
+                    (pap, l, h, r, other, otherOffset, combiner);
         }
+
         void atLeaf(int l, int h) {
             pap.leafCombineInPlace(l, h, other, otherOffset, combiner);
         }
@@ -663,18 +772,35 @@ class PAS {
     // stats
 
     static final class FJOStats extends FJBase
-        implements ParallelArray.SummaryStatistics {
+            implements ParallelArray.SummaryStatistics {
         final Comparator comparator;
-        public int size() { return size; }
-        public Object min() { return min; }
-        public Object max() { return max; }
-        public int indexOfMin() { return indexOfMin; }
-        public int indexOfMax() { return indexOfMax; }
+
+        public int size() {
+            return size;
+        }
+
+        public Object min() {
+            return min;
+        }
+
+        public Object max() {
+            return max;
+        }
+
+        public int indexOfMin() {
+            return indexOfMin;
+        }
+
+        public int indexOfMax() {
+            return indexOfMax;
+        }
+
         int size;
         Object min;
         Object max;
         int indexOfMin;
         int indexOfMax;
+
         FJOStats(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                  Comparator comparator) {
             super(pap, lo, hi, next);
@@ -682,25 +808,29 @@ class PAS {
             this.indexOfMin = -1;
             this.indexOfMax = -1;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOStats(pap, l, h, r, comparator);
         }
+
         void onReduce(FJBase right) {
-            FJOStats r = (FJOStats)right;
+            FJOStats r = (FJOStats) right;
             size += r.size;
             updateMin(r.indexOfMin, r.min);
             updateMax(r.indexOfMax, r.max);
         }
+
         void updateMin(int i, Object x) {
             if (i >= 0 &&
-                (indexOfMin < 0 || comparator.compare(min, x) > 0)) {
+                    (indexOfMin < 0 || comparator.compare(min, x) > 0)) {
                 min = x;
                 indexOfMin = i;
             }
         }
+
         void updateMax(int i, Object x) {
             if (i >= 0 &&
-                (indexOfMax < 0 || comparator.compare(max, x) < 0)) {
+                    (indexOfMax < 0 || comparator.compare(max, x) < 0)) {
                 max = x;
                 indexOfMax = i;
             }
@@ -732,29 +862,52 @@ class PAS {
 
         public String toString() {
             return
-                "size: " + size +
-                " min: " + min + " (index " + indexOfMin +
-                ") max: " + max + " (index " + indexOfMax + ")";
+                    "size: " + size +
+                            " min: " + min + " (index " + indexOfMin +
+                            ") max: " + max + " (index " + indexOfMax + ")";
         }
 
     }
 
     static final class FJDStats extends FJBase
-        implements ParallelDoubleArray.SummaryStatistics {
+            implements ParallelDoubleArray.SummaryStatistics {
         final DoubleComparator comparator;
-        public int size() { return size; }
-        public double min() { return min; }
-        public double max() { return max; }
-        public double sum() { return sum; }
-        public double average() { return sum / size; }
-        public int indexOfMin() { return indexOfMin; }
-        public int indexOfMax() { return indexOfMax; }
+
+        public int size() {
+            return size;
+        }
+
+        public double min() {
+            return min;
+        }
+
+        public double max() {
+            return max;
+        }
+
+        public double sum() {
+            return sum;
+        }
+
+        public double average() {
+            return sum / size;
+        }
+
+        public int indexOfMin() {
+            return indexOfMin;
+        }
+
+        public int indexOfMax() {
+            return indexOfMax;
+        }
+
         int size;
         double min;
         double max;
         double sum;
         int indexOfMin;
         int indexOfMax;
+
         FJDStats(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                  DoubleComparator comparator) {
             super(pap, lo, hi, next);
@@ -764,30 +917,35 @@ class PAS {
             this.min = Double.MAX_VALUE;
             this.max = -Double.MAX_VALUE;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDStats(pap, l, h, r, comparator);
         }
+
         void onReduce(FJBase right) {
-            FJDStats r = (FJDStats)right;
+            FJDStats r = (FJDStats) right;
             size += r.size;
             sum += r.sum;
             updateMin(r.indexOfMin, r.min);
             updateMax(r.indexOfMax, r.max);
         }
+
         void updateMin(int i, double x) {
             if (i >= 0 &&
-                (indexOfMin < 0 || comparator.compare(min, x) > 0)) {
+                    (indexOfMin < 0 || comparator.compare(min, x) > 0)) {
                 min = x;
                 indexOfMin = i;
             }
         }
+
         void updateMax(int i, double x) {
             if (i >= 0 &&
-                (indexOfMax < 0 || comparator.compare(max, x) < 0)) {
+                    (indexOfMax < 0 || comparator.compare(max, x) < 0)) {
                 max = x;
                 indexOfMax = i;
             }
         }
+
         void atLeaf(int l, int h) {
             if (pap.hasFilter())
                 filteredAtLeaf(l, h);
@@ -816,29 +974,52 @@ class PAS {
 
         public String toString() {
             return
-                "size: " + size +
-                " min: " + min + " (index " + indexOfMin +
-                ") max: " + max + " (index " + indexOfMax +
-                ") sum: " + sum;
+                    "size: " + size +
+                            " min: " + min + " (index " + indexOfMin +
+                            ") max: " + max + " (index " + indexOfMax +
+                            ") sum: " + sum;
         }
     }
 
     static final class FJLStats extends FJBase
-        implements ParallelLongArray.SummaryStatistics {
+            implements ParallelLongArray.SummaryStatistics {
         final LongComparator comparator;
-        public int size() { return size; }
-        public long min() { return min; }
-        public long max() { return max; }
-        public long sum() { return sum; }
-        public double average() { return (double)sum / size; }
-        public int indexOfMin() { return indexOfMin; }
-        public int indexOfMax() { return indexOfMax; }
+
+        public int size() {
+            return size;
+        }
+
+        public long min() {
+            return min;
+        }
+
+        public long max() {
+            return max;
+        }
+
+        public long sum() {
+            return sum;
+        }
+
+        public double average() {
+            return (double) sum / size;
+        }
+
+        public int indexOfMin() {
+            return indexOfMin;
+        }
+
+        public int indexOfMax() {
+            return indexOfMax;
+        }
+
         int size;
         long min;
         long max;
         long sum;
         int indexOfMin;
         int indexOfMax;
+
         FJLStats(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                  LongComparator comparator) {
             super(pap, lo, hi, next);
@@ -848,26 +1029,30 @@ class PAS {
             this.min = Long.MAX_VALUE;
             this.max = Long.MIN_VALUE;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLStats(pap, l, h, r, comparator);
         }
+
         void onReduce(FJBase right) {
-            FJLStats r = (FJLStats)right;
+            FJLStats r = (FJLStats) right;
             size += r.size;
             sum += r.sum;
             updateMin(r.indexOfMin, r.min);
             updateMax(r.indexOfMax, r.max);
         }
+
         void updateMin(int i, long x) {
             if (i >= 0 &&
-                (indexOfMin < 0 || comparator.compare(min, x) > 0)) {
+                    (indexOfMin < 0 || comparator.compare(min, x) > 0)) {
                 min = x;
                 indexOfMin = i;
             }
         }
+
         void updateMax(int i, long x) {
             if (i >= 0 &&
-                (indexOfMax < 0 || comparator.compare(max, x) < 0)) {
+                    (indexOfMax < 0 || comparator.compare(max, x) < 0)) {
                 max = x;
                 indexOfMax = i;
             }
@@ -901,10 +1086,10 @@ class PAS {
 
         public String toString() {
             return
-                "size: " + size +
-                " min: " + min + " (index " + indexOfMin +
-                ") max: " + max + " (index " + indexOfMax +
-                ") sum: " + sum;
+                    "size: " + size +
+                            " min: " + min + " (index " + indexOfMin +
+                            ") max: " + max + " (index " + indexOfMax +
+                            ") sum: " + sum;
         }
     }
 
@@ -912,16 +1097,20 @@ class PAS {
 
     static final class FJCountSelected extends FJBase {
         int count;
+
         FJCountSelected(AbstractParallelAnyArray pap, int lo, int hi,
                         FJBase next) {
             super(pap, lo, hi, next);
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJCountSelected(pap, l, h, r);
         }
+
         void onReduce(FJBase right) {
-            count += ((FJCountSelected)right).count;
+            count += ((FJCountSelected) right).count;
         }
+
         void atLeaf(int l, int h) {
             int n = 0;
             for (int i = l; i < h; ++i) {
@@ -972,15 +1161,16 @@ class PAS {
                 if (r.tryUnfork()) {
                     if (!stopping)
                         r.atLeaf(r.lo, r.hi);
-                }
-                else if (stopping)
+                } else if (stopping)
                     r.cancel(false);
                 else
                     r.join();
                 r = r.next;
             }
         }
+
         abstract FJSearchBase newSubtask(int l, int h, FJSearchBase r);
+
         abstract void atLeaf(int l, int h);
     }
 
@@ -991,16 +1181,17 @@ class PAS {
                     FJSearchBase next, AtomicInteger result) {
             super(pap, lo, hi, next, result);
         }
+
         FJSearchBase newSubtask(int l, int h, FJSearchBase r) {
             return new FJSelectAny(pap, l, h, r, result);
         }
+
         void atLeaf(int l, int h) {
             for (int i = l; i < h; ++i) {
                 if (pap.isSelected(i)) {
                     result.compareAndSet(-1, i);
                     break;
-                }
-                else if (result.get() >= 0)
+                } else if (result.get() >= 0)
                     break;
             }
         }
@@ -1010,14 +1201,17 @@ class PAS {
 
     static final class FJOIndexOf extends FJSearchBase {
         final Object target;
+
         FJOIndexOf(AbstractParallelAnyArray pap, int lo, int hi,
                    FJSearchBase next, AtomicInteger result, Object target) {
             super(pap, lo, hi, next, result);
             this.target = target;
         }
+
         FJSearchBase newSubtask(int l, int h, FJSearchBase r) {
             return new FJOIndexOf(pap, l, h, r, result, target);
         }
+
         void atLeaf(int l, int h) {
             final Object[] array = pap.ogetArray();
             if (array == null) return;
@@ -1025,8 +1219,7 @@ class PAS {
                 if (target.equals(array[i])) {
                     result.compareAndSet(-1, i);
                     break;
-                }
-                else if (result.get() >= 0)
+                } else if (result.get() >= 0)
                     break;
             }
         }
@@ -1034,14 +1227,17 @@ class PAS {
 
     static final class FJDIndexOf extends FJSearchBase {
         final double target;
+
         FJDIndexOf(AbstractParallelAnyArray pap, int lo, int hi,
                    FJSearchBase next, AtomicInteger result, double target) {
             super(pap, lo, hi, next, result);
             this.target = target;
         }
+
         FJSearchBase newSubtask(int l, int h, FJSearchBase r) {
             return new FJDIndexOf(pap, l, h, r, result, target);
         }
+
         void atLeaf(int l, int h) {
             final double[] array = pap.dgetArray();
             if (array == null) return;
@@ -1049,8 +1245,7 @@ class PAS {
                 if (target == (array[i])) {
                     result.compareAndSet(-1, i);
                     break;
-                }
-                else if (result.get() >= 0)
+                } else if (result.get() >= 0)
                     break;
             }
         }
@@ -1058,14 +1253,17 @@ class PAS {
 
     static final class FJLIndexOf extends FJSearchBase {
         final long target;
+
         FJLIndexOf(AbstractParallelAnyArray pap, int lo, int hi,
                    FJSearchBase next, AtomicInteger result, long target) {
             super(pap, lo, hi, next, result);
             this.target = target;
         }
+
         FJSearchBase newSubtask(int l, int h, FJSearchBase r) {
             return new FJLIndexOf(pap, l, h, r, result, target);
         }
+
         void atLeaf(int l, int h) {
             final long[] array = pap.lgetArray();
             if (array == null) return;
@@ -1073,8 +1271,7 @@ class PAS {
                 if (target == (array[i])) {
                     result.compareAndSet(-1, i);
                     break;
-                }
-                else if (result.get() >= 0)
+                } else if (result.get() >= 0)
                     break;
             }
         }
@@ -1116,12 +1313,11 @@ class PAS {
                     internalPhase0();
                 else
                     count = p.leafIndexSelected(l, h, true, d.indices);
-            }
-            else if (count != 0) {
+            } else if (count != 0) {
                 if (isInternal)
                     internalPhase1();
                 else
-                    d.leafPhase1(l, l+count, offset);
+                    d.leafPhase1(l, l + count, offset);
             }
         }
 
@@ -1131,7 +1327,8 @@ class PAS {
             FJSelectAll r = new FJSelectAll(driver, mid, hi);
             r.fork();
             l.compute();
-            if (r.tryUnfork()) r.compute(); else r.join();
+            if (r.tryUnfork()) r.compute();
+            else r.join();
             int ln = l.count;
             if (ln != 0)
                 left = l;
@@ -1152,12 +1349,11 @@ class PAS {
                     right.reinitialize();
                     right.fork();
                     left.compute();
-                    if (right.tryUnfork()) right.compute(); else right.join();
-                }
-                else
+                    if (right.tryUnfork()) right.compute();
+                    else right.join();
+                } else
                     left.compute();
-            }
-            else if (right != null) {
+            } else if (right != null) {
                 right.offset = k;
                 right.compute();
             }
@@ -1170,12 +1366,14 @@ class PAS {
         final int initialOffset;
         int phase;
         int resultSize;
+
         FJSelectAllDriver(AbstractParallelAnyArray pap, int initialOffset) {
             this.pap = pap;
             this.initialOffset = initialOffset;
             int n = pap.fence - pap.origin;
             indices = new int[n];
         }
+
         public final void compute() {
             FJSelectAll r = new FJSelectAll(this, pap.origin, pap.fence);
             r.offset = initialOffset;
@@ -1184,20 +1382,25 @@ class PAS {
             phase = 1;
             r.compute();
         }
+
         abstract void createResults(int size);
+
         abstract void leafPhase1(int loIdx, int hiIdx, int offset);
     }
 
     static final class FJOSelectAllDriver extends FJSelectAllDriver {
         final Class elementType;
         Object[] results;
+
         FJOSelectAllDriver(AbstractParallelAnyArray pap, Class elementType) {
             super(pap, 0);
             this.elementType = elementType;
         }
+
         void createResults(int size) {
-            results = (Object[])Array.newInstance(elementType, size);
+            results = (Object[]) Array.newInstance(elementType, size);
         }
+
         void leafPhase1(int loIdx, int hiIdx, int offset) {
             pap.leafTransferByIndex(indices, loIdx, hiIdx, results, offset);
         }
@@ -1205,12 +1408,15 @@ class PAS {
 
     static final class FJDSelectAllDriver extends FJSelectAllDriver {
         double[] results;
+
         FJDSelectAllDriver(AbstractParallelAnyArray pap) {
             super(pap, 0);
         }
+
         void createResults(int size) {
             results = new double[size];
         }
+
         void leafPhase1(int loIdx, int hiIdx, int offset) {
             pap.leafTransferByIndex(indices, loIdx, hiIdx, results, offset);
         }
@@ -1218,12 +1424,15 @@ class PAS {
 
     static final class FJLSelectAllDriver extends FJSelectAllDriver {
         long[] results;
+
         FJLSelectAllDriver(AbstractParallelAnyArray pap) {
             super(pap, 0);
         }
+
         void createResults(int size) {
             results = new long[size];
         }
+
         void leafPhase1(int loIdx, int hiIdx, int offset) {
             pap.leafTransferByIndex(indices, loIdx, hiIdx, results, offset);
         }
@@ -1231,21 +1440,24 @@ class PAS {
 
     static final class FJOAppendAllDriver extends FJSelectAllDriver {
         Object[] results;
+
         FJOAppendAllDriver(AbstractParallelAnyArray pap, int initialOffset,
                            Object[] results) {
             super(pap, 0);
             this.results = results;
         }
+
         void createResults(int size) {
             int newSize = initialOffset + size;
             int oldLength = results.length;
             if (newSize > oldLength) {
                 Class elementType = results.getClass().getComponentType();
-                Object[] r = (Object[])Array.newInstance(elementType, newSize);
+                Object[] r = (Object[]) Array.newInstance(elementType, newSize);
                 System.arraycopy(results, 0, r, 0, oldLength);
                 results = r;
             }
         }
+
         void leafPhase1(int loIdx, int hiIdx, int offset) {
             pap.leafTransferByIndex(indices, loIdx, hiIdx, results, offset);
         }
@@ -1253,11 +1465,13 @@ class PAS {
 
     static final class FJDAppendAllDriver extends FJSelectAllDriver {
         double[] results;
+
         FJDAppendAllDriver(AbstractParallelAnyArray pap, int initialOffset,
                            double[] results) {
             super(pap, initialOffset);
             this.results = results;
         }
+
         void createResults(int size) {
             int newSize = initialOffset + size;
             int oldLength = results.length;
@@ -1267,6 +1481,7 @@ class PAS {
                 results = r;
             }
         }
+
         void leafPhase1(int loIdx, int hiIdx, int offset) {
             pap.leafTransferByIndex(indices, loIdx, hiIdx, results, offset);
         }
@@ -1274,11 +1489,13 @@ class PAS {
 
     static final class FJLAppendAllDriver extends FJSelectAllDriver {
         long[] results;
+
         FJLAppendAllDriver(AbstractParallelAnyArray pap, int initialOffset,
                            long[] results) {
             super(pap, initialOffset);
             this.results = results;
         }
+
         void createResults(int size) {
             int newSize = initialOffset + size;
             int oldLength = results.length;
@@ -1288,6 +1505,7 @@ class PAS {
                 results = r;
             }
         }
+
         void leafPhase1(int loIdx, int hiIdx, int offset) {
             pap.leafTransferByIndex(indices, loIdx, hiIdx, results, offset);
         }
@@ -1308,6 +1526,7 @@ class PAS {
         final int[] indices;
         int offset;
         final int threshold;
+
         FJRemoveAllDriver(AbstractParallelAnyArray pap, int lo, int hi) {
             this.pap = pap;
             this.lo = lo;
@@ -1334,7 +1553,7 @@ class PAS {
                     r.join();
                     int n = r.count;
                     if (n != 0)
-                        pap.leafMoveByIndex(indices, r.lo, r.lo+n, k);
+                        pap.leafMoveByIndex(indices, r.lo, r.lo + n, k);
                     k += n;
                     FJRemoveAll rr = r.right;
                     if (rr != null)
@@ -1354,7 +1573,7 @@ class PAS {
             while (t != null) {
                 int n = t.count;
                 if (n != 0)
-                    t.pap.leafMoveByIndex(t.indices, t.lo, t.lo+n, index);
+                    t.pap.leafMoveByIndex(t.indices, t.lo, t.lo + n, index);
                 index += n;
                 FJRemoveAll p = t.next;
                 if (p != null)
@@ -1379,6 +1598,7 @@ class PAS {
         int count;
         FJRemoveAll right;
         final int threshold;
+
         FJRemoveAll(AbstractParallelAnyArray pap, int lo, int hi,
                     FJRemoveAll next, int[] indices) {
             this.pap = pap;
@@ -1404,7 +1624,7 @@ class PAS {
             while (r != null) {
                 if (r.tryUnfork())
                     r.count = pap.leafIndexSelected
-                        (r.lo, r.hi, false, indices);
+                            (r.lo, r.hi, false, indices);
                 else
                     r.join();
                 r = r.next;
@@ -1417,57 +1637,69 @@ class PAS {
     static final class FJOUniquifier extends FJBase {
         final UniquifierTable table;
         int count;
+
         FJOUniquifier(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
-                     UniquifierTable table) {
+                      UniquifierTable table) {
             super(pap, lo, hi, next);
             this.table = table;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJOUniquifier(pap, l, h, r, table);
         }
+
         void atLeaf(int l, int h) {
             count = table.addObjects(l, h);
         }
+
         void onReduce(FJBase right) {
-            count += ((FJOUniquifier)right).count;
+            count += ((FJOUniquifier) right).count;
         }
     }
 
     static final class FJDUniquifier extends FJBase {
         final UniquifierTable table;
         int count;
+
         FJDUniquifier(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
-                     UniquifierTable table) {
+                      UniquifierTable table) {
             super(pap, lo, hi, next);
             this.table = table;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJDUniquifier(pap, l, h, r, table);
         }
+
         void atLeaf(int l, int h) {
             count = table.addDoubles(l, h);
         }
+
         void onReduce(FJBase right) {
-            count += ((FJDUniquifier)right).count;
+            count += ((FJDUniquifier) right).count;
         }
     }
 
     static final class FJLUniquifier extends FJBase {
         final UniquifierTable table;
         int count;
+
         FJLUniquifier(AbstractParallelAnyArray pap, int lo, int hi, FJBase next,
                       UniquifierTable table) {
             super(pap, lo, hi, next);
             this.table = table;
         }
+
         FJBase newSubtask(int l, int h, FJBase r) {
             return new FJLUniquifier(pap, l, h, r, table);
         }
+
         void atLeaf(int l, int h) {
             count = table.addLongs(l, h);
         }
+
         void onReduce(FJBase right) {
-            count += ((FJLUniquifier)right).count;
+            count += ((FJLUniquifier) right).count;
         }
     }
 
@@ -1488,6 +1720,7 @@ class PAS {
     static final class UniquifierTable extends AtomicLongArray {
         final AbstractParallelAnyArray pap;
         final boolean byIdentity;
+
         UniquifierTable(int size, AbstractParallelAnyArray pap,
                         boolean byIdentity) {
             super(tableSizeFor(size));
@@ -1495,7 +1728,9 @@ class PAS {
             this.byIdentity = byIdentity;
         }
 
-        /** Returns a good size for table */
+        /**
+         * Returns a good size for table
+         */
         static int tableSizeFor(int n) {
             int padded = n + (n >>> 1) + 1;
             if (padded < n) // int overflow
@@ -1519,23 +1754,22 @@ class PAS {
             for (int k = lo; k < hi; ++k) {
                 Object x;
                 if ((filtered && !pap.isSelected(k)) ||
-                    (x = src[k]) == null)
+                        (x = src[k]) == null)
                     continue;
                 int hc = byIdentity ? System.identityHashCode(x) : x.hashCode();
                 int hash = hash(hc);
-                long entry = (((long)hash) << 32) + (k + 1);
+                long entry = (((long) hash) << 32) + (k + 1);
                 int idx = hash & mask;
-                for (;;) {
+                for (; ; ) {
                     long d = get(idx);
                     if (d != 0) {
-                        if ((int)(d >>> 32) == hash) {
-                            Object y = src[(int)((d-1) & 0x7fffffffL)];
+                        if ((int) (d >>> 32) == hash) {
+                            Object y = src[(int) ((d - 1) & 0x7fffffffL)];
                             if (x == y || (!byIdentity && x.equals(y)))
                                 break;
                         }
                         idx = (idx + 1) & mask;
-                    }
-                    else if (compareAndSet(idx, 0, entry)) {
+                    } else if (compareAndSet(idx, 0, entry)) {
                         ++count;
                         break;
                     }
@@ -1554,18 +1788,17 @@ class PAS {
                     continue;
                 double x = src[k];
                 long bits = Double.doubleToLongBits(x);
-                int hash = hash((int)(bits ^ (bits >>> 32)));
-                long entry = (((long)hash) << 32) + (k + 1);
+                int hash = hash((int) (bits ^ (bits >>> 32)));
+                long entry = (((long) hash) << 32) + (k + 1);
                 int idx = hash & mask;
-                for (;;) {
+                for (; ; ) {
                     long d = get(idx);
                     if (d != 0) {
-                        if ((int)(d >>> 32) == hash &&
-                            x == src[(int)((d - 1) & 0x7fffffffL)])
+                        if ((int) (d >>> 32) == hash &&
+                                x == src[(int) ((d - 1) & 0x7fffffffL)])
                             break;
                         idx = (idx + 1) & mask;
-                    }
-                    else if (compareAndSet(idx, 0, entry)) {
+                    } else if (compareAndSet(idx, 0, entry)) {
                         ++count;
                         break;
                     }
@@ -1583,18 +1816,17 @@ class PAS {
                 if (filtered && !pap.isSelected(k))
                     continue;
                 long x = src[k];
-                int hash = hash((int)(x ^ (x >>> 32)));
-                long entry = (((long)hash) << 32) + (k + 1);
+                int hash = hash((int) (x ^ (x >>> 32)));
+                long entry = (((long) hash) << 32) + (k + 1);
                 int idx = hash & mask;
-                for (;;) {
+                for (; ; ) {
                     long d = get(idx);
                     if (d != 0) {
-                        if ((int)(d >>> 32) == hash &&
-                            x == src[(int)((d - 1) & 0x7fffffffL)])
+                        if ((int) (d >>> 32) == hash &&
+                                x == src[(int) ((d - 1) & 0x7fffffffL)])
                             break;
                         idx = (idx + 1) & mask;
-                    }
-                    else if (compareAndSet(idx, 0, entry)) {
+                    } else if (compareAndSet(idx, 0, entry)) {
                         ++count;
                         break;
                     }
@@ -1609,13 +1841,13 @@ class PAS {
         Object[] uniqueObjects(int size) {
             Object[] src = pap.ogetArray();
             Class sclass = src.getClass().getComponentType();
-            Object[] res = (Object[])Array.newInstance(sclass, size);
+            Object[] res = (Object[]) Array.newInstance(sclass, size);
             int k = 0;
             int n = length();
             for (int i = 0; i < n && k < size; ++i) {
                 long d = get(i);
                 if (d != 0)
-                    res[k++] = src[((int)((d - 1) & 0x7fffffffL))];
+                    res[k++] = src[((int) ((d - 1) & 0x7fffffffL))];
             }
             return res;
         }
@@ -1628,7 +1860,7 @@ class PAS {
             for (int i = 0; i < n && k < size; ++i) {
                 long d = get(i);
                 if (d != 0)
-                    res[k++] = src[((int)((d - 1) & 0x7fffffffL))];
+                    res[k++] = src[((int) ((d - 1) & 0x7fffffffL))];
             }
             return res;
         }
@@ -1641,7 +1873,7 @@ class PAS {
             for (int i = 0; i < n && k < size; ++i) {
                 long d = get(i);
                 if (d != 0)
-                    res[k++] = src[((int)((d - 1) & 0x7fffffffL))];
+                    res[k++] = src[((int) ((d - 1) & 0x7fffffffL))];
             }
             return res;
         }
@@ -1652,14 +1884,14 @@ class PAS {
      * <A href="http://supertech.lcs.mit.edu/cilk/"> Cilk</A>:
      * Basic algorithm:
      * if array size is small, just use a sequential quicksort
-     *         Otherwise:
-     *         1. Break array in half.
-     *         2. For each half,
-     *             a. break the half in half (i.e., quarters),
-     *             b. sort the quarters
-     *             c. merge them together
-     *         3. merge together the two halves.
-     *
+     * Otherwise:
+     * 1. Break array in half.
+     * 2. For each half,
+     * a. break the half in half (i.e., quarters),
+     * b. sort the quarters
+     * c. merge them together
+     * 3. merge together the two halves.
+     * <p/>
      * One reason for splitting in quarters is that this guarantees
      * that the final sort is in the main array, not the workspace
      * array.  (workspace and main swap roles on each subsort step.)
@@ -1667,7 +1899,7 @@ class PAS {
      * insertion sort if under threshold.  Otherwise it uses median of
      * three to pick pivot, and loops rather than recurses along left
      * path.
-     *
+     * <p/>
      * It is sad but true that sort and merge performance are
      * sensitive enough to inner comparison overhead to warrant
      * creating 6 versions (not just 3) -- one each for natural
@@ -1680,10 +1912,14 @@ class PAS {
         final int origin;     // origin of the part of array we deal with
         final int n;          // Number of elements in (sub)arrays.
         final int gran;       // split control
+
         FJOSorter(Comparator cmp,
                   Object[] a, Object[] w, int origin, int n, int gran) {
             this.cmp = cmp;
-            this.a = a; this.w = w; this.origin = origin; this.n = n;
+            this.a = a;
+            this.w = w;
+            this.origin = origin;
+            this.n = n;
             this.gran = gran;
         }
 
@@ -1695,34 +1931,42 @@ class PAS {
                 int q = n >>> 2; // lower quarter index
                 int u = h + q;   // upper quarter
                 FJSubSorter ls = new FJSubSorter
-                    (new FJOSorter(cmp, a, w, l,   q,   g),
-                     new FJOSorter(cmp, a, w, l+q, h-q, g),
-                     new FJOMerger(cmp, a, w, l,   q,
-                                   l+q, h-q, l, g, null));
+                        (new FJOSorter(cmp, a, w, l, q, g),
+                                new FJOSorter(cmp, a, w, l + q, h - q, g),
+                                new FJOMerger(cmp, a, w, l, q,
+                                        l + q, h - q, l, g, null));
                 FJSubSorter rs = new FJSubSorter
-                    (new FJOSorter(cmp, a, w, l+h, q,   g),
-                     new FJOSorter(cmp, a, w, l+u, n-u, g),
-                     new FJOMerger(cmp, a, w, l+h, q,
-                                   l+u, n-u, l+h, g, null));
+                        (new FJOSorter(cmp, a, w, l + h, q, g),
+                                new FJOSorter(cmp, a, w, l + u, n - u, g),
+                                new FJOMerger(cmp, a, w, l + h, q,
+                                        l + u, n - u, l + h, g, null));
                 rs.fork();
                 ls.compute();
-                if (rs.tryUnfork()) rs.compute(); else rs.join();
+                if (rs.tryUnfork()) rs.compute();
+                else rs.join();
                 new FJOMerger(cmp, w, a, l, h,
-                              l+h, n-h, l, g, null).compute();
-            }
-            else
-                Arrays.sort(a, l, l+n, cmp);
+                        l + h, n - h, l, g, null).compute();
+            } else
+                Arrays.sort(a, l, l + n, cmp);
         }
     }
 
     static final class FJOCSorter extends RecursiveAction {
-        final Comparable[] a; final Comparable[] w;
-        final int origin; final int n; final int gran;
+        final Comparable[] a;
+        final Comparable[] w;
+        final int origin;
+        final int n;
+        final int gran;
+
         FJOCSorter(Comparable[] a, Comparable[] w,
                    int origin, int n, int gran) {
-            this.a = a; this.w = w; this.origin = origin; this.n = n;
+            this.a = a;
+            this.w = w;
+            this.origin = origin;
+            this.n = n;
             this.gran = gran;
         }
+
         public void compute() {
             int l = origin;
             int g = gran;
@@ -1731,35 +1975,44 @@ class PAS {
                 int q = n >>> 2;
                 int u = h + q;
                 FJSubSorter ls = new FJSubSorter
-                    (new FJOCSorter(a, w, l,   q,   g),
-                     new FJOCSorter(a, w, l+q, h-q, g),
-                     new FJOCMerger(a, w, l,   q,
-                                   l+q, h-q, l, g, null));
+                        (new FJOCSorter(a, w, l, q, g),
+                                new FJOCSorter(a, w, l + q, h - q, g),
+                                new FJOCMerger(a, w, l, q,
+                                        l + q, h - q, l, g, null));
                 FJSubSorter rs = new FJSubSorter
-                    (new FJOCSorter(a, w, l+h, q,   g),
-                     new FJOCSorter(a, w, l+u, n-u, g),
-                     new FJOCMerger(a, w, l+h, q,
-                                   l+u, n-u, l+h, g, null));
+                        (new FJOCSorter(a, w, l + h, q, g),
+                                new FJOCSorter(a, w, l + u, n - u, g),
+                                new FJOCMerger(a, w, l + h, q,
+                                        l + u, n - u, l + h, g, null));
                 rs.fork();
                 ls.compute();
-                if (rs.tryUnfork()) rs.compute(); else rs.join();
+                if (rs.tryUnfork()) rs.compute();
+                else rs.join();
                 new FJOCMerger(w, a, l, h,
-                               l+h, n-h, l, g, null).compute();
-            }
-            else
-                Arrays.sort(a, l, l+n);
+                        l + h, n - h, l, g, null).compute();
+            } else
+                Arrays.sort(a, l, l + n);
         }
     }
 
     static final class FJDSorter extends RecursiveAction {
-        final DoubleComparator cmp; final double[] a; final double[] w;
-        final int origin; final int n; final int gran;
+        final DoubleComparator cmp;
+        final double[] a;
+        final double[] w;
+        final int origin;
+        final int n;
+        final int gran;
+
         FJDSorter(DoubleComparator cmp,
                   double[] a, double[] w, int origin, int n, int gran) {
             this.cmp = cmp;
-            this.a = a; this.w = w; this.origin = origin; this.n = n;
+            this.a = a;
+            this.w = w;
+            this.origin = origin;
+            this.n = n;
             this.gran = gran;
         }
+
         public void compute() {
             int l = origin;
             int g = gran;
@@ -1768,34 +2021,42 @@ class PAS {
                 int q = n >>> 2;
                 int u = h + q;
                 FJSubSorter ls = new FJSubSorter
-                    (new FJDSorter(cmp, a, w, l,   q,   g),
-                     new FJDSorter(cmp, a, w, l+q, h-q, g),
-                     new FJDMerger(cmp, a, w, l,   q,
-                                   l+q, h-q, l, g, null));
+                        (new FJDSorter(cmp, a, w, l, q, g),
+                                new FJDSorter(cmp, a, w, l + q, h - q, g),
+                                new FJDMerger(cmp, a, w, l, q,
+                                        l + q, h - q, l, g, null));
                 FJSubSorter rs = new FJSubSorter
-                    (new FJDSorter(cmp, a, w, l+h, q,   g),
-                     new FJDSorter(cmp, a, w, l+u, n-u, g),
-                     new FJDMerger(cmp, a, w, l+h, q,
-                                   l+u, n-u, l+h, g, null));
+                        (new FJDSorter(cmp, a, w, l + h, q, g),
+                                new FJDSorter(cmp, a, w, l + u, n - u, g),
+                                new FJDMerger(cmp, a, w, l + h, q,
+                                        l + u, n - u, l + h, g, null));
                 rs.fork();
                 ls.compute();
-                if (rs.tryUnfork()) rs.compute(); else rs.join();
+                if (rs.tryUnfork()) rs.compute();
+                else rs.join();
                 new FJDMerger(cmp, w, a, l, h,
-                              l+h, n-h, l, g, null).compute();
-            }
-            else
-                dquickSort(a, cmp, l, l+n-1);
+                        l + h, n - h, l, g, null).compute();
+            } else
+                dquickSort(a, cmp, l, l + n - 1);
         }
     }
 
     static final class FJDCSorter extends RecursiveAction {
-        final double[] a; final double[] w;
-        final int origin; final int n; final int gran;
+        final double[] a;
+        final double[] w;
+        final int origin;
+        final int n;
+        final int gran;
+
         FJDCSorter(double[] a, double[] w, int origin,
                    int n, int gran) {
-            this.a = a; this.w = w; this.origin = origin; this.n = n;
+            this.a = a;
+            this.w = w;
+            this.origin = origin;
+            this.n = n;
             this.gran = gran;
         }
+
         public void compute() {
             int l = origin;
             int g = gran;
@@ -1804,33 +2065,41 @@ class PAS {
                 int q = n >>> 2;
                 int u = h + q;
                 FJSubSorter ls = new FJSubSorter
-                    (new FJDCSorter(a, w, l,   q,   g),
-                     new FJDCSorter(a, w, l+q, h-q, g),
-                     new FJDCMerger(a, w, l,   q,
-                                    l+q, h-q, l, g, null));
+                        (new FJDCSorter(a, w, l, q, g),
+                                new FJDCSorter(a, w, l + q, h - q, g),
+                                new FJDCMerger(a, w, l, q,
+                                        l + q, h - q, l, g, null));
                 FJSubSorter rs = new FJSubSorter
-                    (new FJDCSorter(a, w, l+h, q,   g),
-                     new FJDCSorter(a, w, l+u, n-u, g),
-                     new FJDCMerger(a, w, l+h, q,
-                                    l+u, n-u, l+h, g, null));
+                        (new FJDCSorter(a, w, l + h, q, g),
+                                new FJDCSorter(a, w, l + u, n - u, g),
+                                new FJDCMerger(a, w, l + h, q,
+                                        l + u, n - u, l + h, g, null));
                 rs.fork();
                 ls.compute();
-                if (rs.tryUnfork()) rs.compute(); else rs.join();
+                if (rs.tryUnfork()) rs.compute();
+                else rs.join();
                 new FJDCMerger(w, a, l, h,
-                               l+h, n-h, l, g, null).compute();
-            }
-            else
-                Arrays.sort(a, l, l+n);
+                        l + h, n - h, l, g, null).compute();
+            } else
+                Arrays.sort(a, l, l + n);
         }
     }
 
     static final class FJLSorter extends RecursiveAction {
-        final LongComparator cmp; final long[] a; final long[] w;
-        final int origin; final int n; final int gran;
+        final LongComparator cmp;
+        final long[] a;
+        final long[] w;
+        final int origin;
+        final int n;
+        final int gran;
+
         FJLSorter(LongComparator cmp,
                   long[] a, long[] w, int origin, int n, int gran) {
             this.cmp = cmp;
-            this.a = a; this.w = w; this.origin = origin; this.n = n;
+            this.a = a;
+            this.w = w;
+            this.origin = origin;
+            this.n = n;
             this.gran = gran;
         }
 
@@ -1842,34 +2111,42 @@ class PAS {
                 int q = n >>> 2;
                 int u = h + q;
                 FJSubSorter ls = new FJSubSorter
-                    (new FJLSorter(cmp, a, w, l,   q,   g),
-                     new FJLSorter(cmp, a, w, l+q, h-q, g),
-                     new FJLMerger(cmp, a, w, l,   q,
-                                   l+q, h-q, l, g, null));
+                        (new FJLSorter(cmp, a, w, l, q, g),
+                                new FJLSorter(cmp, a, w, l + q, h - q, g),
+                                new FJLMerger(cmp, a, w, l, q,
+                                        l + q, h - q, l, g, null));
                 FJSubSorter rs = new FJSubSorter
-                    (new FJLSorter(cmp, a, w, l+h, q,   g),
-                     new FJLSorter(cmp, a, w, l+u, n-u, g),
-                     new FJLMerger(cmp, a, w, l+h, q,
-                                   l+u, n-u, l+h, g, null));
+                        (new FJLSorter(cmp, a, w, l + h, q, g),
+                                new FJLSorter(cmp, a, w, l + u, n - u, g),
+                                new FJLMerger(cmp, a, w, l + h, q,
+                                        l + u, n - u, l + h, g, null));
                 rs.fork();
                 ls.compute();
-                if (rs.tryUnfork()) rs.compute(); else rs.join();
+                if (rs.tryUnfork()) rs.compute();
+                else rs.join();
                 new FJLMerger(cmp, w, a, l, h,
-                              l+h, n-h, l, g, null).compute();
-            }
-            else
-                lquickSort(a, cmp, l, l+n-1);
+                        l + h, n - h, l, g, null).compute();
+            } else
+                lquickSort(a, cmp, l, l + n - 1);
         }
     }
 
     static final class FJLCSorter extends RecursiveAction {
-        final long[] a; final long[] w;
-        final int origin; final int n; final int gran;
+        final long[] a;
+        final long[] w;
+        final int origin;
+        final int n;
+        final int gran;
+
         FJLCSorter(long[] a, long[] w, int origin,
                    int n, int gran) {
-            this.a = a; this.w = w; this.origin = origin; this.n = n;
+            this.a = a;
+            this.w = w;
+            this.origin = origin;
+            this.n = n;
             this.gran = gran;
         }
+
         public void compute() {
             int l = origin;
             int g = gran;
@@ -1878,36 +2155,42 @@ class PAS {
                 int q = n >>> 2;
                 int u = h + q;
                 FJSubSorter ls = new FJSubSorter
-                    (new FJLCSorter(a, w, l,   q,   g),
-                     new FJLCSorter(a, w, l+q, h-q, g),
-                     new FJLCMerger(a, w, l,   q,
-                                    l+q, h-q, l, g, null));
+                        (new FJLCSorter(a, w, l, q, g),
+                                new FJLCSorter(a, w, l + q, h - q, g),
+                                new FJLCMerger(a, w, l, q,
+                                        l + q, h - q, l, g, null));
 
                 FJSubSorter rs = new FJSubSorter
-                    (new FJLCSorter(a, w, l+h, q,   g),
-                     new FJLCSorter(a, w, l+u, n-u, g),
-                     new FJLCMerger(a, w, l+h, q,
-                                    l+u, n-u, l+h, g, null));
+                        (new FJLCSorter(a, w, l + h, q, g),
+                                new FJLCSorter(a, w, l + u, n - u, g),
+                                new FJLCMerger(a, w, l + h, q,
+                                        l + u, n - u, l + h, g, null));
                 rs.fork();
                 ls.compute();
-                if (rs.tryUnfork()) rs.compute(); else rs.join();
+                if (rs.tryUnfork()) rs.compute();
+                else rs.join();
                 new FJLCMerger(w, a, l, h,
-                               l+h, n-h, l, g, null).compute();
-            }
-            else
-                Arrays.sort(a, l, l+n);
+                        l + h, n - h, l, g, null).compute();
+            } else
+                Arrays.sort(a, l, l + n);
         }
     }
 
-    /** Utility class to sort half a partitioned array */
+    /**
+     * Utility class to sort half a partitioned array
+     */
     static final class FJSubSorter extends RecursiveAction {
         final RecursiveAction left;
         final RecursiveAction right;
         final RecursiveAction merger;
+
         FJSubSorter(RecursiveAction left, RecursiveAction right,
                     RecursiveAction merger) {
-            this.left = left; this.right = right; this.merger = merger;
+            this.left = left;
+            this.right = right;
+            this.merger = merger;
         }
+
         public void compute() {
             right.fork();
             left.invoke();
@@ -1942,9 +2225,12 @@ class PAS {
                   int lo, int ln, int ro, int rn, int wo,
                   int gran, FJOMerger next) {
             this.cmp = cmp;
-            this.a = a;    this.w = w;
-            this.lo = lo;  this.ln = ln;
-            this.ro = ro;  this.rn = rn;
+            this.a = a;
+            this.w = w;
+            this.lo = lo;
+            this.ln = ln;
+            this.ro = ro;
+            this.rn = rn;
             this.wo = wo;
             this.gran = gran;
             this.next = next;
@@ -1970,8 +2256,8 @@ class PAS {
                         rl = mid + 1;
                 }
                 (rights = new FJOMerger
-                 (cmp, a, w, splitIndex, nleft-lh, ro+rh,
-                  nright-rh, wo+lh+rh, gran, rights)).fork();
+                        (cmp, a, w, splitIndex, nleft - lh, ro + rh,
+                                nright - rh, wo + lh + rh, gran, rights)).fork();
                 nleft = lh;
                 nright = rh;
             }
@@ -1986,7 +2272,13 @@ class PAS {
                 Object al = a[l];
                 Object ar = a[r];
                 Object t;
-                if (cmp.compare(al, ar) <= 0) {++l; t=al;} else {++r; t=ar;}
+                if (cmp.compare(al, ar) <= 0) {
+                    ++l;
+                    t = al;
+                } else {
+                    ++r;
+                    t = ar;
+                }
                 w[k++] = t;
             }
             while (l < lFence)
@@ -2006,15 +2298,25 @@ class PAS {
     }
 
     static final class FJOCMerger extends RecursiveAction {
-        final Comparable[] a; final Comparable[] w;
-        final int lo; final int ln; final int ro;  final int rn; final int wo;
+        final Comparable[] a;
+        final Comparable[] w;
+        final int lo;
+        final int ln;
+        final int ro;
+        final int rn;
+        final int wo;
         final int gran;
         final FJOCMerger next;
+
         FJOCMerger(Comparable[] a, Comparable[] w, int lo,
                    int ln, int ro, int rn, int wo,
                    int gran, FJOCMerger next) {
-            this.a = a;    this.w = w;
-            this.lo = lo;  this.ln = ln; this.ro = ro; this.rn = rn;
+            this.a = a;
+            this.w = w;
+            this.lo = lo;
+            this.ln = ln;
+            this.ro = ro;
+            this.rn = rn;
             this.wo = wo;
             this.gran = gran;
             this.next = next;
@@ -2038,8 +2340,8 @@ class PAS {
                         rl = mid + 1;
                 }
                 (rights = new FJOCMerger
-                 (a, w, splitIndex, nleft-lh, ro+rh,
-                  nright-rh, wo+lh+rh, gran, rights)).fork();
+                        (a, w, splitIndex, nleft - lh, ro + rh,
+                                nright - rh, wo + lh + rh, gran, rights)).fork();
                 nleft = lh;
                 nright = rh;
             }
@@ -2053,7 +2355,13 @@ class PAS {
                 Comparable al = a[l];
                 Comparable ar = a[r];
                 Comparable t;
-                if (al.compareTo(ar) <= 0) {++l; t=al;} else {++r; t=ar; }
+                if (al.compareTo(ar) <= 0) {
+                    ++l;
+                    t = al;
+                } else {
+                    ++r;
+                    t = ar;
+                }
                 w[k++] = t;
             }
             while (l < lFence)
@@ -2071,21 +2379,32 @@ class PAS {
     }
 
     static final class FJDMerger extends RecursiveAction {
-        final DoubleComparator cmp; final double[] a; final double[] w;
-        final int lo; final int ln; final int ro; final int rn; final int wo;
+        final DoubleComparator cmp;
+        final double[] a;
+        final double[] w;
+        final int lo;
+        final int ln;
+        final int ro;
+        final int rn;
+        final int wo;
         final int gran;
         final FJDMerger next;
+
         FJDMerger(DoubleComparator cmp, double[] a, double[] w,
                   int lo, int ln, int ro, int rn, int wo,
                   int gran, FJDMerger next) {
             this.cmp = cmp;
-            this.a = a;    this.w = w;
-            this.lo = lo;  this.ln = ln;
-            this.ro = ro;  this.rn = rn;
+            this.a = a;
+            this.w = w;
+            this.lo = lo;
+            this.ln = ln;
+            this.ro = ro;
+            this.rn = rn;
             this.wo = wo;
             this.gran = gran;
             this.next = next;
         }
+
         public void compute() {
             FJDMerger rights = null;
             int nleft = ln;
@@ -2104,8 +2423,8 @@ class PAS {
                         rl = mid + 1;
                 }
                 (rights = new FJDMerger
-                 (cmp, a, w, splitIndex, nleft-lh, ro+rh,
-                  nright-rh, wo+lh+rh, gran, rights)).fork();
+                        (cmp, a, w, splitIndex, nleft - lh, ro + rh,
+                                nright - rh, wo + lh + rh, gran, rights)).fork();
                 nleft = lh;
                 nright = rh;
             }
@@ -2119,7 +2438,13 @@ class PAS {
                 double al = a[l];
                 double ar = a[r];
                 double t;
-                if (cmp.compare(al, ar) <= 0) {++l; t=al;} else {++r; t=ar; }
+                if (cmp.compare(al, ar) <= 0) {
+                    ++l;
+                    t = al;
+                } else {
+                    ++r;
+                    t = ar;
+                }
                 w[k++] = t;
             }
             while (l < lFence)
@@ -2137,20 +2462,30 @@ class PAS {
     }
 
     static final class FJDCMerger extends RecursiveAction {
-        final double[] a; final double[] w;
-        final int lo; final int ln; final int ro; final int rn; final int wo;
+        final double[] a;
+        final double[] w;
+        final int lo;
+        final int ln;
+        final int ro;
+        final int rn;
+        final int wo;
         final int gran;
         final FJDCMerger next;
+
         FJDCMerger(double[] a, double[] w, int lo,
                    int ln, int ro, int rn, int wo,
                    int gran, FJDCMerger next) {
-            this.a = a;    this.w = w;
-            this.lo = lo;  this.ln = ln;
-            this.ro = ro;  this.rn = rn;
+            this.a = a;
+            this.w = w;
+            this.lo = lo;
+            this.ln = ln;
+            this.ro = ro;
+            this.rn = rn;
             this.wo = wo;
             this.gran = gran;
             this.next = next;
         }
+
         public void compute() {
             FJDCMerger rights = null;
             int nleft = ln;
@@ -2169,8 +2504,8 @@ class PAS {
                         rl = mid + 1;
                 }
                 (rights = new FJDCMerger
-                 (a, w, splitIndex, nleft-lh, ro+rh,
-                  nright-rh, wo+lh+rh, gran, rights)).fork();
+                        (a, w, splitIndex, nleft - lh, ro + rh,
+                                nright - rh, wo + lh + rh, gran, rights)).fork();
                 nleft = lh;
                 nright = rh;
             }
@@ -2184,7 +2519,13 @@ class PAS {
                 double al = a[l];
                 double ar = a[r];
                 double t;
-                if (al <= ar) {++l; t=al;} else {++r; t=ar; }
+                if (al <= ar) {
+                    ++l;
+                    t = al;
+                } else {
+                    ++r;
+                    t = ar;
+                }
                 w[k++] = t;
             }
             while (l < lFence)
@@ -2202,21 +2543,32 @@ class PAS {
     }
 
     static final class FJLMerger extends RecursiveAction {
-        final LongComparator cmp; final long[] a; final long[] w;
-        final int lo; final int ln; final int ro; final int rn; final int wo;
+        final LongComparator cmp;
+        final long[] a;
+        final long[] w;
+        final int lo;
+        final int ln;
+        final int ro;
+        final int rn;
+        final int wo;
         final int gran;
         final FJLMerger next;
+
         FJLMerger(LongComparator cmp, long[] a, long[] w,
                   int lo, int ln, int ro, int rn, int wo,
                   int gran, FJLMerger next) {
             this.cmp = cmp;
-            this.a = a;    this.w = w;
-            this.lo = lo;  this.ln = ln;
-            this.ro = ro;  this.rn = rn;
+            this.a = a;
+            this.w = w;
+            this.lo = lo;
+            this.ln = ln;
+            this.ro = ro;
+            this.rn = rn;
             this.wo = wo;
             this.gran = gran;
             this.next = next;
         }
+
         public void compute() {
             FJLMerger rights = null;
             int nleft = ln;
@@ -2235,8 +2587,8 @@ class PAS {
                         rl = mid + 1;
                 }
                 (rights = new FJLMerger
-                 (cmp, a, w, splitIndex, nleft-lh, ro+rh,
-                  nright-rh, wo+lh+rh, gran, rights)).fork();
+                        (cmp, a, w, splitIndex, nleft - lh, ro + rh,
+                                nright - rh, wo + lh + rh, gran, rights)).fork();
                 nleft = lh;
                 nright = rh;
             }
@@ -2250,7 +2602,13 @@ class PAS {
                 long al = a[l];
                 long ar = a[r];
                 long t;
-                if (cmp.compare(al, ar) <= 0) {++l; t=al;} else {++r; t=ar;}
+                if (cmp.compare(al, ar) <= 0) {
+                    ++l;
+                    t = al;
+                } else {
+                    ++r;
+                    t = ar;
+                }
                 w[k++] = t;
             }
             while (l < lFence)
@@ -2268,20 +2626,30 @@ class PAS {
     }
 
     static final class FJLCMerger extends RecursiveAction {
-        final long[] a; final long[] w;
-        final int lo; final int ln; final int ro; final int rn; final int wo;
+        final long[] a;
+        final long[] w;
+        final int lo;
+        final int ln;
+        final int ro;
+        final int rn;
+        final int wo;
         final int gran;
         final FJLCMerger next;
+
         FJLCMerger(long[] a, long[] w, int lo,
                    int ln, int ro, int rn, int wo,
                    int gran, FJLCMerger next) {
-            this.a = a;    this.w = w;
-            this.lo = lo;  this.ln = ln;
-            this.ro = ro;  this.rn = rn;
+            this.a = a;
+            this.w = w;
+            this.lo = lo;
+            this.ln = ln;
+            this.ro = ro;
+            this.rn = rn;
             this.wo = wo;
             this.gran = gran;
             this.next = next;
         }
+
         public void compute() {
             FJLCMerger rights = null;
             int nleft = ln;
@@ -2300,8 +2668,8 @@ class PAS {
                         rl = mid + 1;
                 }
                 (rights = new FJLCMerger
-                 (a, w, splitIndex, nleft-lh, ro+rh,
-                  nright-rh, wo+lh+rh, gran, rights)).fork();
+                        (a, w, splitIndex, nleft - lh, ro + rh,
+                                nright - rh, wo + lh + rh, gran, rights)).fork();
                 nleft = lh;
                 nright = rh;
             }
@@ -2315,7 +2683,13 @@ class PAS {
                 long al = a[l];
                 long ar = a[r];
                 long t;
-                if (al <= ar) {++l; t=al;} else {++r; t = ar;}
+                if (al <= ar) {
+                    ++l;
+                    t = al;
+                } else {
+                    ++r;
+                    t = ar;
+                }
                 w[k++] = t;
             }
             while (l < lFence)
@@ -2332,57 +2706,66 @@ class PAS {
         }
     }
 
-    /** Cutoff for when to use insertion-sort instead of quicksort */
+    /**
+     * Cutoff for when to use insertion-sort instead of quicksort
+     */
     static final int INSERTION_SORT_THRESHOLD = 8;
 
     // versions of quicksort with comparators
 
 
     static void dquickSort(double[] a, DoubleComparator cmp, int lo, int hi) {
-        for (;;) {
+        for (; ; ) {
             if (hi - lo <= INSERTION_SORT_THRESHOLD) {
                 for (int i = lo + 1; i <= hi; i++) {
                     double t = a[i];
                     int j = i - 1;
                     while (j >= lo && cmp.compare(t, a[j]) < 0) {
-                        a[j+1] = a[j];
+                        a[j + 1] = a[j];
                         --j;
                     }
-                    a[j+1] = t;
+                    a[j + 1] = t;
                 }
                 return;
             }
 
             int mid = (lo + hi) >>> 1;
             if (cmp.compare(a[lo], a[mid]) > 0) {
-                double t = a[lo]; a[lo] = a[mid]; a[mid] = t;
+                double t = a[lo];
+                a[lo] = a[mid];
+                a[mid] = t;
             }
             if (cmp.compare(a[mid], a[hi]) > 0) {
-                double t = a[mid]; a[mid] = a[hi]; a[hi] = t;
+                double t = a[mid];
+                a[mid] = a[hi];
+                a[hi] = t;
                 if (cmp.compare(a[lo], a[mid]) > 0) {
-                    double u = a[lo]; a[lo] = a[mid]; a[mid] = u;
+                    double u = a[lo];
+                    a[lo] = a[mid];
+                    a[mid] = u;
                 }
             }
 
             double pivot = a[mid];
-            int left = lo+1;
-            int right = hi-1;
+            int left = lo + 1;
+            int right = hi - 1;
             boolean sameLefts = true;
-            for (;;) {
+            for (; ; ) {
                 while (cmp.compare(pivot, a[right]) < 0)
                     --right;
                 int c;
                 while (left < right &&
-                       (c = cmp.compare(pivot, a[left])) >= 0) {
+                        (c = cmp.compare(pivot, a[left])) >= 0) {
                     if (c != 0)
                         sameLefts = false;
                     ++left;
                 }
                 if (left < right) {
-                    double t = a[left]; a[left] = a[right]; a[right] = t;
+                    double t = a[left];
+                    a[left] = a[right];
+                    a[right] = t;
                     --right;
-                }
-                else break;
+                } else break;
             }
 
             if (sameLefts && right == hi - 1)
@@ -2390,8 +2773,7 @@ class PAS {
             if (left - lo <= hi - right) {
                 dquickSort(a, cmp, lo, left);
                 lo = left + 1;
-            }
-            else {
+            } else {
                 dquickSort(a, cmp, right, hi);
                 hi = left;
             }
@@ -2399,50 +2781,57 @@ class PAS {
     }
 
     static void lquickSort(long[] a, LongComparator cmp, int lo, int hi) {
-        for (;;) {
+        for (; ; ) {
             if (hi - lo <= INSERTION_SORT_THRESHOLD) {
                 for (int i = lo + 1; i <= hi; i++) {
                     long t = a[i];
                     int j = i - 1;
                     while (j >= lo && cmp.compare(t, a[j]) < 0) {
-                        a[j+1] = a[j];
+                        a[j + 1] = a[j];
                         --j;
                     }
-                    a[j+1] = t;
+                    a[j + 1] = t;
                 }
                 return;
             }
 
             int mid = (lo + hi) >>> 1;
             if (cmp.compare(a[lo], a[mid]) > 0) {
-                long t = a[lo]; a[lo] = a[mid]; a[mid] = t;
+                long t = a[lo];
+                a[lo] = a[mid];
+                a[mid] = t;
             }
             if (cmp.compare(a[mid], a[hi]) > 0) {
-                long t = a[mid]; a[mid] = a[hi]; a[hi] = t;
+                long t = a[mid];
+                a[mid] = a[hi];
+                a[hi] = t;
                 if (cmp.compare(a[lo], a[mid]) > 0) {
-                    long u = a[lo]; a[lo] = a[mid]; a[mid] = u;
+                    long u = a[lo];
+                    a[lo] = a[mid];
+                    a[mid] = u;
                 }
             }
 
             long pivot = a[mid];
-            int left = lo+1;
-            int right = hi-1;
+            int left = lo + 1;
+            int right = hi - 1;
             boolean sameLefts = true;
-            for (;;) {
+            for (; ; ) {
                 while (cmp.compare(pivot, a[right]) < 0)
                     --right;
                 int c;
                 while (left < right &&
-                       (c = cmp.compare(pivot, a[left])) >= 0) {
+                        (c = cmp.compare(pivot, a[left])) >= 0) {
                     if (c != 0)
                         sameLefts = false;
                     ++left;
                 }
                 if (left < right) {
-                    long t = a[left]; a[left] = a[right]; a[right] = t;
+                    long t = a[left];
+                    a[left] = a[right];
+                    a[right] = t;
                     --right;
-                }
-                else break;
+                } else break;
             }
 
             if (sameLefts && right == hi - 1)
@@ -2450,8 +2839,7 @@ class PAS {
             if (left - lo <= hi - right) {
                 lquickSort(a, cmp, lo, left);
                 lo = left + 1;
-            }
-            else {
+            } else {
                 lquickSort(a, cmp, right, hi);
                 hi = left;
             }
@@ -2460,20 +2848,20 @@ class PAS {
 
     /**
      * Cumulative scan
-     *
+     * <p/>
      * A basic version of scan is straightforward.
-     *  Keep dividing by two to threshold segment size, and then:
-     *   Pass 1: Create tree of partial sums for each segment
-     *   Pass 2: For each segment, cumulate with offset of left sibling
+     * Keep dividing by two to threshold segment size, and then:
+     * Pass 1: Create tree of partial sums for each segment
+     * Pass 2: For each segment, cumulate with offset of left sibling
      * See G. Blelloch's http://www.cs.cmu.edu/~scandal/alg/scan.html
-     *
+     * <p/>
      * This version improves performance within FJ framework mainly by
      * allowing second pass of ready left-hand sides to proceed even
      * if some right-hand side first passes are still executing.  It
      * also combines first and second pass for leftmost segment, and
      * for cumulate (not precumulate) also skips first pass for
      * rightmost segment (whose result is not needed for second pass).
-     *
+     * <p/>
      * To manage this, it relies on "phase" phase/state control field
      * maintaining bits CUMULATE, SUMMED, and FINISHED. CUMULATE is
      * main phase bit. When false, segments compute only their sum.
@@ -2488,15 +2876,15 @@ class PAS {
      * internal nodes, it becomes true when one child is cumulated.
      * When second child finishes cumulating, it then moves up tree,
      * executing complete() at the root.
-     *
+     * <p/>
      * This class maintains only the basic control logic.  Subclasses
      * maintain the "in" and "out" fields, and *Ops classes perform
      * computations
      */
     static abstract class FJScan extends ForkJoinTask<Void> {
-        static final short CUMULATE = (short)1;
-        static final short SUMMED   = (short)2;
-        static final short FINISHED = (short)4;
+        static final short CUMULATE = (short) 1;
+        static final short SUMMED = (short) 2;
+        static final short FINISHED = (short) 4;
 
         final FJScan parent;
         final FJScanOp op;
@@ -2506,7 +2894,7 @@ class PAS {
         final int hi;
 
         static final AtomicIntegerFieldUpdater<FJScan> phaseUpdater =
-            AtomicIntegerFieldUpdater.newUpdater(FJScan.class, "phase");
+                AtomicIntegerFieldUpdater.newUpdater(FJScan.class, "phase");
 
         FJScan(FJScan parent, FJScanOp op, int lo, int hi) {
             this.parent = parent;
@@ -2515,10 +2903,16 @@ class PAS {
             this.hi = hi;
         }
 
-        public final Void getRawResult() { return null; }
-        protected final void setRawResult(Void mustBeNull) { }
+        public final Void getRawResult() {
+            return null;
+        }
 
-        /** Returns true if can CAS CUMULATE bit true */
+        protected final void setRawResult(Void mustBeNull) {
+        }
+
+        /**
+         * Returns true if can CAS CUMULATE bit true
+         */
         final boolean transitionToCumulate() {
             int c;
             while (((c = phase) & CUMULATE) == 0)
@@ -2531,7 +2925,7 @@ class PAS {
             if (hi - lo > op.threshold) {
                 if (left == null) { // first pass
                     int mid = (lo + hi) >>> 1;
-                    left =  op.newSubtask(this, lo, mid);
+                    left = op.newSubtask(this, lo, mid);
                     right = op.newSubtask(this, mid, hi);
                 }
 
@@ -2543,20 +2937,19 @@ class PAS {
                     right.fork();
                 if (!cumulate || left.transitionToCumulate())
                     left.exec();
-            }
-            else {
+            } else {
                 int cb;
-                for (;;) { // Establish action: sum, cumulate, or both
+                for (; ; ) { // Establish action: sum, cumulate, or both
                     int b = phase;
                     if ((b & FINISHED) != 0) // already done
                         return false;
                     if ((b & CUMULATE) != 0)
                         cb = FINISHED;
                     else if (lo == op.origin) // combine leftmost
-                        cb = (SUMMED|FINISHED);
+                        cb = (SUMMED | FINISHED);
                     else
                         cb = SUMMED;
-                    if (phaseUpdater.compareAndSet(this, b, b|cb))
+                    if (phaseUpdater.compareAndSet(this, b, b | cb))
                         break;
                 }
 
@@ -2564,13 +2957,13 @@ class PAS {
                     op.sumLeaf(lo, hi, this);
                 else if (cb == FINISHED)
                     op.cumulateLeaf(lo, hi, this);
-                else if (cb == (SUMMED|FINISHED))
+                else if (cb == (SUMMED | FINISHED))
                     op.sumAndCumulateLeaf(lo, hi, this);
 
                 // propagate up
                 FJScan ch = this;
                 FJScan par = parent;
-                for (;;) {
+                for (; ; ) {
                     if (par == null) {
                         if ((cb & FINISHED) != 0)
                             ch.complete(null);
@@ -2580,23 +2973,21 @@ class PAS {
                     if ((pb & cb & FINISHED) != 0) { // both finished
                         ch = par;
                         par = par.parent;
-                    }
-                    else if ((pb & cb & SUMMED) != 0) { // both summed
+                    } else if ((pb & cb & SUMMED) != 0) { // both summed
                         op.pushUp(par, par.left, par.right);
                         int refork =
-                            ((pb & CUMULATE) == 0 &&
-                             par.lo == op.origin) ? CUMULATE : 0;
-                        int nextPhase = pb|cb|refork;
+                                ((pb & CUMULATE) == 0 &&
+                                        par.lo == op.origin) ? CUMULATE : 0;
+                        int nextPhase = pb | cb | refork;
                         if (pb == nextPhase ||
-                            phaseUpdater.compareAndSet(par, pb, nextPhase)) {
+                                phaseUpdater.compareAndSet(par, pb, nextPhase)) {
                             if (refork != 0)
                                 par.fork();
                             cb = SUMMED; // drop finished bit
                             ch = par;
                             par = par.parent;
                         }
-                    }
-                    else if (phaseUpdater.compareAndSet(par, pb, pb|cb))
+                    } else if (phaseUpdater.compareAndSet(par, pb, pb | cb))
                         break;
                 }
             }
@@ -2605,58 +2996,124 @@ class PAS {
 
         // no-op versions of methods to get/set in/out, overridden as
         // appropriate in subclasses
-        Object ogetIn() { return null; }
-        Object ogetOut() { return null; }
-        void rsetIn(Object x) { }
-        void rsetOut(Object x) { }
+        Object ogetIn() {
+            return null;
+        }
 
-        double dgetIn() { return 0; }
-        double dgetOut() { return 0; }
-        void dsetIn(double x) { }
-        void dsetOut(double x) { }
+        Object ogetOut() {
+            return null;
+        }
 
-        long lgetIn() { return 0; }
-        long lgetOut() { return 0; }
-        void lsetIn(long x) { }
-        void lsetOut(long x) { }
+        void rsetIn(Object x) {
+        }
+
+        void rsetOut(Object x) {
+        }
+
+        double dgetIn() {
+            return 0;
+        }
+
+        double dgetOut() {
+            return 0;
+        }
+
+        void dsetIn(double x) {
+        }
+
+        void dsetOut(double x) {
+        }
+
+        long lgetIn() {
+            return 0;
+        }
+
+        long lgetOut() {
+            return 0;
+        }
+
+        void lsetIn(long x) {
+        }
+
+        void lsetOut(long x) {
+        }
     }
 
     // Subclasses adding in/out fields of the appropriate type
     static final class FJOScan extends FJScan {
         Object in;
         Object out;
+
         FJOScan(FJScan parent, FJScanOp op, int lo, int hi) {
             super(parent, op, lo, hi);
         }
-        Object ogetIn() { return in; }
-        Object ogetOut() { return out; }
-        void rsetIn(Object x) { in = x; }
-        void rsetOut(Object x) { out = x; }
+
+        Object ogetIn() {
+            return in;
+        }
+
+        Object ogetOut() {
+            return out;
+        }
+
+        void rsetIn(Object x) {
+            in = x;
+        }
+
+        void rsetOut(Object x) {
+            out = x;
+        }
     }
 
     static final class FJDScan extends FJScan {
         double in;
         double out;
+
         FJDScan(FJScan parent, FJScanOp op, int lo, int hi) {
             super(parent, op, lo, hi);
         }
-        double dgetIn() { return in; }
-        double dgetOut() { return out; }
-        void dsetIn(double x) { in = x; }
-        void dsetOut(double x) { out = x; }
+
+        double dgetIn() {
+            return in;
+        }
+
+        double dgetOut() {
+            return out;
+        }
+
+        void dsetIn(double x) {
+            in = x;
+        }
+
+        void dsetOut(double x) {
+            out = x;
+        }
 
     }
 
     static final class FJLScan extends FJScan {
         long in;
         long out;
+
         FJLScan(FJScan parent, FJScanOp op, int lo, int hi) {
             super(parent, op, lo, hi);
         }
-        long lgetIn() { return in; }
-        long lgetOut() { return out; }
-        void lsetIn(long x) { in = x; }
-        void lsetOut(long x) { out = x; }
+
+        long lgetIn() {
+            return in;
+        }
+
+        long lgetOut() {
+            return out;
+        }
+
+        void lsetIn(long x) {
+            in = x;
+        }
+
+        void lsetOut(long x) {
+            out = x;
+        }
     }
 
     /**
@@ -2666,16 +3123,23 @@ class PAS {
         final int threshold;
         final int origin;
         final int fence;
+
         FJScanOp(AbstractParallelAnyArray pap) {
             this.origin = pap.origin;
             this.fence = pap.fence;
             this.threshold = pap.computeThreshold();
         }
+
         abstract void pushDown(FJScan parent, FJScan left, FJScan right);
+
         abstract void pushUp(FJScan parent, FJScan left, FJScan right);
+
         abstract void sumLeaf(int lo, int hi, FJScan f);
+
         abstract void cumulateLeaf(int lo, int hi, FJScan f);
+
         abstract void sumAndCumulateLeaf(int lo, int hi, FJScan f);
+
         abstract FJScan newSubtask(FJScan parent, int lo, int hi);
     }
 
@@ -2683,6 +3147,7 @@ class PAS {
         final Object[] array;
         final Reducer reducer;
         final Object base;
+
         FJOScanOp(AbstractParallelAnyArray.OPap pap,
                   Reducer reducer, Object base) {
             super(pap);
@@ -2690,15 +3155,18 @@ class PAS {
             this.reducer = reducer;
             this.base = base;
         }
+
         final void pushDown(FJScan parent, FJScan left, FJScan right) {
             Object pin = parent.ogetIn();
             left.rsetIn(pin);
             right.rsetIn(reducer.op(pin, left.ogetOut()));
         }
+
         final void pushUp(FJScan parent, FJScan left, FJScan right) {
             parent.rsetOut(reducer.op(left.ogetOut(),
-                                           right.ogetOut()));
+                    right.ogetOut()));
         }
+
         final FJScan newSubtask(FJScan parent, int lo, int hi) {
             FJOScan f = new FJOScan(parent, this, lo, hi);
             f.in = base;
@@ -2712,6 +3180,7 @@ class PAS {
                       Reducer reducer, Object base) {
             super(pap, reducer, base);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             Object sum = base;
             if (hi != fence) {
@@ -2721,12 +3190,14 @@ class PAS {
             }
             f.rsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             Object[] arr = array;
             Object sum = f.ogetIn();
             for (int i = lo; i < hi; ++i)
                 arr[i] = sum = reducer.op(sum, arr[i]);
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             Object[] arr = array;
             Object sum = base;
@@ -2741,6 +3212,7 @@ class PAS {
                          Reducer reducer, Object base) {
             super(pap, reducer, base);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             Object[] arr = array;
             Object sum = base;
@@ -2748,6 +3220,7 @@ class PAS {
                 sum = reducer.op(sum, arr[i]);
             f.rsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             Object[] arr = array;
             Object sum = f.ogetIn();
@@ -2757,6 +3230,7 @@ class PAS {
                 sum = reducer.op(sum, x);
             }
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             Object[] arr = array;
             Object sum = base;
@@ -2773,6 +3247,7 @@ class PAS {
         final double[] array;
         final DoubleReducer reducer;
         final double base;
+
         FJDScanOp(AbstractParallelAnyArray.DPap pap,
                   DoubleReducer reducer, double base) {
             super(pap);
@@ -2780,15 +3255,18 @@ class PAS {
             this.reducer = reducer;
             this.base = base;
         }
+
         final void pushDown(FJScan parent, FJScan left, FJScan right) {
             double pin = parent.dgetIn();
             left.dsetIn(pin);
             right.dsetIn(reducer.op(pin, left.dgetOut()));
         }
+
         final void pushUp(FJScan parent, FJScan left, FJScan right) {
             parent.dsetOut(reducer.op(left.dgetOut(),
-                                           right.dgetOut()));
+                    right.dgetOut()));
         }
+
         final FJScan newSubtask(FJScan parent, int lo, int hi) {
             FJDScan f = new FJDScan(parent, this, lo, hi);
             f.in = base;
@@ -2802,6 +3280,7 @@ class PAS {
                       DoubleReducer reducer, double base) {
             super(pap, reducer, base);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             double sum = base;
             if (hi != fence) {
@@ -2811,12 +3290,14 @@ class PAS {
             }
             f.dsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = f.dgetIn();
             for (int i = lo; i < hi; ++i)
                 arr[i] = sum = reducer.op(sum, arr[i]);
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = base;
@@ -2831,6 +3312,7 @@ class PAS {
                          DoubleReducer reducer, double base) {
             super(pap, reducer, base);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = base;
@@ -2838,6 +3320,7 @@ class PAS {
                 sum = reducer.op(sum, arr[i]);
             f.dsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = f.dgetIn();
@@ -2847,6 +3330,7 @@ class PAS {
                 sum = reducer.op(sum, x);
             }
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = base;
@@ -2863,6 +3347,7 @@ class PAS {
         final long[] array;
         final LongReducer reducer;
         final long base;
+
         FJLScanOp(AbstractParallelAnyArray.LPap pap,
                   LongReducer reducer, long base) {
             super(pap);
@@ -2870,15 +3355,18 @@ class PAS {
             this.reducer = reducer;
             this.base = base;
         }
+
         final void pushDown(FJScan parent, FJScan left, FJScan right) {
             long pin = parent.lgetIn();
             left.lsetIn(pin);
             right.lsetIn(reducer.op(pin, left.lgetOut()));
         }
+
         final void pushUp(FJScan parent, FJScan left, FJScan right) {
             parent.lsetOut(reducer.op(left.lgetOut(),
-                                           right.lgetOut()));
+                    right.lgetOut()));
         }
+
         final FJScan newSubtask(FJScan parent, int lo, int hi) {
             FJLScan f = new FJLScan(parent, this, lo, hi);
             f.in = base;
@@ -2892,6 +3380,7 @@ class PAS {
                       LongReducer reducer, long base) {
             super(pap, reducer, base);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             long sum = base;
             if (hi != fence) {
@@ -2901,12 +3390,14 @@ class PAS {
             }
             f.lsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = f.lgetIn();
             for (int i = lo; i < hi; ++i)
                 arr[i] = sum = reducer.op(sum, arr[i]);
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = base;
@@ -2921,6 +3412,7 @@ class PAS {
                          LongReducer reducer, long base) {
             super(pap, reducer, base);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = base;
@@ -2928,6 +3420,7 @@ class PAS {
                 sum = reducer.op(sum, arr[i]);
             f.lsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = f.lgetIn();
@@ -2937,6 +3430,7 @@ class PAS {
                 sum = reducer.op(sum, x);
             }
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = base;
@@ -2953,18 +3447,22 @@ class PAS {
 
     static abstract class FJDScanPlusOp extends FJScanOp {
         final double[] array;
+
         FJDScanPlusOp(AbstractParallelAnyArray.DPap pap) {
             super(pap);
             this.array = pap.array;
         }
+
         final void pushDown(FJScan parent, FJScan left, FJScan right) {
             double pin = parent.dgetIn();
             left.dsetIn(pin);
             right.dsetIn(pin + left.dgetOut());
         }
+
         final void pushUp(FJScan parent, FJScan left, FJScan right) {
             parent.dsetOut(left.dgetOut() + right.dgetOut());
         }
+
         final FJScan newSubtask(FJScan parent, int lo, int hi) {
             FJDScan f = new FJDScan(parent, this, lo, hi);
             f.in = 0.0;
@@ -2977,6 +3475,7 @@ class PAS {
         FJDCumulatePlusOp(AbstractParallelAnyArray.DPap pap) {
             super(pap);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             double sum = 0.0;
             if (hi != fence) {
@@ -2986,12 +3485,14 @@ class PAS {
             }
             f.dsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = f.dgetIn();
             for (int i = lo; i < hi; ++i)
                 arr[i] = sum += arr[i];
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = 0.0;
@@ -3005,6 +3506,7 @@ class PAS {
         FJDPrecumulatePlusOp(AbstractParallelAnyArray.DPap pap) {
             super(pap);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = 0.0;
@@ -3012,6 +3514,7 @@ class PAS {
                 sum += arr[i];
             f.dsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = f.dgetIn();
@@ -3021,6 +3524,7 @@ class PAS {
                 sum += x;
             }
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             double[] arr = array;
             double sum = 0.0;
@@ -3035,10 +3539,12 @@ class PAS {
 
     static abstract class FJLScanPlusOp extends FJScanOp {
         final long[] array;
+
         FJLScanPlusOp(AbstractParallelAnyArray.LPap pap) {
             super(pap);
             this.array = pap.array;
         }
+
         final void pushDown(FJScan parent, FJScan left, FJScan right) {
             long pin = parent.lgetIn();
             left.lsetIn(pin);
@@ -3061,6 +3567,7 @@ class PAS {
         FJLCumulatePlusOp(AbstractParallelAnyArray.LPap pap) {
             super(pap);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             long sum = 0L;
             if (hi != fence) {
@@ -3070,12 +3577,14 @@ class PAS {
             }
             f.lsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = f.lgetIn();
             for (int i = lo; i < hi; ++i)
                 arr[i] = sum += arr[i];
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = 0L;
@@ -3089,6 +3598,7 @@ class PAS {
         FJLPrecumulatePlusOp(AbstractParallelAnyArray.LPap pap) {
             super(pap);
         }
+
         void sumLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = 0L;
@@ -3096,6 +3606,7 @@ class PAS {
                 sum += arr[i];
             f.lsetOut(sum);
         }
+
         void cumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = f.lgetIn();
@@ -3105,6 +3616,7 @@ class PAS {
                 sum += x;
             }
         }
+
         void sumAndCumulateLeaf(int lo, int hi, FJScan f) {
             long[] arr = array;
             long sum = 0L;

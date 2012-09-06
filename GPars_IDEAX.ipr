@@ -171,11 +171,20 @@
     <copyright>
       <option name="notice" value="GPars - Groovy Parallel Systems&#10;&#10;Copyright © 2008-2012  The original author or authors&#10;&#10;Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);&#10;you may not use this file except in compliance with the License.&#10;You may obtain a copy of the License at&#10;&#10;      http://www.apache.org/licenses/LICENSE-2.0&#10;&#10;Unless required by applicable law or agreed to in writing, software&#10;distributed under the License is distributed on an &quot;AS IS&quot; BASIS,&#10;WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.&#10;See the License for the specific language governing permissions and&#10;limitations under the License." />
       <option name="keyword" value="Copyright" />
-      <option name="allowReplaceKeyword" value="2008-10" />
+      <option name="allowReplaceKeyword" value="2008-11" />
       <option name="myName" value="GPars" />
       <option name="myLocal" value="true" />
     </copyright>
-    <module2copyright />
+    <copyright>
+      <option name="notice" value="extra-166y ParallelArray library&#10;&#10;Written by Doug Lea with assistance from members of JCP JSR-166&#10;Expert Group and released to the public domain, as explained at&#10;http://creativecommons.org/publicdomain/zero/1.0/" />
+      <option name="keyword" value="Doug Lea" />
+      <option name="allowReplaceKeyword" value="" />
+      <option name="myName" value="jsr166" />
+      <option name="myLocal" value="true" />
+    </copyright>
+    <module2copyright>
+      <element module="extra166" copyright="jsr166" />
+    </module2copyright>
     <LanguageOptions name="CSS">
       <option name="fileTypeOverride" value="1" />
     </LanguageOptions>
@@ -196,6 +205,7 @@
     <option name="myForwardDirection" value="false" />
   </component>
   <component name="DependencyValidationManager">
+    <scope name="extra166" pattern="src:groovyx.gpars.extra166y..*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">
@@ -239,6 +249,9 @@
         </modules>
       </facet-type>
     </autodetection-disabled>
+  </component>
+  <component name="GradleSettings">
+    <option name="gradleHome" value="C:/dev/gradle-1.0-rc-3" />
   </component>
   <component name="GradleUISettings">
     <setting name="root" />
