@@ -166,29 +166,26 @@
       <entry name="?*.ftl" />
       <entry name="trace.info" />
     </wildcardResourcePatterns>
-    <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-      <profile default="false" name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <processorPath useClasspath="true" />
-        <module name="gpars-java-demo" />
-      </profile>
-    </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="gpars-java-demo" target="1.7" />
-    </bytecodeTargetLevel>
+    <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="GPars">
     <copyright>
       <option name="notice" value="GPars - Groovy Parallel Systems&#10;&#10;Copyright © 2008-2012  The original author or authors&#10;&#10;Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);&#10;you may not use this file except in compliance with the License.&#10;You may obtain a copy of the License at&#10;&#10;      http://www.apache.org/licenses/LICENSE-2.0&#10;&#10;Unless required by applicable law or agreed to in writing, software&#10;distributed under the License is distributed on an &quot;AS IS&quot; BASIS,&#10;WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.&#10;See the License for the specific language governing permissions and&#10;limitations under the License." />
       <option name="keyword" value="Copyright" />
-      <option name="allowReplaceKeyword" value="2008-10" />
+      <option name="allowReplaceKeyword" value="2008-11" />
       <option name="myName" value="GPars" />
       <option name="myLocal" value="true" />
     </copyright>
-    <module2copyright />
+    <copyright>
+      <option name="notice" value="extra-166y ParallelArray library&#10;&#10;Written by Doug Lea with assistance from members of JCP JSR-166&#10;Expert Group and released to the public domain, as explained at&#10;http://creativecommons.org/publicdomain/zero/1.0/" />
+      <option name="keyword" value="Doug Lea" />
+      <option name="allowReplaceKeyword" value="" />
+      <option name="myName" value="jsr166" />
+      <option name="myLocal" value="true" />
+    </copyright>
+    <module2copyright>
+      <element module="extra166" copyright="jsr166" />
+    </module2copyright>
     <LanguageOptions name="CSS">
       <option name="fileTypeOverride" value="1" />
     </LanguageOptions>
@@ -209,6 +206,7 @@
     <option name="myForwardDirection" value="false" />
   </component>
   <component name="DependencyValidationManager">
+    <scope name="extra166" pattern="src:groovyx.gpars.extra166y..*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="EclipseCompilerSettings">
@@ -253,6 +251,9 @@
         </modules>
       </facet-type>
     </autodetection-disabled>
+  </component>
+  <component name="GradleSettings">
+    <option name="gradleHome" value="C:/dev/gradle-1.0-rc-3" />
   </component>
   <component name="GradleUISettings">
     <setting name="root" />
@@ -899,7 +900,6 @@
         <inspection_tool class="UnnecessaryParentheses" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreClarifyingParentheses" value="false" />
           <option name="ignoreParenthesesOnConditionals" value="false" />
-          <option name="ignoreParenthesesOnLambdaParameter" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryQualifierForThis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnnecessaryReturn" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1041,7 +1041,6 @@
             <value />
           </option>
           <option name="ignoreTestCases" value="false" />
-          <option name="ignoreLibraryOverrides" value="false" />
         </inspection_tool>
         <inspection_tool class="BadExpressionStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="BadOddness" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1557,7 +1556,6 @@
         <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreInHashCode" value="true" />
           <option name="ignoreInTestCode" value="false" />
-          <option name="ignoreInAnnotations" value="true" />
         </inspection_tool>
         <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="MapReplaceableByEnumMap" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1623,7 +1621,6 @@
         </inspection_tool>
         <inspection_tool class="NegatedIfElse" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignoreNegatedNullComparison" value="true" />
-          <option name="m_ignoreNegatedZeroComparison" value="false" />
         </inspection_tool>
         <inspection_tool class="NestedConditionalExpression" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NestedSwitchStatement" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1739,7 +1736,6 @@
         <inspection_tool class="RawUseOfParameterizedType" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreObjectConstruction" value="true" />
           <option name="ignoreTypeCasts" value="false" />
-          <option name="ignoreUncompilable" value="false" />
         </inspection_tool>
         <inspection_tool class="ReadObjectAndWriteObjectPrivate" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ReadObjectInitialization" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2009,7 +2005,6 @@
         <inspection_tool class="UnnecessaryParentheses" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreClarifyingParentheses" value="false" />
           <option name="ignoreParenthesesOnConditionals" value="false" />
-          <option name="ignoreParenthesesOnLambdaParameter" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryQualifierForThis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnnecessaryReturnJS" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -2044,17 +2039,10 @@
         <inspection_tool class="UseOfPropertiesAsHashtable" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UseOfSunClasses" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilSchemaInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="UtilityClass" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
-        </inspection_tool>
+        <inspection_tool class="UtilityClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithPublicConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithoutPrivateConstructor" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreClassesWithOnlyMain" value="false" />
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
         </inspection_tool>
         <inspection_tool class="ValidExternallyBoundObject" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="VariableNotUsedInsideIf" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2131,7 +2119,6 @@
             <value />
           </option>
           <option name="ignoreTestCases" value="false" />
-          <option name="ignoreLibraryOverrides" value="false" />
         </inspection_tool>
         <inspection_tool class="BadExpressionStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="BindingAnnotationWithoutInject" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -2954,7 +2941,6 @@
             <value />
           </option>
           <option name="ignoreTestCases" value="false" />
-          <option name="ignoreLibraryOverrides" value="false" />
         </inspection_tool>
         <inspection_tool class="BadOddness" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="BeforeClassOrAfterClassIsPublicStaticVoidNoArg" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -3469,7 +3455,6 @@
         <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreInHashCode" value="true" />
           <option name="ignoreInTestCode" value="false" />
-          <option name="ignoreInAnnotations" value="true" />
         </inspection_tool>
         <inspection_tool class="MagicNumberJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -3537,7 +3522,6 @@
         <inspection_tool class="NegatedConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NegatedIfElse" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignoreNegatedNullComparison" value="true" />
-          <option name="m_ignoreNegatedZeroComparison" value="false" />
         </inspection_tool>
         <inspection_tool class="NegatedIfStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NestedAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -3908,7 +3892,6 @@
         <inspection_tool class="UnnecessaryParentheses" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreClarifyingParentheses" value="false" />
           <option name="ignoreParenthesesOnConditionals" value="false" />
-          <option name="ignoreParenthesesOnLambdaParameter" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryQualifierForThis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnnecessarySuperQualifier" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -3936,17 +3919,10 @@
         <inspection_tool class="UseOfProcessBuilder" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UseOfPropertiesAsHashtable" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UseOfSunClasses" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="UtilityClass" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
-        </inspection_tool>
+        <inspection_tool class="UtilityClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithPublicConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithoutPrivateConstructor" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreClassesWithOnlyMain" value="false" />
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
         </inspection_tool>
         <inspection_tool class="VariableNotUsedInsideIf" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="VoidExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -4046,7 +4022,6 @@
             <value />
           </option>
           <option name="ignoreTestCases" value="false" />
-          <option name="ignoreLibraryOverrides" value="false" />
         </inspection_tool>
         <inspection_tool class="BadExpressionStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="BadOddness" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -4590,7 +4565,6 @@
         <inspection_tool class="MagicNumber" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreInHashCode" value="true" />
           <option name="ignoreInTestCode" value="false" />
-          <option name="ignoreInAnnotations" value="true" />
         </inspection_tool>
         <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="MapReplaceableByEnumMap" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -4657,7 +4631,6 @@
         </inspection_tool>
         <inspection_tool class="NegatedIfElse" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_ignoreNegatedNullComparison" value="true" />
-          <option name="m_ignoreNegatedZeroComparison" value="false" />
         </inspection_tool>
         <inspection_tool class="NestedConditionalExpression" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="NestedSwitchStatement" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -5037,7 +5010,6 @@
         <inspection_tool class="UnnecessaryParentheses" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreClarifyingParentheses" value="false" />
           <option name="ignoreParenthesesOnConditionals" value="false" />
-          <option name="ignoreParenthesesOnLambdaParameter" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryQualifierForThis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UnnecessaryReturnJS" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -5072,17 +5044,10 @@
         <inspection_tool class="UseOfPropertiesAsHashtable" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UseOfSunClasses" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilSchemaInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="UtilityClass" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
-        </inspection_tool>
+        <inspection_tool class="UtilityClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithPublicConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithoutPrivateConstructor" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreClassesWithOnlyMain" value="false" />
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
         </inspection_tool>
         <inspection_tool class="ValidExternallyBoundObject" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="VariableNotUsedInsideIf" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -5231,7 +5196,6 @@
             <value />
           </option>
           <option name="ignoreTestCases" value="false" />
-          <option name="ignoreLibraryOverrides" value="false" />
         </inspection_tool>
         <inspection_tool class="BadExceptionThrown" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="exceptionsString" value="java.lang.Throwable,java.lang.Exception,java.lang.Error,java.lang.RuntimeException,java.lang.NullPointerException,java.lang.ClassCastException,java.lang.ArrayIndexOutOfBoundsException" />
@@ -5545,6 +5509,7 @@
         <inspection_tool class="CyclicClassDependency" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CyclicPackageDependency" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="CyclomaticComplexity" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="ignoreEqualsMethod" value="false" />
           <option name="m_limit" value="10" />
         </inspection_tool>
         <inspection_tool class="CyclomaticComplexityJS" enabled="false" level="WARNING" enabled_by_default="false">
@@ -6429,7 +6394,6 @@
         <inspection_tool class="MagicNumber" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreInHashCode" value="true" />
           <option name="ignoreInTestCode" value="false" />
-          <option name="ignoreInAnnotations" value="true" />
         </inspection_tool>
         <inspection_tool class="MagicNumberJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="MalformedFormatString" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -6549,7 +6513,6 @@
         <inspection_tool class="NegatedEqualityExpression" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NegatedIfElse" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_ignoreNegatedNullComparison" value="true" />
-          <option name="m_ignoreNegatedZeroComparison" value="false" />
         </inspection_tool>
         <inspection_tool class="NegatedIfStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NestedAssignment" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -6830,7 +6793,6 @@
         <inspection_tool class="RawUseOfParameterizedType" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreObjectConstruction" value="true" />
           <option name="ignoreTypeCasts" value="false" />
-          <option name="ignoreUncompilable" value="false" />
         </inspection_tool>
         <inspection_tool class="ReadObjectAndWriteObjectPrivate" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ReadObjectInitialization" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7043,7 +7005,10 @@
         <inspection_tool class="StaticDateFormatField" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="StaticFieldReferenceOnSubclass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="StaticGuardedByInstance" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="StaticImport" enabled="false" level="WARNING" enabled_by_default="false" />
+        <inspection_tool class="StaticImport" enabled="false" level="WARNING" enabled_by_default="false">
+          <option name="ignoreSingleFieldImports" value="false" />
+          <option name="ignoreSingeMethodImports" value="false" />
+        </inspection_tool>
         <inspection_tool class="StaticInheritance" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="StaticMatcherField" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="StaticMethodNamingConvention" enabled="false" level="WARNING" enabled_by_default="false">
@@ -7146,7 +7111,6 @@
         <inspection_tool class="SynchronizeOnThis" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizedMethod" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_includeNativeMethods" value="true" />
-          <option name="ignoreSynchronizedSuperMethods" value="true" />
         </inspection_tool>
         <inspection_tool class="SynchronizedOnBoxedPrimitive" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SynchronizedOnGetClass" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7200,7 +7164,6 @@
         <inspection_tool class="ThreeNegationsPerFunctionJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ThreeNegationsPerMethod" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="m_ignoreInEquals" value="true" />
-          <option name="ignoreInAssert" value="false" />
         </inspection_tool>
         <inspection_tool class="ThrowCaughtLocally" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreRethrownExceptions" value="false" />
@@ -7234,7 +7197,6 @@
         <inspection_tool class="TooBroadThrows" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="onlyWarnOnRootExceptions" value="false" />
           <option name="ignoreInTestCode" value="false" />
-          <option name="ignoreLibraryOverrides" value="false" />
         </inspection_tool>
         <inspection_tool class="TrailingSpacesInProperty" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="TransientFieldInNonSerializableClass" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7367,7 +7329,6 @@
         <inspection_tool class="UnnecessaryParentheses" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreClarifyingParentheses" value="false" />
           <option name="ignoreParenthesesOnConditionals" value="false" />
-          <option name="ignoreParenthesesOnLambdaParameter" value="false" />
         </inspection_tool>
         <inspection_tool class="UnnecessaryParenthesesForMethodCallWithClosure" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UnnecessaryPublicModifier" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7465,17 +7426,10 @@
         <inspection_tool class="UseOfPropertiesAsHashtable" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UseOfSunClasses" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UtilSchemaInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="UtilityClass" enabled="false" level="WARNING" enabled_by_default="false">
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
-        </inspection_tool>
+        <inspection_tool class="UtilityClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UtilityClassWithPublicConstructor" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="UtilityClassWithoutPrivateConstructor" enabled="false" level="WARNING" enabled_by_default="false">
           <option name="ignoreClassesWithOnlyMain" value="false" />
-          <option name="ignorableAnnotations">
-            <value />
-          </option>
         </inspection_tool>
         <inspection_tool class="ValidExternallyBoundObject" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="VarCouldBeVal" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -7889,7 +7843,6 @@
         <inspection_tool class="RawUseOfParameterizedType" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreObjectConstruction" value="true" />
           <option name="ignoreTypeCasts" value="false" />
-          <option name="ignoreUncompilable" value="false" />
         </inspection_tool>
         <inspection_tool class="RedundantArrayCreation" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="RedundantCast" enabled="false" level="WARNING" enabled_by_default="false" />
