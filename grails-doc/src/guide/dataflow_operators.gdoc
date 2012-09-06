@@ -57,7 +57,7 @@ operator(inputs: [urlRequests], outputs: [downloadRequests, sites]) {request ->
 {code}
 
 {note}
-The standard error handling will print out an error message to standard error output and terminate the operator in case an uncaught
+The standard error handling will print out an error message to the standard error output and terminate the operator in case an uncaught
 exception is thrown from withing the operator's body. To alter the behavior, you can register your own event listener:
 
 {code}
