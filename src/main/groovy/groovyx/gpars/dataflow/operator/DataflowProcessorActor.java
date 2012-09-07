@@ -102,10 +102,14 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
      */
     final void checkPoison(final Object data) {
         if (data instanceof PoisonPill) {
-            owningProcessor.bindAllOutputsAtomically(data);
+            forwardPoisonPill(data);
             owningProcessor.terminate();
             ((PoisonPill) data).countDown();
         }
+    }
+
+    protected void forwardPoisonPill(final Object data) {
+        owningProcessor.bindAllOutputsAtomically(data);
     }
 
     final void reportException(final Throwable e) {
