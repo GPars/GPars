@@ -16,6 +16,7 @@ h3. Asynchronous functions
 h3. Parallel collections
 
 * Added a couple of new parallel collection processing methods to keep up with the innovation pace in Groovy
+* Merged the extra166y library into GPars
 
 h3. Fork / Join
 
