@@ -1,7 +1,7 @@
 Use of ThreadPool - the Java Executors' based concurrent collection processor
 
 Closures enhancements
-{code}ThreadPool.withPool() {
+{code}GParsExecutorsPool.withPool() {
     Closure longLastingCalculation = {calculate()}
     Closure fastCalculation = longLastingCalculation.async()  //create a new closure, which starts the original closure on a thread pool
     Future result=fastCalculation()                           //returns almost immediately
@@ -11,7 +11,7 @@ Closures enhancements
 {code}
 
 {code}
-ThreadPool.withPool() {
+GParsExecutorsPool.withPool() {
     /**
      * The callAsync() method is an asynchronous variant of the default call() method to invoke a closure.
      * It will return a Future for the result value.
@@ -22,14 +22,14 @@ ThreadPool.withPool() {
 {code}
 
 Executor service enhancements
-{code}ThreadPool.withPool {ExecutorService executorService ->
+{code}GParsExecutorsPool.withPool {ExecutorService executorService ->
     executorService << {println 'Inside parallel task'}
 }
 {code}
 
 Asynchronous function processing
 {code}
-ThreadPool.withPool {
+GParsExecutorsPool.withPool {
     assert [10, 20] == AsyncInvokerUtil.doInParallel({calculateA()}, {calculateB()})         //waits for results
     assert [10, 20] == AsyncInvokerUtil.executeAsync({calculateA()}, {calculateB()})*.get()  //returns Futures instead and doesn't wait for results to be calculated
 }
