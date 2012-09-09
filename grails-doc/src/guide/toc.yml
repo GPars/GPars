@@ -40,7 +40,7 @@ dataflow :
   dataflow_tasks : Tasks
   dataflow_selects : Selects
   dataflow_operators : Operators
-  dataflow_applications : Applications
+  dataflow_applications : Application Frameworks
   dataflow_pipelineDSL : Pipeline DSL
   dataflow_implementation : Implementation
   dataflow_synchronousVariablesAndChannels : Synchronous Variables and Channels

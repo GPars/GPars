@@ -29,7 +29,8 @@ typically not show all the channels that participate in the network. Debugging o
 to the core of the solution, are among the first good candidates to consider for exclusion. Also channels and lifecycle-event listeners,
 which orchestrate aspects such as load balancing or graceful shutdown, will probably be not exposed to the user, although they will be part
 of the generated and executed network. Similarly, a single channel in the domain-specific model will in reality translate into multiple channels
-perhaps with one or more logging/transforming/filtering operators connecting them together.
+perhaps with one or more logging/transforming/filtering operators connecting them together. The function associated with a node
+will most likely be wrapped with some additional infrastructural code to form the operator's body.
 
 GPars gives you the underlying components that the end user may be abstracted away completely by the application-specific framework.
 This keeps GPars domain-agnostic and universal, yet useful at the implementation level.
