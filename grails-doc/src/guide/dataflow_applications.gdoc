@@ -1,0 +1,37 @@
+Dataflow Operators and Selectors can be successfully used to build high-level domain-specific frameworks for problems that naturally fit the flow model.
+
+h3. Building flow frameworks on top of GPars dataflow
+
+GPars dataflow can be viewed as bottom-line language-level infrastructure. Operators, selectors, channels and event listeners
+can be very useful at language level to combine, for example, with actors or parallel collections.
+Whenever a need comes for asynchronous handling of events that come through one of more channels, a dataflow operator
+or a small dataflow network could be a very good fit. Unlike tasks, operators are lightweight and release threads
+when there's no message to process. Unlike actors, operators are addressed indirectly through channels and may easily combine
+messages from multiple channels into one action.
+
+Alternatively, operators can be looked at as continuous functions, which instantly and repeatedly transform their input values into output.
+We believe that a concurrency-friendly general-purpose programming language should provide this type of abstraction.
+
+At the same time, dataflow elements can be easily used as building blocks for constructing domain-specific workflow-like frameworks.
+These frameworks can offer higher-level abstractions specialized to a single problem domain, which would be inappropriate for a general-purpose
+language-level library. Each of the higher-level concepts is then mapped to (potentially several) GPars concepts.
+
+For example, a network solving data-mining problems may consist of several data sources, data cleaning nodes, categorization nodes,
+reporting nodes and others. Image processing network, on the other hand, may need nodes specialized in image compression
+and format transformation. Similarly, networks for data encryption, mp3 encoding, work-flow management as well as many other domains
+that would benefit from dataflow-based solutions, will differ in many aspects - the type of nodes in the network, the type and frequency of events,
+the load-balancing scheme, potential constraints on branching, the need for visualization, debugging and logging, the way users define the networks
+and interact with them as well as many others.
+
+The higher-level application-specific frameworks should put effort into providing abstractions best suited for the given domain
+and hide GPars complexities. For example, the visual graph of the network that the user manipulates on the screen should
+typically not show all the channels that participate in the network. Debugging or logging channels, which rarely contribute
+to the core of the solution, are among the first good candidates to consider for exclusion. Also channels and lifecycle-event listeners,
+which orchestrate aspects such as load balancing or graceful shutdown, will probably be not exposed to the user, although they will be part
+of the generated and executed network. Similarly, a single channel in the domain-specific model will in reality translate into multiple channels
+perhaps with one or more logging/transforming/filtering operators connecting them together. The function associated with a node
+will most likely be wrapped with some additional infrastructural code to form the operator's body.
+
+GPars gives you the underlying components that the end user may be abstracted away completely by the application-specific framework.
+This keeps GPars domain-agnostic and universal, yet useful at the implementation level.
+

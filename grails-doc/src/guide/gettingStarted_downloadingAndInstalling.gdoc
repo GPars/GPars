@@ -32,23 +32,21 @@ search list in this latter case.  Using Maven the dependency is:
 <dependency>
     <groupId>org.codehaus.gpars</groupId>
     <artifactId>gpars</artifactId>
-    <version>0.12</version>
+    <version>1.0.0</version>
 </dependency>
 {code}
-or version 1.0-SNAPSHOT if using the latest snapshot.
+or version 1.1-SNAPSHOT if using the latest snapshot.
 
 h3. Transitive Dependencies
 
-GPars requires that two dependencies, namely "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar
-and "extra166y":http://gee.cs.oswego.edu/dl/jsr166/dist/extra166y.jar (artifacts
-from the "JSR-166 Project":http://g.oswego.edu/dl/concurrency-interest/ ), be on the
-classpath for GPars using programs to compile and execute.
-Release versions of these artifacts are in the main Maven and Codehaus repositories.  Development versions
-of the artifacts are available in the Codehaus snapshots repository.  Using Gradle or Grapes you would use
-dependency specifications:
+GPars as a library depends on Groovy version equal or greater than 1.8. Also, the Fork/Join concurrency library namely "jsr166y":http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166y.jar
+(an artifact from the "JSR-166 Project":http://g.oswego.edu/dl/concurrency-interest/ ) must be on the
+classpath the programs, which use GPars, to compile and execute.
+Released versions of this artifact are in the main Maven and Codehaus repositories.  Development versions
+of the artifact are available in the Codehaus snapshots repository.  Using Gradle or Grapes you would use
+the following dependency specification:
 {code}
 "org.codehaus.jsr166-mirror:jsr166y:1.7.0"
-"org.codehaus.jsr166-mirror:extra166y:1.7.0"
 {code}
 For Maven, the specification would be:
 {code}
@@ -57,16 +55,11 @@ For Maven, the specification would be:
     <artifactId>jsr166y</artifactId>
     <version>1.7.0</version>
 </dependency>
-<dependency>
-    <groupId>org.codehaus.jsr166-mirror</groupId>
-    <artifactId>extra166y</artifactId>
-    <version>1.7.0</version>
-</dependency>
 {code}
 The development versions have version number 1.7.0.1-SNAPSHOT.
 
-GPars defines both of these dependencies in its own descriptor, so adding them in should be taken care of
-automatically if you use Gradle, Maven, Ivy or other type of automatic dependency resolution tool.
+GPars defines this dependency in its own descriptor, so ideally all dependency management should be taken care of
+automatically, if you use Gradle, Grails, Griffon, Maven, Ivy or other type of automatic dependency resolution tool.
 
 Please visit the page "Integration":http://gpars.codehaus.org/Integration on the GPars website for more
 details.
