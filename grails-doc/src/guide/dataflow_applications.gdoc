@@ -20,15 +20,15 @@ For example, a network solving data-mining problems may consist of several data 
 reporting nodes and others. Image processing network, on the other hand, may need nodes specialized in image compression
 and format transformation. Similarly, networks for data encryption, mp3 encoding, work-flow management as well as many other domains
 that would benefit from dataflow-based solutions, will differ in many aspects - the type of nodes in the network, the type and frequency of events,
-potential constraints on branching, the need for visualization, debugging and logging, the way users define the networks
+the load-balancing scheme, potential constraints on branching, the need for visualization, debugging and logging, the way users define the networks
 and interact with them as well as many others.
 
-The higher-level application-specific frameworks should put effort in providing abstractions best suited for the domain
+The higher-level application-specific frameworks should put effort into providing abstractions best suited for the given domain
 and hide GPars complexities. For example, the visual graph of the network that the user manipulates on the screen should
 typically not show all the channels that participate in the network. Debugging or logging channels, which rarely contribute
 to the core of the solution, are among the first good candidates to consider for exclusion. Also channels and lifecycle-event listeners,
-who orchestrate aspects such as load balancing or graceful shutdown, will probably be not displayed, although they will be part
-of the generated and executed network. Similarly, a single channel on the screen will in reality translate into multiple channels
+which orchestrate aspects such as load balancing or graceful shutdown, will probably be not exposed to the user, although they will be part
+of the generated and executed network. Similarly, a single channel in the domain-specific model will in reality translate into multiple channels
 perhaps with one or more logging/transforming/filtering operators connecting them together.
 
 GPars gives you the underlying components that the end user may be abstracted away completely by the application-specific framework.
