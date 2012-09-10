@@ -1,0 +1,278 @@
+Shutting down a network of dataflow processors (operators and selectors) may sometimes be a non-trivial task, especially
+if you need a generic mechanism that will not leave any messages unprocessed.
+
+Dataflow operators and selectors can be terminated in three ways:
+# by calling the terminate() method on all operators that need to be terminated
+# by sending a poisson message
+# by setting up a network of activity monitors that will shutdown the network after all messages have been processed
+
+Check out the details on the ways that GPars provides.
+
+{note:title=Shutting down the thread pool}
+If you use a custom _PGroup_ to maintain a thread pool for your dataflow network, you should not forget to shutdown the pool once the network is terminated.
+Otherwise the thread pool will consume system resources and, in case of using non-daemon threads, it will prevent JVM from exit.
+{note}
+
+h3. Emergency shutdown
+
+You can call _terminate()_ on any operator/selector to immediately shut it down. Provided you keep track of all your processors,
+perhaps by adding them to a list, the fastest way to stop the network would be:
+{code}
+allMyProcessors*.terminate()
+{code}
+
+This should, however, be treated as an emergency exit, since no guarantees can be given regarding messages processed nor finished work.
+Operators will simply terminate instantly leaving work unfinished and abandoning messages in the input channels.
+Certainly, the lifecycle event listeners hooked to the operators/selectors will have their _afterStop()_ event handlers invoked
+in order to, for example, release resources or output a note into the log.
+
+{code}
+def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
+
+def op2 = selector(inputs: [d], outputs: [f, out]) { }
+
+def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+[op1, op2, op3]*.terminate()  //Terminate all operators by calling the terminate() method on them
+op1.join()
+op2.join()
+op3.join()
+{code}
+
+{note}
+Shutting down the whole JVM through _System.exit()_ will also obvisouly shutdown the dataflow network, however, no lifecycle listeners will be invoked in such cases.
+{note}
+
+h4. Stopping operators gently
+
+Operators handle incoming messages repeatedly. The only safe moment for stopping an operator without the risk of loosing
+any messages is right after the operator has finished processing messages is just about to look for more messages in its incoming pipes.
+This is exactly what the terminateAfterNextRun() method does. It will schedule the operator for shutdown after the next set
+of messages gets handled.
+
+The unprocessed messages will stay in the input channels, which allows you to handle them later,
+perhaps with a different operator/selector or in some other way. Using _terminateAfterNextRun()_ you will not loose any input messages.
+This may be particularly handy when you use a group of operators/selectors to load-balance messages coming from a channel.
+Once the work-load decreases, the terminateAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
+
+h3. PoisonPill
+
+{code}
+def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
+
+def op2 = selector(inputs: [d], outputs: [f, out]) { }
+
+def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+a << PoisonPill.instance  //Send the poisson
+
+op1.join()
+op2.join()
+op3.join()
+{code}
+
+After receiving a poisson an operator terminates, right after it finishes the current calculation and makes sure the poisson
+is sent to all its output channels, so that the poisson can spread to the connected operators.
+Also, although operators typically wait for all inputs to have a value, in case of _PoisonPills_, the operator will terminate
+immediately as soon as a _PoisonPill_ appears on any of its inputs. The values already obtained from the other channels
+will be lost. It can be considered an error in the design of the network, if these messages were supposed to be processed.
+They would need a proper value as their peer and not a PoisonPill in order to be processes normally.
+
+Selectors, on the other hand, will patiently wait for _PoisonPill_ to be received from all their input channels before
+sending it on the the output channels.
+This behavior prevents networks containing *feed-back loops involving selectors* from being shutdown using _PoisonPill_ .
+A selector would never receive a _PoisonPill_ from the channel that comes back from behind the selector. A different shutdown
+strategy should be used for such networks.
+
+{note}
+Given the potential variety of operator networks and their asynchronous nature, a good termination strategy is that
+operators and selectors should only ever terminate themselves.
+All ways of terminating them from outside (either by calling the terminate() method or by sending poisson down the stream)
+may result in messages being lost somewhere in the pipes, when the reading operators terminate before they fully handle
+the messages waiting in their input channels.
+{note}
+
+h4. Poison with counting
+
+When sending a poison pill down the operator network you may need to be notified when all the operators or a specified number of them
+have been stopped. The _CountingPoisonPill_ class serves exactly this purpose:
+
+{code}
+operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
+selector(inputs: [d], outputs: [f, out]) { }
+prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+//Send the poisson indicating the number of operators than need to be terminated before we can continue
+final pill = new CountingPoisonPill(3)
+a << pill
+
+//Wait for all operators to terminate
+pill.join()
+//At least 3 operators should be terminated by now
+{code}
+
+The _termination_ property of the _CountingPoisonPill_ class is a regular _Promise<Boolean>_ and so has a lot of handy properties.
+{code}
+//Send the poisson indicating the number of operators than need to be terminated before we can continue
+final pill = new CountingPoisonPill(3)
+pill.termination.whenBound {println "Reporting asynchronously that the network has been stopped"}
+a << pill
+
+if (pill.termination.bound) println "Wow, that was quick. We are done already!"
+else println "Things are being slow today. The network is still running."
+
+//Wait for all operators to terminate
+assert pill.termination.get()
+//At least 3 operators should be terminated by now
+{code}
+
+h4. Poison strategies
+
+To correctly shutdown a network using _PoisonPill_ you must identify the appropriate set of channels to send _PoisonPill_ to.
+_PoisonPill_ will spread in the network the usual way through the channels and processors down the stream. Typically the right
+channels to send _PoisonPill_ to will be those that serve as *data sources* for the network.
+This may be difficult to achieve for general cases or for complex networks. On the other hand, for networks with a prevalent
+direction of message flow _PoisonPill_ provides a very straightforward way to shutdown the whole network gracefully.
+
+h4. Termination tips and tricks
+
+Notice that GPars _tasks_ return a _DataflowVariable_, which gets bound to a value as soon as the task finishes.
+The 'terminator' operator below leverages the fact that _DataflowVariables_ are implementations of the _DataflowReadChannel_
+interface and thus can be consumed by operators. As soon as both tasks finish, the operator will send a _PoisonPill_
+down the _q_ channel to stop the consumer as soon as it processes all data.
+
+{code}
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.group.NonDaemonPGroup
+
+
+def group = new NonDaemonPGroup()
+
+final DataflowQueue q = new DataflowQueue()
+
+// final destination
+def customs = group.operator(inputs: [q], outputs: []) { value ->
+    println "Customs received $value"
+}
+
+// big producer
+def green = group.task {
+    (1..100).each {
+        q << 'green channel ' + it
+        sleep 10
+    }
+}
+
+// little producer
+def red = group.task {
+    (1..10).each {
+        q << 'red channel ' + it
+        sleep 15
+    }
+}
+
+def terminator = group.operator(inputs: [green, red], outputs: []) { t1, t2 ->
+    q << PoisonPill.instance
+}
+
+customs.join()
+group.shutdown()
+{code}
+
+h4. Keeping PoisonPill inside a given network
+
+If your network passed values through channels to entities outside of it, you may need to stop the _PoisonPill_ messages
+on the network boundaries. This can be easily achieved by putting a single-input single-output filtering operator on each such channel.
+{code}
+operator(networkLeavingChannel, otherNetworkEnteringChannel) {
+    bindOutput it
+}
+{code}
+
+The _Pipeline_ DSL may be also helpful here:
+
+{code}
+networkLeavingChannel.filter { !(it instanceOf PoisonPill) } into otherNetworkEnteringChannel
+{code}
+
+{note}
+Check out the _7.6 Pipeline DSL_ section to find out more on pipelines.
+{note}
+
+h3. Graceful shutdown
+
+GPars provides a generic way to shutdown a dataflow network. Unlike the previously mentioned mechanisms this approach
+will keep the network running until all the messages get handled and than gracefully shuts all operators down letting you know when this happens.
+You have to pay a modest performance penalty, though. This is unavoidable since we need to keep track of what's happening inside the network.
+
+{code}
+import groovyx.gpars.dataflow.DataflowBroadcast
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.operator.component.GracefulShutdownListener
+import groovyx.gpars.dataflow.operator.component.GracefulShutdownMonitor
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
+
+PGroup group = new DefaultPGroup(10)
+final a = new DataflowQueue()
+final b = new DataflowQueue()
+final c = new DataflowQueue()
+final d = new DataflowQueue<Object>()
+final e = new DataflowBroadcast<Object>()
+final f = new DataflowQueue<Object>()
+final result = new DataflowQueue<Object>()
+
+final monitor = new GracefulShutdownMonitor(100);
+
+def op1 = group.operator(inputs: [a, b], outputs: [c], listeners: [new GracefulShutdownListener(monitor)]) {x, y ->
+    sleep 5
+    bindOutput x + y
+}
+def op2 = group.operator(inputs: [c], outputs: [d, e], listeners: [new GracefulShutdownListener(monitor)]) {x ->
+    sleep 10
+    bindAllOutputs 2*x
+}
+def op3 = group.operator(inputs: [d], outputs: [f], listeners: [new GracefulShutdownListener(monitor)]) {x ->
+    sleep 5
+    bindOutput x + 40
+}
+def op4 = group.operator(inputs: [e.createReadChannel(), f], outputs: [result], listeners: [new GracefulShutdownListener(monitor)]) {x, y ->
+    sleep 5
+    bindOutput x + y
+}
+
+100.times{a << 10}
+100.times{b << 20}
+
+final shutdownPromise = monitor.shutdownNetwork()
+
+100.times{assert 160 == result.val}
+
+shutdownPromise.get()
+[op1, op2, op3, op4]*.join()
+
+group.shutdown()
+{code}
+
+First, we need an instance of _GracefulShutdownMonitor_ , which will orchestrate the shutdown process. It relies on
+instances of _GracefulShutdownListener_ attached to all operators/selectors. These listeners observe their respective
+processors together with their input channels and report to the shared _GracefulShutdownMonitor_.
+Once _shutdownNetwork()_ is called on _GracefulShutdownMonitor_ , it will periodically check for reported activities,
+query the state of operators as well as the number of messages in their input channels.
+{note}
+Please make sure that no new messages enter the dataflow network after the shutdown has been initiated, since this may cause the network to never terminate.
+The shutdown process should only be started after all data producers have ceased sending additional messages to the monitored network.
+{note}
+
+The _shutdownNetwork()_ method returns a _Promise_ so that you can do the usual set of tricks with it - block waiting for the network
+to terminate using the _get()_ method, register a callback using the _whenBound()_ method or make it trigger a whole set of activities
+through the _then()_ method.
+
+{note}
+For _GracefulShutdownListener_ to work correctly, its _messageArrived()_ event handler must see the original value
+that has arrived through the input channel. Since some event listeners may alter the messages as they pass through the listeners
+it is advisable to add the _GracefulShutdownListener_ first to the list of listeners on each dataflow processor.
+
+Also, graceful shutdown will not work for those rare operators that have listeners, which turn control messages into plain value messages in the _controlMessageArrived()_
+event handler.
+{note}
