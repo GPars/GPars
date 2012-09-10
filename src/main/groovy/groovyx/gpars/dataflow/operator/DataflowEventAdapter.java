@@ -27,6 +27,13 @@ import java.util.List;
  * @author Vaclav Pech
  */
 public class DataflowEventAdapter implements DataflowEventListener {
+    /**
+     * Invoked immediately after the listener has been attached to a dataflow processor.
+     *
+     * @param processor The reporting dataflow operator/selector
+     */
+    @Override
+    public void registered(final DataflowProcessor processor) { }
 
     /**
      * Invoked immediately after the operator starts by a pooled thread before the first message is obtained

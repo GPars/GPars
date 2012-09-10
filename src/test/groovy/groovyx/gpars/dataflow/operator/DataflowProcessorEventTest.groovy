@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,8 +86,10 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         a << 10
         b << 20
         assert 30 == c.val
-        assert listener1.events[0].startsWith('afterStart')
-        assert listener2.events[0].startsWith('afterStart')
+        assert listener1.events[0].startsWith('registered')
+        assert listener1.events[1].startsWith('afterStart')
+        assert listener2.events[0].startsWith('registered')
+        assert listener2.events[1].startsWith('afterStart')
         assert 1 == listener1.countEventsThatStartWith('afterStart')
         assert 1 == listener2.countEventsThatStartWith('afterStart')
         assert 0 == listener1.countEventsThatStartWith('afterStop')
@@ -96,8 +98,8 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
         a << 1
         b << 2
         assert 3 == c.val
-        assert listener1.events[0].startsWith('afterStart')
-        assert listener2.events[0].startsWith('afterStart')
+        assert listener1.events[1].startsWith('afterStart')
+        assert listener2.events[1].startsWith('afterStart')
         assert 1 == listener1.countEventsThatStartWith('afterStart')
         assert 1 == listener2.countEventsThatStartWith('afterStart')
         assert 0 == listener1.countEventsThatStartWith('afterStop')
@@ -237,6 +239,11 @@ public class DataflowProcessorEventTest extends GroovyTestCase {
 
         int countEventsThatStartWith(String filter) {
             retrieveEvents {it.startsWith(filter)}.size()
+        }
+
+        @Override
+        void registered(final DataflowProcessor processor) {
+            events << 'registered'
         }
 
         @Override
