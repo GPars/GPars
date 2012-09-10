@@ -41,8 +41,8 @@ archivesBaseName = 'gpars'
 group = 'org.codehaus.gpars'
 version = '1.0-SNAPSHOT'
 
-sourceCompatibility = 5
-targetCompatibility = 5
+sourceCompatibility = 6
+targetCompatibility = 6
 
 def theVendor = 'gpars.org'
 def theTitle = 'GPars: Groovy Parallel Systems'
