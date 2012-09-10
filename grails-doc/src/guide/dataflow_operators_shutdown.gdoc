@@ -57,6 +57,11 @@ Once the work-load decreases, the terminateAfterNextRun() method may be used to 
 
 h3. PoisonPill
 
+_PoisonPill_ is a common term for a strategy that uses special-purpose messages to stop entities that receive it.
+GPars offers the _PoisonPill_ class, which has exactly such effect or operators and selectors. Since _PoisonPill_
+is a _ControlMessage_, it is invisible to operator's body and custom code does not need to handle it in any way.
+_DataflowEventListeners_ may react to _ControlMessages_ through the _controlMessageArrived()_ handler method.
+
 {code}
 def op1 = operator(inputs: [a, b, c], outputs: [d, e]) {x, y, z -> }
 
