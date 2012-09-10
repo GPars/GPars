@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,6 +58,26 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
         owningProcessor.fireAfterStop();
     }
 
+    /**
+     * Reports whether there is at least one message in at least one input channel waiting for processing
+     * @return True, if such a message exists
+     */
+    final boolean hasIncomingMessages() {
+        for (final Object input : inputs) {
+             if (((DataflowReadChannel)input).length()!=0) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Registers the provided handler to all input channels
+     * @param handler The closure to invoke whenever a value gets bound to any of the input channels
+     */
+    final void registerWheneverBoundListenerToAllInputs(final Closure<Object> handler) {
+        for (final Object input : inputs) {
+            ((DataflowReadChannel<Object>) input).wheneverBound(handler);
+        }
+    }
     final void onException(final Throwable e) {
         reportException(e);
         terminate();
