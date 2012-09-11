@@ -121,6 +121,8 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
         channel << 3
         subscription1.whenBound {barrier.await()}
         assert 2 == subscription1.val
+        assert 3 == subscription1.val
+        barrier.await()
     }
 
     public void testSyncDataflowBroadcast() {

@@ -22,11 +22,9 @@ import groovyx.gpars.dataflow.operator.DataflowEventAdapter;
 import groovyx.gpars.dataflow.operator.DataflowProcessor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
-import static groovyx.gpars.dataflow.operator.component.OperatorState.Calculating;
-import static groovyx.gpars.dataflow.operator.component.OperatorState.CollectingInput;
-import static groovyx.gpars.dataflow.operator.component.OperatorState.Idle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Listens to an operator/selector and reports its state and activity to a GracefulShutdownMonitor, shared with other listeners.
@@ -34,13 +32,14 @@ import static groovyx.gpars.dataflow.operator.component.OperatorState.Idle;
  * @author Vaclav Pech
  */
 public class GracefulShutdownListener extends DataflowEventAdapter {
-    private OperatorState state=Idle;
+    private boolean collectingMessages = false;
+    private final AtomicInteger activeForks = new AtomicInteger(0);
     private final OperatorStateMonitor monitor;
     private DataflowProcessor processor=null;
-    private boolean shutdownFlag = false;
-    private Object lock = new Object();
-    private final List<Object> arrivedMessagesCache = new ArrayList<Object>();
-    private final List<Object> boundMessagesCache = new ArrayList<Object>();
+    private volatile boolean shutdownFlag = false;
+    private final Object lock = new Object();
+    private final Collection<Object> arrivedMessagesCache = new ArrayList<Object>();
+    private final Collection<Object> boundMessagesCache = new ArrayList<Object>();
 
     /**
      * Hooks hooks the shared monitor
@@ -83,8 +82,8 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
      */
     @Override
     public Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
-        fireEvent(CollectingInput);
-        state = CollectingInput;
+        fireEvent();
+        collectingMessages = true;
         synchronized (lock) {
             if (!this.boundMessagesCache.remove(message)) this.arrivedMessagesCache.add(message);
         }
@@ -102,9 +101,8 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
      */
     @Override
     public Object controlMessageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
-        fireEvent(CollectingInput);
-        fireEvent(Idle);
-        state = Idle;
+        fireEvent();
+        collectingMessages=false;
         synchronized (lock) {
             if (!this.boundMessagesCache.remove(message)) this.arrivedMessagesCache.add(message);
         }
@@ -119,8 +117,9 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
      */
     @Override
     public List<Object> beforeRun(final DataflowProcessor processor, final List<Object> messages) {
-        fireEvent(Calculating);
-        state=Calculating;
+        fireEvent();
+        collectingMessages=false;
+        activeForks.incrementAndGet();
         return messages;
     }
 
@@ -131,15 +130,14 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
      */
     @Override
     public void afterRun(final DataflowProcessor processor, final List<Object> messages) {
-        fireEvent(Idle);
-        state=Idle;
+        fireEvent();
+        activeForks.decrementAndGet();
     }
 
     /**
      * If shutdown is in progress, we'll notify the monitor
-     * @param state The current state to report to the monitor
      */
-    private void fireEvent(final OperatorState state) {
+    private void fireEvent() {
         if (shutdownFlag) monitor.stateChanged();
     }
 
@@ -155,7 +153,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
      * @return True, if the current state is Idle
      */
     public boolean isIdle() {
-        return state == Idle;
+        return !collectingMessages && activeForks.get()==0;
     }
 
     /**

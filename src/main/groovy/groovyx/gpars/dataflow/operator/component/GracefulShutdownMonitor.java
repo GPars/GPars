@@ -84,7 +84,7 @@ public class GracefulShutdownMonitor implements OperatorStateMonitor {
     }
 
     /**
-     * Invoked whenever a processor changes state (OperatorState)
+     * Invoked whenever a processor changes state
      */
     @Override
     public void stateChanged() {

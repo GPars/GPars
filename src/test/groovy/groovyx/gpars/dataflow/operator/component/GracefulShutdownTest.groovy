@@ -292,6 +292,45 @@ public class GracefulShutdownTest extends GroovyTestCase {
             [op1, op2, op3, op4]*.join()
         }
     }
+    public void testGracefulOperatorShutdownWithForks() throws Exception {
+        10.times {
+            final DataflowQueue a = new DataflowQueue()
+            final DataflowQueue b = new DataflowQueue()
+            final DataflowQueue c = new DataflowQueue()
+            final d = new DataflowQueue<Object>()
+            final e = new DataflowBroadcast<Object>()
+            final f = new DataflowQueue<Object>()
+            final result = new DataflowQueue<Object>()
+
+            final monitor = new GracefulShutdownMonitor(100);
+            def op1 = group.operator(inputs: [a, b], outputs: [c], maxForks: 3, listeners: [new GracefulShutdownListener(monitor)]) {x, y ->
+                sleep 5
+                bindOutput x + y
+            }
+            def op2 = group.operator(inputs: [c], outputs: [d, e], maxForks: 3, listeners: [new GracefulShutdownListener(monitor)]) {x ->
+                sleep 10
+                bindAllOutputs 2*x
+            }
+            def op3 = group.operator(inputs: [d], outputs: [f], maxForks: 4, listeners: [new GracefulShutdownListener(monitor)]) {x ->
+                sleep 5
+                bindOutput x + 40
+            }
+            def op4 = group.operator(inputs: [e.createReadChannel(), f], outputs: [result], maxForks: 5, listeners: [new GracefulShutdownListener(monitor)]) {x, y ->
+                sleep 5
+                bindOutput x + y
+            }
+
+            100.times{a << 10}
+            100.times{b << 20}
+
+            final shutdownPromise = monitor.shutdownNetwork()
+
+            100.times{assert 160 == result.val}
+
+            shutdownPromise.get()
+            [op1, op2, op3, op4]*.join()
+        }
+    }
 
     public void testGracefulOperatorShutdownWithSameMessages() throws Exception {
         10.times {

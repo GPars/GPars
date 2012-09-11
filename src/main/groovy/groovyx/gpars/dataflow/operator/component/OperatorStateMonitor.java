@@ -23,7 +23,7 @@ package groovyx.gpars.dataflow.operator.component;
  */
 public interface OperatorStateMonitor {
     /**
-     * Invoked whenever a processor changes state (OperatorState)
+     * Invoked whenever a processor changes state
      */
     void stateChanged();
 

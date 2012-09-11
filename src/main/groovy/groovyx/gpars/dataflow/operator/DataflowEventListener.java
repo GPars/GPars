@@ -53,6 +53,7 @@ public interface DataflowEventListener {
      * Invoked if an exception occurs.
      * If any of the listeners returns true, the operator will terminate.
      * Exceptions outside of the operator's body or listeners' messageSentOut() handlers will terminate the operator irrespective of the listeners' votes.
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param e         The thrown exception
@@ -84,6 +85,7 @@ public interface DataflowEventListener {
 
     /**
      * Invoked when a message is being bound to an output channel.
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param channel   The output channel to send the message to
@@ -104,6 +106,7 @@ public interface DataflowEventListener {
 
     /**
      * Invoked when the operator completes a single run
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param messages  The incoming messages that have been processed
@@ -112,6 +115,7 @@ public interface DataflowEventListener {
 
     /**
      * Invoked when the fireCustomEvent() method is triggered manually on a dataflow operator/selector
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param data      The custom piece of data provided as part of the event
