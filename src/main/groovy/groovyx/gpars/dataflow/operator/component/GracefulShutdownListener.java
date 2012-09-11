@@ -38,7 +38,9 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     private final OperatorStateMonitor monitor;
     private DataflowProcessor processor=null;
     private boolean shutdownFlag = false;
-    private final List<Object> messagesCache = new ArrayList<Object>();
+    private Object lock = new Object();
+    private final List<Object> arrivedMessagesCache = new ArrayList<Object>();
+    private final List<Object> boundMessagesCache = new ArrayList<Object>();
 
     /**
      * Hooks hooks the shared monitor
@@ -63,8 +65,8 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
         processor.registerWheneverBoundListenerToAllInputs(new MessagingRunnable<Object>() {
             @Override
             protected void doRun(final Object argument) {
-                synchronized (messagesCache) {
-                    if (!messagesCache.remove(argument)) messagesCache.add(argument);
+                synchronized (lock) {
+                    if (!arrivedMessagesCache.remove(argument)) boundMessagesCache.add(argument);
                 }
             }
         });
@@ -83,8 +85,8 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     public Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
         fireEvent(CollectingInput);
         state = CollectingInput;
-        synchronized (this.messagesCache) {
-            if (!this.messagesCache.remove(message)) this.messagesCache.add(message);
+        synchronized (lock) {
+            if (!this.boundMessagesCache.remove(message)) this.arrivedMessagesCache.add(message);
         }
         return message;
     }
@@ -103,8 +105,8 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
         fireEvent(CollectingInput);
         fireEvent(Idle);
         state = Idle;
-        synchronized (this.messagesCache) {
-            if (!this.messagesCache.remove(message)) this.messagesCache.add(message);
+        synchronized (lock) {
+            if (!this.boundMessagesCache.remove(message)) this.arrivedMessagesCache.add(message);
         }
         return message;
     }
@@ -163,8 +165,8 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     public boolean isIdleAndNoIncomingMessages() {
         if(processor==null)
             throw new IllegalStateException("The GracefulShutdownListener has not been registered with a dataflow processor yet.");
-        synchronized (messagesCache) {
-            return !processor.hasIncomingMessages() && isIdle() && messagesCache.isEmpty();
+        synchronized (lock) {
+            return !processor.hasIncomingMessages() && isIdle() && boundMessagesCache.isEmpty();
         }
     }
 

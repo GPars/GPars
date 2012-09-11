@@ -195,6 +195,43 @@ public class GracefulShutdownTest extends GroovyTestCase {
         monitor.shutdownNetwork().get()
     }
 
+    public void testMultipleIdenticalMessagesThatPreventShutdown() throws Exception {
+        final monitor = new GracefulShutdownMonitor();
+
+        final barrier1 = new CyclicBarrier(2)
+        final barrier2 = new CyclicBarrier(2)
+
+        final listener = new GracefulShutdownListener(monitor) {
+            @Override
+            Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
+                barrier1.await()
+                barrier2.await()
+                return super.controlMessageArrived(processor, channel, index, message)
+            }
+        }
+
+        def op = group.operator(inputs: [a, b], outputs: [c], listeners: [listener]) {x, y ->
+            bindOutput x + y
+        }
+
+        a << 10
+        a << 10
+        b << 20
+        barrier1.await()  //for message 10
+        barrier2.await()
+        barrier1.await()  //for message 20
+        barrier2.await()
+        assert 30 == c.val
+
+        barrier1.await()  //for test control message
+
+        assert listener.isIdle()
+        assert !listener.isIdleAndNoIncomingMessages()
+        barrier2.await()
+
+        monitor.shutdownNetwork().get()
+    }
+
     public void testSlowSingleOperatorShutdown() throws Exception {
         final monitor = new GracefulShutdownMonitor(100);
         final listener = new GracefulShutdownListener(monitor)
@@ -217,7 +254,7 @@ public class GracefulShutdownTest extends GroovyTestCase {
     }
 
     public void testGracefulOperatorShutdown() throws Exception {
-        20.times {
+        10.times {
             final DataflowQueue a = new DataflowQueue()
             final DataflowQueue b = new DataflowQueue()
             final DataflowQueue c = new DataflowQueue()
@@ -252,7 +289,46 @@ public class GracefulShutdownTest extends GroovyTestCase {
             100.times{assert 160 == result.val}
 
             shutdownPromise.get()
-//            [op1, op2, op3, op4]*.terminate()
+            [op1, op2, op3, op4]*.join()
+        }
+    }
+
+    public void testGracefulOperatorShutdownWithSameMessages() throws Exception {
+        10.times {
+            final DataflowQueue a = new DataflowQueue()
+            final DataflowQueue b = new DataflowQueue()
+            final DataflowQueue c = new DataflowQueue()
+            final d = new DataflowQueue<Object>()
+            final e = new DataflowBroadcast<Object>()
+            final f = new DataflowQueue<Object>()
+            final result = new DataflowQueue<Object>()
+
+            final monitor = new GracefulShutdownMonitor(100);
+            def op1 = group.operator(inputs: [a, b], outputs: [c], listeners: [new GracefulShutdownListener(monitor)]) {x, y ->
+                sleep 5
+                bindOutput x + y
+            }
+            def op2 = group.operator(inputs: [c], outputs: [d, e], listeners: [new GracefulShutdownListener(monitor)]) {x ->
+                sleep 10
+                bindAllOutputs 2*x
+            }
+            def op3 = group.operator(inputs: [d], outputs: [f], listeners: [new GracefulShutdownListener(monitor)]) {x ->
+                sleep 5
+                bindOutput x + 40
+            }
+            def op4 = group.operator(inputs: [e.createReadChannel(), f], outputs: [result], listeners: [new GracefulShutdownListener(monitor)]) {x, y ->
+                sleep 5
+                bindOutput x + y
+            }
+
+            100.times{a << 10}
+            100.times{b << 10}
+
+            final shutdownPromise = monitor.shutdownNetwork()
+
+            100.times{assert 120 == result.val}
+
+            shutdownPromise.get()
             [op1, op2, op3, op4]*.join()
         }
     }
