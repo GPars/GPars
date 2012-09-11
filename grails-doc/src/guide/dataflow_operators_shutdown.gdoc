@@ -9,6 +9,8 @@ Dataflow operators and selectors can be terminated in three ways:
 Check out the details on the ways that GPars provides.
 
 {note:title=Shutting down the thread pool}
+*Shutting down the thread pool*
+
 If you use a custom _PGroup_ to maintain a thread pool for your dataflow network, you should not forget to shutdown the pool once the network is terminated.
 Otherwise the thread pool will consume system resources and, in case of using non-daemon threads, it will prevent JVM from exit.
 {note}
@@ -56,6 +58,8 @@ This may be particularly handy when you use a group of operators/selectors to lo
 Once the work-load decreases, the terminateAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
 
 {note:title=Detecting shutdown}
+*Detecting shutdown*
+
 Operators and electors offer a handy _join()_ method for those who need to block until the operator terminates.
 {code}
 allMyProcessors*.join()
@@ -281,11 +285,17 @@ The _shutdownNetwork()_ method returns a _Promise_ so that you can do the usual 
 to terminate using the _get()_ method, register a callback using the _whenBound()_ method or make it trigger a whole set of activities
 through the _then()_ method.
 
-{note}
-For _GracefulShutdownListener_ to work correctly, its _messageArrived()_ event handler must see the original value
+{note:title=Limitations of graceful shutdown}
+*Limitations of graceful shutdown*
+
+# For _GracefulShutdownListener_ to work correctly, its _messageArrived()_ event handler must see the original value
 that has arrived through the input channel. Since some event listeners may alter the messages as they pass through the listeners
 it is advisable to add the _GracefulShutdownListener_ first to the list of listeners on each dataflow processor.
 
-Also, graceful shutdown will not work for those rare operators that have listeners, which turn control messages into plain value messages in the _controlMessageArrived()_
+# Also, graceful shutdown will not work for those rare operators that have listeners, which turn control messages into plain value messages in the _controlMessageArrived()_
 event handler.
+
+# Third and last, load-balancing architectures, which use multiple operators reading messages off a shared channel (queue), will also prevent
+graceful shutdown to work properly. You may consider using *forked operators* instead, by setting the _maxForks_ property to a value greater than 1.
+Another alternative is to manually split the message stream into multiple channels, each of which would be consumed by one of the original operators.
 {note}
