@@ -135,5 +135,16 @@ public class DataflowSelector extends DataflowProcessor {
             throw new IllegalStateException("Cannot select a value.", e);
         }
     }
+
+    /**
+     * Indicates, whether the selector has some guards enabled and so can select a value from the input channels
+     * @return True, if at least input channel guard is enabled
+     */
+    final boolean allGuardsClosed() {
+        for (final Boolean guard : guards) {
+            if(guard==Boolean.TRUE) return false;
+        }
+        return true;
+    }
 }
 

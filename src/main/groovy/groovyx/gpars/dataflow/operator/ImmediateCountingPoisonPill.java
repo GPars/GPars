@@ -21,19 +21,20 @@ import groovyx.gpars.dataflow.Promise;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Represents a non-immediate PoisonPill that counts stopped operators and can be used to wait for all the operators to terminate.
+ * Represents an immediate PoisonPill that counts stopped operators and can be used to wait for all the operators to terminate.
  *
  * @author Vaclav Pech
  */
-public final class CountingPoisonPill extends PoisonPill {
+public final class ImmediateCountingPoisonPill extends PoisonPill {
     private final PoisonTrackCounter poisonTrackCounter;
 
     /**
-     * Creates a non-immediate instance that could be used to stop operators in a network.
+     * Creates an immediate instance that could be used to stop operators in a network.
      *
      * @param count The number of operators that need to be stopped before the join() method returns.
      */
-    public CountingPoisonPill(final int count) {
+    public ImmediateCountingPoisonPill(final int count) {
+        super(true);
         poisonTrackCounter = new PoisonTrackCounter(count);
     }
 
