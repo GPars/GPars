@@ -109,6 +109,25 @@ may result in messages being lost somewhere in the pipes, when the reading opera
 the messages waiting in their input channels.
 {note}
 
+h4. Immediate poison pill
+
+Especially for selectors to shutdown immediately after receiving a poison pill, a notion of *immediate poison pill* has been introduced.
+Since normal, non-immediate poison pills merely close the input channel leaving the selector alive until at least one input channel remains open,
+the immediate poison pill closes the selector instantly. Obviously, unprocessed messages from the other selector's input channels
+will not be handled by the selector, once it reads an immediate poison pill.
+
+With immediate poison pill you can safely shutdown networks with selectors involved in feedback loops.
+
+{code}
+def op1 = selector(inputs: [a, b, c], outputs: [d, e]) {value, index -> }
+def op2 = selector(inputs: [d], outputs: [f, out]) { }
+def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+a << PoisonPill.immediateInstance
+
+[op1, op2, op3]*.join()
+{code}
+
 h4. Poison with counting
 
 When sending a poison pill down the operator network you may need to be notified when all the operators or a specified number of them
@@ -142,6 +161,22 @@ else println "Things are being slow today. The network is still running."
 assert pill.termination.get()
 //At least 3 operators should be terminated by now
 {code}
+
+{note}
+An immediate variant of _CountingPoisonPill_ is also available - _ImmediateCountingPoisonPill_ .
+{code}
+def op1 = selector(inputs: [a, b, c], outputs: [d, e]) {value, index -> }
+def op2 = selector(inputs: [d], outputs: [f, out]) { }
+def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
+
+final pill = new ImmediateCountingPoisonPill(3)
+a << pill
+pill.join()
+{code}
+
+_ImmediateCountingPoisonPill_ will safely and instantly shutdown dataflow networks even with selectors involved in feedback loops,
+which normal non-immediate poison pill would not be able to.
+{note}
 
 h4. Poison strategies
 

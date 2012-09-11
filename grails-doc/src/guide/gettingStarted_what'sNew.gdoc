@@ -34,6 +34,7 @@ h3. Dataflow
 * Lifecycle events for operators and selectors were added
 * Added support for custom error handlers
 * A generic way to shutdown dataflow networks
+* An shutdown poison pill with immediate or delayed effect was added
 * Polished the way operators can be stopped
 * Added synchronous dataflow variables and channels
 * Read channels can report their length
