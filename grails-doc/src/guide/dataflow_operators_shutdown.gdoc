@@ -55,6 +55,14 @@ perhaps with a different operator/selector or in some other way. Using _terminat
 This may be particularly handy when you use a group of operators/selectors to load-balance messages coming from a channel.
 Once the work-load decreases, the terminateAfterNextRun() method may be used to safely reduce the pool of load-balancing operators.
 
+{note:title=Detecting shutdown}
+Operators and electors offer a handy _join()_ method for those who need to block until the operator terminates.
+{code}
+allMyProcessors*.join()
+{code}
+This is the easies way to wait until the whole dataflow network shuts down, irrespective of the shutdown method used.
+{note}
+
 h3. PoisonPill
 
 _PoisonPill_ is a common term for a strategy that uses special-purpose messages to stop entities that receive it.
@@ -201,7 +209,7 @@ networkLeavingChannel.filter { !(it instanceOf PoisonPill) } into otherNetworkEn
 {code}
 
 {note}
-Check out the _7.6 Pipeline DSL_ section to find out more on pipelines.
+Check out the _Pipeline DSL_ section to find out more on pipelines.
 {note}
 
 h3. Graceful shutdown
