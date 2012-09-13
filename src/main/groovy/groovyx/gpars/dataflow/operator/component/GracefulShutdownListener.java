@@ -144,7 +144,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     /**
      * Starts the shutdown phase by turning shutdownFlag on
      */
-    void initiateShutdown() {
+    final void initiateShutdown() {
         shutdownFlag = true;
     }
 
@@ -152,7 +152,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
      * A quick check on, whether the operator/selector is in the Idle state
      * @return True, if the current state is Idle
      */
-    public boolean isIdle() {
+    public final boolean isIdle() {
         return !collectingMessages && activeForks.get()==0;
     }
 
@@ -160,7 +160,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
      * A more sophisticated test for being Idle
      * @return True, if the operator/selector state is Idle, there are no messages in the input channels and there are no messages in the intermediate state between having been removed from the channel and being accepted by the operator
      */
-    public boolean isIdleAndNoIncomingMessages() {
+    public final boolean isIdleAndNoIncomingMessages() {
         if(processor==null)
             throw new IllegalStateException("The GracefulShutdownListener has not been registered with a dataflow processor yet.");
         synchronized (lock) {
@@ -169,10 +169,9 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     }
 
     /**
-     * Used by the monitor to get access to the underlying operator/selector
-     * @return The dataflow processor that the listener monitors
+     * Used by the monitor to terminate the underlying operator/selector
      */
-    DataflowProcessor getProcessor() {
-        return processor;
+    final void terminateProcessor() {
+        processor.terminate();
     }
 }

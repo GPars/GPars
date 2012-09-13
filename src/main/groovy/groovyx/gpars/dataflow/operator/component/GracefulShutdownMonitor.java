@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Vaclav Pech
  */
-public class GracefulShutdownMonitor implements OperatorStateMonitor {
+public final class GracefulShutdownMonitor implements OperatorStateMonitor {
     private static final long DEFAULT_DELAY = 3000L;
     private final long delay;
 
@@ -149,7 +149,7 @@ public class GracefulShutdownMonitor implements OperatorStateMonitor {
         //  We are safe to shutdown now
         result.bind(true);
         for (final GracefulShutdownListener listener : listeners) {
-            listener.getProcessor().terminate();
+            listener.terminateProcessor();
         }
     }
 
