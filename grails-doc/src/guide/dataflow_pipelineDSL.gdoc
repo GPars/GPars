@@ -5,7 +5,7 @@ Building dataflow networks can be further simplified. GPars offers handy shortcu
 {code}
 def toUpperCase = {s -> s.toUpperCase()}
 
-final DataflowReadChannel encrypt = new DataflowQueue()
+final encrypt = new DataflowQueue()
 final DataflowReadChannel encrypted = encrypt | toUpperCase | {it.reverse()} | {'###encrypted###' + it + '###'}
 
 encrypt << "I need to keep this message secret!"
@@ -24,7 +24,7 @@ The _pipe_ operator is a handy shorthand for a more generic _chainWith()_ method
 {code}
 def toUpperCase = {s -> s.toUpperCase()}
 
-final DataflowReadChannel encrypt = new DataflowQueue()
+final encrypt = new DataflowQueue()
 final DataflowReadChannel encrypted = encrypt.chainWith toUpperCase chainWith {it.reverse()} chainWith {'###encrypted###' + it + '###'}
 
 encrypt << "I need to keep this message secret!"
@@ -46,7 +46,7 @@ def save = {text ->
     println 'Saving ' + text
 }
 
-final DataflowReadChannel toEncrypt = new DataflowQueue()
+final toEncrypt = new DataflowQueue()
 final DataflowReadChannel encrypted = toEncrypt.chainWith toUpperCase chainWith {it.reverse()} chainWith {'###encrypted###' + it + '###'}
 
 final DataflowQueue fork1 = new DataflowQueue()
@@ -93,7 +93,7 @@ h4. Joining pipelines
 Two pipelines (or channels) can be connected using the _into()_ method:
 
 {code}
-final DataflowReadChannel encrypt = new DataflowQueue()
+final encrypt = new DataflowQueue()
 final DataflowWriteChannel messagesToSave = new DataflowQueue()
 encrypt.chainWith toUpperCase chainWith {it.reverse()} into messagesToSave
 
@@ -116,7 +116,7 @@ h4. Forking the data flow
 When a need comes to copy the output of a pipeline/channel into more than one following pipeline/channel, the _split()_ method will help you:
 
 {code}
-final DataflowReadChannel encrypt = new DataflowQueue()
+final encrypt = new DataflowQueue()
 final DataflowWriteChannel messagesToSave = new DataflowQueue()
 final DataflowWriteChannel messagesToLog = new DataflowQueue()
 

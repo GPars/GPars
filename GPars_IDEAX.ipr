@@ -1231,7 +1231,6 @@
         <inspection_tool class="EmptyWebServiceClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="Empy-paren Scala method overriden as parameterless" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="EnumAsName" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="EnumClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="EnumSwitchStatementWhichMissesCases" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="ignoreSwitchStatementsWithDefault" value="false" />
         </inspection_tool>
