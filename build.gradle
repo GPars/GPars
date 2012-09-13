@@ -22,7 +22,7 @@
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
 final signingPropertiesAreSet = {
-  project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile') 
+  project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
 }
 
 apply plugin: 'groovy'
@@ -189,7 +189,7 @@ if ( signingPropertiesAreSet ( ) ) {
 
 //build.dependsOn integrationTest
 
-gradle.taskGraph.whenReady { taskGraph -> 
+gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(uploadArchives)) {
         if (!(project.hasProperty('codehausUsername') && project.hasProperty('codehausPassword'))) {
             throw new RuntimeException('Must define both codehausUsername and codehausPassword to upload archives.')
@@ -316,7 +316,7 @@ task zipDist(type: Zip) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.1'
+    gradleVersion = '1.2'
 }
 
 task demo(type: DemoTask, dependsOn: 'compileGroovy') {
