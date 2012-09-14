@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Vaclav Pech
  */
 public final class GracefulShutdownMonitor implements OperatorStateMonitor {
-    private static final long DEFAULT_DELAY = 3000L;
+    private static final long DEFAULT_DELAY = 500L;
     private final long delay;
 
     /**
