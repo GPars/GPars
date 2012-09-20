@@ -186,6 +186,13 @@ channels to send _PoisonPill_ to will be those that serve as *data sources* for 
 This may be difficult to achieve for general cases or for complex networks. On the other hand, for networks with a prevalent
 direction of message flow _PoisonPill_ provides a very straightforward way to shutdown the whole network gracefully.
 
+{note}
+Load-balancing architectures, which use multiple operators reading messages off a shared channel (queue), will also prevent
+poison shutdown to work properly, since only one of the reading operators will get to read the poison message.
+You may consider using *forked operators* instead, by setting the _maxForks_ property to a value greater than 1.
+Another alternative is to manually split the message stream into multiple channels, each of which would be consumed by one of the original operators.
+{note}
+
 h4. Termination tips and tricks
 
 Notice that GPars _tasks_ return a _DataflowVariable_, which gets bound to a value as soon as the task finishes.
