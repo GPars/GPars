@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventOrchestrator;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.BinaryChoiceClosure;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
@@ -95,6 +97,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
             @Override
             public MessageStream send(final Object message) {
                 originalRef.bind((T) message);
+                fireOnMessage((T) message);
                 return this;
             }
         });
@@ -109,6 +112,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public final DataflowWriteChannel<T> leftShift(final T value) {
         hookWheneverBoundListeners(retrieveForBind()).bind(value);
+        fireOnMessage(value);
         return this;
     }
 
@@ -120,6 +124,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     @Override
     public final void bind(final T value) {
         hookWheneverBoundListeners(retrieveForBind()).bind(value);
+        fireOnMessage(value);
     }
 
     /**
@@ -606,6 +611,21 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
             }
         };
 
+    }
+
+    private volatile DataflowChannelEventOrchestrator<T> eventManager;
+
+    @Override
+    public synchronized DataflowChannelEventListenerManager<T> getEventManager() {
+        if (eventManager!=null) return eventManager;
+        eventManager = new DataflowChannelEventOrchestrator<T>();
+        return eventManager;
+    }
+
+    private void fireOnMessage(final T value) {
+        if (eventManager != null) {
+            eventManager.fireOnMessage(value);
+        }
     }
 
     final LinkedBlockingQueue<DataflowVariable<T>> getQueue() {

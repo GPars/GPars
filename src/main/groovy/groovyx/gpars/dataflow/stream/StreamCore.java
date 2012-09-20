@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.DataCallback;
 import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
@@ -67,10 +68,19 @@ public abstract class StreamCore<T> implements FList<T> {
     }
 
     @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter"})
-    protected StreamCore(final DataflowVariable<T> first, final Collection<MessageStream> wheneverBoundListeners) {
+    protected StreamCore(final DataflowVariable<T> first, final Collection<MessageStream> wheneverBoundListeners, final Collection<DataflowChannelListener<T>> updateListeners) {
         this.first = first;
         this.wheneverBoundListeners = wheneverBoundListeners;
         hookWheneverBoundListeners(first);
+        addUpdateListeners(updateListeners);
+    }
+
+    private void addUpdateListeners(final Collection<DataflowChannelListener<T>> updateListeners) {
+        first.getEventManager().addAllDataflowChannelListeners(updateListeners);
+    }
+
+    final void addUpdateListener(final DataflowChannelListener<T> updateListener) {
+        first.getEventManager().addDataflowChannelListener(updateListener);
     }
 
     public static <T> T eos() {

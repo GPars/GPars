@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow.stream;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowVariable;
 
 import java.util.Collection;
@@ -56,8 +57,8 @@ public final class DataflowStream<T> extends StreamCore<T> {
         super(new DataflowVariable<T>(), toBeApplied);
     }
 
-    private DataflowStream(final Collection<MessageStream> wheneverBoundListeners) {
-        super(new DataflowVariable<T>(), wheneverBoundListeners);
+    private DataflowStream(final Collection<MessageStream> wheneverBoundListeners, final Collection<DataflowChannelListener<T>> updateListeners) {
+        super(new DataflowVariable<T>(), wheneverBoundListeners, updateListeners);
     }
 
     /**
@@ -68,7 +69,7 @@ public final class DataflowStream<T> extends StreamCore<T> {
     @Override
     public FList<T> getRest() {
         if (rest.get() == null)
-            rest.compareAndSet(null, new DataflowStream<T>(wheneverBoundListeners));
+            rest.compareAndSet(null, new DataflowStream<T>(wheneverBoundListeners, first.getEventManager().getListeners()));
         return rest.get();
     }
 

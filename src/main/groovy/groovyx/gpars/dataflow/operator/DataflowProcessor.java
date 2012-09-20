@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow.operator;
 
 import groovy.lang.Closure;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.group.PGroup;
@@ -61,7 +62,7 @@ public abstract class DataflowProcessor {
      */
     protected final Object stateObject;
 
-    private final Collection<DataflowEventListener> listeners = new CopyOnWriteArrayList<DataflowEventListener>();
+    final Collection<DataflowEventListener> listeners = new CopyOnWriteArrayList<DataflowEventListener>();
 
     /**
      * Creates a processor
@@ -293,10 +294,19 @@ public abstract class DataflowProcessor {
 
     public final void addDataflowEventListener(final DataflowEventListener listener) {
         listeners.add(listener);
+        listener.registered(this);
     }
 
     public final void removeDataflowEventListener(final DataflowEventListener listener) {
         listeners.remove(listener);
+    }
+
+    /**
+     * Registers the provided handler to all input channels
+     * @param handler The closure to invoke whenever a value gets bound to any of the input channels
+     */
+    public final void registerChannelListenersToAllInputs(final DataflowChannelListener<Object> handler) {
+        actor.registerChannelListenersToAllInputs(handler);
     }
 
     protected final void fireAfterStart() {

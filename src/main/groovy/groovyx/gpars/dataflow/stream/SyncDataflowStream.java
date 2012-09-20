@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package groovyx.gpars.dataflow.stream;
 
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.SyncDataflowVariable;
 
 import java.util.Collection;
@@ -75,8 +76,8 @@ public final class SyncDataflowStream<T> extends StreamCore<T> {
      * @param parties                The number of readers to ask for a value before the message gets exchanged.
      * @param wheneverBoundListeners The collection of listeners to bind to the stream
      */
-    private SyncDataflowStream(final int parties, final Collection<MessageStream> wheneverBoundListeners) {
-        super(new SyncDataflowVariable<T>(parties), wheneverBoundListeners);
+    private SyncDataflowStream(final int parties, final Collection<MessageStream> wheneverBoundListeners, final Collection<DataflowChannelListener<T>> updateListeners) {
+        super(new SyncDataflowVariable<T>(parties), wheneverBoundListeners, updateListeners);
         this.parties = parties;
     }
 
@@ -88,7 +89,7 @@ public final class SyncDataflowStream<T> extends StreamCore<T> {
     @Override
     public FList<T> getRest() {
         if (rest.get() == null)
-            rest.compareAndSet(null, new SyncDataflowStream<T>(parties, wheneverBoundListeners));
+            rest.compareAndSet(null, new SyncDataflowStream<T>(parties, wheneverBoundListeners, first.getEventManager().getListeners()));
         return rest.get();
     }
 

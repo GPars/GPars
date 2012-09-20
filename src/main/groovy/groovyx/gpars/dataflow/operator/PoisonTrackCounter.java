@@ -16,25 +16,24 @@
 
 package groovyx.gpars.dataflow.operator;
 
+import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.Promise;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents a non-immediate PoisonPill that counts stopped operators and can be used to wait for all the operators to terminate.
+ * A helper class used by poison messages to count terminated dataflow processors
  *
  * @author Vaclav Pech
  */
-public final class CountingPoisonPill extends PoisonPill {
-    private final PoisonTrackCounter poisonTrackCounter;
-
-    /**
-     * Creates a non-immediate instance that could be used to stop operators in a network.
-     *
-     * @param count The number of operators that need to be stopped before the join() method returns.
-     */
-    public CountingPoisonPill(final int count) {
-        poisonTrackCounter = new PoisonTrackCounter(count);
+final class PoisonTrackCounter {
+    private final DataflowVariable<Boolean> termination = new DataflowVariable<Boolean>();
+    private final AtomicInteger counter;
+    PoisonTrackCounter(final int count) {
+        if (count < 0)
+            throw new IllegalArgumentException("A counting poison pill can only start with a positive number");
+        this.counter = new AtomicInteger(count);
     }
 
     /**
@@ -43,7 +42,7 @@ public final class CountingPoisonPill extends PoisonPill {
      * @throws InterruptedException If the current thread gets interrupted during the blocking
      */
     public void join() throws InterruptedException {
-        poisonTrackCounter.join();
+        termination.join();
     }
 
     /**
@@ -54,20 +53,15 @@ public final class CountingPoisonPill extends PoisonPill {
      * @throws InterruptedException If the current thread gets interrupted during the blocking
      */
     public void join(final long timeout, final TimeUnit unit) throws InterruptedException {
-        poisonTrackCounter.join(timeout, unit);
+        termination.join(timeout, unit);
     }
 
-    /**
-     * Retrieves the promise for termination
-     * @return A Promise instance that will be bound when all the requested dataflow pocessors have been terminated
-     */
     public Promise<Boolean> getTermination() {
-        return poisonTrackCounter.getTermination();
+        return termination;
     }
 
-    @Override
     void countDown() {
-        poisonTrackCounter.countDown();
+        final int currentValue = counter.decrementAndGet();
+        if (currentValue == 0) termination.bind(true);
     }
 }
-

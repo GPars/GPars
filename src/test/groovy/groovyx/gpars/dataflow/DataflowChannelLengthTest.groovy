@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,20 +98,31 @@ public class DataflowChannelLengthTest extends GroovyTestCase {
         subscription1.whenBound {barrier.await()}
         subscription2.whenBound {barrier.await()}
         barrier.await()
-        assert subscription1.length() == 2
-        assert subscription2.length() == 3
-
-        subscription1.val
-        subscription2.val
-        subscription1.val
-        assert subscription1.length() == 0
+        assert subscription1.length() == 1
         assert subscription2.length() == 2
 
+        subscription1.val
         subscription2.val
+        assert subscription1.length() == 0
+        assert subscription2.length() == 1
+
         subscription2.val
         assert subscription1.length() == 0
         assert subscription2.length() == 0
+    }
 
+    public void testDataflowBroadcastHeadAndAsyncHead() {
+        final DataflowBroadcast channel = new DataflowBroadcast()
+        final CyclicBarrier barrier = new CyclicBarrier(2)
+        final DataflowReadChannel subscription1 = channel.createReadChannel()
+        final DataflowReadChannel subscription2 = channel.createReadChannel()
+        channel << 1
+        channel << 2
+        channel << 3
+        subscription1.whenBound {barrier.await()}
+        assert 2 == subscription1.val
+        assert 3 == subscription1.val
+        barrier.await()
     }
 
     public void testSyncDataflowBroadcast() {

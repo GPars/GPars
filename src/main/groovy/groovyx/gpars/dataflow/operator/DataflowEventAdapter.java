@@ -27,6 +27,13 @@ import java.util.List;
  * @author Vaclav Pech
  */
 public class DataflowEventAdapter implements DataflowEventListener {
+    /**
+     * Invoked immediately after the listener has been attached to a dataflow processor.
+     *
+     * @param processor The reporting dataflow operator/selector
+     */
+    @Override
+    public void registered(final DataflowProcessor processor) { }
 
     /**
      * Invoked immediately after the operator starts by a pooled thread before the first message is obtained
@@ -50,6 +57,7 @@ public class DataflowEventAdapter implements DataflowEventListener {
      * Invoked if an exception occurs. Unless overriden by subclasses this implementation returns true to terminate the operator.
      * If any of the listeners returns true, the operator will terminate.
      * Exceptions outside of the operator's body or listeners' messageSentOut() handlers will terminate the operator irrespective of the listeners' votes.
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param e         The thrown exception
@@ -90,6 +98,7 @@ public class DataflowEventAdapter implements DataflowEventListener {
 
     /**
      * Invoked when a message is being bound to an output channel.
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param channel   The output channel to send the message to
@@ -115,7 +124,8 @@ public class DataflowEventAdapter implements DataflowEventListener {
     }
 
     /**
-     * Invoked when the operator completes a single run
+     * Invoked when the operator completes a single run.
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param messages  The incoming messages that have been processed
@@ -127,6 +137,7 @@ public class DataflowEventAdapter implements DataflowEventListener {
     /**
      * Invoked when the fireCustomEvent() method is triggered manually on a dataflow operator/selector.
      * This implementation returns the original piece of data.
+     * When using maxForks, the method may be invoked from threads running the forks.
      *
      * @param processor The reporting dataflow operator/selector
      * @param data      The custom piece of data provided as part of the event

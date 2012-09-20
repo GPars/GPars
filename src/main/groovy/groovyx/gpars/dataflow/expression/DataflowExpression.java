@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,8 @@ import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.dataflow.Promise;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventOrchestrator;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.BinaryChoiceClosure;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
@@ -381,6 +383,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     protected void doBindImpl(final T value) {
         this.value = value;
         state.set(S_INITIALIZED);
+        fireOnMessage(value);
 
         final WaitingThread waitingQueue = waiting.getAndSet(dummyWaitingThread);
 
@@ -795,6 +798,21 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         group.operator(asList(this), outputs, new SeparationClosure(code));
+    }
+
+    private volatile DataflowChannelEventOrchestrator<T> eventManager;
+
+    @Override
+    public synchronized DataflowChannelEventListenerManager<T> getEventManager() {
+        if (eventManager!=null) return eventManager;
+        eventManager = new DataflowChannelEventOrchestrator<T>();
+        return eventManager;
+    }
+
+    private void fireOnMessage(final T value) {
+        if (eventManager != null) {
+            eventManager.fireOnMessage(value);
+        }
     }
 
     /**

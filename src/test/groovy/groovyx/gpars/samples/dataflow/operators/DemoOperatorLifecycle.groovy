@@ -37,6 +37,11 @@ final DataflowQueue c = new DataflowQueue()
 //The listener to monitor the operator's lifecycle
 final listener = new DataflowEventListener() {
     @Override
+    void registered(final DataflowProcessor processor) {
+        println "Hooked into an operator"
+    }
+
+    @Override
     void afterStart(final DataflowProcessor processor) {
         println 'afterStart'
     }
