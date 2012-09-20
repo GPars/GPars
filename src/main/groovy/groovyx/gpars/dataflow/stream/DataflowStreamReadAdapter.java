@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow.stream;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
@@ -26,6 +27,8 @@ import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.SyncDataflowVariable;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventOrchestrator;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.BinaryChoiceClosure;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
@@ -67,12 +70,20 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     public DataflowStreamReadAdapter(final StreamCore<T> stream) {
         this.head = stream;
         this.asyncHead = head;
+
+        this.head.addUpdateListener(new DataflowChannelListener<T>() {
+            @Override
+            public void onMessage(final T message) {
+                fireOnMessage(message);
+            }
+        });
     }
 
     public Iterator<T> iterator() {
         return new FListIterator<T>(head);
     }
 
+    @SuppressWarnings("ObjectToString")
     @Override
     public final String toString() {
         return head.toString();
@@ -106,7 +117,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
         final DataflowVariable<T> firstDFV = head.getFirstDFV();
         if (!firstDFV.isBound()) return true;
         if (firstDFV instanceof SyncDataflowVariable) {
-            return ((SyncDataflowVariable) firstDFV).awaitingParties();
+            return ((SyncDataflowVariable<T>) firstDFV).awaitingParties();
         }
         return false;
     }
@@ -399,6 +410,21 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     @Override
     public void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         group.operator(asList(this), outputs, new SeparationClosure(code));
+    }
+
+    private volatile DataflowChannelEventOrchestrator<T> eventManager;
+
+    @Override
+    public synchronized DataflowChannelEventListenerManager<T> getEventManager() {
+        if (eventManager!=null) return eventManager;
+        eventManager = new DataflowChannelEventOrchestrator<T>();
+        return eventManager;
+    }
+
+    private void fireOnMessage(final T value) {
+        if (eventManager != null) {
+            eventManager.fireOnMessage(value);
+        }
     }
 
     @Override

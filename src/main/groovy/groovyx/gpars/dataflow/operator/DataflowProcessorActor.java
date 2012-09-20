@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow.operator;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.group.PGroup;
 
@@ -59,23 +60,12 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
     }
 
     /**
-     * Reports whether there is at least one message in at least one input channel waiting for processing
-     * @return True, if such a message exists
-     */
-    final boolean hasIncomingMessages() {
-        for (final Object input : inputs) {
-             if (((DataflowReadChannel)input).length()!=0) return true;
-        }
-        return false;
-    }
-
-    /**
      * Registers the provided handler to all input channels
      * @param handler The closure to invoke whenever a value gets bound to any of the input channels
      */
-    final void registerWheneverBoundListenerToAllInputs(final Closure<Object> handler) {
+    final void registerChannelListenersToAllInputs(final DataflowChannelListener<Object> handler) {
         for (final Object input : inputs) {
-            ((DataflowReadChannel<Object>) input).wheneverBound(handler);
+            ((DataflowReadChannel<Object>) input).getEventManager().addDataflowChannelListener(handler);
         }
     }
     final void onException(final Throwable e) {

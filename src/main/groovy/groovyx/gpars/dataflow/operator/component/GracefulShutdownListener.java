@@ -16,15 +16,14 @@
 
 package groovyx.gpars.dataflow.operator.component;
 
-import groovyx.gpars.MessagingRunnable;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.operator.DataflowEventAdapter;
 import groovyx.gpars.dataflow.operator.DataflowProcessor;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Listens to an operator/selector and reports its state and activity to a GracefulShutdownMonitor, shared with other listeners.
@@ -37,9 +36,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     private final OperatorStateMonitor monitor;
     private DataflowProcessor processor=null;
     private volatile boolean shutdownFlag = false;
-    private final Object lock = new Object();
-    private final Collection<Object> arrivedMessagesCache = new ArrayList<Object>();
-    private final Collection<Object> boundMessagesCache = new ArrayList<Object>();
+    private final AtomicLong messagesInChannels = new AtomicLong(0L);
 
     /**
      * Hooks hooks the shared monitor
@@ -61,12 +58,10 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     @Override
     public void registered(final DataflowProcessor processor) {
         this.processor = processor;
-        processor.registerWheneverBoundListenerToAllInputs(new MessagingRunnable<Object>() {
+        processor.registerChannelListenersToAllInputs(new DataflowChannelListener<Object>() {
             @Override
-            protected void doRun(final Object argument) {
-                synchronized (lock) {
-                    if (!arrivedMessagesCache.remove(argument)) boundMessagesCache.add(argument);
-                }
+            public void onMessage(final Object message) {
+                messagesInChannels.incrementAndGet();
             }
         });
     }
@@ -84,9 +79,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     public Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
         fireEvent();
         collectingMessages = true;
-        synchronized (lock) {
-            if (!this.boundMessagesCache.remove(message)) this.arrivedMessagesCache.add(message);
-        }
+        this.messagesInChannels.decrementAndGet();
         return message;
     }
 
@@ -103,9 +96,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     public Object controlMessageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
         fireEvent();
         collectingMessages=false;
-        synchronized (lock) {
-            if (!this.boundMessagesCache.remove(message)) this.arrivedMessagesCache.add(message);
-        }
+        this.messagesInChannels.decrementAndGet();
         return message;
     }
 
@@ -163,9 +154,7 @@ public class GracefulShutdownListener extends DataflowEventAdapter {
     public final boolean isIdleAndNoIncomingMessages() {
         if(processor==null)
             throw new IllegalStateException("The GracefulShutdownListener has not been registered with a dataflow processor yet.");
-        synchronized (lock) {
-            return !processor.hasIncomingMessages() && isIdle() && boundMessagesCache.isEmpty();
-        }
+        return isIdle() && messagesInChannels.get()<=0L;
     }
 
     /**

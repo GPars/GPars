@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
 import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
@@ -483,6 +484,11 @@ public interface DataflowReadChannel<T> {
      */
     void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
 
+    /**
+     * Retrieves the event manager object of this channel
+     * @return The event manager to register custom events listeners
+     */
+    DataflowChannelEventListenerManager<T> getEventManager();
 
     /**
      * Check if value has been set already for this expression

@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow.operator;
 
 import groovy.lang.Closure;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.group.PGroup;
@@ -301,19 +302,11 @@ public abstract class DataflowProcessor {
     }
 
     /**
-     * Reports whether there is at least one message in at least one input channel waiting for processing
-     * @return True, if such a message exists
-     */
-    public final boolean hasIncomingMessages() {
-        return actor.hasIncomingMessages();
-    }
-
-    /**
      * Registers the provided handler to all input channels
      * @param handler The closure to invoke whenever a value gets bound to any of the input channels
      */
-    public final void registerWheneverBoundListenerToAllInputs(final Closure<Object> handler) {
-        actor.registerWheneverBoundListenerToAllInputs(handler);
+    public final void registerChannelListenersToAllInputs(final DataflowChannelListener<Object> handler) {
+        actor.registerChannelListenersToAllInputs(handler);
     }
 
     protected final void fireAfterStart() {
