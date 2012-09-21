@@ -40,6 +40,7 @@ dataflow :
   dataflow_tasks : Tasks
   dataflow_selects : Selects
   dataflow_operators : Operators
+  dataflow_operators_shutdown : Shutting Down Dataflow Networks
   dataflow_applications : Application Frameworks
   dataflow_pipelineDSL : Pipeline DSL
   dataflow_implementation : Implementation

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,6 +59,9 @@ public final class DataflowOperator extends DataflowProcessor {
             this.actor = new ForkingDataflowOperatorActor(this, group, extractOutputs(channels), extractInputs(channels), (Closure) code.clone(), (Integer) channels.get(MAX_FORKS));
         } else {
             this.actor = new DataflowOperatorActor(this, group, extractOutputs(channels), extractInputs(channels), (Closure) code.clone());
+        }
+        for (final DataflowEventListener listener : listeners) {
+            listener.registered(this);
         }
     }
 

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow.operator;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.StaticDispatchActor;
 import groovyx.gpars.actor.impl.MessageStream;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.group.PGroup;
 
@@ -58,6 +59,15 @@ abstract class DataflowProcessorActor extends StaticDispatchActor<Object> {
         owningProcessor.fireAfterStop();
     }
 
+    /**
+     * Registers the provided handler to all input channels
+     * @param handler The closure to invoke whenever a value gets bound to any of the input channels
+     */
+    final void registerChannelListenersToAllInputs(final DataflowChannelListener<Object> handler) {
+        for (final Object input : inputs) {
+            ((DataflowReadChannel<Object>) input).getEventManager().addDataflowChannelListener(handler);
+        }
+    }
     final void onException(final Throwable e) {
         reportException(e);
         terminate();

@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class DataflowSelectorActor extends DataflowProcessorActor {
 
         if (isControlMessage(value)) {
             value = fireMessageArrived(value, index, true);
-            checkPoison(value);
+            if (value instanceof PoisonPill) handlePoisonPillInSelector(index, value);
             if (isControlMessage(value)) return;
         }
 
@@ -71,6 +71,19 @@ class DataflowSelectorActor extends DataflowProcessorActor {
             stop();
         }
         if (!hasBeenStopped()) ((DataflowSelector) owningProcessor).doSelect();
+    }
+
+    private void handlePoisonPillInSelector(final int index, final Object value) {
+        if (((PoisonPill) value).isImmediate()) {
+            checkPoison(value);
+        } else {
+            final DataflowSelector selector = (DataflowSelector) owningProcessor;
+            selector.setGuard(index, false);
+            if (selector.allGuardsClosed()) checkPoison(value);
+            else {
+                if (!hasBeenStopped()) ((DataflowSelector) owningProcessor).doSelect();
+            }
+        }
     }
 
     @SuppressWarnings({"CatchGenericClass"})

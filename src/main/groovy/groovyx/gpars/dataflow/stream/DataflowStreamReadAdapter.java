@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package groovyx.gpars.dataflow.stream;
 import groovy.lang.Closure;
 import groovyx.gpars.actor.impl.MessageStream;
 import groovyx.gpars.dataflow.Dataflow;
+import groovyx.gpars.dataflow.DataflowChannelListener;
 import groovyx.gpars.dataflow.DataflowQueue;
 import groovyx.gpars.dataflow.DataflowReadChannel;
 import groovyx.gpars.dataflow.DataflowVariable;
@@ -26,6 +27,8 @@ import groovyx.gpars.dataflow.DataflowWriteChannel;
 import groovyx.gpars.dataflow.Promise;
 import groovyx.gpars.dataflow.SyncDataflowVariable;
 import groovyx.gpars.dataflow.expression.DataflowExpression;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventListenerManager;
+import groovyx.gpars.dataflow.impl.DataflowChannelEventOrchestrator;
 import groovyx.gpars.dataflow.impl.ThenMessagingRunnable;
 import groovyx.gpars.dataflow.operator.BinaryChoiceClosure;
 import groovyx.gpars.dataflow.operator.ChainWithClosure;
@@ -67,12 +70,20 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     public DataflowStreamReadAdapter(final StreamCore<T> stream) {
         this.head = stream;
         this.asyncHead = head;
+
+        this.head.addUpdateListener(new DataflowChannelListener<T>() {
+            @Override
+            public void onMessage(final T message) {
+                fireOnMessage(message);
+            }
+        });
     }
 
     public Iterator<T> iterator() {
         return new FListIterator<T>(head);
     }
 
+    @SuppressWarnings("ObjectToString")
     @Override
     public final String toString() {
         return head.toString();
@@ -106,7 +117,7 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
         final DataflowVariable<T> firstDFV = head.getFirstDFV();
         if (!firstDFV.isBound()) return true;
         if (firstDFV instanceof SyncDataflowVariable) {
-            return ((SyncDataflowVariable) firstDFV).awaitingParties();
+            return ((SyncDataflowVariable<T>) firstDFV).awaitingParties();
         }
         return false;
     }
@@ -401,6 +412,21 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
         group.operator(asList(this), outputs, new SeparationClosure(code));
     }
 
+    private volatile DataflowChannelEventOrchestrator<T> eventManager;
+
+    @Override
+    public synchronized DataflowChannelEventListenerManager<T> getEventManager() {
+        if (eventManager!=null) return eventManager;
+        eventManager = new DataflowChannelEventOrchestrator<T>();
+        return eventManager;
+    }
+
+    private void fireOnMessage(final T value) {
+        if (eventManager != null) {
+            eventManager.fireOnMessage(value);
+        }
+    }
+
     @Override
     public boolean isBound() {
         return head.getFirstDFV().isBound();
@@ -442,12 +468,12 @@ public class DataflowStreamReadAdapter<T> implements DataflowReadChannel<T> {
     }
 
     private void moveHead() {
-        if (head == asyncHead) moveAsyncHead();
+        asyncHead = (StreamCore<T>) asyncHead.getRest();
         head = (StreamCore<T>) head.getRest();
     }
 
     private void moveAsyncHead() {
-        asyncHead = (StreamCore<T>) asyncHead.getRest();
+        moveHead();
     }
 }
 

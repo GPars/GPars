@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ public class DataflowOperatorCountingShutdownTest extends GroovyTestCase {
 
         def op3 = prioritySelector(inputs: [e, f], outputs: [b]) {value, index -> }
 
-        final pill = new CountingPoisonPill(3)
+        final pill = new ImmediateCountingPoisonPill(3)
         a << pill
         pill.join()
         assert out.val == pill
@@ -203,11 +203,37 @@ public class DataflowOperatorCountingShutdownTest extends GroovyTestCase {
         c << 30
 
         assert (1..3).collect {d.val} as Set == [10, 20, 30] as Set
-        final pill = new CountingPoisonPill(2)
+        final pill = new ImmediateCountingPoisonPill(2)
         a << pill
         c << pill
         pill.join(1, TimeUnit.SECONDS)
         assert !pill.termination.bound
+        op.join()
+    }
+
+    public void testNonImmediateTerminationWithRepetitionOnSelector() {
+        final DataflowQueue a = new DataflowQueue()
+        final DataflowQueue b = new DataflowQueue()
+        final DataflowQueue c = new DataflowQueue()
+        final DataflowQueue d = new DataflowQueue()
+
+        def op = selector(inputs: [a, b, c], outputs: [d]) {x ->
+            bindOutput 0, x
+        }
+
+        a << 10
+        b << 20
+        c << 30
+
+        assert (1..3).collect {d.val} as Set == [10, 20, 30] as Set
+        final pill = new CountingPoisonPill(1)
+        a << pill
+        c << pill
+        pill.join(1, TimeUnit.SECONDS)
+        assert !pill.termination.bound
+
+        b << pill
+        pill.join()
         op.join()
     }
 }
