@@ -525,6 +525,34 @@ Thread.start {variable << 4}
 assert 9 == result.val
 {code}
 
+h3. Putting it together
+
+By combining _whenAllBound()_ and _then_ (or >>) you can easily create large asynchronous scenarios in a convenient way:
+
+{code}
+withPool {
+    Closure download = {String url ->
+        sleep 3000  //Simulate a web read
+        'web content'
+    }.asyncFun()
+
+    Closure loadFile = {String fileName ->
+        'file content'  //simulate a local file read
+    }.asyncFun()
+
+    Closure hash = {s -> s.hashCode()}.asyncFun()
+
+    Closure compare = {int first, int second ->
+        first == second
+    }
+
+    def all = whenAllBound([
+                  download('http://www.gpars.org') >> hash,
+                  loadFile('/coolStuff/gpars/website/index.html') >> hash
+              ], compare) >> {println it}
+    all.join()  //optionally block until the calculation is all done
+{code}
+
 h2. Dataflow Expressions
 
 Look at the magic below:

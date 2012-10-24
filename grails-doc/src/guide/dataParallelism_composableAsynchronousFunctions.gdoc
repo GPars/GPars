@@ -34,7 +34,7 @@ Closure loadFile = {String fileName ->
     ...  //load the file here
 }
 
-Closure hash = {s -> s.hashCode()}.asyncFun()
+Closure hash = {s -> s.hashCode()}
 
 Closure compare = {int first, int second ->
     first == second
