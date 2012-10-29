@@ -540,7 +540,7 @@ withPool {
         'file content'  //simulate a local file read
     }.asyncFun()
 
-    Closure hash = {s -> s.hashCode()}.asyncFun()
+    Closure hash = {s -> s.hashCode()}
 
     Closure compare = {int first, int second ->
         first == second
@@ -552,6 +552,11 @@ withPool {
               ], compare) >> {println it}
     all.join()  //optionally block until the calculation is all done
 {code}
+
+{note}
+Notice that only the initial action (function) needs to be asynchronous. The functions further down the pipe will be invoked
+asynchronously by the promise even if the are synchronous.
+{note}
 
 h2. Dataflow Expressions
 

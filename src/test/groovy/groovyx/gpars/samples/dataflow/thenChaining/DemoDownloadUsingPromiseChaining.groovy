@@ -33,7 +33,7 @@ withPool {
         'file content'  //simulate a local file read
     }.asyncFun()
 
-    Closure hash = {s -> s.hashCode()}.asyncFun()
+    Closure hash = {s -> s.hashCode()}
 
     Closure compare = {int first, int second ->
         first == second
