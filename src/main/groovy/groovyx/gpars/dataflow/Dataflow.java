@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public abstract class Dataflow {
      * @param code The task body to run
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public static DataflowVariable task(final Closure code) {
+    public static <T> Promise<T> task(final Closure<T> code) {
         return Dataflow.DATA_FLOW_GROUP.task(code);
     }
 
@@ -79,7 +79,7 @@ public abstract class Dataflow {
      * @param callable The task body to run
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public static DataflowVariable task(final Callable callable) {
+    public static <T> Promise<T> task(final Callable<T> callable) {
         return Dataflow.DATA_FLOW_GROUP.task(callable);
     }
 
@@ -92,7 +92,7 @@ public abstract class Dataflow {
      * @param runnable The task body to run
      * @return A DataflowVariable, which gets bound to null once the supplied code finishes
      */
-    public static DataflowVariable task(final Runnable runnable) {
+    public static Promise<Object> task(final Runnable runnable) {
         return Dataflow.DATA_FLOW_GROUP.task(runnable);
     }
 
