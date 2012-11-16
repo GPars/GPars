@@ -62,6 +62,15 @@ def quicksort(numbers) {
 }
 {code}
 
+{note}
+The important piece of the puzzle that needs to be mentioned here is that _forkOffChild()_ doesn't wait for the child to run.
+It merely schedules it for execution some time in the future. If a child fails by throwing an exception, you should not expect
+the exception to be fired from the forkOffChild() method itself. The exception ise likely to happen long after the parent
+has returned from the call to the _forkOffChild()_ method.
+
+It is the _getChildrenResults()_ method that will re-throw exceptions that happened in the child sub-tasks back to the parent task.
+{note}
+
 h4. Alternative approach
 
 Alternatively, the underlying mechanism of nested Fork/Join worker tasks can be used directly. Custom-tailored workers can
