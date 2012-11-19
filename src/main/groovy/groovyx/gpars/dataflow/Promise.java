@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -90,6 +90,22 @@ public interface Promise<T> {
      * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
      */
     T getVal(final long timeout, final TimeUnit units) throws InterruptedException;
+
+    /**
+     * Blocks, if the value has not been assigned yet to the DataflowVariable
+     *
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
+    void join() throws InterruptedException;
+
+    /**
+     * Blocks, if the value has not been assigned yet to the DataflowVariable
+     *
+     * @param timeout The timeout value
+     * @param units   Units for the timeout
+     * @throws InterruptedException If the current thread gets interrupted while waiting for the variable to be bound
+     */
+    void join(final long timeout, final TimeUnit units) throws InterruptedException;
 
     /**
      * Schedule closure to be executed after data became available.

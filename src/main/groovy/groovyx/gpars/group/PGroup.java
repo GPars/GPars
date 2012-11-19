@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -277,11 +277,11 @@ public abstract class PGroup {
      * @param code The task body to run
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public DataflowVariable task(final Closure code) {
-        final Closure clonedCode = (Closure) code.clone();
-        return task(new Callable<Object>() {
+    public <T> Promise<T> task(final Closure<T> code) {
+        final Closure<T> clonedCode = (Closure<T>) code.clone();
+        return task(new Callable<T>() {
             @Override
-            public Object call() throws Exception {
+            public T call() throws Exception {
                 return clonedCode.call();
             }
         });
@@ -296,7 +296,7 @@ public abstract class PGroup {
      * @param callable The task body to run
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public DataflowVariable task(final Callable callable) {
+    public <T> Promise<T> task(final Callable<T> callable) {
         final DataflowVariable result = new DataflowVariable();
         threadPool.execute(new Runnable() {
             @Override
@@ -325,7 +325,7 @@ public abstract class PGroup {
      * @param code The task body to run
      * @return A DataflowVariable, which gets bound to null once the supplied code finishes
      */
-    public DataflowVariable task(final Runnable code) {
+    public Promise<Object> task(final Runnable code) {
         if (code instanceof Closure) return task((Closure) code);
         final DataflowVariable result = new DataflowVariable();
         threadPool.execute(new Runnable() {
@@ -333,8 +333,12 @@ public abstract class PGroup {
             public void run() {
                 Dataflow.activeParallelGroup.set(PGroup.this);
                 try {
-                    code.run();
-                    result.bind(null);
+                    try {
+                        code.run();
+                        result.bind(null);
+                    } catch (Exception e) {
+                        result.bind(e);
+                    }
                 } finally {
                     Dataflow.activeParallelGroup.remove();
                 }
