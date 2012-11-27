@@ -67,7 +67,7 @@ public abstract class Dataflow {
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
     public static <T> Promise<T> task(final Closure<T> code) {
-        return Dataflow.DATA_FLOW_GROUP.task(code);
+        return retrieveCurrentDFPGroup().task(code);
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class Dataflow {
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
     public static <T> Promise<T> task(final Callable<T> callable) {
-        return Dataflow.DATA_FLOW_GROUP.task(callable);
+        return retrieveCurrentDFPGroup().task(callable);
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class Dataflow {
      * @return A DataflowVariable, which gets bound to null once the supplied code finishes
      */
     public static Promise<Object> task(final Runnable runnable) {
-        return Dataflow.DATA_FLOW_GROUP.task(runnable);
+        return retrieveCurrentDFPGroup().task(runnable);
     }
 
     /**
@@ -104,7 +104,7 @@ public abstract class Dataflow {
      * @return A new active operator instance
      */
     public static DataflowProcessor operator(final Map channels, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.operator(channels, code);
+        return retrieveCurrentDFPGroup().operator(channels, code);
     }
 
     /**
@@ -116,7 +116,7 @@ public abstract class Dataflow {
      * @return A new active operator instance
      */
     public static DataflowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, code);
+        return retrieveCurrentDFPGroup().operator(inputChannels, outputChannels, code);
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class Dataflow {
      * @return A new active operator instance
      */
     public static DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.operator(inputChannels, outputChannels, maxForks, code);
+        return retrieveCurrentDFPGroup().operator(inputChannels, outputChannels, maxForks, code);
     }
 
     /**
@@ -141,7 +141,7 @@ public abstract class Dataflow {
      * @return A new active operator instance
      */
     public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.operator(input, output, code);
+        return retrieveCurrentDFPGroup().operator(input, output, code);
     }
 
     /**
@@ -154,7 +154,7 @@ public abstract class Dataflow {
      * @return A new active operator instance
      */
     public static DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.operator(input, output, maxForks, code);
+        return retrieveCurrentDFPGroup().operator(input, output, maxForks, code);
     }
 
     /**
@@ -165,7 +165,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor selector(final Map channels, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.selector(channels, code);
+        return retrieveCurrentDFPGroup().selector(channels, code);
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels, code);
+        return retrieveCurrentDFPGroup().selector(inputChannels, outputChannels, code);
     }
 
     /**
@@ -187,7 +187,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor selector(final Map channels) {
-        return Dataflow.DATA_FLOW_GROUP.selector(channels);
+        return retrieveCurrentDFPGroup().selector(channels);
     }
 
     /**
@@ -198,7 +198,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor selector(final List inputChannels, final List outputChannels) {
-        return Dataflow.DATA_FLOW_GROUP.selector(inputChannels, outputChannels);
+        return retrieveCurrentDFPGroup().selector(inputChannels, outputChannels);
     }
 
     /**
@@ -210,7 +210,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor prioritySelector(final Map channels, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.prioritySelector(channels, code);
+        return retrieveCurrentDFPGroup().prioritySelector(channels, code);
     }
 
     /**
@@ -223,7 +223,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
-        return Dataflow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels, code);
+        return retrieveCurrentDFPGroup().prioritySelector(inputChannels, outputChannels, code);
     }
 
     /**
@@ -234,7 +234,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor prioritySelector(final Map channels) {
-        return Dataflow.DATA_FLOW_GROUP.prioritySelector(channels);
+        return retrieveCurrentDFPGroup().prioritySelector(channels);
     }
 
     /**
@@ -246,7 +246,7 @@ public abstract class Dataflow {
      * @return A new active selector instance
      */
     public static DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels) {
-        return Dataflow.DATA_FLOW_GROUP.prioritySelector(inputChannels, outputChannels);
+        return retrieveCurrentDFPGroup().prioritySelector(inputChannels, outputChannels);
     }
 
     /**
@@ -258,7 +258,7 @@ public abstract class Dataflow {
      * @return A new active splitter instance
      */
     public static DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels) {
-        return Dataflow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels);
+        return retrieveCurrentDFPGroup().splitter(inputChannel, outputChannels);
     }
 
     /**
@@ -271,7 +271,7 @@ public abstract class Dataflow {
      * @return A new active splitter instance
      */
     public static DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels, final int maxForks) {
-        return Dataflow.DATA_FLOW_GROUP.splitter(inputChannel, outputChannels, maxForks);
+        return retrieveCurrentDFPGroup().splitter(inputChannel, outputChannels, maxForks);
     }
 
     /**
@@ -282,7 +282,7 @@ public abstract class Dataflow {
      * @return A new select instance
      */
     public static Select<?> select(final DataflowReadChannel<?>... channels) {
-        return Dataflow.DATA_FLOW_GROUP.select(channels);
+        return retrieveCurrentDFPGroup().select(channels);
     }
 
     /**
@@ -293,7 +293,7 @@ public abstract class Dataflow {
      * @return A new select instance
      */
     public static Select<?> select(final List<DataflowReadChannel> channels) {
-        return Dataflow.DATA_FLOW_GROUP.select(channels);
+        return retrieveCurrentDFPGroup().select(channels);
     }
 
     /**
