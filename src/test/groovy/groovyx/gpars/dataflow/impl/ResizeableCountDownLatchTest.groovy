@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ public class ResizeableCountDownLatchTest extends GroovyTestCase {
             latch.await()
         }
         latch.countDown()
-        assert latch.attemptToCountDownAndAwait(5000000)
+        assert latch.attemptToCountDownAndAwait(30000000)
         latch.increaseCount()
         assert latch.count == 1
         assert !latch.await(0, TimeUnit.MILLISECONDS)
