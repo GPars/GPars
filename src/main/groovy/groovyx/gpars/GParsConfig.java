@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public final class GParsConfig {
     private static volatile boolean poolFactoryFlag = false;
     private static volatile boolean timerFactoryFlag = false;
 
-    public static void setPoolFactory(final PoolFactory pool) {
+    public static synchronized void setPoolFactory(final PoolFactory pool) {
         if (poolFactoryFlag)
             throw new IllegalArgumentException("The pool factory cannot be altered at this stage. It has already been set before.");
         poolFactoryFlag = true;
@@ -58,7 +58,7 @@ public final class GParsConfig {
         return new ResizeablePool(true, 1);
     }
 
-    public static void setTimerFactory(final TimerFactory timerFactory) {
+    public static synchronized void setTimerFactory(final TimerFactory timerFactory) {
         if (timerFactoryFlag)
             throw new IllegalArgumentException("The timer factory cannot be altered at this stage. It has already been set before.");
         timerFactoryFlag = true;
