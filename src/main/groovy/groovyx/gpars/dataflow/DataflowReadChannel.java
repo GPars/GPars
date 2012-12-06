@@ -441,7 +441,7 @@ public interface DataflowReadChannel<T> {
     void choice(final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
 
     /**
-     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
      *
      * @param pool    The thread pool to use
      * @param outputs The channels to send data to.
@@ -450,7 +450,7 @@ public interface DataflowReadChannel<T> {
     void choice(final Pool pool, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
 
     /**
-     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
      *
      * @param group   The PGroup to use
      * @param outputs The channels to send data to.
@@ -486,6 +486,7 @@ public interface DataflowReadChannel<T> {
 
     /**
      * Retrieves the event manager object of this channel
+     *
      * @return The event manager to register custom events listeners
      */
     DataflowChannelEventListenerManager<T> getEventManager();

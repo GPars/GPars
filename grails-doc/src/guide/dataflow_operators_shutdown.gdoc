@@ -48,8 +48,8 @@ Shutting down the whole JVM through _System.exit()_ will also obvisouly shutdown
 h4. Stopping operators gently
 
 Operators handle incoming messages repeatedly. The only safe moment for stopping an operator without the risk of loosing
-any messages is right after the operator has finished processing messages is just about to look for more messages in its incoming pipes.
-This is exactly what the terminateAfterNextRun() method does. It will schedule the operator for shutdown after the next set
+any messages is right after the operator has finished processing messages and is just about to look for more messages in its incoming pipes.
+This is exactly what the _terminateAfterNextRun()_ method does. It will schedule the operator for shutdown after the next set
 of messages gets handled.
 
 The unprocessed messages will stay in the input channels, which allows you to handle them later,
@@ -243,8 +243,8 @@ h4. Keeping PoisonPill inside a given network
 If your network passed values through channels to entities outside of it, you may need to stop the _PoisonPill_ messages
 on the network boundaries. This can be easily achieved by putting a single-input single-output filtering operator on each such channel.
 {code}
-operator(networkLeavingChannel, otherNetworkEnteringChannel) {
-    bindOutput it
+operator(networkLeavingChannel, otherNetworkEnteringChannel) {value ->
+    if (!(value instanceOf PoisonPill)) bindOutput it
 }
 {code}
 
@@ -330,14 +330,9 @@ through the _then()_ method.
 {note:title=Limitations of graceful shutdown}
 *Limitations of graceful shutdown*
 
-# For _GracefulShutdownListener_ to work correctly, its _messageArrived()_ event handler must see the original value
-that has arrived through the input channel. Since some event listeners may alter the messages as they pass through the listeners
-it is advisable to add the _GracefulShutdownListener_ first to the list of listeners on each dataflow processor.
+# For _GracefulShutdownListener_ to work correctly, its _messageArrived()_ event handler must see the original value that has arrived through the input channel. Since some event listeners may alter the messages as they pass through the listeners it is advisable to add the _GracefulShutdownListener_ first to the list of listeners on each dataflow processor.
 
-# Also, graceful shutdown will not work for those rare operators that have listeners, which turn control messages into plain value messages in the _controlMessageArrived()_
-event handler.
+# Also, graceful shutdown will not work for those rare operators that have listeners, which turn control messages into plain value messages in the _controlMessageArrived()_ event handler.
 
-# Third and last, load-balancing architectures, which use multiple operators reading messages off a shared channel (queue), will also prevent
-graceful shutdown to work properly. You may consider using *forked operators* instead, by setting the _maxForks_ property to a value greater than 1.
-Another alternative is to manually split the message stream into multiple channels, each of which would be consumed by one of the original operators.
+# Third and last, load-balancing architectures, which use multiple operators reading messages off a shared channel (queue), will also prevent graceful shutdown to work properly. You may consider using *forked operators* instead, by setting the _maxForks_ property to a value greater than 1. Another alternative is to manually split the message stream into multiple channels, each of which would be consumed by one of the original operators.
 {note}
