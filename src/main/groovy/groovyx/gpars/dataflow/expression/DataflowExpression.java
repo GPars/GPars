@@ -85,6 +85,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      */
     @SuppressWarnings({"InstanceVariableMayNotBeInitialized"})
     protected volatile T value;
+    protected volatile Throwable error;
 
     /**
      * Holds the current state of the variable
@@ -332,6 +333,14 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         doBind(value);
     }
 
+    public final void bindError(final Throwable e) {
+        if (!state.compareAndSet(S_NOT_INITIALIZED, S_INITIALIZING)) {
+            throw new IllegalStateException("A DataflowVariable can only be assigned once. Only re-assignments to an equal value are allowed.");
+        }
+        error = e;
+        doBind(null);
+    }
+
     /**
      * Assigns a value to the variable. Can only be invoked once on each instance of DataflowVariable.
      * Allows attempts to bind to equal values.
@@ -382,6 +391,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     protected void doBindImpl(final T value) {
         this.value = value;
+        if (value instanceof Throwable) error = (Throwable) value;
         state.set(S_INITIALIZED);
         fireOnMessage(value);
 
@@ -459,11 +469,11 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @SuppressWarnings({"TypeMayBeWeakened"})
     protected void scheduleCallback(final Object attachment, final MessageStream callback) {
         if (attachment == null) {
-            callback.send(value);
+            callback.send(error != null ? error : value);
         } else {
             final Map<String, Object> message = new HashMap<String, Object>(2);
             message.put(ATTACHMENT, attachment);
-            message.put(RESULT, value);
+            message.put(RESULT, error != null ? error : value);
             callback.send(message);
         }
     }
@@ -553,7 +563,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public <V> Promise<V> then(final Pool pool, final Closure<V> closure) {
+    public final <V> Promise<V> then(final Pool pool, final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(pool, new ThenMessagingRunnable<T, V>(result, closure));
         return result;
@@ -569,7 +579,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
      * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
      */
     @Override
-    public <V> Promise<V> then(final PGroup group, final Closure<V> closure) {
+    public final <V> Promise<V> then(final PGroup group, final Closure<V> closure) {
         final DataflowVariable<V> result = new DataflowVariable<V>();
         whenBound(group, new ThenMessagingRunnable<T, V>(result, closure));
         return result;
@@ -804,7 +814,7 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     @Override
     public synchronized DataflowChannelEventListenerManager<T> getEventManager() {
-        if (eventManager!=null) return eventManager;
+        if (eventManager != null) return eventManager;
         eventManager = new DataflowChannelEventOrchestrator<T>();
         return eventManager;
     }

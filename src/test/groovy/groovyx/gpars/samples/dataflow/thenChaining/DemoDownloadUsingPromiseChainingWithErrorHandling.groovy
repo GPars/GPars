@@ -21,12 +21,13 @@ import static groovyx.gpars.dataflow.Dataflow.whenAllBound
 
 /**
  * Uses the Dataflow.whenAllBound() and Promise.then() (aka rightShift '>>') methods to wire together multiple asynchronous functions.
+ * Simulates a network error and shows how it gets propagated and handled.
  */
 
 withPool {
     Closure download = { String url ->
         sleep 3000  //Simulate a web read
-        'web content'
+        throw new IOException('test')  //Simulate network error
     }.asyncFun()
 
     Closure loadFile = { String fileName ->
@@ -39,11 +40,9 @@ withPool {
         first == second
     }
 
-    Closure errorHandler = { println "Error detected: $it" }
-
     def all = whenAllBound([
-            download('http://www.gpars.org') >> hash,
+            download('http://www.gpars.org').then(hash),
             loadFile('/coolStuff/gpars/website/index.html') >> hash
-    ], compare) then({ println it }, errorHandler)
+    ], compare).then({ println it }, { println "Error detected: $it" })
     all.join()  //optionally block until the calculation is all done
 }
