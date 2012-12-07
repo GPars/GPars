@@ -730,6 +730,22 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
+    public DataflowReadChannel<T> tap(final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        return tap(Dataflow.retrieveCurrentDFPGroup(), params, target);
+    }
+
+    @Override
+    public DataflowReadChannel<T> tap(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        return tap(new DefaultPGroup(pool), params, target);
+    }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public DataflowReadChannel<T> tap(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        return tap(group, target);
+    }
+
+    @Override
     public <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure<V> closure) {
         return merge(asList(other), closure);
     }
@@ -764,6 +780,46 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
         group.operator(inputs, asList(result), new ChainWithClosure(closure));
         return result;
     }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure) {
+        return merge(params, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure) {
+        return merge(pool, params, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure) {
+        return merge(group, params, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
+        return merge(Dataflow.retrieveCurrentDFPGroup(), params, others, closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
+        return merge(new DefaultPGroup(pool), params, others, closure);
+    }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        final Collection<DataflowReadChannel<?>> inputs = new ArrayList<DataflowReadChannel<?>>();
+        inputs.add(this);
+        inputs.addAll(others);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
+        parameters.put("inputs", inputs);
+        parameters.put("outputs", asList(result));
+        group.operator(parameters, new ChainWithClosure(closure));
+        return result;
+    }
+
 
     @Override
     public void binaryChoice(final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {

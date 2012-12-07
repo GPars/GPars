@@ -34,9 +34,11 @@ import groovyx.gpars.scheduler.Pool;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -472,6 +474,27 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
     }
 
     @Override
+    public DataflowReadChannel<T> tap(final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        return tap(Dataflow.retrieveCurrentDFPGroup(), params, target);
+    }
+
+    @Override
+    public DataflowReadChannel<T> tap(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        return tap(new DefaultPGroup(pool), params, target);
+    }
+
+    @Override
+    public DataflowReadChannel<T> tap(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        final DataflowQueue<T> result = new DataflowQueue<T>();
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
+        parameters.put("inputs", asList(this));
+        parameters.put("outputs", asList(asList(result, target)));
+
+        group.operator(parameters, new ChainWithClosure(new CopyChannelsClosure()));
+        return result;
+    }
+
+    @Override
     public <V> DataflowReadChannel<V> merge(final DataflowReadChannel<Object> other, final Closure<V> closure) {
         return merge(asList(other), closure);
     }
@@ -503,6 +526,44 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
         inputs.add(this);
         inputs.addAll(others);
         group.operator(inputs, asList(result), new ChainWithClosure(closure));
+        return result;
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure) {
+        return merge(params, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure) {
+        return merge(pool, params, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure) {
+        return merge(group, params, asList(other), closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
+        return merge(Dataflow.retrieveCurrentDFPGroup(), params, others, closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final Pool pool, final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
+        return merge(new DefaultPGroup(pool), params, others, closure);
+    }
+
+    @Override
+    public <V> DataflowReadChannel<V> merge(final PGroup group, final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure) {
+        final DataflowQueue<V> result = new DataflowQueue<V>();
+        final Collection<DataflowReadChannel<?>> inputs = new ArrayList<DataflowReadChannel<?>>();
+        inputs.add(this);
+        inputs.addAll(others);
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
+        parameters.put("inputs", inputs);
+        parameters.put("outputs", asList(result));
+        group.operator(parameters, new ChainWithClosure(closure));
         return result;
     }
 
@@ -617,7 +678,7 @@ public class DataflowQueue<T> implements DataflowChannel<T> {
 
     @Override
     public synchronized DataflowChannelEventListenerManager<T> getEventManager() {
-        if (eventManager!=null) return eventManager;
+        if (eventManager != null) return eventManager;
         eventManager = new DataflowChannelEventOrchestrator<T>();
         return eventManager;
     }

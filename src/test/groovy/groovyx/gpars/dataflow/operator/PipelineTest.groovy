@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package groovyx.gpars.dataflow.operator
 
+import groovyx.gpars.dataflow.Dataflow
 import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.DataflowReadChannel
 import groovyx.gpars.group.NonDaemonPGroup
 import groovyx.gpars.group.PGroup
 
@@ -41,7 +43,7 @@ public class PipelineTest extends GroovyTestCase {
         final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
-        pipeline | {it * 2} | {it + 1} | result
+        pipeline | { it * 2 } | { it + 1 } | result
         assert pipeline.complete
         shouldFail(IllegalStateException) {
             pipeline | result
@@ -56,12 +58,39 @@ public class PipelineTest extends GroovyTestCase {
         assert 7 == result.val
     }
 
+    public void testPipelineWithCustomizedGroup() {
+        final DataflowQueue queue = new DataflowQueue()
+        final DataflowQueue groups = new DataflowQueue()
+        final DataflowQueue result = new DataflowQueue()
+        Dataflow.usingGroup(group) {
+            final Pipeline pipeline = new Pipeline(queue)
+
+            assert !pipeline.complete
+            pipeline | { groups << delegate.actor.parallelGroup; it * 2 } | { groups << delegate.actor.parallelGroup; it + 1 } | result
+            assert pipeline.complete
+            shouldFail(IllegalStateException) {
+                pipeline | result
+            }
+
+            queue << 1
+            queue << 2
+            queue << 3
+        }
+
+        assert 3 == result.val
+        assert 5 == result.val
+        assert 7 == result.val
+        2.times {
+            assert group == groups.val
+        }
+    }
+
     public void testPipelineOutput() {
         final DataflowQueue queue = new DataflowQueue()
         final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
-        pipeline | {it * 2} | {it + 1}
+        pipeline | { it * 2 } | { it + 1 }
         assert !pipeline.complete
 
         queue << 1
@@ -80,7 +109,7 @@ public class PipelineTest extends GroovyTestCase {
         final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
-        pipeline | {it * 2} | {it + 1}
+        pipeline | { it * 2 } | { it + 1 }
         assert !pipeline.complete
         pipeline.split(result1, result2)
         assert pipeline.complete
@@ -108,7 +137,7 @@ public class PipelineTest extends GroovyTestCase {
         final Pipeline pipeline = new Pipeline(group, queue)
 
         assert !pipeline.complete
-        pipeline | {it * 2} | {it + 1}
+        pipeline | { it * 2 } | { it + 1 }
         assert !pipeline.complete
         pipeline.tap(result1)
         assert !pipeline.complete
@@ -135,7 +164,7 @@ public class PipelineTest extends GroovyTestCase {
         final DataflowQueue queue1 = new DataflowQueue()
         final DataflowQueue queue2 = new DataflowQueue()
         final DataflowQueue queue3 = new DataflowQueue()
-        new Pipeline(group, queue1).merge(queue2) {a, b -> a + b}.into queue3
+        new Pipeline(group, queue1).merge(queue2) { a, b -> a + b }.into queue3
 
         queue1 << 1
         queue1 << 2
@@ -146,12 +175,41 @@ public class PipelineTest extends GroovyTestCase {
         assert 6 == queue3.val
     }
 
+    public void testMergeWithAdditionalParameters() {
+        final DataflowQueue queue1 = new DataflowQueue()
+        final DataflowQueue queue2 = new DataflowQueue()
+        final DataflowQueue queue3 = new DataflowQueue()
+
+        final DataflowQueue fromListener = new DataflowQueue()
+        def listener = new DataflowEventAdapter() {
+            @Override
+            Object messageArrived(final DataflowProcessor processor, final DataflowReadChannel<Object> channel, final int index, final Object message) {
+                fromListener << 'Message arrived'
+                return super.messageArrived(processor, channel, index, message)
+            }
+        }
+
+        new Pipeline(group, queue1).merge([maxForks: 1, listeners: [listener]], queue2) { a, b -> a + b }.into queue3
+
+        queue1 << 1
+        queue1 << 2
+        queue2 << 3
+        queue2 << 4
+
+        assert 4 == queue3.val
+        assert 6 == queue3.val
+
+        2.times {
+            assert 'Message arrived' == fromListener.val
+        }
+    }
+
     public void testMergeMultiple() {
         final DataflowQueue queue1 = new DataflowQueue()
         final DataflowQueue queue2 = new DataflowQueue()
         final DataflowQueue queue3 = new DataflowQueue()
         final DataflowQueue queue4 = new DataflowQueue()
-        new Pipeline(group, queue1).merge([queue2, queue3]) {a, b, c -> a + b + c}.into queue4
+        new Pipeline(group, queue1).merge([queue2, queue3]) { a, b, c -> a + b + c }.into queue4
 
         queue1 << 1
         queue1 << 2
@@ -168,7 +226,7 @@ public class PipelineTest extends GroovyTestCase {
         final DataflowQueue queue1 = new DataflowQueue()
         final DataflowQueue queue2 = new DataflowQueue()
         final DataflowQueue queue3 = new DataflowQueue()
-        new Pipeline(group, queue1).binaryChoice(queue2, queue3) {a -> a >= 0}
+        new Pipeline(group, queue1).binaryChoice(queue2, queue3) { a -> a >= 0 }
 
         queue1 << 1
         queue1 << 2
@@ -190,7 +248,7 @@ public class PipelineTest extends GroovyTestCase {
         final DataflowQueue queue2 = new DataflowQueue()
         final DataflowQueue queue3 = new DataflowQueue()
         final DataflowQueue queue4 = new DataflowQueue()
-        new Pipeline(group, queue1).choice([queue2, queue3, queue4]) {a -> a % 3}
+        new Pipeline(group, queue1).choice([queue2, queue3, queue4]) { a -> a % 3 }
 
         queue1 << 0
         queue1 << 1
@@ -215,7 +273,7 @@ public class PipelineTest extends GroovyTestCase {
         final DataflowQueue queue2 = new DataflowQueue()
         final DataflowQueue queue3 = new DataflowQueue()
         final DataflowQueue queue4 = new DataflowQueue()
-        new Pipeline(group, queue1).separate([queue2, queue3, queue4]) {a -> [a - 1, a, a + 1]}
+        new Pipeline(group, queue1).separate([queue2, queue3, queue4]) { a -> [a - 1, a, a + 1] }
 
         queue1 << 1
         queue1 << 2
