@@ -130,6 +130,28 @@ or in case your thread pools use non-daemon threads, such as when using the NonD
 otherwise your applications will not exit.
 {note}
 
+You may selectively override the default group used for tasks, operators, callbacks and other dataflow elements inside
+a code block using the _Dataflow.usingGroup() method:
+{code}
+Dataflow.usingGroup(group) {
+    operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+        ...
+        bindOutput 0, x + y + z
+    }
+}
+{code}
+
+You can always override the default group by being specific:
+
+{code}
+Dataflow.usingGroup(group) {
+    anotherGroup.operator(inputs: [a, b, c], outputs: [d]) {x, y, z ->
+        ...
+        bindOutput 0, x + y + z
+    }
+}
+{code}
+
 h3. Constructing operators
 
 The construction properties of an operator, such as _inputs_, _outputs_, _stateObject_ or _maxForks_ cannot be modified once the operator has been build.

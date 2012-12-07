@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package groovyx.gpars.dataflow
 
 import groovy.transform.PackageScope
+import groovyx.gpars.group.NonDaemonPGroup
 
 import java.util.concurrent.Callable
 
@@ -46,6 +47,48 @@ public class DataflowTaskTest extends GroovyTestCase {
 
         assert a.val == 10
         assert result.val == 20
+    }
+
+    public void testUsingGroup() {
+        def group = new NonDaemonPGroup(10)
+        def queue = new DataflowQueue()
+
+        Dataflow.usingGroup(group) {
+            Dataflow.task {
+                queue << Dataflow.retrieveCurrentDFPGroup()
+                'http://gpars.codehaus.org'
+            }
+            .then { page -> queue << Dataflow.retrieveCurrentDFPGroup(); page.toUpperCase() }
+            .then { page -> page.contains('GROOVY') }.then { queue << Dataflow.retrieveCurrentDFPGroup(); throw new RuntimeException('test') }
+            .then({ mentionsGroovy -> println "Groovy found: $mentionsGroovy" }, { error -> queue << Dataflow.retrieveCurrentDFPGroup(); 'error' }).join()
+        }
+
+        4.times {
+            assert group == queue.val
+        }
+    }
+
+    public void testUsingGroupWithOverride() {
+        def group1 = new NonDaemonPGroup(10)
+        def group2 = new NonDaemonPGroup(10)
+        def queue = new DataflowQueue()
+
+        Dataflow.usingGroup(group1) {
+            Dataflow.task {
+                queue << Dataflow.retrieveCurrentDFPGroup()
+                'http://gpars.codehaus.org'
+            }
+            .then { page -> queue << Dataflow.retrieveCurrentDFPGroup(); page.toUpperCase() }
+            .then { page -> page.contains('GROOVY') }.then(group2) { queue << Dataflow.retrieveCurrentDFPGroup(); throw new RuntimeException('test') }
+            .then(group2, { mentionsGroovy -> println "Groovy found: $mentionsGroovy" }, { error -> queue << Dataflow.retrieveCurrentDFPGroup(); 'error' }).join()
+        }
+
+        2.times {
+            assert group1 == queue.val
+        }
+        2.times {
+            assert group2 == queue.val
+        }
     }
 }
 

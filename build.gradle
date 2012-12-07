@@ -22,13 +22,15 @@
 //  Author: Hamlet D'Arcy - Updated OSGi configuration
 
 final signingPropertiesAreSet = {
-  project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
+    project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
 }
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'osgi'
-if (signingPropertiesAreSet()) { apply plugin : 'signing' }
+if (signingPropertiesAreSet()) {
+    apply plugin: 'signing'
+}
 
 //apply plugin: 'codenarc'
 
@@ -90,7 +92,9 @@ repositories {
         url 'http://download.java.net/maven/2'
         url 'http://oss.sonatype.org/content/repositories/snapshots' // For Spock SNAPSHOT artefacts.
     }
-    if (project.hasProperty('gpars_useMavenLocal') && gpars_useMavenLocal) { mavenLocal() }
+    if (project.hasProperty('gpars_useMavenLocal') && gpars_useMavenLocal) {
+        mavenLocal()
+    }
 }
 
 configurations {
@@ -146,9 +150,9 @@ task runBenchmarks(type: JavaExec) {
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
 
-[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '320M')
+[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '512M')
 
-gradle.taskGraph.whenReady {taskGraph ->
+gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(":release") && version.contains("SNAPSHOT")) {
         throw (new StopExecutionException("You should not release a snapshot version! We're Stopping the build!"))
     }
@@ -181,10 +185,10 @@ tasks.withType(CodeNarc).all { codeNarcTask ->
     codeNarcTask.ignoreFailures = true
 }
 
-if ( signingPropertiesAreSet ( ) ) {
-  signing {
-    sign configurations.archives
-  }
+if (signingPropertiesAreSet()) {
+    signing {
+        sign configurations.archives
+    }
 }
 
 //build.dependsOn integrationTest
@@ -220,9 +224,9 @@ gradle.taskGraph.whenReady { taskGraph ->
                 }
             }
             // In the future Gradle will allow to use dynamic props for dependencies to deal with optionals
-            pom.whenConfigured {pom ->
+            pom.whenConfigured { pom ->
                 // dependency is a native Maven dependency object (With properties artifactId, groupId, ...)
-                pom.dependencies.each {dependency ->
+                pom.dependencies.each { dependency ->
                     if (dependency.artifactId in ['netty', 'jcsp', 'multiverse-beta']) {
                         dependency.optional = true
                     }
@@ -370,7 +374,7 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
 
     demoFiles = sourceSets.test.allGroovy.matching {
         include '**/*Demo*.groovy'
-        exclude excludedDemos.collect {name -> "**/${name}.groovy" }
+        exclude excludedDemos.collect { name -> "**/${name}.groovy".toString() }
     }
 }
 
@@ -398,11 +402,11 @@ idea {
                 def dictionaryConfig = provider.asNode().component.find { it.'@name' == 'ProjectDictionaryState' }
                 if (dictionaryConfig) node.remove(dictionaryConfig)
 
-                new File('GPars_IDEAX.ipr').withReader {reader ->
+                new File('GPars_IDEAX.ipr').withReader { reader ->
                     def project = new XmlParser().parse(reader)
-                    def inspections = project.component.find {it.'@name' == 'InspectionProjectProfileManager'}
+                    def inspections = project.component.find { it.'@name' == 'InspectionProjectProfileManager' }
                     node.append(inspections)
-                    def dictionaries = project.component.find {it.'@name' == 'ProjectDictionaryState'}
+                    def dictionaries = project.component.find { it.'@name' == 'ProjectDictionaryState' }
                     node.append(dictionaries)
                 }
 

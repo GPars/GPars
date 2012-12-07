@@ -30,6 +30,7 @@ h3. Dataflow
 * Operator and selector speed-up
 * Kanban-style dataflow operator management has been added
 * Chaining of Promises using the new _then()_ method
+* Exception propagation and handling for Promises
 * Added a DSL for easy operator pipe-lining
 * Lifecycle events for operators and selectors were added
 * Added support for custom error handlers

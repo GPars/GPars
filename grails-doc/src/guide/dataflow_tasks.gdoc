@@ -82,6 +82,32 @@ or in case your thread pools use non-daemon threads, such as when using the NonD
 otherwise your applications will not exit.
 {note}
 
+You may selectively override the default group used for tasks, operators, callbacks and other dataflow elements inside
+a code block using the _Dataflow.usingGroup() method:
+{code}
+Dataflow.usingGroup(group) {
+    task {
+        'http://gpars.codehaus.org'.toURL().text  //should throw MalformedURLException
+    }
+    .then {page -> page.toUpperCase()}
+    .then {page -> page.contains('GROOVY')}
+    .then({mentionsGroovy -> println "Groovy found: $mentionsGroovy"}, {error -> println "Error: $error"}).join()
+}
+{code}
+
+You can always override the default group by being specific:
+
+{code}
+Dataflow.usingGroup(group) {
+    anotherGroup.task {
+        'http://gpars.codehaus.org'.toURL().text  //should throw MalformedURLException
+    }
+    .then(anotherGroup) {page -> page.toUpperCase()}
+    .then(anotherGroup) {page -> page.contains('GROOVY')}.then(anotherGroup) {println Dataflow.retrieveCurrentDFPGroup();it}
+    .then(anotherGroup, {mentionsGroovy -> println "Groovy found: $mentionsGroovy"}, {error -> println "Error: $error"}).join()
+}
+{code}
+
 h3. A mashup variant with methods
 
 To avoid giving you wrong impression about structuring the Dataflow code, here's a rewrite of the mashup example, with a _downloadPage()_ method performing the actual download in a separate task and returning a DataflowVariable instance, so that the main application thread could eventually get hold of the downloaded content.

@@ -24,6 +24,7 @@ import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -340,6 +341,35 @@ public interface DataflowReadChannel<T> {
     DataflowReadChannel<T> tap(final PGroup group, final DataflowWriteChannel<T> target);
 
     /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param target The channel to tap data into
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    DataflowReadChannel<T> tap(final Map<String, Object> params, final DataflowWriteChannel<T> target);
+
+    /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool   The thread pool to use
+     * @param target The channel to tap data into
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    DataflowReadChannel<T> tap(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> target);
+
+    /**
+     * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group  The PGroup to use
+     * @param target The channel to tap data into
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    DataflowReadChannel<T> tap(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target);
+
+    /**
      * Merges channels together as inputs for a single dataflow operator.
      *
      * @param other   The channel to merge with
@@ -402,6 +432,76 @@ public interface DataflowReadChannel<T> {
      * @return A channel of the same type as this channel, which the new operator will output into.
      */
     <V> DataflowReadChannel<V> merge(final PGroup group, final List<DataflowReadChannel<Object>> others, final Closure<V> closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param other   The channel to merge with
+     * @param <V>     The type of values passed between the channels
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param other   The channel to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Pool pool, final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param other   The channel to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final PGroup group, final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure<V> closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final Pool pool, final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure);
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @param <V>     The type of values passed between the channels
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> merge(final PGroup group, final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure<V> closure);
 
     /**
      * Directs the output to one of the two output channels depending on the boolean result of the provided closure.

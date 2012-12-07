@@ -50,46 +50,47 @@ public interface Promise<T> {
     @SuppressWarnings({"ProhibitedExceptionDeclared"})
     T get(final long timeout, final TimeUnit units) throws Throwable;
 
-    /**
-     * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message
-     * back the the supplied actor once the value has been bound.
-     * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
-     * with the value of the Dataflow channel.
-     *
-     * @param callback An actor to send the bound value to.
-     */
-    void getValAsync(final MessageStream callback);
-
-    /**
-     * Asynchronously retrieves the value from the channel. Sends a message back the the supplied MessageStream
-     * with a map holding the supplied attachment under the 'attachment' key and the actual value of the channel under
-     * the 'result' key once the value has been bound.
-     * Attachment is an arbitrary value helping the actor.operator match its request with the reply.
-     * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
-     * with the value of the Dataflow channel.
-     *
-     * @param attachment arbitrary non-null attachment if reader needs better identification of result
-     * @param callback   An actor to send the bound value plus the supplied index to.
-     */
-    void getValAsync(final Object attachment, final MessageStream callback);
-
-    /**
-     * Reads the current value of the channel. Blocks, if the value has not been assigned yet.
-     *
-     * @return The actual value
-     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
-     */
-    T getVal() throws InterruptedException;
-
-    /**
-     * Reads the current value of the channel. Blocks up to given timeout, if the value has not been assigned yet.
-     *
-     * @param timeout The timeout value
-     * @param units   Units for the timeout
-     * @return The actual value
-     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
-     */
-    T getVal(final long timeout, final TimeUnit units) throws InterruptedException;
+//    /**
+//     * Asynchronously retrieves the value from the channel. Sends the actual value of the channel as a message
+//     * back the the supplied actor once the value has been bound.
+//     * The actor can perform other activities or release a thread back to the pool by calling react() waiting for the message
+//     * with the value of the Dataflow channel.
+//     *
+//     * @param callback An actor to send the bound value to.
+//     */
+//    void getValAsync(final MessageStream callback);
+//
+//    /**
+//     * Asynchronously retrieves the value from the channel. Sends a message back the the supplied MessageStream
+//     * with a map holding the supplied attachment under the 'attachment' key and the actual value of the channel under
+//     * the 'result' key once the value has been bound.
+//     * Attachment is an arbitrary value helping the actor.operator match its request with the reply.
+//     * The actor/operator can perform other activities or release a thread back to the pool by calling react() waiting for the message
+//     * with the value of the Dataflow channel.
+//     *
+//     * @param attachment arbitrary non-null attachment if reader needs better identification of result
+//     * @param callback   An actor to send the bound value plus the supplied index to.
+//     */
+//    void getValAsync(final Object attachment, final MessageStream callback);
+//
+//    /**
+//     * Reads the current value of the channel. Blocks, if the value has not been assigned yet.
+//     *
+//     * @return The actual value
+//     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
+//     */
+//    T getVal() throws InterruptedException;
+//
+//    /**
+//     * Reads the current value of the channel. Blocks up to given timeout, if the value has not been assigned yet.
+//     *
+//     * @param timeout The timeout value
+//     * @param units   Units for the timeout
+//     * @return The actual value
+//     * @throws InterruptedException If the current thread gets interrupted while waiting for the channel to be bound
+//     */
+//    T getVal(final long timeout, final TimeUnit units) throws InterruptedException;
+//
 
     /**
      * Blocks, if the value has not been assigned yet to the DataflowVariable
@@ -186,9 +187,59 @@ public interface Promise<T> {
     <V> Promise<V> then(final PGroup group, final Closure<V> closure);
 
     /**
+     * Schedule closure to be executed after data became available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled
+     *
+     * @param closure      closure to execute when data becomes available. The closure should take at most one argument.
+     * @param errorHandler closure to execute when an error (instance of Throwable) gets bound. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    <V> Promise<V> then(final Closure<V> closure, final Closure<V> errorHandler);
+
+    /**
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param pool         The thread pool to use for task scheduling for asynchronous message delivery
+     * @param closure      closure to execute when data becomes available. The closure should take at most one argument.
+     * @param errorHandler closure to execute when an error (instance of Throwable) gets bound. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    <V> Promise<V> then(final Pool pool, final Closure<V> closure, final Closure<V> errorHandler);
+
+    /**
+     * Schedule closure to be executed after data becomes available.
+     * It is important to notice that even if the expression is already bound the execution of closure
+     * will not happen immediately but will be scheduled.
+     *
+     * @param group        The PGroup to use for task scheduling for asynchronous message delivery
+     * @param closure      closure to execute when data becomes available. The closure should take at most one argument.
+     * @param errorHandler closure to execute when an error (instance of Throwable) gets bound. The closure should take at most one argument.
+     * @return A promise for the results of the supplied closure. This allows for chaining of then() method calls.
+     */
+    <V> Promise<V> then(final PGroup group, final Closure<V> closure, final Closure<V> errorHandler);
+
+    /**
      * Check if value has been set already for this expression
      *
      * @return true if bound already
      */
     boolean isBound();
+
+    /**
+     * Checks if the promise is bound to an error
+     *
+     * @return True, if an error has been bound
+     */
+    boolean isError();
+
+    /**
+     * Returns the error bound to the promise
+     *
+     * @return The error
+     * @throws IllegalStateException If not bound or not bound to an error
+     */
+    Throwable getError();
 }
