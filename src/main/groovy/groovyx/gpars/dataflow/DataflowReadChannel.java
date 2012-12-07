@@ -202,6 +202,38 @@ public interface DataflowReadChannel<T> {
     /**
      * Creates and attaches a new operator processing values from the channel
      *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final Map<String, Object> params, final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final Pool pool, final Map<String, Object> params, final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    <V> DataflowReadChannel<V> chainWith(final PGroup group, final Map<String, Object> params, final Closure<V> closure);
+
+    /**
+     * Creates and attaches a new operator processing values from the channel
+     *
      * @param closure The function to invoke on all incoming values as part of the new operator's body
      * @param <V>     The type of values returned from the supplied closure
      * @return A channel of the same type as this channel, which the new operator will output into.
@@ -236,6 +268,36 @@ public interface DataflowReadChannel<T> {
 
 
     /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    DataflowReadChannel<T> filter(final Map<String, Object> params, final Closure<Boolean> closure);
+
+    /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    DataflowReadChannel<T> filter(final Pool pool, final Map<String, Object> params, final Closure<Boolean> closure);
+
+    /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    DataflowReadChannel<T> filter(final PGroup group, final Map<String, Object> params, final Closure<Boolean> closure);
+
+
+    /**
      * Makes the output of the current channel to be an input for the specified channel
      *
      * @param target The channel to copy data into
@@ -257,6 +319,32 @@ public interface DataflowReadChannel<T> {
      * @param target The channel to copy data into
      */
     void into(final PGroup group, final DataflowWriteChannel<T> target);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param target The channel to copy data into
+     */
+    void into(final Map<String, Object> params, final DataflowWriteChannel<T> target);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool   The thread pool to use
+     * @param target The channel to copy data into
+     */
+    void into(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> target);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channel
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group  The PGroup to use
+     * @param target The channel to copy data into
+     */
+    void into(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target);
 
     /**
      * Makes the output of the current channel to be an input for the specified channel
@@ -313,6 +401,61 @@ public interface DataflowReadChannel<T> {
      * @param targets The channels to copy data into
      */
     void split(final PGroup group, final List<DataflowWriteChannel<T>> targets);
+
+    /**
+     * Splits the output of the current channel to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param target1 The first channel to copy data into
+     * @param target2 The second channel to copy data into
+     */
+    void split(final Map<String, Object> params, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2);
+
+    /**
+     * Splits the output of the current channel to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param target1 The first channel to copy data into
+     * @param target2 The second channel to copy data into
+     */
+    void split(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2);
+
+    /**
+     * Splits the output of the current channel to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param target1 The first channel to copy data into
+     * @param target2 The second channel to copy data into
+     */
+    void split(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param targets The channels to copy data into
+     */
+    void split(final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param targets The channels to copy data into
+     */
+    void split(final Pool pool, final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets);
+
+    /**
+     * Makes the output of the current channel to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param targets The channels to copy data into
+     */
+    void split(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets);
 
     /**
      * Taps into the pipeline. The supplied channel will receive a copy of all messages passed through.
@@ -533,6 +676,38 @@ public interface DataflowReadChannel<T> {
     void binaryChoice(final PGroup group, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code);
 
     /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param params      Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    void binaryChoice(final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code);
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param params      Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool        The thread pool to use
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    void binaryChoice(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code);
+
+    /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param params      Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group       The PGroup to use
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    void binaryChoice(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code);
+
+    /**
      * Directs the output to one of the output channels depending on the int result of the provided closure.
      *
      * @param outputs The channels to send data to of the closure returns true
@@ -559,6 +734,35 @@ public interface DataflowReadChannel<T> {
     void choice(final PGroup group, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
 
     /**
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param outputs The channels to send data to of the closure returns true
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    void choice(final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
+
+    /**
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    void choice(final Pool pool, final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
+
+    /**
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    void choice(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code);
+
+    /**
      * Allows the closure to output different values to different output channels.
      *
      * @param outputs The channels to send data to.
@@ -583,6 +787,35 @@ public interface DataflowReadChannel<T> {
      * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
      */
     void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    void separate(final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param pool    The thread pool to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    void separate(final Pool pool, final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param group   The PGroup to use
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    void separate(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code);
 
     /**
      * Retrieves the event manager object of this channel

@@ -86,6 +86,20 @@ public final class Pipeline {
     /**
      * Creates and attaches a new operator
      *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param closure The function to invoke on all incoming values as part of the new operator's body
+     * @param <V>     The type of values returned from the supplied closure
+     * @return This Pipeline instance
+     */
+    public <V> Pipeline chainWith(final Map<String, Object> params, final Closure<V> closure) {
+        checkState();
+        output = output.chainWith(group, params, closure);
+        return this;
+    }
+
+    /**
+     * Creates and attaches a new operator
+     *
      * @param closure The function to invoke on all incoming values as part of the new operator's body
      * @param <V>     The type of values returned from the supplied closure
      * @return This Pipeline instance
@@ -107,6 +121,19 @@ public final class Pipeline {
     }
 
     /**
+     * Creates and attaches a new operator that will filter data using the provided closure
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param closure The filter function to invoke on all incoming values to decide whether to pass the value on or not
+     * @return This Pipeline instance
+     */
+    public Pipeline filter(final Map<String, Object> params, final Closure<Boolean> closure) {
+        checkState();
+        output = output.filter(group, params, closure);
+        return this;
+    }
+
+    /**
      * Makes the output of the pipeline to be an input for the specified channel
      *
      * @param target The channel to copy data into
@@ -114,7 +141,20 @@ public final class Pipeline {
      */
     public <V> void into(final DataflowWriteChannel<V> target) {
         checkState();
-        output.into(target);
+        output.into(group, target);
+        complete = true;
+    }
+
+    /**
+     * Makes the output of the pipeline to be an input for the specified channel
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param target The channel to copy data into
+     * @param <V>    The type of values passed between the channels
+     */
+    public <V> void into(final Map<String, Object> params, final DataflowWriteChannel<V> target) {
+        checkState();
+        output.into(group, params, target);
         complete = true;
     }
 
@@ -137,7 +177,7 @@ public final class Pipeline {
      */
     public <V> void split(final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
         checkState();
-        output.split(target1, target2);
+        output.split(group, target1, target2);
         complete = true;
     }
 
@@ -149,7 +189,34 @@ public final class Pipeline {
      */
     public <V> void split(final List<DataflowWriteChannel<V>> targets) {
         checkState();
-        output.split(targets);
+        output.split(group, targets);
+        complete = true;
+    }
+
+    /**
+     * Splits the output of the pipeline to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param target1 The first channel to copy data into
+     * @param target2 The second channel to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    public <V> void split(final Map<String, Object> params, final DataflowWriteChannel<V> target1, final DataflowWriteChannel<V> target2) {
+        checkState();
+        output.split(group, params, target1, target2);
+        complete = true;
+    }
+
+    /**
+     * Makes the output of the pipeline to be an input for the specified channels
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param targets The channels to copy data into
+     * @param <V>     The type of values passed between the channels
+     */
+    public <V> void split(final Map<String, Object> params, final List<DataflowWriteChannel<V>> targets) {
+        checkState();
+        output.split(group, params, targets);
         complete = true;
     }
 
@@ -248,6 +315,20 @@ public final class Pipeline {
     }
 
     /**
+     * Directs the output to one of the two output channels depending on the boolean result of the provided closure.
+     *
+     * @param params      Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param trueBranch  The channel to send data to if the closure returns true
+     * @param falseBranch The channel to send data to if the closure returns true
+     * @param code        A closure directing data to either the true or the false output branch
+     */
+    public <T> void binaryChoice(final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        checkState();
+        output.binaryChoice(group, params, trueBranch, falseBranch, code);
+        complete = true;
+    }
+
+    /**
      * Directs the output to one of the output channels depending on the int result of the provided closure.
      *
      * @param outputs The channels to send data to.
@@ -260,6 +341,19 @@ public final class Pipeline {
     }
 
     /**
+     * Directs the output to one of the output channels depending on the int result of the provided closure.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning an index of the output channel to direct the data to
+     */
+    public <T> void choice(final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        checkState();
+        output.choice(group, params, outputs, code);
+        complete = true;
+    }
+
+    /**
      * Allows the closure to output different values to different output channels.
      *
      * @param outputs The channels to send data to.
@@ -268,6 +362,19 @@ public final class Pipeline {
     public void separate(final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         checkState();
         output.separate(group, outputs, code);
+        complete = true;
+    }
+
+    /**
+     * Allows the closure to output different values to different output channels.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param outputs The channels to send data to.
+     * @param code    A closure returning a list of values to pass to the output channels. Values are output to the output channels with identical index.
+     */
+    public void separate(final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
+        checkState();
+        output.separate(group, params, outputs, code);
         complete = true;
     }
 }

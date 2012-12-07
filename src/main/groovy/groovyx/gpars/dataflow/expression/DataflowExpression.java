@@ -624,6 +624,24 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
+    public final <V> DataflowReadChannel<V> chainWith(final Map<String, Object> params, final Closure<V> closure) {
+        return chainWith(Dataflow.retrieveCurrentDFPGroup(), params, closure);
+    }
+
+    @Override
+    public final <V> DataflowReadChannel<V> chainWith(final Pool pool, final Map<String, Object> params, final Closure<V> closure) {
+        return chainWith(new DefaultPGroup(pool), params, closure);
+    }
+
+    @SuppressWarnings({"ClassReferencesSubclass"})
+    @Override
+    public <V> DataflowReadChannel<V> chainWith(final PGroup group, final Map<String, Object> params, final Closure<V> closure) {
+        final DataflowVariable<V> result = new DataflowVariable<V>();
+        whenBound(group, new ThenMessagingRunnable<T, V>(result, closure));
+        return result;
+    }
+
+    @Override
     public <V> DataflowReadChannel<V> or(final Closure<V> closure) {
         return chainWith(closure);
     }
@@ -644,6 +662,21 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
+    public DataflowReadChannel<T> filter(final Map<String, Object> params, final Closure<Boolean> closure) {
+        return chainWith(params, new FilterClosure(closure));
+    }
+
+    @Override
+    public DataflowReadChannel<T> filter(final Pool pool, final Map<String, Object> params, final Closure<Boolean> closure) {
+        return chainWith(pool, params, new FilterClosure(closure));
+    }
+
+    @Override
+    public DataflowReadChannel<T> filter(final PGroup group, final Map<String, Object> params, final Closure<Boolean> closure) {
+        return chainWith(group, params, new FilterClosure(closure));
+    }
+
+    @Override
     public void into(final DataflowWriteChannel<T> target) {
         into(Dataflow.retrieveCurrentDFPGroup(), target);
     }
@@ -655,6 +688,26 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     @Override
     public void into(final PGroup group, final DataflowWriteChannel<T> target) {
+        this.whenBound(new MessagingRunnable<T>() {
+            @Override
+            protected void doRun(final T argument) {
+                target.leftShift(argument);
+            }
+        });
+    }
+
+    @Override
+    public void into(final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        into(Dataflow.retrieveCurrentDFPGroup(), params, target);
+    }
+
+    @Override
+    public void into(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
+        into(new DefaultPGroup(pool), params, target);
+    }
+
+    @Override
+    public void into(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target) {
         this.whenBound(new MessagingRunnable<T>() {
             @Override
             protected void doRun(final T argument) {
@@ -695,6 +748,43 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
 
     @Override
     public void split(final PGroup group, final List<DataflowWriteChannel<T>> targets) {
+        this.whenBound(new MessagingRunnable<T>() {
+            @Override
+            protected void doRun(final T argument) {
+                for (final DataflowWriteChannel<T> target : targets) {
+                    target.leftShift(argument);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void split(final Map<String, Object> params, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2) {
+        split(Dataflow.retrieveCurrentDFPGroup(), params, target1, target2);
+    }
+
+    @Override
+    public void split(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2) {
+        split(new DefaultPGroup(pool), params, target1, target2);
+    }
+
+    @Override
+    public void split(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> target1, final DataflowWriteChannel<T> target2) {
+        split(group, params, asList(target1, target2));
+    }
+
+    @Override
+    public void split(final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets) {
+        split(Dataflow.retrieveCurrentDFPGroup(), params, targets);
+    }
+
+    @Override
+    public void split(final Pool pool, final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets) {
+        split(new DefaultPGroup(pool), params, targets);
+    }
+
+    @Override
+    public void split(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> targets) {
         this.whenBound(new MessagingRunnable<T>() {
             @Override
             protected void doRun(final T argument) {
@@ -837,6 +927,25 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
+    public void binaryChoice(final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        binaryChoice(Dataflow.retrieveCurrentDFPGroup(), params, trueBranch, falseBranch, code);
+    }
+
+    @Override
+    public void binaryChoice(final Pool pool, final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        binaryChoice(new DefaultPGroup(pool), params, trueBranch, falseBranch, code);
+    }
+
+    @Override
+    public void binaryChoice(final PGroup group, final Map<String, Object> params, final DataflowWriteChannel<T> trueBranch, final DataflowWriteChannel<T> falseBranch, final Closure<Boolean> code) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
+        parameters.put("inputs", asList(this));
+        parameters.put("outputs", asList(asList(trueBranch, falseBranch)));
+
+        group.operator(parameters, new BinaryChoiceClosure(code));
+    }
+
+    @Override
     public void choice(final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
         choice(Dataflow.retrieveCurrentDFPGroup(), outputs, code);
     }
@@ -852,6 +961,25 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     }
 
     @Override
+    public void choice(final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        choice(Dataflow.retrieveCurrentDFPGroup(), params, outputs, code);
+    }
+
+    @Override
+    public void choice(final Pool pool, final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        choice(new DefaultPGroup(pool), params, outputs, code);
+    }
+
+    @Override
+    public void choice(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<T>> outputs, final Closure<Integer> code) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
+        parameters.put("inputs", asList(this));
+        parameters.put("outputs", asList(asList(outputs)));
+
+        group.operator(parameters, new ChoiceClosure(code));
+    }
+
+    @Override
     public void separate(final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         separate(Dataflow.retrieveCurrentDFPGroup(), outputs, code);
     }
@@ -864,6 +992,25 @@ public abstract class DataflowExpression<T> extends WithSerialId implements Groo
     @Override
     public void separate(final PGroup group, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
         group.operator(asList(this), outputs, new SeparationClosure(code));
+    }
+
+    @Override
+    public void separate(final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
+        separate(Dataflow.retrieveCurrentDFPGroup(), params, outputs, code);
+    }
+
+    @Override
+    public void separate(final Pool pool, final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
+        separate(new DefaultPGroup(pool), params, outputs, code);
+    }
+
+    @Override
+    public void separate(final PGroup group, final Map<String, Object> params, final List<DataflowWriteChannel<?>> outputs, final Closure<List<Object>> code) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(params);
+        parameters.put("inputs", asList(this));
+        parameters.put("outputs", asList(asList(outputs)));
+
+        group.operator(parameters, new SeparationClosure(code));
     }
 
     private volatile DataflowChannelEventOrchestrator<T> eventManager;
