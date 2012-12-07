@@ -383,7 +383,7 @@ which is available on the _Dataflow_ class as well as on _PGroup_ instances.
     Promise taxiReservation = taxiBookingService('BRU:Feb 24 2009 10:31')
 
     //when all reservations have been made we need to build an agenda for our trip
-    Promise agenda = group.whenAllBound([flightReservation, hotelReservation, taxiReservation]) {flight, hotel, taxi ->
+    Promise agenda = group.whenAllBound(flightReservation, hotelReservation, taxiReservation) {flight, hotel, taxi ->
         "Agenda: $flight | $hotel | $taxi"
     }
 
@@ -525,6 +525,49 @@ Thread.start {variable << 4}
 assert 9 == result.val
 {code}
 
+h3. Error handling for Promise chaining
+
+Asynchronous operations may obviously throw exceptions. It is important to be able to handle them easily and with little effort.
+GPars promises can implicitly propagate exceptions from asynchronous calculations across promise chains.
+
+# Promises propagate result values as well as exceptions. The blocking _get()_ method re-throws the exception that was bound to the Promise and so the caller can handle it.
+# For asynchronous notifications, the _whenBound()_ handler closure gets the exception passed in as an argument.
+# The _then()_ method accepts two arguments - a *value handler* and an optional *error handler*. These will be invoked depending on whether the result is a regular value or an exception. If no errorHandler is specified, the exception is re-thrown to the Promise returned by _then()_ .
+# Exactly the same behavior as for _then()_ holds true for the _whenAllBound()_ method, which listens on multiple Promises to get bound
+
+{code}
+    Promise<Integer> initial = new DataflowVariable<Integer>()
+    Promise<String> result = initial.then {it * 2} then {100 / it}                  //Will throw exception for 0
+            .then {println "Logging the value $it as it passes by"; return it}      //Since no error handler is defined, exceptions will be ignored
+                                                                                    //and silently re-thrown to the next handler in the chain
+            .then({"The result for $num is $it"}, {"Error detected for $num: $it"}) //Here the exception is caught
+    initial << 0
+    println result.get()
+{code}
+
+ErrorHandler is a closure that accepts instances of _Throwable_ as its only (optional) argument and returns a value that should be bound to
+the result of the _then()_ method call (the returned Promise). If an exception is thrown from within an error handler, it is bound
+as an error to the resulting Promise.
+
+{code}
+promise.then({it+1})                                                         //Implicitly re-throws potential exceptions bound to promise
+promise.then({it+1}, {e -> throw e})                                         //Explicitly re-throws potential exceptions bound to promise
+promise.then({it+1}, {e -> throw new RuntimeException('Error occurred', e})  //Explicitly re-throws a new exception wrapping a potential exception bound to promise
+{code}
+
+Just like with regular exception handling in Java with try-catch statements, this behavior of GPars promises gives asynchronous invocations the freedom to handle exceptions
+at the place where it is most convenient. You may freely ignore exceptions in your code and assume things just work, yet exceptions
+will not get accidentally swallowed.
+
+ {code}
+task {
+    'gpars.codehaus.org'.toURL().text  //should throw MalformedURLException
+}
+.then {page -> page.toUpperCase()}
+.then {page -> page.contains('GROOVY')}
+.then({mentionsGroovy -> println "Groovy found: $mentionsGroovy"}, {error -> println "Error: $error"}).join()
+ {code}
+
 h3. Putting it together
 
 By combining _whenAllBound()_ and _then_ (or >>) you can easily create large asynchronous scenarios in a convenient way:
@@ -546,10 +589,12 @@ withPool {
         first == second
     }
 
+    Closure errorHandler = {println "Error detected: $it"}
+
     def all = whenAllBound([
                   download('http://www.gpars.org') >> hash,
                   loadFile('/coolStuff/gpars/website/index.html') >> hash
-              ], compare) >> {println it}
+              ], compare).then({println it}, errorHandler)
     all.join()  //optionally block until the calculation is all done
 {code}
 

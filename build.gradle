@@ -151,7 +151,7 @@ task runBenchmarks(type: JavaExec) {
 //  To get the details of the "unchecked" issues.
 compileGroovy.options.compilerArgs = ['-Xlint']
 
-[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '512M')
+[compileGroovy, compileTestGroovy]*.groovyOptions*.fork(memoryInitialSize: '128M', memoryMaximumSize: '320M')
 
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(":release") && version.contains("SNAPSHOT")) {
@@ -375,7 +375,7 @@ task demo(type: DemoTask, dependsOn: 'compileGroovy') {
 
     demoFiles = sourceSets.test.allGroovy.matching {
         include '**/*Demo*.groovy'
-        exclude excludedDemos.collect { name -> "**/${name}.groovy" }
+        exclude excludedDemos.collect { name -> "**/${name}.groovy".toString() }
     }
 }
 

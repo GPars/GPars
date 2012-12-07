@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package groovyx.gpars.samples.dataflow.thenChaining
 
 import groovyx.gpars.dataflow.Promise
+
 import static groovyx.gpars.GParsPool.withPool
 import static groovyx.gpars.dataflow.Dataflow.whenAllBound
 
@@ -47,7 +48,7 @@ withPool {
     Promise taxiReservation = taxiBookingService('BRU:Feb 24 2009 10:31')
 
     //when all reservations have been made we need to build an agenda for our trip
-    Promise agenda = whenAllBound([flightReservation, hotelReservation, taxiReservation]) {flight, hotel, taxi ->
+    Promise agenda = whenAllBound(flightReservation, hotelReservation, taxiReservation) { flight, hotel, taxi ->
         "Agenda: $flight | $hotel | $taxi"
     }
 
