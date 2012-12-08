@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,16 +27,40 @@ import groovyx.gpars.dataflow.DataflowVariable;
 public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
     private final DataflowVariable<V> result;
     private final Closure<V> closure;
+    private final Closure<V> errorHandler;
 
     public ThenMessagingRunnable(final DataflowVariable<V> result, final Closure<V> closure) {
+        this(result, closure, null);
+    }
+
+    public ThenMessagingRunnable(final DataflowVariable<V> result, final Closure<V> closure, final Closure<V> errorHandler) {
         if (closure.getMaximumNumberOfParameters() > 1)
             throw new IllegalArgumentException("The supplied closure expects more than one argument.");
+        if (errorHandler != null && errorHandler.getMaximumNumberOfParameters() > 1)
+            throw new IllegalArgumentException("The supplied error handler expects more than one argument.");
         this.result = result;
         this.closure = closure;
+        this.errorHandler = errorHandler;
     }
 
     @Override
     protected void doRun(final T argument) {
-        result.leftShift(closure.getMaximumNumberOfParameters() == 1 ? closure.call(argument) : closure.call());
+        if (argument instanceof Throwable) {
+            if (errorHandler != null) {
+                try {
+                    result.leftShift(errorHandler.getMaximumNumberOfParameters() == 1 ? errorHandler.call(argument) : errorHandler.call());
+                } catch (Exception e) {
+                    result.bindError(e);
+                }
+            } else {
+                result.bindError((Throwable) argument);
+            }
+        } else {
+            try {
+                result.leftShift(closure.getMaximumNumberOfParameters() == 1 ? closure.call(argument) : closure.call());
+            } catch (Exception e) {
+                result.bindError(e);
+            }
+        }
     }
 }

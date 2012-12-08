@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 package groovyx.gpars.dataflow
 
 import groovyx.gpars.group.NonDaemonPGroup
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+
 import static groovyx.gpars.actor.Actors.blockingActor
 
 public class DataflowTest extends GroovyTestCase {
@@ -78,7 +80,7 @@ public class DataflowTest extends GroovyTestCase {
 
         def result = new DataflowVariable()
 
-        z >> {res ->
+        z >> { res ->
             result << res
         }
 
@@ -86,8 +88,8 @@ public class DataflowTest extends GroovyTestCase {
             z << x.val + y.val
         }
 
-        blockingActor {x << 40}
-        blockingActor {y << 2}
+        blockingActor { x << 40 }
+        blockingActor { y << 2 }
 
         assert 42 == result.val
     }
@@ -97,7 +99,7 @@ public class DataflowTest extends GroovyTestCase {
 
         def result = new DataflowVariable()
 
-        df.z {res ->
+        df.z { res ->
             result << res
         }
 
@@ -117,10 +119,10 @@ public class DataflowTest extends GroovyTestCase {
     }
 
     void testWhenAllBound() {
-        final promises = (1..5).collect {new DataflowVariable()}
-        final result = Dataflow.whenAllBound(promises) {a, b, c, d, e -> a + b + c + d + e}
+        final promises = (1..5).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises) { a, b, c, d, e -> a + b + c + d + e }
         Thread.start {
-            promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
+            promises.eachWithIndex { p, i -> sleep 100; p << i + 1 }
         }
         assert result.val == 15
     }
@@ -133,7 +135,7 @@ public class DataflowTest extends GroovyTestCase {
             sleep 500
             variable << 4
         }
-        assert 8 == group.whenAllBound([variable]) {value ->
+        assert 8 == group.whenAllBound([variable]) { value ->
             def a = new DataflowVariable()
             Thread.start {
                 sleep 500
@@ -145,38 +147,64 @@ public class DataflowTest extends GroovyTestCase {
     }
 
     void testWhenAllBoundWithListArgument() {
-        final promises = (1..5).collect {new DataflowVariable()}
-        final result = Dataflow.whenAllBound(promises) {List values -> values.sum()}
+        final promises = (1..5).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises) { List values -> values.sum() }
         Thread.start {
-            promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
+            promises.eachWithIndex { p, i -> sleep 100; p << i + 1 }
         }
         assert result.val == 15
     }
 
     void testWhenAllBoundWithListArgumentAndOneValue() {
-        final promises = (1..1).collect {new DataflowVariable()}
-        final result = Dataflow.whenAllBound(promises) {List values -> values.sum()}
+        final promises = (1..1).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises) { List values -> values.sum() }
         Thread.start {
-            promises.eachWithIndex {p, i -> sleep 100; p << i + 1}
+            promises.eachWithIndex { p, i -> sleep 100; p << i + 1 }
         }
         assert result.val == 1
     }
 
     void testWhenAllBoundWithListArgumentAndOneListValue() {
-        final promises = (1..1).collect {new DataflowVariable()}
-        final result = Dataflow.whenAllBound(promises) {value -> value.reverse()}
+        final promises = (1..1).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises) { value -> value.reverse() }
         Thread.start {
-            promises.eachWithIndex {p, i -> sleep 100; p << [i + 1, 0]}
+            promises.eachWithIndex { p, i -> sleep 100; p << [i + 1, 0] }
         }
         assert result.val == [0, 1]
     }
 
     void testWhenAllBoundWithListArgumentAndOneListValueWithSpecifiedType() {
-        final promises = (1..1).collect {new DataflowVariable()}
-        final result = Dataflow.whenAllBound(promises) {List value -> value.reverse()}
+        final promises = (1..1).collect { new DataflowVariable() }
+        final result = Dataflow.whenAllBound(promises) { List value -> value.reverse() }
         Thread.start {
-            promises.eachWithIndex {p, i -> sleep 100; p << [i + 1, 0]}
+            promises.eachWithIndex { p, i -> sleep 100; p << [i + 1, 0] }
         }
         assert result.val == [[1, 0]]
+    }
+
+    void testWhenAllBoundWithMultiplePromisesAndListArguments() {
+        final promise1 = new DataflowVariable()
+        final promise2 = new DataflowVariable()
+        final promise3 = new DataflowVariable()
+        final result = Dataflow.whenAllBound(promise1, promise2, promise3) { List value -> value.reverse() }
+        Thread.start {
+            promise1 << 1
+            promise2 << 2
+            promise3 << 3
+        }
+        assert result.val == [3, 2, 1]
+    }
+
+    void testWhenAllBoundWithMultiplePromisesAndExplicitArguments() {
+        final promise1 = new DataflowVariable()
+        final promise2 = new DataflowVariable()
+        final promise3 = new DataflowVariable()
+        final result = Dataflow.whenAllBound(promise1, promise2, promise3) { a, b, c -> [c, b, a] }
+        Thread.start {
+            promise1 << 1
+            promise2 << 2
+            promise3 << 3
+        }
+        assert result.val == [3, 2, 1]
     }
 }

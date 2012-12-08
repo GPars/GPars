@@ -40,11 +40,12 @@ import groovyx.gpars.dataflow.operator.DataflowSelector;
 import groovyx.gpars.scheduler.Pool;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import static java.util.Arrays.asList;
 
 /**
  * Provides a common super class of pooled parallel groups.
@@ -277,7 +278,7 @@ public abstract class PGroup {
      * @param code The task body to run
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public <T> Promise<T> task(final Closure<T> code) {
+    public final <T> Promise<T> task(final Closure<T> code) {
         final Closure<T> clonedCode = (Closure<T>) code.clone();
         return task(new Callable<T>() {
             @Override
@@ -296,7 +297,7 @@ public abstract class PGroup {
      * @param callable The task body to run
      * @return A DataflowVariable, which gets assigned the value returned from the supplied code
      */
-    public <T> Promise<T> task(final Callable<T> callable) {
+    public final <T> Promise<T> task(final Callable<T> callable) {
         final DataflowVariable result = new DataflowVariable();
         threadPool.execute(new Runnable() {
             @Override
@@ -325,7 +326,7 @@ public abstract class PGroup {
      * @param code The task body to run
      * @return A DataflowVariable, which gets bound to null once the supplied code finishes
      */
-    public Promise<Object> task(final Runnable code) {
+    public final Promise<Object> task(final Runnable code) {
         if (code instanceof Closure) return task((Closure) code);
         final DataflowVariable result = new DataflowVariable();
         threadPool.execute(new Runnable() {
@@ -354,7 +355,7 @@ public abstract class PGroup {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public DataflowProcessor operator(final Map channels, final Closure code) {
+    public final DataflowProcessor operator(final Map channels, final Closure code) {
         return new DataflowOperator(this, channels, code).start();
     }
 
@@ -366,7 +367,7 @@ public abstract class PGroup {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public DataflowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
+    public final DataflowProcessor operator(final List inputChannels, final List outputChannels, final Closure code) {
         final HashMap<String, List> params = new HashMap<String, List>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -382,7 +383,7 @@ public abstract class PGroup {
      * @param code           The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
+    public final DataflowProcessor operator(final List inputChannels, final List outputChannels, final int maxForks, final Closure code) {
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -398,10 +399,10 @@ public abstract class PGroup {
      * @param code   The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final Closure code) {
+    public final DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final Closure code) {
         final HashMap<String, List> params = new HashMap<String, List>(5);
-        params.put(DataflowProcessor.INPUTS, Arrays.asList(input));
-        params.put(DataflowProcessor.OUTPUTS, Arrays.asList(output));
+        params.put(DataflowProcessor.INPUTS, asList(input));
+        params.put(DataflowProcessor.OUTPUTS, asList(output));
         return new DataflowOperator(this, params, code).start();
     }
 
@@ -414,10 +415,10 @@ public abstract class PGroup {
      * @param code     The operator's body to run each time all inputs have a value to read
      * @return A new started operator instance with all the channels set
      */
-    public DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, final Closure code) {
+    public final DataflowProcessor operator(final DataflowReadChannel input, final DataflowWriteChannel output, final int maxForks, final Closure code) {
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
-        params.put(DataflowProcessor.INPUTS, Arrays.asList(input));
-        params.put(DataflowProcessor.OUTPUTS, Arrays.asList(output));
+        params.put(DataflowProcessor.INPUTS, asList(input));
+        params.put(DataflowProcessor.OUTPUTS, asList(output));
         params.put(DataflowProcessor.MAX_FORKS, maxForks);
         return new DataflowOperator(this, params, code).start();
     }
@@ -429,7 +430,7 @@ public abstract class PGroup {
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor selector(final Map channels, final Closure code) {
+    public final DataflowProcessor selector(final Map channels, final Closure code) {
         return new DataflowSelector(this, channels, code).start();
     }
 
@@ -441,7 +442,7 @@ public abstract class PGroup {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
+    public final DataflowProcessor selector(final List inputChannels, final List outputChannels, final Closure code) {
         final HashMap<String, List> params = new HashMap<String, List>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -454,7 +455,7 @@ public abstract class PGroup {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor selector(final Map channels) {
+    public final DataflowProcessor selector(final Map channels) {
         return new DataflowSelector(this, channels, new DataflowProcessorAtomicBoundAllClosure()).start();
     }
 
@@ -465,7 +466,7 @@ public abstract class PGroup {
      * @param outputChannels dataflow channels to use for output
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor selector(final List inputChannels, final List outputChannels) {
+    public final DataflowProcessor selector(final List inputChannels, final List outputChannels) {
         final HashMap<String, List> params = new HashMap<String, List>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -480,7 +481,7 @@ public abstract class PGroup {
      * @param code     The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor prioritySelector(final Map channels, final Closure code) {
+    public final DataflowProcessor prioritySelector(final Map channels, final Closure code) {
         return new DataflowPrioritySelector(this, channels, code).start();
     }
 
@@ -493,7 +494,7 @@ public abstract class PGroup {
      * @param code           The selector's body to run each time a value is available in any of the inputs channels
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
+    public final DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels, final Closure code) {
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -507,7 +508,7 @@ public abstract class PGroup {
      * @param channels A map specifying "inputs" and "outputs" - dataflow channels (instances of the DataflowQueue or DataflowVariable classes) to use for inputs and outputs
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor prioritySelector(final Map channels) {
+    public final DataflowProcessor prioritySelector(final Map channels) {
         return new DataflowPrioritySelector(this, channels, new DataflowProcessorAtomicBoundAllClosure()).start();
     }
 
@@ -519,7 +520,7 @@ public abstract class PGroup {
      * @param outputChannels dataflow channels to use for output
      * @return A new started selector instance with all the channels set
      */
-    public DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels) {
+    public final DataflowProcessor prioritySelector(final List inputChannels, final List outputChannels) {
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
         params.put(DataflowProcessor.INPUTS, inputChannels);
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
@@ -533,11 +534,11 @@ public abstract class PGroup {
      * @param outputChannels A list of channels to output to
      * @return A new started splitter instance with all the channels set
      */
-    public DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels) {
+    public final DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels) {
         if (inputChannel == null || outputChannels == null || outputChannels.isEmpty())
             throw new IllegalArgumentException(A_SPLITTER_NEEDS_AN_INPUT_CHANNEL_AND_AT_LEAST_ONE_OUTPUT_CHANNEL_TO_BE_CREATED);
         final HashMap<String, List> params = new HashMap<String, List>(5);
-        params.put(DataflowProcessor.INPUTS, Arrays.asList(inputChannel));
+        params.put(DataflowProcessor.INPUTS, asList(inputChannel));
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
         return new DataflowOperator(this, params, new DataflowProcessorAtomicBoundAllClosure()).start();
     }
@@ -550,11 +551,11 @@ public abstract class PGroup {
      * @param maxForks       Number of threads running the splitter's body, defaults to 1
      * @return A new started splitter instance with all the channels set
      */
-    public DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels, final int maxForks) {
+    public final DataflowProcessor splitter(final DataflowReadChannel inputChannel, final List<DataflowWriteChannel> outputChannels, final int maxForks) {
         if (inputChannel == null || outputChannels == null || outputChannels.isEmpty())
             throw new IllegalArgumentException(A_SPLITTER_NEEDS_AN_INPUT_CHANNEL_AND_AT_LEAST_ONE_OUTPUT_CHANNEL_TO_BE_CREATED);
         final HashMap<String, Object> params = new HashMap<String, Object>(5);
-        params.put(DataflowProcessor.INPUTS, Arrays.asList(inputChannel));
+        params.put(DataflowProcessor.INPUTS, asList(inputChannel));
         params.put(DataflowProcessor.OUTPUTS, outputChannels);
         params.put(DataflowProcessor.MAX_FORKS, maxForks);
         return new DataflowOperator(this, params, new DataflowProcessorAtomicBoundAllClosure()).start();
@@ -566,7 +567,7 @@ public abstract class PGroup {
      *
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public Select select(final DataflowReadChannel... channels) {
+    public final Select select(final DataflowReadChannel... channels) {
         return new Select(this, channels);
     }
 
@@ -576,7 +577,7 @@ public abstract class PGroup {
      *
      * @param channels Dataflow variables or streams to wait for values on
      */
-    public Select select(final List<DataflowReadChannel> channels) {
+    public final Select select(final List<DataflowReadChannel> channels) {
         return new Select(this, channels);
     }
 
@@ -588,13 +589,138 @@ public abstract class PGroup {
      * @param <T>      The type of the final result
      * @return A promise for the final result
      */
-    public <T> Promise<T> whenAllBound(final List<Promise<?>> promises, final Closure<T> code) {
+    public final <T> Promise<T> whenAllBound(final List<Promise> promises, final Closure<T> code) {
+        return whenAllBound(promises, code, null);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1 The promises to wait for
+     * @param code     A closure to execute with concrete values for each of the supplied promises
+     * @param <T>      The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Closure<T> code) {
+        return whenAllBound(asList(promise1), code, null);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1 The promises to wait for
+     * @param promise2 The promises to wait for
+     * @param code     A closure to execute with concrete values for each of the supplied promises
+     * @param <T>      The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Promise promise2, final Closure<T> code) {
+        return whenAllBound(asList(promise1, promise2), code, null);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1 The promises to wait for
+     * @param promise2 The promises to wait for
+     * @param promise3 The promises to wait for
+     * @param code     A closure to execute with concrete values for each of the supplied promises
+     * @param <T>      The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Promise promise2, final Promise promise3, final Closure<T> code) {
+        return whenAllBound(asList(promise1, promise2, promise3), code, null);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1 The promises to wait for
+     * @param promise2 The promises to wait for
+     * @param promise3 The promises to wait for
+     * @param promise4 The promises to wait for
+     * @param code     A closure to execute with concrete values for each of the supplied promises
+     * @param <T>      The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Promise promise2, final Promise promise3, final Promise promise4, final Closure<T> code) {
+        return whenAllBound(asList(promise1, promise2, promise3, promise4), code, null);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promises     The promises to wait for
+     * @param code         A closure to execute with concrete values for each of the supplied promises
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param <T>          The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final List<Promise> promises, final Closure<T> code, final Closure<T> errorHandler) {
         if (promises.size() != code.getMaximumNumberOfParameters() && !isListAccepting(code)) {
             throw new IllegalArgumentException("Cannot run whenAllBound(), since the number of promises does not match the number of arguments to the supplied closure.");
         }
         final DataflowVariable result = new DataflowVariable();
-        whenAllBound(promises, 0, new ArrayList<Object>(promises.size()), result, code);
+        whenAllBound(promises, 0, new ArrayList<Object>(promises.size()), result, code, errorHandler);
         return result;
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1     The promises to wait for
+     * @param code         A closure to execute with concrete values for each of the supplied promises
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param <T>          The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Closure<T> code, final Closure<T> errorHandler) {
+        return whenAllBound(asList(promise1), code, errorHandler);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1     The promises to wait for
+     * @param promise2     The promises to wait for
+     * @param code         A closure to execute with concrete values for each of the supplied promises
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param <T>          The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Promise promise2, final Closure<T> code, final Closure<T> errorHandler) {
+        return whenAllBound(asList(promise1, promise2), code, errorHandler);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1     The promises to wait for
+     * @param promise2     The promises to wait for
+     * @param promise3     The promises to wait for
+     * @param code         A closure to execute with concrete values for each of the supplied promises
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param <T>          The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Promise promise2, final Promise promise3, final Closure<T> code, final Closure<T> errorHandler) {
+        return whenAllBound(asList(promise1, promise2, promise3), code, errorHandler);
+    }
+
+    /**
+     * Without blocking the thread waits for all the promises to get bound and then passes them to the supplied closure.
+     *
+     * @param promise1     The promises to wait for
+     * @param promise2     The promises to wait for
+     * @param promise3     The promises to wait for
+     * @param promise4     The promises to wait for
+     * @param code         A closure to execute with concrete values for each of the supplied promises
+     * @param errorHandler A closure handling an exception (an instance of Throwable), if if it gets bound
+     * @param <T>          The type of the final result
+     * @return A promise for the final result
+     */
+    public final <T> Promise<T> whenAllBound(final Promise promise1, final Promise promise2, final Promise promise3, final Promise promise4, final Closure<T> code, final Closure<T> errorHandler) {
+        return whenAllBound(asList(promise1, promise2, promise3, promise4), code, errorHandler);
     }
 
     /**
@@ -607,20 +733,39 @@ public abstract class PGroup {
      * @param code     The calculation to execute on the values once they are all bound
      * @param <T>      The type of the final result
      */
-    private static <T> void whenAllBound(final List<Promise<?>> promises, final int index, final List<Object> values, final DataflowVariable<T> result, final Closure<T> code) {
+    private <T> void whenAllBound(final List<Promise> promises, final int index, final List<Object> values, final DataflowVariable<T> result, final Closure<T> code, final Closure<T> errorHandler) {
         if (index == promises.size()) {
-            if (isListAccepting(code)) {
-                result.leftShift(code.call(values));
-            } else {
-                result.leftShift(code.call(values.toArray()));
+            try {
+                if (isListAccepting(code)) {
+                    result.leftShift(code.call(values));
+                } else {
+                    result.leftShift(code.call(values.toArray()));
+                }
+            } catch (Exception e) {
+                result.bindError(e);
             }
-        } else promises.get(index).whenBound(new MessagingRunnable<Object>() {
-            @Override
-            protected void doRun(final Object argument) {
-                values.add(argument);
-                whenAllBound(promises, index + 1, values, result, code);
-            }
-        });
+        } else promises.get(index).then(this, new MessagingRunnable<Object>() {
+                    @Override
+                    protected void doRun(final Object argument) {
+                        values.add(argument);
+                        whenAllBound(promises, index + 1, values, result, code, errorHandler);
+                    }
+                }, new MessagingRunnable() {
+                    @Override
+                    protected void doRun(final Object argument) {
+                        if (errorHandler != null) {
+                            try {
+                                result.leftShift(errorHandler.getMaximumNumberOfParameters() == 1 ? errorHandler.call(argument) : errorHandler.call());
+                            } catch (Exception e) {
+                                result.bindError(e);
+                            }
+                        } else {
+                            result.bindError((Throwable) argument);
+                        }
+
+                    }
+                }
+        );
     }
 
     private static <T> boolean isListAccepting(final Closure<T> code) {

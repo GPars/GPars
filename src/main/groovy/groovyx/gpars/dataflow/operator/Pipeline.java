@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import groovyx.gpars.group.PGroup;
 import groovyx.gpars.scheduler.Pool;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A builder for operator pipelines. The greatest benefit of using the Pipeline class compared to chaining the channels directly is
@@ -166,6 +167,20 @@ public final class Pipeline {
     }
 
     /**
+     * Taps into the pipeline at the current position, sending all data that pass through the pipeline also to the channel specified.
+     *
+     * @param params Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param target The channel to tap data into
+     * @param <V>    The type of values passed between the channels
+     * @return This Pipeline instance
+     */
+    public <V> Pipeline tap(final Map<String, Object> params, final DataflowWriteChannel<V> target) {
+        checkState();
+        output = output.tap(group, params, target);
+        return this;
+    }
+
+    /**
      * Merges channels together as inputs for a single dataflow operator.
      *
      * @param other   The channel to merge with
@@ -188,6 +203,34 @@ public final class Pipeline {
     Pipeline merge(final List<DataflowReadChannel<Object>> others, final Closure closure) {
         checkState();
         output = output.merge(group, others, closure);
+        return this;
+    }
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param other   The channel to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    Pipeline merge(final Map<String, Object> params, final DataflowReadChannel<Object> other, final Closure closure) {
+        checkState();
+        output = output.merge(group, params, other, closure);
+        return this;
+    }
+
+    /**
+     * Merges channels together as inputs for a single dataflow operator.
+     *
+     * @param params  Additional parameters to initialize the operator with (e.g. listeners or maxForks)
+     * @param others  The channels to merge with
+     * @param closure The function to invoke on all incoming values as part of the new operator's body. The number of arguments to the closure must match the number of input channels.
+     * @return A channel of the same type as this channel, which the new operator will output into.
+     */
+    Pipeline merge(final Map<String, Object> params, final List<DataflowReadChannel<Object>> others, final Closure closure) {
+        checkState();
+        output = output.merge(group, params, others, closure);
         return this;
     }
 

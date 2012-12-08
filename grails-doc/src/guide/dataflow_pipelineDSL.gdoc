@@ -248,6 +248,19 @@ channel.separate(group, outputs)
 
 {code}
 
+h3. Overriding the default PGroup
+
+To avoid the necessity to specify PGroup for each Pipeline DSL method separately you may override the value of the default Dataflow PGroup.
+{code}
+Dataflow.usingGroup(group) {
+    channel.choice(branches)
+}
+//Is identical to
+channel.choice(group, branches)
+{code}
+
+The _Dataflow.usingGroup()_ method resets the value of the default dataflow PGroup for the given code block to the value specified.
+
 h3. The pipeline builder
 
 The _Pipeline_ class offers an intuitive builder for operator pipelines. The greatest benefit of using the _Pipeline_ class compared to chaining the channels directly is
@@ -287,3 +300,12 @@ assert -7 == result2.val
 pool.shutdown()
 {code}
 
+h3. Passing construction parameters through the Pipeline DSL
+
+You are likely to frequently need the ability to pass additional initialization parameters to the operators, such as the listeners
+to attach or the value for _maxForks_. Just like when building operators directly, the Pipeline DSL methods accept an optional
+map of parameters to pass in.
+
+{code}
+new Pipeline(group, queue1).merge([maxForks: 4, listeners: [listener]], queue2) {a, b -> a + b}.into queue3
+{code}
