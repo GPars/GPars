@@ -1,8 +1,8 @@
-// extra-166y ParallelArray library
-//
-// Written by Doug Lea with assistance from members of JCP JSR-166
-// Expert Group and released to the public domain, as explained at
-// http://creativecommons.org/publicdomain/zero/1.0
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 
 package groovyx.gpars.extra166y;
 
@@ -36,13 +36,12 @@ import static groovyx.gpars.extra166y.Ops.Reducer;
  */
 public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAnyArray.LPap {
     ParallelLongArrayWithMapping
-            (ForkJoinPool ex, int origin, int fence, long[] array) {
+        (ForkJoinPool ex, int origin, int fence, long[] array) {
         super(ex, origin, fence, array);
     }
 
     /**
      * Applies the given procedure to mapped elements
-     *
      * @param procedure the procedure
      */
     public void apply(Procedure<? super U> procedure) {
@@ -51,32 +50,29 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
 
     /**
      * Returns reduction of mapped elements
-     *
      * @param reducer the reducer
-     * @param base    the result for an empty array
+     * @param base the result for an empty array
      * @return reduction
      */
     public U reduce(Reducer<U> reducer, U base) {
         PAS.FJOReduce f = new PAS.FJOReduce
-                (this, origin, fence, null, reducer, base);
+            (this, origin, fence, null, reducer, base);
         ex.invoke(f);
-        return (U) (f.result);
+        return (U)(f.result);
     }
 
     /**
      * Returns mapping of some element matching bound and filter
      * constraints, or null if none.
-     *
      * @return mapping of matching element, or null if none.
      */
     public U any() {
         int i = anyIndex();
-        return (i < 0) ? null : (U) oget(i);
+        return (i < 0) ? null : (U)oget(i);
     }
 
     /**
      * Returns the minimum mapped element, or null if empty
-     *
      * @param comparator the comparator
      * @return minimum mapped element, or null if empty
      */
@@ -87,17 +83,15 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
     /**
      * Returns the minimum mapped element, or null if empty,
      * assuming that all elements are Comparables
-     *
      * @return minimum mapped element, or null if empty
      * @throws ClassCastException if any element is not Comparable.
      */
     public U min() {
-        return reduce((Reducer<U>) (CommonOps.castedMinReducer()), null);
+        return reduce((Reducer<U>)(CommonOps.castedMinReducer()), null);
     }
 
     /**
      * Returns the maximum mapped element, or null if empty
-     *
      * @param comparator the comparator
      * @return maximum mapped element, or null if empty
      */
@@ -108,252 +102,235 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
     /**
      * Returns the maximum mapped element, or null if empty
      * assuming that all elements are Comparables
-     *
      * @return maximum mapped element, or null if empty
      * @throws ClassCastException if any element is not Comparable.
      */
     public U max() {
-        return reduce((Reducer<U>) (CommonOps.castedMaxReducer()), null);
+        return reduce((Reducer<U>)(CommonOps.castedMaxReducer()), null);
     }
 
     /**
      * Returns summary statistics, using the given comparator
      * to locate minimum and maximum elements.
-     *
      * @param comparator the comparator to use for
-     *                   locating minimum and maximum elements
+     * locating minimum and maximum elements
      * @return the summary.
      */
     public ParallelArray.SummaryStatistics<U> summary
-    (Comparator<? super U> comparator) {
+        (Comparator<? super U> comparator) {
         PAS.FJOStats f = new PAS.FJOStats
-                (this, origin, fence, null, comparator);
+            (this, origin, fence, null, comparator);
         ex.invoke(f);
-        return (ParallelArray.SummaryStatistics<U>) f;
+        return (ParallelArray.SummaryStatistics<U>)f;
     }
 
     /**
      * Returns summary statistics, assuming that all elements are
      * Comparables
-     *
      * @return the summary.
      */
     public ParallelArray.SummaryStatistics<U> summary() {
-        return summary((Comparator<? super U>) (CommonOps.castedComparator()));
+        return summary((Comparator<? super U>)(CommonOps.castedComparator()));
     }
 
     /**
      * Returns a new ParallelArray holding mapped elements
-     *
      * @return a new ParallelArray holding mapped elements
      */
     public ParallelArray<U> all() {
-        return new ParallelArray<U>(ex, (U[]) allObjects(null));
+        return new ParallelArray<U>(ex, (U[])allObjects(null));
     }
 
     /**
      * Returns a new ParallelArray with the given element type holding
      * all elements
-     *
      * @param elementType the type of the elements
      * @return a new ParallelArray holding all elements
      */
     public ParallelArray<U> all(Class<? super U> elementType) {
-        return new ParallelArray<U>(ex, (U[]) allObjects(elementType));
+        return new ParallelArray<U>(ex, (U[])allObjects(elementType));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
      * applied to current op's results
-     *
      * @param op the op
      * @return operation prefix
      */
     public abstract <V> ParallelLongArrayWithMapping<V> withMapping
-    (Op<? super U, ? extends V> op);
+        (Op<? super U, ? extends V> op);
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
      * applied to current op's results
-     *
      * @param op the op
      * @return operation prefix
      */
     public abstract ParallelLongArrayWithLongMapping withMapping
-    (ObjectToLong<? super U> op);
+        (ObjectToLong<? super U> op);
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on mapped elements of the array using the given op
      * applied to current op's results
-     *
      * @param op the op
      * @return operation prefix
      */
     public abstract ParallelLongArrayWithDoubleMapping withMapping
-    (ObjectToDouble<? super U> op);
+        (ObjectToDouble<? super U> op);
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
-    public <V, W, X> ParallelLongArrayWithMapping<W> withMapping
-    (BinaryOp<? super U, ? super V, ? extends W> combiner,
-     ParallelArrayWithMapping<X, V> other) {
+    public <V,W,X> ParallelLongArrayWithMapping<W> withMapping
+        (BinaryOp<? super U, ? super V, ? extends W> combiner,
+         ParallelArrayWithMapping<X,V> other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
     public <V> ParallelLongArrayWithMapping<V> withMapping
-    (ObjectAndDoubleToObject<? super U, ? extends V> combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (ObjectAndDoubleToObject<? super U, ? extends V> combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
     public <V> ParallelLongArrayWithMapping<V> withMapping
-    (ObjectAndLongToObject<? super U, ? extends V> combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (ObjectAndLongToObject<? super U, ? extends V> combiner,
+         ParallelLongArrayWithLongMapping other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
-    public <V, W> ParallelLongArrayWithDoubleMapping withMapping
-    (ObjectAndObjectToDouble<? super U, ? super V> combiner,
-     ParallelArrayWithMapping<W, V> other) {
+    public <V,W> ParallelLongArrayWithDoubleMapping withMapping
+        (ObjectAndObjectToDouble<? super U, ? super V> combiner,
+         ParallelArrayWithMapping<W,V> other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
     public ParallelLongArrayWithDoubleMapping withMapping
-    (ObjectAndDoubleToDouble<? super U> combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (ObjectAndDoubleToDouble<? super U> combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
     public ParallelLongArrayWithDoubleMapping withMapping
-    (ObjectAndLongToDouble<? super U> combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (ObjectAndLongToDouble<? super U> combiner,
+         ParallelLongArrayWithLongMapping other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
-    public <V, W> ParallelLongArrayWithLongMapping withMapping
-    (ObjectAndObjectToLong<? super U, ? super V> combiner,
-     ParallelArrayWithMapping<W, V> other) {
+    public <V,W> ParallelLongArrayWithLongMapping withMapping
+        (ObjectAndObjectToLong<? super U, ? super V> combiner,
+         ParallelArrayWithMapping<W,V> other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
     public ParallelLongArrayWithLongMapping withMapping
-    (ObjectAndDoubleToLong<? super U> combiner,
-     ParallelDoubleArrayWithDoubleMapping other) {
+        (ObjectAndDoubleToLong<? super U> combiner,
+         ParallelDoubleArrayWithDoubleMapping other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
      * Returns an operation prefix that causes a method to operate
      * on binary mappings of this array and the other array.
-     *
      * @param combiner the combiner
-     * @param other    the other array
+     * @param other the other array
      * @return operation prefix
      * @throws IllegalArgumentException if other array is a
-     *                                  filtered view (all filters must precede all mappings).
+     * filtered view (all filters must precede all mappings).
      */
     public ParallelLongArrayWithLongMapping withMapping
-    (ObjectAndLongToLong<? super U> combiner,
-     ParallelLongArrayWithLongMapping other) {
+        (ObjectAndLongToLong<? super U> combiner,
+         ParallelLongArrayWithLongMapping other) {
         if (other.hasFilter()) throw new IllegalArgumentException();
         return withIndexedMapping
-                (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
+            (AbstractParallelAnyArray.indexedMapper(combiner, other, origin));
     }
 
     /**
@@ -362,12 +339,11 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
      * accepts as arguments an element's current index and value
      * (as mapped by preceding mappings, if any), and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public abstract <V> ParallelLongArrayWithMapping<V> withIndexedMapping
-    (IntAndObjectToObject<? super U, ? extends V> mapper);
+        (IntAndObjectToObject<? super U, ? extends V> mapper);
 
     /**
      * Returns an operation prefix that causes a method to operate
@@ -375,12 +351,11 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
      * accepts as arguments an element's current index and value
      * (as mapped by preceding mappings, if any), and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public abstract ParallelLongArrayWithDoubleMapping withIndexedMapping
-    (IntAndObjectToDouble<? super U> mapper);
+        (IntAndObjectToDouble<? super U> mapper);
 
     /**
      * Returns an operation prefix that causes a method to operate
@@ -388,18 +363,16 @@ public abstract class ParallelLongArrayWithMapping<U> extends AbstractParallelAn
      * accepts as arguments an element's current index and value
      * (as mapped by preceding mappings, if any), and produces a
      * new value.
-     *
      * @param mapper the mapper
      * @return operation prefix
      */
     public abstract ParallelLongArrayWithLongMapping withIndexedMapping
-    (IntAndObjectToLong<? super U> mapper);
+        (IntAndObjectToLong<? super U> mapper);
 
     /**
      * Returns an Iterable view to sequentially step through mapped
      * elements also obeying bound and filter constraints, without
      * performing computations to evaluate them in parallel
-     *
      * @return the Iterable view
      */
     public Iterable<U> sequentially() {
