@@ -16,15 +16,15 @@ h3. The GPars Artifact
 
 As noted above GPars is now distributed as standard with Groovy.  If however, you have to manage this
 dependency manually, the GPars artifact is in the main Maven repository and in the Codehaus main and
-snapshots repositories.  The current release version (0.12) is in the Maven and Codehaus main repositories,
-the current development version (1.0-SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
+snapshots repositories.  The released versions are in the Maven and Codehaus main repositories,
+the current development version (SNAPSHOT) is in the Codehaus snapshots repository.  To use from Gradle
 or Grapes use the specification:
 {code}
-"org.codehaus.gpars:gpars:0.12"
+"org.codehaus.gpars:gpars:1.0.0"
 {code}
 for the release version, and:
 {code}
-"org.codehaus.gpars:gpars:1.0-SNAPSHOT"
+"org.codehaus.gpars:gpars:1.1-SNAPSHOT"
 {code}
 for the development version.  You will likely need to add the Codehaus snapshots repository manually to the
 search list in this latter case.  Using Maven the dependency is:
@@ -61,5 +61,4 @@ The development versions have version number 1.7.0.1-SNAPSHOT.
 GPars defines this dependency in its own descriptor, so ideally all dependency management should be taken care of
 automatically, if you use Gradle, Grails, Griffon, Maven, Ivy or other type of automatic dependency resolution tool.
 
-Please visit the page "Integration":http://gpars.codehaus.org/Integration on the GPars website for more
-details.
+Please visit the page "Integration":http://gpars.codehaus.org/Integration on the GPars website for more details.

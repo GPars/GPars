@@ -1,5 +1,53 @@
 GPars - Groovy Parallel Systems
 
+1.0.0
+Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=17007
+
+h3. Project changes
+
+h3. Asynchronous functions
+
+* Allowed for delayed and explicit thread pool assignment strategies for asynchronous functions
+* Performance tuning to the asynchronous closure invocation mechanism
+
+h3. Parallel collections
+
+* Added a couple of new parallel collection processing methods to keep up with the innovation pace in Groovy
+* Merged the extra166y library into GPars
+
+h3. Fork / Join
+
+h3. Actors
+
+* _StaticDispatchActor_ has been added to provide easier to create and better performing alternative to _DynamicDispatchActor_
+* A new method _sendAndPromise_ has been added to actors to send a message and get a promise for the future actor's reply
+
+h3. Dataflow
+
+* Operator and selector speed-up
+* Kanban-style dataflow operator management has been added
+* Chaining of Promises using the new _then()_ method
+* Exception propagation and handling for Promises
+* Added a DSL for easy operator pipe-lining
+* Lifecycle events for operators and selectors were added
+* Added support for custom error handlers
+* A generic way to shutdown dataflow networks
+* An shutdown poison pill with immediate or delayed effect was added
+* Polished the way operators can be stopped
+* Added synchronous dataflow variables and channels
+* Read channels can report their length
+
+h3. Agent
+
+h3. Stm
+
+h3. Other
+
+* Removed deprecated classes and methods
+* Added numerous code examples and demos
+* Enhanced project documentation
+* Re-styled the user guide
+
 0.12
 
 Check out the "JIRA release notes":http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=12030&version=16994
