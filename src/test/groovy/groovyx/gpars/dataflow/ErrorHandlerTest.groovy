@@ -18,6 +18,8 @@ package groovyx.gpars.dataflow
 
 import groovyx.gpars.group.NonDaemonPGroup
 
+import java.security.AccessControlException
+
 /**
  * @author Vaclav Pech
  */
@@ -83,6 +85,22 @@ class ErrorHandlerTest extends GroovyTestCase {
         final result = df.then({ throw new RuntimeException('test') }).then({ it + 10 }).then({ it - 3 }, { 0 })
         df.bind(10)
         assert 0 == result.get()
+    }
+
+    public void testErrorMaskingWithDifferentTypeOfHandledException() {
+        def df = new DataflowVariable<Integer>()
+        final result = df.then({ throw new RuntimeException('test') }).then({ it + 10 }, { IllegalStateException e -> println "should not handle this type of errors"; 100 })
+                .then({ it - 3 }, { 0 })
+        df.bind(10)
+        assert 0 == result.get()
+    }
+
+    public void testErrorMaskingWithSuperTypeOfHandledException() {
+        def df = new DataflowVariable<Integer>()
+        final result = df.then({ throw new AccessControlException('test') }).then({ it + 10 }, { SecurityException e -> 100 })
+                .then({ it - 3 }, { 0 })
+        df.bind(10)
+        assert 97 == result.get()
     }
 
     public void testWhenAllBoundBasicInvocation() {

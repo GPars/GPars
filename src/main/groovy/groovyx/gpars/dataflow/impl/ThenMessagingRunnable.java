@@ -46,7 +46,7 @@ public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
     @Override
     protected void doRun(final T argument) {
         if (argument instanceof Throwable) {
-            if (errorHandler != null) {
+            if (errorHandler != null && shallHandle(errorHandler, (Throwable) argument)) {
                 try {
                     result.leftShift(errorHandler.getMaximumNumberOfParameters() == 1 ? errorHandler.call(argument) : errorHandler.call());
                 } catch (Exception e) {
@@ -62,5 +62,11 @@ public class ThenMessagingRunnable<T, V> extends MessagingRunnable<T> {
                 result.bindError(e);
             }
         }
+    }
+
+    private boolean shallHandle(final Closure<V> errorHandler, final Throwable e) {
+        final Class[] types = errorHandler.getParameterTypes();
+        if (types.length == 0) return true;
+        return types[0].isAssignableFrom(e.getClass());
     }
 }
