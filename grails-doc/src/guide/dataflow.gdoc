@@ -568,6 +568,32 @@ task {
 .then({mentionsGroovy -> println "Groovy found: $mentionsGroovy"}, {error -> println "Error: $error"}).join()
  {code}
 
+h4. Handling concrete exception type
+
+You may be also more specific about the handled exception type:
+
+{code}
+url.then(download)
+    .then(calculateHash, {MalformedURLException e -> return 0})
+    .then(formatResult)
+    .then(printResult, printError)
+    .then(sendNotificationEmail);
+{code}`
+
+h4. Customer-site exception handling
+
+You may also leave the exception completely un-handled and let the clients (consumers) handle it:
+
+{code}`
+Promise<Object> result = url.then(download).then(calculateHash).then(formatResult).then(printResult);
+try {
+    result.get()
+} catch (Exception e) {
+    //handle exceptions here
+}
+{code}`
+
+
 h3. Putting it together
 
 By combining _whenAllBound()_ and _then_ (or >>) you can easily create large asynchronous scenarios in a convenient way:

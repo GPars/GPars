@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class DataflowTaskTest {
 
     @Test
-    public void testDataflowVariable() throws InterruptedException {
+    public void testDataflowVariable() throws Throwable {
         final List<String> logMessages = new ArrayList<String>();
 
         final DefaultPGroup group = new DefaultPGroup(10);
@@ -71,7 +71,7 @@ public class DataflowTaskTest {
         });
 
 
-        System.out.println("result = " + result.getVal());
+        System.out.println("result = " + result.get());
     }
 }
 
