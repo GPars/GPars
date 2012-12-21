@@ -1,12 +1,12 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright © 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,19 +23,13 @@ import groovyx.gpars.scheduler.Pool
 import groovyx.gpars.util.GeneralTimer
 import groovyx.gpars.util.PAUtils
 
-import java.util.concurrent.Callable
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
-import java.util.concurrent.Semaphore
+import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 import static groovyx.gpars.util.PAGroovyUtils.createCollection
-import static groovyx.gpars.util.PAUtils.buildClosureForMaps
-import static groovyx.gpars.util.PAUtils.buildClosureForMapsWithIndex
-import static groovyx.gpars.util.PAUtils.buildResultMap
+import static groovyx.gpars.util.PAUtils.*
 
 /**
  * This class forms the core of the DSL initialized by <i>GParsExecutorsPool</i>. The static methods of <i>GParsExecutorsPoolUtil</i>
@@ -71,7 +65,7 @@ public class GParsExecutorsPoolUtil {
      * Calls a closure in a separate thread supplying the given arguments, returning a future for the potential return value.
      */
     public static Future callAsync(final Closure cl, final Object... args) {
-        callParallel {-> cl(* args)}
+        callParallel {-> cl(* args) }
     }
 
     /**
@@ -83,7 +77,7 @@ public class GParsExecutorsPoolUtil {
      */
     public static Future callTimeoutAsync(final Closure cl, long timeout, final Object... args) {
         final Future f = callAsync(cl, args)
-        timer.schedule({f.cancel(true)} as TimerTask, timeout)
+        timer.schedule({ f.cancel(true) } as TimerTask, timeout)
         return f
     }
 
@@ -112,7 +106,7 @@ public class GParsExecutorsPoolUtil {
      * Creates an asynchronous variant of the supplied closure, which, when invoked returns a future for the potential return value
      */
     public static Closure async(Closure cl) {
-        return {Object... args -> callAsync(cl, * args)}
+        return { Object... args -> callAsync(cl, * args) }
     }
 
     /**
@@ -126,10 +120,10 @@ public class GParsExecutorsPoolUtil {
      * Creates an asynchronous and composable variant of the supplied closure, which, when invoked returns a DataflowVariable for the potential return value
      */
     public static Closure asyncFun(final Closure original, final Pool pool, final boolean blocking = false) {
-        final def localPool = pool ?: retrieveLocalPool();
-        return {final Object[] args ->
+        final Pool localPool = pool ?: retrieveLocalPool();
+        return { final Object[] args ->
             final DataflowVariable result = new DataflowVariable()
-            PAUtils.evaluateArguments(localPool ?: new DefaultPool(GParsExecutorsPool.retrieveCurrentPool()), args.clone(), 0, [], result, original, false)
+            PAUtils.evaluateArguments(localPool ?: new DefaultPool(GParsExecutorsPool.retrieveCurrentPool() as ThreadPoolExecutor), args.clone(), 0, [], result, original, false)
             blocking ? result.get() : result
         }
     }
@@ -137,7 +131,7 @@ public class GParsExecutorsPoolUtil {
     private static Pool retrieveLocalPool() {
         final retrievedPool = GParsExecutorsPool.retrieveCurrentPool()
         if (retrievedPool != null) {
-            return new DefaultPool(retrievedPool);
+            return new DefaultPool(retrievedPool as ThreadPoolExecutor);
         }
         return null
     }
@@ -163,7 +157,7 @@ public class GParsExecutorsPoolUtil {
     public static def eachParallel(Object collection, Closure cl) {
         final List<Throwable> exceptions = Collections.synchronizedList([])
         final Semaphore semaphore = new Semaphore(0)
-        Closure code = async({Object... args ->
+        Closure code = async({ Object... args ->
             try {
                 cl(* args)
             } catch (Throwable e) {
@@ -211,7 +205,7 @@ public class GParsExecutorsPoolUtil {
     public static def eachWithIndexParallel(Object collection, Closure cl) {
         final List<Throwable> exceptions = Collections.synchronizedList([])
         final Semaphore semaphore = new Semaphore(0)
-        Closure code = async({Object element, int index ->
+        Closure code = async({ Object element, int index ->
             try {
                 cl(element, index)
             } catch (Throwable e) {
@@ -252,8 +246,8 @@ public class GParsExecutorsPoolUtil {
      *         def result = [1, 2, 3, 4, 5].collectParallel{Number number -> number * 10}*         assertEquals(new HashSet([10, 20, 30, 40, 50]), new HashSet((Collection)result))
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def collectParallel(Object collection, Closure cl) {
-        return processResult(collection.collect(async(cl)))
+    public static Collection<Object> collectParallel(Object collection, Closure cl) {
+        return processResult((List) collection.collect(async(cl)))
     }
 
     /**
@@ -277,15 +271,15 @@ public class GParsExecutorsPoolUtil {
      *     def result = [1, 2, 3, 4, 5].findAllParallel{Number number -> number > 2}*     assertEquals(new HashSet([3, 4, 5]), new HashSet((Collection)result))
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def findAllParallel(Object collection, Closure cl) {
-        collectParallel(collection, {if (cl(it)) return it else return null}).findAll {it != null}
+    public static Collection<Object> findAllParallel(Object collection, Closure cl) {
+        collectParallel(collection, { if (cl(it)) return it else return null }).findAll { it != null }
     }
 
     /**
      * Does parallel findAll on a map returning a map of found items
      */
     public static <K, V> Map<K, V> findAllParallel(Map<K, V> collection, Closure cl) {
-        return buildResultMap(findAllParallel(createCollection(collection), buildClosureForMaps(cl)))
+        return buildResultMap((Collection<Map.Entry>) findAllParallel(createCollection(collection), buildClosureForMaps(cl)))
     }
 
     /**
@@ -305,14 +299,14 @@ public class GParsExecutorsPoolUtil {
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static def grepParallel(Object collection, filter) {
-        collectParallel(collection, {if (filter.isCase(it)) return it else return null}).findAll {it != null}
+        collectParallel(collection, { if (filter.isCase(it)) return it else return null }).findAll { it != null }
     }
 
     /**
      * Does parallel grep on a map
      */
     public static <K, V> Map<K, V> grepParallel(Map<K, V> collection, filter) {
-        return buildResultMap(grepParallel(createCollection(collection), filter in Closure ? buildClosureForMaps(filter) : filter))
+        return buildResultMap((Collection<Map.Entry>) grepParallel(createCollection(collection), filter in Closure ? buildClosureForMaps((Closure) filter) : filter))
     }
 
     /**
@@ -329,8 +323,8 @@ public class GParsExecutorsPoolUtil {
      *     def result = [1, 2, 3, 4, 5].findParallel{Number number -> number > 2}*     assert result in [3, 4, 5]
      *}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
-    public static def findParallel(Object collection, Closure cl) {
-        collectParallel(collection, {if (cl(it)) return it else return null}).find {it != null}
+    public static Object findParallel(Object collection, Closure cl) {
+        collectParallel(collection, { if (cl(it)) return it else return null }).find { it != null }
     }
 
     /**
@@ -338,7 +332,7 @@ public class GParsExecutorsPoolUtil {
      */
     public static <K, V> Map.Entry<K, V> findParallel(Map<K, V> collection, Closure cl) {
         //noinspection GroovyAssignabilityCheck
-        return findParallel(createCollection(collection), buildClosureForMaps(cl))
+        return (Map.Entry) findParallel(createCollection(collection), buildClosureForMaps(cl))
     }
 
     /**
@@ -359,7 +353,7 @@ public class GParsExecutorsPoolUtil {
      */
     public static def findAnyParallel(Object collection, Closure cl) {
         final AtomicReference result = new AtomicReference(null)
-        return processAnyResult(collection.collect {value -> {-> cl(value) ? value : null}})
+        return processAnyResult(collection.collect { value -> {-> cl(value) ? value : null } })
 //        collectParallel(collection, {if ((result.get() == null) && cl(it)) {result.set(it); return it} else return null})
 //        return result.get()
     }
@@ -385,7 +379,7 @@ public class GParsExecutorsPoolUtil {
      */
     public static boolean everyParallel(Object collection, Closure cl) {
         final AtomicBoolean flag = new AtomicBoolean(true)
-        eachParallel(collection, {value -> if (flag.get() && !cl(value)) flag.set(false)})
+        eachParallel(collection, { value -> if (flag.get() && !cl(value)) flag.set(false) })
         return flag.get()
     }
 
@@ -411,7 +405,7 @@ public class GParsExecutorsPoolUtil {
      *     assert [1, 2, 3, 4, 5].anyParallel{Number number -> number > 2}*     assert ![1, 2, 3, 4, 5].anyParallel{Number number -> number > 6}*}* @throws AsyncException If any of the collection's elements causes the closure to throw an exception. The original exceptions will be stored in the AsyncException's concurrentExceptions field.
      */
     public static boolean anyParallel(Object collection, Closure cl) {
-        return processAnyResult(collection.collect {value -> {-> cl(value)}})
+        return processAnyResult(collection.collect { value -> {-> cl(value) } })
 //        final AtomicBoolean flag = new AtomicBoolean(false)
 //        eachParallel(collection, {if ((!flag.get()) && cl(it)) flag.set(true)})
 //        return flag.get()
@@ -441,7 +435,7 @@ public class GParsExecutorsPoolUtil {
         eachParallel(collection, {
             def result = cl(it)
             final def myList = [it].asSynchronized()
-            def list = map.putIfAbsent(result, myList)
+            def list = (List) map.putIfAbsent(result, myList)
             if (list != null) list.add(it)
         })
         return map
@@ -450,9 +444,9 @@ public class GParsExecutorsPoolUtil {
     static List<Object> processResult(List<Future<Object>> futures) {
         final Collection<Throwable> exceptions = new ArrayList<Throwable>()
 
-        final List<Object> result = futures.collect {
+        final List<Object> result = futures.collect { Future<Object> f ->
             try {
-                return it.get()
+                return f.get()
             } catch (Throwable e) {
                 exceptions.add(e)
                 return e
@@ -476,20 +470,20 @@ public class GParsExecutorsPoolUtil {
         final AtomicInteger totalCounter = new AtomicInteger(alternatives.size())
         futures << GParsExecutorsPool.executeAsync(alternatives.collect {
             original ->
-            {->
-                try {
-                    def localResult = original()
-                    if (localResult) {
-                        futures.val*.cancel(true)
-                        result.bindSafely(localResult)
+                {->
+                    try {
+                        def localResult = original()
+                        if (localResult) {
+                            futures.val*.cancel(true)
+                            result.bindSafely(localResult)
+                        }
+                    } catch (InterruptedException ignore) {
+                    } catch (Throwable e) {
+                        exceptions.add(e)
+                    } finally {
+                        if (totalCounter.decrementAndGet() == 0 && !result.isBound()) result << null  //No more results may appear
                     }
-                } catch (InterruptedException ignore) {
-                } catch (Throwable e) {
-                    exceptions.add(e)
-                } finally {
-                    if (totalCounter.decrementAndGet() == 0 && !result.isBound()) result << null  //No more results may appear
                 }
-            }
         })
         final r = result.val
         if (exceptions.empty) return r

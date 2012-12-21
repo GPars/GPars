@@ -1,6 +1,6 @@
 // GPars - Groovy Parallel Systems
 //
-// Copyright � 2008-11  The original author or authors
+// Copyright © 2008-2012  The original author or authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package groovyx.gpars.dataflow
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import groovyx.gpars.dataflow.operator.DataflowOperator
 import groovyx.gpars.dataflow.operator.DataflowProcessor
 import groovyx.gpars.group.PGroup
@@ -25,6 +27,7 @@ import groovyx.gpars.group.PGroup
  * its input and output channels, maxForks and its body of processing logic.
  * @author Dierk Koenig
  */
+@CompileStatic(value = TypeCheckingMode.PASS)
 class ProcessingNode {
     final List inputs = []
     final List outputs = []

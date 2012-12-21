@@ -16,6 +16,9 @@
 
 package groovyx.gpars.csp
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+import org.jcsp.lang.CSProcess
 import org.jcsp.lang.Parallel
 
 /**
@@ -28,6 +31,7 @@ import org.jcsp.lang.Parallel
  * @version 1.1 modified to compile under groovy jsr03
  */
 
+@CompileStatic(value = TypeCheckingMode.PASS)
 class PAR extends Parallel {
 
 /**
@@ -38,7 +42,7 @@ class PAR extends Parallel {
  * */
     PAR(processList) {
         super()
-        processList.each {p ->
+        processList.each { CSProcess p ->
             this.addProcess(p)
         }
     }

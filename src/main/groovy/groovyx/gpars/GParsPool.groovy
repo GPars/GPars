@@ -20,12 +20,13 @@ import groovyx.gpars.dataflow.DataflowVariable
 import groovyx.gpars.forkjoin.AbstractForkJoinWorker
 import groovyx.gpars.forkjoin.ForkJoinUtils
 import groovyx.gpars.util.PoolUtils
+import jsr166y.ForkJoinPool
+import jsr166y.RecursiveTask
+
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import jsr166y.ForkJoinPool
-import jsr166y.RecursiveTask
 
 /**
  * Enables a ParallelArray-based (from JSR-166y) DSL on collections. In general cases the Parallel Array implementation
@@ -222,17 +223,17 @@ public class GParsPool {
     public static List<Future<Object>> executeAsync(Closure... closures) {
         jsr166y.ForkJoinPool pool = retrieveCurrentPool()
         if (pool == null) throw new IllegalStateException("No active Fork/Join thread pool available to execute closures asynchronously. Consider wrapping the function call with GParsPool.withPool().")
-        List<Future<Object>> result = closures.collect {cl ->
+        List<Future<Object>> result = closures.collect { cl ->
             pool.submit(new MyCancellableRecursiveTask(cl))
         }
         result
     }
 
     final static class MyCancellableRecursiveTask extends RecursiveTask {
-        private final def code
+        private final Closure code
         private volatile Thread myThread
 
-        MyCancellableRecursiveTask(final code) {
+        MyCancellableRecursiveTask(final Closure code) {
             this.code = code
         }
 
@@ -288,19 +289,19 @@ public class GParsPool {
         final AtomicInteger failureCounter = new AtomicInteger(0)
         futures << GParsPool.executeAsync(alternatives.collect {
             original ->
-            {->
-                //noinspection GroovyEmptyCatchBlock
-                try {
-                    def localResult = original()
-                    futures.val*.cancel(true)
-                    result << localResult
-                } catch (Exception e) {
-                    int counter = failureCounter.incrementAndGet()
-                    if (counter == alternatives.size()) {
-                        result << new IllegalStateException('All speculations failed', e)
+                {->
+                    //noinspection GroovyEmptyCatchBlock
+                    try {
+                        def localResult = original()
+                        futures.val*.cancel(true)
+                        result << localResult
+                    } catch (Exception e) {
+                        int counter = failureCounter.incrementAndGet()
+                        if (counter == alternatives.size()) {
+                            result << new IllegalStateException('All speculations failed', e)
+                        }
                     }
                 }
-            }
         })
         def r = result.val
         if (r instanceof Exception) throw r
@@ -308,7 +309,7 @@ public class GParsPool {
     }
 
     private static UncaughtExceptionHandler createDefaultUncaughtExceptionHandler() {
-        return {Thread failedThread, Throwable throwable ->
+        return { Thread failedThread, Throwable throwable ->
             System.err.println "Error processing background thread ${failedThread.name}: ${throwable.message}"
             throwable.printStackTrace(System.err)
         } as UncaughtExceptionHandler

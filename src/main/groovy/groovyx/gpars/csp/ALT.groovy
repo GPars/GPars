@@ -16,6 +16,8 @@
 
 package groovyx.gpars.csp
 
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.jcsp.lang.Alternative
 import org.jcsp.lang.Guard
 
@@ -27,6 +29,7 @@ import org.jcsp.lang.Guard
  * @version 1.0
  * @version 1.1    takes account of jsr03 requirements
  */
+@CompileStatic(value = TypeCheckingMode.PASS)
 class ALT extends Alternative {
 
 /**
