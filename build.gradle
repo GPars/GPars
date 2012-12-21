@@ -112,14 +112,14 @@ configurations {
 // symbol look up works correctly without qualification.
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'
+    groovy group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '2.0.6'
     compile 'org.codehaus.jsr166-mirror:jsr166y:1.7.0'
     compile('org.multiverse:multiverse-beta:0.7-RC-1') { transitive = false }
     testCompile fileTree(dir: 'lib', include: '*.jar')
     compile group: 'org.jboss.netty', name: 'netty', version: project.hasProperty('gpars_nettyVersion') ? gpars_nettyVersion : '3.2.7.Final'
     compile 'org.codehaus.jcsp:jcsp:1.1-rc5'
     testCompile group: 'junit', name: 'junit', version: project.hasProperty('gpars_junitVersion') ? gpars_junitVersion : '4.10'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.6-groovy-1.8'
+    testCompile group: 'org.spockframework', name: 'spock-core', version: project.hasProperty('gpars_spockVersion') ? gpars_spockVersion : '0.7-groovy-2.0'
     //  Manually load up the required dependencies for grailsDoc to avoid pulling in everything needed for
     //  Grails, including all the SpringRoo stuff.
     docs group: 'org.codehaus.groovy', name: 'groovy-all', version: project.hasProperty('gpars_groovyVersion') ? gpars_groovyVersion : '1.8.6'

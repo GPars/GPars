@@ -14,11 +14,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:1.8.6" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy-all:2.0.6" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.8.2" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jsr166-mirror:jsr166y:1.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.multiverse:multiverse-beta:0.7-RC-1" level="project" />
-    <orderEntry type="library" name="Maven: org.spockframework:spock-core:0.6-groovy-1.8" level="project" />
     <orderEntry type="library" name="Maven: org.jboss.netty:netty:3.2.7.Final" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jcsp:jcsp:1.1-rc5" level="project" />
     <orderEntry type="module-library">
@@ -48,6 +47,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: org.spockframework:spock-core:0.7-groovy-2.0" level="project" />
   </component>
   <component name="copyright">
     <Base>
